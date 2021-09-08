@@ -1,0 +1,230 @@
+load("//arvr/third-party/toolchains/xros-sdk:package.bzl", "xros_package")
+load(
+    "//arvr/tools/build_defs:oxx.bzl",
+    "oxx_binary",
+    "oxx_static_library",
+    "oxx_test",
+)
+
+oxx_static_library(
+    name = "vrs",
+    srcs = glob(
+        [
+            "*.cpp",
+        ],
+        exclude = [
+            "Sample*.cpp",
+        ],
+    ),
+    # fbandroid currently builds without exceptions, although this is up for debate.
+    # See also https://fb.workplace.com/groups/119362950048410/permalink/120488773269161/.
+    fbandroid_compiler_flags = [
+        "-fexceptions",
+    ],
+    ovrsource_only = False,
+    public_include_directories = [
+        "..",
+    ],
+    public_raw_headers = glob([
+        "*.h",
+        "*.hpp",
+    ]),
+    visibility = ["PUBLIC"],
+    deps = [
+        "//arvr/libraries/logging:logging",
+        "//arvr/libraries/portability:portability",
+        "//arvr/libraries/portability:std_lib_compatibility",
+        "//arvr/libraries/vrs/vrs/os:os",
+        "//arvr/libraries/vrs/vrs/utils:strings",
+        "//arvr/libraries/vrs/vrs/utils/xxhash:xxhash",
+        "//arvr/projects/xrtech/Serialization:Serialization",
+        "//arvr/third-party/zstd:zstd",
+        "//third-party/lz4:lz4",
+        "//third-party/toolchains:pthread",
+        "//xplat/third-party/linker_lib:dl",
+    ],
+)
+
+# Narrow subset of library for just ID-related concepts
+oxx_static_library(
+    name = "stream_identifiers",
+    srcs = [
+        "StreamId.cpp",
+    ],
+    ovrsource_only = False,
+    public_include_directories = [
+        "..",
+    ],
+    public_raw_headers = [
+        "ForwardDefinitions.h",
+        "RecordableId.h",
+        "StreamId.h",
+    ],
+    reexport_all_header_dependencies = False,
+    visibility = ["PUBLIC"],
+    deps = [
+        "//third-party/fmt:fmt",
+    ],
+)
+
+# Private target to check that samples are compileable
+oxx_static_library(
+    name = "vrs_samples",
+    srcs = glob([
+        "Sample*.cpp",
+    ]),
+    ovrsource_only = False,
+    deps = [
+        ":vrs",
+        "//arvr/libraries/vrs/vrs/os:os",
+    ],
+)
+
+oxx_static_library(
+    name = "vrs_test_helpers",
+    srcs = ["test/helpers/VRSTestsHelpers.cpp"],
+    ovrsource_only = False,
+    preprocessor_flags = ["-DGTEST_BUILD"],
+    public_include_directories = [
+        ".",
+    ],
+    raw_headers = ["test/helpers/VRSTestsHelpers.h"],
+    visibility = [
+        "PUBLIC",
+    ],
+    deps = [
+        ":vrs",
+        "//arvr/libraries/logging:logging",
+        "//arvr/libraries/test_helpers:gtest_macros",
+        "//arvr/libraries/vrs/vrs/os:os",
+    ],
+)
+
+oxx_static_library(
+    name = "vrs_os_test_process",
+    srcs = ["test/helpers/OsTestProcess.cpp"],
+    compatible_with = [
+        "ovr_config//os:android",
+        "ovr_config//os:linux",
+        "ovr_config//os:windows",
+        "ovr_config//os:macos",
+    ],
+    ovrsource_only = False,
+    preprocessor_flags = ["-DGTEST_BUILD"],
+    public_include_directories = [
+        ".",
+    ],
+    raw_headers = ["test/helpers/OsTestProcess.h"],
+    visibility = [
+        "PUBLIC",
+    ],
+    deps = [
+        ":vrs",
+        "//arvr/libraries/logging:logging",
+        "//arvr/libraries/test_helpers:gtest_macros",
+        "//arvr/libraries/vrs/vrs/os:os",
+        "//third-party/boost:boost_process",
+    ],
+)
+
+oxx_binary(
+    name = "testedtool",
+    srcs = ["test/testedtool/testedtool.cpp"],
+    visibility = ["PUBLIC"],
+)
+
+oxx_test(
+    name = "unit_test_vrs",
+    srcs = glob(
+        ["test/*.cpp"],
+        exclude = ["test/OsTestProcessTest.cpp"],
+    ),
+    env = {
+        "TESTEDTOOL_EXE": "$(location :testedtool)",
+    },
+    oncall = "arvr_gaia",
+    preprocessor_flags = ["-DGTEST_BUILD"],
+    visibility = [
+        "PUBLIC",
+    ],
+    deps = [
+        ":vrs_test_helpers",
+        "//arvr/libraries/test_helpers:gtest_macros",
+        "//arvr/libraries/vrs/vrs:vrs",
+        "//arvr/libraries/vrs/vrs/utils/legacy_formats:legacy_formats",
+        "//arvr/projects/xrtech/TestDataDir:TestDataDir",
+    ],
+)
+
+oxx_test(
+    name = "unit_test_vrs_files",
+    srcs = glob(["test/file_tests/*.cpp"]),
+    oncall = "arvr_gaia",
+    preprocessor_flags = ["-DGTEST_BUILD"],
+    visibility = [
+        "PUBLIC",
+    ],
+    deps = [
+        ":vrs_test_helpers",
+        "//arvr/libraries/vrs/vrs:vrs",
+        "//arvr/projects/xrtech/TestDataDir:TestDataDir",
+    ],
+)
+
+oxx_test(
+    name = "unit_test_os_test_process",
+    srcs = ["test/OsTestProcessTest.cpp"],
+    compatible_with = [
+        "ovr_config//os:android",
+        "ovr_config//os:linux",
+        "ovr_config//os:windows",
+        "ovr_config//os:macos",
+    ],
+    env = {
+        "TESTEDTOOL_EXE": "$(location :testedtool)",
+    },
+    oncall = "arvr_gaia",
+    preprocessor_flags = ["-DGTEST_BUILD"],
+    visibility = [
+        "PUBLIC",
+    ],
+    deps = [
+        ":vrs_os_test_process",
+        "//arvr/libraries/vrs/vrs:vrs",
+        "//arvr/projects/xrtech/TestDataDir:TestDataDir",
+    ],
+)
+
+xros_package(
+    name = "unit_test_vrs_package",
+    assets = [
+        "//arvr/projects/xrtech/test_data:VRS_Files/VRSTestRecording.vrs",
+        "//arvr/projects/xrtech/test_data:VRS_Files/chunks.vrs",
+        "//arvr/projects/xrtech/test_data:VRS_Files/chunks.vrs_1",
+        "//arvr/projects/xrtech/test_data:VRS_Files/chunks.vrs_2",
+    ],
+    binaries = [
+        ":unit_test_vrs",
+    ],
+    compatible_with = ["ovr_config//os:xros"],
+    group = "application",
+    manifest = "unit_test_vrs.json",
+)
+
+xros_package(
+    name = "unit_test_vrs_files_package",
+    assets = [
+        "//arvr/projects/xrtech/test_data:VRS_Files/ar_camera.vrs",
+        "//arvr/projects/xrtech/test_data:VRS_Files/chunks.vrs",
+        "//arvr/projects/xrtech/test_data:VRS_Files/chunks.vrs_1",
+        "//arvr/projects/xrtech/test_data:VRS_Files/chunks.vrs_2",
+        "//arvr/projects/xrtech/test_data:VRS_Files/arcata_raw10.vrs",
+        "//arvr/projects/xrtech/test_data:VRS_Files/InsideOutCameraSync.vrs",
+    ],
+    binaries = [
+        ":unit_test_vrs_files",
+    ],
+    compatible_with = ["ovr_config//os:xros"],
+    group = "application",
+    manifest = "unit_test_vrs_files.json",
+)

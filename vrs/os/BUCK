@@ -1,0 +1,55 @@
+load(
+    "//arvr/tools/build_defs:oxx.bzl",
+    "oxx_static_library",
+    "oxx_test",
+)
+
+oxx_static_library(
+    name = "os",
+    srcs = glob(["*.cpp"]),
+    ovrsource_only = False,
+    public_include_directories = [
+        "../..",
+    ],
+    public_raw_headers = glob(["*.h"]),
+    visibility = ["PUBLIC"],
+    deps = [
+        "//arvr/libraries/logging:logging",
+        "//arvr/libraries/system_utils/system_utils/os:utils",
+        "//arvr/libraries/portability:portability",
+        "//arvr/libraries/vrs/vrs/utils:strings",
+        "//arvr/libraries/visiontypes/clock:processing_clock",
+        "//xplat/third-party/linker_lib:dl",
+    ] + select({
+        # Ideally arvr/libraries/portability:filesystem (and eventually std::filesystem) would be
+        # used. However, platform007's std::experimental::filesystem is apparently not built
+        # with -fPiC, and this causes issues when including VRS in a dynamic library.
+        "DEFAULT": [
+            "//third-party/boost:boost_filesystem",
+            "//third-party/boost:boost_interprocess",
+            "//third-party/boost:boost",
+            "//third-party/boost:boost_uuid",
+            "//third-party/boost:boost_date_time",
+            "//third-party/toolchains:stdc++fs",
+        ],
+        "ovr_config//os:xros": [
+            "//arvr/libraries/xros/portability:std_filesystem",
+            "//arvr/third-party/toolchains/xros-sdk:uuid",
+        ],
+    }),
+)
+
+oxx_test(
+    name = "unit_test_os",
+    srcs = glob(["test/*.cpp"]),
+    oncall = "arvr_gaia",
+    visibility = [
+        "PUBLIC",
+    ],
+    deps = [
+        ":os",
+        "//arvr/libraries/logging:advanced_backend",
+        "//arvr/libraries/test_helpers:unique_temporary_directory",
+        "//arvr/projects/xrtech/TestDataDir:TestDataDir",
+    ],
+)

@@ -1,0 +1,46 @@
+{
+    "name": "com.facebook.arvr.tests",
+    "version": "1.0.0",
+    "programs": [
+        {
+            "name": "TestXros",
+            "binary": "unit_test_vrs",
+            "volumes": [
+              {
+                "volume_uuid": "f34c5be6-33f0-4a23-8ece-188f0f285002",
+                "is_writeable": true,
+                "default_size_mb": "128",
+                "max_size_mb": "512",
+                "volume_type": "Data"
+              }
+            ],
+            "sandbox": {
+              "services": [
+                {
+                  "name": "com.facebook.Config"
+                },
+                {
+                  "name": "com.facebook.Logger"
+                },
+                {
+                  "name": "com.facebook.storage.Volume"
+                },
+                {
+                  "name": "com.facebook.storage.filesystem.RemoteFileService"
+                },
+                {
+                  "name": "com.facebook.Permission"
+                },
+                {
+                  "name": "com.facebook.launcher.Metadata"
+                }
+              ],
+              "permissions": [
+                {
+                  "name": "com.facebook.launcher.getBootRamdisk"
+                }
+              ]
+            }
+        }
+    ]
+  }

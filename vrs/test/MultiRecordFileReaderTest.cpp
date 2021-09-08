@@ -1,0 +1,458 @@
+// Facebook Technologies, LLC Proprietary and Confidential.
+
+#include <algorithm>
+#include <cstddef>
+#include <cstdlib>
+#include <map>
+#include <memory>
+#include <string>
+
+#include <fmt/format.h>
+#include <gtest/gtest.h>
+
+#define DEFAULT_LOG_CHANNEL "MultiRecordFileReaderTest"
+#include <logging/Checks.h>
+#include <logging/Log.h>
+#include <vrs/DataLayout.h>
+#include <vrs/DataPieces.h>
+#include <vrs/ErrorCode.h>
+#include <vrs/MultiRecordFileReader.h>
+#include <vrs/RecordFileWriter.h>
+#include <vrs/StreamId.h>
+#include <vrs/TagConventions.h>
+#include <vrs/os/Utils.h>
+
+using namespace vrs;
+using namespace std;
+
+using UniqueStreamId = vrs::MultiRecordFileReader::UniqueStreamId;
+
+double getTimestampSec() {
+  using namespace std::chrono;
+  return duration_cast<duration<double>>(steady_clock::now().time_since_epoch()).count();
+}
+
+class MyMetadata : public AutoDataLayout {
+ public:
+  DataPieceValue<uint32_t> sensorValue{"my_sensor"};
+
+  AutoDataLayoutEnd endLayout;
+};
+
+constexpr const char* kTestFlavor = "team/vrs/test/multi-test";
+
+class TestRecordable : public Recordable {
+  static const uint32_t kDataRecordFormatVersion = 1;
+
+ public:
+  TestRecordable() : Recordable(RecordableTypeId::UnitTestRecordableClass, kTestFlavor) {
+    // define your RecordFormat & DataLayout definitions for this stream
+    addRecordFormat(
+        Record::Type::DATA, // the type of records this definition applies to
+        kDataRecordFormatVersion, // a record format version
+        metadata_.getContentBlock(), // the RecordFormat definition
+        {&metadata_}); // the DataLayout definition for the datalayout content block declared above.
+  }
+
+  const Record* createConfigurationRecord() override {
+    double someTimeInSec = getTimestampSec();
+    return createRecord(someTimeInSec, Record::Type::CONFIGURATION, 0);
+  }
+
+  const Record* createStateRecord() override {
+    double someTimeInSec = getTimestampSec();
+    return createRecord(someTimeInSec, Record::Type::STATE, 0);
+  }
+
+  const Record* createData(double timestamp, uint32_t sensorValue) {
+    metadata_.sensorValue.set(sensorValue); // Record the value we want to save in the record
+    return createRecord(
+        timestamp, Record::Type::DATA, kDataRecordFormatVersion, DataSource(metadata_));
+  }
+
+  void createRandomData() {
+    uint32_t sensorValue = static_cast<uint32_t>(rand());
+    this->createData(getTimestampSec(), sensorValue);
+  }
+
+  const Record* createDefaultRecord(Record::Type type) {
+    double someTimeInSec = getTimestampSec();
+    return createRecord(someTimeInSec, type, 0);
+  }
+
+ private:
+  MyMetadata metadata_;
+};
+
+struct VrsFileBuilder {
+  VrsFileBuilder(const string& path) : path_(path) {
+    XR_CHECK_FALSE(os::isFile(path_));
+    fileWriter_.addRecordable(&recordable_);
+    recordable_.setRecordableIsActive(true);
+    recordable_.createConfigurationRecord();
+    recordable_.createStateRecord();
+  }
+
+  void build() {
+    XR_CHECK_FALSE(os::isFile(path_));
+    auto result = fileWriter_.writeToFile(path_);
+    XR_CHECK_EQ(SUCCESS, result);
+    XR_LOGI("Created VRS File successfully: {}", path_);
+  }
+
+  TestRecordable recordable_;
+  RecordFileWriter fileWriter_;
+  const string path_;
+};
+
+const auto kDefaultSessionId = "TestSessionId";
+const auto kDefaultCaptureTimeEpoch = "12345";
+const map<string, string>& getDefaultTags() {
+  static const map<string, string>& defaultTags{
+      {tag_conventions::kSessionId, kDefaultSessionId},
+      {tag_conventions::kCaptureTimeEpoch, kDefaultCaptureTimeEpoch}};
+  return defaultTags;
+};
+
+void createVRSFileSynchronously(
+    const string& path,
+    const size_t numRandomDataRecords,
+    const map<string, string>& tags = {}) {
+  VrsFileBuilder fileBuilder(path);
+  for (size_t i = 0; i < numRandomDataRecords; i++) {
+    fileBuilder.recordable_.createRandomData();
+  }
+  for (const auto& [tagKey, tagValue] : tags) {
+    fileBuilder.fileWriter_.setTag(tagKey, tagValue);
+  }
+  fileBuilder.build();
+}
+
+string getOsTempPath(const string& path) {
+  return os::pathJoin(os::getTempFolder(), path);
+}
+
+vector<string> getOsTempPaths(size_t n) {
+  vector<string> paths;
+  paths.reserve(n);
+  auto timestamp = getTimestampSec();
+  for (size_t i = 0; i < n; i++) {
+    paths.push_back(
+        getOsTempPath(fmt::format("MultiRecordFileReaderTest-{}-{}.vrs", timestamp, i)));
+  }
+  return paths;
+}
+
+void removeFiles(const vector<string>& paths) {
+  for (const auto& path : paths) {
+    os::remove(path);
+  }
+}
+
+vector<unique_ptr<VrsFileBuilder>> createFileBuilders(const vector<string>& filePaths) {
+  vector<unique_ptr<VrsFileBuilder>> fileBuilders;
+  fileBuilders.reserve(filePaths.size());
+  for (const auto& path : filePaths) {
+    fileBuilders.emplace_back(make_unique<VrsFileBuilder>(path));
+  }
+  return fileBuilders;
+}
+
+void assertEmptyStreamTags(const MultiRecordFileReader& reader, UniqueStreamId stream) {
+  const auto& streamTags = reader.getTags(stream);
+  ASSERT_TRUE(streamTags.user.empty());
+}
+
+void assertEmptyStreamTags(const MultiRecordFileReader& reader) {
+  for (const auto& stream : reader.getStreams()) {
+    assertEmptyStreamTags(reader, stream);
+  }
+}
+
+class MultiRecordFileReaderTest : public testing::Test {};
+
+TEST_F(MultiRecordFileReaderTest, invalidFilePaths) {
+  ASSERT_NE(SUCCESS, MultiRecordFileReader().openFiles({"invalidPath1", "invalidPath2"}));
+}
+
+TEST_F(MultiRecordFileReaderTest, relatedFiles) {
+  constexpr auto relatedFileCount = 6;
+  constexpr auto numRecords = 4;
+  const auto relatedFilePaths = getOsTempPaths(relatedFileCount);
+  // Use either empty or default (same) tag values for these files so they are considered related
+  for (size_t i = 0; i < relatedFilePaths.size(); i++) {
+    if (i % 2 == 0) {
+      createVRSFileSynchronously(relatedFilePaths[i], numRecords);
+    } else {
+      createVRSFileSynchronously(relatedFilePaths[i], numRecords, getDefaultTags());
+    }
+  }
+  ASSERT_EQ(SUCCESS, MultiRecordFileReader().openFiles(relatedFilePaths));
+  // Now add an unrelated file path to the mix to make sure we are not able to open unrelated files
+  const auto unrelatedFilePath =
+      getOsTempPath(fmt::format("UnrelatedPath{}.vrs", relatedFilePaths.size()));
+  auto mismatchingTags = getDefaultTags();
+  // Modify the value of one of kRelatedFileTags to make this file seem unrelated
+  mismatchingTags[MultiRecordFileReader::kRelatedFileTags[0]].append("_unrelated");
+  createVRSFileSynchronously(unrelatedFilePath, numRecords, mismatchingTags);
+  auto unrelatedFilePaths = relatedFilePaths;
+  unrelatedFilePaths.push_back(unrelatedFilePath);
+  ASSERT_NE(SUCCESS, MultiRecordFileReader().openFiles(unrelatedFilePaths));
+  removeFiles(unrelatedFilePaths);
+}
+
+vector<double> getNonDecreasingTimestamps(
+    const size_t count,
+    const double startTimestamp = 0,
+    const size_t maxIncrement = 10) {
+  vector<double> timestamps;
+  timestamps.reserve(count);
+  double timestamp = startTimestamp;
+  while (timestamps.size() < count) {
+    timestamps.emplace_back(timestamp);
+    timestamp += (rand() % maxIncrement);
+  }
+  return timestamps;
+}
+
+TEST_F(MultiRecordFileReaderTest, consolidatedIndex) {
+  const auto expectedTimestamps = getNonDecreasingTimestamps(50);
+  const auto filePaths = getOsTempPaths(4);
+  auto fileBuilders = createFileBuilders(filePaths);
+  // Spray these timestamps in the form of data records across these VRS files
+  for (const auto& timestamp : expectedTimestamps) {
+    const auto builderIndex = rand() % fileBuilders.size();
+    fileBuilders[builderIndex]->recordable_.createData(timestamp, timestamp);
+  }
+  for (auto& builder : fileBuilders) {
+    builder->build();
+  }
+  MultiRecordFileReader reader;
+  ASSERT_EQ(SUCCESS, reader.openFiles(filePaths));
+  assertEmptyStreamTags(reader);
+  // Validate that Data Record timestamps match with expectedTimestamps
+  auto timestampIt = expectedTimestamps.cbegin();
+  auto recordIt = reader.recordIndex_->cbegin();
+  while (timestampIt != expectedTimestamps.cend() && recordIt != reader.recordIndex_->cend()) {
+    const auto& record = (*recordIt);
+    if (record->recordType != Record::Type::DATA) {
+      recordIt++;
+      continue;
+    }
+    ASSERT_EQ(*timestampIt, record->timestamp)
+        << fmt::format("expectedTimestamps: {}", fmt::join(expectedTimestamps, ", "));
+    timestampIt++;
+    recordIt++;
+  }
+  ASSERT_TRUE(timestampIt == expectedTimestamps.cend())
+      << fmt::format("Timestamp not found in index. Missing timestamp: {}", *timestampIt);
+  // Check for any extra records in the index
+  while (recordIt != reader.recordIndex_->cend()) {
+    ASSERT_TRUE((*recordIt)->recordType != Record::Type::DATA) << fmt::format(
+        "Extra record found in index. Unexpected Record timestamp: {}", (*recordIt)->timestamp);
+    recordIt++;
+  }
+  removeFiles(filePaths);
+}
+
+TEST_F(MultiRecordFileReaderTest, singleFileRecordCount) {
+  const auto filePaths = getOsTempPaths(1);
+  constexpr auto numConfigRecords = 1;
+  constexpr auto numStateRecords = 1;
+  constexpr auto numDataRecords = 14;
+  constexpr auto numTotalRecords = numDataRecords + numStateRecords + numConfigRecords;
+  createVRSFileSynchronously(filePaths.front(), numDataRecords);
+  MultiRecordFileReader reader;
+  ASSERT_EQ(0, reader.getRecordCount());
+  ASSERT_EQ(SUCCESS, reader.openFiles(filePaths));
+  const auto& streams = reader.getStreams();
+  ASSERT_EQ(1, streams.size());
+  ASSERT_EQ(numTotalRecords, reader.getRecordCount());
+  const auto stream = *streams.begin();
+  ASSERT_EQ(numTotalRecords, reader.getRecordCount(stream));
+  ASSERT_EQ(numConfigRecords, reader.getRecordCount(stream, Record::Type::CONFIGURATION));
+  ASSERT_EQ(numStateRecords, reader.getRecordCount(stream, Record::Type::STATE));
+  ASSERT_EQ(numDataRecords, reader.getRecordCount(stream, Record::Type::DATA));
+  static const StreamId unknownStream;
+  ASSERT_EQ(0, reader.getRecordCount(unknownStream));
+  ASSERT_EQ(0, reader.getRecordCount(unknownStream, Record::Type::CONFIGURATION));
+  assertEmptyStreamTags(reader);
+  ASSERT_EQ(SUCCESS, reader.closeFiles());
+  ASSERT_EQ(0, reader.getRecordCount());
+  ASSERT_EQ(0, reader.getRecordCount(stream));
+  ASSERT_EQ(0, reader.getRecordCount(stream, Record::Type::CONFIGURATION));
+  ASSERT_EQ(0, reader.getRecordCount(stream, Record::Type::STATE));
+  ASSERT_EQ(0, reader.getRecordCount(stream, Record::Type::DATA));
+  assertEmptyStreamTags(reader, stream);
+  assertEmptyStreamTags(reader);
+  ASSERT_TRUE(reader.getStreams().empty());
+  removeFiles(filePaths);
+}
+
+/// Helps test various StreamId related methods and collision handling logic.
+/// - Creates X files on the fly
+/// - Uses X unique Recordables - one per file
+/// - Uses 1 common (colliding) Recordable which writes to all files
+/// - Each file will have a deterministic number of Config, State and Data records per stream
+/// - We store the expected number of records in the form of stream tags which will be used later
+/// for validation
+/// - We validate that MultiRecordFileReader is able to serve all these Streams after disambiguating
+/// internally and match the record counts of each type
+class StreamIdCollisionTester {
+ public:
+  StreamIdCollisionTester() : filePaths_(getOsTempPaths(kFilePathCount)), totalRecordCount_(0) {
+    for (size_t i = 0; i < filePaths_.size(); i++) {
+      auto& filePath = filePaths_[i];
+      XR_CHECK_FALSE(os::isFile(filePath));
+      auto& fileWriter = fileWriters_[i];
+      auto& uniqueRecordable = uniqueRecordables_[i];
+      createRecords(i, uniqueRecordable);
+      createRecords(i, commonRecordable_);
+      auto result = fileWriter.writeToFile(filePath);
+      XR_CHECK_EQ(SUCCESS, result);
+      XR_LOGI("Created VRS File successfully with {} records: {}", totalRecordCount_, filePath);
+    }
+    test();
+  }
+
+  ~StreamIdCollisionTester() {
+    removeFiles(filePaths_);
+  }
+
+  void test() {
+    ASSERT_EQ(SUCCESS, reader_.openFiles(filePaths_));
+    ASSERT_EQ(totalRecordCount_, reader_.getRecordCount());
+    const auto& streams = reader_.getStreams();
+    ASSERT_EQ(
+        // no. of unique streams + (no. of common streams * no. of files)
+        StreamIdCollisionTester::kUniqueStreamCount + (1 * StreamIdCollisionTester::kFilePathCount),
+        streams.size());
+    // Create a copy for manipulation
+    auto remainingStreams = streams;
+    // Ensure that all the expected streams are present and have expected number of records
+    validateUniqueStreams(remainingStreams);
+    validateCommonStreams(remainingStreams);
+    close();
+  }
+
+ private:
+  static constexpr size_t kFilePathCount = 5;
+  // Streams without any collisions across files
+  static constexpr auto& kUniqueStreamCount = kFilePathCount;
+
+  static constexpr auto kExpectedRecordCountTagPrefix = "expectedRecordCount";
+  static inline const string kOriginalStreamIdTag = "originalStreamId";
+
+  static size_t getExpectedRecordsCount(size_t fileIndex, Record::Type type) {
+    auto baseCount = fileIndex * kFilePathCount + 1;
+    switch (type) {
+      case Record::Type::CONFIGURATION:
+        return baseCount;
+      case Record::Type::STATE:
+        return baseCount + 1;
+      case Record::Type::DATA:
+        return baseCount + 2;
+      default:
+        XR_FATAL_ERROR("Unexpected RecordType {}", type);
+    }
+  }
+
+  void close() {
+    ASSERT_EQ(SUCCESS, reader_.closeFiles());
+    ASSERT_EQ(0, reader_.getRecordCount());
+    const auto& stream = uniqueRecordables_[0].getStreamId();
+    ASSERT_EQ(0, reader_.getRecordCount(stream));
+    ASSERT_EQ(0, reader_.getRecordCount(stream, Record::Type::CONFIGURATION));
+    ASSERT_EQ(0, reader_.getRecordCount(stream, Record::Type::STATE));
+    ASSERT_EQ(0, reader_.getRecordCount(stream, Record::Type::DATA));
+    assertEmptyStreamTags(reader_, stream);
+    assertEmptyStreamTags(reader_);
+    ASSERT_TRUE(reader_.getStreams().empty());
+  }
+
+  void createRecords(size_t fileIndex, TestRecordable& recordable) {
+    auto& fileWriter = fileWriters_[fileIndex];
+    fileWriter.addRecordable(&recordable);
+    recordable.setRecordableIsActive(true);
+    createRecords(fileIndex, recordable, Record::Type::CONFIGURATION);
+    createRecords(fileIndex, recordable, Record::Type::STATE);
+    createRecords(fileIndex, recordable, Record::Type::DATA);
+  }
+
+  void createRecords(size_t fileIndex, TestRecordable& recordable, Record::Type type) {
+    auto expectedRecordCount = getExpectedRecordsCount(fileIndex, type);
+    totalRecordCount_ += expectedRecordCount;
+    for (size_t recordCount = 0; recordCount < expectedRecordCount; recordCount++) {
+      recordable.createDefaultRecord(type);
+    }
+    auto tagKey = getExpectedRecordCountTagKey(type);
+    recordable.setTag(tagKey, to_string(expectedRecordCount));
+    recordable.setTag(kOriginalStreamIdTag, recordable.getStreamId().getName());
+  }
+
+  string getExpectedRecordCountTagKey(Record::Type type) const {
+    return fmt::format("{}{}", kExpectedRecordCountTagPrefix, Record::typeName(type));
+  }
+
+  uint32_t getExpectedRecordCount(UniqueStreamId streamId, Record::Type type) const {
+    auto tagKey = getExpectedRecordCountTagKey(type);
+    auto expectedCountStr = reader_.getTag(streamId, tagKey);
+    EXPECT_FALSE(expectedCountStr.empty());
+    return std::stoi(expectedCountStr);
+  }
+
+  uint32_t validateRecordCount(UniqueStreamId streamId, Record::Type type) const {
+    const auto expectedCount = getExpectedRecordCount(streamId, type);
+    EXPECT_EQ(expectedCount, reader_.getRecordCount(streamId, type));
+    return expectedCount;
+  }
+
+  void validateRecordCount(UniqueStreamId streamId) const {
+    uint32_t expectedCount = 0;
+    expectedCount += validateRecordCount(streamId, Record::Type::CONFIGURATION);
+    expectedCount += validateRecordCount(streamId, Record::Type::STATE);
+    expectedCount += validateRecordCount(streamId, Record::Type::DATA);
+    EXPECT_EQ(expectedCount, reader_.getRecordCount(streamId));
+    static const StreamId unknownStream;
+    EXPECT_EQ(0, reader_.getRecordCount(unknownStream));
+    EXPECT_EQ(0, reader_.getRecordCount(unknownStream, Record::Type::DATA));
+    assertEmptyStreamTags(reader_, unknownStream);
+  }
+
+  void validateUniqueStreams(set<UniqueStreamId>& remainingStreams) const {
+    for (const auto& uniqueRecordable : uniqueRecordables_) {
+      const auto expectedStreamId = uniqueRecordable.getStreamId();
+      auto it = remainingStreams.find(expectedStreamId);
+      EXPECT_TRUE(it != remainingStreams.end())
+          << "Unable to find StreamId " << expectedStreamId.getName();
+      remainingStreams.erase(it);
+      validateRecordCount(expectedStreamId);
+      EXPECT_EQ(expectedStreamId.getName(), reader_.getTag(expectedStreamId, kOriginalStreamIdTag));
+    }
+  }
+
+  void validateCommonStreams(set<UniqueStreamId>& remainingStreams) const {
+    const auto expectedOriginalStreamId = commonRecordable_.getStreamId().getName();
+    EXPECT_EQ(kFilePathCount, remainingStreams.size())
+        << "The common stream must be split into one unique stream per file";
+    for (const auto& commonStreamId : remainingStreams) {
+      validateRecordCount(commonStreamId);
+      EXPECT_EQ(expectedOriginalStreamId, reader_.getTag(commonStreamId, kOriginalStreamIdTag));
+    }
+  }
+
+  // Streams which don't have collisions across files
+  TestRecordable uniqueRecordables_[kUniqueStreamCount];
+  // Stream which is common across all files
+  TestRecordable commonRecordable_;
+
+  RecordFileWriter fileWriters_[kFilePathCount];
+  vector<string> filePaths_;
+
+  size_t totalRecordCount_;
+  MultiRecordFileReader reader_;
+};
+
+TEST_F(MultiRecordFileReaderTest, streamIdCollision) {
+  StreamIdCollisionTester();
+}
