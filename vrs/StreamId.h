@@ -284,6 +284,9 @@ enum class RecordableTypeId : uint16_t {
   // Hand visibility information for Nimble
   NimbleHandVisibilityData = 7018,
 
+  // General gesture information for Nimble
+  NimbleGestureData = 7019,
+
   /// Device-independent image formats used by the hand-tracking
   /// and body-tracking teams.
   /// Config data for all formats is a MessagePack blob.
