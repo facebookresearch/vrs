@@ -8,7 +8,7 @@
 
 #define DEFAULT_LOG_CHANNEL "FileHandler"
 #include <logging/Log.h>
-#include <logging/Verify.h> // IWYU pragma: keep
+#include <logging/Verify.h>
 #include <vrs/utils/xxhash/xxhash.h>
 
 #include "DiskFile.h"

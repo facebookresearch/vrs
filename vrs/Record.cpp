@@ -8,7 +8,7 @@
 #include <vrs/utils/EnumStringConverter.h>
 #include "Compressor.h"
 #include "DataSource.h"
-#include "ErrorCode.h" // IWYU pragma: keep
+#include "ErrorCode.h"
 #include "FileFormat.h"
 #include "FileMacros.h"
 #include "RecordManager.h"

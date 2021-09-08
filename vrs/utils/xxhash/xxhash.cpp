@@ -6,7 +6,7 @@
 
 #define XXH_INLINE_ALL
 #define DEFAULT_LOG_CHANNEL "xxhash"
-#include <logging/Checks.h> // IWYU pragma: keep
+#include <logging/Checks.h>
 
 using namespace std;
 

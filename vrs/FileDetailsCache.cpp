@@ -4,7 +4,7 @@
 
 #define DEFAULT_LOG_CHANNEL "FileDetailsCache"
 #include <logging/Log.h>
-#include <logging/Verify.h> // IWYU pragma: keep
+#include <logging/Verify.h>
 
 #include "Compressor.h"
 #include "Decompressor.h"
@@ -14,7 +14,7 @@
 #include "FileFormat.h"
 #include "FileMacros.h"
 #include "IndexRecord.h"
-#include "Recordable.h" // IWYU pragma: keep
+#include "Recordable.h"
 
 namespace vrs {
 namespace FileDetailsCache {

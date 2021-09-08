@@ -3,7 +3,7 @@
 #include <random>
 #include <thread>
 
-#include <gtest/gtest.h> // IWYU pragma: keep
+#include <gtest/gtest.h>
 
 #include <portability/Filesystem.h>
 #include <test_helpers/GTestMacros.h>

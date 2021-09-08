@@ -12,7 +12,7 @@
 #define DEFAULT_LOG_CHANNEL "PixelFrame"
 #include <logging/Checks.h>
 #include <logging/Log.h>
-#include <logging/Verify.h> // IWYU pragma: keep
+#include <logging/Verify.h>
 
 #include <vrs/utils/converters/Raw10ToGrey10Converter.h>
 

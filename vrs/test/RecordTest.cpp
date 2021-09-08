@@ -1,6 +1,6 @@
 // Facebook Technologies, LLC Proprietary and Confidential.
 
-#include <gtest/gtest.h> // IWYU pragma: keep
+#include <gtest/gtest.h>
 
 #include <string>
 

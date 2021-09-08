@@ -4,7 +4,7 @@
 
 #define DEFAULT_LOG_CHANNEL "ContentBlockReader"
 #include <logging/Log.h>
-#include <logging/Verify.h> // IWYU pragma: keep
+#include <logging/Verify.h>
 
 #include "RecordFormatStreamPlayer.h"
 #include "RecordReaders.h"

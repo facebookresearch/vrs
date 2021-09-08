@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <iostream>
-#include <sstream> // IWYU pragma: keep
+#include <sstream>
 
 #if defined(_MSC_VER)
 #include <BaseTsd.h>

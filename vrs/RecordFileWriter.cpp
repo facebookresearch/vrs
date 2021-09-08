@@ -10,7 +10,7 @@
 #define DEFAULT_LOG_CHANNEL "RecordFileWriter"
 
 #include <logging/Log.h>
-#include <logging/Verify.h> // IWYU pragma: keep
+#include <logging/Verify.h>
 
 #include <vrs/os/Event.h>
 #include <vrs/os/Time.h>

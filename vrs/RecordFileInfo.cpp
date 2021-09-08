@@ -6,7 +6,7 @@
 #include <cmath>
 
 #include <iomanip>
-#include <sstream> // IWYU pragma: keep
+#include <sstream>
 
 #include <fmt/format.h>
 

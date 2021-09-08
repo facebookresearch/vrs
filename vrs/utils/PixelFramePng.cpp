@@ -7,7 +7,7 @@
 
 #define DEFAULT_LOG_CHANNEL "PixelFramePng"
 #include <logging/Log.h>
-#include <logging/Verify.h> // IWYU pragma: keep
+#include <logging/Verify.h>
 
 #include <vrs/os/Utils.h>
 

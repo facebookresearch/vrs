@@ -3,7 +3,7 @@
 #include <fstream>
 #include <string>
 
-#include <gtest/gtest.h> // IWYU pragma: keep
+#include <gtest/gtest.h>
 
 #include <TestDataDir/TestDataDir.h>
 #include <vrs/ErrorCode.h>

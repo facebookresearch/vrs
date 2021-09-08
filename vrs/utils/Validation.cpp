@@ -4,13 +4,13 @@
 
 #include <iomanip>
 #include <iostream>
-#include <sstream> // IWYU pragma: keep
+#include <sstream>
 #include <string>
 #include <vector>
 
 #define DEFAULT_LOG_CHANNEL "Validation"
 #include <logging/Log.h>
-#include <logging/Verify.h> // IWYU pragma: keep
+#include <logging/Verify.h>
 
 #include <vrs/FileHandlerFactory.h>
 #include <vrs/RapidjsonHelper.hpp>

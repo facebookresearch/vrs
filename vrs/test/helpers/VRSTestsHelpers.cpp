@@ -2,7 +2,7 @@
 
 #include "VRSTestsHelpers.h"
 
-#include <gtest/gtest.h> // IWYU pragma: keep
+#include <gtest/gtest.h>
 #include <array>
 
 #define DEFAULT_LOG_CHANNEL "VRSTestHelpers"

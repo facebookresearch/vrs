@@ -3,7 +3,7 @@
 #include <ctime>
 
 #include <gtest/gtest.h>
-#include <test_helpers/GTestMacros.h> // IWYU pragma: keep
+#include <test_helpers/GTestMacros.h>
 
 #include <vrs/DataLayoutConventions.h>
 #include <vrs/FileFormat.h>

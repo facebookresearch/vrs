@@ -4,7 +4,7 @@
 
 #define DEFAULT_LOG_CHANNEL "VRSRecordReaders"
 #include <logging/Log.h>
-#include <logging/Verify.h> // IWYU pragma: keep
+#include <logging/Verify.h>
 
 #include "ErrorCode.h"
 #include "FileHandler.h"

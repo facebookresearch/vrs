@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include <gtest/gtest.h> // IWYU pragma: keep
+#include <gtest/gtest.h>
 
 #include <test_helpers/GTestMacros.h>
 #include <vrs/DataLayoutConventions.h>

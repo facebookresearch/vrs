@@ -2,7 +2,7 @@
 
 #include "System.h"
 
-#include <array> // IWYU pragma: keep
+#include <array>
 #include <sstream>
 
 #include <portability/Platform.h>

@@ -10,7 +10,7 @@
 
 #define DEFAULT_LOG_CHANNEL "FileFormat"
 #include <logging/Log.h>
-#include <logging/Verify.h> // IWYU pragma: keep
+#include <logging/Verify.h>
 
 #include "ErrorCode.h"
 #include "FileMacros.h"

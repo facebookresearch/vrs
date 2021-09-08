@@ -2,7 +2,7 @@
 
 #include <cstdio>
 
-#include <gtest/gtest.h> // IWYU pragma: keep
+#include <gtest/gtest.h>
 
 #include <vrs/DataLayoutConventions.h>
 #include <vrs/RecordFileReader.h>

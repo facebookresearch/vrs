@@ -13,11 +13,11 @@
 #include <iomanip>
 #include <memory>
 #include <mutex>
-#include <sstream> // IWYU pragma: keep
+#include <sstream>
 
 #define DEFAULT_LOG_CHANNEL "DataLayout"
 #include <logging/Log.h>
-#include <logging/Verify.h> // IWYU pragma: keep
+#include <logging/Verify.h>
 #include <portability/Platform.h>
 
 #include <vrs/utils/EnumStringConverter.h>

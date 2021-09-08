@@ -6,7 +6,7 @@
 
 #define DEFAULT_LOG_CHANNEL "DataExtractor"
 #include <logging/Log.h>
-#include <logging/Verify.h> // IWYU pragma: keep
+#include <logging/Verify.h>
 
 #include <vrs/FileMacros.h>
 #include <vrs/RapidjsonHelper.hpp>
@@ -15,7 +15,7 @@
 #include <vrs/utils/PixelFrame.h>
 
 const char* kReadMeContent =
-#include "DataExtractorReadMe.hpp" // IWYU pragma: keep
+#include "DataExtractorReadMe.hpp"
     ;
 
 namespace vrs::utils {

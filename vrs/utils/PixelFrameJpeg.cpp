@@ -6,7 +6,7 @@
 
 #define DEFAULT_LOG_CHANNEL "PixelFrameJpeg"
 #include <logging/Log.h>
-#include <logging/Verify.h> // IWYU pragma: keep
+#include <logging/Verify.h>
 
 namespace vrs::utils {
 

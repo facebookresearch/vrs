@@ -7,7 +7,7 @@
 
 #define DEFAULT_LOG_CHANNEL "OsTestProcess"
 #include <logging/Log.h>
-#include <logging/Verify.h> // IWYU pragma: keep
+#include <logging/Verify.h>
 
 #include <vrs/os/Utils.h>
 #include <vrs/utils/Strings.h>

@@ -1,6 +1,6 @@
 // Facebook Technologies, LLC Proprietary and Confidential.
 
-#include <gtest/gtest.h> // IWYU pragma: keep
+#include <gtest/gtest.h>
 
 #define DEFAULT_LOG_CHANNEL "xprsTest"
 #include <logging/Log.h>

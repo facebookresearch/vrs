@@ -6,11 +6,11 @@
 
 #include <algorithm>
 
-#include <logging/Checks.h> // IWYU pragma: keep
+#include <logging/Checks.h>
 #include <portability/Platform.h>
 #include <system_utils/os/Utils.h>
 
-#include <vrs/utils/Strings.h> // IWYU pragma: keep
+#include <vrs/utils/Strings.h>
 
 #if IS_WINDOWS_PLATFORM()
 #include <io.h>
@@ -32,7 +32,7 @@
 #define LSTAT64 lstat64
 #endif
 #include <sys/stat.h>
-#include <sys/types.h> // IWYU pragma: keep
+#include <sys/types.h>
 #include <unistd.h>
 #include <cerrno>
 #include <cstring>
@@ -43,7 +43,7 @@
 #include <xros/portability/StdFilesystem.h>
 namespace fs = xros_std_filesystem;
 #else // !IS_XROS_PLATFORM()
-#include <boost/filesystem.hpp> // IWYU pragma: keep
+#include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 #endif // !IS_XROS_PLATFORM()
 

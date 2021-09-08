@@ -3,7 +3,7 @@
 #include "CopyHelpers.h"
 
 #include <algorithm>
-#include <fstream> // IWYU pragma: keep
+#include <fstream>
 #include <iomanip>
 #include <thread>
 
