@@ -5,8 +5,9 @@
 #define DEFAULT_LOG_CHANNEL "VRSRecord"
 #include <logging/Log.h>
 
+#include <vrs/helpers/EnumStringConverter.h>
 #include <vrs/helpers/FileMacros.h>
-#include <vrs/utils/EnumStringConverter.h>
+
 #include "Compressor.h"
 #include "DataSource.h"
 #include "ErrorCode.h"

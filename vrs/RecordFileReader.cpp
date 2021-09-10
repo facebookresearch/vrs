@@ -8,11 +8,11 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/helpers/FileMacros.h>
+#include <vrs/helpers/Strings.h>
 #include <vrs/os/Time.h>
 #include <vrs/os/Utils.h>
-#include <vrs/utils/Strings.h>
 
-#include <vrs/helpers/FileMacros.h>
 #include "DataLayout.h"
 #include "DescriptionRecord.h"
 #include "DiskFile.h"
@@ -113,7 +113,7 @@ int RecordFileReader::vrsFilePathToFileSpec(const string& filePath, FileSpec& ou
   firstChunk = targetFile;
 
   string root;
-  if (utils::str::endsWith(targetFile, "_0")) {
+  if (helpers::endsWith(targetFile, "_0")) {
     // pattern: "anything_0" -> "anything_1", "anything_2", ...
     root.assign(targetFile, 0, targetFile.size() - 1); // strip trailing '0' char
   } else {

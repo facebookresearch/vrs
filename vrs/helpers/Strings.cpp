@@ -1,9 +1,10 @@
 // Facebook Technologies, LLC Proprietary and Confidential.
 
-#include <vrs/utils/Strings.h>
+#include "Strings.h"
+
 #include <cstring>
 
-namespace vrs::utils::str {
+namespace vrs::helpers {
 
 std::string trim(const std::string& text, const char* whiteChars) {
   size_t end = text.length();
@@ -25,13 +26,13 @@ std::string trim(const std::string& text, const char* whiteChars) {
 
 bool startsWith(const std::string& text, const std::string& prefix) {
   return text.length() >= prefix.length() &&
-      vrs::utils::str::strncasecmp(text.c_str(), prefix.c_str(), prefix.length()) == 0;
+      vrs::helpers::strncasecmp(text.c_str(), prefix.c_str(), prefix.length()) == 0;
 }
 
 bool endsWith(const std::string& text, const std::string& suffix) {
   return text.length() >= suffix.length() &&
-      vrs::utils::str::strncasecmp(
+      vrs::helpers::strncasecmp(
           text.c_str() + text.length() - suffix.length(), suffix.c_str(), suffix.length()) == 0;
 }
 
-} // namespace vrs::utils::str
+} // namespace vrs::helpers

@@ -15,10 +15,11 @@
 
 #include <logging/Log.h>
 #include <logging/Verify.h>
-#include <vrs/os/Utils.h>
-#include <vrs/utils/Strings.h>
 
 #include <vrs/helpers/FileMacros.h>
+#include <vrs/helpers/Strings.h>
+#include <vrs/os/Utils.h>
+
 #include "Compressor.h"
 #include "Decompressor.h"
 #include "ErrorCode.h"
@@ -349,7 +350,7 @@ int DiskFile::addChunk() {
   }
   string newChunkPath = chunks_.front().path;
   // if the first file ends with "_1", the second chunk is numbered "_2", etc.
-  if (utils::str::endsWith(newChunkPath, "_1")) {
+  if (helpers::endsWith(newChunkPath, "_1")) {
     newChunkPath.pop_back();
     newChunkPath += to_string(chunks_.size() + 1);
   } else {

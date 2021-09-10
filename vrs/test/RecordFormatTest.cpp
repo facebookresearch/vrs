@@ -6,7 +6,7 @@
 #include <vrs/Record.h>
 #include <vrs/RecordFormat.h>
 #include <vrs/TagConventions.h>
-#include <vrs/utils/EnumStringConverter.h>
+#include <vrs/helpers/EnumStringConverter.h>
 
 using namespace vrs;
 using vrs::RecordFormat;

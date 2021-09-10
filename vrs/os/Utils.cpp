@@ -9,8 +9,8 @@
 #include <logging/Checks.h>
 #include <system_utils/os/Utils.h>
 
+#include <vrs/helpers/Strings.h>
 #include <vrs/os/Platform.h>
-#include <vrs/utils/Strings.h>
 
 #if IS_WINDOWS_PLATFORM()
 #include <io.h>
@@ -276,7 +276,7 @@ string sanitizeFileName(const string& filename) {
     size_t l = strlen(prefix);
     // test if the name starts with these bad names
     if (sanitizedName.size() >= l &&
-        vrs::utils::str::strncasecmp(prefix, sanitizedName.c_str(), l) == 0) {
+        vrs::helpers::strncasecmp(prefix, sanitizedName.c_str(), l) == 0) {
       // it's only a problem if the name is exactly that?...
       if (l == sanitizedName.size()) {
         return '~' + sanitizedName;

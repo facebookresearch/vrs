@@ -12,7 +12,7 @@
 #define DEFAULT_LOG_CHANNEL "RecordFormat"
 #include <logging/Log.h>
 
-#include <vrs/utils/EnumStringConverter.h>
+#include <vrs/helpers/EnumStringConverter.h>
 
 using namespace std;
 

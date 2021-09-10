@@ -14,7 +14,7 @@
 /*
  * Compatibility helpers along with non-fully standardized string utilities.
  */
-namespace vrs::utils::str {
+namespace vrs::helpers {
 
 // strcasecmp & strncasecmp are named _stricmp & _strnicmp on Windows...
 #if IS_WINDOWS_PLATFORM()
@@ -53,4 +53,4 @@ bool startsWith(const std::string& text, const std::string& prefix);
 /// @return True if text ends with suffix. Case insensitive.
 bool endsWith(const std::string& text, const std::string& suffix);
 
-} // namespace vrs::utils::str
+} // namespace vrs::helpers

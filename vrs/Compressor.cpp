@@ -13,12 +13,12 @@
 #define DEFAULT_LOG_CHANNEL "VRSCompressor"
 #include <logging/Log.h>
 
+#include <vrs/helpers/EnumStringConverter.h>
 #include <vrs/helpers/FileMacros.h>
+
 #include "ErrorCode.h"
 #include "FileHandler.h"
 #include "Record.h"
-
-#include <vrs/utils/EnumStringConverter.h>
 
 namespace {
 

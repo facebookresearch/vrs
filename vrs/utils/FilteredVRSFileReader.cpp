@@ -15,8 +15,8 @@ typedef SSIZE_T ssize_t;
 #endif
 
 #include <vrs/ErrorCode.h>
+#include <vrs/helpers/Strings.h>
 #include <vrs/os/Utils.h>
-#include <vrs/utils/Strings.h>
 
 #include "CopyHelpers.h"
 
@@ -81,13 +81,13 @@ stringToIds(const string& ids, const set<StreamId>& fileStreams, set<StreamId>& 
 }
 
 static Record::Type stringToType(const string& type) {
-  if (utils::str::startsWith("configuration", type)) {
+  if (helpers::startsWith("configuration", type)) {
     return Record::Type::CONFIGURATION;
   }
-  if (utils::str::startsWith("state", type)) {
+  if (helpers::startsWith("state", type)) {
     return Record::Type::STATE;
   }
-  if (utils::str::startsWith("data", type)) {
+  if (helpers::startsWith("data", type)) {
     return Record::Type::DATA;
   }
   cerr << "Can't parse '" << type << "' as a record type." << endl;

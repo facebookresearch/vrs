@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 
 #include <vrs/RecordFileInfo.h>
-#include <vrs/utils/EnumStringConverter.h>
+#include <vrs/helpers/EnumStringConverter.h>
 
 using namespace std;
 using namespace vrs;

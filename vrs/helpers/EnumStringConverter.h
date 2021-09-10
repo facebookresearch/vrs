@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include <vrs/utils/Strings.h>
+#include <vrs/helpers/Strings.h>
 
 /*
  * Helper template class to convert enums to strings & back, in trivial cases.
@@ -62,7 +62,7 @@ struct EnumStringConverter {
   // Case insensitive string to enum conversion
   static E toEnumNoCase(const char* name) {
     for (size_t k = USE_INDEX_ZERO ? 0 : 1; k < NAMES_COUNT; k++) {
-      if (vrs::utils::str::strcasecmp(name, NAMES[k]) == 0) {
+      if (vrs::helpers::strcasecmp(name, NAMES[k]) == 0) {
         return static_cast<E>(k);
       }
     }

@@ -8,9 +8,9 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/helpers/Strings.h>
 #include <vrs/os/Platform.h>
 #include <vrs/os/Utils.h>
-#include <vrs/utils/Strings.h>
 
 // Windows has to be special
 #if IS_WINDOWS_PLATFORM()
@@ -25,7 +25,7 @@ using namespace std;
 using namespace vrs;
 
 inline string trim(const string& line) {
-  return vrs::utils::str::trim(line, " \t\r\n");
+  return vrs::helpers::trim(line, " \t\r\n");
 }
 
 bool TestProcess::start(string arg, bp::ipstream* sout) {
