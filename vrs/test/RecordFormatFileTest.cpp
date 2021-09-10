@@ -7,12 +7,12 @@
 
 #include <vrs/DataLayoutConventions.h>
 #include <vrs/FileFormat.h>
-#include <vrs/RecordFileInfo.h>
 #include <vrs/RecordFileReader.h>
 #include <vrs/RecordFileWriter.h>
 #include <vrs/RecordFormatStreamPlayer.h>
 #include <vrs/Recordable.h>
 #include <vrs/TagConventions.h>
+#include <vrs/helpers/Strings.h>
 #include <vrs/os/Time.h>
 #include <vrs/os/Utils.h>
 
@@ -634,8 +634,8 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
     tag = filePlayer.getTag(tag_conventions::kTagSet);
     EXPECT_EQ(strcmp(tag.c_str(), "{\"tags\":[\"tag1\",\"tag2\",\"tag3\"]}"), 0);
     EXPECT_EQ(
-        RecordFileInfo::make_printable(filePlayer.getTag("bad_tag")),
-        RecordFileInfo::make_printable(kBadString1));
+        helpers::make_printable(filePlayer.getTag("bad_tag")),
+        helpers::make_printable(kBadString1));
     vector<string> tags;
     tag_conventions::parseTagSet(tag, tags);
     EXPECT_EQ(tags.size(), 3);
@@ -655,8 +655,8 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
     EXPECT_EQ(filePlayer.getTags(id).user.size(), 2);
     EXPECT_EQ(filePlayer.getTag(id, "some_tag_name"), "some_tag_value");
     EXPECT_EQ(
-        RecordFileInfo::make_printable(filePlayer.getTag(id, "some_bad_tag")),
-        RecordFileInfo::make_printable(kBadString2));
+        helpers::make_printable(filePlayer.getTag(id, "some_bad_tag")),
+        helpers::make_printable(kBadString2));
 
     // Look for the "other" recordables & prepare to read them
     StreamId other1 = filePlayer.getStreamForTag("which", "other1", RecordableTypeId::UnitTest2);

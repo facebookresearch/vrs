@@ -16,12 +16,12 @@
 #include <vrs/os/Utils.h>
 
 #include <vrs/FileHandlerFactory.h>
-#include <vrs/RecordFileInfo.h>
 #include <vrs/RecordFileWriter.h>
 #include <vrs/StreamPlayer.h>
 #include <vrs/gaia/CachedGaiaFileHandler.h>
 #include <vrs/gaia/GaiaClient.h>
 #include <vrs/gaia/support/GaiaClientConfig.h>
+#include <vrs/helpers/Strings.h>
 
 using namespace std;
 using namespace vrs;
@@ -310,7 +310,7 @@ void ThrottledWriter::printPercentAndQueueSize(uint64_t queueByteSize, bool wait
   if (showProgress()) {
     if (writer_.isWriting()) {
       cout << kResetCurrentLine << (waiting ? "Waiting " : "Reading ") << setw(2) << percent_
-           << "%, processing " << setw(7) << RecordFileInfo::humanReadableFileSize(queueByteSize);
+           << "%, processing " << setw(7) << helpers::humanReadableFileSize(queueByteSize);
     } else {
       cout << kResetCurrentLine << "Reading " << setw(2) << percent_ << "%";
     }
@@ -339,7 +339,7 @@ void ThrottledWriter::waitForBackgroundThreadQueueSize(size_t maxSize) {
   while ((queueByteSize = writer_.getBackgroundThreadQueueByteSize()) > maxSize) {
     if (showProgress()) {
       cout << kResetCurrentLine << "Processing " << setw(7)
-           << RecordFileInfo::humanReadableFileSize(queueByteSize);
+           << helpers::humanReadableFileSize(queueByteSize);
       cout.flush();
     }
     // Check more frequently when we're getting close. This is Science.
@@ -482,10 +482,10 @@ int verbatimDownload(
     cerr << "Download failed, error: " << errorCodeToMessage(statusCode) << endl;
   } else if (showProgress) {
     double duration = os::getTimestampSec() - timeBefore;
-    cout << "Downloaded " << RecordFileInfo::humanReadableFileSize(totalSize) << " in " << fixed
+    cout << "Downloaded " << helpers::humanReadableFileSize(totalSize) << " in " << fixed
          << setprecision(1) << duration << "s, at "
-         << RecordFileInfo::humanReadableFileSize(totalSize / duration) << "/s, saved as '"
-         << targetPath << "'." << endl;
+         << helpers::humanReadableFileSize(totalSize / duration) << "/s, saved as '" << targetPath
+         << "'." << endl;
   }
   return statusCode;
 }
@@ -533,9 +533,9 @@ int verbatimInMemoryDownload(GaiaIdFileVersion idv, std::ostream& output, bool s
     cerr << "Download failed, error: " << errorCodeToMessage(statusCode) << endl;
   } else if (showProgress) {
     double duration = os::getTimestampSec() - timeBefore;
-    cout << "Downloaded " << RecordFileInfo::humanReadableFileSize(totalSize) << " in " << fixed
+    cout << "Downloaded " << helpers::humanReadableFileSize(totalSize) << " in " << fixed
          << setprecision(1) << duration << "s, at "
-         << RecordFileInfo::humanReadableFileSize(totalSize / duration) << "/s" << endl;
+         << helpers::humanReadableFileSize(totalSize / duration) << "/s" << endl;
   }
   return statusCode;
 }
@@ -645,8 +645,8 @@ static int localFileUpload(
     while (uploader.getUploadStatus(uploadId) == GaiaUploadStatus::InProgress &&
            (leftSize = uploader.getQueueSize()) > 0) {
       cout << kResetCurrentLine << "Uploading "
-           << RecordFileInfo::humanReadableFileSize(totalSize - leftSize) << " / "
-           << RecordFileInfo::humanReadableFileSize(totalSize) << "...";
+           << helpers::humanReadableFileSize(totalSize - leftSize) << " / "
+           << helpers::humanReadableFileSize(totalSize) << "...";
       cout.flush();
       const std::chrono::milliseconds kUpdateDelay(250);
       std::this_thread::sleep_for(kUpdateDelay);
@@ -695,9 +695,9 @@ int verbatimUpload(
   } else {
     outGaiaId = gaiaId;
     double duration = os::getTimestampSec() - timeBefore;
-    cout << "Uploaded " << RecordFileInfo::humanReadableFileSize(fileSize) << " in " << fixed
+    cout << "Uploaded " << helpers::humanReadableFileSize(fileSize) << " in " << fixed
          << setprecision(1) << duration << "s, at "
-         << RecordFileInfo::humanReadableFileSize(fileSize / duration) << "/s, Gaia ID: " << gaiaId
+         << helpers::humanReadableFileSize(fileSize / duration) << "/s, Gaia ID: " << gaiaId
          << endl;
   }
   return status;
@@ -740,9 +740,9 @@ int verbatimUpdate(
     cerr << "Update of gaia:" << updateId << " failed: " << errorCodeToMessage(status) << endl;
   } else {
     double duration = os::getTimestampSec() - timeBefore;
-    cout << "Uploaded " << RecordFileInfo::humanReadableFileSize(fileSize) << " in " << fixed
+    cout << "Uploaded " << helpers::humanReadableFileSize(fileSize) << " in " << fixed
          << setprecision(1) << duration << "s, at "
-         << RecordFileInfo::humanReadableFileSize(fileSize / duration) << "/s." << endl;
+         << helpers::humanReadableFileSize(fileSize / duration) << "/s." << endl;
     cout << "Update of gaia:" << updateId << " complete." << endl;
   }
   return status;

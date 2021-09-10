@@ -21,11 +21,11 @@
 
 #include <vrs/helpers/EnumStringConverter.h>
 #include <vrs/helpers/Rapidjson.hpp>
+#include <vrs/helpers/Strings.h>
 #include <vrs/os/Platform.h>
 
 #include "DataLayoutConventions.h"
 #include "DataPieces.h"
-#include "RecordFileInfo.h"
 #include "RecordFormat.h"
 
 // IWYU pragma: no_forward_declare vrs::DataPiece::MakerBundle
@@ -780,7 +780,7 @@ static ostream& operator<<(ostream& os, unsigned char c) {
 }
 
 static ostream& operator<<(ostream& os, const string& s) {
-  return std::operator<<(os, RecordFileInfo::make_printable(s));
+  return std::operator<<(os, helpers::make_printable(s));
 }
 
 } // namespace special_chars
@@ -1325,7 +1325,7 @@ void DataPieceVector<string>::print(ostream& out, const string& indent) const {
       } else {
         out << ' ';
       }
-      out << '"' << RecordFileInfo::make_printable(values[k]) << '"';
+      out << '"' << helpers::make_printable(values[k]) << '"';
     }
     out << endl;
   }
@@ -1364,7 +1364,7 @@ void DataPieceVector<string>::printCompact(ostream& out, const string& indent) c
     } else {
       out << ' ';
     }
-    out << '"' << RecordFileInfo::make_printable(values[k]) << '"';
+    out << '"' << helpers::make_printable(values[k]) << '"';
   }
   if (getOffset() == DataLayout::kNotFound) {
     out << "<unavailable>";
@@ -1576,13 +1576,12 @@ void DataPieceString::print(ostream& out, const string& indent) const {
     out << " required";
   }
   string value = get();
-  out << " = \"" << RecordFileInfo::make_printable(value)
-      << (isAvailable() ? "\"" : "\" (default value)");
+  out << " = \"" << helpers::make_printable(value) << (isAvailable() ? "\"" : "\" (default value)");
   out << endl;
 }
 
 void DataPieceString::printCompact(ostream& out, const string& indent) const {
-  out << indent << getLabel() << ": \"" << RecordFileInfo::make_printable(get()) << "\"";
+  out << indent << getLabel() << ": \"" << helpers::make_printable(get()) << "\"";
   if (getOffset() == DataLayout::kNotFound) {
     out << "<unavailable>";
   }

@@ -5,7 +5,7 @@
 #define DEFAULT_LOG_CHANNEL "EventLogger"
 #include <logging/Log.h>
 
-#include <vrs/RecordFileInfo.h>
+#include <vrs/helpers/Strings.h>
 
 using namespace std;
 
@@ -52,8 +52,8 @@ void EventLogger::logTraffic(const OperationContext& operationContext, const Tra
       event.transferDurationMs,
       event.totalDurationMs,
       event.transferOffset,
-      RecordFileInfo::humanReadableFileSize(event.transferSize),
-      RecordFileInfo::humanReadableFileSize(event.transferRequestSize),
+      helpers::humanReadableFileSize(event.transferSize),
+      helpers::humanReadableFileSize(event.transferRequestSize),
       event.retryCount,
       event.errorCount,
       event.error429Count);

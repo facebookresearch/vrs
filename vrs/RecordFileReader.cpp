@@ -23,7 +23,6 @@
 #include "FileHandlerFactory.h"
 #include "IndexRecord.h"
 #include "LegacyFormatsProvider.h"
-#include "RecordFileInfo.h"
 #include "StreamPlayer.h"
 #include "TagsRecord.h"
 
@@ -184,7 +183,7 @@ int RecordFileReader::doOpenFile(
   TemporaryCachingStrategy temporaryCachingStrategy(*file_, CachingStrategy::Passive);
   FileFormat::FileHeader fileHeader;
   LOG_PROGRESS(readFileHeader(fileSpec, fileHeader), error, [&]() {
-    string fileSize = RecordFileInfo::humanReadableFileSize(file_->getTotalSize());
+    string fileSize = helpers::humanReadableFileSize(file_->getTotalSize());
     return "Reading " + fileSize + ' ' + file_->getFileHandlerName() + " file header";
   });
   if (error != 0) {

@@ -53,4 +53,22 @@ bool startsWith(const std::string& text, const std::string& prefix);
 /// @return True if text ends with suffix. Case insensitive.
 bool endsWith(const std::string& text, const std::string& suffix);
 
+/// Helper method to print a file size in a human readable way,
+/// using B, KB, MB, GB, TB...
+std::string humanReadableFileSize(int64_t bytes);
+template <class T>
+std::string humanReadableFileSize(T bytes) {
+  return humanReadableFileSize(static_cast<int64_t>(bytes));
+}
+
+/// Helper method to print a count of seconds in a human readable way,
+/// using a count of years, weeks, days, hours, minutes, seconds...
+std::string humanReadableDuration(double seconds);
+std::string humanReadableTimestamp(double timestamp);
+
+/// Helper method to make a string printable to expose control characters.
+/// This conversion is meant to make string problems visible, rather than be a proper encoding,
+/// for instance, you can't differentiate between "\n" and string that would contain a newline char.
+std::string make_printable(const std::string& str);
+
 } // namespace vrs::helpers

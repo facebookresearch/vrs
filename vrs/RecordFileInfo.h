@@ -76,21 +76,6 @@ void printOverview(
     const set<StreamId>& streamIds,
     Details details = Details::Overview);
 
-/// Helper method to print a file size in a readable way
-string humanReadableFileSize(int64_t bytes);
-template <class T>
-string humanReadableFileSize(T bytes) {
-  return humanReadableFileSize(static_cast<int64_t>(bytes));
-}
-
-string humanReadableDuration(double seconds);
-string humanReadableTimestamp(double timestamp);
-
-/// Helper method to make a string printable to expose control characters.
-/// This conversion is meant to make string problems visible, rather than be a proper encoding,
-/// for instance, you can't differentiate between "\n" and string that would contain a newline char.
-string make_printable(const string& str);
-
 /// Generate an overview description of given VRS file as json,
 /// showing data for all its streams.
 /// @param path: Path to the VRS file.
