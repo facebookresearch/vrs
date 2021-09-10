@@ -12,9 +12,9 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/helpers/FileMacros.h>
 #include "ErrorCode.h"
 #include "FileHandler.h"
-#include "FileMacros.h"
 #include "IndexRecord.h"
 #include "Recordable.h"
 

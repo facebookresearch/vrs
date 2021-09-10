@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <portability/Platform.h>
+#include <vrs/os/Platform.h>
 
 #if IS_WINDOWS_PLATFORM()
 #include <DML/Vision/DML_CameraTypes.h>

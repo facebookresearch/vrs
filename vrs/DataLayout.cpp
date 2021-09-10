@@ -18,12 +18,13 @@
 #define DEFAULT_LOG_CHANNEL "DataLayout"
 #include <logging/Log.h>
 #include <logging/Verify.h>
-#include <portability/Platform.h>
 
+#include <vrs/helpers/Rapidjson.hpp>
+#include <vrs/os/Platform.h>
 #include <vrs/utils/EnumStringConverter.h>
+
 #include "DataLayoutConventions.h"
 #include "DataPieces.h"
-#include "RapidjsonHelper.hpp"
 #include "RecordFileInfo.h"
 #include "RecordFormat.h"
 

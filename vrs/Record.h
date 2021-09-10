@@ -139,9 +139,6 @@ class Record final {
   /// Get a record type as a text string.
   static const char* typeName(Type type);
 
-  /// Convert a record type name to an enum value.
-  static Type nameToType(const std::string& name);
-
  private:
   friend RecordManager;
 

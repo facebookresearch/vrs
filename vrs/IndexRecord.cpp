@@ -11,11 +11,11 @@
 #include <logging/Verify.h>
 #include <vrs/os/Time.h>
 
+#include <vrs/helpers/FileMacros.h>
 #include "Compressor.h"
 #include "Decompressor.h"
 #include "ErrorCode.h"
 #include "FileHandler.h"
-#include "FileMacros.h"
 #include "ProgressLogger.h"
 
 namespace {

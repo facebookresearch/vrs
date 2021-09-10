@@ -12,6 +12,7 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/helpers/JobQueue.h>
 #include <vrs/os/Event.h>
 #include <vrs/os/Time.h>
 #include <vrs/os/Utils.h>
@@ -21,7 +22,6 @@
 #include "FileFormat.h"
 #include "FileHandlerFactory.h"
 #include "IndexRecord.h"
-#include "JobQueue.h"
 #include "Recordable.h"
 #include "TagsRecord.h"
 

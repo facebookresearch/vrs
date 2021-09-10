@@ -7,7 +7,7 @@
 
 #include <fmt/format.h>
 
-#include <portability/Platform.h>
+#include <vrs/os/Platform.h>
 
 namespace vrs {
 

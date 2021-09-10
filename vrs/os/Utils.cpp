@@ -7,9 +7,9 @@
 #include <algorithm>
 
 #include <logging/Checks.h>
-#include <portability/Platform.h>
 #include <system_utils/os/Utils.h>
 
+#include <vrs/os/Platform.h>
 #include <vrs/utils/Strings.h>
 
 #if IS_WINDOWS_PLATFORM()

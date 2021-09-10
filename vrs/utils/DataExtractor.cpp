@@ -8,9 +8,9 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
-#include <vrs/FileMacros.h>
-#include <vrs/RapidjsonHelper.hpp>
 #include <vrs/RecordFileInfo.h>
+#include <vrs/helpers/FileMacros.h>
+#include <vrs/helpers/Rapidjson.hpp>
 #include <vrs/os/Utils.h>
 #include <vrs/utils/PixelFrame.h>
 

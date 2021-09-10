@@ -2,11 +2,11 @@
 
 #include <gtest/gtest.h>
 
-#include <vrs/test/helpers/OsTestProcess.h>
+#include <vrs/test/helpers/TestProcess.h>
 
-class TestedToolProcess : public vrs::os::OsTestProcess {
+class TestedToolProcess : public vrs::test::TestProcess {
  public:
-  TestedToolProcess() : OsTestProcess("testedtool") {}
+  TestedToolProcess() : TestProcess("testedtool") {}
 };
 
 TEST(TestProcessTest, RunTestedTool) {

@@ -5,8 +5,8 @@
 #define DEFAULT_LOG_CHANNEL "ImageFilter"
 #include <logging/Log.h>
 
-#include <vrs/JobQueue.h>
 #include <vrs/RecordFormatStreamPlayer.h>
+#include <vrs/helpers/JobQueue.h>
 
 #include "CopyHelpers.h"
 

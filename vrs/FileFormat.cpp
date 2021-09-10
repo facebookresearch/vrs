@@ -12,8 +12,8 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/helpers/FileMacros.h>
 #include "ErrorCode.h"
-#include "FileMacros.h"
 #include "IndexRecord.h"
 
 using namespace std::chrono;

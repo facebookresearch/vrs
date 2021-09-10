@@ -34,7 +34,6 @@ using std::string;
 /// For each enum value, please provide a text description for the recordable,
 /// by augmenting the code in StreamId.cpp.
 ///
-/// @see StreamId::recordableTypeIdName()
 enum class RecordableTypeId : uint16_t {
   Undefined = 0xffff,
 
@@ -473,19 +472,6 @@ class StreamId {
   /// @param numericName: a stream ID name in numeric representation, e.g., "1100-1"
   /// @return A stream ID. Use isValid() to know if the conversion succeeded.
   static StreamId fromNumericName(const string& numericName);
-
-  /// Get an English readable recordable type name for the enum value.
-  /// @return English readable recordable type name.
-  /// This name may change over time, so don't use it for identification purposes in your code.
-  /// This can allow the description to change during the life cycle of a product (proto0, proto1,
-  /// EVT1, DVT1, PVT1, etc.)
-  ///
-  /// Note that VRS stores the actual string-name when recording a file, so that you can later tell
-  /// how the recordable type was called when the recording was made.
-  /// VRStool will then show both the original and current recordable type names.
-  static string recordableTypeIdName(RecordableTypeId typeId) {
-    return toString(typeId);
-  }
 
   /// A recording might be using a type id not known by the current version of the code.
   /// This should not be problem, but in some situation, in particular display purposes in

@@ -16,7 +16,7 @@
 #include <logging/Verify.h>
 
 #include <vrs/ErrorCode.h>
-#include <vrs/FileMacros.h>
+#include <vrs/helpers/FileMacros.h>
 
 namespace {
 using namespace vrs;

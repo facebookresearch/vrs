@@ -3,7 +3,7 @@
 // BOOST_USE_WINDOWS_H must be defined first before we include boost interprocess
 // or <windows.h> anywhere, which is why this section must be done before we
 // include "PlaybackThread.h"
-#include <portability/Platform.h>
+#include <vrs/os/Platform.h>
 
 #if IS_WINDOWS_PLATFORM()
 #define BOOST_USE_WINDOWS_H

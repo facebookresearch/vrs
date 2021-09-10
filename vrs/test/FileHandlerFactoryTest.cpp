@@ -7,8 +7,8 @@
 
 #include <vrs/DiskFile.h>
 #include <vrs/FileHandlerFactory.h>
-#include <vrs/FileMacros.h>
 #include <vrs/RecordFileReader.h>
+#include <vrs/helpers/FileMacros.h>
 
 using namespace std;
 using namespace vrs;

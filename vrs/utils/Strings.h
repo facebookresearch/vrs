@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <string>
 
-#include <portability/Platform.h>
+#include <vrs/os/Platform.h>
 
 #if !IS_WINDOWS_PLATFORM()
 #include <strings.h>

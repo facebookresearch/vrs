@@ -6,6 +6,8 @@
 
 #include <logging/Checks.h>
 
+#include <vrs/os/Time.h>
+
 #include <vrs/DataLayout.h>
 #include <vrs/DataPieces.h>
 #include <vrs/RecordFileReader.h>
@@ -17,12 +19,6 @@
 using namespace vrs;
 
 namespace {
-
-// Use your own clock source.
-double getTimestampSec() {
-  using namespace std::chrono;
-  return duration_cast<duration<double>>(steady_clock::now().time_since_epoch()).count();
-}
 
 /*
 
@@ -108,7 +104,7 @@ class RecordableDemo : public Recordable {
   const Record* createConfigurationRecord() override {
     // Use the same time source for ALL your records in the entire file!
     // In this sample, the record has no payload.
-    double someTimeInSec = getTimestampSec();
+    double someTimeInSec = os::getTimestampSec();
     return createRecord(someTimeInSec, Record::Type::CONFIGURATION, 0);
   }
 
@@ -116,7 +112,7 @@ class RecordableDemo : public Recordable {
   // Create a state record to restore the internal state of your recordable on playback
   // Note: always provide a record, even if you don't need to save anything (as shown here).
   const Record* createStateRecord() override {
-    double someTimeInSec = getTimestampSec();
+    double someTimeInSec = os::getTimestampSec();
     return createRecord(someTimeInSec, Record::Type::STATE, 0);
   }
 
@@ -124,7 +120,7 @@ class RecordableDemo : public Recordable {
   void createData(uint32_t sensorValue) {
     metadata_.sensorValue.set(sensorValue); // Record the value we want to save in the record
     // Use the same time source for ALL your records in the entire file!
-    double someTimeInSec = getTimestampSec();
+    double someTimeInSec = os::getTimestampSec();
     createRecord(
         someTimeInSec, Record::Type::DATA, kDataRecordFormatVersion, DataSource(metadata_));
   }
@@ -191,7 +187,7 @@ class RecordSample {
     while (recordable.iNeedToRecordMoreData()) {
       recordable.createMoreRecords(); // for each recordable, maybe create new records of any type
       // maybe once every second, call:
-      double now = getTimestampSec(); // current time using your *unique* time source
+      double now = os::getTimestampSec(); // current time using your *unique* time source
       if (now - lastTime > 1) {
         result = fileWriter.writeRecordsAsync(now - 1); // Start to save data more than 1 second old
         XR_CHECK(result == 0);

@@ -4,6 +4,8 @@
 #include <chrono>
 #include <iostream>
 
+#include <vrs/os/Time.h>
+
 #include <vrs/DataLayout.h>
 #include <vrs/DataLayoutConventions.h>
 #include <vrs/RecordFormatStreamPlayer.h>
@@ -13,12 +15,6 @@
 using namespace vrs;
 
 namespace {
-
-// Use your own clock source.
-double getTimestampSec() {
-  using namespace std::chrono;
-  return duration_cast<duration<double>>(steady_clock::now().time_since_epoch()).count();
-}
 
 using DataLayoutConventions::ImageSpecType;
 
@@ -145,7 +141,7 @@ class MyCameraRecordable : public Recordable {
 
     // create a record using that data
     return createRecord(
-        getTimestampSec(),
+        os::getTimestampSec(),
         Record::Type::CONFIGURATION,
         kConfigurationRecordFormatVersion,
         DataSource(config_));
@@ -153,10 +149,10 @@ class MyCameraRecordable : public Recordable {
   const Record* createStateRecord() override {
     // Best practice is to always create a record when asked, with a reasonable timestamp,
     // even if the record is empty.
-    return createRecord(getTimestampSec(), Record::Type::STATE, 0);
+    return createRecord(os::getTimestampSec(), Record::Type::STATE, 0);
   }
   void createDataRecords(const uint8_t* pixelData) {
-    data_.arrivalTime.set(getTimestampSec());
+    data_.arrivalTime.set(os::getTimestampSec());
     data_.exposureTime.set(2.5);
     data_.frameCounter.set(25);
     data_.cameraTemperature.set(38.5f);
@@ -164,7 +160,7 @@ class MyCameraRecordable : public Recordable {
 
     // create a record using that data
     createRecord(
-        getTimestampSec(),
+        os::getTimestampSec(),
         Record::Type::DATA,
         kDataRecordFormatVersion,
         DataSource(data_, {pixelData, config_.width.get() * config_.height.get()}));

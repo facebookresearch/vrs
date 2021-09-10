@@ -5,7 +5,7 @@
 #include <array>
 #include <sstream>
 
-#include <portability/Platform.h>
+#include <vrs/os/Platform.h>
 
 #if IS_ANDROID_PLATFORM()
 #include <sys/system_properties.h>

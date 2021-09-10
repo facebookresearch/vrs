@@ -13,7 +13,7 @@
 #include <logging/Verify.h>
 
 #include <vrs/FileHandlerFactory.h>
-#include <vrs/RapidjsonHelper.hpp>
+#include <vrs/helpers/Rapidjson.hpp>
 #include <vrs/utils/xxhash/xxhash.h>
 
 #include "CopyHelpers.h"

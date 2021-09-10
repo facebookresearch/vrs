@@ -6,7 +6,7 @@
 #include <logging/Checks.h>
 #include <logging/Log.h>
 
-#include <vrs/FileMacros.h>
+#include <vrs/helpers/FileMacros.h>
 
 using namespace vrs;
 using namespace vrs::utils::test;

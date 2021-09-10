@@ -2,9 +2,8 @@
 
 #include "TagConventions.h"
 
+#include <vrs/helpers/Rapidjson.hpp>
 #include <vrs/os/System.h>
-
-#include "RapidjsonHelper.hpp"
 
 using namespace std;
 

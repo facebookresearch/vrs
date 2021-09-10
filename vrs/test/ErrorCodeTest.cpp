@@ -1,9 +1,10 @@
 // Facebook Technologies, LLC Proprietary and Confidential.
 
 #include <gtest/gtest.h>
-#include <vrs/ErrorCode.h>
 
-#include <portability/Platform.h>
+#include <vrs/os/Platform.h>
+
+#include <vrs/ErrorCode.h>
 
 using namespace vrs;
 

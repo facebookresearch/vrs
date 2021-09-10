@@ -5,8 +5,8 @@
 #include <gtest/gtest.h>
 
 #include <TestDataDir/TestDataDir.h>
-#include <portability/Platform.h>
 #include <test_helpers/UniqueTemporaryDirectory.h>
+#include <vrs/os/Platform.h>
 #include <vrs/os/Utils.h>
 
 // This test verifies that the following definitions are available for... tests!!

@@ -11,7 +11,7 @@
 #include <Serialization/Rapidjson.h>
 #include <logging/Checks.h>
 
-#include "DataPieces.h"
+#include <vrs/DataPieces.h>
 
 namespace vrs {
 

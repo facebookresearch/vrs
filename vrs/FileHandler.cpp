@@ -9,12 +9,13 @@
 #define DEFAULT_LOG_CHANNEL "FileHandler"
 #include <logging/Log.h>
 #include <logging/Verify.h>
+
+#include <vrs/helpers/Rapidjson.hpp>
 #include <vrs/utils/xxhash/xxhash.h>
 
 #include "DiskFile.h"
 #include "ErrorCode.h"
 #include "FileHandlerFactory.h"
-#include "RapidjsonHelper.hpp"
 
 using namespace std;
 

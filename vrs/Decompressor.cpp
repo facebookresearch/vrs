@@ -14,9 +14,9 @@
 #include <logging/Checks.h>
 #include <logging/Log.h>
 
+#include <vrs/helpers/FileMacros.h>
 #include "ErrorCode.h"
 #include "FileHandler.h"
-#include "FileMacros.h"
 #include "Record.h"
 
 namespace vrs {

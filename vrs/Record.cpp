@@ -5,12 +5,12 @@
 #define DEFAULT_LOG_CHANNEL "VRSRecord"
 #include <logging/Log.h>
 
+#include <vrs/helpers/FileMacros.h>
 #include <vrs/utils/EnumStringConverter.h>
 #include "Compressor.h"
 #include "DataSource.h"
 #include "ErrorCode.h"
 #include "FileFormat.h"
-#include "FileMacros.h"
 #include "RecordManager.h"
 
 namespace vrs {
@@ -116,10 +116,6 @@ int Record::writeRecord(
 
 const char* Record::typeName(Type type) {
   return RecordTypeConverter::toString(type);
-}
-
-Record::Type Record::nameToType(const std::string& name) {
-  return toEnum<Record::Type>(name);
 }
 
 } // namespace vrs

@@ -2,16 +2,14 @@
 
 #pragma once
 
-#ifndef __XROS__
+#include <vrs/os/Platform.h>
+
+#if IS_VRS_OSS_TARGET_PLATFORM()
+
 #include <boost/interprocess/sync/interprocess_semaphore.hpp>
-#else
-#include <xr/semaphore.h>
-#endif
 
 namespace vrs::os {
 
-/// vrs::os::Semaphore does not need to be interprocess.
-#ifndef __XROS__
 class Semaphore : private boost::interprocess::interprocess_semaphore {
  public:
   explicit Semaphore(unsigned int a_initial_count) : interprocess_semaphore(a_initial_count) {}
@@ -22,18 +20,9 @@ class Semaphore : private boost::interprocess::interprocess_semaphore {
   bool timedWait(const double a_time_sec);
   bool timed_wait(const boost::posix_time::ptime& abs_time) = delete;
 };
-#else
-class Semaphore {
- public:
-  explicit Semaphore(unsigned int a_initial_count);
-
-  bool timedWait(const double a_time_sec);
-  void post();
-  void wait();
-
- private:
-  xr_semaphore_t sem_;
-};
-#endif
 
 } // namespace vrs::os
+
+#else
+#include "Semaphore_fb.h"
+#endif

@@ -18,10 +18,10 @@
 #include <vrs/os/Utils.h>
 #include <vrs/utils/Strings.h>
 
+#include <vrs/helpers/FileMacros.h>
 #include "Compressor.h"
 #include "Decompressor.h"
 #include "ErrorCode.h"
-#include "FileMacros.h"
 
 using namespace std;
 

@@ -7,15 +7,15 @@
 
 /// To test command line tools
 /// Add a definition for the location of the tool in the BUCK file, as an env variable.
-/// See definition of TESTEDTOOL_EXE used to test this class in os/BUCK.
+/// See definition of TESTEDTOOL_EXE used to test this class in vrs/test/BUCK.
 
-namespace vrs::os {
+namespace vrs::test {
 
 namespace bp = boost::process;
 
-class OsTestProcess {
+class TestProcess {
  public:
-  OsTestProcess(const char* processName) : processName_{processName} {}
+  TestProcess(const char* processName) : processName_{processName} {}
   bool start(std::string arg, bp::ipstream& sout) {
     return start(arg, &sout);
   }
@@ -34,4 +34,4 @@ class OsTestProcess {
   bool findBinary(std::string& inOutName);
 };
 
-} // namespace vrs::os
+} // namespace vrs::test

@@ -2,8 +2,7 @@
 
 #include "FileCache.h"
 
-#include <portability/Platform.h>
-
+#include <vrs/os/Platform.h>
 #include <vrs/os/Utils.h>
 
 #include "ErrorCode.h"

@@ -6,9 +6,9 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/helpers/FileMacros.h>
 #include "ErrorCode.h"
 #include "FileHandler.h"
-#include "FileMacros.h"
 
 namespace vrs {
 

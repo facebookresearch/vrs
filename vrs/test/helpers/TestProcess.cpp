@@ -1,14 +1,14 @@
 // Facebook Technologies, LLC Proprietary and Confidential.
 
-#include "OsTestProcess.h"
+#include "TestProcess.h"
 
-#include <portability/Platform.h>
 #include <system_utils/os/Utils.h>
 
-#define DEFAULT_LOG_CHANNEL "OsTestProcess"
+#define DEFAULT_LOG_CHANNEL "TestProcess"
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/os/Platform.h>
 #include <vrs/os/Utils.h>
 #include <vrs/utils/Strings.h>
 
@@ -19,15 +19,16 @@
 #define EXECUTABLE_SUFFIX ""
 #endif
 
-namespace vrs::os {
+namespace vrs::test {
 
 using namespace std;
+using namespace vrs;
 
-inline std::string trim(const std::string& line) {
+inline string trim(const string& line) {
   return vrs::utils::str::trim(line, " \t\r\n");
 }
 
-bool OsTestProcess::start(string arg, bp::ipstream* sout) {
+bool TestProcess::start(string arg, bp::ipstream* sout) {
   string path = string(processName_);
   if (findBinary(path)) {
     if (looksLikeAFbCentOSServer()) {
@@ -43,9 +44,9 @@ bool OsTestProcess::start(string arg, bp::ipstream* sout) {
   return false;
 }
 
-string OsTestProcess::getJsonOutput(bp::ipstream& output) const {
-  std::string line;
-  while (std::getline(output, line)) {
+string TestProcess::getJsonOutput(bp::ipstream& output) const {
+  string line;
+  while (getline(output, line)) {
     line = trim(line);
     if (!line.empty() && line.front() == '{' && line.back() == '}') {
       return line;
@@ -54,7 +55,7 @@ string OsTestProcess::getJsonOutput(bp::ipstream& output) const {
   return {};
 }
 
-int OsTestProcess::runProcess() {
+int TestProcess::runProcess() {
   if (!process) {
     return -1;
   }
@@ -62,27 +63,28 @@ int OsTestProcess::runProcess() {
   return process->exit_code();
 }
 
-bool OsTestProcess::looksLikeAFbCentOSServer() {
+bool TestProcess::looksLikeAFbCentOSServer() {
 #if IS_LINUX_PLATFORM()
-  return isFile("/etc/fb-os-release");
+  return os::isFile("/etc/fb-os-release");
 #else
   return false;
 #endif
 }
 
-bool OsTestProcess::findBinary(string& inOutName) {
+bool TestProcess::findBinary(string& inOutName) {
   // With Buck, we expect the process's path to be injected using an environment variable
-  std::string envVarName{inOutName};
+  string envVarName{inOutName};
   transform(envVarName.begin(), envVarName.end(), envVarName.begin(), ::toupper);
   envVarName += "_EXE"; // ex: "VRStool" -> "VRSTOOL_EXE"
-  const char* exactPath = std::getenv(envVarName.c_str());
+  const char* exactPath = getenv(envVarName.c_str());
   if (exactPath != nullptr) {
     inOutName = exactPath;
   } else {
     // cmake-generator setup: look for the tool next to the unit test
-    inOutName = getParentFolder(getCurrentExecutablePath()) + '/' + inOutName + EXECUTABLE_SUFFIX;
+    string exeFolder = os::getParentFolder(os::getCurrentExecutablePath());
+    inOutName = os::pathJoin(exeFolder, inOutName + EXECUTABLE_SUFFIX);
   }
-  return isFile(inOutName);
+  return os::isFile(inOutName);
 }
 
-} // namespace vrs::os
+} // namespace vrs::test

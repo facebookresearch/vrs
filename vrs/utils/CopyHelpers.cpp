@@ -9,18 +9,19 @@
 
 #define DEFAULT_LOG_CHANNEL "CopyHelpers"
 #include <logging/Log.h>
-#include <portability/Platform.h>
+
+#include <vrs/helpers/Rapidjson.hpp>
+#include <vrs/os/Platform.h>
+#include <vrs/os/Time.h>
+#include <vrs/os/Utils.h>
 
 #include <vrs/FileHandlerFactory.h>
-#include <vrs/RapidjsonHelper.hpp>
 #include <vrs/RecordFileInfo.h>
 #include <vrs/RecordFileWriter.h>
 #include <vrs/StreamPlayer.h>
 #include <vrs/gaia/CachedGaiaFileHandler.h>
 #include <vrs/gaia/GaiaClient.h>
 #include <vrs/gaia/support/GaiaClientConfig.h>
-#include <vrs/os/Time.h>
-#include <vrs/os/Utils.h>
 
 using namespace std;
 using namespace vrs;

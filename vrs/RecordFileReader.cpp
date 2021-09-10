@@ -12,6 +12,7 @@
 #include <vrs/os/Utils.h>
 #include <vrs/utils/Strings.h>
 
+#include <vrs/helpers/FileMacros.h>
 #include "DataLayout.h"
 #include "DescriptionRecord.h"
 #include "DiskFile.h"
@@ -20,7 +21,6 @@
 #include "FileCache.h"
 #include "FileDetailsCache.h"
 #include "FileHandlerFactory.h"
-#include "FileMacros.h"
 #include "IndexRecord.h"
 #include "LegacyFormatsProvider.h"
 #include "RecordFileInfo.h"
