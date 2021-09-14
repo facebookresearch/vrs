@@ -252,6 +252,7 @@ TEST_F(MultiRecordFileReaderTest, consolidatedIndex) {
         "Extra record found in index. Unexpected Record timestamp: {}", (*recordIt)->timestamp);
     recordIt++;
   }
+  ASSERT_EQ(SUCCESS, reader.closeFiles());
   removeFiles(filePaths);
 }
 
@@ -455,4 +456,41 @@ class StreamIdCollisionTester {
 
 TEST_F(MultiRecordFileReaderTest, streamIdCollision) {
   StreamIdCollisionTester();
+}
+
+TEST_F(MultiRecordFileReaderTest, getFileChunks) {
+  constexpr auto numDataRecords = 10;
+  constexpr auto fileCount = 4;
+  const auto filePaths = getOsTempPaths(fileCount);
+  for (size_t i = 0; i < filePaths.size(); i++) {
+    createVRSFileSynchronously(filePaths[i], numDataRecords);
+  }
+  // Single file use case
+  MultiRecordFileReader singleReader;
+  const auto& singleFilePath = filePaths[0];
+  ASSERT_EQ(SUCCESS, singleReader.openFiles({singleFilePath}));
+  ASSERT_FALSE(singleReader.getFileChunks().empty());
+  const auto singleFileChunks = singleReader.getFileChunks();
+  ASSERT_EQ(1, singleFileChunks.size());
+  ASSERT_EQ(singleFilePath, singleFileChunks[0].first);
+  RecordFileReader singleReaderExpected;
+  ASSERT_EQ(SUCCESS, singleReaderExpected.openFile(singleFilePath));
+  const auto singleFileChunksExpected = singleReader.getFileChunks();
+  ASSERT_EQ(singleFileChunksExpected, singleFileChunks);
+  const auto expectedSize = singleFileChunksExpected[0].second;
+  ASSERT_EQ(SUCCESS, singleReader.closeFiles());
+  ASSERT_EQ(SUCCESS, singleReaderExpected.closeFile());
+  ASSERT_TRUE(singleReader.getFileChunks().empty());
+  // Multi file use case
+  MultiRecordFileReader multiReader;
+  ASSERT_EQ(SUCCESS, multiReader.openFiles(filePaths));
+  const auto fileChunks = multiReader.getFileChunks();
+  ASSERT_EQ(filePaths.size(), fileChunks.size());
+  for (size_t i = 0; i < filePaths.size(); i++) {
+    const auto fileChunk = fileChunks[i];
+    ASSERT_EQ(filePaths[i], fileChunk.first);
+    ASSERT_EQ(expectedSize, fileChunk.second);
+  }
+  ASSERT_EQ(SUCCESS, multiReader.closeFiles());
+  removeFiles(filePaths);
 }

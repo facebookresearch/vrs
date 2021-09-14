@@ -96,6 +96,13 @@ class MultiRecordFileReader {
     return getTag(getTags(uniqueStreamId).user, name);
   }
 
+  /// Get a list of the constituent paths + sizes (in bytes) across all files.
+  /// When no file is open, an empty vector is returned.
+  /// When a single file is open, the underlying chunks with their sizes are returned.
+  /// When multiple files are open, file paths and their sizes are returned.
+  /// @return A vector of pairs path-file size in bytes.
+  vector<std::pair<string, int64_t>> getFileChunks() const;
+
  private:
   using StreamIdToUniqueIdMap = map<StreamId, UniqueStreamId>;
   using StreamIdReaderPair = std::pair<StreamId, RecordFileReader*>;
@@ -132,6 +139,8 @@ class MultiRecordFileReader {
   set<UniqueStreamId> uniqueStreamIds_;
   map<const RecordFileReader*, StreamIdToUniqueIdMap> readerStreamIdToUniqueMap_;
   map<UniqueStreamId, StreamIdReaderPair> uniqueToStreamIdReaderPairMap_;
+  /// File Paths underlying files
+  vector<string> filePaths_;
 
 #ifdef GTEST_BUILD
   FRIEND_TEST(::MultiRecordFileReaderTest, consolidatedIndex);

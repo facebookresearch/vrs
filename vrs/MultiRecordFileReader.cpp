@@ -13,6 +13,7 @@
 #include <vrs/RecordFileReader.h>
 #include <vrs/StreamId.h>
 #include <vrs/TagConventions.h>
+#include <vrs/helpers/FileMacros.h>
 
 using namespace std;
 
@@ -33,11 +34,14 @@ int MultiRecordFileReader::openFiles(const std::vector<std::string>& paths) {
   for (const auto& path : paths) {
     readers_.push_back(make_unique<RecordFileReader>());
     auto& reader = readers_.back();
-    const auto status = reader->openFile(path);
+    FileSpec fileSpec;
+    IF_ERROR_RETURN(RecordFileReader::vrsFilePathToFileSpec(path, fileSpec));
+    const auto status = reader->openFile(fileSpec);
     if (status != SUCCESS) {
       closeFiles();
       return status;
     }
+    filePaths_.push_back(fileSpec.getEasyPath());
     XR_LOGD("Opened file '{}' and assigned to reader #{}", path, readers_.size() - 1);
   }
   if (!areFilesRelated()) {
@@ -140,6 +144,22 @@ const StreamTags& MultiRecordFileReader::getTags(UniqueStreamId uniqueStreamId) 
   const auto& streamId = streamReaderPair->first;
   const auto& reader = streamReaderPair->second;
   return reader->getTags(streamId);
+}
+
+vector<std::pair<string, int64_t>> MultiRecordFileReader::getFileChunks() const {
+  if (!isOpened_) {
+    static const vector<std::pair<string, int64_t>> emptyVector;
+    return emptyVector;
+  }
+  if (hasSingleFile()) {
+    return readers_.front()->getFileChunks();
+  }
+  vector<std::pair<string, int64_t>> fileChunks;
+  fileChunks.reserve(readers_.size());
+  for (size_t i = 0; i < readers_.size(); i++) {
+    fileChunks.emplace_back(filePaths_[i], readers_[i]->getTotalSourceSize());
+  }
+  return fileChunks;
 }
 
 bool MultiRecordFileReader::areFilesRelated() const {
