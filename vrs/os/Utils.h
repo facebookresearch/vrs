@@ -8,8 +8,9 @@
 
 #include <system_utils/os/Utils.h>
 
-/// Only vrs should use these methods, designed to enable an open source
-/// version that won't rely on arvr::system_utils::os
+/// Please do not use this outside of VRS.
+/// Only VRS should use these methods, designed to abstract OS operations for open sourcing.
+/// This version relies on arvr::system_utils::os
 /// The open source version of vrs will use a separate implementation of vrs/os/Utils.cpp|.h
 
 namespace vrs::os {
