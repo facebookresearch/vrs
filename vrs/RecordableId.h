@@ -24,8 +24,3 @@
 /// during a transition phase. We're in the process of updating all the core vrs libraries to use
 /// StreamId. We plan on providing codemode scripts to help client teams update their own code, and
 /// eventually, delete this file entirely.
-
-namespace vrs {
-using RecordableId [[deprecated("Please use vrs::StreamId instead of vrs::RecordableId.")]] =
-    vrs::StreamId;
-}
