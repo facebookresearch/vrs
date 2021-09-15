@@ -103,6 +103,21 @@ class MultiRecordFileReader {
   /// @return A vector of pairs path-file size in bytes.
   vector<std::pair<string, int64_t>> getFileChunks() const;
 
+  /// Streams using << Recordable Class >> ids require a << flavor >>,
+  /// which must be provided when the stream was created.
+  /// Use this API to get the recordable flavor provided, if any, when the stream was created.
+  /// @param streamId: StreamId of the record stream to consider.
+  /// @return The flavor for the corresponding RecordableTypeId, or an empty string,
+  /// if no flavor was provided when the stream was created.
+  const string& getFlavor(UniqueStreamId streamId) const;
+
+  /// Get a set of StreamId for a specific type, and an optional flavor.
+  /// @param typeId: a recordable type id, maybe a Recordable Class.
+  /// Use RecordableTypeId::Undefined to match any recordable type.
+  /// @param flavor: an option flavor.
+  /// @return A vector of stream ids of the given type, and of the provided flavor (if any).
+  vector<UniqueStreamId> getStreams(RecordableTypeId typeId, const string& flavor = {}) const;
+
  private:
   using StreamIdToUniqueIdMap = map<StreamId, UniqueStreamId>;
   using StreamIdReaderPair = std::pair<StreamId, RecordFileReader*>;

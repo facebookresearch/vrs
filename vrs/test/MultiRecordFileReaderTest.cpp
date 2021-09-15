@@ -39,13 +39,14 @@ class MyMetadata : public AutoDataLayout {
   AutoDataLayoutEnd endLayout;
 };
 
+constexpr auto kTestRecordableTypeId = RecordableTypeId::UnitTestRecordableClass;
 constexpr const char* kTestFlavor = "team/vrs/test/multi-test";
 
 class TestRecordable : public Recordable {
   static const uint32_t kDataRecordFormatVersion = 1;
 
  public:
-  TestRecordable() : Recordable(RecordableTypeId::UnitTestRecordableClass, kTestFlavor) {
+  TestRecordable() : Recordable(kTestRecordableTypeId, kTestFlavor) {
     // define your RecordFormat & DataLayout definitions for this stream
     addRecordFormat(
         Record::Type::DATA, // the type of records this definition applies to
@@ -266,6 +267,7 @@ TEST_F(MultiRecordFileReaderTest, singleFileRecordCount) {
   MultiRecordFileReader reader;
   ASSERT_EQ(0, reader.getRecordCount());
   ASSERT_EQ(SUCCESS, reader.openFiles(filePaths));
+  // getStreams() validation
   const auto& streams = reader.getStreams();
   ASSERT_EQ(1, streams.size());
   ASSERT_EQ(numTotalRecords, reader.getRecordCount());
@@ -274,11 +276,20 @@ TEST_F(MultiRecordFileReaderTest, singleFileRecordCount) {
   ASSERT_EQ(numConfigRecords, reader.getRecordCount(stream, Record::Type::CONFIGURATION));
   ASSERT_EQ(numStateRecords, reader.getRecordCount(stream, Record::Type::STATE));
   ASSERT_EQ(numDataRecords, reader.getRecordCount(stream, Record::Type::DATA));
-  static const StreamId unknownStream;
+  // getStreams(RecordableTypeId, flavor) validation
+  ASSERT_EQ(0, reader.getStreams(RecordableTypeId::AccelerometerRecordableClass).size());
+  ASSERT_EQ(1, reader.getStreams(RecordableTypeId::Undefined).size());
+  ASSERT_EQ(1, reader.getStreams(kTestRecordableTypeId).size());
+  ASSERT_EQ(0, reader.getStreams(kTestRecordableTypeId, "unknownFlavor").size());
+  ASSERT_EQ(1, reader.getStreams(kTestRecordableTypeId, kTestFlavor).size());
+  ASSERT_EQ(kTestFlavor, reader.getFlavor(stream));
+  // Unknown Stream Record Counts validation
+  static const UniqueStreamId unknownStream;
   ASSERT_EQ(0, reader.getRecordCount(unknownStream));
   ASSERT_EQ(0, reader.getRecordCount(unknownStream, Record::Type::CONFIGURATION));
   assertEmptyStreamTags(reader);
   ASSERT_EQ(SUCCESS, reader.closeFiles());
+  // Validation after closing
   ASSERT_EQ(0, reader.getRecordCount());
   ASSERT_EQ(0, reader.getRecordCount(stream));
   ASSERT_EQ(0, reader.getRecordCount(stream, Record::Type::CONFIGURATION));
@@ -333,6 +344,7 @@ class StreamIdCollisionTester {
     // Ensure that all the expected streams are present and have expected number of records
     validateUniqueStreams(remainingStreams);
     validateCommonStreams(remainingStreams);
+    validateGetStreamsByTypeFlavor();
     close();
   }
 
@@ -440,6 +452,17 @@ class StreamIdCollisionTester {
       validateRecordCount(commonStreamId);
       EXPECT_EQ(expectedOriginalStreamId, reader_.getTag(commonStreamId, kOriginalStreamIdTag));
     }
+  }
+
+  void validateGetStreamsByTypeFlavor() {
+    const auto streamsSet = reader_.getStreams();
+    vector<UniqueStreamId> expectedStreams(streamsSet.begin(), streamsSet.end());
+    EXPECT_EQ(expectedStreams, reader_.getStreams(RecordableTypeId::Undefined));
+    EXPECT_EQ(0, reader_.getStreams(RecordableTypeId::AccelerometerRecordableClass).size());
+    EXPECT_EQ(expectedStreams, reader_.getStreams(kTestRecordableTypeId));
+    EXPECT_EQ(expectedStreams, reader_.getStreams(kTestRecordableTypeId, kTestFlavor));
+    ASSERT_EQ(kTestFlavor, reader_.getFlavor(expectedStreams.front()));
+    EXPECT_EQ(0, reader_.getStreams(kTestRecordableTypeId, "unknownFlavor").size());
   }
 
   // Streams which don't have collisions across files

@@ -162,6 +162,26 @@ vector<std::pair<string, int64_t>> MultiRecordFileReader::getFileChunks() const 
   return fileChunks;
 }
 
+const string& MultiRecordFileReader::getFlavor(UniqueStreamId streamId) const {
+  return getTag(getTags(streamId).vrs, Recordable::getFlavorTagName());
+}
+
+vector<UniqueStreamId> MultiRecordFileReader::getStreams(
+    RecordableTypeId typeId,
+    const string& flavor) const {
+  if (hasSingleFile()) {
+    return readers_.front()->getStreams(typeId, flavor);
+  }
+  vector<UniqueStreamId> streamIds;
+  for (const auto& streamId : uniqueStreamIds_) {
+    if ((typeId == RecordableTypeId::Undefined || streamId.getTypeId() == typeId) &&
+        (flavor.empty() || getFlavor(streamId) == flavor)) {
+      streamIds.emplace_back(streamId);
+    }
+  }
+  return streamIds;
+}
+
 bool MultiRecordFileReader::areFilesRelated() const {
   if (readers_.empty() || hasSingleFile()) {
     return true;
