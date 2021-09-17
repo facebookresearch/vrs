@@ -182,6 +182,25 @@ vector<UniqueStreamId> MultiRecordFileReader::getStreams(
   return streamIds;
 }
 
+UniqueStreamId MultiRecordFileReader::getStreamForTag(
+    const string& tagName,
+    const string& tag,
+    RecordableTypeId typeId) const {
+  if (!isOpened_) {
+    return {};
+  }
+  if (hasSingleFile()) {
+    return readers_.front()->getStreamForTag(tagName, tag, typeId);
+  }
+  for (const auto& streamId : uniqueStreamIds_) {
+    if ((typeId == RecordableTypeId::Undefined || streamId.getTypeId() == typeId) &&
+        getTag(streamId, tagName) == tag) {
+      return streamId;
+    }
+  }
+  return {};
+}
+
 bool MultiRecordFileReader::areFilesRelated() const {
   if (readers_.empty() || hasSingleFile()) {
     return true;

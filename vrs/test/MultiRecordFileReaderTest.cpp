@@ -118,13 +118,17 @@ const map<string, string>& getDefaultTags() {
 void createVRSFileSynchronously(
     const string& path,
     const size_t numRandomDataRecords,
-    const map<string, string>& tags = {}) {
+    const map<string, string>& fileTags = {},
+    const map<string, string>& streamTags = {}) {
   VrsFileBuilder fileBuilder(path);
   for (size_t i = 0; i < numRandomDataRecords; i++) {
     fileBuilder.recordable_.createRandomData();
   }
-  for (const auto& [tagKey, tagValue] : tags) {
+  for (const auto& [tagKey, tagValue] : fileTags) {
     fileBuilder.fileWriter_.setTag(tagKey, tagValue);
+  }
+  for (const auto& [tagKey, tagValue] : streamTags) {
+    fileBuilder.recordable_.setTag(tagKey, tagValue);
   }
   fileBuilder.build();
 }
@@ -263,7 +267,10 @@ TEST_F(MultiRecordFileReaderTest, singleFileRecordCount) {
   constexpr auto numStateRecords = 1;
   constexpr auto numDataRecords = 14;
   constexpr auto numTotalRecords = numDataRecords + numStateRecords + numConfigRecords;
-  createVRSFileSynchronously(filePaths.front(), numDataRecords);
+  const string expectedStreamTag("expectedStreamTag");
+  const string expectedStreamTagValue("expectedStreamTagValue");
+  const map<string, string> expectedStreamTags = {{expectedStreamTag, expectedStreamTagValue}};
+  createVRSFileSynchronously(filePaths.front(), numDataRecords, {}, expectedStreamTags);
   MultiRecordFileReader reader;
   ASSERT_EQ(0, reader.getRecordCount());
   ASSERT_EQ(SUCCESS, reader.openFiles(filePaths));
@@ -283,11 +290,14 @@ TEST_F(MultiRecordFileReaderTest, singleFileRecordCount) {
   ASSERT_EQ(0, reader.getStreams(kTestRecordableTypeId, "unknownFlavor").size());
   ASSERT_EQ(1, reader.getStreams(kTestRecordableTypeId, kTestFlavor).size());
   ASSERT_EQ(kTestFlavor, reader.getFlavor(stream));
+  // getTags() and getStreamForTag() validation
+  ASSERT_EQ(expectedStreamTags, reader.getTags(stream).user);
+  ASSERT_EQ(stream, reader.getStreamForTag(expectedStreamTag, expectedStreamTagValue));
+  ASSERT_FALSE(reader.getStreamForTag(expectedStreamTag, "unexpectedValue").isValid());
   // Unknown Stream Record Counts validation
   static const UniqueStreamId unknownStream;
   ASSERT_EQ(0, reader.getRecordCount(unknownStream));
   ASSERT_EQ(0, reader.getRecordCount(unknownStream, Record::Type::CONFIGURATION));
-  assertEmptyStreamTags(reader);
   ASSERT_EQ(SUCCESS, reader.closeFiles());
   // Validation after closing
   ASSERT_EQ(0, reader.getRecordCount());
@@ -441,6 +451,10 @@ class StreamIdCollisionTester {
       remainingStreams.erase(it);
       validateRecordCount(expectedStreamId);
       EXPECT_EQ(expectedStreamId.getName(), reader_.getTag(expectedStreamId, kOriginalStreamIdTag));
+      EXPECT_EQ(
+          expectedStreamId,
+          reader_.getStreamForTag(kOriginalStreamIdTag, expectedStreamId.getName()));
+      EXPECT_FALSE(reader_.getStreamForTag(kOriginalStreamIdTag, "unkownValue").isValid());
     }
   }
 
@@ -452,6 +466,10 @@ class StreamIdCollisionTester {
       validateRecordCount(commonStreamId);
       EXPECT_EQ(expectedOriginalStreamId, reader_.getTag(commonStreamId, kOriginalStreamIdTag));
     }
+    EXPECT_EQ(
+        expectedOriginalStreamId,
+        reader_.getStreamForTag(kOriginalStreamIdTag, expectedOriginalStreamId).getName());
+    EXPECT_FALSE(reader_.getStreamForTag(kOriginalStreamIdTag, "unkownValue").isValid());
   }
 
   void validateGetStreamsByTypeFlavor() {

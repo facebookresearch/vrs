@@ -118,6 +118,21 @@ class MultiRecordFileReader {
   /// @return A vector of stream ids of the given type, and of the provided flavor (if any).
   vector<UniqueStreamId> getStreams(RecordableTypeId typeId, const string& flavor = {}) const;
 
+  /// Find the first stream with given tag name + value pair and RecordableTypeId
+  /// @param tagName: The name of the tag to look for.
+  /// @param tag: The tag value to look for.
+  /// @param typeId: The RecordableTypeId to limit the search to, or RecordableTypeId::Undefined to
+  /// look for any device type.
+  /// Note: if more than one streams match the criteria, the "first" one is
+  /// returned, which means the one with the lowest RecordableTypeId enum value, or if equal, the
+  /// one with the lowest UniqueStreamId instanceId.
+  /// @return A UniqueStreamId.
+  /// Call isValid() to know if a matching StreamId was actually found.
+  UniqueStreamId getStreamForTag(
+      const string& tagName,
+      const string& tag,
+      RecordableTypeId typeId = RecordableTypeId::Undefined) const;
+
  private:
   using StreamIdToUniqueIdMap = map<StreamId, UniqueStreamId>;
   using StreamIdReaderPair = std::pair<StreamId, RecordFileReader*>;
@@ -151,6 +166,7 @@ class MultiRecordFileReader {
   /// Index across all underlying VRS files. `nullptr` in single file case for optimization.
   unique_ptr<std::vector<const IndexRecord::RecordInfo*>> recordIndex_;
   /// StreamId related mapping to tackle collisions across different files
+  /// Not meant to be used when hasSingleFile() == true
   set<UniqueStreamId> uniqueStreamIds_;
   map<const RecordFileReader*, StreamIdToUniqueIdMap> readerStreamIdToUniqueMap_;
   map<UniqueStreamId, StreamIdReaderPair> uniqueToStreamIdReaderPairMap_;
