@@ -9,30 +9,32 @@ namespace vrs {
 
 using std::string;
 
-/// Streams need a unique ID, so that VRS can differentiate the records of different streams.
+/// VRS streams need a unique ID, so that VRS can differentiate the records of different streams.
 ///
-/// RecordableTypeId represent a specific hardware device, a virtual device, or when teams have made
-/// their data interoperable, a class of devices using a common data format, or maybe virtual
-/// devices, or annotations of all sorts...
-/// For simplicity, we will say that each RecordableTypeId enum value represents some kind of
-/// << recordable >>, something that generates data saved in a VRS stream using that enum value.
+/// RecordableTypeId represent a specific hardware or logical device, or when teams have made
+/// their data interoperable, a class of devices using a common data format, or maybe a virtual
+/// device, or a stream of annotations of all sorts...
+/// For simplicity, we will say that each RecordableTypeId enum value identifies some type of
+/// << recordable >>, which is a producer of data to be recorded in their own stream.
 ///
-/// Using an enum value for each type of recordable is admittedly a lazy and not very elegant way
-/// to identify unique recordables, because it requires every VRS user to declare their recordable
-/// in a shared name space.
+/// Using an enum value for each recordable type is admittedly a very lazy and inelegant way
+/// to identify unique recordable types, because it requires every use case to have their own
+/// recordable type id in a shared enum definition. This is the legacy method.
 ///
-/// Rather than adding new values to this enum, as we've done for a long time, please consider using
-/// some of the existing << recordable class >> ids (values between 200 and 999), and provide a
-/// required << flavor >> to describe more specifically the data being recorded.
+/// Today, rather than adding new enum values as we've done for too long, please use an existing
+/// << recordable class >> id (values between 200 and 999) along with a << flavor >> that describes
+/// more specifically the data being recorded.
 ///
-/// Whereas << recordable class >> ids are meant to be used and reused by different teams, which can
-/// describe their use case using the << flavor >> parameter, the other ids are not supposed to be
-/// used outside of the context they've been created for.
-/// If you do not want to use an existing << recordable class >> value with a flavor, you can still
-/// create new enum values.
+/// Whereas << recordable class >> ids are meant to be used and reused by different teams, who can
+/// describe their use case using the << flavor >> parameter, the legacy ids are not supposed to be
+/// used outside of the context they were created for.
+/// Should none of the existing << recordable class >> match your use case, feel free to propose new
+/// ones. That's much better than creating new legacy enum values.
 ///
-/// For each enum value, please provide a text description for the recordable,
-/// by augmenting the code in StreamId.cpp.
+/// For now, if you can not use a << recordable class >> value with a << flavor >> without having to
+/// refactor your code, you can still create new enum values, even if that's bad practice.
+///
+/// For each enum value, a text description must be provided in StreamId.cpp.
 ///
 enum class RecordableTypeId : uint16_t {
   Undefined = 0xffff,
@@ -148,7 +150,7 @@ enum class RecordableTypeId : uint16_t {
   FirstRecordableClassId = 200,
   LastRecordableClassId = 999,
 
-  /// << Regular devices >> start at 1000 (legacy types, prefer using << recordable class >> ids)
+  /// << Legacy devices >> start at 1000 (prefer using << recordable class >> ids)
   Cv1Camera = 1000,
   Proto0IMUHAL = 1001,
   Proto0SyncPulseHAL = 1002,
@@ -387,6 +389,7 @@ enum class RecordableTypeId : uint16_t {
 };
 
 /// Get an English readable recordable type name for the enum value.
+/// @param typeId: the recordable type id to describe
 /// @return English readable recordable type name.
 /// This name may change over time, so don't use it for identification purposes in your code.
 /// This can allow the description to change during the life cycle of a product (proto0, proto1,
@@ -406,15 +409,14 @@ inline bool isARecordableClass(RecordableTypeId typeId) {
 /// Identifier for a stream of records, containing a RecordableTypeId and an instance id, so that
 /// multiple streams of the same kind can be recorded side-by-side in a VRS file unambiguously.
 ///
-/// Note that instance ids are not meant to be controlled, set or determined by client code.
+/// Note that instance ids are not meant to be controlled, set, or defined by client code.
 ///
-/// During recording, VRS provides a unique instance id automatically when a recordable is created,
+/// During recording, VRS generates a unique instance id when a recordable is created,
 /// to ensure that each recordable has a unique stream id in the whole system. By design, if you
-/// stop recording, and destroy the recordables and create new ones, the instance id will keep
-/// increasing. This can potentially allow two recordables to be created for the same device, so
-/// that data can be written in two separate VRS files.
+/// stop recording, and destroy the recordables and create new ones, the instance ids will keep
+/// increasing.
 ///
-/// To identify streams, don't rely on instance ids, use recordable tags or flavors instead.
+/// To identify streams, don't rely on instance id values, use recordable tags or flavors instead.
 /// When reading a file, use RecordFileReader::getStreamForTag() and
 /// RecordFileReader::getStreamForFlavor(), to directly find the streams you're looking for.
 class StreamId {

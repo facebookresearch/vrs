@@ -363,7 +363,7 @@ StreamId StreamId::fromNumericName(const string& numericName) {
   // Quick parsing of "NNN-DDD", two uint numbers separated by a '-'.
   const uint8_t* s = reinterpret_cast<const uint8_t*>(numericName.c_str());
   if (*s < '0' || *s > '9') {
-    return StreamId(); // must start with a digit
+    return {}; // must start with a digit
   }
   int recordableTypeId;
   for (recordableTypeId = 0; *s >= '0' && *s <= '9'; ++s) {
@@ -371,7 +371,7 @@ StreamId StreamId::fromNumericName(const string& numericName) {
   }
   if (*s++ == '-') {
     if (*s < '0' || *s > '9') {
-      return StreamId(); // instance id must start with a digit
+      return {}; // instance id must start with a digit
     }
     uint16_t index = 0;
     while (*s >= '0' && *s <= '9') {
@@ -381,7 +381,7 @@ StreamId StreamId::fromNumericName(const string& numericName) {
       return StreamId(static_cast<RecordableTypeId>(recordableTypeId), index);
     }
   }
-  return StreamId();
+  return {};
 }
 
 } // namespace vrs
