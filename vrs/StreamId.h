@@ -483,7 +483,4 @@ class StreamId {
   uint16_t instanceId_; ///< Unique instance id, *not* controlled or controllable by client code.
 };
 
-using RecordableId [[deprecated("Please use vrs::StreamId instead of vrs::RecordableId.")]] =
-    vrs::StreamId;
-
 } // namespace vrs

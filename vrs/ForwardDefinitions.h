@@ -9,8 +9,6 @@
 namespace vrs {
 
 class StreamId;
-using RecordableId [[deprecated("Please use vrs::StreamId instead of vrs::RecordableId.")]] =
-    vrs::StreamId;
 enum class RecordableTypeId : uint16_t;
 
 class RecordFileWriter;
