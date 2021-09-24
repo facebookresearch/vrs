@@ -18,10 +18,14 @@
 #include <vrs/FileHandlerFactory.h>
 #include <vrs/RecordFileWriter.h>
 #include <vrs/StreamPlayer.h>
-#include <vrs/gaia/CachedGaiaFileHandler.h>
 #include <vrs/gaia/GaiaClient.h>
 #include <vrs/gaia/support/GaiaClientConfig.h>
+#include <vrs/gaia/support/HelperDefinitions.h>
 #include <vrs/helpers/Strings.h>
+
+#if IS_NETWORKING_AVAILABLE()
+#include <vrs/gaia/CachedGaiaFileHandler.h>
+#endif
 
 using namespace std;
 using namespace vrs;
@@ -749,16 +753,22 @@ int verbatimUpdate(
 }
 
 int cacheDownload(GaiaIdFileVersion idv, bool showProgress, bool jsonOutput) {
+#if IS_NETWORKING_AVAILABLE()
   std::optional<string> cachePath = CachedGaiaFileHandler::getCachePath(idv);
   os::makeDirectories(os::getParentFolder(*cachePath));
   return cachePath ? verbatimDownload(idv, *cachePath, showProgress, jsonOutput) : FAILURE;
+#else
+  return FAILURE;
+#endif
 }
 
 void uncacheDownload(GaiaIdFileVersion idv) {
+#if IS_NETWORKING_AVAILABLE()
   std::optional<string> cachePath = CachedGaiaFileHandler::getCachePath(idv);
   if (cachePath) {
     os::remove(*cachePath);
   }
+#endif
 }
 
 string jsonResult(
