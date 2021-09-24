@@ -1,4 +1,4 @@
-// Facebook Technologies, LLC Proprietary and Confidential.
+// (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
 
 #define DEFAULT_LOG_CHANNEL "FileHandlerFactory"
 #include <logging/Checks.h>

@@ -1,4 +1,4 @@
-// Facebook Technologies, LLC Proprietary and Confidential.
+// (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
 
 #include "Recordable.h"
 #include "DataLayout.h"

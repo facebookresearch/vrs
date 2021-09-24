@@ -1,6 +1,4 @@
-// Facebook Technologies, LLC Proprietary and Confidential.
-
-/** @file */
+// (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
 
 #pragma once
 

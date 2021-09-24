@@ -1,4 +1,5 @@
-// Facebook Technologies, LLC Properietary and Confidential.
+// (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
+
 #pragma once
 
 #include <algorithm>

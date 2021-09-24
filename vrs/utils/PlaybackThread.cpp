@@ -1,4 +1,4 @@
-// Facebook Technologies, LLC Proprietary and Confidential.
+// (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
 
 // BOOST_USE_WINDOWS_H must be defined first before we include boost interprocess
 // or <windows.h> anywhere, which is why this section must be done before we
