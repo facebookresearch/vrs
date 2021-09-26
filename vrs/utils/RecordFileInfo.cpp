@@ -14,10 +14,10 @@
 
 #include <vrs/helpers/Strings.h>
 
-#include "ErrorCode.h"
-#include "IndexRecord.h"
-#include "RecordFileReader.h"
-#include "TagConventions.h"
+#include <vrs/ErrorCode.h>
+#include <vrs/IndexRecord.h>
+#include <vrs/RecordFileReader.h>
+#include <vrs/TagConventions.h>
 
 using namespace std;
 using namespace fb_rapidjson;

@@ -323,7 +323,7 @@ string verbatimChecksum(const string& path, bool showProgress) {
   return digester.digestToString();
 }
 
-void buildIdMap(
+static void buildIdMap(
     FilteredVRSFileReader& filteredReader,
     std::map<StreamId, StreamId>& idMap,
     bool idToNormalizedId) {
@@ -338,7 +338,7 @@ void buildIdMap(
   }
 }
 
-bool buildIdMap(
+static bool buildIdMap(
     FilteredVRSFileReader& first,
     FilteredVRSFileReader& second,
     std::map<StreamId, StreamId>& idMap) {

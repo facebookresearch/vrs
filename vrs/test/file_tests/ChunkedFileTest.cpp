@@ -7,9 +7,9 @@
 #include <TestDataDir/TestDataDir.h>
 #include <vrs/DiskFile.h>
 #include <vrs/ErrorCode.h>
-#include <vrs/RecordFileInfo.h>
 #include <vrs/RecordFileReader.h>
 #include <vrs/os/Utils.h>
+#include <vrs/utils/RecordFileInfo.h>
 
 #if !IS_WINDOWS_PLATFORM()
 #include <unistd.h>

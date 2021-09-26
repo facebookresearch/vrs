@@ -8,11 +8,11 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
-#include <vrs/RecordFileInfo.h>
 #include <vrs/helpers/FileMacros.h>
 #include <vrs/helpers/Rapidjson.hpp>
 #include <vrs/os/Utils.h>
 #include <vrs/utils/PixelFrame.h>
+#include <vrs/utils/RecordFileInfo.h>
 
 const char* kReadMeContent =
 #include "DataExtractorReadMe.hpp"
