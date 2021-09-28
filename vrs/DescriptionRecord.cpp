@@ -1,4 +1,4 @@
-// (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
+// Copyright (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
 
 #if defined(_MSC_VER)
 #pragma warning(disable : 4503) // decorated name length exceeded, name was truncated
