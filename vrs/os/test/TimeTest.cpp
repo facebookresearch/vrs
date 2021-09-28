@@ -6,9 +6,9 @@
 
 #include <vrs/os/Time.h>
 
-struct OsTimeTest : testing::Test {};
+struct TimeTest : testing::Test {};
 
-TEST_F(OsTimeTest, osTimeGetCurrentTimeSecTest) {
+TEST_F(TimeTest, getCurrentTimeSecTest) {
   // naive monotony test. Values should always grow.
   double lastTime = vrs::os::getTimestampSec();
   size_t zeroGapCount = 0;
@@ -42,7 +42,7 @@ TEST_F(OsTimeTest, osTimeGetCurrentTimeSecTest) {
   EXPECT_GT(kRequiredMinNonZeroGapSec, minNonZeroGap);
 }
 
-TEST_F(OsTimeTest, osTimeGetCurrentTimeSecSinceEpoch) {
+TEST_F(TimeTest, getCurrentTimeSecSinceEpoch) {
   // merely make sure that the implementation isn't completely busted...
   int64_t now = vrs::os::getCurrentTimeSecSinceEpoch();
   const int64_t lastTestUpdateTime = 1590453570;

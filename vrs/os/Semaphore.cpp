@@ -8,12 +8,12 @@
 
 namespace vrs::os {
 
-bool Semaphore::timedWait(const double a_time_sec) {
+bool Semaphore::timedWait(const double timeSec) {
   using namespace boost::posix_time;
-  long integral_time = static_cast<long>(std::floor(a_time_sec));
-  long micro_seconds = static_cast<long>((a_time_sec - integral_time) * 1000000);
+  long integralTime = static_cast<long>(std::floor(timeSec));
+  long microSeconds = static_cast<long>((timeSec - integralTime) * 1000000);
   return interprocess_semaphore::timed_wait(
-      microsec_clock::universal_time() + seconds(integral_time) + microseconds(micro_seconds));
+      microsec_clock::universal_time() + seconds(integralTime) + microseconds(microSeconds));
 }
 
 } // namespace vrs::os

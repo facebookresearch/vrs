@@ -15,8 +15,8 @@
 using namespace std;
 using namespace vrs;
 
-struct osFileTest : testing::Test {
-  osFileTest() {}
+struct FileTest : testing::Test {
+  FileTest() {}
 
 // getTestDataDir() does not work on XROS yet. Exclude for now until this is fixed,
 // since it is not strictly required to get XROS functionality going.
@@ -37,12 +37,12 @@ struct osFileTest : testing::Test {
 };
 
 #if !IS_ANDROID_PLATFORM() && !IS_XROS_PLATFORM()
-TEST_F(osFileTest, testDataDirExistsTest) {
+TEST_F(FileTest, testDataDirExistsTest) {
   EXPECT_TRUE(os::isDir(testDataDir));
 }
 #endif // !IS_ANDROID_PLATFORM()
 
-TEST_F(osFileTest, testOsIsDir) {
+TEST_F(FileTest, testOsIsDir) {
 #if IS_ANDROID_PLATFORM()
   EXPECT_TRUE(os::isDir("/system/bin"));
   EXPECT_FALSE(os::isDir("/system/super_dummy_name_that_should_not_ever_exist_let_me_tell_you"));
@@ -73,7 +73,7 @@ TEST_F(osFileTest, testOsIsDir) {
 
 #if !IS_ANDROID_PLATFORM() && !IS_XROS_PLATFORM()
 
-TEST_F(osFileTest, testOsIsFile) {
+TEST_F(FileTest, testIsFile) {
   EXPECT_TRUE(os::isFile(os::pathJoin(testDataDir, "/filetest/a.txt")));
   EXPECT_TRUE(os::isFile(os::pathJoin(testDataDir, "/filetest/b.txt")));
   EXPECT_FALSE(os::isFile(os::pathJoin(testDataDir, "/filetest/d.txt"))); // does not exist
@@ -94,7 +94,7 @@ TEST_F(osFileTest, testOsIsFile) {
 #endif // !IS_WINDOWS_PLATFORM()
 }
 
-TEST_F(osFileTest, testOsPathExists) {
+TEST_F(FileTest, testPathExists) {
   EXPECT_TRUE(os::pathExists(os::pathJoin(testDataDir, "/filetest/a.txt")));
   EXPECT_TRUE(os::pathExists(os::pathJoin(testDataDir, "/filetest/b.txt")));
   EXPECT_FALSE(os::pathExists(os::pathJoin(testDataDir, "/filetest/d.txt"))); // does not exist
@@ -115,7 +115,7 @@ TEST_F(osFileTest, testOsPathExists) {
 #endif // !IS_WINDOWS_PLATFORM()
 }
 
-TEST_F(osFileTest, testOsGetFileSize) {
+TEST_F(FileTest, testGetFileSize) {
   EXPECT_EQ(0, os::getFileSize(os::pathJoin(testDataDir, "/filetest/a.txt"))); // empty
   EXPECT_EQ(10, os::getFileSize(os::pathJoin(testDataDir, "/filetest/b.txt"))); // something
   // Windows does not have symlinks
@@ -139,7 +139,7 @@ TEST_F(GetCurrentExecutablePathTest, testGetCurrentExecutablePath) {
 }
 #endif
 
-TEST_F(osFileTest, testSanitize) {
+TEST_F(FileTest, testSanitize) {
   vector<const char*> goodNames = {"All good name.txt", "abcdefg", "~.txt"};
   for (const char* goodName : goodNames) {
     EXPECT_EQ(os::sanitizeFileName(goodName), goodName);
@@ -170,7 +170,7 @@ TEST_F(osFileTest, testSanitize) {
   EXPECT_EQ(os::sanitizeFileName(".."), "~..");
 }
 
-TEST_F(osFileTest, testGetFilename) {
+TEST_F(FileTest, testGetFilename) {
   EXPECT_EQ("file.txt", os::getFilename("some/path/file.txt"));
   EXPECT_EQ("path", os::getFilename("some/path/"));
   EXPECT_EQ("path", os::getFilename("/some/path/"));
@@ -178,7 +178,7 @@ TEST_F(osFileTest, testGetFilename) {
   EXPECT_EQ("path", os::getFilename("/some/path//")); // multiple path separators
 }
 
-TEST_F(osFileTest, testFileResize) {
+TEST_F(FileTest, testFileResize) {
   // NOTE: not using osGetTempFolder() since the UniqueTemporaryDirectory code is already ported to
   // XROS.
   string tempDir = arvr::test_helpers::getUniqueTemporaryDirectory().string();

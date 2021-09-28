@@ -12,13 +12,13 @@ namespace vrs::os {
 
 class Semaphore : private boost::interprocess::interprocess_semaphore {
  public:
-  explicit Semaphore(unsigned int a_initial_count) : interprocess_semaphore(a_initial_count) {}
+  explicit Semaphore(unsigned int initialCount) : interprocess_semaphore(initialCount) {}
 
   using boost::interprocess::interprocess_semaphore::post;
   using boost::interprocess::interprocess_semaphore::wait;
 
-  bool timedWait(const double a_time_sec);
-  bool timed_wait(const boost::posix_time::ptime& abs_time) = delete;
+  bool timedWait(const double timeSec);
+  bool timed_wait(const boost::posix_time::ptime& absTime) = delete;
 };
 
 } // namespace vrs::os

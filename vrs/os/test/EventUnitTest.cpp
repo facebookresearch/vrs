@@ -14,7 +14,7 @@ using vrs::os::EventChannel;
 void* dispatchEvents(void* data, bool synchronous);
 void waitOnEvents(void* data, vector<double> waitIntervals);
 
-struct OsEventTest : public testing::Test {
+struct EventTest : public testing::Test {
   virtual void TearDown() {
     if (dispatchThread.get() != nullptr && dispatchThread->joinable()) {
       dispatchThread->join();
@@ -26,7 +26,7 @@ struct OsEventTest : public testing::Test {
     }
   }
 
-  OsEventTest()
+  EventTest()
       : lookback_time_sec(0.1),
         wait_time_sec(0.05),
         launchReady(0),
@@ -94,7 +94,7 @@ struct OsEventTest : public testing::Test {
 };
 
 void* dispatchEvents(void* data, bool synchronous) {
-  OsEventTest* test = static_cast<OsEventTest*>(data);
+  EventTest* test = static_cast<EventTest*>(data);
   test->waitForLaunch();
   for (auto i : test->eventParams) {
     std::this_thread::sleep_for(std::chrono::duration<double>(i.first));
@@ -109,7 +109,7 @@ void* dispatchEvents(void* data, bool synchronous) {
 }
 
 void waitOnEvents(void* data, vector<double> waitIntervals) {
-  OsEventTest* test = static_cast<OsEventTest*>(data);
+  EventTest* test = static_cast<EventTest*>(data);
   test->waitForLaunch();
   EventChannel::Event event;
   for (auto interval : waitIntervals) {
@@ -120,7 +120,7 @@ void waitOnEvents(void* data, vector<double> waitIntervals) {
   }
 }
 
-void OsEventTest::runWaitAndDispatch(EventChannel::NotificationMode mode) {
+void EventTest::runWaitAndDispatch(EventChannel::NotificationMode mode) {
   int a;
   setupEvent(mode);
   addEventInstance(wait_time_sec, static_cast<void*>(&a));
@@ -133,15 +133,15 @@ void OsEventTest::runWaitAndDispatch(EventChannel::NotificationMode mode) {
   EXPECT_EQ(&a, event.pointer);
 }
 
-TEST_F(OsEventTest, WaitAndDispatchUnicast) {
+TEST_F(EventTest, WaitAndDispatchUnicast) {
   runWaitAndDispatch(EventChannel::NotificationMode::UNICAST);
 }
 
-TEST_F(OsEventTest, WaitAndDispatchBroadcast) {
+TEST_F(EventTest, WaitAndDispatchBroadcast) {
   runWaitAndDispatch(EventChannel::NotificationMode::BROADCAST);
 }
 
-void OsEventTest::runDispatchAndWait(EventChannel::NotificationMode mode) {
+void EventTest::runDispatchAndWait(EventChannel::NotificationMode mode) {
   setupEvent(mode);
   addEventInstance(0.0, nullptr);
   startDispatchThread();
@@ -152,15 +152,15 @@ void OsEventTest::runDispatchAndWait(EventChannel::NotificationMode mode) {
   EXPECT_EQ(0, testEventChannel->getNumEventsSinceLastWait());
 }
 
-TEST_F(OsEventTest, DispatchAndWaitUnicast) {
+TEST_F(EventTest, DispatchAndWaitUnicast) {
   runDispatchAndWait(EventChannel::NotificationMode::UNICAST);
 }
 
-TEST_F(OsEventTest, DispatchAndWaitBroadcast) {
+TEST_F(EventTest, DispatchAndWaitBroadcast) {
   runDispatchAndWait(EventChannel::NotificationMode::BROADCAST);
 }
 
-void OsEventTest::runDispatchAndWaitWithLookback(EventChannel::NotificationMode mode) {
+void EventTest::runDispatchAndWaitWithLookback(EventChannel::NotificationMode mode) {
   setupEvent(mode);
   addEventInstance(0.0, nullptr);
   EXPECT_EQ(0, testEventChannel->getNumEventsSinceLastWait());
@@ -172,18 +172,18 @@ void OsEventTest::runDispatchAndWaitWithLookback(EventChannel::NotificationMode 
   EXPECT_EQ(
       EventChannel::Status::SUCCESS, testEventChannel->waitForEvent(event, 0, lookback_time_sec));
   EXPECT_EQ(0, testEventChannel->getNumEventsSinceLastWait());
-  EXPECT_EQ(0, event.num_missed_events);
+  EXPECT_EQ(0, event.numMissedEvents);
 }
 
-TEST_F(OsEventTest, DispatchAndWaitWithLookbackUnicast) {
+TEST_F(EventTest, DispatchAndWaitWithLookbackUnicast) {
   runDispatchAndWaitWithLookback(EventChannel::NotificationMode::UNICAST);
 }
 
-TEST_F(OsEventTest, DispatchAndWaitWithLookbackBroadcast) {
+TEST_F(EventTest, DispatchAndWaitWithLookbackBroadcast) {
   runDispatchAndWaitWithLookback(EventChannel::NotificationMode::BROADCAST);
 }
 
-void OsEventTest::runNumPastEvents(EventChannel::NotificationMode mode) {
+void EventTest::runNumPastEvents(EventChannel::NotificationMode mode) {
   setupEvent(mode);
   EXPECT_EQ(0, testEventChannel->getNumEventsSinceLastWait());
 
@@ -196,19 +196,19 @@ void OsEventTest::runNumPastEvents(EventChannel::NotificationMode mode) {
   EXPECT_EQ(2, testEventChannel->getNumEventsSinceLastWait());
   EXPECT_EQ(
       EventChannel::Status::SUCCESS, testEventChannel->waitForEvent(event, 0, lookback_time_sec));
-  EXPECT_EQ(1, event.num_missed_events);
+  EXPECT_EQ(1, event.numMissedEvents);
   EXPECT_EQ(0, testEventChannel->getNumEventsSinceLastWait());
 }
 
-TEST_F(OsEventTest, NumPastEventsUnicast) {
+TEST_F(EventTest, NumPastEventsUnicast) {
   runNumPastEvents(EventChannel::NotificationMode::UNICAST);
 }
 
-TEST_F(OsEventTest, NumPastEventsBroadcast) {
+TEST_F(EventTest, NumPastEventsBroadcast) {
   runNumPastEvents(EventChannel::NotificationMode::BROADCAST);
 }
 
-void OsEventTest::runSpuriousWakeup(EventChannel::NotificationMode mode) {
+void EventTest::runSpuriousWakeup(EventChannel::NotificationMode mode) {
   setupEvent(mode);
   for (auto i = 0; i < 100; i++) {
     EXPECT_EQ(0, testEventChannel->getNumEventsSinceLastWait());
@@ -216,15 +216,15 @@ void OsEventTest::runSpuriousWakeup(EventChannel::NotificationMode mode) {
   }
 }
 
-TEST_F(OsEventTest, SpuriousWakeupUnicast) {
+TEST_F(EventTest, SpuriousWakeupUnicast) {
   runSpuriousWakeup(EventChannel::NotificationMode::UNICAST);
 }
 
-TEST_F(OsEventTest, SpuriousWakeupBroadcast) {
+TEST_F(EventTest, SpuriousWakeupBroadcast) {
   runSpuriousWakeup(EventChannel::NotificationMode::BROADCAST);
 }
 
-TEST_F(OsEventTest, MultipleListenersUnicast) {
+TEST_F(EventTest, MultipleListenersUnicast) {
   setupEvent(EventChannel::NotificationMode::UNICAST);
 
   size_t numWaiters = 30;
@@ -247,7 +247,7 @@ TEST_F(OsEventTest, MultipleListenersUnicast) {
   EXPECT_EQ(EventChannel::Status::SUCCESS, status);
 }
 
-TEST_F(OsEventTest, MultipleListenersBroadcast) {
+TEST_F(EventTest, MultipleListenersBroadcast) {
   setupEvent(EventChannel::NotificationMode::BROADCAST);
 
   addEventInstance(0.5, nullptr); // In 0.5 seconds, all the listeners should be waiting already.
