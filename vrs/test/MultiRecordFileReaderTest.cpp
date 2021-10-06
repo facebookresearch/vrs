@@ -369,6 +369,7 @@ TEST_F(MultiRecordFileReaderTest, singleFile) {
   ASSERT_EQ(firstRecord, reader.getRecord(stream, firstRecord->recordType, 0));
   ASSERT_NE(firstRecord, reader.getRecord(stream, Record::Type::UNDEFINED, 0));
   ASSERT_EQ(firstRecord, reader.getRecordByTime(stream, firstRecord->timestamp));
+  EXPECT_EQ(firstRecord->streamId, reader.getUniqueStreamId(firstRecord));
   reader.readRecord(*firstRecord);
   streamPlayer.validateLastRecord(firstRecord);
   constexpr uint32_t indexToValidate = numTotalRecords / 2;
@@ -379,6 +380,7 @@ TEST_F(MultiRecordFileReaderTest, singleFile) {
   ASSERT_EQ(
       record,
       reader.getRecordByTime(stream, record->timestamp - std::numeric_limits<double>::epsilon()));
+  EXPECT_EQ(record->streamId, reader.getUniqueStreamId(record));
   ASSERT_EQ(nullptr, reader.getRecordByTime(unknownStream, record->timestamp));
   ASSERT_EQ(nullptr, reader.getRecord(numTotalRecords));
   ASSERT_EQ(nullptr, reader.getRecord(unknownStream, indexToValidate));
@@ -569,6 +571,8 @@ class StreamIdCollisionTester {
           expectedStreamId,
           reader_.getStreamForTag(kOriginalStreamIdTag, expectedStreamId.getName()));
       EXPECT_FALSE(reader_.getStreamForTag(kOriginalStreamIdTag, "unkownValue").isValid());
+      EXPECT_EQ(
+          expectedStreamId, reader_.getUniqueStreamId(reader_.getRecord(expectedStreamId, 0)));
     }
   }
 
@@ -579,6 +583,7 @@ class StreamIdCollisionTester {
     for (const auto& commonStreamId : remainingStreams) {
       validateRecordCount(commonStreamId);
       EXPECT_EQ(expectedOriginalStreamId, reader_.getTag(commonStreamId, kOriginalStreamIdTag));
+      EXPECT_EQ(commonStreamId, reader_.getUniqueStreamId(reader_.getRecord(commonStreamId, 0)));
     }
     EXPECT_EQ(
         expectedOriginalStreamId,

@@ -448,6 +448,21 @@ std::unique_ptr<FileHandler> MultiRecordFileReader::getFileHandler() const {
   return readers_.front()->getFileHandler();
 }
 
+UniqueStreamId MultiRecordFileReader::getUniqueStreamId(
+    const IndexRecord::RecordInfo* record) const {
+  if (!isOpened_ || record == nullptr) {
+    return {};
+  }
+  if (hasSingleFile()) {
+    return record->streamId;
+  }
+  const RecordFileReader* reader = getReader(record);
+  if (reader == nullptr) {
+    return record->streamId;
+  }
+  return getUniqueStreamIdInternal(reader, record->streamId);
+}
+
 bool MultiRecordFileReader::areFilesRelated() const {
   if (readers_.empty() || hasSingleFile()) {
     return true;
@@ -595,15 +610,21 @@ bool MultiRecordFileReader::timeLessThan(
   }
   // When timestamps are the same, we need to map the records to their `UniqueStreamId`, which we
   // can then compare. Fortunately, that should be rare.
-  const auto uniqueStreamIdLhs = getUniqueStreamId(lhs);
-  const auto uniqueStreamIdRhs = getUniqueStreamId(rhs);
+  const auto uniqueStreamIdLhs = getUniqueStreamIdInternal(lhs);
+  const auto uniqueStreamIdRhs = getUniqueStreamIdInternal(rhs);
   return uniqueStreamIdLhs < uniqueStreamIdRhs ||
       (uniqueStreamIdLhs == uniqueStreamIdRhs && lhs->fileOffset < rhs->fileOffset);
 }
 
-UniqueStreamId MultiRecordFileReader::getUniqueStreamId(
+UniqueStreamId MultiRecordFileReader::getUniqueStreamIdInternal(
     const IndexRecord::RecordInfo* record) const {
-  return readerStreamIdToUniqueMap_.at(getReader(record)).at(record->streamId);
+  return getUniqueStreamIdInternal(getReader(record), record->streamId);
+}
+
+UniqueStreamId MultiRecordFileReader::getUniqueStreamIdInternal(
+    const RecordFileReader* reader,
+    StreamId streamId) const {
+  return readerStreamIdToUniqueMap_.at(reader).at(streamId);
 }
 
 } // namespace vrs

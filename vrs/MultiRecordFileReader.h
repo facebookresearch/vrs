@@ -261,6 +261,14 @@ class MultiRecordFileReader {
   /// nullptr may be returned if no underlying files are open yet.
   std::unique_ptr<FileHandler> getFileHandler() const;
 
+  /// Get UniqueStreamId corresponding to the given record.
+  /// This must be used as opposed to reading the StreamId from RecordInfo directly since it handles
+  /// StreamId collisions between streams from multiple files.
+  /// @param record: Record whose UniqueStreamId is supposed to be determined
+  /// @return UniqueStreamId corresponding to the given record. An invalid UniqueStreamId is
+  /// returned for an illegal record.
+  UniqueStreamId getUniqueStreamId(const IndexRecord::RecordInfo* record) const;
+
  private:
   using StreamIdToUniqueIdMap = map<StreamId, UniqueStreamId>;
   using StreamIdReaderPair = std::pair<StreamId, RecordFileReader*>;
@@ -296,7 +304,10 @@ class MultiRecordFileReader {
   RecordFileReader* getReader(const IndexRecord::RecordInfo* record) const;
 
   /// Returns the UniqueStreamId corresponding to the StreamId contained in the given record.
-  UniqueStreamId getUniqueStreamId(const IndexRecord::RecordInfo* record) const;
+  /// These "*Internal" methods will throw in case if invoked with illegal record, reader or
+  /// StreamId where as getUniqueStreamId() will return an invalid UniqueStreamId in those cases.
+  UniqueStreamId getUniqueStreamIdInternal(const IndexRecord::RecordInfo* record) const;
+  UniqueStreamId getUniqueStreamIdInternal(const RecordFileReader* reader, StreamId streamId) const;
 
   bool timeLessThan(const IndexRecord::RecordInfo* lhs, const IndexRecord::RecordInfo* rhs) const;
 
