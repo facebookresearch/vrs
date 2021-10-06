@@ -27,6 +27,10 @@ static bool belongsTo(const IndexRecord::RecordInfo* record, const RecordFileRea
   return index.size() > 0 && record >= &index[0] && record <= &index[index.size() - 1];
 }
 
+static bool timestampLT(const IndexRecord::RecordInfo* lhs, double rhsTimestamp) {
+  return lhs->timestamp < rhsTimestamp;
+}
+
 int MultiRecordFileReader::openFiles(const std::vector<std::string>& paths) {
   if (paths.empty()) {
     XR_LOGE("At least one file must be opened");
@@ -56,6 +60,7 @@ int MultiRecordFileReader::openFiles(const std::vector<std::string>& paths) {
   }
   initializeUniqueStreamIds();
   createConsolidatedIndex();
+  initializeFileTags();
   isOpened_ = true;
   return SUCCESS;
 }
@@ -72,6 +77,12 @@ int MultiRecordFileReader::closeFiles() {
     }
   }
   readers_.clear();
+  recordIndex_ = nullptr;
+  uniqueStreamIds_.clear();
+  readerStreamIdToUniqueMap_.clear();
+  uniqueToStreamIdReaderPairMap_.clear();
+  filePaths_.clear();
+  fileTags_.clear();
   isOpened_ = false;
   return resultFinal;
 }
@@ -348,6 +359,95 @@ int MultiRecordFileReader::readRecord(const IndexRecord::RecordInfo& recordInfo)
   return reader->readRecord(recordInfo);
 }
 
+bool MultiRecordFileReader::setCachingStrategy(CachingStrategy cachingStrategy) {
+  if (!isOpened_) {
+    return false;
+  }
+  for (auto& reader : readers_) {
+    if (!reader->setCachingStrategy(cachingStrategy)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+CachingStrategy MultiRecordFileReader::getCachingStrategy() const {
+  if (!isOpened_) {
+    return CachingStrategy::Passive;
+  }
+  return readers_.front()->getCachingStrategy();
+}
+
+bool MultiRecordFileReader::prefetchRecordSequence(
+    const vector<const IndexRecord::RecordInfo*>& records) {
+  if (!isOpened_) {
+    return false;
+  }
+  // Split the input prefetch sequence into sequences correponding to each underlying Reader
+  map<RecordFileReader*, vector<const IndexRecord::RecordInfo*>> readerPrefetchSequenceMap;
+  for (const auto* prefetchRecord : records) {
+    RecordFileReader* reader = getReader(prefetchRecord);
+    if (reader == nullptr) {
+      XR_LOGW("Illegal record provided to prefetchRecordSequence()");
+      return false;
+    }
+    readerPrefetchSequenceMap[reader].emplace_back(prefetchRecord);
+  }
+  for (auto& [reader, prefetchSequence] : readerPrefetchSequenceMap) {
+    if (!reader->prefetchRecordSequence(prefetchSequence)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool MultiRecordFileReader::purgeFileCache() {
+  if (!isOpened_) {
+    return true;
+  }
+  bool succeeded = true;
+  for (auto& reader : readers_) {
+    succeeded = reader->purgeFileCache() && succeeded;
+  }
+  return succeeded;
+}
+
+const IndexRecord::RecordInfo* MultiRecordFileReader::getRecordByTime(double timestamp) const {
+  if (!isOpened_) {
+    return nullptr;
+  }
+  if (hasSingleFile()) {
+    return readers_.front()->getRecordByTime(timestamp);
+  }
+  const auto lowerBound =
+      std::lower_bound(recordIndex_->cbegin(), recordIndex_->cend(), timestamp, timestampLT);
+  return lowerBound == recordIndex_->cend() ? nullptr : *lowerBound;
+}
+
+const IndexRecord::RecordInfo* MultiRecordFileReader::getRecordByTime(
+    UniqueStreamId streamId,
+    double timestamp) const {
+  if (!isOpened_) {
+    return nullptr;
+  }
+  if (hasSingleFile()) {
+    return readers_.front()->getRecordByTime(streamId, timestamp);
+  }
+  const StreamIdReaderPair* streamIdReaderPair = getStreamIdReaderPair(streamId);
+  if (streamIdReaderPair == nullptr) {
+    return nullptr;
+  }
+  const RecordFileReader* reader = streamIdReaderPair->second;
+  return reader->getRecordByTime(streamIdReaderPair->first, timestamp);
+}
+
+std::unique_ptr<FileHandler> MultiRecordFileReader::getFileHandler() const {
+  if (readers_.empty()) {
+    return nullptr;
+  }
+  return readers_.front()->getFileHandler();
+}
+
 bool MultiRecordFileReader::areFilesRelated() const {
   if (readers_.empty() || hasSingleFile()) {
     return true;
@@ -417,6 +517,13 @@ void MultiRecordFileReader::createConsolidatedIndex() {
       // If record is not terminal, add the next record to the priority queue
       recordPQueue.emplace(record + 1);
     }
+  }
+}
+
+void MultiRecordFileReader::initializeFileTags() {
+  for (const auto& reader : readers_) {
+    const auto& fileTags = reader->getTags();
+    fileTags_.insert(fileTags.begin(), fileTags.end());
   }
 }
 

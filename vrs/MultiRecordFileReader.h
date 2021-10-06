@@ -207,6 +207,60 @@ class MultiRecordFileReader {
   /// returned.
   int readRecord(const IndexRecord::RecordInfo& recordInfo);
 
+  /// Set Caching strategy for all the underlying file handlers.
+  /// This should be called *after* opening the files, as open might replace the file handler.
+  /// @param cachingStragy: Caching strategy desired.
+  /// @return True if the caching strategy was set.
+  /// False if any of the underlying file handlers doesn't support the requested strategy, or any
+  /// particular strategy.
+  bool setCachingStrategy(CachingStrategy cachingStrategy);
+
+  /// Get Caching strategy for all the underlying file handlers.
+  /// The same strategy is supposed to be used by all file handlers.
+  CachingStrategy getCachingStrategy() const;
+
+  /// When streaming VRS files from the cloud, it may be very beneficial to tell before hand which
+  /// records will be read, in order, so that the data can be prefetched optimally.
+  /// Note the only some FileHandlers implement this, others will just ignore the request, which is
+  /// always safe to make.
+  /// @param records: a sequence of records in the exact order they will be read. It's ok to
+  /// skip one or more records, but:
+  /// - don't try to read "past" records, or you'll confuse the caching strategy, possibly leading
+  /// to much worse performance.
+  /// - if you read a single record out of the sequence, the prefetch list will be cleared.
+  /// You may call this method as often as you like, and any previous read sequence will be cleared,
+  /// but whatever is already in the cache will remain.
+  /// @return True if the file handler backend supports this request, false if it was ignored.
+  bool prefetchRecordSequence(const vector<const IndexRecord::RecordInfo*>& records);
+
+  /// If the underlying file handler caches data on reads, purge its caches to free memory.
+  /// Sets the caching strategy to Passive, and clears any pending read sequence.
+  /// @return True if all the underlying caches were purged, false if they weren't for some reason.
+  /// Note: this is a best effort. If transactions are pending, their cache blocks won't be cleared.
+  bool purgeFileCache();
+
+  /// Get the tags map for all the underlying files. Does not include any stream tags.
+  /// @return The tags map for all underlying files.
+  const map<string, string>& getTags() const {
+    return fileTags_;
+  }
+
+  /// Find the first record at or after a timestamp.
+  /// @param timestamp: timestamp to seek.
+  /// @return Pointer to the record info, or nullptr (timestamp is too big?).
+  const IndexRecord::RecordInfo* getRecordByTime(double timestamp) const;
+
+  /// Find the first record of a specific stream at or after a timestamp.
+  /// @param streamId: UniqueStreamId of the stream to consider.
+  /// @param timestamp: timestamp to seek.
+  /// @return Pointer to the record info, or nullptr (timestamp is too big?).
+  const IndexRecord::RecordInfo* getRecordByTime(UniqueStreamId streamId, double timestamp) const;
+
+  /// Get a clone of the current file handler, for use elsewhere.
+  /// @return A copy of the current file handler.
+  /// nullptr may be returned if no underlying files are open yet.
+  std::unique_ptr<FileHandler> getFileHandler() const;
+
  private:
   using StreamIdToUniqueIdMap = map<StreamId, UniqueStreamId>;
   using StreamIdReaderPair = std::pair<StreamId, RecordFileReader*>;
@@ -227,6 +281,8 @@ class MultiRecordFileReader {
 
   /// This depends on initializeUniqueStreamIds()
   void createConsolidatedIndex();
+
+  void initializeFileTags();
 
   /// Finds a UniqueStreamId generated based on the given duplicateStreamId
   UniqueStreamId generateUniqueStreamId(StreamId duplicateStreamId) const;
@@ -269,6 +325,7 @@ class MultiRecordFileReader {
   /// File Paths underlying files
   vector<string> filePaths_;
   const RecordComparatorGT recordComparatorGT_{*this};
+  map<string, string> fileTags_;
 
 #ifdef GTEST_BUILD
   FRIEND_TEST(::MultiRecordFileReaderTest, multiFile);

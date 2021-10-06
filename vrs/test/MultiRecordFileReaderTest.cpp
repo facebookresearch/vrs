@@ -28,9 +28,13 @@ using namespace std;
 
 using UniqueStreamId = vrs::MultiRecordFileReader::UniqueStreamId;
 
-double getTimestampSec() {
+static double getTimestampSec() {
   using namespace std::chrono;
   return duration_cast<duration<double>>(steady_clock::now().time_since_epoch()).count();
+}
+
+static bool isTimestampLE(const IndexRecord::RecordInfo* lhs, const IndexRecord::RecordInfo* rhs) {
+  return lhs == rhs || lhs->timestamp <= rhs->timestamp;
 }
 
 class MyMetadata : public AutoDataLayout {
@@ -216,7 +220,9 @@ TEST_F(MultiRecordFileReaderTest, relatedFiles) {
       createVRSFileSynchronously(relatedFilePaths[i], numRecords, getDefaultTags());
     }
   }
-  ASSERT_EQ(SUCCESS, MultiRecordFileReader().openFiles(relatedFilePaths));
+  MultiRecordFileReader reader;
+  ASSERT_EQ(SUCCESS, reader.openFiles(relatedFilePaths));
+  ASSERT_EQ(getDefaultTags(), reader.getTags());
   // Now add an unrelated file path to the mix to make sure we are not able to open unrelated files
   const auto unrelatedFilePath =
       getOsTempPath(fmt::format("UnrelatedPath{}.vrs", relatedFilePaths.size()));
@@ -287,12 +293,25 @@ TEST_F(MultiRecordFileReaderTest, multiFile) {
         "Extra record found in index. Unexpected Record timestamp: {}", (*recordIt)->timestamp);
     recordIt++;
   }
-  // Validate getRecordIndex() and getReader()
+  // Validate getRecordIndex(), getReader(), getRecordByTime(timestamp)
   const auto& recordIndex = *reader.recordIndex_;
   for (size_t index = 0; index < reader.getRecordCount(); index++) {
     const auto* record = recordIndex[index];
     ASSERT_EQ(index, reader.getRecordIndex(record));
     ASSERT_NE(nullptr, reader.getReader(record));
+    ASSERT_TRUE(isTimestampLE(reader.getRecordByTime(record->timestamp), record));
+  }
+  const double lastTimestamp = reader.getRecord(reader.getRecordCount() - 1)->timestamp;
+  ASSERT_EQ(nullptr, reader.getRecordByTime(lastTimestamp + 10));
+  // Validate getRecordByTime(stream, timestamp)
+  for (const auto& stream : reader.getStreams()) {
+    const auto& streamIndex = reader.getIndex(stream);
+    const size_t position = streamIndex.size() / 2;
+    const IndexRecord::RecordInfo* record = streamIndex[position];
+    ASSERT_TRUE(isTimestampLE(reader.getRecordByTime(stream, record->timestamp), record));
+    ASSERT_TRUE(isTimestampLE(
+        reader.getRecordByTime(stream, record->timestamp - std::numeric_limits<double>::epsilon()),
+        record));
   }
   ASSERT_EQ(reader.getRecordCount(), reader.getRecordIndex(nullptr));
   ASSERT_EQ(nullptr, reader.getReader(nullptr));
@@ -312,10 +331,12 @@ TEST_F(MultiRecordFileReaderTest, singleFile) {
   const string expectedStreamTag("expectedStreamTag");
   const string expectedStreamTagValue("expectedStreamTagValue");
   const map<string, string> expectedStreamTags = {{expectedStreamTag, expectedStreamTagValue}};
-  createVRSFileSynchronously(filePaths.front(), numDataRecords, {}, expectedStreamTags);
+  createVRSFileSynchronously(
+      filePaths.front(), numDataRecords, getDefaultTags(), expectedStreamTags);
   MultiRecordFileReader reader;
   ASSERT_EQ(0, reader.getRecordCount());
   ASSERT_EQ(SUCCESS, reader.openFiles(filePaths));
+  ASSERT_EQ(getDefaultTags(), reader.getTags());
   // getStreams() validation
   const auto& streams = reader.getStreams();
   ASSERT_EQ(1, streams.size());
@@ -347,12 +368,18 @@ TEST_F(MultiRecordFileReaderTest, singleFile) {
   ASSERT_EQ(firstRecord, reader.getRecord(stream, 0));
   ASSERT_EQ(firstRecord, reader.getRecord(stream, firstRecord->recordType, 0));
   ASSERT_NE(firstRecord, reader.getRecord(stream, Record::Type::UNDEFINED, 0));
+  ASSERT_EQ(firstRecord, reader.getRecordByTime(stream, firstRecord->timestamp));
   reader.readRecord(*firstRecord);
   streamPlayer.validateLastRecord(firstRecord);
   constexpr uint32_t indexToValidate = numTotalRecords / 2;
   const auto* record = reader.getRecord(indexToValidate);
   ASSERT_EQ(indexToValidate, reader.getRecordIndex(record));
   ASSERT_EQ(record, reader.getRecord(stream, indexToValidate));
+  ASSERT_EQ(record, reader.getRecordByTime(stream, record->timestamp));
+  ASSERT_EQ(
+      record,
+      reader.getRecordByTime(stream, record->timestamp - std::numeric_limits<double>::epsilon()));
+  ASSERT_EQ(nullptr, reader.getRecordByTime(unknownStream, record->timestamp));
   ASSERT_EQ(nullptr, reader.getRecord(numTotalRecords));
   ASSERT_EQ(nullptr, reader.getRecord(unknownStream, indexToValidate));
   ASSERT_EQ(nullptr, reader.getRecord(unknownStream, Record::Type::DATA, indexToValidate));
