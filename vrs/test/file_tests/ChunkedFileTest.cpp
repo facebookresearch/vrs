@@ -1,5 +1,6 @@
 // Copyright (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
 
+#include <string_view>
 #include <utility>
 
 #include <gtest/gtest.h>
@@ -73,6 +74,10 @@ TEST_F(ChunkedFileTester, MissingChunkChunkedFileTest) {
 }
 
 #if !IS_WINDOWS_PLATFORM() && !IS_XROS_PLATFORM()
+/// Check that the filename and file size matches
+/// Ignores the path of the filename to avoid problems with symlinks in the path.
+void checkFilesMatch(const std::string& fileA, const std::string& fileB) {}
+
 TEST_F(ChunkedFileTester, LinkedFileTest) {
   vrs::RecordFileReader file;
   // Test that if we link to the first chunk, even from a remote folder,
@@ -87,9 +92,13 @@ TEST_F(ChunkedFileTester, LinkedFileTest) {
   ASSERT_EQ(RecordFileReader::vrsFilePathToFileSpec(linkedFile, foundSpec), 0);
   ASSERT_EQ(foundSpec.chunks.size(), 3);
   EXPECT_EQ(foundSpec.fileHandlerName, DiskFile::staticName());
-  EXPECT_EQ(foundSpec.chunks[0], kChunkedFile);
-  EXPECT_EQ(foundSpec.chunks[1], kChunkedFile2);
-  EXPECT_EQ(foundSpec.chunks[2], kChunkedFile3);
+
+  EXPECT_EQ(os::getFilename(foundSpec.chunks[0]), os::getFilename(kChunkedFile));
+  EXPECT_EQ(os::getFilename(foundSpec.chunks[1]), os::getFilename(kChunkedFile2));
+  EXPECT_EQ(os::getFilename(foundSpec.chunks[2]), os::getFilename(kChunkedFile3));
+  EXPECT_EQ(os::getFileSize(foundSpec.chunks[0]), os::getFileSize(kChunkedFile));
+  EXPECT_EQ(os::getFileSize(foundSpec.chunks[1]), os::getFileSize(kChunkedFile2));
+  EXPECT_EQ(os::getFileSize(foundSpec.chunks[2]), os::getFileSize(kChunkedFile3));
 
   EXPECT_EQ(::unlink(linkedFile.c_str()), 0); // delete that link
 
