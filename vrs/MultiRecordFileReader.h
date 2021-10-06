@@ -175,6 +175,38 @@ class MultiRecordFileReader {
   /// @return The index of the file, with all the records corresponding to the selected stream.
   const vector<const IndexRecord::RecordInfo*>& getIndex(UniqueStreamId streamId) const;
 
+  /// RecordableTypeId text descriptions may change over time, so at the time of recording,
+  /// we capture the text name, so that we can see what it was when the file was recorded.
+  /// @param streamId: UniqueStreamId of the record stream to consider.
+  /// @return The original text description for the corresponding RecordableTypeId.
+  const string& getOriginalRecordableTypeName(UniqueStreamId streamId) const {
+    return getTag(getTags(streamId).vrs, Recordable::getOriginalNameTagName());
+  }
+
+  /// Hook stream players to the streams revealed by getStreams() after you've opened file(s),
+  /// and before you start reading records.
+  /// You can disconnect the StreamPlayer by passing a nullptr for the stream id.
+  /// The file player does *not* take ownership of the StreamPlayer, which allows to use the same
+  /// StreamPlayer object for multiple streams, maybe even in different file readers.
+  /// So the caller is responsible for deleting the StreamPlayer objet after the file is read.
+  /// @param streamId: UniqueStreamId to hook the stream player to.
+  /// @param streamPlayer: StreamPlayer to attach.
+  void setStreamPlayer(UniqueStreamId streamId, StreamPlayer* streamPlayer);
+
+  /// Get all the RecordFormat description used in this VRS file.
+  /// Mostly useful for tools like VRStool & VRSplayer.
+  /// @param streamId: UniqueStreamId of the record stream to consider.
+  /// @param outFormats: Reference to be set.
+  /// @return Number of formats found.
+  uint32_t getRecordFormats(UniqueStreamId streamId, RecordFormatMap& outFormats) const;
+
+  /// Preferred way to read records.
+  /// @param recordInfo: RecordInfo reference of the record to read.
+  /// @return 0 on success, or a non-zero error code.
+  /// If there is no StreamPlayer hooked up for the stream, no read operation is done and 0 is
+  /// returned.
+  int readRecord(const IndexRecord::RecordInfo& recordInfo);
+
  private:
   using StreamIdToUniqueIdMap = map<StreamId, UniqueStreamId>;
   using StreamIdReaderPair = std::pair<StreamId, RecordFileReader*>;
@@ -205,7 +237,7 @@ class MultiRecordFileReader {
 
   /// Returns the RecordFileReader corresponding to the given record.
   /// nullptr is returned in case the given record doesn't belong to any of the underlying readers.
-  const RecordFileReader* getReader(const IndexRecord::RecordInfo* record) const;
+  RecordFileReader* getReader(const IndexRecord::RecordInfo* record) const;
 
   /// Returns the UniqueStreamId corresponding to the StreamId contained in the given record.
   UniqueStreamId getUniqueStreamId(const IndexRecord::RecordInfo* record) const;

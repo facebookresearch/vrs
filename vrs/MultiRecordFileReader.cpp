@@ -303,6 +303,51 @@ const vector<const IndexRecord::RecordInfo*>& MultiRecordFileReader::getIndex(
   return reader->getIndex(streamIdReaderPair->first);
 }
 
+void MultiRecordFileReader::setStreamPlayer(UniqueStreamId streamId, StreamPlayer* streamPlayer) {
+  if (!isOpened_) {
+    return;
+  }
+  if (hasSingleFile()) {
+    readers_.front()->setStreamPlayer(streamId, streamPlayer);
+  }
+  const StreamIdReaderPair* streamIdReaderPair = getStreamIdReaderPair(streamId);
+  if (streamIdReaderPair != nullptr) {
+    RecordFileReader* reader = streamIdReaderPair->second;
+    reader->setStreamPlayer(streamIdReaderPair->first, streamPlayer);
+  }
+}
+
+uint32_t MultiRecordFileReader::getRecordFormats(
+    UniqueStreamId streamId,
+    RecordFormatMap& outFormats) const {
+  outFormats.clear();
+  if (!isOpened_) {
+    return outFormats.size();
+  }
+  if (hasSingleFile()) {
+    return readers_.front()->getRecordFormats(streamId, outFormats);
+  }
+  const StreamIdReaderPair* streamIdReaderPair = getStreamIdReaderPair(streamId);
+  if (streamIdReaderPair != nullptr) {
+    RecordFileReader* reader = streamIdReaderPair->second;
+    return reader->getRecordFormats(streamIdReaderPair->first, outFormats);
+  }
+  return outFormats.size();
+}
+
+int MultiRecordFileReader::readRecord(const IndexRecord::RecordInfo& recordInfo) {
+  if (!isOpened_) {
+    XR_LOGE("No file open");
+    return NO_FILE_OPEN;
+  }
+  RecordFileReader* reader = getReader(&recordInfo);
+  if (reader == nullptr) {
+    XR_LOGE("Invalid recordInfo");
+    return INVALID_PARAMETER;
+  }
+  return reader->readRecord(recordInfo);
+}
+
 bool MultiRecordFileReader::areFilesRelated() const {
   if (readers_.empty() || hasSingleFile()) {
     return true;
@@ -426,8 +471,7 @@ void MultiRecordFileReader::initializeUniqueStreamIds() {
   }
 }
 
-const RecordFileReader* MultiRecordFileReader::getReader(
-    const IndexRecord::RecordInfo* record) const {
+RecordFileReader* MultiRecordFileReader::getReader(const IndexRecord::RecordInfo* record) const {
   for (const auto& reader : readers_) {
     if (belongsTo(record, *reader)) {
       return reader.get();

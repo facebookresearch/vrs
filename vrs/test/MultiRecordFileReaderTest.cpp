@@ -19,6 +19,7 @@
 #include <vrs/MultiRecordFileReader.h>
 #include <vrs/RecordFileWriter.h>
 #include <vrs/StreamId.h>
+#include <vrs/StreamPlayer.h>
 #include <vrs/TagConventions.h>
 #include <vrs/os/Utils.h>
 
@@ -174,6 +175,29 @@ void assertEmptyStreamTags(const MultiRecordFileReader& reader) {
   }
 }
 
+class TestStreamPlayer : public StreamPlayer {
+ public:
+  virtual bool processRecordHeader(const CurrentRecord& record, DataReference& outDataReference)
+      override {
+    return true;
+  }
+
+  void processRecord(const CurrentRecord& record, uint32_t) override {
+    lastRecord = {record.timestamp, record.streamId, record.recordType};
+  }
+
+  void validateLastRecord(const IndexRecord::RecordInfo* expectedRecord) {
+    ASSERT_EQ(
+        (RecordSignature{
+            expectedRecord->timestamp, expectedRecord->streamId, expectedRecord->recordType}),
+        lastRecord);
+  }
+
+ private:
+  using RecordSignature = std::tuple<double, StreamId, Record::Type>;
+  RecordSignature lastRecord;
+};
+
 class MultiRecordFileReaderTest : public testing::Test {};
 
 TEST_F(MultiRecordFileReaderTest, invalidFilePaths) {
@@ -235,11 +259,17 @@ TEST_F(MultiRecordFileReaderTest, multiFile) {
   MultiRecordFileReader reader;
   ASSERT_EQ(SUCCESS, reader.openFiles(filePaths));
   assertEmptyStreamTags(reader);
+  TestStreamPlayer streamPlayer;
+  for (const auto& stream : reader.getStreams()) {
+    reader.setStreamPlayer(stream, &streamPlayer);
+  }
   // Validate that Data Record timestamps match with expectedTimestamps
   auto timestampIt = expectedTimestamps.cbegin();
   auto recordIt = reader.recordIndex_->cbegin();
   while (timestampIt != expectedTimestamps.cend() && recordIt != reader.recordIndex_->cend()) {
     const auto& record = (*recordIt);
+    reader.readRecord(*record);
+    streamPlayer.validateLastRecord(record);
     if (record->recordType != Record::Type::DATA) {
       recordIt++;
       continue;
@@ -295,6 +325,8 @@ TEST_F(MultiRecordFileReaderTest, singleFile) {
   ASSERT_EQ(numConfigRecords, reader.getRecordCount(stream, Record::Type::CONFIGURATION));
   ASSERT_EQ(numStateRecords, reader.getRecordCount(stream, Record::Type::STATE));
   ASSERT_EQ(numDataRecords, reader.getRecordCount(stream, Record::Type::DATA));
+  TestStreamPlayer streamPlayer;
+  reader.setStreamPlayer(stream, &streamPlayer);
   // getStreams(RecordableTypeId, flavor) validation
   ASSERT_EQ(0, reader.getStreams(RecordableTypeId::AccelerometerRecordableClass).size());
   ASSERT_EQ(1, reader.getStreams(RecordableTypeId::Undefined).size());
@@ -310,11 +342,13 @@ TEST_F(MultiRecordFileReaderTest, singleFile) {
   static const UniqueStreamId unknownStream;
   ASSERT_EQ(0, reader.getRecordCount(unknownStream));
   ASSERT_EQ(0, reader.getRecordCount(unknownStream, Record::Type::CONFIGURATION));
-  // getRecord() and getRecordIndex() validation
+  // getRecord(), getRecordIndex(), readRecord() validation
   const IndexRecord::RecordInfo* firstRecord = reader.getRecord(0);
   ASSERT_EQ(firstRecord, reader.getRecord(stream, 0));
   ASSERT_EQ(firstRecord, reader.getRecord(stream, firstRecord->recordType, 0));
   ASSERT_NE(firstRecord, reader.getRecord(stream, Record::Type::UNDEFINED, 0));
+  reader.readRecord(*firstRecord);
+  streamPlayer.validateLastRecord(firstRecord);
   constexpr uint32_t indexToValidate = numTotalRecords / 2;
   const auto* record = reader.getRecord(indexToValidate);
   ASSERT_EQ(indexToValidate, reader.getRecordIndex(record));
@@ -323,6 +357,8 @@ TEST_F(MultiRecordFileReaderTest, singleFile) {
   ASSERT_EQ(nullptr, reader.getRecord(unknownStream, indexToValidate));
   ASSERT_EQ(nullptr, reader.getRecord(unknownStream, Record::Type::DATA, indexToValidate));
   ASSERT_EQ(nullptr, reader.getLastRecord(unknownStream, Record::Type::DATA));
+  reader.readRecord(*record);
+  streamPlayer.validateLastRecord(record);
   IndexRecord::RecordInfo unknownRecord;
   ASSERT_EQ(numTotalRecords, reader.getRecordIndex(&unknownRecord));
   ASSERT_EQ(numTotalRecords, reader.getIndex(stream).size());
@@ -330,6 +366,12 @@ TEST_F(MultiRecordFileReaderTest, singleFile) {
   const IndexRecord::RecordInfo* lastRecord = reader.getRecord(numTotalRecords - 1);
   ASSERT_EQ(lastRecord, reader.getLastRecord(stream, lastRecord->recordType));
   ASSERT_EQ(nullptr, reader.getLastRecord(stream, Record::Type::UNDEFINED));
+  // getRecordFormats() validation
+  RecordFormatMap recordFormatMap;
+  reader.getRecordFormats(stream, recordFormatMap);
+  ASSERT_LT(0, recordFormatMap.size());
+  reader.getRecordFormats(unknownStream, recordFormatMap);
+  ASSERT_EQ(0, recordFormatMap.size());
   // Validation after closing
   ASSERT_EQ(SUCCESS, reader.closeFiles());
   ASSERT_EQ(0, reader.getRecordCount());
@@ -345,6 +387,10 @@ TEST_F(MultiRecordFileReaderTest, singleFile) {
   ASSERT_EQ(nullptr, reader.getRecord(unknownStream, Record::Type::DATA, indexToValidate));
   ASSERT_EQ(nullptr, reader.getLastRecord(unknownStream, Record::Type::DATA));
   ASSERT_TRUE(reader.getIndex(stream).empty());
+  reader.getRecordFormats(stream, recordFormatMap);
+  ASSERT_EQ(0, recordFormatMap.size());
+  reader.getRecordFormats(unknownStream, recordFormatMap);
+  ASSERT_EQ(0, recordFormatMap.size());
   removeFiles(filePaths);
 }
 
@@ -393,6 +439,7 @@ class StreamIdCollisionTester {
     validateCommonStreams(remainingStreams);
     validateGetStreamsByTypeFlavor();
     validateGetRecord();
+    validateGetRecordFormats();
     close();
   }
 
@@ -536,6 +583,17 @@ class StreamIdCollisionTester {
     const IndexRecord::RecordInfo* lastRecord = firstStreamIndex[firstStreamIndex.size() - 1];
     ASSERT_EQ(lastRecord, reader_.getLastRecord(firstStream, lastRecord->recordType));
     ASSERT_EQ(nullptr, reader_.getLastRecord(firstStream, Record::Type::UNDEFINED));
+  }
+
+  void validateGetRecordFormats() {
+    RecordFormatMap recordFormatMap;
+    for (const auto& stream : reader_.getStreams()) {
+      reader_.getRecordFormats(stream, recordFormatMap);
+      ASSERT_LT(0, recordFormatMap.size());
+    }
+    UniqueStreamId unknownStreamId;
+    reader_.getRecordFormats(unknownStreamId, recordFormatMap);
+    ASSERT_EQ(0, recordFormatMap.size());
   }
 
   // Streams which don't have collisions across files
