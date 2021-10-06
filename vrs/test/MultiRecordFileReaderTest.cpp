@@ -311,15 +311,25 @@ TEST_F(MultiRecordFileReaderTest, singleFile) {
   ASSERT_EQ(0, reader.getRecordCount(unknownStream));
   ASSERT_EQ(0, reader.getRecordCount(unknownStream, Record::Type::CONFIGURATION));
   // getRecord() and getRecordIndex() validation
+  const IndexRecord::RecordInfo* firstRecord = reader.getRecord(0);
+  ASSERT_EQ(firstRecord, reader.getRecord(stream, 0));
+  ASSERT_EQ(firstRecord, reader.getRecord(stream, firstRecord->recordType, 0));
+  ASSERT_NE(firstRecord, reader.getRecord(stream, Record::Type::UNDEFINED, 0));
   constexpr uint32_t indexToValidate = numTotalRecords / 2;
   const auto* record = reader.getRecord(indexToValidate);
   ASSERT_EQ(indexToValidate, reader.getRecordIndex(record));
   ASSERT_EQ(record, reader.getRecord(stream, indexToValidate));
   ASSERT_EQ(nullptr, reader.getRecord(numTotalRecords));
   ASSERT_EQ(nullptr, reader.getRecord(unknownStream, indexToValidate));
+  ASSERT_EQ(nullptr, reader.getRecord(unknownStream, Record::Type::DATA, indexToValidate));
+  ASSERT_EQ(nullptr, reader.getLastRecord(unknownStream, Record::Type::DATA));
   IndexRecord::RecordInfo unknownRecord;
   ASSERT_EQ(numTotalRecords, reader.getRecordIndex(&unknownRecord));
   ASSERT_EQ(numTotalRecords, reader.getIndex(stream).size());
+  // getLastRecord() validation
+  const IndexRecord::RecordInfo* lastRecord = reader.getRecord(numTotalRecords - 1);
+  ASSERT_EQ(lastRecord, reader.getLastRecord(stream, lastRecord->recordType));
+  ASSERT_EQ(nullptr, reader.getLastRecord(stream, Record::Type::UNDEFINED));
   // Validation after closing
   ASSERT_EQ(SUCCESS, reader.closeFiles());
   ASSERT_EQ(0, reader.getRecordCount());
@@ -332,6 +342,8 @@ TEST_F(MultiRecordFileReaderTest, singleFile) {
   ASSERT_TRUE(reader.getStreams().empty());
   ASSERT_EQ(nullptr, reader.getRecord(stream, indexToValidate));
   ASSERT_EQ(nullptr, reader.getRecord(unknownStream, indexToValidate));
+  ASSERT_EQ(nullptr, reader.getRecord(unknownStream, Record::Type::DATA, indexToValidate));
+  ASSERT_EQ(nullptr, reader.getLastRecord(unknownStream, Record::Type::DATA));
   ASSERT_TRUE(reader.getIndex(stream).empty());
   removeFiles(filePaths);
 }
@@ -516,9 +528,14 @@ class StreamIdCollisionTester {
     ASSERT_EQ(0, reader_.getRecordIndex(firstRecord));
     const auto firstStream = firstRecord->streamId;
     ASSERT_EQ(firstRecord, reader_.getRecord(firstStream, 0));
+    ASSERT_EQ(firstRecord, reader_.getRecord(firstStream, firstRecord->recordType, 0));
+    ASSERT_EQ(nullptr, reader_.getRecord(firstStream, Record::Type::UNDEFINED, 0));
     const auto& firstStreamIndex = reader_.getIndex(firstStream);
     ASSERT_EQ(reader_.getRecordCount(firstStream), firstStreamIndex.size());
     ASSERT_EQ(firstStreamIndex[0], reader_.getRecord(firstStream, 0));
+    const IndexRecord::RecordInfo* lastRecord = firstStreamIndex[firstStreamIndex.size() - 1];
+    ASSERT_EQ(lastRecord, reader_.getLastRecord(firstStream, lastRecord->recordType));
+    ASSERT_EQ(nullptr, reader_.getLastRecord(firstStream, Record::Type::UNDEFINED));
   }
 
   // Streams which don't have collisions across files

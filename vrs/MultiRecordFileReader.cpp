@@ -256,6 +256,36 @@ const IndexRecord::RecordInfo* MultiRecordFileReader::getRecord(
   return indexNumber < streamIndex.size() ? streamIndex[indexNumber] : nullptr;
 }
 
+const IndexRecord::RecordInfo* MultiRecordFileReader::getRecord(
+    UniqueStreamId streamId,
+    Record::Type recordType,
+    uint32_t indexNumber) const {
+  if (!isOpened_) {
+    return nullptr;
+  }
+  if (hasSingleFile()) {
+    return readers_.front()->getRecord(streamId, recordType, indexNumber);
+  }
+  const StreamIdReaderPair* streamIdReaderPair = getStreamIdReaderPair(streamId);
+  if (streamIdReaderPair == nullptr) {
+    return nullptr;
+  }
+  const RecordFileReader* reader = streamIdReaderPair->second;
+  return reader->getRecord(streamIdReaderPair->first, recordType, indexNumber);
+}
+
+const IndexRecord::RecordInfo* MultiRecordFileReader::getLastRecord(
+    UniqueStreamId streamId,
+    Record::Type recordType) const {
+  const auto& index = getIndex(streamId);
+  for (auto iter = index.rbegin(); iter != index.rend(); ++iter) {
+    if ((*iter)->recordType == recordType) {
+      return *iter;
+    }
+  }
+  return nullptr;
+}
+
 const vector<const IndexRecord::RecordInfo*>& MultiRecordFileReader::getIndex(
     UniqueStreamId streamId) const {
   static const vector<const IndexRecord::RecordInfo*> sEmptyIndex;

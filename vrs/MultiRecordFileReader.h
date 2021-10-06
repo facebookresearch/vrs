@@ -152,6 +152,24 @@ class MultiRecordFileReader {
   /// or a record with the indexNumber wasn't found.
   const IndexRecord::RecordInfo* getRecord(UniqueStreamId streamId, uint32_t indexNumber) const;
 
+  /// Find a specific record for a specific stream and type, by index number.
+  /// nullptr is returned if no record is found for that index number.
+  /// @param streamId: UniqueStreamId of the record stream to consider.
+  /// @param recordType: Type of the records to consider.
+  /// @param indexNumber: Index of the record to look for.
+  /// @return Pointer to the record info,
+  /// or nullptr if the streamId or the indexNumber wasn't found for that specific type.
+  const IndexRecord::RecordInfo*
+  getRecord(UniqueStreamId streamId, Record::Type recordType, uint32_t indexNumber) const;
+
+  /// Find the last record for a specific stream and specific type.
+  /// @param streamId: UniqueStreamId of the record stream to consider.
+  /// @param recordType: Type of the records to consider.
+  /// @return Pointer to the record info,
+  /// or nullptr if the streamId or no record of the type was found.
+  const IndexRecord::RecordInfo* getLastRecord(UniqueStreamId streamId, Record::Type recordType)
+      const;
+
   /// Get a record index limited to a specific stream.
   /// @param streamId: UniqueStreamId of the record stream to consider.
   /// @return The index of the file, with all the records corresponding to the selected stream.
