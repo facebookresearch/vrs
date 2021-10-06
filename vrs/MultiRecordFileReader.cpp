@@ -21,6 +21,12 @@ using UniqueStreamId = vrs::MultiRecordFileReader::UniqueStreamId;
 
 namespace vrs {
 
+/// Checks whether a given record belogs to the given reader
+static bool belongsTo(const IndexRecord::RecordInfo* record, const RecordFileReader& reader) {
+  const auto& index = reader.getIndex();
+  return index.size() > 0 && record >= &index[0] && record <= &index[index.size() - 1];
+}
+
 int MultiRecordFileReader::openFiles(const std::vector<std::string>& paths) {
   if (paths.empty()) {
     XR_LOGE("At least one file must be opened");
@@ -48,8 +54,8 @@ int MultiRecordFileReader::openFiles(const std::vector<std::string>& paths) {
     closeFiles();
     return INVALID_REQUEST;
   }
-  createConsolidatedIndex();
   initializeUniqueStreamIds();
+  createConsolidatedIndex();
   isOpened_ = true;
   return SUCCESS;
 }
@@ -201,6 +207,31 @@ UniqueStreamId MultiRecordFileReader::getStreamForTag(
   return {};
 }
 
+uint32_t MultiRecordFileReader::getRecordIndex(const IndexRecord::RecordInfo* record) const {
+  if (!isOpened_ || record == nullptr) {
+    return getRecordCount();
+  }
+  if (hasSingleFile()) {
+    return readers_.front()->getRecordIndex(record);
+  }
+  if (getReader(record) == nullptr) {
+    // Weeding out illegal records (which don't belong to any of the underlying readers)
+    return getRecordCount();
+  }
+  auto lowerIt = std::lower_bound(
+      recordIndex_->begin(),
+      recordIndex_->end(),
+      record,
+      [this](const IndexRecord::RecordInfo* lhs, const IndexRecord::RecordInfo* rhs) {
+        return this->timeLessThan(lhs, rhs);
+      });
+  if (lowerIt != recordIndex_->end() && *lowerIt == record) {
+    return lowerIt - recordIndex_->begin();
+  } else {
+    return getRecordCount();
+  }
+}
+
 bool MultiRecordFileReader::areFilesRelated() const {
   if (readers_.empty() || hasSingleFile()) {
     return true;
@@ -242,16 +273,13 @@ void MultiRecordFileReader::createConsolidatedIndex() {
     return;
   }
   uint32_t indexSize = 0;
-  auto comparator = [](const IndexRecord::RecordInfo* a, const IndexRecord::RecordInfo* b) {
-    return a->timestamp > b->timestamp;
-  };
   // Holds RecordInfo* sorted in non-decreasing order of corresponding timestamps.
   // We will store only one element from each RecordFileReader index and perform a K-way merge.
   priority_queue<
       const IndexRecord::RecordInfo*,
       std::vector<const IndexRecord::RecordInfo*>,
-      decltype(comparator)>
-      recordPQueue(comparator);
+      decltype(recordComparatorGT_)>
+      recordPQueue(recordComparatorGT_);
   // Stores the last valid (terminal) RecordInfo* for each RecordFileReader index.
   set<const IndexRecord::RecordInfo*> terminalRecordPtrs;
   for (const auto& reader : readers_) {
@@ -325,6 +353,35 @@ void MultiRecordFileReader::initializeUniqueStreamIds() {
       uniqueStreamIds_.emplace(uniqueStreamId);
     }
   }
+}
+
+const RecordFileReader* MultiRecordFileReader::getReader(
+    const IndexRecord::RecordInfo* record) const {
+  for (const auto& reader : readers_) {
+    if (belongsTo(record, *reader)) {
+      return reader.get();
+    }
+  }
+  return nullptr;
+}
+
+bool MultiRecordFileReader::timeLessThan(
+    const IndexRecord::RecordInfo* lhs,
+    const IndexRecord::RecordInfo* rhs) const {
+  if (lhs->timestamp != rhs->timestamp) {
+    return lhs->timestamp < rhs->timestamp;
+  }
+  // When timestamps are the same, we need to map the records to their `UniqueStreamId`, which we
+  // can then compare. Fortunately, that should be rare.
+  const auto uniqueStreamIdLhs = getUniqueStreamId(lhs);
+  const auto uniqueStreamIdRhs = getUniqueStreamId(rhs);
+  return uniqueStreamIdLhs < uniqueStreamIdRhs ||
+      (uniqueStreamIdLhs == uniqueStreamIdRhs && lhs->fileOffset < rhs->fileOffset);
+}
+
+UniqueStreamId MultiRecordFileReader::getUniqueStreamId(
+    const IndexRecord::RecordInfo* record) const {
+  return readerStreamIdToUniqueMap_.at(getReader(record)).at(record->streamId);
 }
 
 } // namespace vrs

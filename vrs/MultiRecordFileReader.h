@@ -133,6 +133,12 @@ class MultiRecordFileReader {
       const string& tag,
       RecordableTypeId typeId = RecordableTypeId::Undefined) const;
 
+  /// Get a record's index in the global index.
+  /// @param record: pointer of the record.
+  /// @return Index in the global index, or getRecordCount() is record is nullptr or an invalid
+  /// pointer.
+  uint32_t getRecordIndex(const IndexRecord::RecordInfo* record) const;
+
  private:
   using StreamIdToUniqueIdMap = map<StreamId, UniqueStreamId>;
   using StreamIdReaderPair = std::pair<StreamId, RecordFileReader*>;
@@ -149,9 +155,10 @@ class MultiRecordFileReader {
   /// @return true if the files associated with this instance are related, false otherwise.
   bool areFilesRelated() const;
 
-  void createConsolidatedIndex();
-
   void initializeUniqueStreamIds();
+
+  /// This depends on initializeUniqueStreamIds()
+  void createConsolidatedIndex();
 
   /// Finds a UniqueStreamId generated based on the given duplicateStreamId
   UniqueStreamId generateUniqueStreamId(StreamId duplicateStreamId) const;
@@ -159,6 +166,27 @@ class MultiRecordFileReader {
   const StreamIdReaderPair* getStreamIdReaderPair(UniqueStreamId uniqueStreamId) const;
 
   const string& getTag(const map<string, string>& tags, const string& name) const;
+
+  /// Returns the RecordFileReader corresponding to the given record.
+  /// nullptr is returned in case the given record doesn't belong to any of the underlying readers.
+  const RecordFileReader* getReader(const IndexRecord::RecordInfo* record) const;
+
+  /// Returns the UniqueStreamId corresponding to the StreamId contained in the given record.
+  UniqueStreamId getUniqueStreamId(const IndexRecord::RecordInfo* record) const;
+
+  bool timeLessThan(const IndexRecord::RecordInfo* lhs, const IndexRecord::RecordInfo* rhs) const;
+
+  class RecordComparatorGT {
+   public:
+    explicit RecordComparatorGT(const MultiRecordFileReader& parent) : parent_(parent) {}
+
+    bool operator()(const IndexRecord::RecordInfo* lhs, const IndexRecord::RecordInfo* rhs) const {
+      return parent_.timeLessThan(rhs, lhs);
+    }
+
+   private:
+    const MultiRecordFileReader& parent_;
+  };
 
   bool isOpened_{false};
   /// Underlying RecordFileReader - one per VRS file
@@ -172,6 +200,7 @@ class MultiRecordFileReader {
   map<UniqueStreamId, StreamIdReaderPair> uniqueToStreamIdReaderPairMap_;
   /// File Paths underlying files
   vector<string> filePaths_;
+  const RecordComparatorGT recordComparatorGT_{*this};
 
 #ifdef GTEST_BUILD
   FRIEND_TEST(::MultiRecordFileReaderTest, consolidatedIndex);

@@ -257,6 +257,18 @@ TEST_F(MultiRecordFileReaderTest, consolidatedIndex) {
         "Extra record found in index. Unexpected Record timestamp: {}", (*recordIt)->timestamp);
     recordIt++;
   }
+  // Validate getRecordIndex() and getReader()
+  const auto& recordIndex = *reader.recordIndex_;
+  for (size_t index = 0; index < reader.getRecordCount(); index++) {
+    const auto* record = recordIndex[index];
+    ASSERT_EQ(index, reader.getRecordIndex(record));
+    ASSERT_NE(nullptr, reader.getReader(record));
+  }
+  ASSERT_EQ(reader.getRecordCount(), reader.getRecordIndex(nullptr));
+  ASSERT_EQ(nullptr, reader.getReader(nullptr));
+  IndexRecord::RecordInfo unknownRecord;
+  ASSERT_EQ(reader.getRecordCount(), reader.getRecordIndex(&unknownRecord));
+  ASSERT_EQ(nullptr, reader.getReader(&unknownRecord));
   ASSERT_EQ(SUCCESS, reader.closeFiles());
   removeFiles(filePaths);
 }
