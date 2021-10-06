@@ -232,6 +232,47 @@ uint32_t MultiRecordFileReader::getRecordIndex(const IndexRecord::RecordInfo* re
   }
 }
 
+const IndexRecord::RecordInfo* MultiRecordFileReader::getRecord(uint32_t index) const {
+  if (!isOpened_) {
+    return nullptr;
+  }
+  if (hasSingleFile()) {
+    const auto& singleFileIndex = readers_.front()->getIndex();
+    return index < singleFileIndex.size() ? &singleFileIndex[index] : nullptr;
+  }
+  return index < recordIndex_->size() ? (*recordIndex_)[index] : nullptr;
+}
+
+const IndexRecord::RecordInfo* MultiRecordFileReader::getRecord(
+    UniqueStreamId streamId,
+    uint32_t indexNumber) const {
+  if (!isOpened_) {
+    return nullptr;
+  }
+  if (hasSingleFile()) {
+    return readers_.front()->getRecord(streamId, indexNumber);
+  }
+  const vector<const IndexRecord::RecordInfo*>& streamIndex = getIndex(streamId);
+  return indexNumber < streamIndex.size() ? streamIndex[indexNumber] : nullptr;
+}
+
+const vector<const IndexRecord::RecordInfo*>& MultiRecordFileReader::getIndex(
+    UniqueStreamId streamId) const {
+  static const vector<const IndexRecord::RecordInfo*> sEmptyIndex;
+  if (!isOpened_) {
+    return sEmptyIndex;
+  }
+  if (hasSingleFile()) {
+    return readers_.front()->getIndex(streamId);
+  }
+  const StreamIdReaderPair* streamIdReaderPair = getStreamIdReaderPair(streamId);
+  if (streamIdReaderPair == nullptr) {
+    return sEmptyIndex;
+  }
+  const RecordFileReader* reader = streamIdReaderPair->second;
+  return reader->getIndex(streamIdReaderPair->first);
+}
+
 bool MultiRecordFileReader::areFilesRelated() const {
   if (readers_.empty() || hasSingleFile()) {
     return true;

@@ -220,7 +220,7 @@ vector<double> getNonDecreasingTimestamps(
   return timestamps;
 }
 
-TEST_F(MultiRecordFileReaderTest, consolidatedIndex) {
+TEST_F(MultiRecordFileReaderTest, multiFile) {
   const auto expectedTimestamps = getNonDecreasingTimestamps(50);
   const auto filePaths = getOsTempPaths(4);
   auto fileBuilders = createFileBuilders(filePaths);
@@ -273,7 +273,7 @@ TEST_F(MultiRecordFileReaderTest, consolidatedIndex) {
   removeFiles(filePaths);
 }
 
-TEST_F(MultiRecordFileReaderTest, singleFileRecordCount) {
+TEST_F(MultiRecordFileReaderTest, singleFile) {
   const auto filePaths = getOsTempPaths(1);
   constexpr auto numConfigRecords = 1;
   constexpr auto numStateRecords = 1;
@@ -310,8 +310,18 @@ TEST_F(MultiRecordFileReaderTest, singleFileRecordCount) {
   static const UniqueStreamId unknownStream;
   ASSERT_EQ(0, reader.getRecordCount(unknownStream));
   ASSERT_EQ(0, reader.getRecordCount(unknownStream, Record::Type::CONFIGURATION));
-  ASSERT_EQ(SUCCESS, reader.closeFiles());
+  // getRecord() and getRecordIndex() validation
+  constexpr uint32_t indexToValidate = numTotalRecords / 2;
+  const auto* record = reader.getRecord(indexToValidate);
+  ASSERT_EQ(indexToValidate, reader.getRecordIndex(record));
+  ASSERT_EQ(record, reader.getRecord(stream, indexToValidate));
+  ASSERT_EQ(nullptr, reader.getRecord(numTotalRecords));
+  ASSERT_EQ(nullptr, reader.getRecord(unknownStream, indexToValidate));
+  IndexRecord::RecordInfo unknownRecord;
+  ASSERT_EQ(numTotalRecords, reader.getRecordIndex(&unknownRecord));
+  ASSERT_EQ(numTotalRecords, reader.getIndex(stream).size());
   // Validation after closing
+  ASSERT_EQ(SUCCESS, reader.closeFiles());
   ASSERT_EQ(0, reader.getRecordCount());
   ASSERT_EQ(0, reader.getRecordCount(stream));
   ASSERT_EQ(0, reader.getRecordCount(stream, Record::Type::CONFIGURATION));
@@ -320,6 +330,9 @@ TEST_F(MultiRecordFileReaderTest, singleFileRecordCount) {
   assertEmptyStreamTags(reader, stream);
   assertEmptyStreamTags(reader);
   ASSERT_TRUE(reader.getStreams().empty());
+  ASSERT_EQ(nullptr, reader.getRecord(stream, indexToValidate));
+  ASSERT_EQ(nullptr, reader.getRecord(unknownStream, indexToValidate));
+  ASSERT_TRUE(reader.getIndex(stream).empty());
   removeFiles(filePaths);
 }
 
@@ -367,6 +380,7 @@ class StreamIdCollisionTester {
     validateUniqueStreams(remainingStreams);
     validateCommonStreams(remainingStreams);
     validateGetStreamsByTypeFlavor();
+    validateGetRecord();
     close();
   }
 
@@ -448,10 +462,12 @@ class StreamIdCollisionTester {
     expectedCount += validateRecordCount(streamId, Record::Type::STATE);
     expectedCount += validateRecordCount(streamId, Record::Type::DATA);
     EXPECT_EQ(expectedCount, reader_.getRecordCount(streamId));
+    EXPECT_EQ(expectedCount, reader_.getIndex(streamId).size());
     static const StreamId unknownStream;
     EXPECT_EQ(0, reader_.getRecordCount(unknownStream));
     EXPECT_EQ(0, reader_.getRecordCount(unknownStream, Record::Type::DATA));
     assertEmptyStreamTags(reader_, unknownStream);
+    EXPECT_TRUE(reader_.getIndex(unknownStream).empty());
   }
 
   void validateUniqueStreams(set<UniqueStreamId>& remainingStreams) const {
@@ -493,6 +509,16 @@ class StreamIdCollisionTester {
     EXPECT_EQ(expectedStreams, reader_.getStreams(kTestRecordableTypeId, kTestFlavor));
     ASSERT_EQ(kTestFlavor, reader_.getFlavor(expectedStreams.front()));
     EXPECT_EQ(0, reader_.getStreams(kTestRecordableTypeId, "unknownFlavor").size());
+  }
+
+  void validateGetRecord() {
+    const auto* firstRecord = reader_.getRecord(0);
+    ASSERT_EQ(0, reader_.getRecordIndex(firstRecord));
+    const auto firstStream = firstRecord->streamId;
+    ASSERT_EQ(firstRecord, reader_.getRecord(firstStream, 0));
+    const auto& firstStreamIndex = reader_.getIndex(firstStream);
+    ASSERT_EQ(reader_.getRecordCount(firstStream), firstStreamIndex.size());
+    ASSERT_EQ(firstStreamIndex[0], reader_.getRecord(firstStream, 0));
   }
 
   // Streams which don't have collisions across files

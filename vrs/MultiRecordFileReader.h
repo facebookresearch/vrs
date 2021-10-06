@@ -4,7 +4,7 @@
 
 #ifdef GTEST_BUILD
 #include <gtest/gtest.h>
-class GTEST_TEST_CLASS_NAME_(MultiRecordFileReaderTest, consolidatedIndex);
+class GTEST_TEST_CLASS_NAME_(MultiRecordFileReaderTest, multiFile);
 #endif
 
 #include <string>
@@ -139,6 +139,24 @@ class MultiRecordFileReader {
   /// pointer.
   uint32_t getRecordIndex(const IndexRecord::RecordInfo* record) const;
 
+  /// Get the record correponding to the given index position in the global index.
+  /// @param index: Position in the global index to look up.
+  /// @return Corresponding record if present or nullptr if the given index is invalid.
+  const IndexRecord::RecordInfo* getRecord(uint32_t index) const;
+
+  /// Find a specific record for a specific stream, regardless of type, by index number.
+  /// @param streamId: UniqueStreamId of the record stream to consider.
+  /// @param indexNumber: Index position (for streamId - not global index) of the record to look
+  /// for.
+  /// @return Pointer to the record info, or nullptr if the streamId,
+  /// or a record with the indexNumber wasn't found.
+  const IndexRecord::RecordInfo* getRecord(UniqueStreamId streamId, uint32_t indexNumber) const;
+
+  /// Get a record index limited to a specific stream.
+  /// @param streamId: UniqueStreamId of the record stream to consider.
+  /// @return The index of the file, with all the records corresponding to the selected stream.
+  const vector<const IndexRecord::RecordInfo*>& getIndex(UniqueStreamId streamId) const;
+
  private:
   using StreamIdToUniqueIdMap = map<StreamId, UniqueStreamId>;
   using StreamIdReaderPair = std::pair<StreamId, RecordFileReader*>;
@@ -203,7 +221,7 @@ class MultiRecordFileReader {
   const RecordComparatorGT recordComparatorGT_{*this};
 
 #ifdef GTEST_BUILD
-  FRIEND_TEST(::MultiRecordFileReaderTest, consolidatedIndex);
+  FRIEND_TEST(::MultiRecordFileReaderTest, multiFile);
 #endif
 };
 
