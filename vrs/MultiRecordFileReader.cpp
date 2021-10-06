@@ -463,6 +463,14 @@ UniqueStreamId MultiRecordFileReader::getUniqueStreamId(
   return getUniqueStreamIdInternal(reader, record->streamId);
 }
 
+int64_t MultiRecordFileReader::getTotalSourceSize() const {
+  int64_t totalSize = 0;
+  for (const auto& reader : readers_) {
+    totalSize += reader->getTotalSourceSize();
+  }
+  return totalSize;
+}
+
 bool MultiRecordFileReader::areFilesRelated() const {
   if (readers_.empty() || hasSingleFile()) {
     return true;

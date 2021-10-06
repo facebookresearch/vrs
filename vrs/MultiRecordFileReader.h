@@ -64,7 +64,9 @@ class MultiRecordFileReader {
 
   /// Tell if files are being read. Must be true for most operations.
   /// @return True if the file is opened.
-  bool isOpened() const;
+  bool isOpened() const {
+    return isOpened_;
+  }
 
   /// Get the number of records across all open files.
   /// @return The number of records across all open files, or 0, if no file is opened.
@@ -268,6 +270,10 @@ class MultiRecordFileReader {
   /// @return UniqueStreamId corresponding to the given record. An invalid UniqueStreamId is
   /// returned for an illegal record.
   UniqueStreamId getUniqueStreamId(const IndexRecord::RecordInfo* record) const;
+
+  /// Get the total size of all underlying files.
+  /// @return The number of bytes of all the files combined.
+  int64_t getTotalSourceSize() const;
 
  private:
   using StreamIdToUniqueIdMap = map<StreamId, UniqueStreamId>;

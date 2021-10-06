@@ -263,7 +263,10 @@ TEST_F(MultiRecordFileReaderTest, multiFile) {
     builder->build();
   }
   MultiRecordFileReader reader;
+  ASSERT_FALSE(reader.isOpened());
   ASSERT_EQ(SUCCESS, reader.openFiles(filePaths));
+  ASSERT_TRUE(reader.isOpened());
+  ASSERT_LT(0, reader.getTotalSourceSize());
   assertEmptyStreamTags(reader);
   TestStreamPlayer streamPlayer;
   for (const auto& stream : reader.getStreams()) {
@@ -319,6 +322,7 @@ TEST_F(MultiRecordFileReaderTest, multiFile) {
   ASSERT_EQ(reader.getRecordCount(), reader.getRecordIndex(&unknownRecord));
   ASSERT_EQ(nullptr, reader.getReader(&unknownRecord));
   ASSERT_EQ(SUCCESS, reader.closeFiles());
+  ASSERT_FALSE(reader.isOpened());
   removeFiles(filePaths);
 }
 
@@ -335,7 +339,10 @@ TEST_F(MultiRecordFileReaderTest, singleFile) {
       filePaths.front(), numDataRecords, getDefaultTags(), expectedStreamTags);
   MultiRecordFileReader reader;
   ASSERT_EQ(0, reader.getRecordCount());
+  ASSERT_FALSE(reader.isOpened());
   ASSERT_EQ(SUCCESS, reader.openFiles(filePaths));
+  ASSERT_TRUE(reader.isOpened());
+  ASSERT_LT(0, reader.getTotalSourceSize());
   ASSERT_EQ(getDefaultTags(), reader.getTags());
   // getStreams() validation
   const auto& streams = reader.getStreams();
@@ -403,6 +410,7 @@ TEST_F(MultiRecordFileReaderTest, singleFile) {
   ASSERT_EQ(0, recordFormatMap.size());
   // Validation after closing
   ASSERT_EQ(SUCCESS, reader.closeFiles());
+  ASSERT_FALSE(reader.isOpened());
   ASSERT_EQ(0, reader.getRecordCount());
   ASSERT_EQ(0, reader.getRecordCount(stream));
   ASSERT_EQ(0, reader.getRecordCount(stream, Record::Type::CONFIGURATION));
@@ -664,6 +672,7 @@ TEST_F(MultiRecordFileReaderTest, getFileChunks) {
   const auto singleFileChunksExpected = singleReader.getFileChunks();
   ASSERT_EQ(singleFileChunksExpected, singleFileChunks);
   const auto expectedSize = singleFileChunksExpected[0].second;
+  ASSERT_EQ(singleReaderExpected.getTotalSourceSize(), singleReader.getTotalSourceSize());
   ASSERT_EQ(SUCCESS, singleReader.closeFiles());
   ASSERT_EQ(SUCCESS, singleReaderExpected.closeFile());
   ASSERT_TRUE(singleReader.getFileChunks().empty());
