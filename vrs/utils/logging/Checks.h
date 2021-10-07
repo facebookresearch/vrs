@@ -1,12 +1,10 @@
-// (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
+// Copyright (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
 
 #pragma once
 
-#include "Utils.h"
-
 #include <string>
 
-#include <vrs/os/Platform.h>
+#include "Utils.h"
 
 namespace vrs::logging {
 void logAndAbort(const std::string& condition, const std::string& message = "");
@@ -16,7 +14,7 @@ void logAndAbort(const std::string& condition, const std::string& message = "");
 // Check Macros.
 //
 #define XR_CHECK(condition, ...)                          \
-  while (CT_UNLIKELY(!(condition))) {                     \
+  while (XR_UNLIKELY(!(condition))) {                     \
     vrs::logging::logAndAbort(#condition, ##__VA_ARGS__); \
   }                                                       \
   (void)0

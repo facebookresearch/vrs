@@ -1,11 +1,11 @@
-// # (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
+// Copyright (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
 
 #pragma once
 
-#include "Utils.h"
-
 #include <fmt/color.h>
 #include <fmt/core.h>
+
+#include "Utils.h"
 
 #ifndef DEFAULT_LOG_CHANNEL
 #error "DEFAULT_LOG_CHANNEL must be defined before including <logging/Verify.h>"
@@ -18,7 +18,7 @@
 //
 
 #define XR_VERIFY_C(channel_, condition_, ...) \
-  if (CT_UNLIKELY(!(condition_))) {            \
+  if (XR_UNLIKELY(!(condition_))) {            \
     fmt::print(                                \
         stderr,                                \
         fg(fmt::color::red),                   \

@@ -1,6 +1,5 @@
 // Copyright (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
 
-#include <string_view>
 #include <utility>
 
 #include <gtest/gtest.h>
@@ -74,9 +73,6 @@ TEST_F(ChunkedFileTester, MissingChunkChunkedFileTest) {
 }
 
 #if !IS_WINDOWS_PLATFORM() && !IS_XROS_PLATFORM()
-/// Check that the filename and file size matches
-/// Ignores the path of the filename to avoid problems with symlinks in the path.
-void checkFilesMatch(const std::string& fileA, const std::string& fileB) {}
 
 TEST_F(ChunkedFileTester, LinkedFileTest) {
   vrs::RecordFileReader file;

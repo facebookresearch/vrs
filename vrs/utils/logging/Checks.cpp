@@ -1,4 +1,4 @@
-// (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
+// Copyright (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
 
 #include "Checks.h"
 
@@ -16,7 +16,7 @@
 // NOTE: Size must be cast to `int` as that is what printf formatting functions expect; and `size_t`
 // may have a different size than `int`.
 #define XR_ABORT_IMPL(msg) \
-  __android_log_assert(nullptr, "[CT]", "%.*s", static_cast<int>(msg.size()), msg.data())
+  __android_log_assert(nullptr, "[VRS]", "%.*s", static_cast<int>(msg.size()), msg.data())
 
 #else // !IS_ANDROID_PLATFORM()
 

@@ -1,4 +1,4 @@
-// (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
+// Copyright (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
 
 #define DEFAULT_LOG_CHANNEL "Log"
 #include "Log.h"
@@ -32,4 +32,5 @@ void log(Level level, const char* channel, const std::string& message) {
   }
   fmt::print(stderr, fg(c), "[{}][{}]: {}", channel, logLevel, message);
 }
+
 } // namespace vrs::logging
