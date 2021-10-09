@@ -25,7 +25,7 @@ bool PixelFrame::readJpegFrame(RecordReader* reader, const uint32_t sizeBytes) {
   return readJpegFrame(jpegBuf);
 }
 
-bool PixelFrame::readJpegFrame(const std::vector<uint8_t>& jpegBuf) {
+bool PixelFrame::readJpegFrame(const std::vector<uint8_t>& jpegBuf, bool decodePixels) {
   // setup libjpeg
   struct jpeg_decompress_struct cinfo;
   struct jpeg_error_mgr jerr;
@@ -41,11 +41,13 @@ bool PixelFrame::readJpegFrame(const std::vector<uint8_t>& jpegBuf) {
     cinfo.out_color_space = JCS_RGB;
     init(ImageContentBlockSpec(PixelFormat::RGB8, cinfo.image_width, cinfo.image_height));
   }
-  // decompress row by row
-  uint8_t* rowPtr = frameBytes_.data();
-  while (cinfo.output_scanline < cinfo.output_height) {
-    jpeg_read_scanlines(&cinfo, &rowPtr, 1);
-    rowPtr += imageSpec_.getStride();
+  if (decodePixels) {
+    // decompress row by row
+    uint8_t* rowPtr = frameBytes_.data();
+    while (cinfo.output_scanline < cinfo.output_height) {
+      jpeg_read_scanlines(&cinfo, &rowPtr, 1);
+      rowPtr += imageSpec_.getStride();
+    }
   }
   jpeg_finish_decompress(&cinfo);
   jpeg_destroy_decompress(&cinfo);

@@ -47,7 +47,7 @@ bool PixelFrame::readPngFrame(RecordReader* reader, const uint32_t sizeBytes) {
   return readPngFrame(buffer);
 }
 
-bool PixelFrame::readPngFrame(const std::vector<uint8_t>& pngBuffer) {
+bool PixelFrame::readPngFrame(const std::vector<uint8_t>& pngBuffer, bool decodePixels) {
   // Let LibPNG check the sig.
   SourceBuffer src(pngBuffer);
   if (png_sig_cmp(src.buffer.data(), 0, kPngSigBytes) != 0) {
@@ -120,33 +120,35 @@ bool PixelFrame::readPngFrame(const std::vector<uint8_t>& pngBuffer) {
     return false;
   }
 
-  if (bitdepth < 8) {
-    png_set_expand_gray_1_2_4_to_8(pngPtr);
-    // And the bitdepth info
-    bitdepth = 8;
+  if (decodePixels) {
+    if (bitdepth < 8) {
+      png_set_expand_gray_1_2_4_to_8(pngPtr);
+      // And the bitdepth info
+      bitdepth = 8;
+    }
+    // We don't support 16 bit precision, so if the image Has 16 bits per channel
+    // precision, round it down to 8.
+    if (bitdepth == 16) {
+      png_set_strip_16(pngPtr);
+      bitdepth = 8;
+    }
+
+    // Update the information structs with the transformations we requested:
+    png_read_update_info(pngPtr, infoPtr);
+
+    // Array of row pointers. One for every row.
+    vector<png_bytep> pngBytep(imgHeight);
+    const size_t stride = imageSpec_.getStride();
+    for (size_t i = 0; i < imgHeight; ++i) {
+      // Set the pointer to the data pointer + i times the row stride.
+      pngBytep[i] = reinterpret_cast<png_bytep>(frameBytes_.data()) + i * stride;
+    }
+
+    // Read the imagedata and write it to the rowptrs
+    png_read_image(pngPtr, pngBytep.data());
+
+    png_read_end(pngPtr, infoPtr);
   }
-  // We don't support 16 bit precision, so if the image Has 16 bits per channel
-  // precision, round it down to 8.
-  if (bitdepth == 16) {
-    png_set_strip_16(pngPtr);
-    bitdepth = 8;
-  }
-
-  // Update the information structs with the transformations we requested:
-  png_read_update_info(pngPtr, infoPtr);
-
-  // Array of row pointers. One for every row.
-  vector<png_bytep> pngBytep(imgHeight);
-  const size_t stride = imageSpec_.getStride();
-  for (size_t i = 0; i < imgHeight; ++i) {
-    // Set the pointer to the data pointer + i times the row stride.
-    pngBytep[i] = reinterpret_cast<png_bytep>(frameBytes_.data()) + i * stride;
-  }
-
-  // Read the imagedata and write it to the rowptrs
-  png_read_image(pngPtr, pngBytep.data());
-
-  png_read_end(pngPtr, infoPtr);
 
   // Clean up the read and info structs
   png_destroy_read_struct(&pngPtr, &infoPtr, (png_infopp)0);

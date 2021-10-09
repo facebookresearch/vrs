@@ -90,8 +90,10 @@ class PixelFrame {
   /// @return True if the frame type is supported & the frame was read.
   bool readJpegFrame(RecordReader* reader, const uint32_t sizeBytes);
   /// Decode a JPEG encoded frame into the internal buffer.
+  /// @param buffer: jpg data, possibly read from a valid jpg file (the whole file).
+  /// @param decodePixels: if true, decode the image in the buffer, otherwise, only read the format.
   /// @return True if the frame type is supported & the frame was read.
-  bool readJpegFrame(const std::vector<uint8_t>& buffer);
+  bool readJpegFrame(const std::vector<uint8_t>& buffer, bool decodePixels = true);
 
   static bool
   readJpegFrame(std::shared_ptr<PixelFrame>& frame, RecordReader* reader, const uint32_t sizeBytes);
@@ -102,9 +104,10 @@ class PixelFrame {
   /// @return True if the frame type is supported & the frame was read.
   bool readPngFrame(RecordReader* reader, const uint32_t sizeBytes);
   /// Decode a png buffer data into the image.
-  /// @pngBuffer: png data, possibly read from a valid png file (the whole file).
+  /// @param pngBuffer: png data, possibly read from a valid png file (the whole file).
+  /// @param decodePixels: if true, decode the image in the buffer, otherwise, only read the format.
   /// @return True if the frame type is supported & the frame was read.
-  bool readPngFrame(const std::vector<uint8_t>& pngBuffer);
+  bool readPngFrame(const std::vector<uint8_t>& pngBuffer, bool decodePixels = true);
 
   /// Save image as PNG
   /// @param path: path of the file to write
