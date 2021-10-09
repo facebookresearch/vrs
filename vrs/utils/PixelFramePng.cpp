@@ -104,12 +104,17 @@ bool PixelFrame::readPngFrame(const std::vector<uint8_t>& pngBuffer) {
     }
     init(ImageContentBlockSpec(PixelFormat::GREY8, imgWidth, imgHeight));
   } else if (colorType == PNG_COLOR_TYPE_RGB) {
-    if (channels < 3 || channels > 4) {
-      XR_LOGE("{} channels color images make no sense...", channels);
+    if (channels != 3) {
+      XR_LOGE("{} channels color images make no sense with PNG_COLOR_TYPE_RGB...", channels);
       return false;
     }
-    init(ImageContentBlockSpec(
-        channels == 3 ? PixelFormat::RGB8 : PixelFormat::RGBA8, imgWidth, imgHeight));
+    init(ImageContentBlockSpec(PixelFormat::RGB8, imgWidth, imgHeight));
+  } else if (colorType == PNG_COLOR_TYPE_RGB_ALPHA) {
+    if (channels != 4) {
+      XR_LOGE("{} channels color images make no sense with PNG_COLOR_TYPE_RGB_ALPHA...", channels);
+      return false;
+    }
+    init(ImageContentBlockSpec(PixelFormat::RGBA8, imgWidth, imgHeight));
   } else {
     XR_LOGE("Only gray and rgb images are supported.");
     return false;
