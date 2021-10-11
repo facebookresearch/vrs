@@ -361,11 +361,8 @@ static bool buildIdMap(
   return normalizedToSecondMap.empty();
 }
 
-bool isSameLine(
-    const vector<char>& first,
-    const vector<char>& second,
-    size_t offset,
-    size_t lineSize) {
+static bool
+isSameLine(const vector<char>& first, const vector<char>& second, size_t offset, size_t lineSize) {
   if (offset + lineSize < first.size()) {
     size_t endOffset = offset + lineSize;
     for (size_t idx = offset; idx < endOffset; idx++) {
@@ -387,7 +384,7 @@ bool isSameLine(
   }
   return true;
 }
-void printLine(const vector<char>& v, size_t offset, size_t lineSize, bool printAscii) {
+static void printLine(const vector<char>& v, size_t offset, size_t lineSize, bool printAscii) {
   size_t maxOffset = min<size_t>(offset + lineSize, v.size());
   const unsigned char* buf = reinterpret_cast<const unsigned char*>(v.data());
   printf("%08x: ", static_cast<unsigned int>(offset));
@@ -406,7 +403,7 @@ void printLine(const vector<char>& v, size_t offset, size_t lineSize, bool print
   printf("\n");
 }
 
-void printDifferences(
+static void printDifferences(
     const vector<char>& buffer,
     const vector<char>& otherBuffer,
     size_t lineSize,
