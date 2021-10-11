@@ -202,19 +202,16 @@ const string& getTempFolder() {
 /// If sourcePath is a link, returns the path to the linked target, or sourcePath otherwise.
 /// Returns true if the source was really a link, but you can *always* use outLinkedPath.
 bool getLinkedTarget(const string& sourcePath, string& outLinkedPath) {
-#if !IS_WINDOWS_PLATFORM() // not supported on Windows
-  struct STAT64 st;
-  if (LSTAT64(sourcePath.c_str(), &st) == 0 && S_ISLNK(st.st_mode)) {
-    // Note: use realpath() instead of readlink()
+// XROS doesn't contain fs::symlink_file because it does not support symlinks
+#if !IS_XROS_PLATFORM()
+  fs::path source(sourcePath);
+  if (fs::symlink_status(source).type() == fs::symlink_file) {
+    // Note: apply canonical() instead of readlink()
     // so that relative paths in symlinks are resolved properly
-    char* resolvedPath = realpath(sourcePath.c_str(), nullptr);
-    if (resolvedPath) {
-      outLinkedPath = string(resolvedPath);
-      free(resolvedPath);
-      return true;
-    }
+    outLinkedPath = fs::canonical(source).string();
+    return true;
   }
-#endif // !IS_WINDOWS_PLATFORM()
+#endif
   outLinkedPath = sourcePath;
   return false;
 }
