@@ -237,6 +237,7 @@ const map<RecordableTypeId, const char*>& getRecordableTypeIdRegistry() {
       {RecordableTypeId::NimbleSelfTouchContactData, "Nimble Self touch contact data"},
       {RecordableTypeId::NimbleHandVisibilityData, "Nimble hand visibility data"},
       {RecordableTypeId::NimbleGestureData, "Nimble gesture data"},
+      {RecordableTypeId::NimbleCtrlData, "Nimble CTRL data"},
       {RecordableTypeId::DeviceIndependentImages, "Device-independent Images (hand & body)"},
       {RecordableTypeId::DeviceIndependentDepthImage,
        "Device-independent Depth Images (hand & body)"},
