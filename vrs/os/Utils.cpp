@@ -7,7 +7,6 @@
 #include <algorithm>
 
 #include <logging/Checks.h>
-#include <system_utils/os/Utils.h>
 
 #include <vrs/helpers/Strings.h>
 #include <vrs/os/Platform.h>
@@ -46,6 +45,11 @@ namespace fs = xros_std_filesystem;
 #else // !IS_XROS_PLATFORM()
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
+#if IS_VRS_OSS_CODE()
+using fs_error_code = boost::system::error_code;
+constexpr auto kNotFoundFileType = boost::filesystem::file_type::file_not_found;
+constexpr auto kRegularFileType = boost::filesystem::file_type::regular_file;
+#endif
 #endif // !IS_XROS_PLATFORM()
 
 using namespace arvr;
@@ -59,14 +63,14 @@ std::wstring osUtf8ToWstring(const string& utf8String) {
 }
 #endif // IS_WINDOWS_PLATFORM()
 
-FILE* fileOpen(const string& filename, const char* modes) {
+FILE* fileOpen(const string& path, const char* modes) {
 #if IS_WINDOWS_PLATFORM()
   // On Windows, the C APIs create file handles that are inheritable by default. This is not a
   // desirable behavior, since subprocesses could inherit our handles to VRS file and create file
   // access contention bugs. The Windows-specific "N" mode makes the file handle non-inheritable.
-  return ::_wfopen(osUtf8ToWstring(filename).c_str(), osUtf8ToWstring(modes).append(L"N").c_str());
+  return ::_wfopen(osUtf8ToWstring(path).c_str(), osUtf8ToWstring(modes).append(L"N").c_str());
 #else // !IS_WINDOWS_PLATFORM()
-  return ::fopen(filename.c_str(), modes);
+  return ::fopen(path.c_str(), modes);
 #endif // !IS_WINDOWS_PLATFORM()
 }
 
@@ -124,11 +128,11 @@ int getLastFileError() {
   return errno;
 }
 
-int remove(const string& filename) {
+int remove(const string& path) {
 #if IS_WINDOWS_PLATFORM()
-  return ::_wremove(osUtf8ToWstring(filename).c_str());
+  return ::_wremove(osUtf8ToWstring(path).c_str());
 #else // !IS_WINDOWS_PLATFORM()
-  return ::remove(filename.c_str());
+  return ::remove(path.c_str());
 #endif // !IS_WINDOWS_PLATFORM()
 }
 
@@ -180,8 +184,7 @@ const string& getTempFolder() {
     tempDir = fs::temp_directory_path();
 #endif // !IS_ANDROID_PLATFORM()
 
-    string processName =
-        system_utils::os::getFilename(system_utils::os::getCurrentExecutablePath());
+    string processName = getFilename(getCurrentExecutablePath());
     const size_t maxLength = 40;
     if (processName.length() > maxLength) {
       processName.resize(maxLength);
@@ -190,8 +193,7 @@ const string& getTempFolder() {
     string uniqueFolderName;
     do {
       uniqueFolderName = (tempDir / (processName + random_name(10))).string();
-    } while (system_utils::os::pathExists(uniqueFolderName) ||
-             system_utils::os::makeDir(uniqueFolderName) != 0);
+    } while (pathExists(uniqueFolderName) || makeDir(uniqueFolderName) != 0);
     uniqueFolderName += '/';
     return uniqueFolderName;
 #endif // !IS_XROS_PLATFORM()
@@ -297,5 +299,135 @@ string sanitizeFileName(const string& filename) {
   }
   return sanitizedName;
 }
+
+#if IS_VRS_OSS_CODE()
+
+string pathJoin(const string& a, const string& b) {
+  return (fs::path(a) / b).generic_string();
+}
+
+string pathJoin(const string& a, const string& b, const string& c) {
+  return (fs::path(a) / b / c).generic_string();
+}
+
+int makeDir(const string& dir) {
+  fs_error_code code;
+  return fs::create_directory(fs::path(dir), code) ? 0 : code.value();
+}
+
+int makeDirectories(const string& dir) {
+  fs_error_code code;
+  return fs::create_directories(dir, code) ? 0 : code.value();
+}
+
+bool isDir(const string& path) {
+  return fs::is_directory(fs::path(path));
+}
+
+bool isFile(const string& path) {
+  fs_error_code ec;
+  auto type = fs::status(fs::path(path), ec).type(); // This will traverse symlinks
+  if (ec) { // Underlying OS API error - we cannot access it.
+    return false;
+  }
+  return type == kRegularFileType; // Not supporting block-, character-, socket files
+}
+
+bool pathExists(const string& path) {
+  fs_error_code ec;
+  auto type = fs::status(fs::path(path), ec).type(); // This will traverse symlinks
+  if (ec) {
+    return false; // Underlying OS API error - we cannot access it.
+  }
+  return type != kNotFoundFileType;
+}
+
+int64_t getFileSize(const string& path) {
+  fs_error_code ec;
+  auto size = fs::file_size(fs::path(path), ec);
+  if (ec) {
+    return -1;
+  }
+  return size;
+}
+
+// make 'path/to/folder' and 'path/to/folder/' mean the same thing
+static fs::path getCleanedPath(const string& path) {
+  fs::path fspath;
+  if (path.empty() || (path.back() != '/' && path.back() != '\\')) {
+    fspath = path;
+  } else {
+    string p{path};
+    do {
+      p.pop_back();
+    } while (!p.empty() && (p.back() == '/' || p.back() == '\\'));
+    fspath = p;
+  }
+  return fspath;
+}
+
+string getFilename(const string& path) {
+  return getCleanedPath(path).filename().generic_string();
+}
+
+string getParentFolder(const string& path) {
+  return getCleanedPath(path).parent_path().generic_string();
+}
+
+const string& getHomeFolder() {
+  static string sHomeFolder = [] {
+#if IS_ANDROID_PLATFORM()
+    return "/data/local/tmp/"; // there is no home folder where to write, use the temp folder...
+#elif IS_WINDOWS_PLATFORM()
+    const char* home = getenv("USERPROFILE");
+    string homeFolder = (home != nullptr) ? home : fs::temp_directory_path().string();
+    if (homeFolder.empty() || (homeFolder.back() != '/' && homeFolder.back() != '\\')) {
+      homeFolder += '/';
+    }
+    return homeFolder;
+#else
+    const char* home = getenv("HOME");
+    string homeFolder = (home != nullptr) ? home : fs::temp_directory_path().string();
+    if (homeFolder.empty() || homeFolder.back() != '/') {
+      homeFolder += '/';
+    }
+    return homeFolder;
+#endif
+  }();
+  return sHomeFolder;
+}
+
+#if !IS_WINDOWS_PLATFORM() && !IS_APPLE_PLATFORM()
+static size_t getLinuxSelfExePath(char* buf, size_t buflen) {
+  ssize_t readlinkLen = ::readlink("/proc/self/exe", buf, buflen);
+  size_t len = (readlinkLen == -1 || readlinkLen == sizeof(buf)) ? 0 : readlinkLen;
+  buf[len] = '\0';
+  return len;
+}
+#endif
+
+string getCurrentExecutablePath() {
+#if IS_WINDOWS_PLATFORM()
+  const size_t kMaxPath = 1024;
+  char exePath[kMaxPath];
+  if (::GetModuleFileNameA(NULL, exePath, kMaxPath) <= 0) {
+    exePath[0] = '\0';
+  }
+  return exePath;
+#elif IS_APPLE_PLATFORM()
+  char exePath[PATH_MAX];
+  uint32_t len = PATH_MAX;
+  if (_NSGetExecutablePath(exePath, &len) != 0) {
+    exePath[0] = '\0'; // buffer too small (!)
+  }
+  return exePath;
+#else // IS_LINUX_PLATFORM() || IS_ANDROID_PLATFORM()
+  char exePath[PATH_MAX];
+  size_t len = getLinuxSelfExePath(exePath, PATH_MAX);
+  exePath[len] = '\0';
+  return exePath;
+#endif // IS_LINUX_PLATFORM() || IS_ANDROID_PLATFORM()
+}
+#endif
 
 } // namespace vrs::os
