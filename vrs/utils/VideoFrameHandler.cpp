@@ -102,4 +102,12 @@ uint32_t VideoFrameHandler::getFramesToSkip() const {
       : 0;
 }
 
+void VideoFrameHandler::reset() {
+  decodedKeyFrameIndex_ = kInvalidFrameIndex;
+  decodedKeyFrameTimestamp_ = 0;
+  requestedKeyFrameIndex_ = kInvalidFrameIndex;
+  requestedKeyFrameTimestamp_ = 0;
+  videoGoodState_ = false;
+}
+
 } // namespace vrs::utils

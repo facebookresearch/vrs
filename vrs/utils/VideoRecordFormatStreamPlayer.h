@@ -59,6 +59,11 @@ class VideoRecordFormatStreamPlayer : public RecordFormatStreamPlayer {
     return whileReadingMissingFrames_;
   }
 
+  /// Reset videoFrameHandler's internal state to force reading from the key frame.
+  /// @param streamId: StreamID for the handler you want to reset, if you don't specify anything
+  /// reset all the handlers.
+  void resetVideoFrameHandler(const StreamId& streamId = {});
+
 /// Reference implementation to systematically & transparently read missing I-frame & P-frames.
 /// Note that callbacks when reading previous frames will be happen, as if the record was really
 /// the one we need to decode. whileReadingMissingFrames() will tell the context during callbacks.

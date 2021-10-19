@@ -81,6 +81,8 @@ class VideoFrameHandler {
   /// this method will tell how many frames past the key frame timestamp may be skipped.
   uint32_t getFramesToSkip() const;
 
+  void reset();
+
  private:
   std::unique_ptr<DecoderI> decoder_;
 

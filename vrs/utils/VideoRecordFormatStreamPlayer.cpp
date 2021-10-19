@@ -47,4 +47,14 @@ int VideoRecordFormatStreamPlayer::tryToDecodeFrame(
   return handlers_[record.streamId].tryToDecodeFrame(outFrame, record.reader, contentBlock);
 }
 
+void VideoRecordFormatStreamPlayer::resetVideoFrameHandler(const StreamId& streamId) {
+  if (streamId.isValid()) {
+    handlers_[streamId].reset();
+  } else {
+    for (auto& handler : handlers_) {
+      handler.second.reset();
+    }
+  }
+}
+
 } // namespace vrs::utils
