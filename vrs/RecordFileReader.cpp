@@ -615,6 +615,33 @@ const IndexRecord::RecordInfo* RecordFileReader::getRecordByTime(
   return nullptr;
 }
 
+const IndexRecord::RecordInfo* RecordFileReader::getNearestRecordByTime(
+    double timestamp,
+    double epsilon,
+    StreamId streamId) const {
+  // If stream id is undefined, we search for all the streams.
+  if (streamId.isValid()) {
+    const vector<const IndexRecord::RecordInfo*>& index = getIndex(streamId);
+    return vrs::getNearestRecordByTime(index, timestamp, epsilon);
+  }
+
+  const IndexRecord::RecordInfo* nearest = nullptr;
+  const IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type());
+  auto lowerBound =
+      std::lower_bound(recordIndex_.begin(), recordIndex_.end(), firstTime, timeCompare);
+
+  auto start = (lowerBound == recordIndex_.begin()) ? lowerBound : lowerBound - 1;
+  auto end = (lowerBound == recordIndex_.end()) ? lowerBound : lowerBound + 1;
+  for (auto iter = start; iter != end; iter++) {
+    double diff = abs((*iter).timestamp - timestamp);
+    if (diff <= epsilon && (nearest == nullptr || diff < abs(nearest->timestamp - timestamp))) {
+      nearest = &(*iter);
+    }
+  }
+
+  return nearest;
+}
+
 uint32_t RecordFileReader::getRecordIndex(const IndexRecord::RecordInfo* record) const {
   if (!recordIndex_.empty() && record >= &recordIndex_.front() && record <= &recordIndex_.back()) {
     return static_cast<uint32_t>(record - &(recordIndex_.front()));
@@ -930,6 +957,25 @@ int RecordFileReader::readRecord(
     return streamPlayer->recordReadComplete(*this, recordInfo);
   }
   return 0;
+}
+
+const IndexRecord::RecordInfo* getNearestRecordByTime(
+    const std::vector<const IndexRecord::RecordInfo*>& index,
+    double timestamp,
+    double epsilon) {
+  const IndexRecord::RecordInfo* nearest = nullptr;
+  const IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type());
+  auto lowerBound = std::lower_bound(index.begin(), index.end(), &firstTime, ptrTimeCompare);
+
+  auto start = (lowerBound == index.begin()) ? lowerBound : lowerBound - 1;
+  auto end = (lowerBound == index.end()) ? lowerBound : lowerBound + 1;
+  for (auto iter = start; iter != end; iter++) {
+    double diff = abs((*iter)->timestamp - timestamp);
+    if (diff <= epsilon && (nearest == nullptr || diff < abs(nearest->timestamp - timestamp))) {
+      nearest = *iter;
+    }
+  }
+  return nearest;
 }
 
 } // namespace vrs

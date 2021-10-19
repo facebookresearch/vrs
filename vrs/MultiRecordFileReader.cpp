@@ -441,6 +441,28 @@ const IndexRecord::RecordInfo* MultiRecordFileReader::getRecordByTime(
   return reader->getRecordByTime(streamIdReaderPair->first, timestamp);
 }
 
+const IndexRecord::RecordInfo* MultiRecordFileReader::getNearestRecordByTime(
+    double timestamp,
+    double epsilon,
+    StreamId streamId) const {
+  if (!isOpened_) {
+    return nullptr;
+  }
+  if (hasSingleFile()) {
+    return readers_.front()->getNearestRecordByTime(timestamp, epsilon, streamId);
+  }
+  if (streamId.isValid()) {
+    const StreamIdReaderPair* streamIdReaderPair = getStreamIdReaderPair(streamId);
+    if (streamIdReaderPair == nullptr) {
+      return nullptr;
+    }
+    const RecordFileReader* reader = streamIdReaderPair->second;
+    return reader->getNearestRecordByTime(timestamp, epsilon, streamIdReaderPair->first);
+  }
+
+  return vrs::getNearestRecordByTime(*recordIndex_, timestamp, epsilon);
+}
+
 std::unique_ptr<FileHandler> MultiRecordFileReader::getFileHandler() const {
   if (readers_.empty()) {
     return nullptr;

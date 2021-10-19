@@ -134,6 +134,37 @@ void checkIndex(vrs::RecordFileReader& file, uint32_t recordIndex) {
   r = file.getRecordByTime(
       record.streamId, record.recordType, nextafter(record.timestamp, record.timestamp + 1));
   EXPECT_GT(file.getRecordIndex(r), recordIndex);
+
+  // search nearest record
+  r = file.getNearestRecordByTime(record.timestamp, 1e-6, record.streamId);
+  EXPECT_NE(r, nullptr);
+  i = file.getRecordIndex(r);
+  EXPECT_FALSE(
+      i > 0 && index[i - 1].streamId == record.streamId &&
+      index[i - 1].timestamp == record.timestamp);
+
+  // search nearest record with slightly different timestamps
+  r = file.getNearestRecordByTime(record.timestamp + 1e-7, 1e-6, record.streamId);
+  EXPECT_NE(r, nullptr);
+  i = file.getRecordIndex(r);
+  EXPECT_FALSE(
+      i > 0 && index[i - 1].streamId == record.streamId &&
+      index[i - 1].timestamp == record.timestamp);
+
+  r = file.getNearestRecordByTime(record.timestamp - 1e-7, 1e-6, record.streamId);
+  EXPECT_NE(r, nullptr);
+  i = file.getRecordIndex(r);
+  EXPECT_FALSE(
+      i > 0 && index[i - 1].streamId == record.streamId &&
+      index[i - 1].timestamp == record.timestamp);
+
+  r = file.getNearestRecordByTime(record.timestamp + 1e-6, 1e-7, record.streamId);
+  EXPECT_EQ(r, nullptr);
+  r = file.getNearestRecordByTime(record.timestamp - 1e-6, 1e-7, record.streamId);
+  EXPECT_EQ(r, nullptr);
+
+  r = file.getNearestRecordByTime(record.timestamp, 1e-6);
+  EXPECT_NE(r, nullptr);
 }
 
 TEST_F(GetRecordTester, GetRecordTest) {
