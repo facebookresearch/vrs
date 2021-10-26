@@ -185,12 +185,11 @@ class MultiRecordFileReader {
     return getTag(getTags(streamId).vrs, Recordable::getOriginalNameTagName());
   }
 
-  /// Hook stream players to the streams revealed by getStreams() after you've opened file(s),
-  /// and before you start reading records.
-  /// You can disconnect the StreamPlayer by passing a nullptr for the stream id.
-  /// The file player does *not* take ownership of the StreamPlayer, which allows to use the same
-  /// StreamPlayer object for multiple streams, maybe even in different file readers.
-  /// So the caller is responsible for deleting the StreamPlayer objet after the file is read.
+  /// Hook a stream player to a specific stream after opening a file and before reading records.
+  /// The file player does *not* take ownership of the StreamPlayer.
+  /// Using the same StreamPlayer instance for multiple streams is supported.
+  /// So the caller is responsible for deleting the StreamPlayer objets after the file is read.
+  /// Disconnect the StreamPlayer by passing a nullptr for the stream id.
   /// @param streamId: UniqueStreamId to hook the stream player to.
   /// @param streamPlayer: StreamPlayer to attach.
   void setStreamPlayer(UniqueStreamId streamId, StreamPlayer* streamPlayer);

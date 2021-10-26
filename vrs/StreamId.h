@@ -412,16 +412,16 @@ inline bool isARecordableClass(RecordableTypeId typeId) {
 /// Identifier for a stream of records, containing a RecordableTypeId and an instance id, so that
 /// multiple streams of the same kind can be recorded side-by-side in a VRS file unambiguously.
 ///
-/// Note that instance ids are not meant to be controlled, set, or defined by client code.
+/// Note that instance ids are not meant to be controlled, set, or defined by the recording code.
 ///
 /// During recording, VRS generates a unique instance id when a recordable is created,
-/// to ensure that each recordable has a unique stream id in the whole system. By design, if you
-/// stop recording, and destroy the recordables and create new ones, the instance ids will keep
-/// increasing.
-///
-/// To identify streams, don't rely on instance id values, use recordable tags or flavors instead.
-/// When reading a file, use RecordFileReader::getStreamForTag() and
-/// RecordFileReader::getStreamForFlavor(), to directly find the streams you're looking for.
+/// to ensure that each recordable has a unique stream id in the whole system. In particular, by
+/// design, if you stop recording, destroy the recordables and create new ones, the instance ids
+/// generated will keep increasing.
+/// Therefore, when discovering the streams in a VRS file, specific instance ids can't be used to
+/// recognize different instances of particular RecordableTypeId. Instead, use recordable tags or
+/// flavors. The APIs RecordFileReader::getStreamForTag() and RecordFileReader::getStreamForFlavor()
+/// can then quickly determine the StreamId for each of the streams in the file.
 class StreamId {
  public:
   StreamId() : typeId_{RecordableTypeId::Undefined}, instanceId_{0} {}

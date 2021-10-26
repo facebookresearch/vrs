@@ -16,7 +16,7 @@ class VideoRecordFormatStreamPlayer : public RecordFormatStreamPlayer {
  public:
   /// Method to handle image/video data received in the onImageRead() callback.
   /// @param outBuffer: an allocated buffer where to write the decoded image data.
-  /// The buffer's size must be contentBlock.image().getRawImageSize()
+  /// The buffer's size must be cb.image().getRawImageSize()
   /// @param record: record being read context.
   /// @param cb: image content block description.
   /// @return 0 if the image was properly decoded and the data written out in the buffer.

@@ -543,6 +543,7 @@ class ContentBlock {
 /// so that we can tell how a particular type of VRS record looks like.
 ///
 /// Major ContentBlock types include DataLayout blocks and image blocks.
+/// See enum class ContentType above for the complete list of ContentBlock types.
 ///
 /// See ContentBlock to find out about all the different types of content blocks supported.
 class RecordFormat {
