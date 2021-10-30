@@ -25,9 +25,7 @@
 
 #endif
 
-#if IS_XROS_PLATFORM()
-#include <xr/uuid/uuid.h>
-#else
+#if IS_VRS_OSS_CODE()
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #endif
@@ -104,18 +102,11 @@ std::string vrs::os::getOsFingerPrint() {
 #endif
 }
 
+#if IS_VRS_OSS_CODE()
 std::string vrs::os::getUniqueSessionId() {
-#if IS_XROS_PLATFORM()
-  xr_uuid_t uuid;
-  xr_uuid_formatted_t uuidString;
-
-  xr_uuid_generate_pseudo_random(&uuid);
-  xr_uuid_format(&uuid, &uuidString);
-  return std::string(uuidString.str);
-#else // !IS_XROS_PLATFORM()
   std::stringstream sstream;
   boost::uuids::random_generator generator;
   sstream << generator();
   return sstream.str();
-#endif // !IS_XROS_PLATFORM()
 }
+#endif
