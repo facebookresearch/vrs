@@ -38,19 +38,13 @@
 #include <cstring>
 #endif // !IS_WINDOWS_PLATFORM()
 
-#if IS_XROS_PLATFORM()
-#include <logging/Checks.h>
-#include <xros/portability/StdFilesystem.h>
-namespace fs = xros_std_filesystem;
-#else // !IS_XROS_PLATFORM()
+#if IS_VRS_OSS_CODE()
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
-#if IS_VRS_OSS_CODE()
 using fs_error_code = boost::system::error_code;
 constexpr auto kNotFoundFileType = boost::filesystem::file_type::file_not_found;
 constexpr auto kRegularFileType = boost::filesystem::file_type::regular_file;
 #endif
-#endif // !IS_XROS_PLATFORM()
 
 using namespace arvr;
 using std::string;
@@ -112,17 +106,17 @@ int fileSeek(FILE* file, int64_t offset, int origin) {
 #endif
 }
 
+#if IS_VRS_OSS_CODE()
 int fileSetSize(std::FILE* file, int64_t size) {
 #if IS_WINDOWS_PLATFORM()
   return ::_chsize_s(_fileno(file), size);
-#elif IS_XROS_PLATFORM()
-  return xros_std_filesystem::setFileSize(file, size);
 #elif (defined(__ANDROID_API__) && __ANDROID_API__ >= 21)
   return ::ftruncate64(fileno(file), static_cast<off64_t>(size));
 #else
   return ::ftruncate(fileno(file), size);
 #endif
 }
+#endif
 
 int getLastFileError() {
   return errno;
@@ -151,7 +145,7 @@ string fileErrorToString(int errnum) {
 // we can't use boost::unique_path, because std::file system doesn't have it.
 // we can't use std::tmpnam, because it's deprecated, and throws a warning, breaking the build...
 // So yes, we're reinventing the wheel.
-static string random_name(int length) {
+string randomName(int length) {
   auto randchar = []() -> char {
     const char charset[] =
         "0123456789_"
@@ -164,19 +158,9 @@ static string random_name(int length) {
   return str;
 }
 
+#if IS_VRS_OSS_CODE()
 const string& getTempFolder() {
   static string sUniqueFolderName = [] {
-
-#if IS_XROS_PLATFORM()
-    fs::path tempDir = fs::temp_directory_path();
-
-    fs::path uniqueDir;
-    do {
-      uniqueDir = tempDir / random_name(16);
-    } while (fs::create_directories(uniqueDir) == false);
-    return uniqueDir.string();
-
-#else // !IS_XROS_PLATFORM()
     fs::path tempDir;
 #if IS_ANDROID_PLATFORM()
     tempDir = "/data/local/tmp/";
@@ -192,11 +176,10 @@ const string& getTempFolder() {
     processName += '-';
     string uniqueFolderName;
     do {
-      uniqueFolderName = (tempDir / (processName + random_name(10))).string();
+      uniqueFolderName = (tempDir / (processName + randomName(10))).string();
     } while (pathExists(uniqueFolderName) || makeDir(uniqueFolderName) != 0);
     uniqueFolderName += '/';
     return uniqueFolderName;
-#endif // !IS_XROS_PLATFORM()
   }();
   return sUniqueFolderName;
 }
@@ -204,8 +187,6 @@ const string& getTempFolder() {
 /// If sourcePath is a link, returns the path to the linked target, or sourcePath otherwise.
 /// Returns true if the source was really a link, but you can *always* use outLinkedPath.
 bool getLinkedTarget(const string& sourcePath, string& outLinkedPath) {
-// XROS doesn't contain fs::symlink_file because it does not support symlinks
-#if !IS_XROS_PLATFORM()
   fs::path source(sourcePath);
   if (fs::symlink_status(source).type() == fs::symlink_file) {
     // Note: apply canonical() instead of readlink()
@@ -213,10 +194,10 @@ bool getLinkedTarget(const string& sourcePath, string& outLinkedPath) {
     outLinkedPath = fs::canonical(source).string();
     return true;
   }
-#endif
   outLinkedPath = sourcePath;
   return false;
 }
+#endif
 
 int hidePath(MAYBE_UNUSED const string& path, MAYBE_UNUSED bool hide) {
 #if IS_WINDOWS_PLATFORM()
@@ -243,7 +224,7 @@ string getUniquePath(const string& baseName, size_t randomSuffixLength) {
   uniqueName = baseName + '~';
   do {
     uniqueName.resize(baseName.size() + 1);
-    uniqueName += random_name(randomSuffixLength);
+    uniqueName += randomName(randomSuffixLength);
   } while (os::pathExists(uniqueName));
   return uniqueName;
 }
