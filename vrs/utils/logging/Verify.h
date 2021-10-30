@@ -5,6 +5,7 @@
 #include <fmt/color.h>
 #include <fmt/core.h>
 
+#include "LogLevel.h"
 #include "Utils.h"
 
 #ifndef DEFAULT_LOG_CHANNEL

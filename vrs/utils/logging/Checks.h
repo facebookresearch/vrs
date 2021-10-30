@@ -5,6 +5,7 @@
 #include <fmt/core.h>
 #include <string>
 
+#include "LogLevel.h"
 #include "Utils.h"
 
 namespace vrs::logging {
