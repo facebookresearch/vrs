@@ -22,6 +22,7 @@
 #include <vrs/helpers/EnumStringConverter.h>
 #include <vrs/helpers/Rapidjson.hpp>
 #include <vrs/helpers/Strings.h>
+#include <vrs/os/CompilerAttributes.h>
 #include <vrs/os/Platform.h>
 
 #include "DataLayoutConventions.h"
@@ -29,14 +30,6 @@
 #include "RecordFormat.h"
 
 // IWYU pragma: no_forward_declare vrs::DataPiece::MakerBundle
-
-// XROS builds with -Wthread-safety-analysis, which (correctly) flags that the DataLayouter mutex
-// can be used in an unsafe fashion.
-#if IS_XROS_PLATFORM()
-#define DISABLE_THREAD_SAFETY_ANALYSIS __attribute__((no_thread_safety_analysis))
-#else // !IS_XROS_PLATFORM()
-#define DISABLE_THREAD_SAFETY_ANALYSIS
-#endif // !IS_XROS_PLATFORM()
 
 namespace vrs {
 
