@@ -6,7 +6,11 @@
 #include <cstdio>
 #include <string>
 
-// @oss-disable: #include <vrs/os/Utils_fb.h>
+#include <vrs/os/Platform.h>
+
+#if IS_VRS_FB_INTERNAL()
+#include <vrs/os/Utils_fb.h>
+#endif
 
 /// Mini-OS abstraction layer. Only VRS should use these.
 /// Enables the encapsulation of file system implementations,
@@ -37,7 +41,7 @@ std::string getUniquePath(const std::string& baseName, size_t randomSuffixLength
 int getLastFileError();
 std::string fileErrorToString(int errnum);
 
-// @oss-disable: #if 0
+#if IS_VRS_OSS_CODE()
 
 /// Path joining helpers
 std::string pathJoin(const std::string& a, const std::string& b);
@@ -64,6 +68,6 @@ std::string getParentFolder(const std::string& path);
 const std::string& getHomeFolder();
 std::string getCurrentExecutablePath();
 
-// @oss-disable: #endif
+#endif // IS_VRS_OSS_CODE()
 
 } // namespace vrs::os
