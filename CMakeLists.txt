@@ -18,3 +18,5 @@ add_subdirectory(vrs/helpers)
 add_subdirectory(vrs/os)
 add_subdirectory(vrs/utils/logging)
 add_subdirectory(vrs/utils/xxhash)
+
+add_subdirectory(sample_apps)
