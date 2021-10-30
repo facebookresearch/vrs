@@ -9,6 +9,7 @@
 #include <logging/Checks.h>
 
 #include <vrs/helpers/Strings.h>
+#include <vrs/os/CompilerAttributes.h>
 #include <vrs/os/Platform.h>
 
 #if IS_WINDOWS_PLATFORM()
@@ -46,7 +47,6 @@ constexpr auto kNotFoundFileType = boost::filesystem::file_type::file_not_found;
 constexpr auto kRegularFileType = boost::filesystem::file_type::regular_file;
 #endif
 
-using namespace arvr;
 using std::string;
 
 namespace vrs::os {

@@ -10,6 +10,7 @@
 
 #include <vrs/helpers/FileMacros.h>
 #include <vrs/helpers/Strings.h>
+#include <vrs/os/CompilerAttributes.h>
 #include <vrs/os/Time.h>
 #include <vrs/os/Utils.h>
 

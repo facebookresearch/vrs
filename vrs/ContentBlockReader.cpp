@@ -6,6 +6,8 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/os/CompilerAttributes.h>
+
 #include "RecordFormatStreamPlayer.h"
 #include "RecordReaders.h"
 
