@@ -8,10 +8,10 @@
 #include <type_traits>
 #include <vector>
 
-#include <Serialization/Rapidjson.h>
 #include <logging/Checks.h>
 
 #include <vrs/DataPieces.h>
+#include <vrs/helpers/Serialization.h>
 
 namespace vrs {
 

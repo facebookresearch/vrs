@@ -6,7 +6,7 @@
 
 #include "DescriptionRecord.h"
 
-#include <Serialization/Rapidjson.h>
+#include <vrs/helpers/Serialization.h>
 
 #define DEFAULT_LOG_CHANNEL "VRSDescriptionRecord"
 #include <logging/Log.h>

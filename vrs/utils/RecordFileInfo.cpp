@@ -10,8 +10,7 @@
 
 #include <fmt/format.h>
 
-#include <Serialization/Rapidjson.h>
-
+#include <vrs/helpers/Serialization.h>
 #include <vrs/helpers/Strings.h>
 
 #include <vrs/ErrorCode.h>
