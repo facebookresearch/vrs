@@ -21,7 +21,7 @@ enum class Level {
 void log(Level level, const char* channel, const std::string& message);
 } // namespace vrs::logging
 
-#define XR_LOG_DEFAULT(level, ...) log(level, DEFAULT_LOG_CHANNEL, fmt::format(__VA_ARGS__));
+#define XR_LOG_DEFAULT(level, ...) log(level, DEFAULT_LOG_CHANNEL, fmt::format(__VA_ARGS__))
 
 #define XR_LOGD(...) XR_LOG_DEFAULT(vrs::logging::Level::Debug, __VA_ARGS__)
 #define XR_LOGI(...) XR_LOG_DEFAULT(vrs::logging::Level::Info, __VA_ARGS__)

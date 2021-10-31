@@ -3,9 +3,7 @@
 file (GLOB VRS_SRCS *.cpp *.h *.hpp)
 
 add_library(vrs STATIC ${VRS_SRCS})
-
-target_include_directories(vrs PUBLIC ${VRS_SOURCE_DIR}/vrs)
-
+target_include_directories(vrs PUBLIC ${VRS_SOURCE_DIR})
 target_link_libraries(vrs
     PUBLIC
         vrs_helpers

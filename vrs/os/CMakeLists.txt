@@ -4,9 +4,7 @@ file (GLOB VRS_OS_SRCS *.cpp *.h *.hpp)
 list (REMOVE_ITEM VRS_OS_SRCS "Platform.h")
 
 add_library(vrs_os STATIC ${VRS_OS_SRCS})
-
 target_include_directories(vrs_os PUBLIC ${VRS_SOURCE_DIR})
-
 target_link_libraries(vrs_os
     PUBLIC
         vrs_logging
@@ -17,8 +15,5 @@ target_link_libraries(vrs_os
         Boost::date_time
 )
 
-
 add_library(vrs_platform INTERFACE)
 target_include_directories(vrs_platform INTERFACE ${VRS_SOURCE_DIR})
-
-get_target_property(LIB_INCLUDES vrs_os INCLUDE_DIRECTORIES)

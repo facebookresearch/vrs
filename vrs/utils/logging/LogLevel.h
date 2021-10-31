@@ -19,7 +19,7 @@ enum class Level {
 /**
  * Set the global log level that applies for all channels, unless the channel has separate settings.
  */
-void setGlobalLogLevel(Level level) {}
+inline void setGlobalLogLevel(Level level) {}
 
 } // namespace logging
 } // namespace arvr

@@ -30,7 +30,7 @@ void log(Level level, const char* channel, const std::string& message) {
     default:
       c = fmt::color::white;
   }
-  fmt::print(stderr, fg(c), "[{}][{}]: {}", channel, logLevel, message);
+  fmt::print(stderr, fg(c), "[{}][{}]: {}\n", channel, logLevel, message);
 }
 
 } // namespace vrs::logging

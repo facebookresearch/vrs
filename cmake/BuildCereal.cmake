@@ -22,14 +22,10 @@ ExternalProject_Add(
 
 ExternalProject_Get_Property(cereal binary_dir)
 set(CEREAL_BINARY_DIR ${binary_dir})
-
-set(CEREAL_LIBRARIES "${CEREAL_BINARY_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}cereal${CMAKE_STATIC_LIBRARY_SUFFIX}")
-
 set(CEREAL_INCLUDE_DIRS "${CEREAL_BINARY_DIR}/include")
-message(STATUS "${CEREAL_INCLUDE_DIRS}")
-
 file(MAKE_DIRECTORY ${CEREAL_INCLUDE_DIRS})
-add_library(Cereal::Cereal STATIC IMPORTED)
+
+add_library(Cereal::Cereal INTERFACE IMPORTED)
 target_compile_definitions(Cereal::Cereal
   INTERFACE
     CEREAL_THREAD_SAFE=1
@@ -40,6 +36,7 @@ add_dependencies(Cereal::Cereal cereal)
 
 set_target_properties(Cereal::Cereal PROPERTIES
   INTERFACE_INCLUDE_DIRECTORIES ${CEREAL_INCLUDE_DIRS}
-  IMPORTED_LOCATION ${CEREAL_LIBRARIES}
 )
 target_include_directories(Cereal::Cereal INTERFACE ${CEREAL_INCLUDE_DIRS})
+
+message(STATUS "${CEREAL_INCLUDE_DIRS}")
