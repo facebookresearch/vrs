@@ -7,6 +7,8 @@ project(vrs CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
+include(${CMAKE_MODULE_PATH}/Platform.cmake)
+include(${CMAKE_MODULE_PATH}/CCache.cmake)
 
 # Library setup
 include(${CMAKE_MODULE_PATH}/LibrariesSetup.cmake)
