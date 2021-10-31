@@ -26,15 +26,16 @@ class FileHandlerFactory {
   /// @return A status code, 0 meaning success.
   ///
   /// `path` identification methods:
-  /// 1) File path; examples `/posix/path/to/file`, or `C:\\Path\\To\\File`
-  /// 2) Gaia URI; examples `gaia:12346789`
-  /// 3) JSON object containing:
+  /// 1) File paths; examples `/posix/path/to/file`, or `C:\\Path\\To\\File`
+  /// 2) URI paths, probably mapped to custom FileHandler implementations registered externally.
+  /// 3) JSON "paths" containing:
   ///    storage - name of a registered file handler to use
   ///    chunks - storage specific references (path, url, ...) to successive chunks of data
   ///    ```{
   ///      "storage": "required-name-of-file-handler",
   ///      "chunks": [ "chunk_path_1", "chunk2_path_2", ... ],
   ///    }```
+  ///    JSON paths are converted into FileSpec objects by FileSpec::fromJson()
   /// 4) If all the above methods fail, fall back to opening path as file path.
   ///
   /// Method is virtual to enable mock FileHandlerFactories to be created for unit testing.

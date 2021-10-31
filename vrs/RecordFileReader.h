@@ -66,8 +66,8 @@ class RecordFileReader {
 
   /// Open a record file.
   /// Use one RecordFileReader object per file you want to read.
-  /// @param filePath: Identifier of resource to open. 1) a file path,
-  ///   2) gaia:FBID URI, or 3) JSON object. See FileHandlerFactory::delegateOpen for details.
+  /// @param filePath: Identifier of resource to open. Might be a file path, a URI,
+  /// or a "JSON path". See FileHandlerFactory::delegateOpen for details.
   /// @param autoWriteFixedIndex: If the index was rebuilt, patch the original file in place.
   /// @return 0 on success and you can read the file, or some non-zero error code, in which case,
   /// further read calls will fail.

@@ -128,7 +128,7 @@ inline void FileSpec::setExtra(const string& name, const T& value) {
 }
 
 /// Class to abstract VRS file system operations, to enable support for alternate storage methods,
-/// in particular network storage, such as WarmStorage, Everstore, and Manifold.
+/// in particular network/cloud storage implementation.
 /// For simplicity, in this documentation, we will make references to a "file", but it might be a
 /// data blob on a network storage.
 ///
