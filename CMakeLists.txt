@@ -7,6 +7,7 @@ set(CMAKE_MODULE_PATH "${VRS_SOURCE_DIR}/cmake")
 
 include(${CMAKE_MODULE_PATH}/Platform.cmake)
 include(${CMAKE_MODULE_PATH}/Compiler.cmake)
+include(${CMAKE_MODULE_PATH}/Options.cmake)
 
 # Declare the project, make cmake chose/test the compiler, etc
 project(vrs

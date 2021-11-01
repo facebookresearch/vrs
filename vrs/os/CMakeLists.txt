@@ -9,6 +9,7 @@ add_library(vrs_os STATIC ${VRS_OS_SRCS})
 target_include_directories(vrs_os PUBLIC ${VRS_SOURCE_DIR})
 target_link_libraries(vrs_os
     PUBLIC
+        vrs_platform
         vrs_logging
         Boost::system
         Boost::filesystem
@@ -19,3 +20,6 @@ target_link_libraries(vrs_os
 
 add_library(vrs_platform INTERFACE)
 target_include_directories(vrs_platform INTERFACE ${VRS_SOURCE_DIR})
+if ("${OSS_CMAKE_OVERRIDE}")
+  target_compile_definitions(vrs_platform INTERFACE OSS_CMAKE_OVERRIDE)
+endif()
