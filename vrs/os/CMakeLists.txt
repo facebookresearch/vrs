@@ -1,7 +1,9 @@
 # Copyright (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
 
-file (GLOB VRS_OS_SRCS *.cpp *.h *.hpp)
-list (REMOVE_ITEM VRS_OS_SRCS "Platform.h")
+file(GLOB VRS_OS_SRCS *.cpp *.h *.hpp)
+# Remove fb-only source files (if there is still any lying around)
+file(GLOB VRS_OS_FB_SRCS *_fb\.cpp *_fb\.h)
+list(REMOVE_ITEM VRS_OS_SRCS ${VRS_OS_FB_SRCS})
 
 add_library(vrs_os STATIC ${VRS_OS_SRCS})
 target_include_directories(vrs_os PUBLIC ${VRS_SOURCE_DIR})
