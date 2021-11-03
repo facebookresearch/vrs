@@ -8,8 +8,9 @@
 namespace vrs::logging {
 
 void log(Level level, const char* channel, const std::string& message) {
-  fmt::color c;
-  std::string logLevel = "";
+  const fmt::color kNoColor = static_cast<fmt::color>(0xFFFFFFFF);
+  fmt::color c = kNoColor;
+  const char* logLevel = "";
   switch (level) {
     case Level::Error:
       c = fmt::color::red;
@@ -20,17 +21,21 @@ void log(Level level, const char* channel, const std::string& message) {
       logLevel = "WARNING";
       break;
     case Level::Info:
-      c = fmt::color::green;
+      c = fmt::color::blue;
       logLevel = "INFO";
       break;
     case Level::Debug:
-      c = fmt::color::yellow;
+      c = fmt::color::green;
       logLevel = "DEBUG";
       break;
     default:
-      c = fmt::color::white;
+      c = kNoColor;
   }
-  fmt::print(stderr, fg(c), "[{}][{}]: {}\n", channel, logLevel, message);
+  if (c != kNoColor) {
+    fmt::print(stderr, fg(c), "[{}][{}]: {}\x1b[0m\n", channel, logLevel, message);
+  } else {
+    fmt::print(stderr, "[{}][{}]: {}\n", channel, logLevel, message);
+  }
 }
 
 } // namespace vrs::logging
