@@ -5,7 +5,6 @@
 #include <gtest/gtest.h>
 
 #include <TestDataDir/TestDataDir.h>
-#include <test_helpers/UniqueTemporaryDirectory.h>
 #include <vrs/os/Platform.h>
 #include <vrs/os/Utils.h>
 
@@ -18,13 +17,7 @@ using namespace vrs;
 struct FileTest : testing::Test {
   FileTest() {}
 
-// getTestDataDir() does not work on XROS yet. Exclude for now until this is fixed,
-// since it is not strictly required to get XROS functionality going.
-#if !IS_XROS_PLATFORM()
   string testDataDir = coretech::getTestDataDir();
-#else
-  string testDataDir;
-#endif
 
   void testFileName(const string& filename) {
     string path = os::pathJoin(os::getTempFolder(), os::sanitizeFileName(filename));
@@ -179,9 +172,7 @@ TEST_F(FileTest, testGetFilename) {
 }
 
 TEST_F(FileTest, testFileResize) {
-  // NOTE: not using osGetTempFolder() since the UniqueTemporaryDirectory code is already ported to
-  // XROS.
-  string tempDir = arvr::test_helpers::getUniqueTemporaryDirectory().string();
+  string tempDir = os::getTempFolder();
   string testFilePath = os::pathJoin(tempDir, "a.txt");
 
   { // Create a dummy file in the temp dir that we can grow and shrink.
