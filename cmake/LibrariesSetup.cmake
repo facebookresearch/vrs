@@ -19,8 +19,8 @@ find_package(Lz4 REQUIRED)
 # Zstd
 find_package(Zstd REQUIRED)
 
-# Install Cereal
-include(${CMAKE_MODULE_PATH}/BuildCereal.cmake)
+# Cereal
+find_package(Cereal REQUIRED)
 
 # Google tests, if enabled
 if (UNIT_TESTS)
