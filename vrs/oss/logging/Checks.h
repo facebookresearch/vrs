@@ -9,7 +9,7 @@
 #include "Utils.h"
 
 namespace vrs::logging {
-void logAndAbort(const std::string& condition, const std::string& message = "");
+void logAndAbort(const std::string& condition, const std::string& message = {});
 } // namespace vrs::logging
 
 //
