@@ -13,3 +13,16 @@ target_link_libraries(vrs_helpers
         Cereal::Cereal
 )
 target_include_directories(vrs_helpers PUBLIC ${VRS_SOURCE_DIR})
+
+if (UNIT_TESTS)
+  enable_testing()
+
+  add_executable(helpers_test test/StringsTest.cpp)
+  target_link_libraries(helpers_test
+      PUBLIC
+        vrs_helpers
+        GTest::Main
+  )
+
+  gtest_discover_tests(helpers_test)
+endif()

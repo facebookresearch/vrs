@@ -23,3 +23,20 @@ target_include_directories(vrs_platform INTERFACE ${VRS_SOURCE_DIR})
 if ("${OSS_CMAKE_OVERRIDE}")
   target_compile_definitions(vrs_platform INTERFACE OSS_CMAKE_OVERRIDE)
 endif()
+
+if (UNIT_TESTS)
+  enable_testing()
+
+  add_executable(os_test
+    test/TimeTest.cpp
+    test/EventUnitTest.cpp
+#    test/UtilsTest.cpp
+  )
+  target_link_libraries(os_test
+      PUBLIC
+        vrs_os
+        GTest::Main
+  )
+
+  gtest_discover_tests(os_test)
+endif()

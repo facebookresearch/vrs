@@ -21,3 +21,9 @@ find_package(Zstd REQUIRED)
 
 # Install Cereal
 include(${CMAKE_MODULE_PATH}/BuildCereal.cmake)
+
+# Google tests, if enabled
+if (UNIT_TESTS)
+  include(CTest)
+  find_package(GTest REQUIRED)
+endif()
