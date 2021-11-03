@@ -27,8 +27,10 @@ include(${CMAKE_MODULE_PATH}/LibrariesSetup.cmake)
 add_subdirectory(vrs)
 add_subdirectory(vrs/helpers)
 add_subdirectory(vrs/os)
-add_subdirectory(vrs/utils/logging)
 add_subdirectory(vrs/utils/xxhash)
+
+# Include the oss libraries
+add_subdirectory(oss/logging)
 
 # Add the apps/tools
 add_subdirectory(sample_apps)
