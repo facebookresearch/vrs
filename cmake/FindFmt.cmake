@@ -24,18 +24,15 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(
     DEFAULT_MSG
     Fmt_LIBRARY Fmt_INCLUDE_DIR)
 
-if(Fmt_FOUND)
+if (Fmt_FOUND)
     set(Fmt_LIBRARIES ${Fmt_LIBRARY})
     set(Fmt_INCLUDE_DIRS ${Fmt_INCLUDE_DIR})
-    message(STATUS "Found {fmt}: ${Fmt_LIBRARY}")
     add_library(Fmt::Fmt UNKNOWN IMPORTED)
     set_target_properties(
       Fmt::Fmt PROPERTIES
-      INTERFACE_INCLUDE_DIRECTORIES "${Fmt_INCLUDE_DIR}"
-    )
+      INTERFACE_INCLUDE_DIRECTORIES "${Fmt_INCLUDE_DIR}")
     set_target_properties(
       Fmt::Fmt PROPERTIES
       IMPORTED_LINK_INTERFACE_LANGUAGES "C"
-      IMPORTED_LOCATION "${Fmt_LIBRARY}"
-    )
+      IMPORTED_LOCATION "${Fmt_LIBRARY}")
 endif()

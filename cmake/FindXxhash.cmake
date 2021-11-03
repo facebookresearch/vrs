@@ -38,7 +38,7 @@ find_library(xxHash_LIBRARY NAMES xxhash xxHash PATH_SUFFIXES lib)
 
 mark_as_advanced(xxHash_INCLUDE_DIR)
 
-if(xxHash_INCLUDE_DIR AND EXISTS "${xxHash_INCLUDE_DIR}/xxhash.h")
+if (xxHash_INCLUDE_DIR AND EXISTS "${xxHash_INCLUDE_DIR}/xxhash.h")
   file(STRINGS "${xxHash_INCLUDE_DIR}/xxhash.h" XXHASH_H REGEX "^#define XXH_VERSION_[A-Z]+[ ]+[0-9]+$")
   string(REGEX REPLACE ".+XXH_VERSION_MAJOR[ ]+([0-9]+).*$"   "\\1" xxHash_VERSION_MAJOR "${XXHASH_H}")
   string(REGEX REPLACE ".+XXH_VERSION_MINOR[ ]+([0-9]+).*$"   "\\1" xxHash_VERSION_MINOR "${XXHASH_H}")
@@ -50,14 +50,14 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(xxHash
   REQUIRED_VARS xxHash_LIBRARY xxHash_INCLUDE_DIR VERSION_VAR xxHash_VERSION)
 
-if(xxHash_FOUND)
+if (xxHash_FOUND)
   set(xxHash_INCLUDE_DIRS "${xxHash_INCLUDE_DIR}")
 
-  if(NOT xxHash_LIBRARIES)
+  if (NOT xxHash_LIBRARIES)
     set(xxHash_LIBRARIES ${xxHash_LIBRARY})
   endif()
 
-  if(NOT TARGET xxHash::xxHash)
+  if (NOT TARGET xxHash::xxHash)
     add_library(xxHash::xxHash UNKNOWN IMPORTED)
     set_target_properties(xxHash::xxHash PROPERTIES
       IMPORTED_LOCATION "${xxHash_LIBRARY}"

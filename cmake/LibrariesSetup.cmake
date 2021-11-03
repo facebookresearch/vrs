@@ -1,28 +1,18 @@
 # Copyright (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
 
-# Boost
 find_package(Boost REQUIRED
-COMPONENTS
+  COMPONENTS
     filesystem
     chrono
     date_time
     system
-    thread
-)
-
-# Fmt
+    thread)
 find_package(Fmt REQUIRED)
-
-# Lz4
 find_package(Lz4 REQUIRED)
-
-# Zstd
 find_package(Zstd REQUIRED)
-
-# Cereal
 find_package(Cereal REQUIRED)
 
-# Google tests, if enabled
+# Setup unit test infra, but only if unit tests are enabled
 if (UNIT_TESTS)
   include(CTest)
   find_package(GTest REQUIRED)

@@ -20,8 +20,8 @@ mark_as_advanced(
   Zstd_LIBRARIES
   Zstd_INCLUDE_DIRS)
 
-if(Zstd_FOUND AND NOT (TARGET Zstd::Zstd))
-  add_library (Zstd::Zstd UNKNOWN IMPORTED)
+if (Zstd_FOUND AND NOT (TARGET Zstd::Zstd))
+  add_library(Zstd::Zstd UNKNOWN IMPORTED)
   set_target_properties(Zstd::Zstd
     PROPERTIES
       IMPORTED_LOCATION ${Zstd_LIBRARIES}

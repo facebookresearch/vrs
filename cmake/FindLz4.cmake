@@ -20,7 +20,7 @@ mark_as_advanced(
   Lz4_LIBRARIES
   Lz4_INCLUDE_DIRS)
 
-if(Lz4_FOUND AND NOT (TARGET Lz4::Lz4))
+if (Lz4_FOUND AND NOT (TARGET Lz4::Lz4))
   add_library(Lz4::Lz4 UNKNOWN IMPORTED)
   set_target_properties(Lz4::Lz4
     PROPERTIES
