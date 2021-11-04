@@ -29,8 +29,9 @@ add_subdirectory(vrs/helpers)
 add_subdirectory(vrs/os)
 add_subdirectory(vrs/utils/xxhash)
 
-# Include the oss libraries
+# Include oss replacement libraries
 add_subdirectory(oss/logging)
+add_subdirectory(oss/misc)
 
 # Add the apps/tools
 add_subdirectory(sample_apps)

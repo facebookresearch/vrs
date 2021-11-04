@@ -2,14 +2,17 @@
 
 #include "TestProcess.h"
 
+#include <vrs/os/Platform.h>
+
+#if IS_VRS_FB_INTERNAL()
 #include <system_utils/os/Utils.h>
+#endif
 
 #define DEFAULT_LOG_CHANNEL "TestProcess"
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
 #include <vrs/helpers/Strings.h>
-#include <vrs/os/Platform.h>
 #include <vrs/os/Utils.h>
 
 // Windows has to be special
@@ -31,9 +34,11 @@ inline string trim(const string& line) {
 bool TestProcess::start(string arg, bp::ipstream* sout) {
   string path = string(processName_);
   if (findBinary(path)) {
+#if IS_VRS_FB_INTERNAL()
     if (looksLikeAFbCentOSServer()) {
       path = arvr::system_utils::os::getCurrentFBCodeLoader() + ' ' + path;
     }
+#endif
     if (sout != nullptr) {
       process.reset(new bp::child(path + ' ' + arg, bp::std_out > *sout, bp::std_err > bp::null));
     } else {
