@@ -60,7 +60,7 @@ if (UNIT_TESTS)
   target_compile_definitions(vrs_test PUBLIC GTEST_BUILD)
 
   add_executable(vrs_file_tests
-    #test/file_tests/ChunkedFileTest.cpp  # Relies of vrs/utils...
+    test/file_tests/ChunkedFileTest.cpp
     test/file_tests/DawnSimulatorTest.cpp
     test/file_tests/FileCacheTest.cpp
     test/file_tests/LegacyFormatTest.cpp
