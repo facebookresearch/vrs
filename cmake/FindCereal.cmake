@@ -4,7 +4,7 @@ find_path(CEREAL_INCLUDE_DIR cereal/cereal.hpp)
 mark_as_advanced(CEREAL_INCLUDE_DIR)
 
 include(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(
+find_package_handle_standard_args(
     Cereal
     DEFAULT_MSG
     CEREAL_INCLUDE_DIR)

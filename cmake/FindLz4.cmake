@@ -1,3 +1,5 @@
+# Copyright (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
+#
 # - Find Lz4
 # Find the Lz4 compression library and includes
 #

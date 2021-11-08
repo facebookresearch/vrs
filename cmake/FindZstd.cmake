@@ -1,3 +1,5 @@
+# Copyright (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
+#
 # - Find Zstd
 # Find the Zstd compression library and includes
 #

@@ -19,7 +19,7 @@ find_library(Fmt_LIBRARY NAMES fmt fmtd)
 mark_as_advanced(Fmt_LIBRARY)
 
 include(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(
+find_package_handle_standard_args(
     Fmt
     DEFAULT_MSG
     Fmt_LIBRARY Fmt_INCLUDE_DIR)
