@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#define DEFAULT_LOG_CHANNEL "DawnSimulator"
+#define DEFAULT_LOG_CHANNEL "DeviceSimulator"
 #include <logging/Log.h>
 #include <portability/Filesystem.h>
 #include <vrs/RecordFileReader.h>
@@ -17,11 +17,11 @@ using namespace vrs::test;
 
 namespace {
 
-struct DawnSimulator : testing::Test {};
+struct DeviceSimulator : testing::Test {};
 
 } // namespace
 
-TEST_F(DawnSimulator, classicIndex) {
+TEST_F(DeviceSimulator, classicIndex) {
   const std::string testPath = os::getTempFolder() + "ClassicIndex.vrs";
 
   CreateParams t(testPath);
@@ -43,7 +43,7 @@ TEST_F(DawnSimulator, classicIndex) {
   deleteChunkedFile(testPath);
 }
 
-TEST_F(DawnSimulator, singleThread) {
+TEST_F(DeviceSimulator, singleThread) {
   const std::string testPath = os::getTempFolder() + "SingleThread.vrs";
 
   CreateParams t(testPath);
@@ -60,7 +60,7 @@ TEST_F(DawnSimulator, singleThread) {
   deleteChunkedFile(testPath);
 }
 
-TEST_F(DawnSimulator, preallocateIndex) {
+TEST_F(DeviceSimulator, preallocateIndex) {
   const std::string testPath = os::getTempFolder() + "PreallocateTest.vrs";
 
   // preallocate for the exact number of records
@@ -79,7 +79,7 @@ TEST_F(DawnSimulator, preallocateIndex) {
   deleteChunkedFile(testPath);
 }
 
-TEST_F(DawnSimulator, preallocateTooFewIndex) {
+TEST_F(DeviceSimulator, preallocateTooFewIndex) {
   const std::string testPath = os::getTempFolder() + "PreallocateTooFewTest.vrs";
 
   // preallocate for too few records
@@ -97,7 +97,7 @@ TEST_F(DawnSimulator, preallocateTooFewIndex) {
   deleteChunkedFile(testPath);
 }
 
-TEST_F(DawnSimulator, preallocateTooManyIndex) {
+TEST_F(DeviceSimulator, preallocateTooManyIndex) {
   const std::string testPath = os::getTempFolder() + "PreallocateTooManyTest.vrs";
 
   // preallocate for too many records
@@ -142,7 +142,7 @@ void checkChunks(const map<size_t, std::string>& chunks, const std::string& path
   }
 }
 
-TEST_F(DawnSimulator, splitIndex) {
+TEST_F(DeviceSimulator, splitIndex) {
   const std::string testPath = os::getTempFolder() + "SplitIndex.vrs";
 
   map<size_t, string> chunks;

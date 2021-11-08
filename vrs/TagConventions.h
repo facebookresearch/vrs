@@ -42,7 +42,7 @@ namespace tag_conventions {
 // Hardware components
 // For dependent devices with their own id/serial (controllers?), tag at the stream level
 
-  // Device Type: device type. Ex: "Monterey", "Caplipso", "Laguna"
+  // Device Type: device type, maybe the code name of the device/prototype
   constexpr const char* kDeviceType = "device_type";
   // Device version: device version name. Ex: "proto0", "EVT2"
   constexpr const char* kDeviceVersion = "device_version";
@@ -138,27 +138,27 @@ namespace tag_conventions {
   bool parseTagSet(const string& jsonTagSet, vector<string>& outVectorTagSet);
 
 /*
- * Sample: Monterey + controllers
+ * Sample: Santa Cruz + controllers
  *
  * File tags:
- *  kProjectName = "Monterey"
+ *  kProjectName = "Santa Cruz"
  *  kCaptureTimeEpoch = "1520364293"
  *  kSessionId = "5584bdc43"
  *  kCaptureType = "calibration"   <- other use case: "INSIDE_OUT_TRACKER_RECORDING"...
  *
- *  kDeviceType = "Monterey"
- *  kDeviceVersion = "EVT3"             <- main device (HMD for Monterey)
+ *  kDeviceType = "Santa Cruz"
+ *  kDeviceVersion = "EVT3"             <- main device (HMD for Santa Cruz)
  *  kDeviceSerial = "0ba3602ffbee80b9"  <- of HMD
  *  kHardwareConfiguration = "hmd + 2 hand controllers"
  *
- *  kOsFingerprint = "oculus/vr_monterey_proto1/proto1:7.1.1/N9F27L/863:userdev/dev-keys"
+ *  kOsFingerprint = "oculus/vr_santa_cruz_proto1/proto1:7.1.1/N9F27L/863:userdev/dev-keys"
  *  kSoftwareCompileDate = "Sep 26 2017 19:06:45"
  *  kSoftwareRevision = "185ea53a5584bdc43640ba3602ccbee80b91d33e"
  *  kFirmwareCompileDate = "Sep 20 2017 15:26:25"
  *  kFirmwareRevision = "265ea53b5584bdc43640ba3602ffbee80b91d43a"
  *
  * Controller stream tags (for each stream)
- *  kDeviceType = "Monterey Controller"
+ *  kDeviceType = "Santa Cruz Controller"
  *  kDeviceVersion = "EVT0"
  *  kDeviceSerial = "bee80b91d3"
  *  kDeviceId = "left controller"

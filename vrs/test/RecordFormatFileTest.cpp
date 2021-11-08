@@ -29,11 +29,11 @@ namespace {
 static const string kBadString1 = "\0x00hello\0x00";
 static const string kBadString2 = "\t1PASH3T1RS8113\n";
 
-// The MontereyCamera definitions were copied from the real Monterey definitions,
+// The SantaCruzCamera definitions were copied from the real SantaCruz definitions,
 // which aren't visible from the VRS module.
 // They are used to test DataLayout, not the other way around, so this duplication can be done,
-// without caring about future changes to the official MontereyCamera definitions.
-namespace MontereyCamera {
+// without caring about future changes to the official SantaCruzCamera definitions.
+namespace SantaCruzCamera {
 
 using ::vrs::AutoDataLayout;
 using ::vrs::AutoDataLayoutEnd;
@@ -205,7 +205,7 @@ class DataLayoutData : public AutoDataLayout {
   AutoDataLayoutEnd endLayout;
 };
 
-} // namespace MontereyCamera
+} // namespace SantaCruzCamera
 
 class VariableImageSpec : public AutoDataLayout {
  public:
@@ -229,12 +229,12 @@ class OtherRecordable : public Recordable {
   OtherRecordable(uint32_t cameraId) : Recordable(RecordableTypeId::UnitTest2) {
     addRecordFormat(
         Record::Type::CONFIGURATION,
-        MontereyCamera::DataLayoutConfiguration::kVersion,
+        SantaCruzCamera::DataLayoutConfiguration::kVersion,
         config.getContentBlock(),
         {&config});
     addRecordFormat(
         Record::Type::DATA,
-        MontereyCamera::DataLayoutData::kVersion,
+        SantaCruzCamera::DataLayoutData::kVersion,
         data.getContentBlock(),
         {&data});
     config.cameraId.set(cameraId);
@@ -243,7 +243,7 @@ class OtherRecordable : public Recordable {
     return createRecord(
         os::getTimestampSec(),
         Record::Type::CONFIGURATION,
-        MontereyCamera::DataLayoutConfiguration::kVersion,
+        SantaCruzCamera::DataLayoutConfiguration::kVersion,
         DataSource(config));
   }
   const Record* createStateRecord() override {
@@ -254,12 +254,12 @@ class OtherRecordable : public Recordable {
     createRecord(
         os::getTimestampSec(),
         Record::Type::DATA,
-        MontereyCamera::DataLayoutData::kVersion,
+        SantaCruzCamera::DataLayoutData::kVersion,
         DataSource(data));
   }
 
-  MontereyCamera::DataLayoutConfiguration config;
-  MontereyCamera::DataLayoutData data;
+  SantaCruzCamera::DataLayoutConfiguration config;
+  SantaCruzCamera::DataLayoutData data;
   uint64_t frameCounter{};
 };
 
@@ -268,15 +268,15 @@ class OtherStreamPlayer : public RecordFormatStreamPlayer {
   bool onDataLayoutRead(const CurrentRecord& record, size_t blockIndex, DataLayout& layout)
       override {
     if (record.recordType == Record::Type::CONFIGURATION) {
-      if (record.formatVersion == MontereyCamera::DataLayoutConfiguration::kVersion) {
-        MontereyCamera::DataLayoutConfiguration& expectedLayout =
-            getExpectedLayout<MontereyCamera::DataLayoutConfiguration>(layout, blockIndex);
+      if (record.formatVersion == SantaCruzCamera::DataLayoutConfiguration::kVersion) {
+        SantaCruzCamera::DataLayoutConfiguration& expectedLayout =
+            getExpectedLayout<SantaCruzCamera::DataLayoutConfiguration>(layout, blockIndex);
         cameraId = expectedLayout.cameraId.get();
       }
     } else if (record.recordType == Record::Type::DATA) {
-      if (record.formatVersion == MontereyCamera::DataLayoutData::kVersion) {
-        MontereyCamera::DataLayoutData& expectedLayout =
-            getExpectedLayout<MontereyCamera::DataLayoutData>(layout, blockIndex);
+      if (record.formatVersion == SantaCruzCamera::DataLayoutData::kVersion) {
+        SantaCruzCamera::DataLayoutData& expectedLayout =
+            getExpectedLayout<SantaCruzCamera::DataLayoutData>(layout, blockIndex);
         frameCounter = expectedLayout.frameCounter.get();
       }
     }
@@ -305,7 +305,7 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
     configurationCount_++;
     if (configurationCount_ % 2 == 0) {
       // VRS 1.0 style record creation
-      MontereyCamera::VRSConfiguration vrsConfig;
+      SantaCruzCamera::VRSConfiguration vrsConfig;
       vrsConfig.width.set(640 + configurationCount_);
       vrsConfig.height.set(480 + configurationCount_);
       vrsConfig.bytesPerPixels.set(1);
@@ -321,11 +321,11 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
       return createRecord(
           kTime + fixedImageCount_ - 0.1,
           Record::Type::CONFIGURATION,
-          MontereyCamera::kConfigurationVersion,
+          SantaCruzCamera::kConfigurationVersion,
           DataSource(vrsConfig));
     } else {
       // VRS 2.0 style record creation
-      MontereyCamera::DataLayoutConfiguration vrsConfig;
+      SantaCruzCamera::DataLayoutConfiguration vrsConfig;
       vrsConfig.width.set(640 + configurationCount_);
       vrsConfig.height.set(480 + configurationCount_);
       vrsConfig.bytesPerPixels.set(1);
@@ -336,7 +336,7 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
       return createRecord(
           kTime + fixedImageCount_ - 0.1,
           Record::Type::CONFIGURATION,
-          MontereyCamera::kConfigurationVersion,
+          SantaCruzCamera::kConfigurationVersion,
           DataSource(vrsConfig));
     }
   }
@@ -355,7 +355,7 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
     }
     if (fixedImageCount_ % 2 == 0) {
       // VRS 1.0 style record creation
-      MontereyCamera::VRSDataV2 data;
+      SantaCruzCamera::VRSDataV2 data;
       data.captureTimestamp.set(0.5 * fixedImageCount_);
       data.arrivalTimestamp.set(kTime + 0.1 * fixedImageCount_);
       data.frameCounter.set(fixedImageCount_);
@@ -363,11 +363,11 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
       createRecord(
           kTime + fixedImageCount_++,
           Record::Type::DATA,
-          MontereyCamera::VRSDataV2::kVersion,
+          SantaCruzCamera::VRSDataV2::kVersion,
           DataSource(data, buffer));
     } else {
       // VRS 2.0 style record creation
-      MontereyCamera::DataLayoutData layout;
+      SantaCruzCamera::DataLayoutData layout;
       layout.captureTimestamp.set(0.5 * fixedImageCount_);
       layout.arrivalTimestamp.set(kTime + 0.1 * fixedImageCount_);
       layout.frameCounter.set(fixedImageCount_);
@@ -379,7 +379,7 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
       createRecord(
           kTime + fixedImageCount_++,
           Record::Type::DATA,
-          MontereyCamera::DataLayoutData::kVersion,
+          SantaCruzCamera::DataLayoutData::kVersion,
           DataSource(layout, buffer));
     }
   }
@@ -414,11 +414,11 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
   bool onDataLayoutRead(const CurrentRecord& record, size_t blockIndex, DataLayout& layout)
       override {
     if (record.recordType == Record::Type::DATA) {
-      if (record.formatVersion == MontereyCamera::VRSDataV2::kVersion) {
+      if (record.formatVersion == SantaCruzCamera::VRSDataV2::kVersion) {
         // VRS 1.0 style record for a fixed-size frame
         EXPECT_EQ(blockIndex, 0);
-        MontereyCamera::DataLayoutData& expectedLayout =
-            getExpectedLayout<MontereyCamera::DataLayoutData>(layout, blockIndex);
+        SantaCruzCamera::DataLayoutData& expectedLayout =
+            getExpectedLayout<SantaCruzCamera::DataLayoutData>(layout, blockIndex);
         uint64_t frameNumber = static_cast<uint32_t>(expectedLayout.frameCounter.get());
         EXPECT_EQ(record.timestamp, kTime + frameNumber);
         EXPECT_EQ(expectedLayout.captureTimestamp.get(), 0.5 * frameNumber);
@@ -432,11 +432,11 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
         EXPECT_EQ(expectedLayout.exposureDuration.get(), 0);
         EXPECT_FALSE(expectedLayout.temperature.isAvailable());
         EXPECT_EQ(expectedLayout.temperature.get(), -1);
-      } else if (record.formatVersion == MontereyCamera::DataLayoutData::kVersion) {
+      } else if (record.formatVersion == SantaCruzCamera::DataLayoutData::kVersion) {
         // VRS 2.0 style record for a fixed-size frame
         EXPECT_EQ(blockIndex, 0);
-        MontereyCamera::DataLayoutData& expectedLayout =
-            getExpectedLayout<MontereyCamera::DataLayoutData>(layout, blockIndex);
+        SantaCruzCamera::DataLayoutData& expectedLayout =
+            getExpectedLayout<SantaCruzCamera::DataLayoutData>(layout, blockIndex);
         uint64_t frameNumber = static_cast<uint32_t>(expectedLayout.frameCounter.get());
         EXPECT_EQ(record.timestamp, kTime + frameNumber);
         EXPECT_EQ(expectedLayout.captureTimestamp.get(), 0.5 * frameNumber);
@@ -493,10 +493,10 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
       }
     } else if (record.recordType == Record::Type::CONFIGURATION) {
       configurationCount_++;
-      EXPECT_EQ(record.formatVersion, MontereyCamera::kConfigurationVersion);
+      EXPECT_EQ(record.formatVersion, SantaCruzCamera::kConfigurationVersion);
       EXPECT_EQ(blockIndex, 0);
-      MontereyCamera::DataLayoutConfiguration& expectedLayout =
-          getExpectedLayout<MontereyCamera::DataLayoutConfiguration>(layout, blockIndex);
+      SantaCruzCamera::DataLayoutConfiguration& expectedLayout =
+          getExpectedLayout<SantaCruzCamera::DataLayoutConfiguration>(layout, blockIndex);
       EXPECT_EQ(expectedLayout.width.get(), 640 + configurationCount_);
       EXPECT_EQ(expectedLayout.height.get(), 480 + configurationCount_);
       EXPECT_EQ(expectedLayout.bytesPerPixels.get(), 1);
@@ -505,7 +505,7 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
       EXPECT_EQ(expectedLayout.cameraSerial.get(), 11);
       vector<float> calibrationData;
       EXPECT_TRUE(expectedLayout.calibration.get(calibrationData));
-      size_t countExpect = MontereyCamera::kCalibrationDataSize;
+      size_t countExpect = SantaCruzCamera::kCalibrationDataSize;
       EXPECT_EQ(calibrationData.size(), countExpect);
       for (size_t k = 0; k < countExpect; k++) {
         EXPECT_EQ(calibrationData[k], static_cast<float>((k < 6) ? k + 1 : 0));
@@ -530,8 +530,8 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
     int readStatus = record.reader->read(buffer);
     EXPECT_EQ(readStatus, 0);
     if (readStatus == 0) {
-      if (record.formatVersion == MontereyCamera::VRSDataV2::kVersion ||
-          record.formatVersion == MontereyCamera::DataLayoutData::kVersion) {
+      if (record.formatVersion == SantaCruzCamera::VRSDataV2::kVersion ||
+          record.formatVersion == SantaCruzCamera::DataLayoutData::kVersion) {
         EXPECT_EQ(contentBlock.image().getWidth(), 640 + configurationCount_);
         EXPECT_EQ(contentBlock.image().getHeight(), 480 + configurationCount_);
         fixedImageCount_++;
@@ -558,10 +558,10 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
     tag_conventions::addTagSet(fileWriter, {"tag1", "tag2", "tag3"});
     fileWriter.setTag("bad_tag", kBadString1);
     setRecordableIsActive(true);
-    MontereyCamera::DataLayoutConfiguration config;
+    SantaCruzCamera::DataLayoutConfiguration config;
     this->addRecordFormat(
         Record::Type::CONFIGURATION,
-        MontereyCamera::DataLayoutConfiguration::kVersion,
+        SantaCruzCamera::DataLayoutConfiguration::kVersion,
         config.getContentBlock(),
         {&config});
     // We create 3 types of data records
@@ -574,19 +574,19 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
         varImageSpec.getContentBlock() + rawImage,
         {&varImageSpec});
     // 2 - fixed size data records (size in config record), datalayout style
-    MontereyCamera::DataLayoutData montereyDataLayoutData;
+    SantaCruzCamera::DataLayoutData santaCruzDataLayoutData;
     this->addRecordFormat(
         Record::Type::DATA,
-        MontereyCamera::DataLayoutData::kVersion,
-        MontereyCamera::DataLayoutData().getContentBlock() + rawImage,
-        {&montereyDataLayoutData});
+        SantaCruzCamera::DataLayoutData::kVersion,
+        SantaCruzCamera::DataLayoutData().getContentBlock() + rawImage,
+        {&santaCruzDataLayoutData});
     // 3 - fixed size data records (size in config record), VRS 1.0 style
-    MontereyCamera::DataLayoutDataV2 montereyDataLayoutv2;
+    SantaCruzCamera::DataLayoutDataV2 santaCruzDataLayoutv2;
     this->addRecordFormat(
         Record::Type::DATA,
-        MontereyCamera::DataLayoutDataV2::kVersion,
-        montereyDataLayoutv2.getContentBlock() + rawImage,
-        {&montereyDataLayoutv2});
+        SantaCruzCamera::DataLayoutDataV2::kVersion,
+        santaCruzDataLayoutv2.getContentBlock() + rawImage,
+        {&santaCruzDataLayoutv2});
     configurationCount_ = 0;
     fixedImageCount_ = 0;
     variableImageCount_ = 0;

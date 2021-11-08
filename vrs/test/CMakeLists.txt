@@ -46,7 +46,7 @@ target_compile_definitions(vrs_test PUBLIC GTEST_BUILD)
 
 add_executable(vrs_file_tests
   file_tests/ChunkedFileTest.cpp
-  file_tests/DawnSimulatorTest.cpp
+  file_tests/DeviceSimulatorTest.cpp
   file_tests/FileCacheTest.cpp
   file_tests/RecordableTest.cpp
   file_tests/SimpleFileHandlerTest.cpp
