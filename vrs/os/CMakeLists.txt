@@ -30,11 +30,12 @@ if (UNIT_TESTS)
   add_executable(os_test
     test/TimeTest.cpp
     test/EventUnitTest.cpp
-#    test/UtilsTest.cpp
+    test/UtilsTest.cpp
   )
   target_link_libraries(os_test
       PUBLIC
         vrs_os
+        vrs_oss_misc
         GTest::Main
   )
 
