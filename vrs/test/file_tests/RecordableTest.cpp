@@ -273,7 +273,7 @@ class RecordableTest : public Recordable, StreamPlayer {
     EXPECT_TRUE(recordable2.isValid());
     StreamId badRecordable = filePlayer.getStreamForType(RecordableTypeId::UnitTest2, 1);
     EXPECT_TRUE(!badRecordable.isValid());
-    badRecordable = filePlayer.getStreamForType(RecordableTypeId::Cv1Camera, 0);
+    badRecordable = filePlayer.getStreamForType(RecordableTypeId::ImageStream, 0);
 
     // test getStreamForTag()
     EXPECT_EQ(
