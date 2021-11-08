@@ -14,6 +14,6 @@ find_package(Cereal REQUIRED)
 
 # Setup unit test infra, but only if unit tests are enabled
 if (UNIT_TESTS)
-  include(CTest)
+  enable_testing()
   find_package(GTest REQUIRED)
 endif()

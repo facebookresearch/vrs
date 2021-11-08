@@ -98,7 +98,7 @@ void testDetails(const string& cacheFile, const RecordFileReader& reader, const 
 }
 
 TEST_F(FileCacheTest, detailsTest) {
-  std::string kTestFile = string(coretech::getTestDataDir()) + "/VRS_Files/ar_camera.vrs";
+  std::string kTestFile = string(coretech::getTestDataDir()) + "/VRS_Files/sample_file.vrs";
   const string cacheFile = os::getTempFolder() + "detailsTest.vrsi";
   RecordFileReader reader;
   ASSERT_EQ(reader.openFile(kTestFile), 0);

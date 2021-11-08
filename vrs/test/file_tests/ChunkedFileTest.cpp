@@ -49,7 +49,7 @@ struct ChunkedFileTester : testing::Test {
 TEST_F(ChunkedFileTester, ChunkedFileTest) {
   vrs::RecordFileReader file;
   EXPECT_EQ(file.openFile(kChunkedFile), 0);
-  EXPECT_EQ(file.getRecordCount(), 166); // number of records if all chunks are found
+  EXPECT_EQ(file.getRecordCount(), 306); // number of records if all chunks are found
   EXPECT_EQ(file.getFileChunks().size(), 3);
 }
 
@@ -57,7 +57,7 @@ TEST_F(ChunkedFileTester, OpenChunkedFileTest) {
   vrs::RecordFileReader file;
   std::string jsonPath = FileSpec({kChunkedFile, kChunkedFile2, kChunkedFile3}).toJson();
   EXPECT_EQ(file.openFile(jsonPath), 0);
-  EXPECT_EQ(file.getRecordCount(), 166); // number of records if all chunks are found
+  EXPECT_EQ(file.getRecordCount(), 306); // number of records if all chunks are found
   EXPECT_EQ(file.getFileChunks().size(), 3);
 }
 
@@ -76,7 +76,7 @@ TEST_F(ChunkedFileTester, LinkedFileTest) {
   string linkedFile = os::getTempFolder() + "chunks_link.vrs";
   EXPECT_EQ(::symlink(kChunkedFile.c_str(), linkedFile.c_str()), 0); // create a link
   EXPECT_EQ(file.openFile(linkedFile), 0);
-  EXPECT_EQ(file.getRecordCount(), 166);
+  EXPECT_EQ(file.getRecordCount(), 306);
   EXPECT_EQ(file.getFileChunks().size(), 3);
 
   FileSpec foundSpec;

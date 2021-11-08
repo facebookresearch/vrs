@@ -7,7 +7,7 @@
 namespace coretech {
 
 std::string getTestDataDir() {
-  return vrs::os::pathJoin(VRS_SOURCE_DIR, "../../projects/xrtech/test_data") + "/";
+  return vrs::os::pathJoin(VRS_SOURCE_DIR, "oss/test_data") + "/";
 }
 
 } // namespace coretech

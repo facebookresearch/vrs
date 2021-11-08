@@ -1,5 +1,6 @@
 // Copyright (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
 
+#include <cmath>
 #include <random>
 
 #include <gtest/gtest.h>
@@ -12,7 +13,7 @@ using namespace vrs;
 
 namespace {
 struct GetRecordTester : testing::Test {
-  std::string kTestFile = string(coretech::getTestDataDir()) + "/VRS_Files/VRSTestRecording.vrs";
+  std::string kTestFile = string(coretech::getTestDataDir()) + "/VRS_Files/sample_file.vrs";
 };
 } // namespace
 
@@ -43,6 +44,13 @@ check(vrs::RecordFileReader& file, StreamId id, Record::Type type, uint32_t inde
   EXPECT_EQ(ref, file.getRecord(id, type, indexNumber));
   EXPECT_EQ(getRecord(file, id, type, indexNumber + 1), file.getRecord(id, type, indexNumber + 1));
   EXPECT_EQ(ref, file.getRecord(id, type, indexNumber));
+}
+
+static bool isCloserThan(
+    const IndexRecord::RecordInfo& closer,
+    double timestamp,
+    const IndexRecord::RecordInfo& farther) {
+  return abs(closer.timestamp - timestamp) < abs(farther.timestamp - timestamp);
 }
 
 void checkIndex(vrs::RecordFileReader& file, uint32_t recordIndex) {
@@ -95,7 +103,7 @@ void checkIndex(vrs::RecordFileReader& file, uint32_t recordIndex) {
       i > 0 && index[i - 1].streamId == record.streamId &&
       index[i - 1].timestamp == record.timestamp);
   // our original index may not be the first with that timestamp, so look for it
-  while (i != recordIndex && i + 1 < index.size() && index[i - 1].streamId == record.streamId &&
+  while (i != recordIndex && i + 1 < index.size() && index[i + 1].streamId == record.streamId &&
          index[i + 1].timestamp == record.timestamp) {
     i++;
   }
@@ -119,8 +127,8 @@ void checkIndex(vrs::RecordFileReader& file, uint32_t recordIndex) {
       i > 0 && index[i - 1].streamId == record.streamId &&
       index[i - 1].recordType == record.recordType && index[i - 1].timestamp == record.timestamp);
   // our original index may not be the first with that timestamp, so look for it
-  while (i != recordIndex && i + 1 < index.size() && index[i - 1].streamId == record.streamId &&
-         index[i - 1].recordType == record.recordType &&
+  while (i != recordIndex && i + 1 < index.size() && index[i + 1].streamId == record.streamId &&
+         index[i + 1].recordType == record.recordType &&
          index[i + 1].timestamp == record.timestamp) {
     i++;
   }
@@ -144,19 +152,27 @@ void checkIndex(vrs::RecordFileReader& file, uint32_t recordIndex) {
       index[i - 1].timestamp == record.timestamp);
 
   // search nearest record with slightly different timestamps
-  r = file.getNearestRecordByTime(record.timestamp + 1e-7, 1e-6, record.streamId);
+  double target = record.timestamp + 1e-7;
+  r = file.getNearestRecordByTime(target, 1e-6, record.streamId);
   EXPECT_NE(r, nullptr);
   i = file.getRecordIndex(r);
   EXPECT_FALSE(
       i > 0 && index[i - 1].streamId == record.streamId &&
-      index[i - 1].timestamp == record.timestamp);
+      isCloserThan(index[i - 1], target, record));
+  EXPECT_FALSE(
+      i + 1 < index.size() && index[i + 1].streamId == record.streamId &&
+      isCloserThan(index[i + 1], target, record));
 
-  r = file.getNearestRecordByTime(record.timestamp - 1e-7, 1e-6, record.streamId);
+  target = record.timestamp - 1e-7;
+  r = file.getNearestRecordByTime(target, 1e-6, record.streamId);
   EXPECT_NE(r, nullptr);
   i = file.getRecordIndex(r);
   EXPECT_FALSE(
       i > 0 && index[i - 1].streamId == record.streamId &&
-      index[i - 1].timestamp == record.timestamp);
+      isCloserThan(index[i - 1], target, record));
+  EXPECT_FALSE(
+      i + 1 < index.size() && index[i + 1].streamId == record.streamId &&
+      isCloserThan(index[i + 1], target, record));
 
   r = file.getNearestRecordByTime(record.timestamp + 1e-6, 1e-7, record.streamId);
   EXPECT_EQ(r, nullptr);
@@ -170,8 +186,8 @@ void checkIndex(vrs::RecordFileReader& file, uint32_t recordIndex) {
 TEST_F(GetRecordTester, GetRecordTest) {
   vrs::RecordFileReader file;
   EXPECT_EQ(file.openFile(kTestFile), 0);
-  EXPECT_EQ(file.getRecordCount(), 3390);
-  EXPECT_EQ(file.getStreams().size(), 6);
+  EXPECT_EQ(file.getRecordCount(), 307);
+  EXPECT_EQ(file.getStreams().size(), 3);
 
   std::mt19937 gen(123456); // constant seed, to always do the same tests
 
@@ -192,7 +208,7 @@ TEST_F(GetRecordTester, GetRecordTest) {
 
   // test seekRecordIndex methods
   const auto& index = file.getIndex();
-  EXPECT_EQ(index.size(), 3390);
+  EXPECT_EQ(index.size(), 307);
 
   // Asking for the index of nullptr is safe, but you get an out of bound index.
   EXPECT_GE(file.getRecordIndex(nullptr), index.size());
@@ -204,36 +220,42 @@ TEST_F(GetRecordTester, GetRecordTest) {
   EXPECT_EQ(file.getRecordIndex(rec), midIndex);
 
   rec = file.getRecordByTime(index[midIndex].recordType, index[midIndex].timestamp);
-
   EXPECT_EQ(file.getRecordIndex(rec), midIndex);
 
   rec = file.getRecordByTime(index[midIndex].streamId, index[midIndex].timestamp);
   EXPECT_EQ(file.getRecordIndex(rec), midIndex);
 
-  rec = file.getRecordByTime(index[0].timestamp - 100);
-  EXPECT_EQ(file.getRecordIndex(rec), 0);
-  rec = file.getRecordByTime(Record::Type::CONFIGURATION, index[0].timestamp - 100);
-  EXPECT_EQ(file.getRecordIndex(rec), 131);
-  rec = file.getRecordByTime(Record::Type::STATE, index[0].timestamp - 100);
-  EXPECT_EQ(file.getRecordIndex(rec), 132);
+  double startTime = index[0].timestamp;
 
-  // records 1963 & 1964 have identical timestamps
-  rec = file.getRecordByTime(index[1963].timestamp);
-  EXPECT_EQ(file.getRecordIndex(rec), 1963);
-  rec = file.getRecordByTime(index[1964].timestamp);
-  EXPECT_EQ(file.getRecordIndex(rec), 1963);
+  rec = file.getRecordByTime(nextafter(startTime, startTime - 1));
+  EXPECT_EQ(file.getRecordIndex(rec), 0);
+
+  rec = file.getRecordByTime(startTime);
+  EXPECT_EQ(file.getRecordIndex(rec), 0);
+
+  rec = file.getRecordByTime(Record::Type::CONFIGURATION, nextafter(startTime, startTime + 1));
+  EXPECT_EQ(file.getRecordIndex(rec), 2);
+
+  rec = file.getRecordByTime(Record::Type::STATE, startTime);
+  EXPECT_EQ(file.getRecordIndex(rec), 1);
+
+  // records 33 & 34 have identical timestamps
+  rec = file.getRecordByTime(index[33].timestamp);
+  EXPECT_EQ(file.getRecordIndex(rec), 33);
+  rec = file.getRecordByTime(index[34].timestamp);
+  EXPECT_EQ(file.getRecordIndex(rec), 33);
 
   // test timestamps slightly greater or lesser
-  rec = file.getRecordByTime(nextafter(index[1963].timestamp, index[1963].timestamp - 1.));
-  EXPECT_EQ(file.getRecordIndex(rec), 1963);
-  rec = file.getRecordByTime(nextafter(index[1963].timestamp, index[1963].timestamp + 1.));
-  EXPECT_EQ(file.getRecordIndex(rec), 1965);
+  rec = file.getRecordByTime(nextafter(index[33].timestamp, index[33].timestamp - 1.));
+  EXPECT_EQ(file.getRecordIndex(rec), 33);
+  rec = file.getRecordByTime(nextafter(index[33].timestamp, index[33].timestamp + 1.));
+  EXPECT_EQ(file.getRecordIndex(rec), 35);
 
-  rec = file.getRecordByTime(index[1964].recordType, index[1964].timestamp);
-  EXPECT_EQ(index[1963].recordType, index[1964].recordType);
-  EXPECT_EQ(file.getRecordIndex(rec), 1963);
-  rec = file.getRecordByTime(index[1964].streamId, index[1964].timestamp);
-  EXPECT_EQ(file.getRecordIndex(rec), 1964);
+  rec = file.getRecordByTime(index[34].recordType, index[34].timestamp);
+  EXPECT_EQ(index[33].recordType, index[34].recordType);
+  EXPECT_EQ(file.getRecordIndex(rec), 33);
+  rec = file.getRecordByTime(index[34].streamId, index[34].timestamp);
+  EXPECT_EQ(file.getRecordIndex(rec), 33);
 
   for (uint32_t i = 0; i < index.size(); i++) {
     checkIndex(file, i);

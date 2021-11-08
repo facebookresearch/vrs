@@ -16,7 +16,7 @@ using namespace vrs;
 struct FileHandlerFactoryTest : testing::Test {
   string vrsFilesDir = coretech::getTestDataDir() + "/VRS_Files/";
   string singleFile = vrsFilesDir + "chunks.vrs";
-  string singleFileJson = FileSpec({vrsFilesDir + "VRSTestRecording.vrs"}).toJson();
+  string singleFileJson = FileSpec({vrsFilesDir + "sample_file.vrs"}).toJson();
   string chunkedFile = FileSpec({singleFile, singleFile + "_1", singleFile + "_2"}).toJson();
   string gaiaFile = "gaia:123456";
 };
@@ -60,17 +60,17 @@ TEST_F(FileHandlerFactoryTest, ANDROID_DISABLED(OpenSomeRealVRSFiles)) {
   EXPECT_EQ(openVRSFile(singleFile, file), 0);
   EXPECT_EQ(
       file->getTotalSize(),
-      13594); // auto-detection of chunks means the size includes all the chunks
+      82677); // auto-detection of chunks means the size includes all the chunks
   EXPECT_EQ(file->getFileHandlerName(), DiskFile::staticName());
   file.reset();
 
   EXPECT_EQ(openVRSFile(singleFileJson, file), 0);
-  EXPECT_EQ(file->getTotalSize(), 137551082);
+  EXPECT_EQ(file->getTotalSize(), 83038);
   EXPECT_EQ(file->getFileHandlerName(), DiskFile::staticName());
   file.reset();
 
   EXPECT_EQ(openVRSFile(chunkedFile, file), 0);
-  EXPECT_EQ(file->getTotalSize(), 13594);
+  EXPECT_EQ(file->getTotalSize(), 82677);
   EXPECT_EQ(file->getFileHandlerName(), DiskFile::staticName());
   file.reset();
 }
