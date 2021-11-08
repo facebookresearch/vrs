@@ -1,7 +1,7 @@
 # Copyright (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
 
-set(OSS_CMAKE_OVERRIDE ON CACHE BOOL "Force OSS build mode.")
-if ("${OSS_CMAKE_OVERRIDE}")
+set(OSS_BUILD_MODE ON CACHE BOOL "Force OSS build mode.")
+if ("${OSS_BUILD_MODE}")
   message(STATUS "Forcing OSS build mode")
 endif()
 

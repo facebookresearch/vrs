@@ -21,15 +21,18 @@
 /// IS_WINDOWS_PLATFORM()
 /// -> are we compiling for the Windows desktop platform?
 
-#ifdef OSS_CMAKE_OVERRIDE
+// Set OSS_BUILD_MODE in the open source version of the code.
+#ifndef OSS_BUILD_MODE // @oss-enable
+#define OSS_BUILD_MODE // @oss-enable
+#endif // @oss-enable
+
+#ifdef OSS_BUILD_MODE
 #define IS_VRS_OSS_CODE() 1
 #define IS_VRS_FB_INTERNAL() 0
 
 #else
-// @oss-disable: #define IS_VRS_OSS_CODE() 0
-// @oss-disable: #define IS_VRS_FB_INTERNAL() 1
-#define IS_VRS_OSS_CODE() 1 // @oss-enable
-#define IS_VRS_FB_INTERNAL() 0 // @oss-enable
+#define IS_VRS_OSS_CODE() 0
+#define IS_VRS_FB_INTERNAL() 1
 #endif
 
 #if IS_VRS_FB_INTERNAL()

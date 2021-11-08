@@ -20,8 +20,8 @@ target_link_libraries(vrs_os
 
 add_library(vrs_platform INTERFACE)
 target_include_directories(vrs_platform INTERFACE ${VRS_SOURCE_DIR})
-if ("${OSS_CMAKE_OVERRIDE}")
-  target_compile_definitions(vrs_platform INTERFACE OSS_CMAKE_OVERRIDE)
+if ("${OSS_BUILD_MODE}")
+  target_compile_definitions(vrs_platform INTERFACE OSS_BUILD_MODE)
 endif()
 
 if (UNIT_TESTS)
