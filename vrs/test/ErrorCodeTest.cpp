@@ -62,15 +62,15 @@ TEST_F(ErrorCodeTest, testErrorCode) {
 }
 
 TEST_F(ErrorCodeTest, newDomainTest) {
-  ErrorDomain gaia = newErrorDomain("Gaia");
-  ErrorDomain gaia_2 = newErrorDomain("Gaia");
+  ErrorDomain jpeg = newErrorDomain("Jpeg");
+  ErrorDomain jpeg_2 = newErrorDomain("Jpeg");
   ErrorDomain curl = newErrorDomain("Curl");
   ErrorDomain curl_2 = newErrorDomain("Curl");
-  EXPECT_EQ(gaia, gaia_2);
+  EXPECT_EQ(jpeg, jpeg_2);
   EXPECT_EQ(curl, curl_2);
-  EXPECT_STREQ(errorCodeToMessage(errorDomainToErrorCodeStart(gaia)).c_str(), "Gaia");
+  EXPECT_STREQ(errorCodeToMessage(errorDomainToErrorCodeStart(jpeg)).c_str(), "Jpeg");
   EXPECT_STREQ(errorCodeToMessage(errorDomainToErrorCodeStart(curl)).c_str(), "Curl");
-  int gaiaError42 = domainErrorCode(gaia, 42, "explanation for 42");
-  EXPECT_EQ(gaiaError42, errorDomainToErrorCodeStart(gaia) + 1);
-  EXPECT_STREQ(errorCodeToMessage(gaiaError42).c_str(), "Gaia error 42: explanation for 42");
+  int jpegError42 = domainErrorCode(jpeg, 42, "explanation for 42");
+  EXPECT_EQ(jpegError42, errorDomainToErrorCodeStart(jpeg) + 1);
+  EXPECT_STREQ(errorCodeToMessage(jpegError42).c_str(), "Jpeg error 42: explanation for 42");
 }

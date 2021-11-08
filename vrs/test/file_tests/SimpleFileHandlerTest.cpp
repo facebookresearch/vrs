@@ -350,25 +350,25 @@ TEST_F(SimpleFileHandlerTest, pathJsonUriParse) {
   EXPECT_EQ(spec.toJson(), "{\"chunks\":[\"" + escape(path) + "\"],\"storage\":\"diskfile\"}");
 
   invalidate(spec);
-  path = "gaia:123456";
+  path = "mystorage:123456";
   EXPECT_EQ(spec.fromPathJsonUri(path), 0);
   EXPECT_EQ(spec.uri, path);
-  EXPECT_EQ(spec.fileHandlerName, "gaia");
+  EXPECT_EQ(spec.fileHandlerName, "mystorage");
   EXPECT_TRUE(spec.chunks.empty());
   EXPECT_TRUE(spec.chunkSizes.empty());
   EXPECT_TRUE(spec.fileName.empty());
   EXPECT_FALSE(spec.hasChunkSizes());
   EXPECT_EQ(spec.getFileSize(), -1);
   EXPECT_EQ(spec.getSourceLocation(), path);
-  EXPECT_EQ(spec.toJson(), "{\"storage\":\"gaia\",\"source_uri\":\"gaia:123456\"}");
-  EXPECT_EQ(spec.getEasyPath(), "gaia:123456");
+  EXPECT_EQ(spec.toJson(), "{\"storage\":\"mystorage\",\"source_uri\":\"mystorage:123456\"}");
+  EXPECT_EQ(spec.getEasyPath(), "mystorage:123456");
 
   invalidate(spec);
   path =
-      "{\"filename\":\"myfile.vrs\",\"storage\":\"http\",\"source_uri\":\"gaia:123456\","
+      "{\"filename\":\"myfile.vrs\",\"storage\":\"http\",\"source_uri\":\"mystorage:123456\","
       "\"chunks\":[\"first chunk\",\"second chunk\"],\"chunk_sizes\":[12345,6789]}";
   EXPECT_EQ(spec.fromPathJsonUri(path), 0);
-  EXPECT_EQ(spec.uri, "gaia:123456");
+  EXPECT_EQ(spec.uri, "mystorage:123456");
   EXPECT_EQ(spec.fileHandlerName, "http");
   chunks = {"first chunk", "second chunk"};
   EXPECT_EQ(spec.chunks, chunks);
@@ -377,12 +377,12 @@ TEST_F(SimpleFileHandlerTest, pathJsonUriParse) {
   EXPECT_EQ(spec.fileName, "myfile.vrs");
   EXPECT_TRUE(spec.hasChunkSizes());
   EXPECT_EQ(spec.getFileSize(), 12345 + 6789);
-  EXPECT_EQ(spec.getSourceLocation(), "gaia:123456");
+  EXPECT_EQ(spec.getSourceLocation(), "mystorage:123456");
   EXPECT_EQ(
       spec.toJson(),
       "{\"chunks\":[\"first chunk\",\"second chunk\"],\"chunk_sizes\":[12345,6789],"
-      "\"storage\":\"http\",\"filename\":\"myfile.vrs\",\"source_uri\":\"gaia:123456\"}");
-  EXPECT_EQ(spec.getEasyPath(), "uri: gaia:123456, name: myfile.vrs");
+      "\"storage\":\"http\",\"filename\":\"myfile.vrs\",\"source_uri\":\"mystorage:123456\"}");
+  EXPECT_EQ(spec.getEasyPath(), "uri: mystorage:123456, name: myfile.vrs");
 
   invalidate(spec);
 
@@ -400,9 +400,9 @@ TEST_F(SimpleFileHandlerTest, pathJsonUriParse) {
   "bmdGaWxlIn0%3D&_nc_ht=interncache-atn&oh=9e7b2e1dd75bd0994a1417323305ecf5&oe=5EE63484"
   path = "{\"chunks\":[\"" CHUNK1 "\",\"" CHUNK2 "\",\"" CHUNK3
          "\"],\"chunk_sizes\":[1073741824,23598876,3265687],\"storage\":\"http\",\"filename\":"
-         "\"VRSLargeTestFile.vrs\",\"source_uri\":\"gaia:480864042405253\",\"version\":\"1\"}";
+         "\"VRSLargeTestFile.vrs\",\"source_uri\":\"mystorage:480864042405253\",\"version\":\"1\"}";
   EXPECT_EQ(spec.fromPathJsonUri(path), 0);
-  EXPECT_EQ(spec.uri, "gaia:480864042405253");
+  EXPECT_EQ(spec.uri, "mystorage:480864042405253");
   EXPECT_EQ(spec.fileHandlerName, "http");
   chunks = {CHUNK1, CHUNK2, CHUNK3};
   EXPECT_EQ(spec.chunks, chunks);
@@ -411,13 +411,13 @@ TEST_F(SimpleFileHandlerTest, pathJsonUriParse) {
   EXPECT_EQ(spec.fileName, "VRSLargeTestFile.vrs");
   EXPECT_TRUE(spec.hasChunkSizes());
   EXPECT_EQ(spec.getFileSize(), 1100606387);
-  EXPECT_EQ(spec.getSourceLocation(), "gaia:480864042405253");
+  EXPECT_EQ(spec.getSourceLocation(), "mystorage:480864042405253");
   EXPECT_EQ(
       spec.toJson(),
       "{\"chunks\":[\"" CHUNK1 "\",\"" CHUNK2 "\",\"" CHUNK3
       "\"],\"chunk_sizes\":[1073741824,23598876,3265687],\"storage\":\"http\",\"filename\":"
-      "\"VRSLargeTestFile.vrs\",\"source_uri\":\"gaia:480864042405253\",\"version\":\"1\"}");
-  EXPECT_EQ(spec.getEasyPath(), "uri: gaia:480864042405253, name: VRSLargeTestFile.vrs");
+      "\"VRSLargeTestFile.vrs\",\"source_uri\":\"mystorage:480864042405253\",\"version\":\"1\"}");
+  EXPECT_EQ(spec.getEasyPath(), "uri: mystorage:480864042405253, name: VRSLargeTestFile.vrs");
 
   // remove uri
   path = "{\"chunks\":[\"" CHUNK1 "\",\"" CHUNK2 "\",\"" CHUNK3

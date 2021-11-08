@@ -14,11 +14,12 @@ using namespace std;
 using namespace vrs;
 
 struct FileHandlerFactoryTest : testing::Test {
-  string vrsFilesDir = coretech::getTestDataDir() + "/VRS_Files/";
-  string singleFile = vrsFilesDir + "chunks.vrs";
-  string singleFileJson = FileSpec({vrsFilesDir + "sample_file.vrs"}).toJson();
-  string chunkedFile = FileSpec({singleFile, singleFile + "_1", singleFile + "_2"}).toJson();
-  string gaiaFile = "gaia:123456";
+  const string kVrsFilesDir = coretech::getTestDataDir() + "/VRS_Files/";
+  const string kFirstChunk = kVrsFilesDir + "chunks.vrs";
+  const string kSingleFileJson = FileSpec({kVrsFilesDir + "sample_file.vrs"}).toJson();
+  const string kMultiChunksJson =
+      FileSpec({kFirstChunk, kFirstChunk + "_1", kFirstChunk + "_2"}).toJson();
+  const string kUriSchemeFile = "myscheme:123456";
 };
 
 // Fake FileHandler class that just pretends to open any path
@@ -57,19 +58,19 @@ static int openVRSFile(const string& path, std::unique_ptr<FileHandler>& outFile
 TEST_F(FileHandlerFactoryTest, ANDROID_DISABLED(OpenSomeRealVRSFiles)) {
   std::unique_ptr<FileHandler> file;
 
-  EXPECT_EQ(openVRSFile(singleFile, file), 0);
+  EXPECT_EQ(openVRSFile(kFirstChunk, file), 0);
   EXPECT_EQ(
       file->getTotalSize(),
       82677); // auto-detection of chunks means the size includes all the chunks
   EXPECT_EQ(file->getFileHandlerName(), DiskFile::staticName());
   file.reset();
 
-  EXPECT_EQ(openVRSFile(singleFileJson, file), 0);
+  EXPECT_EQ(openVRSFile(kSingleFileJson, file), 0);
   EXPECT_EQ(file->getTotalSize(), 83038);
   EXPECT_EQ(file->getFileHandlerName(), DiskFile::staticName());
   file.reset();
 
-  EXPECT_EQ(openVRSFile(chunkedFile, file), 0);
+  EXPECT_EQ(openVRSFile(kMultiChunksJson, file), 0);
   EXPECT_EQ(file->getTotalSize(), 82677);
   EXPECT_EQ(file->getFileHandlerName(), DiskFile::staticName());
   file.reset();
@@ -80,17 +81,17 @@ TEST_F(FileHandlerFactoryTest, testBadFileHandler) {
   EXPECT_NE(reader.openFile("{\"chunks\":[\"somepath\"],\"storage\":\"bad_oil\"}"), 0);
 }
 
-TEST_F(FileHandlerFactoryTest, OpenGaiaUris) {
+TEST_F(FileHandlerFactoryTest, openCustomSchemeUri) {
   FileHandlerFactory& factory = FileHandlerFactory::getInstance();
   std::unique_ptr<FileHandler> file;
 
-  EXPECT_NE(factory.delegateOpen(gaiaFile, file), 0); // fails: no handler for "gaia"
+  EXPECT_NE(factory.delegateOpen(kUriSchemeFile, file), 0); // fails: no handler for "myscheme"
   EXPECT_FALSE((file));
 
-  // Verify that gaia URI are handled by our fake gaia handler
-  factory.registerFileHandler(make_unique<FakeHandler>("gaia"));
-  EXPECT_EQ(factory.delegateOpen(gaiaFile, file), 0);
-  EXPECT_STREQ(file->getFileHandlerName().c_str(), "gaia");
-  factory.unregisterFileHandler("gaia");
+  // Verify that myscheme URI are handled by our "myscheme" handler
+  factory.registerFileHandler(make_unique<FakeHandler>("myscheme"));
+  EXPECT_EQ(factory.delegateOpen(kUriSchemeFile, file), 0);
+  EXPECT_STREQ(file->getFileHandlerName().c_str(), "myscheme");
+  factory.unregisterFileHandler("myscheme");
   file.reset();
 }

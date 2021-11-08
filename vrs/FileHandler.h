@@ -58,13 +58,13 @@ struct FileSpec {
   int fromPathJsonUri(const string& pathJsonUri);
 
   // Parse json and extract file specs, with optional extra parameters.
-  // @param jsonStr: ex. {"storage": "everstore", "chunks":["chunk1", "chunk2"],
+  // @param jsonStr: ex. {"storage": "mystorage", "chunks":["chunk1", "chunk2"],
   // "filename":"file.vrs"}.
   // @return True if parsing the json succeeded.
   bool fromJson(const string& jsonStr);
 
   // Generate json string from a file spec.
-  // @return jsonStr: ex. {"storage": "everstore", "chunks":["chunk1", "chunk2"],
+  // @return jsonStr: ex. {"storage": "mystorage", "chunks":["chunk1", "chunk2"],
   // "filename":"file.vrs"}.
   string toJson() const;
 

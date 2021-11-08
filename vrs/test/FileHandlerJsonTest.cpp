@@ -13,28 +13,28 @@ struct FileHandlerJsonTest : testing::Test {
   const std::string kJSONPathWithChunks = "{\"chunks\": [\"file1\", \"file2\"]}";
   const std::string kJSONPathWithSingleChunk = "{\"chunks\": [\"file1\"]}";
   const std::string kJSONPathWithChunksAndFileHandle =
-      "{\"storage\": \"everstore\",\"chunks\": [\"file1\", \"file2\"]}";
+      "{\"storage\": \"mystorage\",\"chunks\": [\"file1\", \"file2\"]}";
   const std::string kJSONPathWithChunksAndFileName =
       "{\"filename\": \"sample.vrs\",\"chunks\": [\"file1\", \"file2\"]}";
   const std::string kJSONPathWithChunksAndFileSizes =
       "{\"chunk_sizes\": [12345, 67890],\"chunks\": [\"file1\", \"file2\"]}";
   const std::string kJSONPathWithSingleExtraField =
-      "{\"storage\": \"everstore\",\"chunks\": [\"file1\", \"file2\"],"
+      "{\"storage\": \"mystorage\",\"chunks\": [\"file1\", \"file2\"],"
       "\"bucketname\": \"bucketname1\"}";
   const std::string kJSONPathWithMultipleExtraField =
-      "{\"storage\": \"everstore\",\"chunks\": [\"file1\", \"file2\"],"
+      "{\"storage\": \"mystorage\",\"chunks\": [\"file1\", \"file2\"],"
       "\"bucketname\": \"bucketname1\", \"extra1\": \"extra1\","
       "\"extra2\": [\"extra2-1\", \"extra2-2\"]}";
   const std::string kNonJSONPath = "file1";
 
-  const std::string kUriPath = "manifold:test/path/file.vrs?key1=val1&key2=val2";
+  const std::string kUriPath = "mystorage:test/path/file.vrs?key1=val1&key2=val2";
   const std::string kUriPathWithNoHost = "test/path/file.vrs?key1=val1";
   const std::string kUriPathWithNoHostWithColonSlash = ":test/path/file.vrs?key1=val1";
-  const std::string kUriPathWithNoPath = "manifold:";
-  const std::string kUriPathWithNoPathWithQuery = "manifold:?key1=val1";
-  const std::string kUriPathWithInvalidQuery = "manifold:test/path/file.vrs?key1=";
-  const std::string kUriPathWithInvalidQuery2 = "manifold:test/path/file.vrs?=val1";
-  const std::string kUriWithEncodedPath = "manifold:test%2Fpath%2Ffile.vrs";
+  const std::string kUriPathWithNoPath = "mystorage:";
+  const std::string kUriPathWithNoPathWithQuery = "mystorage:?key1=val1";
+  const std::string kUriPathWithInvalidQuery = "mystorage:test/path/file.vrs?key1=";
+  const std::string kUriPathWithInvalidQuery2 = "mystorage:test/path/file.vrs?=val1";
+  const std::string kUriWithEncodedPath = "mystorage:test%2Fpath%2Ffile.vrs";
 };
 
 TEST_F(FileHandlerJsonTest, JSONPathWithChunks) {
@@ -57,7 +57,7 @@ TEST_F(FileHandlerJsonTest, JSONPathWithChunksAndFileHandle) {
   EXPECT_EQ(spec.chunks.size(), 2);
   EXPECT_EQ(spec.chunks[0], "file1");
   EXPECT_EQ(spec.chunks[1], "file2");
-  EXPECT_EQ(spec.fileHandlerName, "everstore");
+  EXPECT_EQ(spec.fileHandlerName, "mystorage");
 }
 TEST_F(FileHandlerJsonTest, JSONPathWithChunksAndFileName) {
   vrs::FileSpec spec;
@@ -72,7 +72,7 @@ TEST_F(FileHandlerJsonTest, JSONPathWithExtraField) {
   vrs::FileSpec spec;
   EXPECT_TRUE(spec.fromJson(kJSONPathWithSingleExtraField));
   EXPECT_EQ(spec.chunks.size(), 2);
-  EXPECT_EQ(spec.fileHandlerName, "everstore");
+  EXPECT_EQ(spec.fileHandlerName, "mystorage");
   EXPECT_EQ(spec.extras.size(), 1);
   EXPECT_NE(spec.extras.find("bucketname"), spec.extras.end());
   EXPECT_EQ(spec.extras["bucketname"], "bucketname1");
@@ -116,7 +116,7 @@ TEST_F(FileHandlerJsonTest, ParseURI) {
 
   EXPECT_EQ(vrs::FileSpec::parseUri(kUriPath, fileHandlerName, path, m), 0);
   EXPECT_EQ(path, "test/path/file.vrs");
-  EXPECT_EQ(fileHandlerName, "manifold");
+  EXPECT_EQ(fileHandlerName, "mystorage");
   EXPECT_EQ(m.size(), 2);
   EXPECT_EQ(m["key1"], "val1");
   EXPECT_EQ(m["key2"], "val2");
@@ -129,17 +129,17 @@ TEST_F(FileHandlerJsonTest, ParseURI) {
 
   EXPECT_EQ(vrs::FileSpec::parseUri(kUriPathWithInvalidQuery, fileHandlerName, path, m), 0);
   EXPECT_EQ(path, "test/path/file.vrs");
-  EXPECT_EQ(fileHandlerName, "manifold");
+  EXPECT_EQ(fileHandlerName, "mystorage");
   EXPECT_TRUE(m.empty());
 
   EXPECT_EQ(vrs::FileSpec::parseUri(kUriPathWithInvalidQuery2, fileHandlerName, path, m), 0);
   EXPECT_EQ(path, "test/path/file.vrs");
-  EXPECT_EQ(fileHandlerName, "manifold");
+  EXPECT_EQ(fileHandlerName, "mystorage");
   EXPECT_TRUE(m.empty());
 
   EXPECT_EQ(vrs::FileSpec::parseUri(kUriWithEncodedPath, fileHandlerName, path, m), 0);
   EXPECT_EQ(path, "test/path/file.vrs");
-  EXPECT_EQ(fileHandlerName, "manifold");
+  EXPECT_EQ(fileHandlerName, "mystorage");
   EXPECT_TRUE(m.empty());
 }
 
