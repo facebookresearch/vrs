@@ -20,4 +20,9 @@ int64_t getCurrentTimeSecSinceEpoch() {
   return duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
 }
 
+int64_t getTimestampMs() {
+  using namespace std::chrono;
+  return duration_cast<std::chrono::milliseconds>(steady_clock::now().time_since_epoch()).count();
+}
+
 } // namespace vrs::os
