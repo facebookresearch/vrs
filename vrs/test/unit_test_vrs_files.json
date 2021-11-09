@@ -8,8 +8,6 @@
             "volumes": [
               {
                 "volume_uuid": "f34c5be6-33f0-4a23-8ece-188f0f285002",
-                "is_writeable": true,
-                "default_size_mb": "128",
                 "max_size_mb": "512",
                 "volume_type": "Data"
               }
