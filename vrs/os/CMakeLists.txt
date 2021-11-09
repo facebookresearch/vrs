@@ -35,7 +35,7 @@ if (UNIT_TESTS)
   target_link_libraries(os_test
       PUBLIC
         vrs_os
-        vrs_oss_misc
+        vrs_oss_testdatadir
         GTest::Main
   )
 
