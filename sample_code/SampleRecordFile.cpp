@@ -183,7 +183,7 @@ class RecordSample {
     int result = fileWriter.createFileAsync("my_record_file.vrs");
     XR_CHECK(result == 0);
 
-    double lastTime = 123; // start with now
+    double lastTime = os::getTimestampSec();
     while (recordable.iNeedToRecordMoreData()) {
       recordable.createMoreRecords(); // for each recordable, maybe create new records of any type
       // maybe once every second, call:

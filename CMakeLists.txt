@@ -32,5 +32,6 @@ add_subdirectory(vrs/utils/xxhash)
 # Include oss replacement libraries
 add_subdirectory(vrs/oss)
 
-# Add the apps/tools
+# Add the sample apps/code
 add_subdirectory(sample_apps)
+add_subdirectory(sample_code)
