@@ -17,12 +17,12 @@ target_include_directories(vrs_helpers PUBLIC ${VRS_SOURCE_DIR})
 if (UNIT_TESTS)
   enable_testing()
 
-  add_executable(helpers_test test/StringsTest.cpp)
-  target_link_libraries(helpers_test
+  add_executable(test_vrs_helpers test/StringsTest.cpp)
+  target_link_libraries(test_vrs_helpers
       PUBLIC
         vrs_helpers
         GTest::Main
   )
 
-  gtest_discover_tests(helpers_test)
+  gtest_discover_tests(test_vrs_helpers)
 endif()

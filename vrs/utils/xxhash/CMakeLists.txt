@@ -9,3 +9,18 @@ target_link_libraries(vrs_xxhash
         vrs_logging
         xxHash::xxHash
 )
+
+if (UNIT_TESTS)
+  enable_testing()
+
+  add_executable(test_vrs_xxhash
+    test/xxhashTest.cpp
+  )
+  target_link_libraries(test_vrs_xxhash
+      PUBLIC
+        vrs_xxhash
+        GTest::Main
+  )
+
+  gtest_discover_tests(test_vrs_xxhash)
+endif()

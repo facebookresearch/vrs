@@ -27,17 +27,17 @@ endif()
 if (UNIT_TESTS)
   enable_testing()
 
-  add_executable(os_test
+  add_executable(test_vrs_os
     test/TimeTest.cpp
     test/EventUnitTest.cpp
     test/UtilsTest.cpp
   )
-  target_link_libraries(os_test
+  target_link_libraries(test_vrs_os
       PUBLIC
         vrs_os
         vrs_oss_testdatadir
         GTest::Main
   )
 
-  gtest_discover_tests(os_test)
+  gtest_discover_tests(test_vrs_os)
 endif()
