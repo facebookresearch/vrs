@@ -31,6 +31,9 @@
 #define STAT64 stat64
 #define LSTAT64 lstat64
 #endif
+#if IS_LINUX_PLATFORM()
+#include <linux/limits.h>
+#endif
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
