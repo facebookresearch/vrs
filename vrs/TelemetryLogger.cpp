@@ -1,8 +1,8 @@
 // Copyright (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
 
-#include "EventLogger.h"
+#include "TelemetryLogger.h"
 
-#define DEFAULT_LOG_CHANNEL "EventLogger"
+#define DEFAULT_LOG_CHANNEL "TelemetryLogger"
 #include <logging/Log.h>
 
 #include <vrs/helpers/Strings.h>
@@ -11,18 +11,19 @@ using namespace std;
 
 namespace vrs {
 
-EventLogger& EventLogger::getInstance() {
+TelemetryLogger& TelemetryLogger::getInstance() {
   return *getStaticInstance().get();
 }
 
-std::unique_ptr<EventLogger> EventLogger::setLogger(std::unique_ptr<EventLogger>&& eventLogger) {
-  std::unique_ptr<EventLogger> previousLogger;
-  getStaticInstance().swap(eventLogger);
+std::unique_ptr<TelemetryLogger> TelemetryLogger::setLogger(
+    std::unique_ptr<TelemetryLogger>&& telemetryLogger) {
+  std::unique_ptr<TelemetryLogger> previousLogger;
+  getStaticInstance().swap(telemetryLogger);
   return previousLogger;
 }
 
-void EventLogger::logEvent(LogEvent&& event) {
-  if (event.type == EventLogger::kErrorType) {
+void TelemetryLogger::logEvent(LogEvent&& event) {
+  if (event.type == TelemetryLogger::kErrorType) {
     XR_LOGE(
         "{}, {}: {} {}",
         event.operationContext.operation,
@@ -39,7 +40,9 @@ void EventLogger::logEvent(LogEvent&& event) {
   }
 }
 
-void EventLogger::logTraffic(const OperationContext& operationContext, const TrafficEvent& event) {
+void TelemetryLogger::logTraffic(
+    const OperationContext& operationContext,
+    const TrafficEvent& event) {
   XR_LOGI(
       "{} {} {}/{}, {}: When: {} Duration: {}/{} "
       "Offset: {} Transfer: {}/{} Retries: {} Errors: {} 429: {}",
@@ -59,12 +62,12 @@ void EventLogger::logTraffic(const OperationContext& operationContext, const Tra
       event.error429Count);
 }
 
-std::unique_ptr<EventLogger>& EventLogger::getStaticInstance() {
-  static std::unique_ptr<EventLogger> sInstance = std::make_unique<EventLogger>();
+std::unique_ptr<TelemetryLogger>& TelemetryLogger::getStaticInstance() {
+  static std::unique_ptr<TelemetryLogger> sInstance = std::make_unique<TelemetryLogger>();
   return sInstance;
 }
 
-EventLogger::~EventLogger() {}
+TelemetryLogger::~TelemetryLogger() {}
 
 TrafficEvent& TrafficEvent::setUrl(const string& aServerName) {
   // discard prefixes such as http:// and https:// by finding "://"

@@ -12,6 +12,7 @@ namespace vrs {
 
 using std::string;
 
+/// Context description for telemetry events.
 struct OperationContext {
   string operation;
   string sourceLocation;
@@ -35,6 +36,7 @@ struct OperationContext {
   }
 };
 
+/// General purpose telemetry event.
 struct LogEvent {
   LogEvent() = default;
   LogEvent(
@@ -63,6 +65,12 @@ struct LogEvent {
   std::string serverMessage;
 };
 
+/// \brief Telemetry event specialized to report cloud traffic
+///
+/// A key goal of telemetry is to monitor traffic to cloud storage solutions, so we can mesure
+/// resource usage and detect excessive traffic. This requires logging every network transaction,
+/// as opposed to sparse events, giving leverage to custom implementation optimizations not possible
+/// with a generic event.
 struct TrafficEvent {
   bool isSuccess = false;
   bool uploadNotDownload = false;
@@ -133,21 +141,24 @@ struct TrafficEvent {
   TrafficEvent& setUrl(const string& aServerName);
 };
 
-/// The EventLogger class
-/// Helper class to log events for VRS operations.
-/// By default, logs to use XR_LOGI and XR_LOGE, XR_LOGW, but can
-/// be easily overwritten to log anywhere.
-class EventLogger {
+/// \brief TelemetryLogger to report important events
+///
+/// Telemetry building block infra to report events from VRS operations.
+/// The default implementation simply logs using XR_LOGI and XR_LOGE, XR_LOGW,
+/// but can easily be augmented to implement telemetry in a central database.
+class TelemetryLogger {
  public:
-  virtual ~EventLogger();
-  static EventLogger& getInstance();
+  virtual ~TelemetryLogger();
+
+  static TelemetryLogger& getInstance();
 
   static constexpr const char* kErrorType = "error";
   static constexpr const char* kWarningType = "warning";
 
   /// set logger and get back the previous one, making sure the assignment is performed
   /// before the previous logger is deleted.
-  static std::unique_ptr<EventLogger> setLogger(std::unique_ptr<EventLogger>&& eventLogger);
+  static std::unique_ptr<TelemetryLogger> setLogger(
+      std::unique_ptr<TelemetryLogger>&& telemetryLogger);
 
   /// methods for clients to use without having to get an instance, etc
   static inline void error(
@@ -173,6 +184,7 @@ class EventLogger {
   virtual void logTraffic(const OperationContext& operationContext, const TrafficEvent& event);
 
  private:
-  static std::unique_ptr<EventLogger>& getStaticInstance();
+  static std::unique_ptr<TelemetryLogger>& getStaticInstance();
 };
+
 } // namespace vrs

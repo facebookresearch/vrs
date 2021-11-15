@@ -21,7 +21,7 @@ add_executable(test_vrs
   DataLayoutFormatTest.cpp
   DataLayoutTest.cpp
   ErrorCodeTest.cpp
-  EventLoggerTest.cpp
+  TelemetryLoggerTest.cpp
   FileHandlerFactoryTest.cpp
   FileHandlerJsonTest.cpp
   FrameCompressionTest.cpp

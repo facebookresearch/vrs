@@ -18,7 +18,6 @@
 #include "DescriptionRecord.h"
 #include "DiskFile.h"
 #include "ErrorCode.h"
-#include "EventLogger.h"
 #include "FileCache.h"
 #include "FileDetailsCache.h"
 #include "FileHandlerFactory.h"
@@ -26,6 +25,7 @@
 #include "LegacyFormatsProvider.h"
 #include "StreamPlayer.h"
 #include "TagsRecord.h"
+#include "TelemetryLogger.h"
 
 using namespace std;
 
@@ -337,7 +337,7 @@ int RecordFileReader::readFileDetails(
     }
   } else {
     if (file_->isRemoteFileSystem()) {
-      EventLogger::warning(
+      TelemetryLogger::warning(
           {"RecordFileReader::open", fileSpec.getSourceLocation()}, "Index is incomplete.");
     }
     XR_LOGW("Index incomplete. Rebuilding index of '{}'...", fileSpec.getEasyPath());

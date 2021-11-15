@@ -2,17 +2,17 @@
 
 #include <gtest/gtest.h>
 
-#include <vrs/EventLogger.h>
+#include <vrs/TelemetryLogger.h>
 
 using namespace vrs;
 
 namespace {
 
-struct EventLoggerTest : testing::Test {};
+struct TelemetryLoggerTest : testing::Test {};
 
 } // namespace
 
-TEST_F(EventLoggerTest, cacheTest) {
+TEST_F(TelemetryLoggerTest, cacheTest) {
   TrafficEvent event;
   // test real urls
   const char* kStoragePathA =
