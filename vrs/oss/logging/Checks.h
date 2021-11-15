@@ -2,11 +2,13 @@
 
 #pragma once
 
-#include <fmt/core.h>
 #include <string>
 
+#include <fmt/core.h>
+
+#include <vrs/os/CompilerAttributes.h>
+
 #include "LogLevel.h"
-#include "Utils.h"
 
 namespace vrs::logging {
 void logAndAbort(const std::string& condition, const std::string& message = {});
@@ -53,10 +55,10 @@ void logAndAbort(const std::string& condition, const std::string& message = {});
 #define XR_DEV_CHECK_GE_LE(val1, val2, val3, ...) XR_CHECK_GE_LE(val1, val2, val3, ##__VA_ARGS__)
 #define XR_DEV_FATAL_ERROR(...) XR_FATAL_ERROR(__VA_ARGS__)
 
-// XR_PRECONDITION_NOTNULL performs a not-null check but returns the value, such that this macro
-// can be used in initializer lists
+// XR_PRECONDITION_NOTNULL performs a not-null check but returns the value,
+// so this macro can be used in initializer lists
 #define XR_PRECONDITION_NOTNULL(_val, ...) ((XR_CHECK_NOTNULL(_val, ##__VA_ARGS__)), _val)
 
-// XR_DEV_PRECONDITION_NOTNULL is the same as XR_PRECONDITION_NOTNULL, except that the check is
-// compiled out in production builds
+// XR_DEV_PRECONDITION_NOTNULL is the same as XR_PRECONDITION_NOTNULL,
+// except that the check is compiled out in production builds
 #define XR_DEV_PRECONDITION_NOTNULL(_val, ...) ((XR_DEV_CHECK_NOTNULL(_val, ##__VA_ARGS__)), _val)

@@ -9,5 +9,3 @@ namespace coretech {
 std::string getTestDataDir();
 
 }
-
-#define IS_XROS_PLATFORM() 0

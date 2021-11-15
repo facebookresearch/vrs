@@ -9,10 +9,11 @@
 #define DEFAULT_LOG_CHANNEL "VRSIndexRecord"
 #include <logging/Log.h>
 #include <logging/Verify.h>
+
+#include <vrs/helpers/FileMacros.h>
 #include <vrs/os/CompilerAttributes.h>
 #include <vrs/os/Time.h>
 
-#include <vrs/helpers/FileMacros.h>
 #include "Compressor.h"
 #include "Decompressor.h"
 #include "ErrorCode.h"

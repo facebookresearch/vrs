@@ -2,9 +2,10 @@
 
 #pragma once
 
-// Dummy implementation to make it consistent with FB internal logging backend.
+// Empty implementation to provide the same APIs as FB's internal logging backend.
 namespace arvr {
 namespace logging {
+
 enum class Level {
   Disabled = 0, ///< Completely suppresses log output. Not available in the logging macros.
   Error = 1, ///<
@@ -16,9 +17,8 @@ enum class Level {
                            ///< available in the logging macros.
 };
 
-/**
- * Set the global log level that applies for all channels, unless the channel has separate settings.
- */
+// Set the global log level that applies for all channels, unless the channel has separate settings.
+// Empty implementation for now in OSS.
 inline void setGlobalLogLevel(Level level) {}
 
 } // namespace logging

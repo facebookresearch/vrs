@@ -5,8 +5,9 @@
 #include <fmt/color.h>
 #include <fmt/core.h>
 
+#include <vrs/os/CompilerAttributes.h>
+
 #include "LogLevel.h"
-#include "Utils.h"
 
 #ifndef DEFAULT_LOG_CHANNEL
 #error "DEFAULT_LOG_CHANNEL must be defined before including <logging/Verify.h>"

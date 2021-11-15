@@ -5,7 +5,6 @@
 #include <vrs/os/Platform.h>
 
 #if IS_VRS_OSS_CODE()
-#define DISABLE_THREAD_SAFETY_ANALYSIS
 #ifdef _MSC_VER
 
 #if _MSVC_LANG >= 201703L
@@ -45,6 +44,21 @@
 
 #endif // !HAS_CPP_17()
 
+// static branch prediction
+#if defined(__clang__) || defined(__GNUC__)
+#define XR_UNLIKELY(x) (__builtin_expect(!!(x), 0))
+#else // !(clang or gcc)
+#define XR_UNLIKELY(x) !!(x)
+#endif // !(clang or gcc)
+
 #else
-#include <vrs/os/CompilerAttributes_fb.h>
+#include <portability/CompilerAttributes.h>
 #endif
+
+// XROS builds with -Wthread-safety-analysis, which (correctly) flags that the DataLayouter mutex
+// can be used in an unsafe fashion.
+#if IS_XROS_PLATFORM()
+#define DISABLE_THREAD_SAFETY_ANALYSIS __attribute__((no_thread_safety_analysis))
+#else // !IS_XROS_PLATFORM()
+#define DISABLE_THREAD_SAFETY_ANALYSIS
+#endif // !IS_XROS_PLATFORM()

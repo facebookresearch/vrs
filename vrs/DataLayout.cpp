@@ -29,8 +29,6 @@
 #include "DataPieces.h"
 #include "RecordFormat.h"
 
-// IWYU pragma: no_forward_declare vrs::DataPiece::MakerBundle
-
 namespace vrs {
 
 using namespace std;
