@@ -300,9 +300,11 @@ bool DataLayout::isSame(const DataLayout& otherLayout) const {
   return true;
 }
 
+/// \brief DataLayout private namespace for internal helper classes & functions.
 namespace internal {
 
-/// Helper class to manage the registration of DataPiece objects within a single DataLayout.
+/// \brief Helper class to manage the registration of DataPiece objects within a single DataLayout.
+///
 /// C++ doesn't support a form of introspection that would allow objects to "find their parent".
 /// This technique allows the automatic registration of DataPiece objects.
 ///  - call dataLayoutBegin(layout) to start registering DataPiece objects with a layout object.
@@ -404,6 +406,8 @@ const char* sDataTypeNames[] = {
     "DataPieceVector",
     "DataPieceString",
     "DataPieceStringMap"};
+
+/// \brief Helper to convert data piece types enums to/from names.
 struct DataPieceTypeStringConverter : public EnumStringConverter<
                                           DataPieceType,
                                           sDataTypeNames,
@@ -432,6 +436,7 @@ static string makePieceName(DataPieceType pieceType) {
 
 using DataPieceMaker = DataPiece* (*)(const DataPiece::MakerBundle&);
 
+/// \brief Helper factory class to create DataPiece objects.
 struct DataPieceFactory {
   static void registerClass(const string& pieceName, DataPieceMaker maker) {
     DataPieceFactory::get().registry_[pieceName] = maker;
@@ -934,7 +939,6 @@ const string DataPiece::kMaxValue = "max";
 const string DataPiece::kMinIncrement = "min_increment";
 const string DataPiece::kMaxIncrement = "max_increment";
 
-// for factory construction, we need a fixed constructor signature option
 struct DataPiece::MakerBundle {
   MakerBundle(const char* l, const JValue& p) : label(l), piece(p) {}
 

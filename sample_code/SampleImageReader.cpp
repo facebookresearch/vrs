@@ -7,12 +7,15 @@
 
 using namespace vrs;
 
-/// This sample code shows how to read images of a VRS file that follows RecordFormat & DataLayout
-/// conventions.
+namespace vrs_sample_code {
 
-// class to consume images of a VRS file
+// This sample code shows how to read images of a VRS file that follows RecordFormat & DataLayout
+// conventions. The code compiles, but it is not actually functional, it just demonstrates basic
+// principles.
+
+/// Sample class to read images from a VRS file stream.
 class ImagePlayer : public RecordFormatStreamPlayer {
-  /// this is where you'll receive the images
+  /// Callback that will receive the images
   bool onImageRead(const CurrentRecord& record, size_t /*idx*/, const ContentBlock& cb) override {
     // the image data was not read yet: allocate your own buffer & read!
     size_t frameByteCount = cb.getBlockSize();
@@ -36,7 +39,7 @@ class ImagePlayer : public RecordFormatStreamPlayer {
   }
 };
 
-/// This class is only here to make the compiler happy.
+/// Sample basic code to demonstrate how to read a VRS file.
 struct SampleImageReader {
   /// This function is the entry point for your reader
   void imageReader(const string& vrsFilePath) {
@@ -57,3 +60,5 @@ struct SampleImageReader {
     }
   }
 };
+
+} // namespace vrs_sample_code

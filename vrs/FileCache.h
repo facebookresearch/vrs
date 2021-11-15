@@ -9,7 +9,8 @@ namespace vrs {
 
 using std::string;
 
-/// Utility class to manage various forms of file caching. Disabled by default.
+/// \brief Utility class to manage various forms of file caching. Disabled by default.
+///
 /// There is a main file cache, which needs to be created for file caching to be enabled.
 class FileCache {
  public:

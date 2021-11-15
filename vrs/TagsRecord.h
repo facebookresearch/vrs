@@ -10,6 +10,7 @@
 
 namespace vrs {
 
+/// \brief DataLayout definition used in tag records, which is a VRS internal record type.
 struct TagsRecord : public AutoDataLayout {
   enum { kTagsVersion = 1 };
 
@@ -21,6 +22,7 @@ struct TagsRecord : public AutoDataLayout {
   AutoDataLayoutEnd end;
 };
 
+/// \brief StreamPlayer to decode the content of VRS tag records.
 class TagsRecordPlayer : public RecordFormatStreamPlayer {
  public:
   TagsRecordPlayer(RecordFileReader* fileReader, map<StreamId, StreamTags>& streamTags);

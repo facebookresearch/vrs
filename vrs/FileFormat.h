@@ -11,7 +11,7 @@
 
 namespace vrs {
 
-/// This namespace declares the key datastructures that define a record file.
+/// \brief Namespace for key datastructures of a VRS file.
 ///
 /// File format description:
 ///
@@ -42,7 +42,8 @@ namespace vrs {
 namespace FileFormat {
 #pragma pack(push, 1)
 
-/// Naive (and incomplete) layer for endianness support.
+/// \brief Placeholder layer for endianness support, if we ever need it.
+///
 /// All it currently does is enforce that we read & write native types through get & set methods.
 template <class T>
 class LittleEndian final {
@@ -120,7 +121,7 @@ struct FileHeader {
 // Re-interpret legacy recordable Type id
 RecordableTypeId readRecordableTypeId(const FileFormat::LittleEndian<int32_t>& recordableTypeId);
 
-/// Every record starts with this header, and is followed by a raw data blob,
+/// \brief Every record starts with this header, and is followed by a raw data blob,
 /// which semantic is private to the data type handler.
 struct RecordHeader {
   RecordHeader();

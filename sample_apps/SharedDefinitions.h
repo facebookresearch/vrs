@@ -4,6 +4,8 @@
 #include <vrs/DataLayoutConventions.h>
 #include <vrs/DataPieces.h>
 
+namespace vrs_sample_apps {
+
 using namespace vrs; // we should not do this in a header, but for readability, we do in this sample
 
 // This file contains definitions shared between our reader & writer code
@@ -12,6 +14,7 @@ constexpr const char* kSampleFileName = "sample_file.vrs";
 
 // DataLayout definitions: these are groups of data fields that will store in different records.
 
+/// Sample metadata for configuration records of an image stream.
 struct CameraStreamConfig : public AutoDataLayout {
   using ImageSpecType = DataLayoutConventions::ImageSpecType;
 
@@ -27,6 +30,7 @@ struct CameraStreamConfig : public AutoDataLayout {
   AutoDataLayoutEnd endLayout;
 };
 
+/// Sample metadata for data records of an image stream.
 struct CameraStreamData : public AutoDataLayout {
   // Additional data provided with each frame
   DataPieceValue<uint64_t> exposureTime{"exposure_time"};
@@ -37,12 +41,14 @@ struct CameraStreamData : public AutoDataLayout {
   AutoDataLayoutEnd endLayout;
 };
 
+/// Sample metadata for configuration records of a metadata stream.
 struct MotionStreamConfig : public AutoDataLayout {
   DataPieceValue<double> motionStreamParam{"some_motion_stream_param"};
 
   AutoDataLayoutEnd endLayout;
 };
 
+/// Sample metadata for data records of a metadata stream.
 struct MotionStreamData : public AutoDataLayout {
   DataPieceVector<Matrix3Dd> motionData{"motion_data"};
 
@@ -66,3 +72,5 @@ constexpr const char* kMotionStreamFlavor = "sample/motion";
 #define CALIBRATION_VALUES \
   { 23, 53, 343, 3, 12, 8 }
 constexpr double kMotionValue = 25;
+
+} // namespace vrs_sample_apps

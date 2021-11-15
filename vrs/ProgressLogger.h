@@ -8,7 +8,8 @@ namespace vrs {
 
 using std::string;
 
-/// \brief The ProgressLogger class
+/// \brief ProgressLogger class to be notified of some process' progress.
+///
 /// Helper class to implement status logging when opening a VRS file
 /// By default, logs to use XR_LOGI and XR_LOGE, but can be easily overwritten
 /// to log anywhere. By default, this class never requests to stop the operation, but that can be
@@ -108,6 +109,7 @@ class ProgressLogger {
   double nextProgressTime_;
 };
 
+/// \brief Progess logger to ignore all progress notifications.
 class SilentLogger : public ProgressLogger {
  public:
   ~SilentLogger();

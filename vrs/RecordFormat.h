@@ -64,7 +64,7 @@ enum class PixelFormat : uint8_t {
                   ///< where Ir means infrafred.
   RGBA32F, ///< 1 32 bit float value.
   BAYER8_RGGB, ///< 8 bit per pixel, RGGB bayer pattern.
-  RAW10, /// https://developer.android.com/reference/android/graphics/ImageFormat#RAW10
+  RAW10, ///< https://developer.android.com/reference/android/graphics/ImageFormat#RAW10
   RAW10_BAYER_RGGB, ///< 10 bit per pixel, RGGB bayer pattern.
 
   COUNT, ///< Count of values in this enum type. @internal
@@ -79,6 +79,7 @@ enum class AudioFormat : uint8_t {
   COUNT ///< Count of values in this enum type. @internal
 };
 
+/// Convert an AudioFormat to a string
 string toString(AudioFormat audioFormat);
 
 /// Audio sample format, when the audio type is AudioFormat::PCM.
@@ -107,9 +108,10 @@ enum class AudioSampleFormat : uint8_t {
   COUNT ///< Count of values in this enum type. @internal
 };
 
+/// Convert an AudioSampleFormat to a string
 string toString(AudioSampleFormat audioSampleFormat);
 
-class ContentParser; ///< to workaround not being able to forward declare istringstream.
+class ContentParser; // to workaround not being able to forward declare istringstream.
 class RecordFormat;
 
 /// Specification of an image content block.
@@ -120,7 +122,6 @@ class ImageContentBlockSpec {
 
   ImageContentBlockSpec() {}
 
-  /// Default copy constructor
   ImageContentBlockSpec(const ImageContentBlockSpec&) = default;
   ImageContentBlockSpec(
       const ImageContentBlockSpec& imageSpec,
@@ -419,7 +420,7 @@ class AudioContentBlockSpec {
   uint32_t sampleCount_;
 };
 
-/// Specification of a VRS record content block.
+/// \brief Specification of a VRS record content block.
 ///
 /// VRS records are described by RecordFormat as a succession of ContentBlocks,
 /// which each describe the data they contain.
@@ -490,8 +491,7 @@ class ContentBlock {
   /// Default copy assignment
   ContentBlock& operator=(const ContentBlock& rhs) = default;
 
-  /// Conversion to string, to store on disk & reconstruct later using constructor.
-  /// @Internal
+  /// Conversion to string, to store on disk & reconstruct later using constructor. @internal
   string asString() const;
 
   /// Get the content block size, if available or calculable.
@@ -538,7 +538,8 @@ class ContentBlock {
   AudioContentBlockSpec audioSpec_;
 };
 
-/// Description of the format of a VRS record as a succession of typed blocks of content.
+/// \brief Description of the format of a VRS record as a succession of typed blocks of content.
+///
 /// A RecordFormat description can be associated with each record type & record format version,
 /// so that we can tell how a particular type of VRS record looks like.
 ///
@@ -688,6 +689,8 @@ class RecordFormat {
 /// Map a pair of record type/format version to a record format, for a particular stream.
 typedef map<pair<Record::Type, uint32_t>, RecordFormat> RecordFormatMap;
 
+/// \brief Helper to identify a particular content block within a file.
+///
 /// A ContentBlock is the part of a record, a defined by RecordFormat.
 /// A ContentBlock is uniquely identified by this combo:
 /// - a recordable type id,

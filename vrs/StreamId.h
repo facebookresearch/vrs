@@ -11,6 +11,8 @@ namespace vrs {
 
 using std::string;
 
+/// \brief VRS stream type or class identifier enum.
+///
 /// VRS streams need a unique ID, so that VRS can differentiate the records of different streams.
 ///
 /// RecordableTypeId represent a specific hardware or logical device, or when teams have made
@@ -182,6 +184,8 @@ inline bool isARecordableClass(RecordableTypeId typeId) {
       typeId <= RecordableTypeId::LastRecordableClassId;
 }
 
+/// \brief VRS stream identifier class.
+///
 /// Identifier for a stream of records, containing a RecordableTypeId and an instance id, so that
 /// multiple streams of the same kind can be recorded side-by-side in a VRS file unambiguously.
 ///

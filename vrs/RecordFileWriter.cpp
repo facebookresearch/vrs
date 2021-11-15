@@ -661,8 +661,8 @@ uint64_t RecordFileWriter::collectOldRecords(RecordBatch& batch, double maxTimes
   return count;
 }
 
-// Helper class pointing to the next record in a device's list of records.
-// This class doesn't not modify the list, simply iterating on it.
+/// \brief Helper class pointing to the next record in a device's list of records.
+/// This class doesn't not modify the list, simply iterating on it.
 class RecordList {
  public:
   RecordList(const pair<StreamId, list<Record*>>& deviceRecords)

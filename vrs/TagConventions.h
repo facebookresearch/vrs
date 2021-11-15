@@ -11,6 +11,8 @@
 #include <vrs/RecordFileWriter.h>
 
 namespace vrs {
+
+/// Namespace for tag names following standardized conventions.
 namespace tag_conventions {
 
 // Overall identification, HW & SW independent

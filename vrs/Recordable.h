@@ -30,7 +30,8 @@ struct StreamTags {
   }
 };
 
-/// Class to override to implement a record producing device, or virtual device.
+/// \brief Class to override to implement a record producing device, or virtual device.
+///
 /// Recordables are meant to be attached to a single RecordFileWriter, that will write its records.
 /// Each instance maps one-to-one with a RecordFileWriter's record stream.
 class Recordable {

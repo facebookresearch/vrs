@@ -23,9 +23,11 @@ struct CurrentRecord {
   RecordReader* reader;
 };
 
-/// Class to handle reading the records of a VRS file, by attaching an instance to one or more
-/// streams of a RecordFileReader. This is the original way to handle VRS records, which is now
-/// probably better handled by the specialized RecordFormatStreamPlayer.
+/// \brief Class designed to receive record data when reading a VRS file.
+///
+/// Class to handle data read from records of a VRS file, by attaching an instance to one or more
+/// streams of a RecordFileReader. This base class is the bare-bones way to read VRS records.
+/// Reading records is now probably better handled by the specialized RecordFormatStreamPlayer.
 ///
 /// For each record, the stream player will be presented the record in a callback named
 /// processXXXHeader(), which will tell if the record should be read by returning true, in which

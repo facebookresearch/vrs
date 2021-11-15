@@ -9,7 +9,8 @@ namespace vrs {
 using std::string;
 using std::vector;
 
-/// The WriteFileHandler interface adds write operations to the FileHandler interface.
+/// \brief The WriteFileHandler interface adds write operations to the FileHandler interface.
+///
 /// There are two types of WriteFileHandler implementations. They might be able to:
 /// - create files, which which case the create() API should be implemented.
 /// - modify an existing file, in which case reopenForUpdates() gives write access.

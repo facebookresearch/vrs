@@ -1,7 +1,5 @@
 // Copyright (c) Facebook, Inc. and its affiliates. Confidential and proprietary.
 
-/** @file */
-
 #pragma once
 
 #include <cstdint>
@@ -56,8 +54,8 @@ enum class JsonFormatProfile {
   Public, ///< for public use cases, avoiding VRS internal names
 };
 
-/// When printing out a DataLayout as json, this class allows to specify what should be included
-/// in the generated json message.
+/// \brief When printing out a DataLayout as json, this class allows to specify what should be
+/// included in the generated json message.
 ///
 /// The default constructor provides the profile needed for the description of DataLayout stored
 /// in VRS files, to document a DataLayoutContentBlock. Therefore, this default profile should not
@@ -82,7 +80,7 @@ struct JsonFormatProfileSpec {
   JsonFormatProfileSpec(JsonFormatProfile profile);
 };
 
-/// The DataLayout class describes the data stored inside a DataLayoutContentBlock.
+/// \brief The DataLayout class describes the data stored inside a DataLayoutContentBlock.
 ///
 /// A DataLayout object is usually constructed using AutoDataLayout and AutoDataLayoutEnd helpers.
 /// This method allows the easy & safe definition of a DataLayout in the form of a struct.
@@ -189,7 +187,7 @@ class DataLayout {
 
 // Pack and use unit32_t because we're storing on disk, and size_t might be 32 or 64 bits
 #pragma pack(push, 1)
-  /// describes where the data of a variable size DataPiece is in the varData_ buffer.
+  /// Describes where the data of a variable size DataPiece is in the varData_ buffer.
   class IndexEntry {
    public:
     void setOffset(size_t offset) {
@@ -488,7 +486,7 @@ class DataLayout {
   DataLayout* mappedDataLayout_{};
 };
 
-/// When you just need a placeholder for a DataLayout...
+/// When you just need a placeholder for a DataLayout.
 class EmptyDataLayout : public DataLayout {
  public:
   EmptyDataLayout() {
@@ -496,6 +494,8 @@ class EmptyDataLayout : public DataLayout {
   }
 };
 
+/// \brief Specialized DataLayout class to declare a DataLayout in struct format.
+///
 /// To create an automatically generated DataLayout class, inherit from AutoDataLayout,
 /// then declare the specialized DataPiece objects as members,
 /// and finalize the DataLayout by using an AutoDataLayoutEnd object as the *last* class member.
@@ -523,6 +523,8 @@ class AutoDataLayoutEnd {
   AutoDataLayoutEnd();
 };
 
+/// \brief Specialiazed DataLayout for programmatic DataLayout generation.
+///
 /// Helper class to build a DataLayout manually, piece-by-piece.
 /// Make sure to call endLayout as soon as you're no longer adding pieces, to release a blobal lock.
 class ManualDataLayout : public DataLayout {
@@ -554,9 +556,10 @@ class ManualDataLayout : public DataLayout {
   bool layoutInProgress_;
 };
 
-/// Helper class to include DataLayout structs containing a set of DataPieceXXX and DataLayoutStruct
-/// while preserving the required unicity of the field names. Embedded DataPiece objects will have
-/// a name automatically prefixed with the name of the DataLayoutStruct, with a '/' in between.
+/// \brief Helper class to include DataLayout structs containing a set of DataPieceXXX and
+/// DataLayoutStruct while preserving the required unicity of the field names. Embedded DataPiece
+/// objects will have a name automatically prefixed with the name of the DataLayoutStruct, with a
+/// '/' in between.
 ///
 /// Example:
 ///
@@ -601,8 +604,9 @@ struct DataLayoutStruct {
     init();                                                                                   \
   }
 
-// Helper function to allocate optional fields only when it is enabled.
-// The OptionalFields must be a struct with vrs data piece fields and will be stored as unique_ptr.
+/// \brief Helper function to allocate optional fields only when it is enabled.
+///
+/// The OptionalFields must be a struct with vrs data piece fields and will be stored as unique_ptr.
 template <class OptionalFields>
 class OptionalDataPieces : public std::unique_ptr<OptionalFields> {
  public:

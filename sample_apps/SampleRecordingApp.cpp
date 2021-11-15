@@ -17,6 +17,9 @@
 
 using namespace vrs;
 using namespace vrs::DataLayoutConventions;
+using namespace vrs_sample_apps;
+
+namespace vrs_sample_apps {
 
 // Use your own clock source.
 double getTimestampSec() {
@@ -24,6 +27,8 @@ double getTimestampSec() {
   return duration_cast<duration<double>>(steady_clock::now().time_since_epoch()).count();
 }
 
+/// \brief Sample fake device showing how to produce records containing metadata and images.
+///
 /// Stream of images, that resembles how we've stored camera data for many projects
 /// A configuration record stores the camera image settings (resolution, pixel format...)
 /// and maybe some calibration data, etc.
@@ -99,6 +104,8 @@ class ImageStream : public Recordable {
   CameraStreamData data_;
 };
 
+/// \brief Sample fake device showing how to produce records containing audio data (no metadata).
+///
 /// Stream of audio blocks. Because audio samples can come at a high frequency, we collect in blocks
 /// that we save in records. Note that the size of these blocks may vary from record to record,
 /// even though in this sample, the records are always of the same size.
@@ -143,6 +150,8 @@ class AudioStream : public Recordable {
   }
 };
 
+/// \brief Sample fake device showing how to produce records containing metadata.
+///
 /// Stream of metadata of some sort.
 /// Both configuration & data records contain a single datalayout content block.
 class MotionStream : public Recordable {
@@ -192,9 +201,9 @@ class MotionStream : public Recordable {
   MotionStreamData data_;
 };
 
-int main() {
-  ::arvr::logging::setGlobalLogLevel(arvr::logging::Level::Info);
+} // namespace vrs_sample_apps
 
+int main() {
   // Make the file & attach the streams
   RecordFileWriter fileWriter;
   ImageStream imageStream;

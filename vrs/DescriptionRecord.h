@@ -12,6 +12,7 @@ namespace vrs {
 
 class FileHandler;
 
+/// \brief Helper functions to read & write description records.
 namespace DescriptionRecord {
 
 /// Description record format version. @internal

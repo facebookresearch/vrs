@@ -92,12 +92,13 @@ class RecordFormatRegistrar {
   map<RecordableTypeId, map<string, string>> legacyRecordFormats_;
 };
 
-/// Older VRS files written before DataLayout do not include RecordFormat & DataLayout definitions,
-/// of course, but often enough, records can easily be described with the right DataLayout
-/// definition, which allows an easier transition to DataLayout, as client code can be updated to
-/// use RecordFormatStreamPlayer to read older and newer VRS files alike.
+/// \brief System to inject record format & data layout definitions for files created without.
 ///
-/// For this, you need to inject RecordFormat and DataLayout definitions using this class.
+/// Early VRS files do not include RecordFormat & DataLayout definitions, but often enough, records
+/// can easily be described with the right RecordFormat and DataLayout definitions. This allows an
+/// easier transition to RecordFormat and DataLayout, as client code can be updated to rely entirely
+/// on RecordFormatStreamPlayer to read older and newer VRS files alike.
+/// For this, you can inject RecordFormat and DataLayout definitions using this class.
 class LegacyFormatsProvider {
  public:
   virtual ~LegacyFormatsProvider();

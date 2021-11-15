@@ -17,7 +17,8 @@ using std::ostream;
 using std::string;
 using std::vector;
 
-/// Map with string keys and type T.
+/// \brief DataPiece map container, with string keys and values of type T.
+///
 /// Read values are extracted from the DataLayout's buffer, (VRS records reading/decoding).
 /// Staged values are stored in the map<string, T> member of this class (VRS record creation).
 template <typename T>

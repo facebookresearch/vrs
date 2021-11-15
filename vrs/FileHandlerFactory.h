@@ -10,6 +10,8 @@
 
 namespace vrs {
 
+/// \brief A factory system for FileHandlers, allowing the runtime registration & usage of custom
+/// FileHandler implementations
 class FileHandlerFactory {
  public:
   static FileHandlerFactory& getInstance();

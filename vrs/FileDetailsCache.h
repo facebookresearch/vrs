@@ -16,7 +16,9 @@ using std::set;
 using std::string;
 using std::vector;
 
+/// Helper methods to read & write file details in a cache file.
 namespace FileDetailsCache {
+
 /// Create a VRS details file cache at a disk location, in one synchronous operation.
 /// @param cacheFile: path to the cache file to write.
 /// @param streamIds: stream IDs to save.
@@ -32,6 +34,7 @@ int write(
     const map<StreamId, StreamTags>& streamTags,
     const vector<IndexRecord::RecordInfo>& recordIndex,
     bool fileHasIndex);
+
 /// Read a VRS details file cache from a disk location.
 /// @param cacheFile: path to the cache file to read.
 /// @param outStreamIds: stream Ids read.
@@ -47,5 +50,7 @@ int read(
     map<StreamId, StreamTags>& outStreamTags,
     vector<IndexRecord::RecordInfo>& outRecordIndex,
     bool& outFileHasIndex);
+
 } // namespace FileDetailsCache
+
 } // namespace vrs

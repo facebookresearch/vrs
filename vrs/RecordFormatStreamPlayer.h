@@ -25,7 +25,7 @@ namespace DataLayoutConventions {
 class VideoFrameSpec;
 }
 
-/// VRS internal data structure, to hold various objects needed to decode a specific RecordFormat.
+/// \brief Internal data structure to hold various objects needed to decode a specific RecordFormat.
 /// @internal
 struct RecordFormatReader {
   double lastReadRecordTimestamp = std::numeric_limits<double>::max();
@@ -35,8 +35,9 @@ struct RecordFormatReader {
   vector<unique_ptr<DataLayout>> legacyDataLayouts;
 };
 
-/// Specialized StreamPlayer designed to handle records which format is managed by RecordFormat,
-/// which are a succession of typed content blocks described by ContentBlock objects.
+/// \brief Specialized StreamPlayer designed to handle records which format is managed by
+/// RecordFormat, which are a succession of typed content blocks described by ContentBlock objects.
+///
 /// For each of the record's content blocks a specific callback will be called depending on the type
 /// of content block. The content blocks are decoded in order, until they are all read, some
 /// decoding error occured, or a callback returns false.

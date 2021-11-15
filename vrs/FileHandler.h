@@ -23,6 +23,9 @@ enum class CachingStrategy {
   Streaming, ///< Automatically download data "forward", using last read-request as a hint.
 };
 
+/// \brief Generalized file descriptor class, allowing the efficient representation of complex
+/// file objects, maybe multi-chunks, with additional optional properties.
+///
 /// File specification struct, to describe a file object in more details than just a single path,
 /// possibly with multiple chunks, with a special file handler, an explicit file name (useful when
 /// the chunks are urls), and possibly a source uri.
@@ -127,10 +130,11 @@ inline void FileSpec::setExtra(const string& name, const T& value) {
   extras[name] = std::to_string(value);
 }
 
-/// Class to abstract VRS file system operations, to enable support for alternate storage methods,
-/// in particular network/cloud storage implementation.
-/// For simplicity, in this documentation, we will make references to a "file", but it might be a
-/// data blob on a network storage.
+/// \brief Class to abstract VRS file system operations, to enable support for alternate storage
+/// methods, in particular network/cloud storage implementations.
+///
+/// For simplicity, in this documentation, we will references "files", but they might be one or more
+/// data blobs on a network storage.
 ///
 /// VRS file users probably only need to use RecordFileReader & RecordFileWriter, but they have the
 /// option to use FileHandler directly to access files stored on remote file systems, same as VRS.
@@ -334,6 +338,7 @@ class FileHandler {
   string fileHandlerName_;
 };
 
+/// Helper class to temporarily modify a FileHandler's caching strategy.
 class TemporaryCachingStrategy {
  public:
   TemporaryCachingStrategy(FileHandler& handler, CachingStrategy temporaryStrategy)

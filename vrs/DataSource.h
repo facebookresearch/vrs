@@ -16,7 +16,8 @@ using std::vector;
 
 class DataLayout;
 
-/// Class possibly referencing a DataLayout object, and abstracting the interactions for DataSource.
+/// \brief Class referencing a DataLayout object, and abstracting the interactions for DataSource.
+///
 /// Only the constructor is meant to be used by code outside of DataSource.
 /// The default constructor holds no data.
 /// Do not change the underlying DataLayout until the DataLayoutChunk is destroyed. This is usually
@@ -40,6 +41,8 @@ struct DataLayoutChunk {
   const size_t layoutVariableSize_{};
 };
 
+/// \brief Elementary part of a DataSource for a simple block of memory.
+///
 /// Class possibly referencing a buffer of bytes, specified in 4 possible different ways:
 /// - a raw pointer + size.
 /// - a trivially copyable object of type T.
@@ -92,7 +95,7 @@ class DataSourceChunk {
   const size_t size_;
 };
 
-/// Class to represent a data chunk composed of multiple smaller
+/// \brief Class to represent a data chunk composed of multiple smaller
 /// chunks that each have fixed offsets from each other in memory.
 class NonContiguousChunk final : public vrs::DataSourceChunk {
  public:
@@ -116,6 +119,8 @@ class NonContiguousChunk final : public vrs::DataSourceChunk {
   const std::size_t strideInBytes_;
 };
 
+/// \brief A class referencing data to be captured in a record at creation.
+///
 /// VRS records data content are passed to VRS using a single DataSource object.
 ///
 /// DataSource objects point to data to be copied in a record's buffer when createRecord() is called

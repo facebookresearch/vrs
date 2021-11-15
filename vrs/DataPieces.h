@@ -22,14 +22,15 @@ using std::string;
 /// Forward declaration of a mystery type to avoid exposing a third party json library.
 struct JsonWrapper;
 
-/// Abstract class representing a piece of information part of a DataLayout.
+/// \brief Abstract class representing a piece of information part of a DataLayout.
+///
 /// DataPiece objets have a type (DataPieceType) and label (a text name),
 /// which together are enough to identify uniquely a DataPiece of a particular DataLayout.
 /// See DataLayout for more details.
 class DataPiece {
  public:
-  /// structs declared here but undefined, so they can include RapidJson definitions
-  /// that we do not want to spread in all headers
+  /// \brief Forward declaration, so we can pass RapidJson definitions in headers,
+  /// without having to include the actual RapidJson headers everywhere.
   struct MakerBundle;
 
  protected:
@@ -216,9 +217,11 @@ inline const string& getTypeName<string>() {
   return sName;
 };
 
-// Data read from disk might not be aligned as the architecture would like it,
-// which can be extremely slow or even crash on ARM7.
-// These helper methods make the code safe & readable.
+/// \brief Template to represent some POD object without memory alignment.
+///
+/// Data read from disk might not be aligned as the architecture would like it,
+/// which can be extremely slow and even crash on some architectures (ARM7).
+/// These helper methods make the code safe & readable.
 #pragma pack(push, 1) // tells the compiler that the data might not be aligned
 template <class T>
 struct UnalignedValue {
@@ -226,10 +229,13 @@ struct UnalignedValue {
 };
 #pragma pack(pop)
 
+/// Helper to make dereferencing a pointer to read an unaligned POD object safe.
 template <class T>
 T readUnaligned(const void* ptr) {
   return reinterpret_cast<const UnalignedValue<T>*>(ptr)->value;
 }
+
+/// Helper to make dereferencing a pointer to write an unaligned POD object safe.
 template <class T>
 void writeUnaligned(void* ptr, const T& value) {
   reinterpret_cast<UnalignedValue<T>*>(ptr)->value = value;

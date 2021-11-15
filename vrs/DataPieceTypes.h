@@ -12,10 +12,13 @@ using std::size_t;
 
 #pragma pack(push, 1)
 
-/// Shameless fake bool class, to workaround vector<bool> NOT being a regular container.
+/// \brief Substitude for bool POD type, which can be used safely in DataPiece templates.
+///
+/// Shamelessly fake bool class, to workaround vector<bool> NOT being a regular container.
 /// Should behave like a bool, except that vector<Bool> will be a regular vector.
-/// vector<bool> has no data() method, which means we can't use regular template code.
+/// vector<bool> has no data() method, which means it can't be used with DataPiece template code.
 /// vector<Bool> does behave like other vector<T> classes. Yes, it's silly.
+/// https://stackoverflow.com/questions/17794569/why-isnt-vectorbool-a-stl-container
 class Bool {
  public:
   Bool(bool value = false) : value_(value) {}
@@ -49,7 +52,8 @@ class Bool {
   bool value_;
 };
 
-/// Class to represent points of 2, 3 and 4 dimensions, each for either int32_t, float or double.
+/// \brief POD type for of 2, 3 and 4 dimensions points, each for either int32_t, float or double.
+///
 /// Note how the coordinates can be accessed using x(), y(), z() and w() convenience methods, but
 /// that the z() and w() methods are only available for larger dimensions.
 template <typename T, size_t N>

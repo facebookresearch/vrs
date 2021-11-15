@@ -33,7 +33,7 @@ using std::string;
 class Record;
 class Recordable;
 
-/// private namespace
+/// Namespace for RecordFileWriter's private implementation classes.
 namespace RecordFileWriter_ {
 struct WriterThreadData;
 struct PurgeThreadData;
@@ -47,7 +47,7 @@ enum class ThreadRole { Writer, Purge, Compression };
 /// Arguments are currentThread, ThreadRole, threadIndex (Only used for Compression)
 using InitCreatedThreadCallback = std::function<void(std::thread&, ThreadRole, int)>;
 
-/// Class to create a VRS file.
+/// \brief The class to create VRS files.
 ///
 /// There are different strategies to write a VRS file:
 ///

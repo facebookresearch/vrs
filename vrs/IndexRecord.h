@@ -24,6 +24,7 @@ class ProgressLogger;
 
 struct DiskRecordIndexStruct;
 
+/// \brief Namespace for index record related classes.
 namespace IndexRecord {
 
 enum {
@@ -35,6 +36,7 @@ enum {
 
 #pragma pack(push, 1)
 
+/// \brief Helper class to store StreamID objects on disk.
 struct DiskStreamId {
   DiskStreamId() : typeId(static_cast<int32_t>(RecordableTypeId::Undefined)), instanceId(0) {}
   DiskStreamId(StreamId streamId)
@@ -56,6 +58,7 @@ struct DiskStreamId {
   }
 };
 
+/// \brief Helper class to store details about a single VRS record on disk.
 struct DiskRecordInfo {
   DiskRecordInfo() {}
   DiskRecordInfo(double timestamp, uint32_t recordSize, StreamId streamId, Record::Type recordType)
@@ -85,6 +88,7 @@ struct DiskRecordInfo {
 
 #pragma pack(pop)
 
+/// \brief Helper class to hold the details about a single VRS record in memory.
 struct RecordInfo {
   RecordInfo() {}
   RecordInfo(double timestamp, int64_t fileOffset, StreamId streamId, Record::Type recordType)
@@ -108,6 +112,7 @@ struct RecordInfo {
   }
 };
 
+/// \brief Helper class to write VRS index records.
 class Writer {
  public:
   Writer(FileFormat::FileHeader& fileHeader)
@@ -167,6 +172,7 @@ class Writer {
   size_t writtenIndexCount_; // how many index entries have been written in the partial index
 };
 
+/// \brief Helper class to read VRS index records.
 class Reader {
  public:
   Reader(

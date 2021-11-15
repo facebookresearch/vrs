@@ -16,8 +16,11 @@
 
 using namespace vrs;
 using namespace vrs::DataLayoutConventions;
+using namespace vrs_sample_apps;
 
-/// Image stream reader
+namespace vrs_sample_apps {
+
+/// Image stream reader showing how to read records from a typical stream containing images.
 class ImageStreamPlayer : public RecordFormatStreamPlayer {
  public:
   bool onDataLayoutRead(const CurrentRecord& record, size_t blockIndex, DataLayout& dl) override {
@@ -74,7 +77,7 @@ class ImageStreamPlayer : public RecordFormatStreamPlayer {
   size_t imageIndex = 0;
 };
 
-/// Audio stream reader
+/// Audio stream reader showing how to read records from a typical stream containing audio blocks.
 class AudioStreamPlayer : public RecordFormatStreamPlayer {
  public:
   bool onAudioRead(const CurrentRecord& record, size_t blockIdx, const ContentBlock& cb) override {
@@ -102,7 +105,7 @@ class AudioStreamPlayer : public RecordFormatStreamPlayer {
   size_t audioBlockIndex = 0;
 };
 
-/// Motion data reader
+/// Stream reader showing how to read records containing only metadata information in a DataLayout.
 class MotionStreamPlayer : public RecordFormatStreamPlayer {
  public:
   bool onDataLayoutRead(const CurrentRecord& record, size_t blockIndex, DataLayout& dl) override {
@@ -135,9 +138,9 @@ class MotionStreamPlayer : public RecordFormatStreamPlayer {
   size_t motionRecordCount = 0;
 };
 
-int main() {
-  ::arvr::logging::setGlobalLogLevel(arvr::logging::Level::Info);
+} // namespace vrs_sample_apps
 
+int main() {
   RecordFileReader reader;
   int status = reader.openFile(os::getHomeFolder() + kSampleFileName);
   if (status != 0) {

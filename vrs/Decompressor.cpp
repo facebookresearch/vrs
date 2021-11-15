@@ -24,6 +24,7 @@ namespace vrs {
 static size_t kMaxInputBufferSize = 2 * 1024 * 1024; // 2 MB
 static size_t kMinInputBufferSize = 4 * 1024;
 
+/// \brief Decompressor for lz4 data.
 class Decompressor::Lz4Decompressor {
  public:
   Lz4Decompressor() {
@@ -45,6 +46,7 @@ class Decompressor::Lz4Decompressor {
   LZ4F_decompressOptions_t options_ = {};
 };
 
+/// \brief Decompressor for zstd data.
 class Decompressor::ZstdDecompressor {
  public:
   ZstdDecompressor() {

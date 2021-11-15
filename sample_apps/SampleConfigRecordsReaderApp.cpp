@@ -17,6 +17,7 @@
 using namespace std;
 using namespace vrs;
 using namespace vrs::DataLayoutConventions;
+using namespace vrs_sample_apps;
 
 /// Sample app, to show how to get data from configuration records, maybe to setup a replay.
 /// Ideally, such data would have been stored in stream tags, which are all available when the file
@@ -25,8 +26,6 @@ using namespace vrs::DataLayoutConventions;
 /// So here, you open the file,
 
 int main() {
-  ::arvr::logging::setGlobalLogLevel(arvr::logging::Level::Info);
-
   RecordFileReader reader;
   int status = reader.openFile(os::getHomeFolder() + kSampleFileName);
   if (status != 0) {

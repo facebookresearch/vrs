@@ -75,6 +75,8 @@ enum ErrorCode : int {
   DISKFILE_PARTIAL_WRITE_ERROR,
 };
 
+/// \brief Core VRS error domains.
+///
 /// Errors can come from VRS, or a helper library like LZ4, ZSTD, or a file handler's sub-system.
 /// There is no telling if these error codes will collide with the OS', VRS' or each other.
 /// Error domains create a safe mechanism to report any of these errors as an int,

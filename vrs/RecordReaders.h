@@ -10,7 +10,7 @@ namespace vrs {
 
 class FileHandler;
 
-/// Abstract VRS internal helper class to read & (if necessary) uncompress records.
+/// \brief Abstract VRS internal helper class to read & (if necessary) uncompress records.
 /// @internal
 class RecordReader {
  public:
@@ -71,14 +71,14 @@ class RecordReader {
   uint32_t remainingUncompressedSize_;
 };
 
-/// RecordReader specialized to read uncompressed records. For VRS internal usage only.
+/// \brief RecordReader specialized to read uncompressed records. For VRS internal usage only.
 /// @internal
 class UncompressedRecordReader : public RecordReader {
  public:
   int read(DataReference& destination, uint32_t& outReadSize) override;
 };
 
-/// RecordReader specialized to read compressed records. For VRS internal usage only.
+/// \brief RecordReader specialized to read compressed records. For VRS internal usage only.
 /// @internal
 class CompressedRecordReader : public RecordReader {
  public:

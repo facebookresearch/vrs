@@ -14,7 +14,7 @@
 
 using namespace vrs;
 
-namespace {
+namespace vrs_sample_code {
 
 using DataLayoutConventions::ImageSpecType;
 
@@ -31,7 +31,7 @@ using DataLayoutConventions::ImageSpecType;
  *
  */
 
-// Definition of the configuration records' metadata
+/// Definition of the configuration records' metadata.
 class MyCameraDataLayoutConfiguration : public AutoDataLayout {
  public:
   // Spec of a raw image, stored in data records (controlled by most recent config record)
@@ -48,7 +48,7 @@ class MyCameraDataLayoutConfiguration : public AutoDataLayout {
   AutoDataLayoutEnd endLayout;
 };
 
-// Definition of the data records' metadata
+/// Definition of the data records' metadata.
 class MyCameraDataLayoutData : public AutoDataLayout {
  public:
   // Additional data provided with each frame
@@ -100,6 +100,7 @@ class MyCameraDataLayoutData : public AutoDataLayout {
   AutoDataLayoutEnd endLayout;
 };
 
+/// Definition of some obsolete metadata.
 class MyCameraDataLayoutLegacyData : public AutoDataLayout {
  public:
   // Additional (made-up) data that used to be present
@@ -109,7 +110,7 @@ class MyCameraDataLayoutLegacyData : public AutoDataLayout {
   AutoDataLayoutEnd endLayout;
 };
 
-// class to generate records for this device
+/// Class to generate a stream of sample records.
 class MyCameraRecordable : public Recordable {
   // Record format version numbers describe the overall record format.
   // Note DataLayout field changes do *not* require to change the record format version.
@@ -171,7 +172,7 @@ class MyCameraRecordable : public Recordable {
   MyCameraDataLayoutData data_;
 };
 
-// class to consume records read from a file
+/// Class to consume records read from a file
 class MyCameraStreamPlayer : public RecordFormatStreamPlayer {
   bool onDataLayoutRead(const CurrentRecord& record, size_t blockIndex, DataLayout& readData)
       override {
@@ -229,4 +230,4 @@ class MyCameraStreamPlayer : public RecordFormatStreamPlayer {
   }
 };
 
-} // namespace
+} // namespace vrs_sample_code

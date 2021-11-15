@@ -15,7 +15,8 @@ using std::list;
 
 class DataLayout;
 
-/// VRS internal class to manage the records of a specific Recordable.
+/// \brief VRS internal class to manage the records of a specific Recordable after their creation.
+///
 /// Each Recordable has its own RecordManager to minize (ideally avoid) inter-thread locking.
 /// All timestamps are in seconds since some arbitrary point in time, and must be using the same
 /// time domain for the entire VRS file.
@@ -89,7 +90,7 @@ class RecordManager {
   /// allocated buffer without having to reallocate memory. See setRecordBufferOverAllocationMins().
   /// @param requestedSise: number of bytes needed.
   /// @return Number of bytes that should be allocated.
-  /// @internal: only VRS itself should need to use this API.
+  /// @internal only VRS itself should need to use this API.
   size_t getAdjustedRecordBufferSize(size_t requestedSize);
 
   /// Get the count of recycled records are currently waiting to be reused.

@@ -16,6 +16,7 @@ namespace DataLayoutConventions {
 constexpr const char* kNextContentBlockSize = "next_content_block_size";
 using ContentBlockSizeType = uint32_t;
 
+/// DataLayout only containing the size of the content block following.
 class NextContentBlockSizeSpec : public AutoDataLayout {
  public:
   DataPieceValue<ContentBlockSizeType> nextContentBlockSize{kNextContentBlockSize};
@@ -42,6 +43,8 @@ constexpr const char* kImageCodecQuality = "image_codec_quality";
 /// Data type to use for the kImageXXX fields above.
 using ImageSpecType = uint32_t;
 
+/// \brief DataLayout definitions use to describe what's in an image content block.
+///
 /// These names and types are a convention that enables us to find image block spec within
 /// a DataLayout block, which is either before the image content block in the same record,
 /// or in the last Configuration record. Note that once a configuration *location* is found,
@@ -87,6 +90,7 @@ constexpr const char* kImageKeyFrameTimeStamp = "image_key_frame_timestamp";
 /// 0 = this frame is a key frame, 1 = the previous frame was the last seen key frame, etc...
 constexpr const char* kImageKeyFrameIndex = "image_key_frame_index";
 
+/// DataLayout definitions use to describe a video image content block.
 class VideoFrameSpec : public AutoDataLayout {
  public:
   DataPieceValue<double> keyFrameTimestamp{kImageKeyFrameTimeStamp};
@@ -110,6 +114,8 @@ constexpr const char* kAudioSampleRate = "audio_sample_rate";
 /// DataLayout convention name for the number of samples in the content block.
 constexpr const char* kAudioSampleCount = "audio_sample_count";
 
+/// \brief DataLayout definitions use to describe what's in an audio content block.
+///
 /// These names and types are a convention that enables us to find audio block spec within
 /// a DataLayout block, which is either before the audio content block in the same record,
 /// or in the last Configuration record. Note that once a configuration *location* is found,

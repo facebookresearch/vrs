@@ -30,9 +30,9 @@ using std::vector;
 class DataLayout;
 class StreamPlayer;
 
-/// \brief The RecordFileReader class
-/// Implementation for reading a VRS file.
-/// Method:
+/// \brief The class to read VRS files.
+///
+/// Recipe:
 /// - open a VRS file using openFile().
 /// - get info about the VRS file using getTags().
 /// (optional: the writer may provide recording context info).

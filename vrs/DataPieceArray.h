@@ -17,6 +17,8 @@ using std::ostream;
 using std::string;
 using std::vector;
 
+/// \brief Fixed size array of POD values.
+///
 /// Array of type T and fixed size. The array is stored in DataLayout's fixed size buffer.
 /// The size of the array is defined at construction and may not change.
 template <typename T>

@@ -16,8 +16,7 @@
 
 using namespace std;
 
-/// RecordFormat parsing helper class
-/// @internal
+/// RecordFormat string parsing helper class. @internal
 class vrs::ContentParser {
  public:
   ContentParser(const string& parseString, char delim) : is_(parseString), delim_{delim} {

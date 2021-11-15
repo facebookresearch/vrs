@@ -9,7 +9,8 @@
 
 namespace vrs {
 
-/// Decompressor helper class, which decompresses data at the target location.
+/// \brief Decompressor helper class, to decompresses data at a target location.
+///
 /// The data to decompress must be in the internal buffer. Use getBuffer(size) to allocate memory
 /// for the internal buffer reserving at least size bytes and get a pointer where to write the data,
 /// probably reading from disk directly in that internal buffer.

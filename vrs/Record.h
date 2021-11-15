@@ -24,7 +24,9 @@ enum class CompressionType : uint8_t {
   Zstd, ///< zstd compression.
 };
 
-/// Record are containers of data, captured at a specific point in time (their timestamp).
+/// \brief Essential VRS class holding a record's details and payload in memory during creation.
+///
+/// Record are containers for data captured at a specific point in time (their timestamp).
 ///
 /// Records can only be created using Recordable::createRecord(), and are then owned and managed
 /// by the recordable's private RecordManager.

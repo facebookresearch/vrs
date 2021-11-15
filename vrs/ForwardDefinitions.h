@@ -4,7 +4,7 @@
 
 #include <cstdint>
 
-/// Small set of forward declarations to reduce header inclusions
+// Small set of forward declarations to reduce header inclusions
 
 namespace vrs {
 

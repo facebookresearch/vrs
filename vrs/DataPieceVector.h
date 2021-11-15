@@ -15,7 +15,8 @@ using std::ostream;
 using std::string;
 using std::vector;
 
-/// Vector of type T and variable size.
+/// \brief Vector of type T and variable size.
+///
 /// Read values are extracted from the DataLayout's buffer, (VRS records reading/decoding).
 /// Staged values are stored in the vector<T> member of this class (VRS record creation).
 template <typename T>
@@ -190,7 +191,7 @@ class DataPieceVector : public DataPiece {
   vector<T> defaultValues_;
 };
 
-// Specializations declaration, required here for gcc Android.
+// Specializations declaration, required here for come compilers.
 template <>
 void DataPieceVector<string>::stage(const string* values, size_t count);
 template <>

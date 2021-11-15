@@ -250,7 +250,8 @@ class DataPieceValue : public DataPiece {
   unique_ptr<T> defaultValue_;
 };
 
-/// Helper class to store enums more easily.
+/// \brief DataPieceValue specialization class to store enums more conveniently and safely.
+///
 /// This DataPiece type is very light layer on top of DataPieceValue.
 /// DataPieceEnum provides automatic casting between an enum type and an explicit POD type.
 /// DataPieceEnum is safer to use, because it gives explicit control over the numeric type used to

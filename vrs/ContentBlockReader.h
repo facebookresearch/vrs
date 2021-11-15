@@ -17,7 +17,8 @@ class ContentBlock;
 class RecordFormatStreamPlayer;
 struct RecordFormatReader;
 
-/// Abstract class to handle the interpretation of a record format's content block.
+/// \brief Abstract class to handle the interpretation of a record format's content block.
+///
 /// Specialized versions of this class will handle specific types of content blocks.
 /// @see RecordFormat
 /// @see ContentBlock
@@ -51,7 +52,7 @@ class ContentBlockReader {
   unique_ptr<DataLayoutConventions::NextContentBlockSizeSpec> contentBlockSizeSpec_;
 };
 
-/// Specialized version of ContentBlockReader to handle a content block containing an image.
+/// \brief Specialized version of ContentBlockReader to handle content blocks containing an image.
 /// @internal
 class ImageBlockReader : public ContentBlockReader {
  public:
@@ -68,7 +69,7 @@ class ImageBlockReader : public ContentBlockReader {
   unique_ptr<DataLayoutConventions::VideoFrameSpec> videoFrameSpec_;
 };
 
-/// Specialized version of ContentBlockReader to handle a content block containing audio data.
+/// \brief Specialized version of ContentBlockReader to handle content blocks containing audio data.
 /// @internal
 class AudioBlockReader : public ContentBlockReader {
  public:
@@ -90,8 +91,8 @@ class AudioBlockReader : public ContentBlockReader {
   DataLayoutConventions::AudioSpec audioSpec_;
 };
 
-/// Specialized version of ContentBlockReader to handle a content block containing custom data.
-/// Custom data is data which format/content is not known to VRS.
+/// \brief Specialized version of ContentBlockReader to handle a content block containing custom
+/// data. Custom data is data which format/content is not known to VRS.
 /// @internal
 class CustomBlockReader : public ContentBlockReader {
  public:
@@ -101,8 +102,8 @@ class CustomBlockReader : public ContentBlockReader {
   bool readBlock(const CurrentRecord&, RecordFormatStreamPlayer&) override;
 };
 
-/// Specialized version of ContentBlockReader to handle data that could not be handled by another
-/// better suited ContentBlockReader. It's the fallback handler.
+/// \brief Specialized version of ContentBlockReader to handle data that could not be handled by
+/// another better suited ContentBlockReader. It's the fallback handler.
 /// @internal
 class UnsupportedBlockReader : public ContentBlockReader {
  public:
@@ -112,7 +113,8 @@ class UnsupportedBlockReader : public ContentBlockReader {
   bool readBlock(const CurrentRecord&, RecordFormatStreamPlayer&) override;
 };
 
-/// Specialized version of ContentBlockReader to handle an empty content block.
+/// \brief Specialized version of ContentBlockReader to handle an empty content block.
+///
 /// This can happen, when a variable size block is empty, or when a content block ends up being
 /// a placeholder.
 /// @internal
@@ -124,7 +126,7 @@ class EmptyBlockReader : public ContentBlockReader {
   bool readBlock(const CurrentRecord&, RecordFormatStreamPlayer&) override;
 };
 
-/// Specialized version of ContentBlockReader to handle DataLayout blocks.
+/// \brief Specialized version of ContentBlockReader to handle DataLayout blocks.
 /// @internal
 class DataLayoutBlockReader : public ContentBlockReader {
  public:

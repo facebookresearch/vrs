@@ -15,7 +15,8 @@ using std::min;
 using std::ostream;
 using std::string;
 
-/// For variable length string.
+/// \brief DataPiece for variable length string.
+///
 /// Written values are stored in the string member of this class (VRS record creation)
 /// Read values are extracted from the DataLayout's buffer, (VRS records reading/decoding)
 class DataPieceString : public DataPiece {

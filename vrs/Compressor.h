@@ -13,7 +13,7 @@
 
 namespace vrs {
 
-/// VRS Compression setting.
+/// \brief VRS Compression setting.
 ///
 /// VRS records are compressed by default, using the LZ4_FAST setting, which is an extremely fast
 /// lossless compression.
@@ -57,9 +57,10 @@ Enum toEnum(const std::string& name);
 template <>
 CompressionPreset toEnum<CompressionPreset>(const std::string& presetName);
 
-/// Helper class to compress data using lz4 presets. You can switch between presets at no cost.
-/// If presets don't work well enough with your data, you can easily experiment with new settings
-/// and add your own preset to CompressionPreset.
+/// \brief Helper class to compress data using lz4 or zstd presets.
+///
+/// You can switch between presets at no cost. If presets don't work well enough with your data, you
+/// can easily experiment with new settings and add your own preset to CompressionPreset.
 /// @internal
 class Compressor {
  public:

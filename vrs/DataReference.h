@@ -12,12 +12,10 @@ using std::vector;
 
 class FileHandler;
 
-/// Container of data container references, to tell VRS where to write data when reading a record.
-/// It's essentially a wrapper for two pairs of pointers to a buffer & the size of that buffer,
-/// which may both be null.
+/// \brief Container of data pointers, to tell where to write data when reading a record.
 ///
-/// Note: this class used to be used both for reading & writing record, but the record creation side
-/// has now been entirely replaced with DataSource, which adds support for DataLayout.
+/// This is essentially a wrapper for two pairs of pointers to a buffer and the size of that buffer,
+/// both of which may be null.
 ///
 /// Examples:
 ///
