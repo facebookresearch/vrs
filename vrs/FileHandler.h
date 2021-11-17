@@ -292,8 +292,12 @@ class FileHandler {
   /// - section or entire segments may be skipped entirely
   /// Warning: If a read request is made out of order (backward), or outside the sequence, the
   /// predictive cache may be disabled, in part or entirely.
+  /// @param clearSequence: Flag on whether to cancel any pre-existing custom read sequence upon
+  /// caching starts.
   /// @return True if the file handler support custom read sequences.
-  virtual bool prefetchReadSequence(const std::vector<std::pair<size_t, size_t>>& /* sequence */) {
+  virtual bool prefetchReadSequence(
+      const std::vector<std::pair<size_t, size_t>>& sequence,
+      bool clearSequence = true) {
     return false;
   }
 

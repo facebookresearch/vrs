@@ -408,7 +408,8 @@ int RecordFileReader::clearStreamPlayers() {
 }
 
 bool RecordFileReader::prefetchRecordSequence(
-    const vector<const IndexRecord::RecordInfo*>& records) {
+    const vector<const IndexRecord::RecordInfo*>& records,
+    bool clearSequence) {
   if (!XR_VERIFY(endOfUserRecordsOffset_ > static_cast<int64_t>(recordHeaderSize_)) ||
       !file_->isRemoteFileSystem()) {
     return false; // don't even try for local file systems!
@@ -450,7 +451,7 @@ bool RecordFileReader::prefetchRecordSequence(
       }
     }
   }
-  return file_->prefetchReadSequence(segments);
+  return file_->prefetchReadSequence(segments, clearSequence);
 }
 
 bool RecordFileReader::hasIndex() const {

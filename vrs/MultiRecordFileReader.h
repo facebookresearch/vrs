@@ -231,8 +231,12 @@ class MultiRecordFileReader {
   /// - if you read a single record out of the sequence, the prefetch list will be cleared.
   /// You may call this method as often as you like, and any previous read sequence will be cleared,
   /// but whatever is already in the cache will remain.
+  /// @param clearSequence: Flag on whether to cancel any pre-existing custom read sequence upon
+  /// caching starts.
   /// @return True if the file handler backend supports this request, false if it was ignored.
-  bool prefetchRecordSequence(const vector<const IndexRecord::RecordInfo*>& records);
+  bool prefetchRecordSequence(
+      const vector<const IndexRecord::RecordInfo*>& records,
+      bool clearSequence = true);
 
   /// If the underlying file handler caches data on reads, purge its caches to free memory.
   /// Sets the caching strategy to Passive, and clears any pending read sequence.

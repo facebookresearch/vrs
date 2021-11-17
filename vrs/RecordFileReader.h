@@ -109,8 +109,12 @@ class RecordFileReader {
   /// - if you read a single record out of the sequence, the prefetch list will be cleared.
   /// You may call this method as often as you like, and any previous read sequence will be cleared,
   /// but whatever is already in the cache will remain.
+  /// @param clearSequence: Flag on whether to cancel any pre-existing custom read sequence upon
+  /// caching starts.
   /// @return True if the file handler backend supports this request, false if it was ignored.
-  bool prefetchRecordSequence(const vector<const IndexRecord::RecordInfo*>& records);
+  bool prefetchRecordSequence(
+      const vector<const IndexRecord::RecordInfo*>& records,
+      bool clearSequence = true);
 
   /// Read a file's record. Preferred way to read records.
   /// @param recordInfo: RecordInfo reference of the record to read.

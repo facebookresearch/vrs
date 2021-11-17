@@ -379,7 +379,8 @@ CachingStrategy MultiRecordFileReader::getCachingStrategy() const {
 }
 
 bool MultiRecordFileReader::prefetchRecordSequence(
-    const vector<const IndexRecord::RecordInfo*>& records) {
+    const vector<const IndexRecord::RecordInfo*>& records,
+    bool clearSequence) {
   if (!isOpened_) {
     return false;
   }
@@ -394,7 +395,7 @@ bool MultiRecordFileReader::prefetchRecordSequence(
     readerPrefetchSequenceMap[reader].emplace_back(prefetchRecord);
   }
   for (auto& [reader, prefetchSequence] : readerPrefetchSequenceMap) {
-    if (!reader->prefetchRecordSequence(prefetchSequence)) {
+    if (!reader->prefetchRecordSequence(prefetchSequence, clearSequence)) {
       return false;
     }
   }
