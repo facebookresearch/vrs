@@ -84,7 +84,7 @@ We also plan on having a VRS Users group dedicated on discussing VRS usage. Stay
 
 # Contributing
 
-Contributions are welcome, in particular around open source build instructions for other platforms, and tools.
+We welcome contributions! See [CONTRIBUTING](CONTRIBUTING.md) for details on how to get started, and our [code of conduct](CODE_OF_CONDUCT.md).
 
 # Future Plans
 In this first release of VRS for open source, only the core components of VRS are provided. We are working on open sourcing more code:
