@@ -1,0 +1,31 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build VRS on ubuntu-latest
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install cmake ninja-build ccache libboost-all-dev libfmt-dev
+          sudo apt-get install libcereal-dev liblz4-dev libzstd-dev libxxhash-dev libgtest-dev
+      - name: Configure
+        shell: bash
+        run: |
+          mkdir build
+          cmake -S . -B build '-GCodeBlocks - Ninja'
+      - name: Build and Test
+        shell: bash
+        run: |
+          cd build
+          ninja all
+          ctest -j8
