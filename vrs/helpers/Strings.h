@@ -14,7 +14,8 @@
 /*
  * Compatibility helpers along with non-fully standardized string utilities.
  */
-namespace vrs::helpers {
+namespace vrs {
+namespace helpers {
 
 // strcasecmp & strncasecmp are named _stricmp & _strnicmp on Windows...
 #if IS_WINDOWS_PLATFORM()
@@ -71,4 +72,5 @@ std::string humanReadableTimestamp(double timestamp);
 /// for instance, you can't differentiate between "\n" and string that would contain a newline char.
 std::string make_printable(const std::string& str);
 
-} // namespace vrs::helpers
+} // namespace helpers
+} // namespace vrs

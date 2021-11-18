@@ -8,7 +8,9 @@
 #include <mutex>
 #include <string>
 
-namespace vrs::os {
+namespace vrs {
+namespace os {
+
 /// EventChannel represents a type of event, which can dispatch instances of event.
 class EventChannel {
  public:
@@ -87,4 +89,5 @@ class EventChannel {
   std::condition_variable wakeupCondition_; // notify when pendingWakeupsCount_ becomes non-zero
 };
 
-} // namespace vrs::os
+} // namespace os
+} // namespace vrs

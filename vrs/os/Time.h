@@ -6,7 +6,8 @@
 
 /// VRS internal API. DO NOT USE THESE API OUTSIDE OF VRS. Make your own time domain decision.
 
-namespace vrs::os {
+namespace vrs {
+namespace os {
 
 /// Time in seconds since some unspecified point in time, which might be the last boot time.
 /// This time is guaranteed to be monotonous throughout the run of the app, and really measure
@@ -26,4 +27,5 @@ int64_t getTimestampMs();
 /// Therefore, using double is misleading & dangerous.
 int64_t getCurrentTimeSecSinceEpoch();
 
-} // namespace vrs::os
+} // namespace os
+} // namespace vrs

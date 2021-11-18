@@ -10,7 +10,9 @@
 #error "DEFAULT_LOG_CHANNEL must be defined before including <logging/Log.h>"
 #endif // DEFAULT_LOG_CHANNEL
 
-namespace vrs::logging {
+namespace vrs {
+namespace logging {
+
 enum class Level {
   Error = 0,
   Warning = 1,
@@ -19,7 +21,9 @@ enum class Level {
 };
 
 void log(Level level, const char* channel, const std::string& message);
-} // namespace vrs::logging
+
+} // namespace logging
+} // namespace vrs
 
 #define XR_LOG_DEFAULT(level, ...) log(level, DEFAULT_LOG_CHANNEL, fmt::format(__VA_ARGS__))
 

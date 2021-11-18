@@ -6,7 +6,8 @@
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-namespace vrs::os {
+namespace vrs {
+namespace os {
 
 bool Semaphore::timedWait(const double timeSec) {
   using namespace boost::posix_time;
@@ -16,6 +17,7 @@ bool Semaphore::timedWait(const double timeSec) {
       microsec_clock::universal_time() + seconds(integralTime) + microseconds(microSeconds));
 }
 
-} // namespace vrs::os
+} // namespace os
+} // namespace vrs
 
 #endif

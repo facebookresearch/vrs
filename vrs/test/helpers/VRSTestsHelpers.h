@@ -10,7 +10,8 @@
 #include <vrs/RecordFileWriter.h>
 #include <vrs/Recordable.h>
 
-namespace vrs::test {
+namespace vrs {
+namespace test {
 
 using namespace vrs;
 
@@ -156,4 +157,5 @@ struct CheckParams {
 
 void checkRecordCountAndIndex(const CheckParams& checkParams);
 
-}; // namespace vrs::test
+} // namespace test
+} // namespace vrs

@@ -22,7 +22,8 @@
 #define EXECUTABLE_SUFFIX ""
 #endif
 
-namespace vrs::test {
+namespace vrs {
+namespace test {
 
 using namespace std;
 using namespace vrs;
@@ -92,4 +93,5 @@ bool TestProcess::findBinary(string& inOutName) {
   return os::isFile(inOutName);
 }
 
-} // namespace vrs::test
+} // namespace test
+} // namespace vrs

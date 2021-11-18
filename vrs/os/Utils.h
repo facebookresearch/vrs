@@ -16,7 +16,8 @@
 /// Enables the encapsulation of file system implementations,
 /// without explicitly depending on boost or std::filesystem, which may or may be available.
 
-namespace vrs::os {
+namespace vrs {
+namespace os {
 
 /// FILE helpers
 std::FILE* fileOpen(const std::string& path, const char* modes);
@@ -70,4 +71,5 @@ std::string getCurrentExecutablePath();
 
 #endif // IS_VRS_OSS_CODE()
 
-} // namespace vrs::os
+} // namespace os
+} // namespace vrs

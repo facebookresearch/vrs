@@ -214,7 +214,8 @@ void createRecordsThreadTask(ThreadParam* param) {
 
 } // namespace
 
-namespace vrs::test {
+namespace vrs {
+namespace test {
 
 void deleteChunkedFile(const std::string& path) {
   FileSpec spec;
@@ -397,4 +398,5 @@ void checkRecordCountAndIndex(const CheckParams& p) {
   }
 }
 
-} // namespace vrs::test
+} // namespace test
+} // namespace vrs

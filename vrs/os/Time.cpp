@@ -6,7 +6,8 @@
 
 #include <vrs/os/Platform.h>
 
-namespace vrs::os {
+namespace vrs {
+namespace os {
 
 #if IS_VRS_OSS_CODE()
 double getTimestampSec() {
@@ -25,4 +26,5 @@ int64_t getTimestampMs() {
   return duration_cast<std::chrono::milliseconds>(steady_clock::now().time_since_epoch()).count();
 }
 
-} // namespace vrs::os
+} // namespace os
+} // namespace vrs

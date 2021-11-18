@@ -52,7 +52,8 @@ constexpr auto kRegularFileType = boost::filesystem::file_type::regular_file;
 
 using std::string;
 
-namespace vrs::os {
+namespace vrs {
+namespace os {
 
 #if IS_WINDOWS_PLATFORM()
 std::wstring osUtf8ToWstring(const string& utf8String) {
@@ -414,4 +415,5 @@ string getCurrentExecutablePath() {
 }
 #endif
 
-} // namespace vrs::os
+} // namespace os
+} // namespace vrs

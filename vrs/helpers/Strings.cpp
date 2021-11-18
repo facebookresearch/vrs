@@ -11,7 +11,8 @@
 
 #include <fmt/format.h>
 
-namespace vrs::helpers {
+namespace vrs {
+namespace helpers {
 
 using namespace std;
 
@@ -147,4 +148,5 @@ string make_printable(const string& str) {
   return sanitized;
 }
 
-} // namespace vrs::helpers
+} // namespace helpers
+} // namespace vrs

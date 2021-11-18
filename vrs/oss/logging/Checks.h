@@ -10,9 +10,13 @@
 
 #include "LogLevel.h"
 
-namespace vrs::logging {
+namespace vrs {
+namespace logging {
+
 void logAndAbort(const std::string& condition, const std::string& message = {});
-} // namespace vrs::logging
+
+} // namespace logging
+} // namespace vrs
 
 //
 // Check Macros.

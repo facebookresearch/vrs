@@ -9,7 +9,8 @@
 /// Add a definition for the location of the tool in the BUCK file, as an env variable.
 /// See definition of TESTEDTOOL_EXE used to test this class in vrs/test/BUCK.
 
-namespace vrs::test {
+namespace vrs {
+namespace test {
 
 namespace bp = boost::process;
 
@@ -34,4 +35,5 @@ class TestProcess {
   bool findBinary(std::string& inOutName);
 };
 
-} // namespace vrs::test
+} // namespace test
+} // namespace vrs

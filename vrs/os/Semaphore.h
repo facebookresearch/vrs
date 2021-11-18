@@ -8,7 +8,8 @@
 
 #include <boost/interprocess/sync/interprocess_semaphore.hpp>
 
-namespace vrs::os {
+namespace vrs {
+namespace os {
 
 class Semaphore : private boost::interprocess::interprocess_semaphore {
  public:
@@ -21,7 +22,8 @@ class Semaphore : private boost::interprocess::interprocess_semaphore {
   bool timed_wait(const boost::posix_time::ptime& absTime) = delete;
 };
 
-} // namespace vrs::os
+} // namespace os
+} // namespace vrs
 
 #else
 #include "Semaphore_fb.h"

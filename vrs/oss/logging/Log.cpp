@@ -5,7 +5,8 @@
 
 #include <fmt/color.h>
 
-namespace vrs::logging {
+namespace vrs {
+namespace logging {
 
 void log(Level level, const char* channel, const std::string& message) {
   const fmt::color kNoColor = static_cast<fmt::color>(0xFFFFFFFF);
@@ -38,4 +39,5 @@ void log(Level level, const char* channel, const std::string& message) {
   }
 }
 
-} // namespace vrs::logging
+} // namespace logging
+} // namespace vrs

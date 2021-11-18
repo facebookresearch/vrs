@@ -24,9 +24,13 @@
 
 #endif //! IS_ANDROID_PLATFORM()
 
-namespace vrs::logging {
+namespace vrs {
+namespace logging {
+
 void logAndAbort(const std::string& condition, const std::string& message) {
   fmt::print(stderr, fg(fmt::color::red), "{} {}", condition, message);
   XR_ABORT_IMPL(message);
 }
-} // namespace vrs::logging
+
+} // namespace logging
+} // namespace vrs

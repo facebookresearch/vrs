@@ -6,7 +6,8 @@
 
 #include <vrs/os/Time.h>
 
-namespace vrs::os {
+namespace vrs {
+namespace os {
 
 EventChannel::EventChannel(const std::string& name, NotificationMode notificationMode)
     : name_{name},
@@ -125,4 +126,5 @@ EventChannel::NotificationMode EventChannel::getNotificationMode() const {
   return notificationMode_;
 }
 
-} // namespace vrs::os
+} // namespace os
+} // namespace vrs
