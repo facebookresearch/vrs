@@ -38,8 +38,8 @@ The simplest way to build VRS is to install the libraries on your system using s
 ### Install build tools & libraries (Linux)
 * install tools & libraries:
   ```
-  sudo apt-get install cmake ninja-build ccache libboost-all-dev libfmt-dev 
-  sudo apt-get install libcereal-dev liblz4-dev libzstd-dev libxxhash-dev libgtest-dev
+  sudo apt-get install cmake ninja-build ccache libgtest-dev libfmt-dev libcereal-dev liblz4-dev libzstd-dev libxxhash-dev
+  sudo apt-get install libboost-system-dev libboost-filesystem-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev
   ```
 
 ## Build & run (MacOS & Linux)
