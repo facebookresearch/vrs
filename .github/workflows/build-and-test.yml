@@ -16,8 +16,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt-get install cmake ninja-build ccache libboost-all-dev libfmt-dev
-          sudo apt-get install libcereal-dev liblz4-dev libzstd-dev libxxhash-dev libgtest-dev
+          sudo apt-get install cmake ninja-build ccache libgtest-dev libfmt-dev libcereal-dev liblz4-dev libzstd-dev libxxhash-dev
+          sudo apt-get install libboost-system-dev libboost-filesystem-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev
+
       - name: Configure
         shell: bash
         run: |
