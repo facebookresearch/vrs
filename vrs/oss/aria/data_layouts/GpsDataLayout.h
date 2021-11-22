@@ -7,6 +7,8 @@
 #include <vrs/DataLayout.h>
 #include <vrs/DataPieces.h>
 
+// Note: The VRS stream type for GPS data is vrs::RecordableTypeId::GpsRecordableClass.
+
 namespace aria {
 
 struct GpsConfigurationLayout : public vrs::AutoDataLayout {

@@ -7,6 +7,9 @@
 #include <vrs/DataLayout.h>
 #include <vrs/DataPieces.h>
 
+// Note: The VRS stream types for motion data are vrs::RecordableTypeId::SlamImuData
+// (gyroscrope/accelerometer) and vrs::RecordableTypeId::SlamMagnetometerData (magnetometer).
+
 namespace aria {
 
 struct MotionSensorConfigurationLayout : public vrs::AutoDataLayout {

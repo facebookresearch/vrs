@@ -8,6 +8,10 @@
 #include <vrs/DataLayoutConventions.h>
 #include <vrs/DataPieces.h>
 
+// Note: The VRS stream types for image data are vrs::RecordableTypeId::SlamCameraData (for SLAM
+// cameras), vrs::RecordableTypeId::RgbCameraRecordableClass (for RGB camera), and
+// vrs::RecordableTypeId::EyeCameraRecordableClass (for eye-tracking cameras).
+
 namespace aria {
 
 using vrs::DataLayoutConventions::ImageSpecType;

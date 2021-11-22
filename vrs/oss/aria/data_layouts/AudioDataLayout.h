@@ -8,6 +8,9 @@
 #include <vrs/DataLayoutConventions.h>
 #include <vrs/DataPieces.h>
 
+// Note: The VRS stream type for audio data is
+// vrs::RecordableTypeId::StereoAudioRecordableClass.
+
 namespace aria {
 
 struct AudioConfigurationLayout : public vrs::AutoDataLayout {

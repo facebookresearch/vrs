@@ -7,6 +7,9 @@
 #include <vrs/DataLayout.h>
 #include <vrs/DataPieces.h>
 
+// Note: The VRS stream type for barometer data is
+// vrs::RecordableTypeId::BarometerRecordableClass.
+
 namespace aria {
 
 struct BarometerConfigurationLayout : public vrs::AutoDataLayout {

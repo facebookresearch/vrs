@@ -7,6 +7,9 @@
 #include <vrs/DataLayout.h>
 #include <vrs/DataPieces.h>
 
+// Note: The VRS stream type for Bluetooth beacon data is
+// vrs::RecordableTypeId::BluetoothBeaconRecordableClass.
+
 namespace aria {
 
 struct BluetoothBeaconConfigurationLayout : public vrs::AutoDataLayout {

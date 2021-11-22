@@ -7,6 +7,8 @@
 #include <vrs/DataLayout.h>
 #include <vrs/DataPieces.h>
 
+// Note: The VRS stream type for time sync data is vrs::RecordableTypeId::TimeRecordableClass.
+
 namespace aria {
 
 struct TimeSyncConfigurationLayout : public vrs::AutoDataLayout {

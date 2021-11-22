@@ -7,6 +7,9 @@
 #include <vrs/DataLayout.h>
 #include <vrs/DataPieces.h>
 
+// Note: The VRS stream type for Wi-Fi, beacon data is
+// vrs::RecordableTypeId::WifiBeaconRecordableClass.
+
 namespace aria {
 
 struct WifiBeaconConfigurationLayout : public vrs::AutoDataLayout {
