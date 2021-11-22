@@ -41,6 +41,7 @@ const map<RecordableTypeId, const char*>& getRecordableTypeIdRegistry() {
     {RecordableTypeId::FaceCameraRecordableClass, "Face Camera Class"},
     {RecordableTypeId::MouthCameraRecordableClass, "Mouth Camera Class"},
     {RecordableTypeId::RgbCameraRecordableClass, "RGB Camera Class"},
+    {RecordableTypeId::SlamCameraData, "Camera Data (SLAM)"},
 
     /// << Microphones >>
     {RecordableTypeId::MonoAudioRecordableClass, "Mono Audio Class"},
