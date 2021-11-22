@@ -58,6 +58,8 @@ const map<RecordableTypeId, const char*>& getRecordableTypeIdRegistry() {
     {RecordableTypeId::TemperatureRecordableClass, "Temperature Data Class"},
     {RecordableTypeId::BarometerRecordableClass, "Barometer Data Class"},
     {RecordableTypeId::PhotoplethysmogramRecordableClass, "Photoplethysmogram (PPG) Data Class"},
+    {RecordableTypeId::SlamImuData, "IMU Data (SLAM)"},
+    {RecordableTypeId::SlamMagnetometerData, "Magnetometer Data (SLAM)"},
 
     /// << Calibration, Setup, Diagnostic, etc >>
     {RecordableTypeId::CalibrationRecordableClass, "Calibration Data Class"},

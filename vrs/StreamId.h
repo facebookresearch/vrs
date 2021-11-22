@@ -155,6 +155,8 @@ enum class RecordableTypeId : uint16_t {
   LastRecordableClassId = 999,
 
   SlamCameraData = 1201,
+  SlamImuData = 1202,
+  SlamMagnetometerData = 1203,
 
 #if IS_VRS_FB_INTERNAL()
 #include "StreamId_fb.h"
