@@ -21,6 +21,7 @@ using std::vector;
 enum class CachingStrategy {
   Passive, ///< (default) Read & cache on-demand (don't prefetch).
   Streaming, ///< Automatically download data "forward", using last read-request as a hint.
+  ReleaseAfterRead, ///< Same as "Passive" but release used cache blocks immediately after read.
 };
 
 /// \brief Generalized file descriptor class, allowing the efficient representation of complex
