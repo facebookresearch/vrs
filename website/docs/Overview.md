@@ -3,7 +3,7 @@ sidebar_position: 1
 title: Overview
 ---
 
-VRS is a **file format** optimized to record & playback streams of sensor data, such as images, audio samples, and any other discrete sensors (IMU, temperature, etc), stored in per-device streams of time-stamped records.
+VRS is a **file format** optimized to record and playback streams of sensor data, such as images, audio samples, and any other discrete sensors (IMU, temperature, etc), stored in per-device streams of time-stamped records. 
 
 VRS was first created to record images and sensor data from early prototypes of the Quest device, to develop the device’s positional tracking system now known as [Insight](https://ai.facebook.com/blog/powered-by-ai-oculus-insight/), and Quest's hand tracking software. It is also the file format used by the [Aria glasses](https://about.facebook.com/realitylabs/projectaria/).
 
