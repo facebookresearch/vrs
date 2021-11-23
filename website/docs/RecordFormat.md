@@ -3,7 +3,8 @@ sidebar_position: 6
 title: Record Format
 ---
 
-*This guide is meant for developers who need to design a new VRS file format for their use case, maybe for a new device.*
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 VRS offers standardized methods to represent common data types, but it does not prescribe how to address specific use cases. 
 You can use VRS to collect data coming from a Quest device, or collect traffic going over USB, and each can be done in different ways.
@@ -104,7 +105,10 @@ We recommend that you use the [lowercase snake case naming convention](https://e
 
 Because each record has a record format version number, and `RecordFormat`/`DataLayout` definitions are tied to a record format version within that stream, it is possible to use multiple `RecordFormat`/`DataLayout` definitions within a particular stream.
 
-### Example 1: standard case
+## Examples
+
+<Tabs>
+  <TabItem value="example_1" label="Example 1: standard case" default>
 
 Here is a sample `DataLayout` definition:
 
@@ -133,7 +137,9 @@ Notice that the struct must derive from `AutoDataLayout`, and finish with an `Au
 
 Also notice that each field has a label. 
 
-### Example 2: nested definitions
+  </TabItem>
+  <TabItem value="example_2" label="Example 2: nested definitions">
+
 Note: this option isn't very commonly needed.
 
 It is possible to define structs, that can be nested in a DataLayout definition. For instance:
@@ -166,10 +172,10 @@ struct MyDataLayout: public AutoDataLayout {
 
 It is possible to nest `DataLayoutStruct` within `DataLayoutStruct` definitions, as often as makes sense, and the resulting `DataPiece` fields will have labels similarly constructed, with deeper nesting. However, it is not possible to use `DataLayoutStruct` definitions in template containers.
 
+  </TabItem>
+  <TabItem value="example_3" label="Example 3: optional definitions">
 
-### Example 3: optional definitions
 Note: this option is only very rarely needeed.
-
 
 It is possible to define fields that are only used in some recording conditions or devices, saving space in the records, and making records produced by devices less ambiguous, since they will only show the fields if they were used during recording.
 
@@ -199,6 +205,8 @@ At runtime, for recording, you need to decide upfront if the optional fields wil
 
 When reading the file, you can either try to use the appropriate constructor, or always include the optional fields, and test the presence of data in the file by checking each of the fields' `isAvailable()` method.
 
+  </TabItem>
+</Tabs>
 
 ## Registering your RecordFormat and DataLayout definitions
 
