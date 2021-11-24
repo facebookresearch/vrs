@@ -37,12 +37,21 @@ class MultiRecordFileReader {
   /// Only related files are allowed to be opened together. i.e. the files which have the same
   /// values for tags defined in `kRelatedFileTags`. If these tags are present, then the values must
   /// match.
-  /// All the files must have their timestamps in the same time domain.π
+  /// All the files must have their timestamps in the same time domain.
   /// This method is expected to be invoked only once per instance.
   /// @param paths: VRS file paths to open.
-  /// @return 0 on success and you can read the file, or some non-zero error code, in which case,
-  /// further read calls will fail.
-  int openFiles(const std::vector<std::string>& paths);
+  /// @return 0 on success and you can read all the files, or some non-zero
+  /// error code, in which case, further read calls will fail.
+  int open(const std::vector<std::string>& paths);
+
+  /// Open a single VRS file.
+  /// This method is expected to be invoked only once per instance.
+  /// @param path: VRS file path to open.
+  /// @return 0 on success and you can read the file, or some non-zero error code,
+  /// in which case, further read calls will fail.
+  int open(const std::string& path) {
+    return open(std::vector<std::string>{path});
+  }
 
   /// Tags which determine whether VRS files are related to each other.
   /// Related files are expected to have the same value for these tags.
@@ -54,7 +63,7 @@ class MultiRecordFileReader {
   /// @return 0 on success or if no file was open.
   /// Some file system error code upon encountering an error while closing any of the underlying
   /// files.
-  int closeFiles();
+  int close();
 
   /// Get the set of StreamId for all the streams across all the open files.
   /// In case the the same StreamId is used in multiple files, this method generates UniqueStreamIds

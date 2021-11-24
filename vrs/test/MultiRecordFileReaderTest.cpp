@@ -205,7 +205,9 @@ class TestStreamPlayer : public StreamPlayer {
 class MultiRecordFileReaderTest : public testing::Test {};
 
 TEST_F(MultiRecordFileReaderTest, invalidFilePaths) {
-  ASSERT_NE(SUCCESS, MultiRecordFileReader().openFiles({"invalidPath1", "invalidPath2"}));
+  ASSERT_NE(
+      SUCCESS,
+      MultiRecordFileReader().open(std::vector<std::string>{"invalidPath1", "invalidPath2"}));
 }
 
 TEST_F(MultiRecordFileReaderTest, relatedFiles) {
@@ -221,7 +223,7 @@ TEST_F(MultiRecordFileReaderTest, relatedFiles) {
     }
   }
   MultiRecordFileReader reader;
-  ASSERT_EQ(SUCCESS, reader.openFiles(relatedFilePaths));
+  ASSERT_EQ(SUCCESS, reader.open(relatedFilePaths));
   ASSERT_EQ(getDefaultTags(), reader.getTags());
   // Now add an unrelated file path to the mix to make sure we are not able to open unrelated files
   const auto unrelatedFilePath =
@@ -232,7 +234,7 @@ TEST_F(MultiRecordFileReaderTest, relatedFiles) {
   createVRSFileSynchronously(unrelatedFilePath, numRecords, mismatchingTags);
   auto unrelatedFilePaths = relatedFilePaths;
   unrelatedFilePaths.push_back(unrelatedFilePath);
-  ASSERT_NE(SUCCESS, MultiRecordFileReader().openFiles(unrelatedFilePaths));
+  ASSERT_NE(SUCCESS, MultiRecordFileReader().open(unrelatedFilePaths));
   removeFiles(unrelatedFilePaths);
 }
 
@@ -264,7 +266,7 @@ TEST_F(MultiRecordFileReaderTest, multiFile) {
   }
   MultiRecordFileReader reader;
   ASSERT_FALSE(reader.isOpened());
-  ASSERT_EQ(SUCCESS, reader.openFiles(filePaths));
+  ASSERT_EQ(SUCCESS, reader.open(filePaths));
   ASSERT_TRUE(reader.isOpened());
   ASSERT_LT(0, reader.getTotalSourceSize());
   assertEmptyStreamTags(reader);
@@ -321,7 +323,7 @@ TEST_F(MultiRecordFileReaderTest, multiFile) {
   IndexRecord::RecordInfo unknownRecord;
   ASSERT_EQ(reader.getRecordCount(), reader.getRecordIndex(&unknownRecord));
   ASSERT_EQ(nullptr, reader.getReader(&unknownRecord));
-  ASSERT_EQ(SUCCESS, reader.closeFiles());
+  ASSERT_EQ(SUCCESS, reader.close());
   ASSERT_FALSE(reader.isOpened());
   removeFiles(filePaths);
 }
@@ -340,7 +342,7 @@ TEST_F(MultiRecordFileReaderTest, singleFile) {
   MultiRecordFileReader reader;
   ASSERT_EQ(0, reader.getRecordCount());
   ASSERT_FALSE(reader.isOpened());
-  ASSERT_EQ(SUCCESS, reader.openFiles(filePaths));
+  ASSERT_EQ(SUCCESS, reader.open(filePaths));
   ASSERT_TRUE(reader.isOpened());
   ASSERT_LT(0, reader.getTotalSourceSize());
   ASSERT_EQ(getDefaultTags(), reader.getTags());
@@ -409,7 +411,7 @@ TEST_F(MultiRecordFileReaderTest, singleFile) {
   reader.getRecordFormats(unknownStream, recordFormatMap);
   ASSERT_EQ(0, recordFormatMap.size());
   // Validation after closing
-  ASSERT_EQ(SUCCESS, reader.closeFiles());
+  ASSERT_EQ(SUCCESS, reader.close());
   ASSERT_FALSE(reader.isOpened());
   ASSERT_EQ(0, reader.getRecordCount());
   ASSERT_EQ(0, reader.getRecordCount(stream));
@@ -462,7 +464,7 @@ class StreamIdCollisionTester {
   }
 
   void test() {
-    ASSERT_EQ(SUCCESS, reader_.openFiles(filePaths_));
+    ASSERT_EQ(SUCCESS, reader_.open(filePaths_));
     ASSERT_EQ(totalRecordCount_, reader_.getRecordCount());
     const auto& streams = reader_.getStreams();
     ASSERT_EQ(
@@ -503,7 +505,7 @@ class StreamIdCollisionTester {
   }
 
   void close() {
-    ASSERT_EQ(SUCCESS, reader_.closeFiles());
+    ASSERT_EQ(SUCCESS, reader_.close());
     ASSERT_EQ(0, reader_.getRecordCount());
     const auto& stream = uniqueRecordables_[0].getStreamId();
     ASSERT_EQ(0, reader_.getRecordCount(stream));
@@ -662,7 +664,7 @@ TEST_F(MultiRecordFileReaderTest, getFileChunks) {
   // Single file use case
   MultiRecordFileReader singleReader;
   const auto& singleFilePath = filePaths[0];
-  ASSERT_EQ(SUCCESS, singleReader.openFiles({singleFilePath}));
+  ASSERT_EQ(SUCCESS, singleReader.open(singleFilePath));
   ASSERT_FALSE(singleReader.getFileChunks().empty());
   const auto singleFileChunks = singleReader.getFileChunks();
   ASSERT_EQ(1, singleFileChunks.size());
@@ -673,12 +675,12 @@ TEST_F(MultiRecordFileReaderTest, getFileChunks) {
   ASSERT_EQ(singleFileChunksExpected, singleFileChunks);
   const auto expectedSize = singleFileChunksExpected[0].second;
   ASSERT_EQ(singleReaderExpected.getTotalSourceSize(), singleReader.getTotalSourceSize());
-  ASSERT_EQ(SUCCESS, singleReader.closeFiles());
+  ASSERT_EQ(SUCCESS, singleReader.close());
   ASSERT_EQ(SUCCESS, singleReaderExpected.closeFile());
   ASSERT_TRUE(singleReader.getFileChunks().empty());
   // Multi file use case
   MultiRecordFileReader multiReader;
-  ASSERT_EQ(SUCCESS, multiReader.openFiles(filePaths));
+  ASSERT_EQ(SUCCESS, multiReader.open(filePaths));
   const auto fileChunks = multiReader.getFileChunks();
   ASSERT_EQ(filePaths.size(), fileChunks.size());
   for (size_t i = 0; i < filePaths.size(); i++) {
@@ -686,6 +688,6 @@ TEST_F(MultiRecordFileReaderTest, getFileChunks) {
     ASSERT_EQ(filePaths[i], fileChunk.first);
     ASSERT_EQ(expectedSize, fileChunk.second);
   }
-  ASSERT_EQ(SUCCESS, multiReader.closeFiles());
+  ASSERT_EQ(SUCCESS, multiReader.close());
   removeFiles(filePaths);
 }

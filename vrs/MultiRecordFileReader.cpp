@@ -31,13 +31,13 @@ static bool timestampLT(const IndexRecord::RecordInfo* lhs, double rhsTimestamp)
   return lhs->timestamp < rhsTimestamp;
 }
 
-int MultiRecordFileReader::openFiles(const std::vector<std::string>& paths) {
+int MultiRecordFileReader::open(const std::vector<std::string>& paths) {
   if (paths.empty()) {
     XR_LOGE("At least one file must be opened");
     return INVALID_REQUEST;
   }
   if (!readers_.empty()) {
-    XR_LOGE("openFiles() must be invoked only once per instance");
+    XR_LOGE("open() must be invoked only once per instance");
     return INVALID_REQUEST;
   }
   readers_.reserve(paths.size());
@@ -48,14 +48,14 @@ int MultiRecordFileReader::openFiles(const std::vector<std::string>& paths) {
     IF_ERROR_RETURN(RecordFileReader::vrsFilePathToFileSpec(path, fileSpec));
     const auto status = reader->openFile(fileSpec);
     if (status != SUCCESS) {
-      closeFiles();
+      close();
       return status;
     }
     filePaths_.push_back(fileSpec.getEasyPath());
     XR_LOGD("Opened file '{}' and assigned to reader #{}", path, readers_.size() - 1);
   }
   if (!areFilesRelated()) {
-    closeFiles();
+    close();
     return INVALID_REQUEST;
   }
   initializeUniqueStreamIds();
@@ -65,7 +65,7 @@ int MultiRecordFileReader::openFiles(const std::vector<std::string>& paths) {
   return SUCCESS;
 }
 
-int MultiRecordFileReader::closeFiles() {
+int MultiRecordFileReader::close() {
   if (!isOpened_) {
     return NO_FILE_OPEN;
   }
@@ -99,7 +99,7 @@ const set<UniqueStreamId>& MultiRecordFileReader::getStreams() const {
 }
 
 MultiRecordFileReader::~MultiRecordFileReader() {
-  closeFiles();
+  close();
 }
 
 uint32_t MultiRecordFileReader::getRecordCount() const {
