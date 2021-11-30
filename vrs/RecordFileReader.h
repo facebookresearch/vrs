@@ -123,7 +123,10 @@ class RecordFileReader {
   /// returned.
   int readRecord(const IndexRecord::RecordInfo& recordInfo);
 
-  /// Read a file's record, and use a custom stream player for that record.
+  /// Internal: Read a record using a specific stream player.
+  /// Prefer using setStreamPlayer and the single parameter version of readRecord().
+  /// Avoid calling directly, as it won't work as expected unless the player was properly setup
+  /// for decoding the stream before.
   /// @param recordInfo: RecordInfo reference of the record to read.
   /// @param streamPlayer: StreamPlayer object to use for this operation only. The default stream
   /// player that might have been setup using setStreamPlayer() will not receive any callback.
