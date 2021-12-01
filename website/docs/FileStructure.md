@@ -7,19 +7,20 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
 ## File Tags
-VRS files contain **file tags**, which simply a set of name-value pairs, both of which a text strings. File tags may mean anything, but VRS defines
-[some tag conventions](https://github.com/facebookresearch/vrs/blob/main/vrs/TagConventions.h) to represent a few common concepts.
+VRS files contain file tags. File tags  are a set of name/value pairs, both of which are text strings. File tags may be set to any text string, but VRS provides some [tag conventions](https://github.com/facebookresearch/vrs/blob/main/vrs/TagConventions.h) to represent a few common concepts in VRS.
+
 
 ## Streams
 VRS files contain multiple streams, each associated with a *device type*, defined by a
 [`RecordableTypeId`](https://github.com/facebookresearch/vrs/blob/main/vrs/StreamId.h) enum value.
-`RecordableTypeId` values which are a «Recordable Class» (a subset of the `RecordableTypeId` enum) must be paired with a «Recordable Flavor» to identify the type of device or data contained in that stream.
 
-A device type can also represent a virtual device, such as the output of a vision algorithm, or some events (such as keyboard/mouse/orientation events) that we want to use to exercise some code.
+A subset of `RecordableTypeId` values represent generic devices, which we called «Recordable Class» IDs. «Recordable Class» IDs must be paired with «Recordable Flavor» values to identify a user-specific type of device or data contained in that stream.
+
+A device type can also represent a virtual device, such as the output of a vision algorithm, or an event, such as a keyboard, mouse, or orientation event, that can be used to exercise code.
 
 ## Stream Tags
-Streams also have tags, which simply a set of name-value pairs, both of which a text strings. Stream tags may mean anything, but the
-[tag conventions](https://github.com/facebookresearch/vrs/blob/main/vrs/TagConventions.h) can be used for streams to represent a few common concepts.
+Streams also have tags, which are also a set of name/value pairs, both of which are text strings. Stream tags may be set to any string value, but VRS provides some
+[tag conventions](https://github.com/facebookresearch/vrs/blob/main/vrs/TagConventions.h) for streams to represent a few common concepts.
 
 ## Records
 Streams contain a time-sorted sequence of records. Records have the following metadata:
@@ -27,26 +28,28 @@ Streams contain a time-sorted sequence of records. Records have the following me
 <Tabs>
   <TabItem value="timestamp" label="Timestamp" default>
 
-Timestamps are `double` values, counting a number of seconds since some arbitrary point in time (EPOCH, boot time, or any other fixed point).
+Timestamps are `double` type values that count the number of seconds from a point in time, such as EPOCH, boot time, or any other fixed point.
 
 :::note
-*All the records of a VRS file **must use timestamps in the same time domain**, because that's how VRS will sort the records in the file and for playback.*
-
-If your data has device specific timestamps (images and IMU samples might come with their own device specific timestamps), save those timestamps inside the records.
+All records in a VRS file must use timestamps in the same time domain. VRS sorts the records in the file and in playback in that order. If your data has device-specific timestamps you need to keep, you must save those timestamps inside the records. Images and IMU samples may have their own device-specific timestamps.
 :::
 
-Timestamps are using the `double` type, because this is how time is represented in the Oculus world. This type is awkward for many newcomers (including yours trully initially), but it often turns out to be a forcing function for clarity on what the VRS time source should be. It is commonly the case that devices (cameras, IMU, etc) will have their own internal clock or counters which aren't synchronized, and using `double` can help avoid confusing VRS timestamps and device specific time domains.  
+Timestamps are `double` type values, to be compatible with how time is represented in the Oculus world. Frequently, devices such as cameras and IMUs use their own internal clocks or counters, which are not synchronized. Using the `double` type can now help distinguish VRS timestamps from device specific timestamps.
 
 :::caution
-If you are considering recording audio, be aware that audio devices are defacto clocks, since they will produce data at a specific sample rate. If you use a system clock as the clock for your VRS records, that clock and your audio clock are bound to drift, making it difficult to accurately synchronize audio data with your other data (images in particular). You can (usually) easily establish a correspondance between your system clock and the first audio sample when you start recording, but then, 10 minutes down the road, your system clock and the audio clock (as determined by the count of audio samples produced divided by the sample rate) will no longer be in sync in a visible way.  
-Be extremely careful when trying to find which audio sample corresponds to a particular image, as this is likely to be very challenging to accomplish reliably, and never as accurate as you wish it were.
+When recording audio, be aware that audio devices are de facto clocks; they produce data at a specific sample rate. If you use a system clock for your VRS records, that clock and your audio clock will drift. This will make it difficult to accurately synchronize audio data with your other data, especially images.
+
+It’s reasonably easy to establish a correspondence between your system clock and the first audio sample when you start recording. After that, the count of the audio samples produced, divided by the sample rate, determines the actual duration of time as seen by the audio device, and that duration will not match the duration of time measured by your system clock. Ten minutes after that, your system clock and the audio clock will no longer be in sync and the gap will be visually noticeable.
+
+Therefore, be extremely careful when trying to find which audio sample corresponds to a particular image. This is very challenging to accomplish and is seldom very accurate.
 :::
+
 
   </TabItem>
   <TabItem value="streamid" label="StreamId">
 
-A `StreamId` is composed of a device type id (a `RecordableTypeId` enum value) and an instance id, unique in the file for that device type id. Instance ids are generated by VRS.
- 
+A `StreamId` is composed of a device type ID (`RecordableTypeId` enum value) and an instance ID, which is unique in the file for that device type ID. Instance IDs are generated by VRS.
+
   </TabItem>
   <TabItem value="recordtype" label="Record Type">
 
@@ -54,27 +57,28 @@ Records can be **Configuration**, **State** or **Data** records.
 <Tabs>
   <TabItem value="configuration" label="Configuration Records" default>
 
-**Configuration records** describe how the device is configured. Example: the resolution and exposure settings of a camera. This could also be how an algorithm is configured.
+**Configuration records** contain the settings to configure a device. For example, the resolution and exposure settings of a camera are stored in configuration records. Configuration records can also describe how an algorithm is configured.
 
-The configuration of a device is expected to be somewhat stable, that is, not change at every moment, but configuration records are also not meant to store parameters that never change, like a serial number. For parameters that cannot change (like a serial number), prefer to use stream tags, which can be queried directly as soon as a VRS file is open for reading.
+The configuration of a device is expected to be somewhat stable (does not change at every moment).  However, configuration records are not meant to store parameters that never change, such as serial numbers. For parameters that cannot change (such as serial numbers), use stream tags, which can be queried directly as soon as the VRS file is open for reading.
 
   </TabItem>
   <TabItem value="state" label="State Records">
 
-**State records** are meant to store the state of a device. For physical devices, it is probably not very useful, but for algorithms, it is meant to store the algorithm's internal state at different instants, as it could be the result of previous calculations affecting behaviors. For a vision algorithm, it could be features it is tracking at the moment, where they are in space, etc.
+**State records** store the state of a device. They may store the internal state of an algorithm at different instants that may be the results of previous calculations that affect behaviors. For a vision algorithm, they may be tracking where features are in space at a given instant.
 
-While the state of a device might be changing at any time, in particular when data is processed, for performance reasons, we probably do not want to record each individual state. Recording the state of a device is important to allow to jump back in time without having to replay the entire session.
+The state of a device might be changing at any time, in particular when data is being processed. For performance reasons, we do not record each individual state. However, recording the state of a device can be important to allow it to jump back in time without having to replay the entire session.
 
-Note that typically, state records are empty, because the internal state of devices is not commonly tracked.
- 
+**Note:** Typically, state records are empty, because the internal state of a device is not commonly tracked.
+
+
   </TabItem>
   <TabItem value="data" label="Data Records">
 
-**Data records** contain data that flow out of the device or algorithm. For cameras, it is probably images, for an IMU device, it is probably a set of sensor samples, for a vision algorithm, it might be a pose.
+**Data records** contain data that flows from a device or algorithm. For cameras, it is usually images. For an IMU device, it is usually a set of sensor samples. For a vision algorithm, it might be a pose.
 
-The implementer of a device is responsible for the format of that data. Data records typically include metadata, such as internal counters, timestamps and other measurements, often along a capture image or an audio sample block.
+The implementer of the device is responsible for the data format. Data records typically include metadata, such as internal counters, timestamps, and other measurements, often along a captured image or an audio sample block.
 
-Use `RecordFormat` & `DataLayout` to make your record's format interoperable.
+Use `RecordFormat` and `DataLayout` to make your record format interoperable.
 
   </TabItem>
 </Tabs>
@@ -82,11 +86,11 @@ Use `RecordFormat` & `DataLayout` to make your record's format interoperable.
   </TabItem>
   <TabItem value="recordformatversion" label="Record Format Version">
 
-Record format version (int32), which ties the record to its `RecordFormat`, or that the reader will need to recognize to interpret the data inside (pre-`RecordFormat` legacy style).
+Use a record format version number (int32), to tie the record to a record format.
+
+`RecordFormatStreamPlayer` objects will be able to find the record's `RecordFormat` and `DataLayout` definitions in the stream's metadata using that version number.
+
+`StreamPlayer` objects can also be used to read any records, but then, interpreting the record's data correctly will have to be entirely managed by the `StreamPlayer` object. This later option can be useful when copying records "as is", without interpreting their data.
 
   </TabItem>
 </Tabs>
-
-
-
-
