@@ -34,12 +34,14 @@ The simplest way to build VRS is to install the libraries on your system using s
 * install tools & libraries:
   ```
   brew install cmake ninja ccache boost fmt cereal lz4 zstd xxhash googletest
+  brew install node doxygen
   ```
 ### Install build tools & libraries (Linux)
 * install tools & libraries:
   ```
   sudo apt-get install cmake ninja-build ccache libgtest-dev libfmt-dev libcereal-dev liblz4-dev libzstd-dev libxxhash-dev
   sudo apt-get install libboost-system-dev libboost-filesystem-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev
+  sudo apt-get install npm doxygen
   ```
 
 ## Build & run (MacOS & Linux)
@@ -62,7 +64,30 @@ We don’t have equivalent instructions for Windows.
 [vcpkg](https://vcpkg.io/en/index.html) looks like a promising package manager for Windows, but the cmake build system needs more massaging to work.\
 Contributions welcome! :-)
 
-# Samples
+# Documentation & Support
+
+VRS is documented in three complementary ways:
+1. A high level documentation built using [Docusaurus](https://docusaurus.io/), right in the GitHub repo, in the `website` folder.
+2. The API documentation built using [Doxgyen](https://www.doxygen.nl/manual/index.html), or by looking at the source code.  
+   Note we focus on documenting the API users of VRS should be using, while the VRS internal API is less systematically documented. If you find a class that isn't well documented, or not documented at all, you should probably avoid using that class directly. In doubt, ask.
+4. Sample code.
+
+To read the VRS documentation with Docusaurus using your web browser (MacOS):
+```
+cd <top_vrs_repo_folder>/website
+npm start
+```
+
+To build and navigate the API documentation with your web browser, assuming you have installed doxygen on your system (MacOS):
+```
+cd <top_vrs_repo_folder>
+doxygen vrs/Doxyfile
+open docs/index.html
+```
+
+We also plan on having a VRS Users group dedicated on discussing VRS usage. Stay tuned for details.
+
+# Sample Code
 
 * [The sample code](./sample_code) demonstrates the basics to record and read a VRS file, then how to work with `RecordFormat` and `DataLayout` definitions. The code is extensively documented, functional, compiles but isn’t meant to be run.
     * [SampleRecordAndPlay.cpp](./sample_code/SampleRecordAndPlay.cpp)\
@@ -75,12 +100,6 @@ Contributions welcome! :-)
     * a metadata stream
     * a stream with metadata and uncompressed images
     * a stream with audio images
-
-# Documentation & Support
-
-The VRS API is documented in the source code in a Doxygen friendly way, but we're working on a proper documentation web site that will combine both higher level documentation and API documentation generated with Doxygen.
-
-We also plan on having a VRS Users group dedicated on discussing VRS usage. Stay tuned for details.
 
 # Contributing
 
