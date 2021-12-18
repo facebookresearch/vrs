@@ -854,8 +854,8 @@ int RecordFileWriter::writeRecordsSingleThread(SortedRecords& records, int lastE
   }
   int error = lastError;
   uint64_t currentChunkSize = static_cast<uint64_t>(file_->getChunkPos());
-  double oldest = DBL_MAX;
-  double newest = -DBL_MAX;
+  double oldest = numeric_limits<double>::max();
+  double newest = numeric_limits<double>::lowest();
   uint32_t writtenRecords = 0;
   uint32_t skippedRecords = 0;
   for (auto& r : records) {
@@ -943,8 +943,8 @@ int RecordFileWriter::writeRecordsMultiThread(
   map<SortRecord, CompressionJob*> compressionResults;
   uint64_t currentChunkSize = static_cast<uint64_t>(file_->getChunkPos());
   int error = lastError;
-  double oldest = DBL_MAX;
-  double newest = -DBL_MAX;
+  double oldest = numeric_limits<double>::max();
+  double newest = numeric_limits<double>::lowest();
   uint64_t writtenRecords = 0;
   uint64_t skippedRecords = 0;
   uint64_t compressedRecords = 0;

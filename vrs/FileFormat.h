@@ -80,7 +80,7 @@ class LittleEndian final {
   }
 
  private:
-  T value_{}; // c++11 value-initialization
+  T value_{};
 };
 
 /// Every file starts with this header, which may grow but not shrink!

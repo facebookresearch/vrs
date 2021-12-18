@@ -47,6 +47,7 @@ enum class AudioSampleFormat : uint8_t;
 
 struct FileSpec;
 class FileHandler;
+class WriteFileHandler;
 class DiskFile;
 
 } // namespace vrs

@@ -31,7 +31,6 @@ using std::set;
 using std::unique_ptr;
 using std::vector;
 
-class FileHandler;
 class ProgressLogger;
 
 struct DiskRecordIndexStruct;

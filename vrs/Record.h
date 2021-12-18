@@ -14,13 +14,10 @@
 
 #pragma once
 
-#include <cfloat>
-
 #include <vector>
 
+#include "ForwardDefinitions.h"
 #include "StreamId.h"
-
-#include "WriteFileHandler.h"
 
 namespace vrs {
 

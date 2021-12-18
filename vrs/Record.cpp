@@ -52,7 +52,7 @@ Record::Type toEnum<>(const std::string& name) {
   return RecordTypeConverter::toEnumNoCase(name.c_str());
 }
 
-const double Record::kMaxTimestamp = DBL_MAX;
+const double Record::kMaxTimestamp = std::numeric_limits<double>::max();
 
 void Record::recycle() {
   recordManager_.recycle(this);
