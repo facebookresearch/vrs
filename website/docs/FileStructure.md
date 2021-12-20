@@ -3,26 +3,26 @@ sidebar_position: 3
 title: File Structure
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
 
 ## File Tags
-VRS files contain file tags. File tags  are a set of name/value pairs, both of which are text strings. File tags may be set to any text string, but VRS provides some [tag conventions](https://github.com/facebookresearch/vrs/blob/main/vrs/TagConventions.h) to represent a few common concepts in VRS.
 
+VRS files contain file tags. File tags are a set of name/value pairs, both of which are text strings. File tags may be set to any text string, but VRS provides some [tag conventions](https://github.com/facebookresearch/vrs/blob/main/vrs/TagConventions.h) to represent a few common concepts in VRS.
 
 ## Streams
-VRS files contain multiple streams, each associated with a *device type*, defined by a
-[`RecordableTypeId`](https://github.com/facebookresearch/vrs/blob/main/vrs/StreamId.h) enum value.
+
+VRS files contain multiple streams, each associated with a _device type_, defined by a [`RecordableTypeId`](https://github.com/facebookresearch/vrs/blob/main/vrs/StreamId.h) enum value.
 
 A subset of `RecordableTypeId` values represent generic devices, which we called «Recordable Class» IDs. «Recordable Class» IDs must be paired with «Recordable Flavor» values to identify a user-specific type of device or data contained in that stream.
 
 A device type can also represent a virtual device, such as the output of a vision algorithm, or an event, such as a keyboard, mouse, or orientation event, that can be used to exercise code.
 
 ## Stream Tags
-Streams also have tags, which are also a set of name/value pairs, both of which are text strings. Stream tags may be set to any string value, but VRS provides some
-[tag conventions](https://github.com/facebookresearch/vrs/blob/main/vrs/TagConventions.h) for streams to represent a few common concepts.
+
+Streams also have tags, which are also a set of name/value pairs, both of which are text strings. Stream tags may be set to any string value, but VRS provides some [tag conventions](https://github.com/facebookresearch/vrs/blob/main/vrs/TagConventions.h) for streams to represent a few common concepts.
 
 ## Records
+
 Streams contain a time-sorted sequence of records. Records have the following metadata:
 
 <Tabs>
@@ -30,20 +30,23 @@ Streams contain a time-sorted sequence of records. Records have the following me
 
 Timestamps are `double` type values that count the number of seconds from a point in time, such as EPOCH, boot time, or any other fixed point.
 
+<!-- prettier-ignore -->
 :::note
 All records in a VRS file must use timestamps in the same time domain. VRS sorts the records in the file and in playback in that order. If your data has device-specific timestamps you need to keep, you must save those timestamps inside the records. Images and IMU samples may have their own device-specific timestamps.
 :::
 
+<!-- prettier-ignore -->
 Timestamps are `double` type values, to be compatible with how time is represented in the Oculus world. Frequently, devices such as cameras and IMUs use their own internal clocks or counters, which are not synchronized. Using the `double` type can now help distinguish VRS timestamps from device specific timestamps.
 
+<!-- prettier-ignore -->
 :::caution
 When recording audio, be aware that audio devices are de facto clocks; they produce data at a specific sample rate. If you use a system clock for your VRS records, that clock and your audio clock will drift. This will make it difficult to accurately synchronize audio data with your other data, especially images.
 
 It’s reasonably easy to establish a correspondence between your system clock and the first audio sample when you start recording. After that, the count of the audio samples produced, divided by the sample rate, determines the actual duration of time as seen by the audio device, and that duration will not match the duration of time measured by your system clock. Ten minutes after that, your system clock and the audio clock will no longer be in sync and the gap will be visually noticeable.
 
+<!-- prettier-ignore -->
 Therefore, be extremely careful when trying to find which audio sample corresponds to a particular image. This is very challenging to accomplish and is seldom very accurate.
 :::
-
 
   </TabItem>
   <TabItem value="streamid" label="StreamId">
@@ -54,12 +57,13 @@ A `StreamId` is composed of a device type ID (`RecordableTypeId` enum value) and
   <TabItem value="recordtype" label="Record Type">
 
 Records can be **Configuration**, **State** or **Data** records.
+
 <Tabs>
   <TabItem value="configuration" label="Configuration Records" default>
 
 **Configuration records** contain the settings to configure a device. For example, the resolution and exposure settings of a camera are stored in configuration records. Configuration records can also describe how an algorithm is configured.
 
-The configuration of a device is expected to be somewhat stable (does not change at every moment).  However, configuration records are not meant to store parameters that never change, such as serial numbers. For parameters that cannot change (such as serial numbers), use stream tags, which can be queried directly as soon as the VRS file is open for reading.
+The configuration of a device is expected to be somewhat stable (does not change at every moment). However, configuration records are not meant to store parameters that never change, such as serial numbers. For parameters that cannot change (such as serial numbers), use stream tags, which can be queried directly as soon as the VRS file is open for reading.
 
   </TabItem>
   <TabItem value="state" label="State Records">
@@ -69,7 +73,6 @@ The configuration of a device is expected to be somewhat stable (does not change
 The state of a device might be changing at any time, in particular when data is being processed. For performance reasons, we do not record each individual state. However, recording the state of a device can be important to allow it to jump back in time without having to replay the entire session.
 
 **Note:** Typically, state records are empty, because the internal state of a device is not commonly tracked.
-
 
   </TabItem>
   <TabItem value="data" label="Data Records">

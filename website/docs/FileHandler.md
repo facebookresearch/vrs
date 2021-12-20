@@ -13,21 +13,21 @@ While the `FileHandler` interface is part of the VRS toolbox, it is effectively 
 
 VRS files are not necessarily a single file on a hard drive. They can be any of the following types of files:
 
-* Chunked files on one or more local hard drives
-* A binary blob in cloud storage
-* A list of binary blobs in cloud storage (chunks in cloud storage)
-* Some kind of database reference that points to any of the above...
+- Chunked files on one or more local hard drives
+- A binary blob in cloud storage
+- A list of binary blobs in cloud storage (chunks in cloud storage)
+- Some kind of database reference that points to any of the above...
 
 ## What does `FileHandler` do?
 
 The `FileHandler` interface enables you to do the following read operations with a file:
 
-* Open the file with a given path (a text string to interpret, details are below)
-* Provide the file size
-* Move the read position
-* Read a number of bytes
-* Provide caching hints
-* Close the file and release the allocated resources (such as file system handles and caches)
+- Open the file with a given path (a text string to interpret, details are below)
+- Provide the file size
+- Move the read position
+- Read a number of bytes
+- Provide caching hints
+- Close the file and release the allocated resources (such as file system handles and caches)
 
 At the core, that is all `FileHandler` does.
 
@@ -36,11 +36,12 @@ At the core, that is all `FileHandler` does.
 The primary way to identify a file is to provide a file path, but that is insufficient.
 
 We need to be able to handle the following use cases:
-* Chunked files
-* Files in cloud storage
-* Chunked files in cloud storage
-* References to a database entry, pointing to a file in another storage location
-* Files stored in Amazon AWS S3, Microsoft Azure, Google Cloud Storage, etc.
+
+- Chunked files
+- Files in cloud storage
+- Chunked files in cloud storage
+- References to a database entry, pointing to a file in another storage location
+- Files stored in Amazon AWS S3, Microsoft Azure, Google Cloud Storage, etc.
 
 We want to avoid making special-case implementations of our APIs and keep them simple, so using a single string to represent any path is a requirement. URIs are powerful and convenient, but chunked files quickly become difficult to represent, as chunked files can be a collection of URIs. For extreme cases, JSON appears to be the only reasonable option.
 
@@ -50,8 +51,8 @@ In the end, VRS supports regular file paths, URIs, and JSON file specifications,
 
 A JSON file specification must have the following required fields:
 
-* `“storage"`: the name of the `FileHandler` able to read that location.
-* `“chunks”`: an ordered list of strings, each representing a chunk of the logical file, in a format that the designated `FileHandler` can handle.
+- `“storage"`: the name of the `FileHandler` able to read that location.
+- `“chunks”`: an ordered list of strings, each representing a chunk of the logical file, in a format that the designated `FileHandler` can handle.
 
 A valid JSON file specification can simply be as follows:  
 `{"storage":"diskfile","chunks":["/local/folder/file.vrs"]}`
@@ -66,9 +67,9 @@ A chunked file in the cloud might be accessed using chunks published as HTTP obj
 
 When dealing with objects in cloud storage, it can be expensive to do a basic operation, such as getting the size of a file chunk, particularly when you have many. Knowing how to name a file to download, and remembering how a file was originally referenced is critical. Therefore, the following optional fields have been introduced to answer these questions:
 
-* `chunk_sizes`: an ordered list of integers, which should match the list of `chunks`.
-* `filename`: a name suitable to save the file locally. It might be the name of the file before it was uploaded to cloud storage.
-* `source_uri`: a URI representation of how the object was initially represented, in particular if the JSON file specification was generated from a URI.
+- `chunk_sizes`: an ordered list of integers, which should match the list of `chunks`.
+- `filename`: a name suitable to save the file locally. It might be the name of the file before it was uploaded to cloud storage.
+- `source_uri`: a URI representation of how the object was initially represented, in particular if the JSON file specification was generated from a URI.
 
 Example:  
 `{"storage":"http","chunks":["http://cdn.meta.com/HASH1"],"chunk_sizes":[123456],"filename":"scene23.vrs","source_uri":"aria:456789"}`
@@ -77,7 +78,6 @@ Example:
 
 Additional fields can be provided, outside of the core JSON file specifications. Extra values are string values, which name isn't reserved for required or optional fields. These might include authentication options for some cloud storage implementations, for instance:  
 `{"storage":"http","chunks":["http://cdn.meta.com/HASH1"],"source_uri":"aria:456789","auth_token":"09*JOYBAaSLBG@#O@"}`
-
 
 ### URIs
 
@@ -101,22 +101,22 @@ At its core, a `FileSpec` object is simply a struct with the following public fi
 
 `FileSpec` provides helper functions to convert to and from JSON and to get the size of a file (when specified directly). In practice, JSON file specifications and `FileSpec` objects are equivalent.
 
-
 ## `FileHandlerFactory`
 
 The primary role of `FileHandler` is to provide an abstract way to read files. VRS core provides a single `FileHandler` implementation that can read local files. All other `FileHandler` implementations do not belong in the VRS core. This is so that its dependencies can be limited as much as possible, and it can be easily compiled for mobile and other embedded environments.
 
 The `FileHandlerFactory` singleton allows:
-* Registering additional `FileHandler` implementations
-* Requesting the construction of `FileHandler` objects by name
-* Interpreting a file represented by a local file path, a URI, or a JSON file specification using the appropriate `FileHandler`.
+
+- Registering additional `FileHandler` implementations
+- Requesting the construction of `FileHandler` objects by name
+- Interpreting a file represented by a local file path, a URI, or a JSON file specification using the appropriate `FileHandler`.
 
 `FileHandlerFactory` is a pretty small but essential class, used to open files as follows:
 
-* Convert a string path into a `FileSpec`
-* Create a `FileHandler` instance specified by name in the `FileSpec` object
-* Request a `FileHandler` instance to actually open the `FileSpec`, whatever that means for that `FileHandler`
-* Return an error code and the `FileHandler` object
+- Convert a string path into a `FileSpec`
+- Create a `FileHandler` instance specified by name in the `FileSpec` object
+- Request a `FileHandler` instance to actually open the `FileSpec`, whatever that means for that `FileHandler`
+- Return an error code and the `FileHandler` object
 
 All this is done by the `FileHandlerFactory` API as shown below:
 
@@ -128,7 +128,6 @@ int FileHandlerFactory::delegateOpen(
 
 When the VRS `RecordFileReader` class opens a VRS file using the string path, the `FileHandlerFactory` API finds the `FileHandler` that is needed for all read operations. The `RecordFileReader` object does not need to know if the VRS file is local, chunked, or in cloud storage.
 
-
 ### Further Nested Delegation
 
 For completeness, more levels of indirection might be required. When `FileHandlerFactory` asks `FileHandler` to open a file, it uses the `FileHandler` eponym API to open the `FileSpec`, using `delegateOpen`. This is so the `FileHandler` itself may delegate the actual handling of the `FileSpec` to yet another `FileHandler` implementation.
@@ -139,11 +138,10 @@ For example, suppose you have an HTTP `FileHandler`, which can stream data from 
 
 Putting it all together, when VRS needs to interpret a string path, the following logic is used:
 
-* If the string path is a JSON specification, it is converted into a `FileSpec` object with a `FileHandler` name.
-* If the string path is a URI, it is parsed and made into a valid `FileSpec` object, by the `FileHandler` with the same name as the URI scheme, if such a `FileHandler` is available.
-* Otherwise, the string path is assumed to be a local file path, that is readable to the VRS built-in disk file `FileHandler`, using the standard POSIX file APIs.
-* Once the `FileSpec` object is built, the `FileHandlerFactory` tries to open the file, using  `delegateOpen()` to find the correct `FileHandler` for the job.
-
+- If the string path is a JSON specification, it is converted into a `FileSpec` object with a `FileHandler` name.
+- If the string path is a URI, it is parsed and made into a valid `FileSpec` object, by the `FileHandler` with the same name as the URI scheme, if such a `FileHandler` is available.
+- Otherwise, the string path is assumed to be a local file path, that is readable to the VRS built-in disk file `FileHandler`, using the standard POSIX file APIs.
+- Once the `FileSpec` object is built, the `FileHandlerFactory` tries to open the file, using `delegateOpen()` to find the correct `FileHandler` for the job.
 
 ## `FileHandler` vs. `WriteFileHandler`
 
@@ -151,16 +149,15 @@ As you may have noticed, `FileHandler` is strictly a read-only interface, becaus
 
 The `WriteFileHandler` classes that derive from `FileHandler` can add support for write operations, but they may not be able to support any write operations. Creating a `WriteFileHandler` is much more complicated than creating a read-only `FileHandler`.
 
-
 ### Reading is easy
 
 A (read) `FileHandler` only really needs to implement the following operations:
 
-* `open()`
-* `close()`
-* `getFileSize()`
-* `setPos(position)`
-* `read(length)`
+- `open()`
+- `close()`
+- `getFileSize()`
+- `setPos(position)`
+- `read(length)`
 
 Effectively, cloud storage is typically stateless, and only offers support for `getFileSize()` and `readRange(position, length)`, but these can be enough to implement the `FileHandler` interface. As a result, it is easy to read cloud-stored data using the same interface as for files, even if performance will obviously differ greatly. In practice, all our `FileHandler` interfaces fully implement the read operations, or delegate them to other `FileHandler` implementations, that implement caching too.
 
@@ -168,23 +165,23 @@ Effectively, cloud storage is typically stateless, and only offers support for `
 
 You can do the following file operations with typical disk file APIs:
 
-* Create a file at a location, so that an entry appears in the file system, immediately.
-* Write bytes to the file and extend the file.
-* Write more bytes to the file, and extend the file further.
-* Handle write requests of any size (OS system caching minimizes performance issues for you).
-* Seek to a past location, to read what is written before.
-* Overwrite or extend a file. (You cannot insert bytes into the middle of a file.)
-* Open an existing file to modify it.
-* If your app crashes or does not close the file explicitly, the data may not be fully written to disk, depending on the implementation, so it is common to have partially written files.
+- Create a file at a location, so that an entry appears in the file system, immediately.
+- Write bytes to the file and extend the file.
+- Write more bytes to the file, and extend the file further.
+- Handle write requests of any size (OS system caching minimizes performance issues for you).
+- Seek to a past location, to read what is written before.
+- Overwrite or extend a file. (You cannot insert bytes into the middle of a file.)
+- Open an existing file to modify it.
+- If your app crashes or does not close the file explicitly, the data may not be fully written to disk, depending on the implementation, so it is common to have partially written files.
 
 In contrast, when writing files to a cloud storage, things typically happen as follows:
 
-* Files are not actually created until the final close/commit/submit/finalize operation is performed, after a series of successful write operations.
-* Write operations are network operations. They have very high latencies and high error rates. Retrying file write operations is often required.
-* Small write operations can be extremely inefficient on the backend, in terms of storage. So, writing data in large chunks makes a huge difference.
-* You can not read back data you have just written, until you have finalized the object, and it is fully committed.
-* You can not overwrite or modify data you have already written.
-* If an app crashes before the upload is finalized, anything uploaded is probably lost. Some cloud storage solutions can recover partial uploads or chunks, but at the cost of added code complexity.
+- Files are not actually created until the final close/commit/submit/finalize operation is performed, after a series of successful write operations.
+- Write operations are network operations. They have very high latencies and high error rates. Retrying file write operations is often required.
+- Small write operations can be extremely inefficient on the backend, in terms of storage. So, writing data in large chunks makes a huge difference.
+- You can not read back data you have just written, until you have finalized the object, and it is fully committed.
+- You can not overwrite or modify data you have already written.
+- If an app crashes before the upload is finalized, anything uploaded is probably lost. Some cloud storage solutions can recover partial uploads or chunks, but at the cost of added code complexity.
 
 In practice, all these constraints vary greatly between cloud storage solutions. Even if you only need to upload existing files, as they are, to a cloud storage, the cloud storage may have a maximum file size, or a chunking preference. So, if you want to store large files in the cloud, you have to chunk them and manage the chunks yourself to a certain extent.
 

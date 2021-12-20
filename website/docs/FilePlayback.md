@@ -5,17 +5,14 @@ title: File Playback
 
 To playback a VRS file:
 
-* Create a [`RecordFileReader`](https://github.com/facebookresearch/vrs/blob/main/vrs/RecordFileReader.h) object, and point it to a VRS file.
-* (Optional) Query the tags.
-* Query for the streams the file contains, and check their tags if you want.
-* Attach [`StreamPlayer`](https://github.com/facebookresearch/vrs/blob/main/vrs/StreamPlayer.h) objects to the streams you want to read.
-* *Play* the file. Callbacks of the stream player objects will be invoked for each record in turn, as fast as possible.
-* or: Use the file and/or stream indexes to choose the records to read, one at a time, using the same [`StreamPlayer`](https://github.com/facebookresearch/vrs/blob/main/vrs/StreamPlayer.h) callbacks.
+- Create a [`RecordFileReader`](https://github.com/facebookresearch/vrs/blob/main/vrs/RecordFileReader.h) object, and point it to a VRS file.
+- (Optional) Query the tags.
+- Query for the streams the file contains, and check their tags if you want.
+- Attach [`StreamPlayer`](https://github.com/facebookresearch/vrs/blob/main/vrs/StreamPlayer.h) objects to the streams you want to read.
+- _Play_ the file. Callbacks of the stream player objects will be invoked for each record in turn, as fast as possible.
+- or: Use the file and/or stream indexes to choose the records to read, one at a time, using the same [`StreamPlayer`](https://github.com/facebookresearch/vrs/blob/main/vrs/StreamPlayer.h) callbacks.
 
-Creating and reading VRS files is demonstrated in a number of other places,
-[including pre-`RecordFormat` & `DataLayout` sample code](https://github.com/facebookresearch/vrs/blob/main/sample_code/SampleRecordAndPlay.cpp),
-[`RecordFormat` & `DataLayout` sample code](https://github.com/facebookresearch/vrs/blob/main/sample_code/SampleRecordFormatDataLayout.cpp), and
-[unit tests](https://github.com/facebookresearch/vrs/blob/main/vrs/test/file_tests/SimpleFileHandlerTest.cpp).
+Creating and reading VRS files is demonstrated in a number of other places, [including pre-`RecordFormat` & `DataLayout` sample code](https://github.com/facebookresearch/vrs/blob/main/sample_code/SampleRecordAndPlay.cpp), [`RecordFormat` & `DataLayout` sample code](https://github.com/facebookresearch/vrs/blob/main/sample_code/SampleRecordFormatDataLayout.cpp), and [unit tests](https://github.com/facebookresearch/vrs/blob/main/vrs/test/file_tests/SimpleFileHandlerTest.cpp).
 
 ### Why are records read using a [`StreamPlayer`](https://github.com/facebookresearch/vrs/blob/main/vrs/StreamPlayer.h) callback object, rather than a "regular" blocking call?
 
