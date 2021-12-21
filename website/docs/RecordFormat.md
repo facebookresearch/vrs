@@ -187,7 +187,7 @@ The name of each field in the `DataLayoutStruct` is prepended by the name of the
 Effectively, the declaration above creates the same `DataPiece` fields and the same datalayout definition as the datalayout definition below, which requires different member variable names to avoid conflicts at the struct level:
 
 ```cpp
-struct MyDataLayou t: public AutoDataLayout {
+struct MyDataLayout: public AutoDataLayout {
   DataPieceVector<vrs::Matrix4Dd> leftHandOrientation{"left_hand/orientation"};
   DataPieceVector<vrs::Matrix3Dd> leftHandTranslation{"left_hand/translation"};
   DataPieceVector<vrs::Matrix4Dd> rightHandOrientation{"right_hand/orientation"};
@@ -238,7 +238,7 @@ When reading a file, you can try to use the appropriate constructor, or you can 
 
 ### Image, Audio, and Custom Content Blocks
 
-Image, audio, and custom content blocks directly contain their payload, and no additional metadata. In some cases, such as for `image/jpg` or `image/png` data, no other information is needed to interpret the data. In other cases, such with `images/raw` images, which are raw pixel buffers, image dimensions, pixel format and possibly stride information are required to know how to interpret the image content block. If that informaton never changes, it may provided directly in the `RecordFormat` definition, otherwise, it might need to be provided in a configuration record, or in the data records themselves, using what we call the Datalayout Conventions.
+Image, audio, and custom content blocks directly contain their payload, and no additional metadata. In some cases, such as for `image/jpg` or `image/png` data, no other information is needed to interpret the data. In other cases, such with `images/raw` images, which are raw pixel buffers, image dimensions, pixel format and possibly stride information are required to know how to interpret the image content block. If that information never changes, it may provided directly in the `RecordFormat` definition, otherwise, it might need to be provided in a configuration record, or in the data records themselves, using what we call the Datalayout Conventions.
 
 <Tabs>
   <TabItem value="example_1" label="Image Content Block Examples" default>
@@ -259,7 +259,7 @@ Please refer to the Image Support section for more details on how to manage imag
 ```cpp
 ContentBlock(ContentType::AUDIO); // Audio content block, without any detail
 ContentBlock(AudioFormat::PCM); // PCM audio data
-ContentBlock(AudioSampleFormat::S16_LE, 2, 48000); // PCM audio data, int16 little endian samples, 2 channels, 48 Khz
+ContentBlock(AudioSampleFormat::S16_LE, 2, 48000); // PCM audio data, int16 little endian samples, 2 channels, 48 kHz
 ```
 
 Audio blocks are analog to image blocks, and are handled the same way.

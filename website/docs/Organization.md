@@ -14,7 +14,7 @@ The VRS documentation has different parts:
     cd <vrs_repo_top_level_folder>
     doxygen vrs/Doxyfile
   ```
-  You'll find the API documention in html at `website/static/doxygen/index.html`.
+  You'll find the API documentation in html at `website/static/doxygen/index.html`.
 - [Sample code](https://github.com/facebookresearch/vrs/tree/main/sample_code), which is not functional, but demonstrates how to use the APIs.
   - [SampleRecordAndPlay.cpp](https://github.com/facebookresearch/vrs/blob/main/sample_code/SampleRecordAndPlay.cpp) demonstrates different ways to create a file, by dumping the whole content from memory to disk after creating all the records in memory, or by writing the record to disk while continuing to create records.
   - [SampleImageReader.cpp](https://github.com/facebookresearch/vrs/blob/main/sample_code/SampleImageReader.cpp) demonstrates how to read typical image records, that is, records containing metadata and an image.
