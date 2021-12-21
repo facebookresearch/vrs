@@ -45,7 +45,7 @@ static const double kStartTimestamp = 1543864285;
 
 static const size_t kRecordSetCount = 3;
 
-using namespace DataLayoutConventions;
+using namespace datalayout_conventions;
 
 // Generate/check a custom block of data with a (very) pseudo random pattern
 struct CustomBlob {

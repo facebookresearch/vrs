@@ -47,7 +47,7 @@ bool mayUsePastConfigurationReader(
   XR_LOGW(
       "Can't define the {} block format for {} to read this {} block with DataLayout. "
       "This might be happening, because the {} format is defined in a configuration record using "
-      "DataLayoutConventions, but {} {} record.",
+      "datalayout conventions, but {} {} record.",
       typeName,
       record.streamId.getName(),
       typeName,
@@ -117,7 +117,7 @@ size_t ContentBlockReader::findContentBlockSize(
   }
   // Try to find the size in the datalayout before this block, but only try once
   if (blockIndex_ > 0 && !contentBlockSizeSpec_) {
-    contentBlockSizeSpec_ = make_unique<DataLayoutConventions::NextContentBlockSizeSpec>();
+    contentBlockSizeSpec_ = make_unique<datalayout_conventions::NextContentBlockSizeSpec>();
     const size_t index = blockIndex_ - 1;
     RecordFormatReader* reader = player.getCurrentRecordFormatReader();
     if (reader->recordFormat.getContentBlock(index).getContentType() == ContentType::DATA_LAYOUT) {
@@ -226,7 +226,7 @@ bool AudioBlockReader::findAudioSpec(
 }
 
 bool AudioBlockReader::audioContentFromAudioSpec(
-    const DataLayoutConventions::AudioSpec& audioSpec,
+    const datalayout_conventions::AudioSpec& audioSpec,
     ContentBlock& audioContentBlock) const {
   AudioSampleFormat sampleFormat = AudioSampleFormat::UNDEFINED;
   uint8_t numChannels = 0;
@@ -340,7 +340,7 @@ bool ImageBlockReader::onImageFound(
     const ContentBlock& contentBlock) {
   if (contentBlock.image().getImageFormat() == ImageFormat::VIDEO) {
     if (!videoFrameSpec_) {
-      videoFrameSpec_ = make_unique<DataLayoutConventions::VideoFrameSpec>();
+      videoFrameSpec_ = make_unique<datalayout_conventions::VideoFrameSpec>();
       // Video frames spec must specified in a datalayout just before the image block
       RecordFormatReader* reader = player.getCurrentRecordFormatReader();
       if (blockIndex_ > 0 &&

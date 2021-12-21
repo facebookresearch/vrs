@@ -1016,12 +1016,12 @@ void printValue(ostream& out, const T& value, const string&) {
 }
 
 template <>
-void printValue<DataLayoutConventions::ImageSpecType>(
+void printValue<datalayout_conventions::ImageSpecType>(
     ostream& out,
-    const DataLayoutConventions::ImageSpecType& value,
+    const datalayout_conventions::ImageSpecType& value,
     const string& label) {
   using namespace special_chars;
-  if (label == DataLayoutConventions::kImagePixelFormat) {
+  if (label == datalayout_conventions::kImagePixelFormat) {
     out << toString(static_cast<PixelFormat>(value)) << " (" << value << ")";
   } else {
     out << value;

@@ -28,13 +28,13 @@ constexpr const char* kSampleFileName = "sample_file.vrs";
 
 /// Sample metadata for configuration records of an image stream.
 struct CameraStreamConfig : public AutoDataLayout {
-  using ImageSpecType = DataLayoutConventions::ImageSpecType;
+  using ImageSpecType = datalayout_conventions::ImageSpecType;
 
   // Spec of a raw image, stored in data records (controlled by most recent config record)
-  DataPieceValue<ImageSpecType> width{DataLayoutConventions::kImageWidth};
-  DataPieceValue<ImageSpecType> height{DataLayoutConventions::kImageHeight};
+  DataPieceValue<ImageSpecType> width{datalayout_conventions::kImageWidth};
+  DataPieceValue<ImageSpecType> height{datalayout_conventions::kImageHeight};
   // Prefer to specify a storage type when storing an enum, to make the storage format explicit.
-  DataPieceEnum<PixelFormat, ImageSpecType> pixelFormat{DataLayoutConventions::kImagePixelFormat};
+  DataPieceEnum<PixelFormat, ImageSpecType> pixelFormat{datalayout_conventions::kImagePixelFormat};
 
   // Additional configuration information for the camera
   DataPieceVector<float> cameraCalibration{"camera_calibration"};

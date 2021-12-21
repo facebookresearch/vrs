@@ -20,7 +20,7 @@
 #include <vrs/RecordFormatStreamPlayer.h>
 
 using namespace vrs;
-using namespace vrs::DataLayoutConventions;
+using namespace vrs::datalayout_conventions;
 
 struct ContentBlockReaderTest : testing::Test {};
 namespace {

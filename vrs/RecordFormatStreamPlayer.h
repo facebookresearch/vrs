@@ -33,7 +33,7 @@ class DataLayoutBlockReader;
 class ImageBlockReader;
 class AudioBlockReader;
 
-namespace DataLayoutConventions {
+namespace datalayout_conventions {
 class VideoFrameSpec;
 }
 

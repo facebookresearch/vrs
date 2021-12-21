@@ -28,7 +28,7 @@
 #include "SharedDefinitions.h"
 
 using namespace vrs;
-using namespace vrs::DataLayoutConventions;
+using namespace vrs::datalayout_conventions;
 using namespace vrs_sample_apps;
 
 namespace vrs_sample_apps {

@@ -61,7 +61,7 @@ class ContentBlockReader {
 
   const RecordFormat& recordFormat_;
   const size_t blockIndex_;
-  unique_ptr<DataLayoutConventions::NextContentBlockSizeSpec> contentBlockSizeSpec_;
+  unique_ptr<datalayout_conventions::NextContentBlockSizeSpec> contentBlockSizeSpec_;
 };
 
 /// \brief Specialized version of ContentBlockReader to handle content blocks containing an image.
@@ -77,8 +77,8 @@ class ImageBlockReader : public ContentBlockReader {
   bool
   onImageFound(const CurrentRecord& rec, RecordFormatStreamPlayer& player, const ContentBlock& cb);
 
-  DataLayoutConventions::ImageSpec imageSpec_;
-  unique_ptr<DataLayoutConventions::VideoFrameSpec> videoFrameSpec_;
+  datalayout_conventions::ImageSpec imageSpec_;
+  unique_ptr<datalayout_conventions::VideoFrameSpec> videoFrameSpec_;
 };
 
 /// \brief Specialized version of ContentBlockReader to handle content blocks containing audio data.
@@ -92,7 +92,7 @@ class AudioBlockReader : public ContentBlockReader {
 
  protected:
   bool readAudioContentBlock(const CurrentRecord&, RecordFormatStreamPlayer&, const ContentBlock&);
-  bool audioContentFromAudioSpec(const DataLayoutConventions::AudioSpec&, ContentBlock&) const;
+  bool audioContentFromAudioSpec(const datalayout_conventions::AudioSpec&, ContentBlock&) const;
   bool findAudioSpec(
       const CurrentRecord&,
       RecordFormatStreamPlayer&,
@@ -100,7 +100,7 @@ class AudioBlockReader : public ContentBlockReader {
       size_t countOfBlocksToSearch);
   bool tryCurrentAudioSpec(const CurrentRecord&, RecordFormatStreamPlayer&, bool& readNextBlock);
 
-  DataLayoutConventions::AudioSpec audioSpec_;
+  datalayout_conventions::AudioSpec audioSpec_;
 };
 
 /// \brief Specialized version of ContentBlockReader to handle a content block containing custom

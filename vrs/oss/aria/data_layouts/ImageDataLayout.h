@@ -26,7 +26,7 @@
 
 namespace aria {
 
-using vrs::DataLayoutConventions::ImageSpecType;
+using vrs::datalayout_conventions::ImageSpecType;
 
 struct ImageSensorConfigurationLayout : public vrs::AutoDataLayout {
   static constexpr uint32_t kVersion = 2;
@@ -47,10 +47,10 @@ struct ImageSensorConfigurationLayout : public vrs::AutoDataLayout {
   vrs::DataPieceValue<double> nominalRateHz{"nominal_rate"};
 
   // Image description. Part of general VRS data layout conventions.
-  vrs::DataPieceValue<ImageSpecType> imageWidth{vrs::DataLayoutConventions::kImageWidth};
-  vrs::DataPieceValue<ImageSpecType> imageHeight{vrs::DataLayoutConventions::kImageHeight};
-  vrs::DataPieceValue<ImageSpecType> imageStride{vrs::DataLayoutConventions::kImageStride};
-  vrs::DataPieceValue<ImageSpecType> pixelFormat{vrs::DataLayoutConventions::kImagePixelFormat};
+  vrs::DataPieceValue<ImageSpecType> imageWidth{vrs::datalayout_conventions::kImageWidth};
+  vrs::DataPieceValue<ImageSpecType> imageHeight{vrs::datalayout_conventions::kImageHeight};
+  vrs::DataPieceValue<ImageSpecType> imageStride{vrs::datalayout_conventions::kImageStride};
+  vrs::DataPieceValue<ImageSpecType> pixelFormat{vrs::datalayout_conventions::kImagePixelFormat};
 
   // Exposure duration min, max [s]. NaN if not available.
   vrs::DataPieceValue<double> exposureDurationMin{"exposure_duration.min"};

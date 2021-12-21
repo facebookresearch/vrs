@@ -312,7 +312,7 @@ class RecordFileReader {
 
   /// Helper function: Read the first configuration record of a particular stream.
   /// This might be necessary to properly read records containing image or audio blocks,
-  /// if their configuration is contained in the configuration record using DataLayoutConventions.
+  /// if their configuration is contained in the configuration record using datalayout conventions.
   /// Notes:
   ///  - a RecordFormatStreamPlayer must be attached to the stream prior to making this call,
   ///    because that's where the configuration data is being cached.
@@ -331,7 +331,7 @@ class RecordFileReader {
 
   /// Helper function: Read the first configuration record of all the streams.
   /// This might be necessary to properly read records containing image or audio blocks,
-  /// if their configuration is contained in the configuration record using DataLayoutConventions.
+  /// if their configuration is contained in the configuration record using datalayout conventions.
   /// Notes:
   ///  - a RecordFormatStreamPlayer must be attached to the stream prior to making this call,
   ///    because that's where the configuration data is being cached.

@@ -31,14 +31,14 @@ struct AudioConfigurationLayout : public vrs::AutoDataLayout {
   vrs::DataPieceValue<std::uint32_t> streamId{"stream_id"};
 
   // Number of channels in the audio stream.
-  vrs::DataPieceValue<std::uint8_t> numChannels{vrs::DataLayoutConventions::kAudioChannelCount};
+  vrs::DataPieceValue<std::uint8_t> numChannels{vrs::datalayout_conventions::kAudioChannelCount};
 
   // Number of samples per second. Typical values: 44100Hz.
-  vrs::DataPieceValue<std::uint32_t> sampleRate{vrs::DataLayoutConventions::kAudioSampleRate};
+  vrs::DataPieceValue<std::uint32_t> sampleRate{vrs::datalayout_conventions::kAudioSampleRate};
 
   // Format of each subsample, deciding the bits and type per subsample.
   // Convertible from vrs::AudioSampleFormat.
-  vrs::DataPieceValue<std::uint8_t> sampleFormat{vrs::DataLayoutConventions::kAudioSampleFormat};
+  vrs::DataPieceValue<std::uint8_t> sampleFormat{vrs::datalayout_conventions::kAudioSampleFormat};
 
   vrs::AutoDataLayoutEnd endLayout;
 };

@@ -28,7 +28,7 @@
 
 using namespace std;
 using namespace vrs;
-using namespace vrs::DataLayoutConventions;
+using namespace vrs::datalayout_conventions;
 using namespace vrs_sample_apps;
 
 /// Sample app, to show how to get data from configuration records, maybe to setup a replay.

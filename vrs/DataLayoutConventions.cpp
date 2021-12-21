@@ -17,7 +17,7 @@
 #include "RecordFormat.h"
 
 namespace vrs {
-namespace DataLayoutConventions {
+namespace datalayout_conventions {
 
 ContentBlock ImageSpec::getImageContentBlock(const ImageContentBlockSpec& base, size_t blockSize) {
   PixelFormat readPixelFormat{PixelFormat::UNDEFINED};
@@ -79,5 +79,5 @@ ContentBlock ImageSpec::getImageContentBlock(const ImageContentBlockSpec& base, 
   return {};
 }
 
-} // namespace DataLayoutConventions
+} // namespace datalayout_conventions
 } // namespace vrs

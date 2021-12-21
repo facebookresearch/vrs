@@ -24,12 +24,12 @@
 #include <vrs/os/Utils.h>
 
 using namespace vrs;
-using namespace vrs::DataLayoutConventions;
+using namespace vrs::datalayout_conventions;
 using namespace std;
 
 namespace TestFormat {
 
-using DataLayoutConventions::ImageSpecType;
+using datalayout_conventions::ImageSpecType;
 
 struct Configuration : public AutoDataLayout {
   enum : uint32_t { kVersion = 1 };

@@ -22,7 +22,7 @@
 namespace vrs {
 
 /// Name and type conventions used to map ContentBlockReader needs to DataLayout data
-namespace DataLayoutConventions {
+namespace datalayout_conventions {
 
 /// Convention to specify the size of the content block following
 constexpr const char* kNextContentBlockSize = "next_content_block_size";
@@ -146,5 +146,11 @@ class AudioSpec : public AutoDataLayout {
   AutoDataLayoutEnd end;
 };
 
-} // namespace DataLayoutConventions
+} // namespace datalayout_conventions
+
+// Previous name to help transition.
+namespace DataLayoutConventions {
+using namespace datalayout_conventions;
+}
+
 } // namespace vrs

@@ -28,7 +28,7 @@ using namespace vrs;
 
 namespace vrs_sample_code {
 
-using DataLayoutConventions::ImageSpecType;
+using datalayout_conventions::ImageSpecType;
 
 /*
  * This sample code demonstrates the use of the RecordFormat & DataLayout.
@@ -47,10 +47,10 @@ using DataLayoutConventions::ImageSpecType;
 class MyCameraDataLayoutConfiguration : public AutoDataLayout {
  public:
   // Spec of a raw image, stored in data records (controlled by most recent config record)
-  DataPieceValue<ImageSpecType> width{DataLayoutConventions::kImageWidth};
-  DataPieceValue<ImageSpecType> height{DataLayoutConventions::kImageHeight};
+  DataPieceValue<ImageSpecType> width{datalayout_conventions::kImageWidth};
+  DataPieceValue<ImageSpecType> height{datalayout_conventions::kImageHeight};
   // Prefer to specify a storage type when storing an enum, to make the storage format explicit.
-  DataPieceEnum<PixelFormat, ImageSpecType> pixelFormat{DataLayoutConventions::kImagePixelFormat};
+  DataPieceEnum<PixelFormat, ImageSpecType> pixelFormat{datalayout_conventions::kImagePixelFormat};
 
   // Additional configuration information for the camera
   DataPieceValue<uint32_t> cameraId{"camera_id"};
@@ -226,7 +226,7 @@ class MyCameraStreamPlayer : public RecordFormatStreamPlayer {
 
   // When a RecordFormat image block definition isn't specific enough to describe a raw image
   // format, VRS will search for image spec definitions automatically, following the procedure
-  // described in DataLayoutConventions.
+  // described in DataLayoutConventions.h.
   bool onImageRead(const CurrentRecord& record, size_t blockIndex, const ContentBlock& block)
       override {
     // Unlike with VRS 1.0 APIs, the image data was not read yet: allocate your own buffer & read!

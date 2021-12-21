@@ -33,7 +33,7 @@
 
 using namespace std;
 using namespace vrs;
-using namespace vrs::DataLayoutConventions;
+using namespace vrs::datalayout_conventions;
 
 namespace {
 
@@ -56,7 +56,7 @@ using ::vrs::DataReference;
 using ::vrs::Point3Df;
 using ::vrs::Point4Df;
 using ::vrs::StreamPlayer;
-using ::vrs::DataLayoutConventions::ImageSpecType;
+using ::vrs::datalayout_conventions::ImageSpecType;
 using ::vrs::FileFormat::LittleEndian;
 
 static const int32_t kCalibrationDataSize = 22;
@@ -166,10 +166,10 @@ class DataLayoutConfiguration : public AutoDataLayout {
  public:
   enum : uint32_t { kVersion = 5 };
 
-  DataPieceValue<ImageSpecType> width{::vrs::DataLayoutConventions::kImageWidth};
-  DataPieceValue<ImageSpecType> height{::vrs::DataLayoutConventions::kImageHeight};
-  DataPieceValue<ImageSpecType> bytesPerPixels{::vrs::DataLayoutConventions::kImageBytesPerPixel};
-  DataPieceValue<ImageSpecType> format{::vrs::DataLayoutConventions::kImagePixelFormat};
+  DataPieceValue<ImageSpecType> width{::vrs::datalayout_conventions::kImageWidth};
+  DataPieceValue<ImageSpecType> height{::vrs::datalayout_conventions::kImageHeight};
+  DataPieceValue<ImageSpecType> bytesPerPixels{::vrs::datalayout_conventions::kImageBytesPerPixel};
+  DataPieceValue<ImageSpecType> format{::vrs::datalayout_conventions::kImagePixelFormat};
   DataPieceValue<uint32_t> cameraId{"camera_id"};
   DataPieceValue<uint16_t> cameraSerial{"camera_serial"};
   DataPieceArray<float> calibration{"camera_calibration", kCalibrationDataSize};

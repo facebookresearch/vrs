@@ -46,7 +46,7 @@ static const uint32_t kDataVersion = 1;
 
 static const double kStartTimestamp = 1543864285;
 
-using DataLayoutConventions::ImageSpecType;
+using datalayout_conventions::ImageSpecType;
 
 double getFrameTimestamp(uint32_t frameNumber) {
   uint32_t frameGroup = frameNumber / kImagesPerTimestamp;
@@ -56,9 +56,9 @@ double getFrameTimestamp(uint32_t frameNumber) {
 class ImageStreamConfiguration : public AutoDataLayout {
  public:
   // Define the image format following conventions
-  DataPieceValue<ImageSpecType> width{DataLayoutConventions::kImageWidth};
-  DataPieceValue<ImageSpecType> height{DataLayoutConventions::kImageHeight};
-  DataPieceEnum<PixelFormat, ImageSpecType> pixelFormat{DataLayoutConventions::kImagePixelFormat};
+  DataPieceValue<ImageSpecType> width{datalayout_conventions::kImageWidth};
+  DataPieceValue<ImageSpecType> height{datalayout_conventions::kImageHeight};
+  DataPieceEnum<PixelFormat, ImageSpecType> pixelFormat{datalayout_conventions::kImagePixelFormat};
 
   // Some user code fields...
   DataPieceString cameraSerial{"camera_serial"};
