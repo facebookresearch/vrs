@@ -69,7 +69,10 @@ instructions for macOS and Ubuntu.
   brew install node doxygen
   ```
 
-### Install build tools & libraries (Linux)
+### Install build tools & libraries (Ubuntu)
+
+_These instructions are validated using Ubuntu 20.04, whereas Ubuntu 18.04
+doesn't install recent enough versions of cmake, fmt, lz4, and zstd._
 
 - install tools & libraries:
   ```
@@ -168,7 +171,7 @@ are provided. We are working on open sourcing more code:
 - `VRSplayer`: a basic "player", to view VRS file like multi-stream video files.
 - `pyvrs`: a Python library to work with VRS files in Python.
 - integration with PyTorch, so ML jobs can consume VRS files as training data.
-- tooling to build VRS container files optimized for PyTorch traning.
+- tooling to build VRS container files optimized for PyTorch training.
 - video codec compression support.
 - building blocks to implement network streaming.
 
