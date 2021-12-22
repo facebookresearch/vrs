@@ -54,7 +54,7 @@ RecordFileReader::~RecordFileReader() {
 }
 
 void RecordFileReader::setOpenProgressLogger(ProgressLogger* progressLogger) {
-  if (progressLogger) {
+  if (progressLogger != nullptr) {
     openProgressLogger_ = progressLogger;
   } else {
     // so we can always assume we have a logger active
@@ -528,7 +528,7 @@ StreamId RecordFileReader::getStreamForTag(
 
 const IndexRecord::RecordInfo* RecordFileReader::getRecord(StreamId streamId, uint32_t indexNumber)
     const {
-  auto& index = getIndex(streamId);
+  const auto& index = getIndex(streamId);
   return indexNumber < index.size() ? index[indexNumber] : nullptr;
 }
 
@@ -536,7 +536,7 @@ const IndexRecord::RecordInfo* RecordFileReader::getRecord(
     StreamId streamId,
     Record::Type recordType,
     uint32_t indexNumber) const {
-  auto& index = getIndex(streamId);
+  const auto& index = getIndex(streamId);
   if (indexNumber >= index.size()) {
     return nullptr;
   }
@@ -701,7 +701,7 @@ const vector<const IndexRecord::RecordInfo*>& RecordFileReader::getIndex(StreamI
       streamIndex_[iter.first].reserve(iter.second);
     }
     // We can now create the indexes, trusting that the emplace_back operations will be trivial
-    for (auto& recordIndex : recordIndex_) {
+    for (const auto& recordIndex : recordIndex_) {
       streamIndex_[recordIndex.streamId].emplace_back(&recordIndex);
     }
   }
@@ -713,9 +713,9 @@ uint32_t RecordFileReader::getRecordCount(StreamId streamId) const {
 }
 
 uint32_t RecordFileReader::getRecordCount(StreamId streamId, Record::Type recordType) const {
-  auto& recordIndex = getIndex(streamId);
+  const auto& recordIndex = getIndex(streamId);
   uint32_t count = 0;
-  for (auto& recordInfo : recordIndex) {
+  for (const auto& recordInfo : recordIndex) {
     if (recordInfo->recordType == recordType) {
       count++;
     }
@@ -724,7 +724,7 @@ uint32_t RecordFileReader::getRecordCount(StreamId streamId, Record::Type record
 }
 
 double RecordFileReader::getFirstDataRecordTime() const {
-  for (auto& record : recordIndex_) {
+  for (const auto& record : recordIndex_) {
     if (record.recordType == Record::Type::DATA) {
       return record.timestamp;
     }
