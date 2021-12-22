@@ -12,8 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set(SAMPLE_PLAYBACK_APP_SRCS "SamplePlaybackApp.cpp")
-add_executable(sample_playback_app ${SAMPLE_PLAYBACK_APP_SRCS})
+add_executable(aria_file_reader "AriaFileReader.cpp")
+target_link_libraries(aria_file_reader
+    PUBLIC
+        vrs
+        Fmt::Fmt
+)
+
+add_executable(sample_playback_app "SamplePlaybackApp.cpp")
 target_link_libraries(sample_playback_app
     PUBLIC
         vrs
@@ -21,9 +27,7 @@ target_link_libraries(sample_playback_app
         vrs_os
 )
 
-
-set(SAMPLE_RECORDING_APP_SRCS "SampleRecordingApp.cpp")
-add_executable(sample_recording_app ${SAMPLE_RECORDING_APP_SRCS})
+add_executable(sample_recording_app "SampleRecordingApp.cpp")
 target_link_libraries(sample_recording_app
     PUBLIC
         vrs

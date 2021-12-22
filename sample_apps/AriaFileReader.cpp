@@ -14,6 +14,9 @@
 
 #include <cassert>
 
+#include <cstdio>
+
+#include <vrs/ErrorCode.h>
 #include <vrs/RecordFileReader.h>
 #include <vrs/RecordFormatStreamPlayer.h>
 
@@ -198,7 +201,8 @@ struct AriaFileReader {
   /// This function is the entry point for your reader
   static void readFile(const string& vrsFilePath) {
     RecordFileReader reader;
-    if (reader.openFile(vrsFilePath) == 0) {
+    int status = reader.openFile(vrsFilePath);
+    if (status == SUCCESS) {
       std::vector<std::unique_ptr<StreamPlayer>> streamPlayers;
       // Map the devices referenced in the file to stream player objects
       // Just ignore the device(s) you do not care for
@@ -241,8 +245,14 @@ struct AriaFileReader {
           streamPlayers.emplace_back(move(streamPlayer));
         }
       }
-      // We're ready: read all the records in order, and send them to the stream players registered
-      reader.readAllRecords();
+      if (streamPlayers.empty()) {
+        fmt::print(stderr, "Found no Aria stream in '{}'...\n", vrsFilePath);
+      } else {
+        fmt::print("Found {} Aria streams in '{}'.\n", streamPlayers.size(), vrsFilePath);
+        reader.readAllRecords();
+      }
+    } else {
+      fmt::print(stderr, "Failed to open '{}', {}.\n", vrsFilePath, errorCodeToMessage(status));
     }
   }
 };
@@ -250,6 +260,8 @@ struct AriaFileReader {
 } // namespace aria_sample_reader
 
 int main(int argc, char** argv) {
-  aria_sample_reader::AriaFileReader::readFile("myAriaFile.vrs");
+  if (argc > 1) {
+    aria_sample_reader::AriaFileReader::readFile(argv[1]);
+  }
   return 0;
 }
