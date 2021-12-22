@@ -63,6 +63,12 @@ TEST_F(ChunkedFileTester, ChunkedFileTest) {
   EXPECT_EQ(file.openFile(kChunkedFile), 0);
   EXPECT_EQ(file.getRecordCount(), 306); // number of records if all chunks are found
   EXPECT_EQ(file.getFileChunks().size(), 3);
+  EXPECT_TRUE(file.mightContainImages(StreamId(RecordableTypeId::ForwardCameraRecordableClass, 1)));
+  EXPECT_FALSE(file.mightContainImages(StreamId(RecordableTypeId::AudioStream, 1)));
+  EXPECT_FALSE(file.mightContainImages(StreamId(RecordableTypeId::MotionRecordableClass, 1)));
+  EXPECT_FALSE(file.mightContainAudio(StreamId(RecordableTypeId::ForwardCameraRecordableClass, 1)));
+  EXPECT_TRUE(file.mightContainAudio(StreamId(RecordableTypeId::AudioStream, 1)));
+  EXPECT_FALSE(file.mightContainAudio(StreamId(RecordableTypeId::MotionRecordableClass, 1)));
 }
 
 TEST_F(ChunkedFileTester, OpenChunkedFileTest) {

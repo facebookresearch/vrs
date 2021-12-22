@@ -827,6 +827,42 @@ const string& RecordFileReader::getFlavor(StreamId streamId) const {
   return getTag(getTags(streamId).vrs, Recordable::getFlavorTagName());
 }
 
+bool RecordFileReader::mightContainImages(StreamId streamId) const {
+  return mightContainContentTypeInDataRecord(streamId, ContentType::IMAGE);
+}
+
+bool RecordFileReader::mightContainAudio(StreamId streamId) const {
+  return mightContainContentTypeInDataRecord(streamId, ContentType::AUDIO);
+}
+
+bool RecordFileReader::mightContainContentTypeInDataRecord(StreamId streamId, ContentType type)
+    const {
+  RecordFormatMap formats;
+  if (getRecordFormats(streamId, formats) > 0) {
+    for (const auto& format : formats) {
+      if (format.second.getBlocksOfTypeCount(type) > 0) {
+        // Find a data record for that stream, but don't create a stream index if none exists yet
+        auto iter = streamIndex_.find(streamId);
+        if (iter != streamIndex_.end()) {
+          for (const IndexRecord::RecordInfo* record : iter->second) {
+            if (record->recordType == Record::Type::DATA) {
+              return true;
+            }
+          }
+        } else {
+          for (const IndexRecord::RecordInfo& record : recordIndex_) {
+            if (record.streamId == streamId && record.recordType == Record::Type::DATA) {
+              return true;
+            }
+          }
+        }
+        return false;
+      }
+    }
+  }
+  return false;
+}
+
 int RecordFileReader::readAllRecords() {
   if (!file_->isOpened()) {
     XR_LOGE("No file open");
