@@ -25,7 +25,7 @@
 
 namespace aria {
 
-struct AudioConfigurationLayout : public vrs::AutoDataLayout {
+struct AudioConfigRecordMetadata : public vrs::AutoDataLayout {
   static constexpr uint32_t kVersion = 2;
 
   vrs::DataPieceValue<std::uint32_t> streamId{"stream_id"};
@@ -43,7 +43,7 @@ struct AudioConfigurationLayout : public vrs::AutoDataLayout {
   vrs::AutoDataLayoutEnd endLayout;
 };
 
-struct AudioDataLayout : public vrs::AutoDataLayout {
+struct AudioDataRecordMetadata : public vrs::AutoDataLayout {
   static constexpr uint32_t kVersion = 2;
 
   // A list of timestamps of each sample in the block, following the same order they are stored in

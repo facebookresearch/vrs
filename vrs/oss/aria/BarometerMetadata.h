@@ -19,32 +19,39 @@
 #include <vrs/DataLayout.h>
 #include <vrs/DataPieces.h>
 
-// Note: The VRS stream type for time sync data is vrs::RecordableTypeId::TimeRecordableClass.
+// Note: The VRS stream type for barometer data is
+// vrs::RecordableTypeId::BarometerRecordableClass.
 
 namespace aria {
 
-struct TimeSyncConfigurationLayout : public vrs::AutoDataLayout {
+struct BarometerConfigRecordMetadata : public vrs::AutoDataLayout {
   static constexpr uint32_t kVersion = 1;
 
   vrs::DataPieceValue<std::uint32_t> streamId{"stream_id"};
+  vrs::DataPieceString sensorModelName{"sensor_model_name"};
 
-  // Sample rate for time data [Hz]
-  vrs::DataPieceValue<double> sampleRateHz{"sample_rate_hz"};
+  // Sample rate for temperature and pressure data (in unit of Hz)
+  vrs::DataPieceValue<double> sampleRate{"sample_rate"};
 
-  vrs::AutoDataLayoutEnd endLayout;
+  vrs::AutoDataLayoutEnd end;
 };
 
-struct TimeSyncDataLayout : public vrs::AutoDataLayout {
+struct BarometerDataRecordMetadata : public vrs::AutoDataLayout {
   static constexpr uint32_t kVersion = 1;
 
-  // The capture timestamp in nanoseconds using a monotonic clock, same clock that
-  // is used for the VRS records timestamps
-  vrs::DataPieceValue<std::int64_t> monotonicTimestampNs{"monotonic_timestamp_ns"};
+  // Timestamp of data capture in board clock, in unit of nanoseconds.
+  vrs::DataPieceValue<std::int64_t> captureTimestampNs{"capture_timestamp_ns"};
 
-  // The real time clock or wall clock in nanoseconds
-  vrs::DataPieceValue<std::int64_t> realTimestampNs{"real_timestamp_ns"};
+  // Temperature in Celcius degree.
+  vrs::DataPieceValue<double> temperature{"temperature"};
 
-  vrs::AutoDataLayoutEnd endLayout;
+  // Pressure in Pascal.
+  vrs::DataPieceValue<double> pressure{"pressure"};
+
+  // Relative altitude in meters.
+  vrs::DataPieceValue<double> altitude{"altitude"};
+
+  vrs::AutoDataLayoutEnd end;
 };
 
 } // namespace aria

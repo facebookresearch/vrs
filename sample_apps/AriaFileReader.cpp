@@ -20,14 +20,14 @@
 #include <vrs/RecordFileReader.h>
 #include <vrs/RecordFormatStreamPlayer.h>
 
-#include <vrs/oss/aria/AudioDataLayout.h>
-#include <vrs/oss/aria/BaroDataLayout.h>
-#include <vrs/oss/aria/BluetoothBeaconDataLayouts.h>
-#include <vrs/oss/aria/GpsDataLayout.h>
-#include <vrs/oss/aria/ImageDataLayout.h>
-#include <vrs/oss/aria/MotionDataLayout.h>
-#include <vrs/oss/aria/TimeSyncDataLayout.h>
-#include <vrs/oss/aria/WifiBeaconDataLayouts.h>
+#include <vrs/oss/aria/AudioMetadata.h>
+#include <vrs/oss/aria/BarometerMetadata.h>
+#include <vrs/oss/aria/BluetoothBeaconMetadata.h>
+#include <vrs/oss/aria/GpsMetadata.h>
+#include <vrs/oss/aria/ImageSensorMetadata.h>
+#include <vrs/oss/aria/MotionSensorMetadata.h>
+#include <vrs/oss/aria/TimeSyncMetadata.h>
+#include <vrs/oss/aria/WifiBeaconMetadata.h>
 
 using namespace vrs;
 
@@ -43,14 +43,14 @@ void printDataLayout(const CurrentRecord& r, DataLayout& datalayout) {
   datalayout.printLayoutCompact(std::cout, "  ");
 }
 
-class AriaImagePlayer : public RecordFormatStreamPlayer {
+class AriaImageSensorPlayer : public RecordFormatStreamPlayer {
   bool onDataLayoutRead(const CurrentRecord& r, size_t blockIndex, DataLayout& dl) override {
     if (r.recordType == Record::Type::CONFIGURATION) {
-      auto& config = getExpectedLayout<aria::ImageSensorConfigurationLayout>(dl, blockIndex);
+      auto& config = getExpectedLayout<aria::ImageSensorConfigRecordMetadata>(dl, blockIndex);
       // Read config record metadata...
       printDataLayout(r, config);
     } else if (r.recordType == Record::Type::DATA) {
-      auto& data = getExpectedLayout<aria::ImageDataLayout>(dl, blockIndex);
+      auto& data = getExpectedLayout<aria::ImageSensorDataRecordMetadata>(dl, blockIndex);
       // Read data record metadata...
       printDataLayout(r, data);
     }
@@ -78,11 +78,11 @@ class AriaImagePlayer : public RecordFormatStreamPlayer {
 class AriaMotionSensorPlayer : public RecordFormatStreamPlayer {
   bool onDataLayoutRead(const CurrentRecord& r, size_t blockIndex, DataLayout& dl) override {
     if (r.recordType == Record::Type::CONFIGURATION) {
-      auto& config = getExpectedLayout<aria::MotionSensorConfigurationLayout>(dl, blockIndex);
+      auto& config = getExpectedLayout<aria::MotionSensorConfigRecordMetadata>(dl, blockIndex);
       // Read config record metadata...
       printDataLayout(r, config);
     } else if (r.recordType == Record::Type::DATA) {
-      auto& data = getExpectedLayout<aria::MotionDataLayout>(dl, blockIndex);
+      auto& data = getExpectedLayout<aria::MotionSensorDataRecordMetadata>(dl, blockIndex);
       // Read data record metadata...
       printDataLayout(r, data);
     }
@@ -90,14 +90,14 @@ class AriaMotionSensorPlayer : public RecordFormatStreamPlayer {
   }
 };
 
-class AriaStereoAudioPlayer : public RecordFormatStreamPlayer {
+class AriaAudioPlayer : public RecordFormatStreamPlayer {
   bool onDataLayoutRead(const CurrentRecord& r, size_t blockIndex, DataLayout& dl) override {
     if (r.recordType == Record::Type::CONFIGURATION) {
-      auto& config = getExpectedLayout<aria::AudioConfigurationLayout>(dl, blockIndex);
+      auto& config = getExpectedLayout<aria::AudioConfigRecordMetadata>(dl, blockIndex);
       // Read config record metadata...
       printDataLayout(r, config);
     } else if (r.recordType == Record::Type::DATA) {
-      auto& data = getExpectedLayout<aria::AudioDataLayout>(dl, blockIndex);
+      auto& data = getExpectedLayout<aria::AudioDataRecordMetadata>(dl, blockIndex);
       // Read data record metadata...
       printDataLayout(r, data);
     }
@@ -125,11 +125,11 @@ class AriaStereoAudioPlayer : public RecordFormatStreamPlayer {
 class AriaWifiBeaconPlayer : public RecordFormatStreamPlayer {
   bool onDataLayoutRead(const CurrentRecord& r, size_t blockIndex, DataLayout& dl) override {
     if (r.recordType == Record::Type::CONFIGURATION) {
-      auto& config = getExpectedLayout<aria::WifiBeaconConfigurationLayout>(dl, blockIndex);
+      auto& config = getExpectedLayout<aria::WifiBeaconConfigRecordMetadata>(dl, blockIndex);
       // Read config record metadata...
       printDataLayout(r, config);
     } else if (r.recordType == Record::Type::DATA) {
-      auto& data = getExpectedLayout<aria::WifiBeaconDataLayout>(dl, blockIndex);
+      auto& data = getExpectedLayout<aria::WifiBeaconDataRecordMetadata>(dl, blockIndex);
       // Read data record metadata...
       printDataLayout(r, data);
     }
@@ -137,14 +137,14 @@ class AriaWifiBeaconPlayer : public RecordFormatStreamPlayer {
   }
 };
 
-class AriaBlueToothBeaconPlayer : public RecordFormatStreamPlayer {
+class AriaBluetoothBeaconPlayer : public RecordFormatStreamPlayer {
   bool onDataLayoutRead(const CurrentRecord& r, size_t blockIndex, DataLayout& dl) override {
     if (r.recordType == Record::Type::CONFIGURATION) {
-      auto& config = getExpectedLayout<aria::BluetoothBeaconConfigurationLayout>(dl, blockIndex);
+      auto& config = getExpectedLayout<aria::BluetoothBeaconConfigRecordMetadata>(dl, blockIndex);
       // Read config record metadata...
       printDataLayout(r, config);
     } else if (r.recordType == Record::Type::DATA) {
-      auto& data = getExpectedLayout<aria::BluetoothBeaconDataLayout>(dl, blockIndex);
+      auto& data = getExpectedLayout<aria::BluetoothBeaconDataRecordMetadata>(dl, blockIndex);
       // Read data record metadata...
       printDataLayout(r, data);
     }
@@ -155,11 +155,11 @@ class AriaBlueToothBeaconPlayer : public RecordFormatStreamPlayer {
 class AriaGpsPlayer : public RecordFormatStreamPlayer {
   bool onDataLayoutRead(const CurrentRecord& r, size_t blockIndex, DataLayout& dl) override {
     if (r.recordType == Record::Type::CONFIGURATION) {
-      auto& config = getExpectedLayout<aria::GpsConfigurationLayout>(dl, blockIndex);
+      auto& config = getExpectedLayout<aria::GpsConfigRecordMetadata>(dl, blockIndex);
       // Read config record metadata...
       printDataLayout(r, config);
     } else if (r.recordType == Record::Type::DATA) {
-      auto& data = getExpectedLayout<aria::GpsDataLayout>(dl, blockIndex);
+      auto& data = getExpectedLayout<aria::GpsDataRecordMetadata>(dl, blockIndex);
       // Read data record metadata...
       printDataLayout(r, data);
     }
@@ -170,11 +170,11 @@ class AriaGpsPlayer : public RecordFormatStreamPlayer {
 class AriaBarometerPlayer : public RecordFormatStreamPlayer {
   bool onDataLayoutRead(const CurrentRecord& r, size_t blockIndex, DataLayout& dl) override {
     if (r.recordType == Record::Type::CONFIGURATION) {
-      auto& config = getExpectedLayout<aria::BarometerConfigurationLayout>(dl, blockIndex);
+      auto& config = getExpectedLayout<aria::BarometerConfigRecordMetadata>(dl, blockIndex);
       // Read config record metadata...
       printDataLayout(r, config);
     } else if (r.recordType == Record::Type::DATA) {
-      auto& data = getExpectedLayout<aria::BarometerDataLayout>(dl, blockIndex);
+      auto& data = getExpectedLayout<aria::BarometerDataRecordMetadata>(dl, blockIndex);
       // Read data record metadata...
       printDataLayout(r, data);
     }
@@ -185,11 +185,11 @@ class AriaBarometerPlayer : public RecordFormatStreamPlayer {
 class AriaTimeSyncPlayer : public RecordFormatStreamPlayer {
   bool onDataLayoutRead(const CurrentRecord& r, size_t blockIndex, DataLayout& dl) override {
     if (r.recordType == Record::Type::CONFIGURATION) {
-      auto& config = getExpectedLayout<aria::TimeSyncConfigurationLayout>(dl, blockIndex);
+      auto& config = getExpectedLayout<aria::TimeSyncConfigRecordMetadata>(dl, blockIndex);
       // Read config record metadata...
       printDataLayout(r, config);
     } else if (r.recordType == Record::Type::DATA) {
-      auto& data = getExpectedLayout<aria::TimeSyncDataLayout>(dl, blockIndex);
+      auto& data = getExpectedLayout<aria::TimeSyncDataRecordMetadata>(dl, blockIndex);
       // Read data record metadata...
       printDataLayout(r, data);
     }
@@ -212,7 +212,7 @@ struct AriaFileReader {
           case RecordableTypeId::SlamCameraData:
           case RecordableTypeId::RgbCameraRecordableClass:
           case RecordableTypeId::EyeCameraRecordableClass:
-            streamPlayer = std::make_unique<AriaImagePlayer>();
+            streamPlayer = std::make_unique<AriaImageSensorPlayer>();
             break;
           case RecordableTypeId::SlamImuData:
           case RecordableTypeId::SlamMagnetometerData:
@@ -222,10 +222,10 @@ struct AriaFileReader {
             streamPlayer = std::make_unique<AriaWifiBeaconPlayer>();
             break;
           case RecordableTypeId::StereoAudioRecordableClass:
-            streamPlayer = std::make_unique<AriaStereoAudioPlayer>();
+            streamPlayer = std::make_unique<AriaAudioPlayer>();
             break;
           case RecordableTypeId::BluetoothBeaconRecordableClass:
-            streamPlayer = std::make_unique<AriaBlueToothBeaconPlayer>();
+            streamPlayer = std::make_unique<AriaBluetoothBeaconPlayer>();
             break;
           case RecordableTypeId::GpsRecordableClass:
             streamPlayer = std::make_unique<AriaGpsPlayer>();

@@ -24,7 +24,7 @@
 
 namespace aria {
 
-struct BluetoothBeaconConfigurationLayout : public vrs::AutoDataLayout {
+struct BluetoothBeaconConfigRecordMetadata : public vrs::AutoDataLayout {
   static constexpr uint32_t kVersion = 1;
 
   vrs::DataPieceValue<std::uint32_t> streamId{"stream_id"};
@@ -35,7 +35,7 @@ struct BluetoothBeaconConfigurationLayout : public vrs::AutoDataLayout {
   vrs::AutoDataLayoutEnd end;
 };
 
-struct BluetoothBeaconDataLayout : public vrs::AutoDataLayout {
+struct BluetoothBeaconDataRecordMetadata : public vrs::AutoDataLayout {
   static constexpr uint32_t kVersion = 2;
 
   // Timestamp of the data sample in real time (UNIX epoch).

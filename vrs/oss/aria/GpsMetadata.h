@@ -23,7 +23,7 @@
 
 namespace aria {
 
-struct GpsConfigurationLayout : public vrs::AutoDataLayout {
+struct GpsConfigRecordMetadata : public vrs::AutoDataLayout {
   static constexpr uint32_t kVersion = 1;
 
   vrs::DataPieceValue<std::uint32_t> streamId{"stream_id"};
@@ -34,7 +34,7 @@ struct GpsConfigurationLayout : public vrs::AutoDataLayout {
   vrs::AutoDataLayoutEnd end;
 };
 
-struct GpsDataLayout : public vrs::AutoDataLayout {
+struct GpsDataRecordMetadata : public vrs::AutoDataLayout {
   static constexpr uint32_t kVersion = 1;
 
   // Timestamp of capturing this sample, in nanoseconds.

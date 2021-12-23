@@ -24,7 +24,7 @@
 
 namespace aria {
 
-struct MotionSensorConfigurationLayout : public vrs::AutoDataLayout {
+struct MotionSensorConfigRecordMetadata : public vrs::AutoDataLayout {
   static constexpr uint32_t kVersion = 2;
 
   // Index to preserve order of IMU streams.
@@ -54,9 +54,9 @@ struct MotionSensorConfigurationLayout : public vrs::AutoDataLayout {
   vrs::DataPieceString description{"description"};
 
   vrs::AutoDataLayoutEnd end;
-}; // class MotionSensorConfigurationLayout
+};
 
-struct MotionDataLayout : public vrs::AutoDataLayout {
+struct MotionSensorDataRecordMetadata : public vrs::AutoDataLayout {
   static constexpr uint32_t kVersion = 2;
 
   // Indication which data values are valid in this data sample.
@@ -82,9 +82,9 @@ struct MotionDataLayout : public vrs::AutoDataLayout {
   vrs::AutoDataLayoutEnd end;
 }; // struct MotionDataLayout
 
-struct MotionStateLayout : public vrs::AutoDataLayout {
+struct MotionSensorStateRecordMetadata : public vrs::AutoDataLayout {
   static constexpr uint32_t kVersion = 2;
   vrs::AutoDataLayoutEnd end;
-}; // struct MotionStateLayout
+};
 
 } // namespace aria

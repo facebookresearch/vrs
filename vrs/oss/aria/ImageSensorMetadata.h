@@ -28,7 +28,7 @@ namespace aria {
 
 using vrs::datalayout_conventions::ImageSpecType;
 
-struct ImageSensorConfigurationLayout : public vrs::AutoDataLayout {
+struct ImageSensorConfigRecordMetadata : public vrs::AutoDataLayout {
   static constexpr uint32_t kVersion = 2;
 
   // Type, version, serial of *entire* HMD device
@@ -70,11 +70,11 @@ struct ImageSensorConfigurationLayout : public vrs::AutoDataLayout {
   vrs::DataPieceString description{"description"};
 
   vrs::AutoDataLayoutEnd end;
-}; // class ImageSensorConfigurationLayout
+};
 
 // The field imageBufferSize is not part of the data layout because it is
 // redundant since it can be obtained via a call to vrs::ContentBlock::getBlockSize().
-struct ImageDataLayout : public vrs::AutoDataLayout {
+struct ImageSensorDataRecordMetadata : public vrs::AutoDataLayout {
   static constexpr uint32_t kVersion = 2;
 
   // The first two entries are used to identify frame groups:
@@ -102,11 +102,11 @@ struct ImageDataLayout : public vrs::AutoDataLayout {
   vrs::DataPieceValue<double> temperature{"temperature_deg_c"};
 
   vrs::AutoDataLayoutEnd end;
-}; // struct ImageDataLayout
+};
 
-struct ImageStateLayout : public vrs::AutoDataLayout {
+struct ImageSensorStateRecordMetadata : public vrs::AutoDataLayout {
   static constexpr uint32_t kVersion = 2;
   vrs::AutoDataLayoutEnd end;
-}; // struct ImageStateLayout
+};
 
 } // namespace aria
