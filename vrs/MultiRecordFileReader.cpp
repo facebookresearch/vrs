@@ -552,10 +552,14 @@ bool MultiRecordFileReader::readFirstConfigurationRecordsForType(
     return false;
   }
   bool allGood = true;
+  bool foundAtLeastOneStream = false;
   for (const auto& reader : readers_) {
-    allGood = reader->readFirstConfigurationRecordsForType(typeId, streamPlayer) && allGood;
+    if (reader->getStreamForType(typeId).isValid()) {
+      foundAtLeastOneStream = true;
+      allGood = reader->readFirstConfigurationRecordsForType(typeId, streamPlayer) && allGood;
+    }
   }
-  return allGood;
+  return foundAtLeastOneStream && allGood;
 }
 
 bool MultiRecordFileReader::areFilesRelated() const {
