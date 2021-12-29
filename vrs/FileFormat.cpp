@@ -19,6 +19,7 @@
 #include <ctime>
 #include <iomanip>
 #include <iostream>
+#include <random>
 
 #define DEFAULT_LOG_CHANNEL "FileFormat"
 #include <logging/Log.h>
@@ -55,8 +56,20 @@ void FileHeader::init(uint32_t magic1, uint32_t magic2, uint32_t magic3, uint32_
   magicHeader3.set(magic3);
   fileHeaderSize.set(sizeof(FileHeader));
   recordHeaderSize.set(sizeof(RecordHeader));
-  creationId.set(static_cast<uint64_t>(
-      duration_cast<nanoseconds>(system_clock::now().time_since_epoch()).count()));
+  uint64_t id = static_cast<uint64_t>(
+      duration_cast<nanoseconds>(system_clock::now().time_since_epoch()).count());
+  // The 64 bit creationId might be used to identify the file to cache its index: it must be unique.
+  // Most nanosecond implementations don't return values with nanosecond precision,
+  // so we override the 30 lsb (~1s) with random bits.
+  // creationId is now an approximate number of ns since Unix EPOCH, with 30 bits guaranteed random.
+  // Note: this is not perfect unicity, but good enough to avoid collisions in a local file cache.
+  std::random_device rd;
+  std::mt19937_64 engine(rd());
+  std::uniform_int_distribution<uint32_t> distribution;
+  uint32_t randomBits = distribution(engine);
+  const uint64_t c30bits = (1 << 30) - 1; // 30 lsb set
+  id = (id & ~c30bits) | (randomBits & c30bits);
+  creationId.set(id);
   fileFormatVersion.set(formatVersion);
 }
 
