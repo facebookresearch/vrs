@@ -130,10 +130,6 @@ namespace tag_conventions {
 
 // Key configuration/settings (when relevant, never required)
 
-  // Image decimation factor: when only 1 out of N images are being recorded
-  constexpr const char* kImageDecimationFactor = "image_decimation_factor";
-  // Overall camera frame rate
-  constexpr const char* kCameraFrameRate = "camera_frame_rate";
   // Intensity target used by dynamic exposure control. How to fill it:
   // * Do not fill it or fill it with -1 when unknown.
   // * Fill it with 0 when using fixed exposure settings.
