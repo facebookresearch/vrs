@@ -310,51 +310,32 @@ class RecordFileReader {
   /// @return The timestamp for the file data record, or 0, if the file contains no data record.
   double getFirstDataRecordTime() const;
 
-  /// Helper function: Read the first configuration record of a particular stream.
+  /// Helper function: Read a stream's first configuration record.
   /// This might be necessary to properly read records containing image or audio blocks,
-  /// if their configuration is contained in the configuration record using datalayout conventions.
+  /// if their configuration is defined in a configuration record using datalayout conventions.
   /// Notes:
-  ///  - a RecordFormatStreamPlayer must be attached to the stream prior to making this call,
-  ///    because that's where the configuration data is being cached.
-  ///  - that this API reads the first configuration record of the stream, and if the stream
-  ///    contains more than one configuration record, that record may not be the right one for all
-  ///    your data records.
-  ///  - if you provide a stream player, the caching happens in that stream player, which won't
-  ///    solve the use case described above.
+  ///  - a RecordFormatStreamPlayer must be attached to the reader prior to making this call,
+  ///    so it can find the RecordFormat and DataLayout definitions.
+  ///  - if you provide a stream player, the caching happens in that stream player only.
+  ///  - if the stream contains more than one configuration record, the first configuration record
+  ///    probably won't be right for all the data records.
   /// @param streamId: StreamId of the record stream to consider.
   /// @param streamPlayer (optional): provide a streamPlayer that will receive the records.
-  /// If provided, and a stream player is already registered to receive records for that stream, the
-  /// provided stream player will get the data, and the registered stream player will not get
-  /// anything.
+  /// If provided and a stream player was previously registered to receive records for that stream,
+  /// only the provided stream player will receive the data.
   /// @return True if a config record was read for the given stream.
   bool readFirstConfigurationRecord(StreamId streamId, StreamPlayer* streamPlayer = nullptr);
 
-  /// Helper function: Read the first configuration record of all the streams.
-  /// This might be necessary to properly read records containing image or audio blocks,
-  /// if their configuration is contained in the configuration record using datalayout conventions.
-  /// Notes:
-  ///  - a RecordFormatStreamPlayer must be attached to the stream prior to making this call,
-  ///    because that's where the configuration data is being cached.
-  ///  - that this API reads the first configuration record of the stream, and if the stream
-  ///    contains more than one configuration record, that record may not be the right one for all
-  ///    your data records.
-  ///  - if you provide a stream player, the caching happens in that stream player, which won't
-  ///  solve the use
-  ///    case described above.
+  /// Helper function: Read every stream's first configuration record.
+  /// See readFirstConfigurationRecord() for more information.
   /// @param streamPlayer (optional): provide a stream player that will receive the records.
-  /// If provided, and a stream player is already registered to receive records for that stream, the
-  /// provided stream player will get the data, and the registered stream player will not get
-  /// anything.
   /// @return True if a config record was read for the given stream.
   bool readFirstConfigurationRecords(StreamPlayer* streamPlayer = nullptr);
 
-  /// Helper function: Read the first configuration record for all the streams of a particular
-  /// recordable type. See readFirstConfigurationRecord() for limitations.
+  /// Helper function: Read the first configuration record of all the streams of a particular
+  /// recordable type. See readFirstConfigurationRecord() for more information.
   /// @param typeId: The RecordableTypeId of the type of device to look for.
   /// @param streamPlayer (optional): provide a stream player that will receive the records.
-  /// If provided, and a stream player is already registered to receive records for that stream, the
-  /// provided stream player will get the data, and the registered stream player will not get
-  /// anything.
   /// @return true if a configuration record was properly read for each matching stream.
   bool readFirstConfigurationRecordsForType(
       RecordableTypeId typeId,
