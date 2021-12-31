@@ -307,7 +307,6 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
  public:
   DataLayoutFileTest(string fileName)
       : Recordable(RecordableTypeId::UnitTest1), fileName_(fileName) {}
-  virtual ~DataLayoutFileTest() {}
 
   const Record* createStateRecord() override {
     return createRecord(kTime, Record::Type::STATE, kStateVersion);
