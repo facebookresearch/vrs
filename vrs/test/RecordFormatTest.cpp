@@ -479,7 +479,6 @@ TEST_F(RecordFormatTest, testGetFormatVersionFromTagName) {
   TEST_BAD_RECORD_FORMAT_NAME("RF:Data:1x");
   TEST_BAD_RECORD_FORMAT_NAME("RF:Data:100.");
   TEST_BAD_RECORD_FORMAT_NAME("RF:Data:-100");
-  TEST_BAD_RECORD_FORMAT_NAME("RF:Data:+100");
 }
 
 TEST_F(RecordFormatTest, testFormatSizes) {

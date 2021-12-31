@@ -16,6 +16,7 @@
 
 #include <cassert>
 #include <cerrno>
+#include <climits>
 
 #include <iomanip>
 #include <limits>
@@ -999,24 +1000,16 @@ static bool getRecordType(const char*& str, Record::Type& outRecordType) {
 
 // reads an uint32_t value, moves the string pointer & returns true on success
 static bool readUInt32(const char*& str, uint32_t& outValue) {
-  // check first digit to reject sign
-  if (!isdigit(static_cast<int>(*reinterpret_cast<const unsigned char*>(str)))) {
-    return false;
-  }
   char* newStr = nullptr;
   errno = 0;
-  unsigned long int intout = strtoul(str, &newStr, 10);
-  if (errno == ERANGE || intout > numeric_limits<uint32_t>::max()) {
-    XR_LOGE("readUInt32() overflow on reading '{}'.", str);
+  long long int readInt = strtoll(str, &newStr, 10);
+  if (readInt < 0 || (readInt == LLONG_MAX && errno == ERANGE) ||
+      readInt > numeric_limits<uint32_t>::max() || str == newStr) {
+    XR_LOGE("Failed to parse '{}'.", str);
     return false;
   }
 
-  if (str == newStr) {
-    XR_LOGE("Failed string to integer conversion on reading '{}'.", str);
-    return false;
-  }
-
-  outValue = static_cast<uint32_t>(intout);
+  outValue = static_cast<uint32_t>(readInt);
 
   str = newStr;
   return true;
