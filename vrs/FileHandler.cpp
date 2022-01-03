@@ -23,6 +23,7 @@
 #include <logging/Verify.h>
 
 #include <vrs/helpers/Rapidjson.hpp>
+#include <vrs/helpers/Strings.h>
 #include <vrs/utils/xxhash/xxhash.h>
 
 #include "DiskFile.h"
@@ -380,59 +381,28 @@ bool FileSpec::hasExtra(const string& name) const {
 }
 
 int FileSpec::getExtraAsInt(const string& name, int defaultValue) const {
-  const auto extra = extras.find(name);
-  if (extra != extras.end() && !extra->second.empty()) {
-    try {
-      return stoi(extra->second);
-    } catch (std::logic_error&) {
-      /* do nothing */
-    }
-  }
-  return defaultValue;
+  int result;
+  return helpers::getInt(extras, name, result) ? result : defaultValue;
 }
 
 int64_t FileSpec::getExtraAsInt64(const string& name, int64_t defaultValue) const {
-  const auto extra = extras.find(name);
-  if (extra != extras.end() && !extra->second.empty()) {
-    try {
-      return stoll(extra->second);
-    } catch (std::logic_error&) {
-      /* do nothing */
-    }
-  }
-  return defaultValue;
+  int64_t result;
+  return helpers::getInt64(extras, name, result) ? result : defaultValue;
 }
 
 uint64_t FileSpec::getExtraAsUInt64(const string& name, uint64_t defaultValue) const {
-  const auto extra = extras.find(name);
-  if (extra != extras.end() && !extra->second.empty()) {
-    try {
-      return stoull(extra->second);
-    } catch (std::logic_error&) {
-      /* do nothing */
-    }
-  }
-  return defaultValue;
+  uint64_t result;
+  return helpers::getUInt64(extras, name, result) ? result : defaultValue;
 }
 
 double FileSpec::getExtraAsDouble(const string& name, double defaultValue) const {
-  const auto extra = extras.find(name);
-  if (extra != extras.end() && !extra->second.empty()) {
-    try {
-      return stod(extra->second);
-    } catch (std::logic_error&) {
-      /* do nothing */
-    }
-  }
-  return defaultValue;
+  double result;
+  return helpers::getDouble(extras, name, result) ? result : defaultValue;
 }
 
 bool FileSpec::getExtraAsBool(const string& name, bool defaultValue) const {
-  const auto extra = extras.find(name);
-  if (extra != extras.end() && !extra->second.empty()) {
-    return extra->second != "0" && extra->second != "false";
-  }
-  return defaultValue;
+  bool result;
+  return helpers::getBool(extras, name, result) ? result : defaultValue;
 }
 
 int FileSpec::decodeQuery(const string& query, string& outKey, string& outValue) {

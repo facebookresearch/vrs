@@ -143,3 +143,51 @@ TEST_F(StringsHelpersTester, humanReadableDurationTest) {
   EXPECT_EQ(humanReadableDuration(-3.2), "-3.200s");
   EXPECT_EQ(humanReadableDuration(5000000000 * kYear), "1.578e+17s");
 }
+
+TEST_F(StringsHelpersTester, getValueTest) {
+  using namespace vrs::helpers;
+  map<string, string> m = {
+      {"bool_true", "1"},
+      {"bool_false", "false"},
+      {"bool_0", "0"},
+      {"int", "1234567890"},
+      {"int64_pos", "1234567890"},
+      {"int64_neg", "-1234567890"},
+      {"uint64", "1234567890"},
+      {"uint64_neg", "-1"},
+      {"double", "-3.5"},
+      {"double_bad", "abc"},
+  };
+  bool boolValue;
+  EXPECT_TRUE(getBool(m, "bool_true", boolValue));
+  EXPECT_EQ(boolValue, true);
+  EXPECT_TRUE(getBool(m, "bool_false", boolValue));
+  EXPECT_EQ(boolValue, false);
+  EXPECT_TRUE(getBool(m, "bool_0", boolValue));
+  EXPECT_EQ(boolValue, false);
+  EXPECT_FALSE(getBool(m, "nobool", boolValue));
+
+  int intValue;
+  EXPECT_TRUE(getInt(m, "int", intValue));
+  EXPECT_EQ(intValue, 1234567890);
+  EXPECT_FALSE(getInt(m, "noint", intValue));
+
+  int64_t int64Value;
+  EXPECT_TRUE(getInt64(m, "int64_pos", int64Value));
+  EXPECT_EQ(int64Value, 1234567890);
+  EXPECT_TRUE(getInt64(m, "int64_neg", int64Value));
+  EXPECT_EQ(int64Value, -1234567890);
+  EXPECT_FALSE(getInt64(m, "noint64", int64Value));
+
+  uint64_t uint64Value;
+  EXPECT_TRUE(getUInt64(m, "uint64", uint64Value));
+  EXPECT_EQ(uint64Value, 1234567890);
+  EXPECT_TRUE(getUInt64(m, "uint64_neg", uint64Value));
+  EXPECT_EQ(uint64Value, 0xffffffffffffffff);
+  EXPECT_FALSE(getUInt64(m, "nouint64", uint64Value));
+
+  double doubleValue;
+  EXPECT_TRUE(getDouble(m, "double", doubleValue));
+  EXPECT_EQ(doubleValue, -3.5);
+  EXPECT_FALSE(getDouble(m, "double_bad", doubleValue));
+}

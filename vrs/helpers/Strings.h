@@ -15,6 +15,7 @@
 #pragma once
 
 #include <algorithm>
+#include <map>
 #include <string>
 
 #include <vrs/os/Platform.h>
@@ -65,6 +66,50 @@ bool startsWith(const std::string& text, const std::string& prefix);
 /// @param prefix: the suffix to test
 /// @return True if text ends with suffix. Case insensitive.
 bool endsWith(const std::string& text, const std::string& suffix);
+
+/// Helper to get a field of a string map interpreted as a bool.
+/// @param m: the map to search.
+/// @param field: the name of the field.
+/// @param outValue: on exit, set to the value retrieved.
+/// @return True if the field was found and outValue was set.
+bool getBool(const std::map<std::string, std::string>& m, const std::string& field, bool& outValue);
+
+/// Helper to get a field of a string map interpreted as an int.
+/// @param m: the map to search.
+/// @param field: the name of the field.
+/// @param outValue: on exit, set to the value retrieved.
+/// @return True if the field was found and outValue was set.
+bool getInt(const std::map<std::string, std::string>& m, const std::string& field, int& outValue);
+
+/// Helper to get a field of a string map interpreted as an int64_t.
+/// @param m: the map to search.
+/// @param field: the name of the field.
+/// @param outValue: on exit, set to the value retrieved.
+/// @return True if the field was found and outValue was set.
+bool getInt64(
+    const std::map<std::string, std::string>& m,
+    const std::string& field,
+    int64_t& outValue);
+
+/// Helper to get a field of a string map interpreted as an uint64_t.
+/// @param m: the map to search.
+/// @param field: the name of the field.
+/// @param outValue: on exit, set to the value retrieved.
+/// @return True if the field was found and outValue was set.
+bool getUInt64(
+    const std::map<std::string, std::string>& m,
+    const std::string& field,
+    uint64_t& outValue);
+
+/// Helper to get a field of a string map interpreted as a double.
+/// @param m: the map to search.
+/// @param field: the name of the field.
+/// @param outValue: on exit, set to the value retrieved.
+/// @return True if the field was found and outValue was set.
+bool getDouble(
+    const std::map<std::string, std::string>& m,
+    const std::string& field,
+    double& outValue);
 
 /// Helper method to print a file size in a human readable way,
 /// using B, KB, MB, GB, TB...
