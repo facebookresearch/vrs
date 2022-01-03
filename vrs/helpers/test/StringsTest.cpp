@@ -132,16 +132,22 @@ TEST_F(StringsHelpersTester, humanReadableDurationTest) {
   const double kWeek = 7 * kDay;
   const double kYear = 31557600; // Julian astronomical year
   EXPECT_EQ(humanReadableDuration(0), "0.000s");
-  EXPECT_EQ(humanReadableDuration(4 * kDay + 3 * kHour + 2 * kMinute + 15.001), "4d 3h 2m 15.001s");
-  EXPECT_EQ(humanReadableDuration(38 * kDay + 0.001), "5w 3d 0h 0m 0.001s");
+  EXPECT_EQ(humanReadableDuration(1), "1.000s");
+  EXPECT_EQ(humanReadableDuration(0.999), "999ms");
+  EXPECT_EQ(humanReadableDuration(0.123), "123ms");
+  EXPECT_EQ(humanReadableDuration(0.002), "2ms");
+  EXPECT_EQ(humanReadableDuration(1000), "16m 40.000s");
+  EXPECT_EQ(
+      humanReadableDuration(4 * kDay + 3 * kHour + 2 * kMinute + 15.001), "4 days 3h 2m 15.001s");
+  EXPECT_EQ(humanReadableDuration(38 * kDay + 0.001), "5 weeks 3 days 0h 0m 0.001s");
   EXPECT_EQ(
       humanReadableDuration(
           kYear * 860 + 6 * kWeek + 3 * kDay + 5 * kHour + 10 * kMinute + 15.123456),
-      "860y 6w 3d 5h 10m 15.123s");
+      "860 years 6 weeks 3 days 5h 10m 15.123s");
   EXPECT_EQ(humanReadableDuration(13 * kHour + 59 * kMinute + 59.001), "13h 59m 59.001s");
   EXPECT_EQ(humanReadableDuration(24 * kMinute), "24m 0.000s");
   EXPECT_EQ(humanReadableDuration(-3.2), "-3.200s");
-  EXPECT_EQ(humanReadableDuration(5000000000 * kYear), "1.578e+17s");
+  EXPECT_EQ(humanReadableDuration(5000000000 * kYear), "1.577880000e+17s");
 }
 
 TEST_F(StringsHelpersTester, getValueTest) {
@@ -190,4 +196,43 @@ TEST_F(StringsHelpersTester, getValueTest) {
   EXPECT_TRUE(getDouble(m, "double", doubleValue));
   EXPECT_EQ(doubleValue, -3.5);
   EXPECT_FALSE(getDouble(m, "double_bad", doubleValue));
+}
+
+TEST_F(StringsHelpersTester, humanReadableTimestampTest) {
+  using namespace vrs::helpers;
+  EXPECT_EQ(humanReadableTimestamp(0), "0.000");
+  EXPECT_EQ(humanReadableTimestamp(0.001), "0.001");
+  EXPECT_EQ(humanReadableTimestamp(-0.001), "-0.001");
+  EXPECT_EQ(humanReadableTimestamp(0.0009999), "9.999e-04");
+  EXPECT_EQ(humanReadableTimestamp(0, 6), "0.000000");
+  EXPECT_EQ(humanReadableTimestamp(0.001, 6), "0.001000");
+  EXPECT_EQ(humanReadableTimestamp(0.0009999, 6), "0.001000");
+  EXPECT_EQ(humanReadableTimestamp(0, 9), "0.000000000");
+  EXPECT_EQ(humanReadableTimestamp(0.001, 9), "0.001000000");
+  EXPECT_EQ(humanReadableTimestamp(0.0009999, 9), "0.000999900");
+  EXPECT_EQ(humanReadableTimestamp(0.0000009, 9), "0.000000900");
+  EXPECT_EQ(humanReadableTimestamp(0.000000001, 9), "0.000000001");
+  EXPECT_EQ(humanReadableTimestamp(0.0000000009, 9), "9.000e-10");
+  EXPECT_EQ(humanReadableTimestamp(1000000000, 9), "1000000000.000000000");
+  EXPECT_EQ(humanReadableTimestamp(10000000000, 9), "1.000000000e+10");
+
+  EXPECT_EQ(humanReadableTimestamp(1. / 1000, 3), "0.001");
+  EXPECT_EQ(humanReadableTimestamp(1. / 1000000, 6), "0.000001");
+  EXPECT_EQ(humanReadableTimestamp(1. / 1000000000, 9), "0.000000001");
+  EXPECT_EQ(humanReadableTimestamp(123456789. / 1000000000, 9), "0.123456789");
+  EXPECT_EQ(humanReadableTimestamp(1234567123456789. / 1000000000, 9), "1234567.123456789");
+
+  EXPECT_EQ(humanReadableTimestamp(5.3, 3), "5.300");
+  EXPECT_EQ(humanReadableTimestamp(5.3, 6), "5.300000");
+  EXPECT_EQ(humanReadableTimestamp(5.3, 9), "5.300000000");
+  EXPECT_EQ(humanReadableTimestamp(50.3, 3), "50.300");
+  EXPECT_EQ(humanReadableTimestamp(500.3, 3), "500.300");
+  EXPECT_EQ(humanReadableTimestamp(5000.3, 3), "5000.300");
+  EXPECT_EQ(humanReadableTimestamp(50000.3, 3), "50000.300");
+  EXPECT_EQ(humanReadableTimestamp(500000.3, 3), "500000.300");
+  EXPECT_EQ(humanReadableTimestamp(5000000.3, 3), "5000000.300");
+  EXPECT_EQ(humanReadableTimestamp(50000000.3, 3), "50000000.300");
+  EXPECT_EQ(humanReadableTimestamp(500000000.3, 3), "500000000.300");
+  EXPECT_EQ(humanReadableTimestamp(5000000000.3, 3), "5000000000.300");
+  EXPECT_EQ(humanReadableTimestamp(50000000000.3, 3), "5.000000000e+10");
 }

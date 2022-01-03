@@ -90,19 +90,19 @@ string humanReadableDuration(double seconds) {
     bool showNext = false;
     if (seconds > kYear) {
       int years = static_cast<int>(seconds / kYear);
-      ss << years << "y ";
+      ss << years << " years ";
       seconds -= years * kYear;
       showNext = true;
     }
     if (showNext || seconds > kWeek) {
       int weeks = static_cast<int>(seconds / kWeek);
-      ss << weeks << "w ";
+      ss << weeks << " weeks ";
       seconds -= weeks * kWeek;
       showNext = true;
     }
     if (showNext || seconds > kDay) {
       int days = static_cast<int>(seconds / kDay);
-      ss << days << "d ";
+      ss << days << " days ";
       seconds -= days * kDay;
       showNext = true;
     }
@@ -116,21 +116,45 @@ string humanReadableDuration(double seconds) {
       int minutes = static_cast<int>(seconds / kMinute);
       ss << minutes << "m ";
       seconds -= minutes * kMinute;
+      showNext = true;
     }
-    ss << fixed << setprecision(3) << seconds << "s";
+    if (showNext || seconds == 0 || seconds >= 1) {
+      ss << humanReadableTimestamp(seconds) << "s";
+    } else if (seconds >= 2e-3) {
+      ss << fmt::format("{:.0f}ms", seconds * 1000);
+    } else if (seconds >= 2e-6) {
+      ss << fmt::format("{:.0f}us", seconds * 1000000);
+    } else if (seconds >= 2e-9) {
+      ss << fmt::format("{:.0f}ns", seconds * 1000000000);
+    } else {
+      ss << fmt::format("{:.9e}", seconds);
+    }
   } else {
-    ss << scientific << setprecision(3) << seconds << "s";
+    ss << humanReadableTimestamp(seconds) << "s";
   }
   return ss.str();
 }
 
-string humanReadableTimestamp(double timestamp) {
-  double atimestamp = abs(timestamp);
-  if (atimestamp < 1e-3 || atimestamp > 1e10) {
-    return fmt::format("{:.3e}", timestamp);
-  } else {
-    return fmt::format("{:.3f}", timestamp);
+string humanReadableTimestamp(double seconds, uint8_t precision) {
+  const char* cPreferedFormat = "{:.3f}";
+  double cTinyLimit = 1e-3;
+  const char* cTinyFormat = "{:.3e}";
+  const double cHugeLimit = 1e10;
+  const char* cHugeFormat = "{:.9e}";
+  if (precision > 3) {
+    if (precision <= 6) {
+      cTinyLimit = 1e-6;
+      cPreferedFormat = "{:.6f}";
+    } else {
+      cTinyLimit = 1e-9;
+      cPreferedFormat = "{:.9f}";
+    }
   }
+  double atimestamp = abs(seconds);
+  if (atimestamp < cTinyLimit) {
+    return fmt::format(atimestamp > 0 ? cTinyFormat : cPreferedFormat, seconds);
+  }
+  return fmt::format(atimestamp >= cHugeLimit ? cHugeFormat : cPreferedFormat, seconds);
 }
 
 string make_printable(const string& str) {

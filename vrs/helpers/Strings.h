@@ -120,9 +120,16 @@ std::string humanReadableFileSize(T bytes) {
 }
 
 /// Helper method to print a count of seconds in a human readable way,
-/// using a count of years, weeks, days, hours, minutes, seconds...
+/// using a count of years, weeks, days, hours, minutes, seconds, as appropriate.
 std::string humanReadableDuration(double seconds);
-std::string humanReadableTimestamp(double timestamp);
+
+/// Helper method to print a count of seconds with a certain precision, when that makes sense.
+/// @param seconds: the count of seconds.
+/// @param precision: how many fraction digits to print. Optimized for 3, 6 and 9 only.
+/// @return The count of seconds printed optimized for human consumption, using a given number of
+/// digits past 0, so we always show up to ms, us or ns, but uses the scientific notation for very
+/// small or very large numbers.
+std::string humanReadableTimestamp(double seconds, uint8_t precision = 3);
 
 /// Helper method to make a string printable to expose control characters.
 /// This conversion is meant to make string problems visible, rather than be a proper encoding,
