@@ -12,27 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-file (GLOB VRS_XXHASH_SRCS *.cpp *.h *.hpp)
-
-add_library(vrs_utils_xxhash STATIC ${VRS_XXHASH_SRCS})
-target_include_directories(vrs_utils_xxhash PUBLIC ${VRS_SOURCE_DIR})
-target_link_libraries(vrs_utils_xxhash
-  PUBLIC
-    vrs_logging
-    xxHash::xxHash
+add_library(vrs_utils
+  STATIC
+    RecordFileInfo.cpp
+    RecordFileInfo.h
 )
-
-if (UNIT_TESTS)
-  enable_testing()
-
-  add_executable(test_vrs_utils_xxhash
-    test/xxhashTest.cpp
-  )
-  target_link_libraries(test_vrs_utils_xxhash
-    PUBLIC
-      vrs_utils_xxhash
-      GTest::Main
-  )
-
-  gtest_discover_tests(test_vrs_utils_xxhash)
-endif()
+target_link_libraries(vrs_utils
+  PUBLIC
+    vrs
+    vrs_helpers
+    Cereal::Cereal
+    Fmt::Fmt
+)
+target_include_directories(vrs_utils PUBLIC ${VRS_SOURCE_DIR})

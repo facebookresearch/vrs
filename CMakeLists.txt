@@ -39,6 +39,7 @@ include(${CMAKE_MODULE_PATH}/LibrariesSetup.cmake)
 add_subdirectory(vrs)
 add_subdirectory(vrs/helpers)
 add_subdirectory(vrs/os)
+add_subdirectory(vrs/utils)
 add_subdirectory(vrs/utils/xxhash)
 
 # Include oss replacement libraries
