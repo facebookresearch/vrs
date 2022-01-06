@@ -90,19 +90,19 @@ string humanReadableDuration(double seconds) {
     bool showNext = false;
     if (seconds > kYear) {
       int years = static_cast<int>(seconds / kYear);
-      ss << years << " years ";
+      ss << years << ((years == 1) ? " year " : " years ");
       seconds -= years * kYear;
       showNext = true;
     }
     if (showNext || seconds > kWeek) {
       int weeks = static_cast<int>(seconds / kWeek);
-      ss << weeks << " weeks ";
+      ss << weeks << ((weeks == 1) ? " week " : " weeks ");
       seconds -= weeks * kWeek;
       showNext = true;
     }
     if (showNext || seconds > kDay) {
       int days = static_cast<int>(seconds / kDay);
-      ss << days << " days ";
+      ss << days << ((days == 1) ? " day " : " days ");
       seconds -= days * kDay;
       showNext = true;
     }
