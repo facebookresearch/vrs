@@ -209,7 +209,7 @@ bool printVRSFileInternals(FileHandler& file) {
        << char((fileFormatVersion >> 8) & 0xff) << char((fileFormatVersion >> 16) & 0xff)
        << char((fileFormatVersion >> 24) & 0xff) << "', "
        << (fileHeader.isFormatSupported() ? "supported." : "NOT SUPPORTED.") << endl;
-  cout << "Creation ID: " << fileHeader.creationId.get() << '.' << endl;
+  cout << "Creation ID: " << std::hex << fileHeader.creationId.get() << std::dec << '.' << endl;
   time_t creationTimeSec = static_cast<time_t>(fileHeader.creationId.get() / 1000000000);
   cout << "Creation date: " << put_time(localtime(&creationTimeSec), "%c %Z.") << '\n';
   cout << "File header size: " << fileHeader.fileHeaderSize.get() << " bytes";
