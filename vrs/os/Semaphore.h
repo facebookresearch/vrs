@@ -18,6 +18,7 @@
 
 #if IS_VRS_OSS_TARGET_PLATFORM()
 
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/interprocess/sync/interprocess_semaphore.hpp>
 
 namespace vrs {
