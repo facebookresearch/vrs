@@ -15,6 +15,7 @@
 #include "Strings.h"
 
 #include <cctype>
+#include <climits>
 #include <cmath>
 #include <cstring>
 
@@ -243,6 +244,21 @@ bool getDouble(const std::map<string, string>& m, const string& field, double& o
     }
   }
   return false;
+}
+
+bool readUInt32(const char*& str, uint32_t& outValue) {
+  char* newStr = nullptr;
+  errno = 0;
+  long long int readInt = strtoll(str, &newStr, 10);
+  if (readInt < 0 || (readInt == LLONG_MAX && errno == ERANGE) ||
+      readInt > numeric_limits<uint32_t>::max() || str == newStr) {
+    return false;
+  }
+
+  outValue = static_cast<uint32_t>(readInt);
+
+  str = newStr;
+  return true;
 }
 
 } // namespace helpers

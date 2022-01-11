@@ -236,3 +236,14 @@ TEST_F(StringsHelpersTester, humanReadableTimestampTest) {
   EXPECT_EQ(humanReadableTimestamp(5000000000.3, 3), "5000000000.300");
   EXPECT_EQ(humanReadableTimestamp(50000000000.3, 3), "5.000000000e+10");
 }
+
+TEST_F(StringsHelpersTester, readUnsignedInt32) {
+  using namespace vrs::helpers;
+  uint32_t outInt;
+  const char* strInt = "123";
+  readUInt32(strInt, outInt);
+  EXPECT_EQ(outInt, 123);
+
+  const char* strWord = "vrs";
+  EXPECT_EQ(readUInt32(strWord, outInt), false);
+}

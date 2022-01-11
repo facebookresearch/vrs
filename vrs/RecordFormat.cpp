@@ -998,23 +998,6 @@ static bool getRecordType(const char*& str, Record::Type& outRecordType) {
   return false;
 }
 
-// reads an uint32_t value, moves the string pointer & returns true on success
-static bool readUInt32(const char*& str, uint32_t& outValue) {
-  char* newStr = nullptr;
-  errno = 0;
-  long long int readInt = strtoll(str, &newStr, 10);
-  if (readInt < 0 || (readInt == LLONG_MAX && errno == ERANGE) ||
-      readInt > numeric_limits<uint32_t>::max() || str == newStr) {
-    XR_LOGE("Failed to parse '{}'.", str);
-    return false;
-  }
-
-  outValue = static_cast<uint32_t>(readInt);
-
-  str = newStr;
-  return true;
-}
-
 bool RecordFormat::parseRecordFormatTagName(
     const string& tagName,
     Record::Type& recordType,
@@ -1031,7 +1014,11 @@ bool RecordFormat::parseRecordFormatTagName(
     return false;
   }
   str += separatorLength;
-  return readUInt32(str, outFormatVersion) && *str == 0;
+  bool parseSuccess = helpers::readUInt32(str, outFormatVersion);
+  if (!parseSuccess) {
+    XR_LOGE("Failed to parse '{}'.", str);
+  }
+  return parseSuccess && *str == 0;
 }
 
 string toString(ContentType contentType) {

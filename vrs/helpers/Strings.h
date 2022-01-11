@@ -111,6 +111,9 @@ bool getDouble(
     const std::string& field,
     double& outValue);
 
+// reads an uint32_t value, moves the string pointer & returns true on success
+bool readUInt32(const char*& str, uint32_t& outValue);
+
 /// Helper method to print a file size in a human readable way,
 /// using B, KB, MB, GB, TB...
 std::string humanReadableFileSize(int64_t bytes);
