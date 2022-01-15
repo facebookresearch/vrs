@@ -269,6 +269,11 @@ class StreamId {
   /// particular, it can be useful to be able to tell.
   static bool isKnownTypeId(RecordableTypeId typeId);
 
+  /// StreamId value guaranteed to be smaller than any valid StreamId object.
+  static StreamId lowest() {
+    return {static_cast<RecordableTypeId>(0), 0};
+  }
+
  private:
   RecordableTypeId typeId_; ///< Identifier for a record type.
   uint16_t instanceId_; ///< Unique instance id, *not* controlled or controllable by client code.
