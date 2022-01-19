@@ -490,6 +490,46 @@ TEST_F(MultiRecordFileReaderTest, singleFile) {
   removeFiles(filePaths);
 }
 
+TEST_F(MultiRecordFileReaderTest, getFirstAndLastRecord) {
+  // Set up test VRS files and reader instance.
+  const auto expectedTimestamps = getNonDecreasingTimestamps(50);
+  const auto filePaths = getOsTempPaths(4);
+  auto fileBuilders = createFileBuilders(filePaths);
+  // Spray these timestamps in the form of data records across these VRS files
+  for (const auto& timestamp : expectedTimestamps) {
+    const auto builderIndex = rand() % fileBuilders.size();
+    fileBuilders[builderIndex]->recordable_.createData(timestamp, timestamp);
+  }
+  for (auto& builder : fileBuilders) {
+    builder->build();
+  }
+
+  MultiRecordFileReader reader;
+  ASSERT_FALSE(reader.isOpened());
+  ASSERT_EQ(SUCCESS, reader.open(filePaths));
+  ASSERT_TRUE(reader.isOpened());
+  ASSERT_LT(0, reader.getTotalSourceSize());
+  assertEmptyStreamTags(reader);
+  TestStreamPlayer streamPlayer;
+  for (const auto& stream : reader.getStreams()) {
+    reader.setStreamPlayer(stream, &streamPlayer);
+  }
+
+  const auto* lastDataRecord = reader.getLastRecord(Record::Type::DATA);
+  const auto* firstDataRecord = reader.getFirstRecord(Record::Type::DATA);
+  // Should not exist.
+  const auto* firstUndefinedRecord = reader.getFirstRecord(Record::Type::UNDEFINED);
+  ASSERT_EQ(
+      firstDataRecord->timestamp,
+      *std::min_element(expectedTimestamps.begin(), expectedTimestamps.end()));
+  ASSERT_EQ(
+      lastDataRecord->timestamp,
+      *std::max_element(expectedTimestamps.begin(), expectedTimestamps.end()));
+  ASSERT_EQ(firstUndefinedRecord, nullptr);
+
+  reader.close();
+}
+
 /// Helps test various StreamId related methods and collision handling logic.
 /// - Creates X files on the fly
 /// - Uses X unique Recordables - one per file

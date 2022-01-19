@@ -21,6 +21,7 @@
 #include <logging/Checks.h>
 #include <logging/Log.h>
 #include <vrs/ErrorCode.h>
+#include <vrs/IndexRecord.h>
 #include <vrs/MultiRecordFileReader.h>
 #include <vrs/RecordFileReader.h>
 #include <vrs/StreamId.h>
@@ -314,6 +315,29 @@ const IndexRecord::RecordInfo* MultiRecordFileReader::getLastRecord(
   for (auto iter = index.rbegin(); iter != index.rend(); ++iter) {
     if ((*iter)->recordType == recordType) {
       return *iter;
+    }
+  }
+  return nullptr;
+}
+
+const IndexRecord::RecordInfo* MultiRecordFileReader::getFirstRecord(
+    Record::Type recordType) const {
+  const uint32_t recordCount = getRecordCount();
+  for (uint32_t recordIndex = 0; recordIndex < recordCount; ++recordIndex) {
+    const IndexRecord::RecordInfo* record = getRecord(recordIndex);
+    if (record->recordType == recordType) {
+      return record;
+    }
+  }
+  return nullptr;
+}
+
+const IndexRecord::RecordInfo* MultiRecordFileReader::getLastRecord(Record::Type recordType) const {
+  uint32_t recordIndex = getRecordCount();
+  while (recordIndex-- > 0) {
+    const IndexRecord::RecordInfo* record = getRecord(recordIndex);
+    if (record->recordType == recordType) {
+      return record;
     }
   }
   return nullptr;

@@ -300,6 +300,20 @@ class MultiRecordFileReader {
     return fileTags_;
   }
 
+  /// Get the record with smallest timestamp across all streams and files, of a specified record
+  /// type.
+  /// @param recordType: Type of record to look for.
+  /// @return Pointer to the first record of the specified type, or null if no records of
+  ///         the specified type exist.
+  const IndexRecord::RecordInfo* getFirstRecord(Record::Type recordType) const;
+
+  /// Get the record with largest timestamp across all streams and files, of a specified record
+  /// type.
+  /// @param recordType: Type of record to look for.
+  /// @return Pointer to the last record of the specified type, or null if no records of
+  ///         the specified type exist.
+  const IndexRecord::RecordInfo* getLastRecord(Record::Type recordType) const;
+
   /// Find the first record at or after a timestamp.
   /// @param timestamp: timestamp to seek.
   /// @return Pointer to the record info, or nullptr (timestamp is too big?).
