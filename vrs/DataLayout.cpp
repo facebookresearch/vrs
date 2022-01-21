@@ -752,6 +752,17 @@ bool DataPiece::isSame(const DataPiece* rhs) const {
 
 namespace {
 
+string compactString(const string& str) {
+  const size_t kMaxLength = 80;
+  if (str.size() < kMaxLength) {
+    return helpers::make_printable(str);
+  }
+  const size_t kSplitLength = kMaxLength / 5;
+  string front(str.c_str(), kMaxLength - kSplitLength);
+  string tail(str.c_str() + str.size() - kSplitLength, kSplitLength);
+  return helpers::make_printable(front) + "  ***truncated***  " + helpers::make_printable(tail);
+}
+
 template <typename T>
 void adjustPrecision(const T&, std::ostream&) {}
 
@@ -1371,7 +1382,7 @@ void DataPieceVector<string>::printCompact(ostream& out, const string& indent) c
     } else {
       out << ' ';
     }
-    out << '"' << helpers::make_printable(values[k]) << '"';
+    out << '"' << compactString(values[k]) << '"';
   }
   if (getOffset() == DataLayout::kNotFound) {
     out << "<unavailable>";
@@ -1472,7 +1483,7 @@ void DataPieceStringMap<T>::print(ostream& out, const string& indent) const {
     out << " required";
   }
   map<string, T> values;
-  bool isDefault = get(values);
+  bool isDefault = !get(values);
   out << ", count: " << values.size() << endl;
   if (!values.empty()) {
     out << indent << (isDefault ? "  Values (default):" : "  Values:") << endl;
@@ -1488,12 +1499,23 @@ template <typename T>
 void DataPieceStringMap<T>::printCompact(ostream& out, const string& indent) const {
   out << indent << getLabel();
   map<string, T> values;
-  bool isDefault = get(values);
+  bool isDefault = !get(values);
   out << ", " << values.size() << (isDefault ? " default" : "") << " values:" << endl;
   for (auto& iter : values) {
     out << indent << "    \"" << iter.first << "\": ";
     using namespace special_chars;
     out << iter.second << endl;
+  }
+}
+
+template <>
+void DataPieceStringMap<string>::printCompact(ostream& out, const string& indent) const {
+  out << indent << getLabel();
+  map<string, string> values;
+  bool isDefault = !get(values);
+  out << ", " << values.size() << (isDefault ? " default" : "") << " values:" << endl;
+  for (auto& iter : values) {
+    out << indent << "    \"" << iter.first << "\": " << compactString(iter.second) << endl;
   }
 }
 
@@ -1588,7 +1610,7 @@ void DataPieceString::print(ostream& out, const string& indent) const {
 }
 
 void DataPieceString::printCompact(ostream& out, const string& indent) const {
-  out << indent << getLabel() << ": \"" << helpers::make_printable(get()) << "\"";
+  out << indent << getLabel() << ": \"" << compactString(get()) << "\"";
   if (getOffset() == DataLayout::kNotFound) {
     out << "<unavailable>";
   }

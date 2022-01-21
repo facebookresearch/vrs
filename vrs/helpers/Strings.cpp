@@ -160,26 +160,28 @@ string humanReadableTimestamp(double seconds, uint8_t precision) {
 
 string make_printable(const string& str) {
   string sanitized;
-  sanitized.reserve(str.size() + 10);
-  for (unsigned char c : str) {
-    if (c < 128 && isprint(c)) {
-      sanitized.push_back(c);
-    } else if (c == '\n') {
-      sanitized += "\\n"; // LF
-    } else if (c == '\r') {
-      sanitized += "\\r"; // CR
-    } else if (c == '\t') {
-      sanitized += "\\t"; // tab
-    } else if (c == '\b') {
-      sanitized += "\\b"; // backspace
-    } else if (c == 0x1B) {
-      sanitized += "\\e"; // esc
-    } else {
-      // stringstream methods just won't work right, even with Stackoverflow's help...
-      static const char* digits = "0123456789abcdef";
-      sanitized += "\\x";
-      sanitized.push_back(digits[(c >> 4) & 0xf]);
-      sanitized.push_back(digits[c & 0xf]);
+  if (!str.empty()) {
+    sanitized.reserve(str.size() + 10);
+    for (unsigned char c : str) {
+      if (c < 128 && isprint(c)) {
+        sanitized.push_back(c);
+      } else if (c == '\n') {
+        sanitized += "\\n"; // LF
+      } else if (c == '\r') {
+        sanitized += "\\r"; // CR
+      } else if (c == '\t') {
+        sanitized += "\\t"; // tab
+      } else if (c == '\b') {
+        sanitized += "\\b"; // backspace
+      } else if (c == 0x1B) {
+        sanitized += "\\e"; // esc
+      } else {
+        // stringstream methods just won't work right, even with Stackoverflow's help...
+        static const char* digits = "0123456789abcdef";
+        sanitized += "\\x";
+        sanitized.push_back(digits[(c >> 4) & 0xf]);
+        sanitized.push_back(digits[c & 0xf]);
+      }
     }
   }
   return sanitized;
