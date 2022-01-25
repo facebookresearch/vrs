@@ -17,6 +17,7 @@
 #include <cstdio>
 
 #include <algorithm>
+#include <vector>
 
 #include <logging/Checks.h>
 
