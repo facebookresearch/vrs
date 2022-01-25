@@ -3709,10 +3709,10 @@ doctrine@^3.0.0:
   dependencies:
     esutils "^2.0.2"
 
-docusaurus-plugin-internaldocs-fb@^0.9.12:
-  version "0.9.12"
-  resolved "https://registry.yarnpkg.com/docusaurus-plugin-internaldocs-fb/-/docusaurus-plugin-internaldocs-fb-0.9.12.tgz#1ba1f0800092425633cc6364751df25b73b3cc70"
-  integrity sha512-CQ25P7h0ZrREaylSSB81CU+sR3xPcy09TfNUXgd335+k031s9SskR1DNMapA7BoHQJ1htR7d8Hb6RiSWwky+/w==
+docusaurus-plugin-internaldocs-fb@0.10.4:
+  version "0.10.4"
+  resolved "https://registry.yarnpkg.com/docusaurus-plugin-internaldocs-fb/-/docusaurus-plugin-internaldocs-fb-0.10.4.tgz#64b54e364c6f4f29349556af955a06d4b5fa663a"
+  integrity sha512-2Gtj2sDm7duKZMjcOVm7sd2s9ToZIjt9rQP7QJiz6ztM1m4j8I6xY55aXE6NTIxcNTDBXX6kOFh6IdaGAmqGcA==
   dependencies:
     "@mdx-js/mdx" "2.0.0-next.9"
     "@mdx-js/react" "^1.6.22"
