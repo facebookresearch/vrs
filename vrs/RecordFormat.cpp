@@ -14,6 +14,7 @@
 
 #include "RecordFormat.h"
 
+#include <array>
 #include <cassert>
 #include <cerrno>
 #include <climits>
@@ -311,28 +312,30 @@ void ImageContentBlockSpec::set(ContentParser& parser) {
   } else {
     uint32_t width, height, stride, quality, keyFrameIndex;
     double keyFrameTimestamp;
-    char text[200];
+    array<char, 200> text;
     while (parser.next()) {
       const char* cstr = parser.str.c_str();
       int firstChar = static_cast<uint8_t>(*cstr); // could be 0, but that's ok
-      if (isdigit(firstChar) && width_ == 0 && sscanf(cstr, "%ux%u", &width, &height) == 2) {
+      if (isdigit(firstChar) != 0 && width_ == 0 && sscanf(cstr, "%ux%u", &width, &height) == 2) {
         width_ = width;
         height_ = height;
       } else if (
           firstChar == 'p' && pixelFormat_ == PixelFormat::UNDEFINED &&
-          parser.str.size() < COUNT_OF(text) && sscanf(cstr, "pixel=%s", text)) {
-        pixelFormat_ = PixelFormatConverter::toEnum(text);
-      } else if (firstChar == 's' && stride_ == 0 && sscanf(cstr, "stride=%u", &stride)) {
+          parser.str.size() < text.size() && sscanf(cstr, "pixel=%s", text.data()) == 1) {
+        pixelFormat_ = PixelFormatConverter::toEnum(text.data());
+      } else if (firstChar == 's' && stride_ == 0 && sscanf(cstr, "stride=%u", &stride) == 1) {
         stride_ = stride;
       } else if (
-          firstChar == 'c' && codecName_.empty() && parser.str.size() < COUNT_OF(text) &&
-          sscanf(cstr, "codec=%s", text)) {
-        codecName_ = unescapeString(text, COUNT_OF(text));
-      } else if (firstChar == 'c' && sscanf(cstr, "codec_quality=%u", &quality)) {
-        codecQuality_ = isQualityValid(quality) ? static_cast<uint8_t>(quality) : kQualityUndefined;
-      } else if (firstChar == 'k' && sscanf(cstr, "keyframe_timestamp=%lf", &keyFrameTimestamp)) {
+          firstChar == 'c' && codecName_.empty() && parser.str.size() < text.size() &&
+          sscanf(cstr, "codec=%s", text.data()) == 1) {
+        codecName_ = unescapeString(text.data(), text.size());
+      } else if (firstChar == 'c' && sscanf(cstr, "codec_quality=%u", &quality) == 1) {
+        uint8_t q = static_cast<uint8_t>(quality);
+        codecQuality_ = isQualityValid(q) ? q : kQualityUndefined;
+      } else if (
+          firstChar == 'k' && sscanf(cstr, "keyframe_timestamp=%lf", &keyFrameTimestamp) == 1) {
         keyFrameTimestamp_ = keyFrameTimestamp;
-      } else if (firstChar == 'k' && sscanf(cstr, "keyframe_index=%u", &keyFrameIndex)) {
+      } else if (firstChar == 'k' && sscanf(cstr, "keyframe_index=%u", &keyFrameIndex) == 1) {
         keyFrameIndex_ = keyFrameIndex;
       } else {
         XR_LOGE("Could not parse image spec '{}' in '{}'", parser.str, parser.source());
