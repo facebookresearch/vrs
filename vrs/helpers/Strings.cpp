@@ -153,9 +153,10 @@ string humanReadableTimestamp(double seconds, uint8_t precision) {
   }
   double atimestamp = abs(seconds);
   if (atimestamp < cTinyLimit) {
-    return fmt::format(atimestamp > 0 ? cTinyFormat : cPreferedFormat, seconds);
+    return fmt::format(fmt::runtime(atimestamp > 0 ? cTinyFormat : cPreferedFormat), seconds);
   }
-  return fmt::format(atimestamp >= cHugeLimit ? cHugeFormat : cPreferedFormat, seconds);
+  return fmt::format(
+      fmt::runtime(atimestamp >= cHugeLimit ? cHugeFormat : cPreferedFormat), seconds);
 }
 
 string make_printable(const string& str) {
