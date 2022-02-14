@@ -526,6 +526,10 @@ StreamId RecordFileReader::getStreamForTag(
   return {};
 }
 
+const IndexRecord::RecordInfo* RecordFileReader::getRecord(uint32_t globalIndex) const {
+  return globalIndex < recordIndex_.size() ? &recordIndex_[globalIndex] : nullptr;
+}
+
 const IndexRecord::RecordInfo* RecordFileReader::getRecord(StreamId streamId, uint32_t indexNumber)
     const {
   const auto& index = getIndex(streamId);
@@ -994,6 +998,7 @@ int RecordFileReader::readRecord(
       recordHeader.timestamp.get(),
       recordHeader.getStreamId(),
       recordHeader.getRecordType(),
+      getRecordIndex(&recordInfo),
       recordHeader.formatVersion.get(),
       uncompressedDataSize,
       reader};

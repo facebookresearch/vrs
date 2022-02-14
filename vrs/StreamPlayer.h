@@ -26,6 +26,7 @@ struct CurrentRecord {
   double timestamp;
   StreamId streamId;
   Record::Type recordType;
+  uint32_t globalIndex; ///< Sequential index of the record within its entire file
   uint32_t formatVersion;
   uint32_t recordSize; ///< Size of the record, uncompressed.
   /// In some situations, some data wasn't read yet, and the RecordReader object can let you:

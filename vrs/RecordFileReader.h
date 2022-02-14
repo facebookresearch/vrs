@@ -241,6 +241,12 @@ class RecordFileReader {
   /// @return Number of records for the specified stream id & record type.
   uint32_t getRecordCount(StreamId streamId, Record::Type recordType) const;
 
+  /// Find a specific record, regardless of its stream or type, by its absolute index number in the
+  /// file.
+  /// @param globalIndex: Index of the record to look for.
+  /// @return Pointer to the record info, or nullptr the index exceeds the total number of records.
+  const IndexRecord::RecordInfo* getRecord(uint32_t globalIndex) const;
+
   /// Find a specific record for a specific stream, regardless of type, by index number.
   /// @param streamId: StreamId of the record stream to consider.
   /// @param indexNumber: Index of the record to look for.
