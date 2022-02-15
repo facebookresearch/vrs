@@ -70,8 +70,8 @@ void printTime(
           << humanReadableTimestamp(lastRecord->timestamp) << " ("
           << humanReadableDuration(lastRecord->timestamp - firstRecord->timestamp);
       if (showFps && recordCount > 1 && firstRecord->timestamp < lastRecord->timestamp) {
-        out << ", " << setprecision(2)
-            << (recordCount - 1.) / (lastRecord->timestamp - firstRecord->timestamp) << "rps";
+        out << fmt::format(
+            ", {:.4g}rps", (recordCount - 1.) / (lastRecord->timestamp - firstRecord->timestamp));
       }
       out << ')';
     } else {
@@ -273,7 +273,7 @@ void printOverview(
       }
     }
     if (last > first) {
-      out << ", " << setprecision(2) << 1. * (index.size() - skipCount) / (last - first) << "rps";
+      out << fmt::format(", {:.4g}rps", 1. * (index.size() - skipCount) / (last - first));
     }
     out << "." << endl;
   }
