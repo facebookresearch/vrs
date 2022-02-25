@@ -40,6 +40,8 @@ class MultiRecordFileReader {
   /// UniqueStreamId is expected.
   using UniqueStreamId = StreamId;
 
+  using ReaderId = RecordFileReader::ReaderId;
+
   MultiRecordFileReader() = default;
   MultiRecordFileReader(const MultiRecordFileReader&) = delete;
   MultiRecordFileReader& operator=(const MultiRecordFileReader&) = delete;
@@ -185,16 +187,33 @@ class MultiRecordFileReader {
       const string& tag,
       RecordableTypeId typeId = RecordableTypeId::Undefined) const;
 
-  /// Get a record's index in the global index.
-  /// @param record: pointer of the record.
+  /// Get all unique reader ids associated with all open files. In playable callbacks, these reader
+  /// ids can be used to uniquely identify the source file associated with the CurrentRecord object,
+  /// via reader->getReaderId().
+  /// @return Vector of reader ids, with the i'th reader id corresponding to the i'th file path
+  /// passed to open().
+  std::vector<ReaderId> getReaderIds() const;
+
+  /// Get a record's index in the global index, which is orderd by timestamp across all open files.
+  /// @param record: Pointer of the record.
   /// @return Index in the global index, or getRecordCount() is record is nullptr or an invalid
   /// pointer.
   uint32_t getRecordIndex(const IndexRecord::RecordInfo* record) const;
 
   /// Get the record correponding to the given index position in the global index.
-  /// @param index: Position in the global index to look up.
+  /// @param globalIndex: Position in the global index to look up.
   /// @return Corresponding record if present or nullptr if the given index is invalid.
-  const IndexRecord::RecordInfo* getRecord(uint32_t index) const;
+  const IndexRecord::RecordInfo* getRecord(uint32_t globalIndex) const;
+
+  /// For the file whose reader has the given id, retrieve the record at the given index within that
+  /// individual file.
+  /// @param readerId: Id of the reader. The reader ids for all open files can be obtained using the
+  /// getReaderIds() method.
+  /// @param indexInFile: Index of the requested record within the specified reader. Note that this
+  /// is not the same as the record's global index across all open files.
+  /// @return Corresponding record if the reader id and in-reader index are both valid; otherwise,
+  /// returns nullptr.
+  const IndexRecord::RecordInfo* getRecord(ReaderId readerId, uint32_t indexInFile) const;
 
   /// Find a specific record for a specific stream, regardless of type, by index number.
   /// @param streamId: UniqueStreamId of the record stream to consider.

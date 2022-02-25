@@ -26,14 +26,30 @@ class FileHandler;
 /// @internal
 class RecordReader {
  public:
+  /// Globally unique id type.
+  using ReaderId = uint32_t;
+
+  static constexpr ReaderId kInvalidReaderId = std::numeric_limits<ReaderId>::max();
+
   virtual ~RecordReader();
 
   /// Initialize the RecordReader to read a record from a file.
   /// @param file: File to read from, ready to read the record at the current file position.
   /// @param diskSize: Size of the record on disk.
   /// @param expandedSize: Size of the record uncompressed.
+  /// @param readerId: Id with which the reader will be associated.
   /// @return Pointer to the reader.
-  RecordReader* init(FileHandler& file, uint32_t diskSize, uint32_t expandedSize);
+  RecordReader* init(
+      FileHandler& file,
+      uint32_t diskSize,
+      uint32_t expandedSize,
+      ReaderId readerId = kInvalidReaderId);
+
+  /// Returns the globally unique id of this reader, or kInvalidReaderId if the value was not set.
+  /// @return Reader id.
+  ReaderId getReaderId() const {
+    return readerId_;
+  }
 
   /// Read data to a DataReference.
   /// @param destination: DataReference to read data to.
@@ -81,6 +97,9 @@ class RecordReader {
   FileHandler* file_;
   uint32_t remainingDiskBytes_;
   uint32_t remainingUncompressedSize_;
+
+ private:
+  ReaderId readerId_{kInvalidReaderId};
 };
 
 /// \brief RecordReader specialized to read uncompressed records. For VRS internal usage only.

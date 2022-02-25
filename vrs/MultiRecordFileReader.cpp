@@ -241,6 +241,15 @@ UniqueStreamId MultiRecordFileReader::getStreamForTag(
   return {};
 }
 
+std::vector<MultiRecordFileReader::ReaderId> MultiRecordFileReader::getReaderIds() const {
+  std::vector<ReaderId> readerIds;
+  readerIds.reserve(readers_.size());
+  for (const auto& reader : readers_) {
+    readerIds.push_back(reader->getReaderId());
+  }
+  return readerIds;
+}
+
 uint32_t MultiRecordFileReader::getRecordIndex(const IndexRecord::RecordInfo* record) const {
   if (!isOpened_ || record == nullptr) {
     return getRecordCount();
@@ -266,15 +275,29 @@ uint32_t MultiRecordFileReader::getRecordIndex(const IndexRecord::RecordInfo* re
   }
 }
 
-const IndexRecord::RecordInfo* MultiRecordFileReader::getRecord(uint32_t index) const {
+const IndexRecord::RecordInfo* MultiRecordFileReader::getRecord(uint32_t globalIndex) const {
   if (!isOpened_) {
     return nullptr;
   }
   if (hasSingleFile()) {
     const auto& singleFileIndex = readers_.front()->getIndex();
-    return index < singleFileIndex.size() ? &singleFileIndex[index] : nullptr;
+    return globalIndex < singleFileIndex.size() ? &singleFileIndex[globalIndex] : nullptr;
   }
-  return index < recordIndex_->size() ? (*recordIndex_)[index] : nullptr;
+  return globalIndex < recordIndex_->size() ? (*recordIndex_)[globalIndex] : nullptr;
+}
+
+const IndexRecord::RecordInfo* MultiRecordFileReader::getRecord(
+    ReaderId readerId,
+    uint32_t indexInFile) const {
+  if (isOpened_) {
+    for (const auto& reader : readers_) {
+      if (reader->getReaderId() == readerId) {
+        const auto& singleFileIndex = reader->getIndex();
+        return indexInFile < singleFileIndex.size() ? &singleFileIndex[indexInFile] : nullptr;
+      }
+    }
+  }
+  return nullptr;
 }
 
 const IndexRecord::RecordInfo* MultiRecordFileReader::getRecord(

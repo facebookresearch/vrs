@@ -33,6 +33,8 @@ struct CurrentRecord {
   /// - know how much has been read.
   /// - know how much has not been read, yet.
   /// - read more data directly.
+  /// RecordReader also provides a unique id for the reader, which can be used in multi-file
+  /// scenarios to determine which file originated the current record.
   RecordReader* reader;
 };
 

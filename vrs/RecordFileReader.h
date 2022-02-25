@@ -57,11 +57,20 @@ class StreamPlayer;
 /// or delegate the work by posting a PlaybackRecord to a PlaybackThread.
 class RecordFileReader {
  public:
+  using ReaderId = RecordReader::ReaderId;
+
   RecordFileReader();
   RecordFileReader(const RecordFileReader&) = delete;
   RecordFileReader& operator=(const RecordFileReader&) = delete;
 
   virtual ~RecordFileReader();
+
+  /// Gets the unique id associated with this reader. In playable callbacks, this value is available
+  /// in the CurrentRecord instance via reader->getReaderId().
+  /// @return The id associated with this reader.
+  ReaderId getReaderId() const {
+    return readerId_;
+  }
 
   /// Checks if a file is most probably a VRS file by checking its header for VRS file's format
   /// magic numbers.
@@ -474,6 +483,9 @@ class RecordFileReader {
   static int vrsFilePathToFileSpec(const string& filePath, FileSpec& outFileSpec);
 
  private:
+  /// Generate a globally unique reader id.
+  static ReaderId getUniqueReaderId();
+
   int doOpenFile(const FileSpec& fileSpec, bool autoWriteFixedIndex, bool checkSignatureOnly);
   int readFileHeader(const FileSpec& fileSpec, FileFormat::FileHeader& outFileHeader);
   int readFileDetails(
@@ -483,6 +495,9 @@ class RecordFileReader {
 
   const string& getTag(const map<string, string>& tags, const string& name) const; ///< private
   bool mightContainContentTypeInDataRecord(StreamId streamId, ContentType type) const; ///< private
+
+  /// Globally unique id of this reader, constant for its lifetime.
+  const ReaderId readerId_;
 
   // Members to read an open VRS file
   std::unique_ptr<FileHandler> file_;

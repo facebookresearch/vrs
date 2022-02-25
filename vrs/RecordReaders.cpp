@@ -26,7 +26,9 @@ namespace vrs {
 
 RecordReader::~RecordReader() = default;
 
-RecordReader* RecordReader::init(FileHandler& file, uint32_t diskSize, uint32_t expandedSize) {
+RecordReader*
+RecordReader::init(FileHandler& file, uint32_t diskSize, uint32_t expandedSize, ReaderId readerId) {
+  readerId_ = readerId;
   file_ = &file;
   remainingDiskBytes_ = diskSize;
   remainingUncompressedSize_ = expandedSize;
