@@ -68,15 +68,18 @@ void Record::set(
   this->recordType_ = type;
   this->formatVersion_ = formatVersion;
   bufferUsedSize_ = data.getDataSize();
-  // only resize if we have to
-  if (buffer_.size() < bufferUsedSize_) {
-    // If we're going to reallocate our buffer, then ask for a bit more right away...
-    if (bufferUsedSize_ > buffer_.capacity()) {
-      buffer_.reserve(recordManager_.getAdjustedRecordBufferSize(bufferUsedSize_));
+  if (bufferUsedSize_ > 0) {
+    // only resize if we have to
+    if (buffer_.size() < bufferUsedSize_) {
+      // If we're going to reallocate our buffer, then ask for a bit more right away...
+      if (bufferUsedSize_ > buffer_.capacity()) {
+        buffer_.resize(0); // make sure we don't copy existing data for no reason!
+        buffer_.reserve(recordManager_.getAdjustedRecordBufferSize(bufferUsedSize_));
+      }
+      buffer_.resize(bufferUsedSize_);
     }
-    buffer_.resize(bufferUsedSize_);
+    data.copyTo(&buffer_[0].byte);
   }
-  data.copyTo(buffer_.data());
   this->creationOrder_ = creationOrder;
 }
 

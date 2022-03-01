@@ -261,3 +261,58 @@ TEST_F(RecordTester, sortRecordSortTest) {
 
   checkSortOrder(records);
 }
+
+static uint8_t f(uint8_t k) {
+  return 3 * k + 1;
+}
+
+const size_t kSize = 9; // odd, to expose padding issues
+
+union ArrayUnion {
+  ArrayUnion() {} // required
+  Record::uninitialized_byte uninitialized_bytes[kSize];
+  uint8_t initialized_bytes[kSize];
+};
+
+TEST_F(RecordTester, initRecordTest) {
+  std::vector<Record::uninitialized_byte> buffer;
+  buffer.reserve(100);
+  buffer.resize(1);
+  // init reserved capacity to our pattern
+  uint8_t* b = &buffer[0].byte;
+  size_t initCapacity = buffer.capacity();
+  for (uint8_t k = 0; k < initCapacity; k++) {
+    b[k] = f(k);
+  }
+  // allocate & verify that the buffer data wasn't initialized (still our pattern)
+  buffer.resize(0);
+  buffer.resize(10);
+  const uint8_t* b1 = &buffer[0].byte;
+  for (uint8_t k = 0; k < initCapacity; k++) {
+    EXPECT_EQ(b1[k], f(k));
+  }
+  // allocate & verify that the buffer data wasn't initialized (still our pattern)
+  buffer.resize(0);
+  buffer.resize(30);
+  const uint8_t* b2 = &buffer[0].byte;
+  for (uint8_t k = 0; k < initCapacity; k++) {
+    EXPECT_EQ(b2[k], f(k));
+  }
+  buffer.resize(0);
+  buffer.resize(2000); // we should get a new buffer which data should be different
+  const uint8_t* b3 = &buffer[0].byte;
+  bool differentData = false;
+  for (uint8_t k = 0; !differentData && k < initCapacity; k++) {
+    if (b3[k] != f(k)) {
+      differentData = true;
+    }
+  }
+  // if the underlying buffer is new, the data should be different
+  EXPECT_EQ(differentData, b3 != b2);
+  buffer.clear();
+  // Verify identical memory usage
+  ArrayUnion u;
+  EXPECT_EQ(sizeof(u.uninitialized_bytes), kSize);
+  EXPECT_EQ(sizeof(u.initialized_bytes), kSize);
+  EXPECT_EQ(sizeof(u), kSize);
+}

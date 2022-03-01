@@ -148,18 +148,23 @@ class Record final {
   /// Get a record type as a text string.
   static const char* typeName(Type type);
 
+  /// Public for testing
+  struct uninitialized_byte final {
+    uninitialized_byte() {} // do not use '= default' as it will initialize byte!
+    uint8_t byte;
+  };
+
  private:
   friend RecordManager;
 
   /// Records are created & deleted exclusively by a Recordable's RecordManager.
   Record(RecordManager& recordManager) : recordManager_(recordManager) {}
-  ~Record() {}
+  ~Record() = default;
 
- private:
   double timestamp_;
   Type recordType_;
   uint32_t formatVersion_;
-  std::vector<uint8_t> buffer_;
+  std::vector<uninitialized_byte> buffer_;
   size_t bufferUsedSize_;
   uint64_t creationOrder_;
 
