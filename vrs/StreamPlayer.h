@@ -26,16 +26,15 @@ struct CurrentRecord {
   double timestamp;
   StreamId streamId;
   Record::Type recordType;
-  uint32_t globalIndex; ///< Sequential index of the record within its entire file
   uint32_t formatVersion;
   uint32_t recordSize; ///< Size of the record, uncompressed.
   /// In some situations, some data wasn't read yet, and the RecordReader object can let you:
   /// - know how much has been read.
   /// - know how much has not been read, yet.
   /// - read more data directly.
-  /// RecordReader also provides a unique id for the reader, which can be used in multi-file
-  /// scenarios to determine which file originated the current record.
   RecordReader* reader;
+  const IndexRecord::RecordInfo* recordInfo;
+  RecordFileReader* fileReader;
 };
 
 /// \brief Class designed to receive record data when reading a VRS file.

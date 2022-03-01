@@ -45,7 +45,7 @@ namespace vrs {
 
 StreamPlayer::~StreamPlayer() = default;
 
-RecordFileReader::RecordFileReader() : readerId_(getUniqueReaderId()) {
+RecordFileReader::RecordFileReader() {
   file_ = make_unique<DiskFile>();
 }
 
@@ -156,14 +156,6 @@ bool RecordFileReader::isVrsFile(const string& filePath) {
     return false;
   }
   return isVrsFile(fileSpec);
-}
-
-RecordFileReader::ReaderId RecordFileReader::getUniqueReaderId() {
-  static std::mutex sMutex;
-  static ReaderId sNextReaderId = 0;
-
-  std::unique_lock<std::mutex> guard{sMutex};
-  return sNextReaderId++;
 }
 
 // Log progress & bail, if user cancelled
@@ -987,12 +979,12 @@ int RecordFileReader::readRecord(
   switch (compressionType) {
     case CompressionType::None:
       uncompressedDataSize = dataSize;
-      reader = uncompressedRecordReader_.init(*file_, dataSize, dataSize, readerId_);
+      reader = uncompressedRecordReader_.init(*file_, dataSize, dataSize);
       break;
     case CompressionType::Lz4:
     case CompressionType::Zstd:
       uncompressedDataSize = recordHeader.uncompressedSize.get();
-      reader = compressedRecordReader_.init(*file_, dataSize, uncompressedDataSize, readerId_);
+      reader = compressedRecordReader_.init(*file_, dataSize, uncompressedDataSize);
       compressedRecordReader_.initCompressionType(compressionType);
       break;
     default: // ignore the lint warning: the enum value was read from disk, so it could be anything!
@@ -1006,10 +998,11 @@ int RecordFileReader::readRecord(
       recordHeader.timestamp.get(),
       recordHeader.getStreamId(),
       recordHeader.getRecordType(),
-      getRecordIndex(&recordInfo),
       recordHeader.formatVersion.get(),
       uncompressedDataSize,
-      reader};
+      reader,
+      &recordInfo,
+      this};
   DataReference dataReference;
   bool wantsData = reader != nullptr && streamPlayer->processRecordHeader(header, dataReference);
   uint32_t requestedSize = dataReference.getSize();
