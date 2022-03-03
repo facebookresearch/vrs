@@ -137,26 +137,23 @@ string humanReadableDuration(double seconds) {
 }
 
 string humanReadableTimestamp(double seconds, uint8_t precision) {
-  const char* cPreferedFormat = "{:.3f}";
+  const char* cFormat = "{:.3f}";
   double cTinyLimit = 1e-3;
-  const char* cTinyFormat = "{:.3e}";
   const double cHugeLimit = 1e10;
-  const char* cHugeFormat = "{:.9e}";
   if (precision > 3) {
     if (precision <= 6) {
       cTinyLimit = 1e-6;
-      cPreferedFormat = "{:.6f}";
+      cFormat = "{:.6f}";
     } else {
       cTinyLimit = 1e-9;
-      cPreferedFormat = "{:.9f}";
+      cFormat = "{:.9f}";
     }
   }
   double atimestamp = abs(seconds);
   if (atimestamp < cTinyLimit) {
-    return fmt::format(fmt::runtime(atimestamp > 0 ? cTinyFormat : cPreferedFormat), seconds);
+    return atimestamp > 0 ? fmt::format("{:.3e}", seconds) : fmt::format(cFormat, seconds);
   }
-  return fmt::format(
-      fmt::runtime(atimestamp >= cHugeLimit ? cHugeFormat : cPreferedFormat), seconds);
+  return atimestamp >= cHugeLimit ? fmt::format("{:.9e}", seconds) : fmt::format(cFormat, seconds);
 }
 
 string make_printable(const string& str) {
