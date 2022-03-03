@@ -55,26 +55,26 @@ struct LogEvent {
       const std::string& type,
       const OperationContext& opContext,
       const std::string& message,
-      const string& serverMessage)
-      : type{type}, operationContext{opContext}, message{message}, serverMessage{serverMessage} {}
+      const string& serverReply)
+      : type{type}, operationContext{opContext}, message{message}, serverReply{serverReply} {}
   LogEvent(LogEvent&& rhs)
       : type{move(rhs.type)},
         operationContext{std::move(rhs.operationContext)},
         message{move(rhs.message)},
-        serverMessage{move(rhs.serverMessage)} {}
+        serverReply{move(rhs.serverReply)} {}
 
   LogEvent& operator=(LogEvent&& rhs) {
     type = move(rhs.type);
     operationContext = std::move(rhs.operationContext);
     message = move(rhs.message);
-    serverMessage = move(rhs.serverMessage);
+    serverReply = move(rhs.serverReply);
     return *this;
   }
 
   std::string type;
   OperationContext operationContext;
   std::string message;
-  std::string serverMessage;
+  std::string serverReply;
 };
 
 /// \brief Telemetry event specialized to report cloud traffic
