@@ -37,18 +37,18 @@ std::unique_ptr<TelemetryLogger> TelemetryLogger::setLogger(
 void TelemetryLogger::logEvent(LogEvent&& event) {
   if (event.type == TelemetryLogger::kErrorType) {
     XR_LOGE(
-        "{}, {}: {} {}",
+        "{}, {}: {}, {}",
         event.operationContext.operation,
         event.operationContext.sourceLocation,
         event.message,
-        event.serverMessage);
+        event.serverReply);
   } else {
     XR_LOGW(
-        "{}, {}: {} {}",
+        "{}, {}: {}, {}",
         event.operationContext.operation,
         event.operationContext.sourceLocation,
         event.message,
-        event.serverMessage);
+        event.serverReply);
   }
 }
 

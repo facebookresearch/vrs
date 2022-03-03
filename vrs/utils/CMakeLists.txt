@@ -14,6 +14,10 @@
 
 add_library(vrs_utils
   STATIC
+    FilterCopyHelpers.cpp
+    FilterCopyHelpers.h
+    FilteredFileReader.cpp
+    FilteredFileReader.h
     RecordFileInfo.cpp
     RecordFileInfo.h
 )
