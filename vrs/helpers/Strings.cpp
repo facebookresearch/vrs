@@ -137,23 +137,41 @@ string humanReadableDuration(double seconds) {
 }
 
 string humanReadableTimestamp(double seconds, uint8_t precision) {
-  const char* cFormat = "{:.3f}";
+  // This code must work with Ubuntu's 20.4 fmt and the newest compilers/fmt.
+  // Bottom line: fmt::format must use a constant format string to compile everywhere.
+  enum Format { f3, f6, f9, e3, e9 };
+  Format format = f3;
   double cTinyLimit = 1e-3;
   const double cHugeLimit = 1e10;
   if (precision > 3) {
     if (precision <= 6) {
       cTinyLimit = 1e-6;
-      cFormat = "{:.6f}";
+      format = f6;
     } else {
       cTinyLimit = 1e-9;
-      cFormat = "{:.9f}";
+      format = f9;
     }
   }
   double atimestamp = abs(seconds);
   if (atimestamp < cTinyLimit) {
-    return atimestamp > 0 ? fmt::format("{:.3e}", seconds) : fmt::format(cFormat, seconds);
+    if (atimestamp > 0) {
+      format = e3;
+    }
+  } else if (atimestamp >= cHugeLimit) {
+    format = e9;
   }
-  return atimestamp >= cHugeLimit ? fmt::format("{:.9e}", seconds) : fmt::format(cFormat, seconds);
+  switch (format) {
+    case f3:
+      return fmt::format("{:.3f}", seconds);
+    case f6:
+      return fmt::format("{:.6f}", seconds);
+    case f9:
+      return fmt::format("{:.9f}", seconds);
+    case e3:
+      return fmt::format("{:.3e}", seconds);
+    case e9:
+      return fmt::format("{:.9e}", seconds);
+  }
 }
 
 string make_printable(const string& str) {
