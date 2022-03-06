@@ -772,27 +772,28 @@ int RecordFileWriter::createFile(const string& filePath, bool splitHead) {
   }
 
   if (!spec.isDiskFile()) {
-    // If you are not using DiskFile, we assume you are writing to a remote storage.
-    // In that case, the file needs a split head, so the VRS file's head can be written
-    // to a temporary local file (it needs to be edited during creation), while the rest of the
-    // payload can be uploaded. The file's head will be uploaded & prepended to the uploaded file
-    // on file close.
-    if (spec.chunks.size() < 2) {
-      XR_LOGE(
-          "To write files with {}, you need to have at least 2 chunks "
-          "['file head temporary local path', 'upload destination']...",
-          spec.fileHandlerName);
-      return INVALID_FILE_SPEC;
-    }
-    splitHead = true;
-
     std::unique_ptr<WriteFileHandler> writeFile{dynamic_cast<WriteFileHandler*>(
         FileHandlerFactory::getInstance().getFileHandler(spec.fileHandlerName).release())};
     if (!writeFile) {
       XR_LOGE("Found no WriteFileHandler named {}.", spec.fileHandlerName);
       return INVALID_FILE_SPEC;
     }
-
+    if (!writeFile->reopenForUpdatesSupported()) {
+      // If a custom FileHandler can't handle updates, the file needs a local file where to write
+      // the file's header, the description record, and index record, because that part needs to be
+      // updated during file creation.
+      // The rest of the file, which contains all the data records, can be written forward in one
+      // pass, as it is being generated (no edits needed). In the upload case, the file's head will
+      // need be uploaded and prepended to the uploaded data, after the file is closed.
+      if (spec.chunks.size() < 2) {
+        XR_LOGE(
+            "To write files with {}, you need to have at least 2 chunks "
+            "['file head temporary local path', 'upload destination']...",
+            spec.fileHandlerName);
+        return INVALID_FILE_SPEC;
+      }
+      splitHead = true;
+    }
     file_ = std::move(writeFile);
   } else if (spec.chunks.size() != 1) {
     XR_LOGE("File creation using {} requires a single file chunk.", spec.fileHandlerName);
