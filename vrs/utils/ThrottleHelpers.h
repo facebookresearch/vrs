@@ -22,11 +22,14 @@ namespace vrs::utils {
 extern const size_t kDownloadChunkSize;
 extern const char* const kResetCurrentLine;
 
+class ThrottledFileDelegate;
+
 /// Class to control memory usage while writing out to a VRS file
 /// using a RecordFileWriter object.
 class ThrottledWriter {
  public:
   ThrottledWriter(const CopyOptions& options);
+  ThrottledWriter(const CopyOptions& options, ThrottledFileDelegate& fileDelegate);
 
   /// Init writer with latest copy options values (if they were changed since constructor)
   void initWriter();
@@ -64,6 +67,10 @@ class ThrottledWriter {
     return copyOptions_.showProgress;
   }
 
+  const CopyOptions& getCopyOptions() const {
+    return copyOptions_;
+  }
+
  private:
   RecordFileWriter writer_;
   function<bool()> waitCondition_;
@@ -72,6 +79,28 @@ class ThrottledWriter {
   int32_t percent_ = 0;
   double minTimestamp_ = 0;
   double duration_ = 0;
+};
+
+/// Default handling of file creation & closing, offering customization opportunities
+/// in particular when handling uploads.
+class ThrottledFileDelegate {
+ public:
+  ThrottledFileDelegate() = default;
+  ThrottledFileDelegate(ThrottledWriter& throttledWriter) {
+    init(throttledWriter);
+  }
+  virtual ~ThrottledFileDelegate() = default;
+  virtual void init(ThrottledWriter& throttledWriter) {
+    throttledWriter_ = &throttledWriter;
+  }
+  virtual bool shouldPreallocateIndex() const {
+    return true;
+  }
+  virtual int createFile(const string& pathToCopy);
+  virtual int closeFile();
+
+ protected:
+  ThrottledWriter* throttledWriter_{};
 };
 
 } // namespace vrs::utils

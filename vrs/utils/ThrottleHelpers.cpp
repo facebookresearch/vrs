@@ -56,13 +56,18 @@ ThrottledWriter::ThrottledWriter(const CopyOptions& options) : copyOptions_{opti
   nextUpdateTime_ = 0;
 }
 
+ThrottledWriter::ThrottledWriter(const CopyOptions& options, ThrottledFileDelegate& fileDelegate)
+    : ThrottledWriter(options) {
+  fileDelegate.init(*this);
+}
+
 void ThrottledWriter::initWriter() {
   writer_.setCompressionThreadPoolSize(
-      std::min<size_t>(copyOptions_.compressionPoolSize, thread::hardware_concurrency()));
+      min<size_t>(copyOptions_.compressionPoolSize, thread::hardware_concurrency()));
   writer_.setMaxChunkSizeMB(copyOptions_.maxChunkSizeMB);
 }
 
-vrs::RecordFileWriter& ThrottledWriter::getWriter() {
+RecordFileWriter& ThrottledWriter::getWriter() {
   return writer_;
 }
 
@@ -97,8 +102,8 @@ void ThrottledWriter::onRecordDecoded(double timestamp, double writeGraceWindow)
     if (now >= nextUpdateTime_) {
       double progress = duration_ > 0.0001 ? (timestamp - minTimestamp_) / duration_ : 1.;
       // timestamp ranges only include data records, but config & state records might be beyond
-      percent_ = std::max<int32_t>(static_cast<int32_t>(progress * 100), 0);
-      percent_ = std::min<int32_t>(percent_, 100);
+      percent_ = max<int32_t>(static_cast<int32_t>(progress * 100), 0);
+      percent_ = min<int32_t>(percent_, 100);
       printPercentAndQueueSize(writer_.getBackgroundThreadQueueByteSize(), false);
       nextUpdateTime_ = now + kRefreshDelaySec;
     }
@@ -151,6 +156,14 @@ void ThrottledWriter::waitForBackgroundThreadQueueSize(size_t maxSize) {
     cout << kResetCurrentLine << "Finishing...";
     cout.flush();
   }
+}
+
+int ThrottledFileDelegate::createFile(const string& pathToCopy) {
+  return throttledWriter_->getWriter().createFileAsync(pathToCopy);
+}
+
+int ThrottledFileDelegate::closeFile() {
+  return throttledWriter_->closeFile();
 }
 
 } // namespace vrs::utils
