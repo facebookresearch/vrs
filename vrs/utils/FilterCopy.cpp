@@ -14,6 +14,8 @@
 
 #include "FilterCopy.h"
 
+#include <array>
+
 #define DEFAULT_LOG_CHANNEL "FilterCopy"
 #include <logging/Log.h>
 
@@ -67,6 +69,192 @@ int filterCopy(
     }
   }
   return copyResult;
+}
+
+namespace {
+
+// given a list of existing tags and a list of new tags, create a list of tags to insert
+void mergeTags(
+    const map<string, string>& writtenTags,
+    const map<string, string>& newTags,
+    map<string, string>& outTags,
+    const string& source,
+    bool isVrsPrivate) {
+  for (const auto& newTag : newTags) {
+    auto writtenTag = writtenTags.find(newTag.first);
+    // add tags, but don't overwrite an existing value (warn instead)
+    if (writtenTag != writtenTags.end()) {
+      if (newTag.second != writtenTag->second) {
+        // if that tag is already set to a different value
+        if (isVrsPrivate) {
+          // don't merge private VRS tags, but warn...
+          cerr << "Warning! The tag '" << newTag.first << "' was already set, ignoring value '"
+               << newTag.second << "' from " << source << endl;
+        } else {
+          // store value using a new name, to perserve (some) context
+          cerr << "Warning! The tag '" << newTag.first
+               << "' was already set. Dup found in: " << source << endl;
+          string newName = newTag.first + "_merged";
+          int count = 1;
+          // find a name that's not in use anywhere.
+          // Because of collisions, we even need to check newTags & outTags...
+          while (writtenTags.find(newName) != writtenTags.end() ||
+                 newTags.find(newName) != newTags.end() || outTags.find(newName) != outTags.end()) {
+            newName = newTag.first + "_merged-" + to_string(count++);
+          }
+          outTags[newName] = newTag.second;
+        }
+      } else {
+        // the value is identical: do nothing.
+      }
+    } else {
+      outTags[newTag.first] = newTag.second;
+    }
+  }
+}
+
+class NoDuplicateCopier : public Copier {
+ public:
+  NoDuplicateCopier(
+      RecordFileReader& fileReader,
+      RecordFileWriter& fileWriter,
+      StreamId id,
+      const CopyOptions& copyOptions)
+      : Copier(fileReader, fileWriter, id, copyOptions) {
+    lastRecordTimestamps_.fill(nan(""));
+  }
+
+  bool processRecordHeader(const CurrentRecord& record, DataReference& outDataRef) override {
+    double& lastTimestamp = lastRecordTimestamps_[static_cast<size_t>(record.recordType)];
+    if (lastTimestamp == record.timestamp) {
+      return false;
+    }
+    lastTimestamp = record.timestamp;
+    return Copier::processRecordHeader(record, outDataRef);
+  }
+
+ protected:
+  array<double, static_cast<size_t>(Record::Type::COUNT)> lastRecordTimestamps_;
+};
+
+struct SourceRecord {
+  RecordFileReader* reader;
+  const IndexRecord::RecordInfo* record;
+
+  bool operator<(const SourceRecord& rhs) const {
+    return *record < *rhs.record;
+  }
+};
+
+} // namespace
+
+int filterMerge(
+    FilteredFileReader& firstRecordFilter,
+    const vector<FilteredFileReader*>& moreRecordFilters,
+    const string& pathToCopy,
+    const CopyOptions& copyOptions,
+    unique_ptr<ThrottledFileDelegate> throttledFileDelegate) {
+  // setup the record file writer and hook-up the readers to record copiers, and copy/merge tags
+  ThrottledWriter throttledWriter(copyOptions, *throttledFileDelegate);
+  RecordFileWriter& recordFileWriter = throttledWriter.getWriter();
+  list<NoDuplicateCopier> copiers; // to delete copiers on exit
+  // track copiers by recordable type id in sequence/instance order in the output file
+  map<RecordableTypeId, vector<NoDuplicateCopier*>> copiersMap;
+  // copy the tags & create the copiers for the first source file
+  recordFileWriter.addTags(firstRecordFilter.reader.getTags());
+  for (auto id : firstRecordFilter.filter.streams) {
+    copiers.emplace_back(firstRecordFilter.reader, recordFileWriter, id, copyOptions);
+    copiersMap[id.getTypeId()].push_back(&copiers.back());
+  }
+  // calculate the overall timerange, so we can resolve time constraints on the overall file
+  double startTimestamp, endTimestamp;
+  firstRecordFilter.getTimeRange(startTimestamp, endTimestamp);
+  for (auto* recordFilter : moreRecordFilters) {
+    RecordFileReader& reader = recordFilter->reader;
+    recordFilter->expandTimeRange(startTimestamp, endTimestamp);
+    // add the global tags
+    map<string, string> tags;
+    mergeTags(recordFileWriter.getTags(), reader.getTags(), tags, recordFilter->path, false);
+    recordFileWriter.addTags(tags);
+
+    // track how many stream of each type we've seen in the current reader
+    map<RecordableTypeId, size_t> recordableIndex;
+    // For each stream, see if we merge it into an existing stream, or create a new one
+    for (auto id : recordFilter->filter.streams) {
+      if (copyOptions.mergeStreams) {
+        size_t index = recordableIndex[id.getTypeId()]++; // get index & increment for next one
+        vector<NoDuplicateCopier*>& existingCopiers = copiersMap[id.getTypeId()];
+        if (index < existingCopiers.size()) {
+          // merge this stream: re-use the existing copier
+          reader.setStreamPlayer(id, existingCopiers[index]);
+          Writer& writer = existingCopiers[index]->getWriter();
+          // merge new user & vrs tags into the existing stream tags
+          const StreamTags& writtenTags = writer.getRecordableTags();
+          const StreamTags& newTags = reader.getTags(id);
+          StreamTags streamTags;
+          string tagSource = id.getName() + " of " + recordFilter->path;
+          mergeTags(writtenTags.user, newTags.user, streamTags.user, tagSource, false);
+          mergeTags(writtenTags.vrs, newTags.vrs, streamTags.vrs, tagSource, true);
+          writer.addTags(streamTags);
+        } else {
+          copiers.emplace_back(reader, recordFileWriter, id, copyOptions);
+          copiersMap[id.getTypeId()].push_back(&copiers.back());
+        }
+      } else {
+        copiers.emplace_back(reader, recordFileWriter, id, copyOptions);
+      }
+    }
+  }
+
+  copyOptions.tagOverrides.overrideTags(throttledWriter.getWriter());
+
+  // create a time-sorted list of all the records (pre-flight only: no actual read)
+  deque<SourceRecord> records;
+  auto recordCollector = [&records](
+                             RecordFileReader& reader, const IndexRecord::RecordInfo& record) {
+    records.push_back(SourceRecord{&reader, &record});
+    return true;
+  };
+  firstRecordFilter.filter.resolveTimeConstraints(startTimestamp, endTimestamp);
+  firstRecordFilter.preRollConfigAndState(recordCollector);
+  firstRecordFilter.iterate(recordCollector);
+  for (auto* recordFilter : moreRecordFilters) {
+    recordFilter->filter.resolveTimeConstraints(startTimestamp, endTimestamp);
+    recordFilter->preRollConfigAndState(recordCollector);
+    recordFilter->iterate(recordCollector);
+  }
+  sort(records.begin(), records.end());
+
+  if (throttledFileDelegate->shouldPreallocateIndex()) {
+    // Build preliminary index
+    auto preliminaryIndex = make_unique<deque<IndexRecord::DiskRecordInfo>>();
+    deque<IndexRecord::DiskRecordInfo>& index = *preliminaryIndex;
+    int64_t offset = 0;
+    for (auto& r : records) {
+      index.push_back(
+          {r.record->timestamp,
+           static_cast<uint32_t>(r.record->fileOffset - offset),
+           r.record->streamId,
+           r.record->recordType});
+      offset = r.record->fileOffset;
+    }
+    recordFileWriter.preallocateIndex(move(preliminaryIndex));
+  }
+
+  int mergeResult = throttledFileDelegate->createFile(pathToCopy);
+  if (mergeResult == 0) {
+    // read all the records in order
+    if (!records.empty()) {
+      throttledWriter.initTimeRange(
+          records.front().record->timestamp, records.back().record->timestamp);
+      for (auto& recordSource : records) {
+        recordSource.reader->readRecord(*recordSource.record);
+        throttledWriter.onRecordDecoded(recordSource.record->timestamp);
+      }
+    }
+    mergeResult = throttledFileDelegate->closeFile();
+  }
+  return mergeResult;
 }
 
 } // namespace vrs::utils

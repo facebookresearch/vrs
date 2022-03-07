@@ -68,4 +68,21 @@ int filterCopy(
     unique_ptr<ThrottledFileDelegate> throttledFileDelegate =
         std::make_unique<ThrottledFileDelegate>());
 
+/// Merge records from multiple files into a new file, using multiple filtered readers.
+/// @param filteredReader: first source file with record filtering.
+/// @param moreRecordFilters: more source files with filterering
+/// @param pathToCopy: path of the destination location
+/// @param copyOptions: copy parameters, such as compression preset, chunking behavior, etc.
+/// @param throttledFileDelegate: delegate to create & close the target file.
+/// This might be useful when doing more advanced operations, such as uploads.
+/// @return a status code, with 0 meaning success, and any non-zero value is a failure, in which
+/// case an error message will be printed in cerr.
+int filterMerge(
+    FilteredFileReader& recordFilter,
+    const vector<FilteredFileReader*>& moreRecordFilters,
+    const string& pathToCopy,
+    const CopyOptions& copyOptions,
+    unique_ptr<ThrottledFileDelegate> throttledFileDelegate =
+        std::make_unique<ThrottledFileDelegate>());
+
 } // namespace vrs::utils
