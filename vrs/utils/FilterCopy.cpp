@@ -15,6 +15,7 @@
 #include "FilterCopy.h"
 
 #include <array>
+#include <iomanip>
 
 #define DEFAULT_LOG_CHANNEL "FilterCopy"
 #include <logging/Log.h>
@@ -23,6 +24,14 @@ using namespace std;
 using namespace vrs;
 
 namespace vrs::utils {
+
+void printProgress(const char* status, size_t currentSize, size_t totalSize, bool showProgress) {
+  if (showProgress) {
+    size_t percent = 100 * currentSize / totalSize;
+    cout << kResetCurrentLine << status << setw(2) << percent << "%...";
+    cout.flush();
+  }
+}
 
 unique_ptr<StreamPlayer> makeCopier(
     RecordFileReader& fileReader,

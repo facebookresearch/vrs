@@ -18,6 +18,8 @@
 
 namespace vrs::utils {
 
+void printProgress(const char* status, size_t currentSize, size_t totalSize, bool showProgress);
+
 /// Type of function that returns a new stream player suitable to copy or filter a particular stream
 /// during a copy operation.
 /// This StreamPlayer is responsible for:
