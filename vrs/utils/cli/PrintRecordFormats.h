@@ -20,6 +20,8 @@
 
 namespace vrs::utils {
 
-std::string getRecordFormats(vrs::utils::FilteredFileReader& filteredReader);
+/// Print RecordFormat definitions found in a VRS file.
+/// @param filteredReader: file to examine, with filters.
+std::string printRecordFormats(FilteredFileReader& filteredReader);
 
 }; // namespace vrs::utils

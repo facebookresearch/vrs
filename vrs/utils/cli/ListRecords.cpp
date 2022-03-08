@@ -41,8 +41,9 @@ class RecordLister : public StreamPlayer {
 
   void list(const CurrentRecord& record) {
     printf(
-        "%.03f %s %s %d bytes.\n",
+        "%.03f %s - %s, %s record, %d bytes.\n",
         record.timestamp,
+        record.streamId.getNumericName().c_str(),
         record.streamId.getName().c_str(),
         Record::typeName(record.recordType),
         record.recordSize);
@@ -58,6 +59,9 @@ void listRecords(utils::FilteredFileReader& filteredReader) {
   for (auto id : filteredReader.filter.streams) {
     filteredReader.reader.setStreamPlayer(id, &lister);
   }
+  double startTimestamp, endTimestamp;
+  filteredReader.getConstrainedTimeRange(startTimestamp, endTimestamp);
+  filteredReader.preRollConfigAndState();
   filteredReader.iterate();
 }
 

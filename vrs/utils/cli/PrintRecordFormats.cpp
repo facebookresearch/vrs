@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "JsonDescription.h"
+#include "PrintRecordFormats.h"
 
 #include <sstream>
 
@@ -22,7 +22,7 @@ using namespace vrs::utils;
 
 namespace vrs::utils {
 
-string getRecordFormats(FilteredFileReader& filteredReader) {
+string printRecordFormats(FilteredFileReader& filteredReader) {
   stringstream ss;
   JsonFormatProfileSpec spec;
   spec.prettyJson = true;

@@ -19,8 +19,7 @@
 
 namespace vrs::utils {
 
-int compressionBenchmark(
-    vrs::utils::FilteredFileReader& source,
-    const vrs::utils::CopyOptions& options);
+/// Compare compression options applied to a certain file.
+int compressionBenchmark(FilteredFileReader& source, const CopyOptions& options);
 
-}
+} // namespace vrs::utils

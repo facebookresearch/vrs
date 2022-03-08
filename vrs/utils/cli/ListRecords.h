@@ -18,6 +18,9 @@
 
 namespace vrs::utils {
 
-void listRecords(vrs::utils::FilteredFileReader& filteredReader);
+/// Print a list of records' top-level metadata without actually reading the records.
+/// Includes timestamp, stream id, record type and record size, but nothing else.
+/// @param filteredReader: the file to read, with filters.
+void listRecords(FilteredFileReader& filteredReader);
 
-}
+} // namespace vrs::utils

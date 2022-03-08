@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "DataLayoutPrint.h"
+#include "PrintRecordFormatRecords.h"
 
 #include <iostream>
 
@@ -143,7 +143,7 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
 
 namespace vrs::utils {
 
-void dataLayoutPrintRecordsNormal(utils::FilteredFileReader& filteredReader, PrintoutType type) {
+void printRecordFormatRecords(FilteredFileReader& filteredReader, PrintoutType type) {
   DataLayoutPrinter lister(type);
   for (auto id : filteredReader.filter.streams) {
     filteredReader.reader.setStreamPlayer(id, &lister);

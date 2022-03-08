@@ -46,8 +46,8 @@ enum class CompareType { None, Compare, CompareVerbatim, Count };
 /// and records one by one, while respecting filters, so that you can compare parts of files.
 /// Two files losslessly compressed differently, with different indexes, may well be equal.
 /// Both files are expected to be opened already, all filters applied.
-/// @param recordFilter: first VRS file to compare, opened, with filters applied.
-/// @param other: second VRS file to compare against, opened, with filters applied.
+/// @param first: VRS file to compare, opened, with filters applied.
+/// @param second: other VRS file to compare against, opened, with filters applied.
 /// @param copyOptions: to disable progress logging. Other parameters are not applicable.
 bool compareVRSfiles(
     FilteredFileReader& first,
