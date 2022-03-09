@@ -271,7 +271,7 @@ void FilteredFileReader::getConstrainedTimeRange(
     double& outStartTimestamp,
     double& outEndTimestamp) {
   getTimeRange(outStartTimestamp, outEndTimestamp);
-  filter.resolveTimeConstraints(outStartTimestamp, outEndTimestamp);
+  filter.resolveRelativeTimeConstraints(outStartTimestamp, outEndTimestamp);
   constrainTimeRange(outStartTimestamp, outEndTimestamp);
 }
 
@@ -380,7 +380,7 @@ void RecordFilter::setMaxTime(double maximumTime, bool relativeToEnd) {
   relativeMaxTime = relativeToEnd;
 }
 
-bool RecordFilter::resolveTimeConstraints(double startTimestamp, double endTimestamp) {
+bool RecordFilter::resolveRelativeTimeConstraints(double startTimestamp, double endTimestamp) {
   if (relativeMinTime || relativeMaxTime || aroundTime) {
     if (relativeMinTime) {
       minTime += (minTime < 0) ? endTimestamp : startTimestamp;
@@ -405,7 +405,7 @@ bool FilteredFileReader::resolveTimeConstraints() {
   const auto& index = reader.getIndex();
   return index.empty()
       ? true
-      : filter.resolveTimeConstraints(index.front().timestamp, index.back().timestamp);
+      : filter.resolveRelativeTimeConstraints(index.front().timestamp, index.back().timestamp);
 }
 
 string RecordFilter::getTimeConstraintDescription() const {

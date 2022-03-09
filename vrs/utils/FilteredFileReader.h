@@ -74,7 +74,7 @@ struct RecordFilter {
   void setMaxTime(double maximumTime, bool relativeToEnd);
 
   // Resolve relative time constraints based on the given start & end timestamps
-  bool resolveTimeConstraints(double startTimestamp, double endTimestamp);
+  bool resolveRelativeTimeConstraints(double startTimestamp, double endTimestamp);
   string getTimeConstraintDescription() const;
 };
 

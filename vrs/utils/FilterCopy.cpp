@@ -252,11 +252,11 @@ int filterMerge(
     records.push_back(SourceRecord{&reader, &record});
     return true;
   };
-  firstRecordFilter.filter.resolveTimeConstraints(startTimestamp, endTimestamp);
+  firstRecordFilter.filter.resolveRelativeTimeConstraints(startTimestamp, endTimestamp);
   firstRecordFilter.preRollConfigAndState(recordCollector);
   firstRecordFilter.iterate(recordCollector);
   for (auto* recordFilter : moreRecordFilters) {
-    recordFilter->filter.resolveTimeConstraints(startTimestamp, endTimestamp);
+    recordFilter->filter.resolveRelativeTimeConstraints(startTimestamp, endTimestamp);
     recordFilter->preRollConfigAndState(recordCollector);
     recordFilter->iterate(recordCollector);
   }
