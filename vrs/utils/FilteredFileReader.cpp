@@ -223,13 +223,14 @@ void FilteredFileReader::setMaxTime(double maximumTime, bool relativeToEnd) {
   return filter.setMaxTime(maximumTime, relativeToEnd);
 }
 
-void FilteredFileReader::getTimeRange(double& outStartTimestamp, double& outEndTimestamp) {
+void FilteredFileReader::getTimeRange(double& outStartTimestamp, double& outEndTimestamp) const {
   outStartTimestamp = numeric_limits<double>::max();
   outEndTimestamp = numeric_limits<double>::lowest();
   expandTimeRange(outStartTimestamp, outEndTimestamp);
 }
 
-void FilteredFileReader::expandTimeRange(double& inOutStartTimestamp, double& inOutEndTimestamp) {
+void FilteredFileReader::expandTimeRange(double& inOutStartTimestamp, double& inOutEndTimestamp)
+    const {
   const auto& index = reader.getIndex();
   if (!index.empty()) {
     double firstTimestamp = inOutStartTimestamp;

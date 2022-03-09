@@ -165,12 +165,12 @@ struct FilteredFileReader {
   // Apply time constrains & get resulting range in one call.
   void getConstrainedTimeRange(double& outStartTimestamp, double& outEndTimestamp);
 
-  // Get the time range including the data records of the considered streams only.
+  // Get the time range including the data records of the filtered streams only.
   // The file must be opened already.
   // The resulting values are used to convert file-relative timestamps into absolute timestamps.
-  void getTimeRange(double& outStartTimestamp, double& outEndTimestamp);
+  void getTimeRange(double& outStartTimestamp, double& outEndTimestamp) const;
   // Expand an existing timerange to include the data records of the considered streams only.
-  void expandTimeRange(double& inOutStartTimestamp, double& inOutEndTimestamp);
+  void expandTimeRange(double& inOutStartTimestamp, double& inOutEndTimestamp) const;
   // Constrain the given time range to the current filter's time constraints
   void constrainTimeRange(double& inOutStartTimestamp, double& inOutEndTimestamp) const;
 
