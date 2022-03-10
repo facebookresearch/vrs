@@ -378,7 +378,7 @@ int makeAndWriteFrame(
   size_t addedSize = 0;
   size_t remainingSize = frameSize;
   while (remainingSize > 0) {
-    size_t chunkSize = std::min<size_t>(maxChunkSize, remainingSize);
+    size_t chunkSize = min<size_t>(maxChunkSize, remainingSize);
     EXPECT_ZERO_OR_RETURN(
         compressor.addFrameData(file, input.data() + addedSize, chunkSize, writtenSize));
     addedSize += chunkSize;
@@ -404,7 +404,7 @@ int readFrame(
 } // namespace
 
 TEST_F(FrameCompressionTest, compressedFrames) {
-  const std::string testPath = os::getTempFolder() + "compressedFrames.vrs";
+  const string testPath = os::getTempFolder() + "compressedFrames.vrs";
   DiskFile file;
 
   Compressor compressor;
@@ -453,7 +453,7 @@ TEST_F(FrameCompressionTest, compressedFrames) {
 }
 
 TEST_F(FrameCompressionTest, truncatedFrame) {
-  const std::string testPath = os::getTempFolder() + "truncatedFrame.vrs";
+  const string testPath = os::getTempFolder() + "truncatedFrame.vrs";
   DiskFile file;
 
   Compressor compressor;
@@ -480,7 +480,7 @@ TEST_F(FrameCompressionTest, truncatedFrame) {
 }
 
 TEST_F(FrameCompressionTest, truncatedFrames) {
-  const std::string testPath = os::getTempFolder() + "truncatedFrames.vrs";
+  const string testPath = os::getTempFolder() + "truncatedFrames.vrs";
   DiskFile file;
 
   vector<size_t> truncationSizes = {1, 5, 25, 100};
@@ -516,7 +516,7 @@ TEST_F(FrameCompressionTest, truncatedFrames) {
 }
 
 TEST_F(FrameCompressionTest, stringReadWrite) {
-  const std::string testPath = os::getTempFolder() + "string.vrs";
+  const string testPath = os::getTempFolder() + "string.vrs";
 
   string writtenString;
   string readString;

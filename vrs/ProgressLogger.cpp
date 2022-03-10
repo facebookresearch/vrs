@@ -88,7 +88,7 @@ bool ProgressLogger::logStatus(const string& stepName, int status) {
 
 bool ProgressLogger::logDuration(const string& operationName, double duration, int precision) {
   if (detailedProgress_) {
-    std::stringstream ss;
+    stringstream ss;
     ss << operationName << " in " << fixed << setprecision(precision) << duration << "s.";
     logMessage(ss.str());
     updateNextProgessTime();

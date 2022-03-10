@@ -403,7 +403,7 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
     imageSpec_.height.set(height);
     PixelFormat pixelFormat = PixelFormat::BGR8;
     imageSpec_.pixelFormat.set(pixelFormat);
-    imageSpec_.name.stage(std::to_string(width));
+    imageSpec_.name.stage(to_string(width));
     imageSpec_.names.stage({"hello", "", "bonjour"});
     imageSpec_.more_names.stage({"hi", "", "cio"});
     imageSpec_.stringMapInt.stage({{"one", 1}, {"two", 2}, {"three", 3}});
@@ -472,7 +472,7 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
         EXPECT_EQ(expectedLayout.pixelFormat.get(), PixelFormat::BGR8);
         EXPECT_TRUE(expectedLayout.name.isAvailable());
         EXPECT_STREQ(
-            expectedLayout.name.get().c_str(), std::to_string(expectedLayout.width.get()).c_str());
+            expectedLayout.name.get().c_str(), to_string(expectedLayout.width.get()).c_str());
         vector<string> names;
         EXPECT_TRUE(expectedLayout.names.get(names));
         EXPECT_EQ(names.size(), 3);
@@ -639,7 +639,7 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
     tag = filePlayer.getTag(tag_conventions::kOsFingerprint);
     EXPECT_GT(tag.size(), 1); // almost any value will do...
     tag = filePlayer.getTag(tag_conventions::kCaptureTimeEpoch);
-    time_t epoch = static_cast<time_t>(std::atoll(tag.c_str()));
+    time_t epoch = static_cast<time_t>(atoll(tag.c_str()));
     EXPECT_GE(epoch, timeBefore);
     EXPECT_LE(epoch, timeBefore + 20); // let's give it 20 seconds!
     tag = filePlayer.getTag(tag_conventions::kTagSet);

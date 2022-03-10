@@ -221,9 +221,9 @@ int readIndexData(
 } // namespace
 
 int write(
-    const std::string& cacheFile,
+    const string& cacheFile,
     const set<StreamId>& streamIds,
-    const map<std::string, std::string>& fileTags,
+    const map<string, string>& fileTags,
     const map<StreamId, StreamTags>& streamTags,
     const vector<IndexRecord::RecordInfo>& recordIndex,
     bool fileHasIndex) {
@@ -263,9 +263,9 @@ int write(
 }
 
 int read(
-    const std::string& cacheFile,
+    const string& cacheFile,
     set<StreamId>& outStreamIds,
-    map<std::string, std::string>& outFileTags,
+    map<string, string>& outFileTags,
     map<StreamId, StreamTags>& outStreamTags,
     vector<IndexRecord::RecordInfo>& outRecordIndex,
     bool& outFileHasIndex) {

@@ -26,6 +26,8 @@
 #include "FileFormat.h"
 #include "RecordManager.h"
 
+using namespace std;
+
 namespace vrs {
 
 namespace {
@@ -43,16 +45,16 @@ struct RecordTypeConverter : public EnumStringConverter<
 
 } // namespace
 
-std::string toString(Record::Type recordType) {
+string toString(Record::Type recordType) {
   return RecordTypeConverter::toString(recordType);
 }
 
 template <>
-Record::Type toEnum<>(const std::string& name) {
+Record::Type toEnum<>(const string& name) {
   return RecordTypeConverter::toEnumNoCase(name.c_str());
 }
 
-const double Record::kMaxTimestamp = std::numeric_limits<double>::max();
+const double Record::kMaxTimestamp = numeric_limits<double>::max();
 
 void Record::recycle() {
   recordManager_.recycle(this);

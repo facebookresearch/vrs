@@ -18,13 +18,14 @@
 #include <vrs/RecordManager.h>
 #include <vrs/os/Time.h>
 
+using namespace std;
 using namespace vrs;
 
 TEST(RecordManager, CollectOldRecords) {
   RecordManager manager;
   constexpr uint32_t kDataVersion = 1337;
   constexpr int kFrameDt = 1;
-  std::vector<uint8_t> data(10);
+  vector<uint8_t> data(10);
 
   // Create a bunch of records!
   int frameIndex = 0;
@@ -36,14 +37,14 @@ TEST(RecordManager, CollectOldRecords) {
   }
 
   // Verify that we can pull a subsection of the records.
-  std::list<Record*> recordData;
+  list<Record*> recordData;
   manager.collectOldRecords(1.33, recordData);
   EXPECT_EQ(recordData.size(), 134);
   EXPECT_DOUBLE_EQ(recordData.front()->getTimestamp(), 0.0);
   EXPECT_DOUBLE_EQ(recordData.back()->getTimestamp(), 1.33);
 
   // Call backwards in time. There shouldn't be anything.
-  std::list<Record*> noRecords;
+  list<Record*> noRecords;
   manager.collectOldRecords(0.74, noRecords);
   EXPECT_TRUE(noRecords.empty());
 
@@ -58,7 +59,7 @@ TEST(RecordManager, CollectOldRecords) {
 TEST(RecordManager, Recycle) {
   RecordManager manager;
   constexpr uint32_t kDataVersion = 1337;
-  std::vector<uint8_t> data;
+  vector<uint8_t> data;
   manager.setMaxCacheSize(5);
   EXPECT_EQ(manager.getCurrentCacheSize(), 0);
 
@@ -66,7 +67,7 @@ TEST(RecordManager, Recycle) {
   manager.createRecord(os::getTimestampSec(), Record::Type::DATA, kDataVersion, DataSource(data));
   EXPECT_EQ(manager.getCurrentCacheSize(), 0);
 
-  std::list<Record*> records;
+  list<Record*> records;
   manager.collectOldRecords(os::getTimestampSec(), records);
   EXPECT_EQ(records.size(), 1);
 
@@ -78,8 +79,8 @@ TEST(RecordManager, Recycle) {
 
 namespace {
 constexpr uint32_t kDataVersion = 1337;
-void collectAndRecycle(RecordManager& manager, double maxAge = std::numeric_limits<double>::max()) {
-  std::list<Record*> records;
+void collectAndRecycle(RecordManager& manager, double maxAge = numeric_limits<double>::max()) {
+  list<Record*> records;
   manager.collectOldRecords(maxAge, records);
   for (auto record : records) {
     record->recycle();
@@ -93,7 +94,7 @@ void resetManager(RecordManager& manager) {
 void testAllocationLimit(RecordManager& manager, size_t firstSize, size_t maxSize) {
   resetManager(manager);
   double now = os::getTimestampSec();
-  std::vector<uint8_t> data(firstSize);
+  vector<uint8_t> data(firstSize);
   Record* record = manager.createRecord(now, Record::Type::DATA, kDataVersion, DataSource(data));
   collectAndRecycle(manager);
   ASSERT_EQ(manager.getCurrentCacheSize(), 1);

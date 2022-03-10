@@ -20,6 +20,8 @@
 #include <vrs/ErrorCode.h>
 #include <vrs/FileHandlerFactory.h>
 
+using namespace std;
+
 namespace vrs {
 
 FileHandlerFactory& FileHandlerFactory::getInstance() {
@@ -28,12 +30,10 @@ FileHandlerFactory& FileHandlerFactory::getInstance() {
 }
 
 FileHandlerFactory::FileHandlerFactory() {
-  registerFileHandler(std::make_unique<DiskFile>());
+  registerFileHandler(make_unique<DiskFile>());
 }
 
-int FileHandlerFactory::delegateOpen(
-    const std::string& path,
-    std::unique_ptr<FileHandler>& outNewDelegate) {
+int FileHandlerFactory::delegateOpen(const string& path, unique_ptr<FileHandler>& outNewDelegate) {
   FileSpec fileSpec;
   int status = fileSpec.fromPathJsonUri(path);
   return status == 0 ? delegateOpen(fileSpec, outNewDelegate) : status;
@@ -41,10 +41,10 @@ int FileHandlerFactory::delegateOpen(
 
 int FileHandlerFactory::delegateOpen(
     const FileSpec& fileSpec,
-    std::unique_ptr<FileHandler>& outNewDelegate) {
+    unique_ptr<FileHandler>& outNewDelegate) {
   if (!fileSpec.fileHandlerName.empty() &&
       (!outNewDelegate || outNewDelegate->getFileHandlerName() != fileSpec.fileHandlerName)) {
-    std::unique_ptr<FileHandler> newHandler = getFileHandler(fileSpec.fileHandlerName);
+    unique_ptr<FileHandler> newHandler = getFileHandler(fileSpec.fileHandlerName);
     if (!newHandler) {
       XR_LOGW(
           "No FileHandler '{}' available to open '{}'",
@@ -57,10 +57,10 @@ int FileHandlerFactory::delegateOpen(
   }
   // default to a disk file
   if (!outNewDelegate) {
-    outNewDelegate = std::make_unique<DiskFile>();
+    outNewDelegate = make_unique<DiskFile>();
   }
   // Now delegate opening the file to the file handler, which might delegate further...
-  std::unique_ptr<FileHandler> newDelegate;
+  unique_ptr<FileHandler> newDelegate;
   int status = outNewDelegate->delegateOpenSpec(fileSpec, newDelegate);
   if (newDelegate) {
     outNewDelegate.swap(newDelegate);
@@ -68,16 +68,16 @@ int FileHandlerFactory::delegateOpen(
   return status;
 }
 
-void FileHandlerFactory::registerFileHandler(std::unique_ptr<FileHandler>&& fileHandler) {
+void FileHandlerFactory::registerFileHandler(unique_ptr<FileHandler>&& fileHandler) {
   XR_DEV_CHECK_FALSE(fileHandler->getFileHandlerName().empty());
-  fileHandlerMap_[fileHandler->getFileHandlerName()] = std::move(fileHandler);
+  fileHandlerMap_[fileHandler->getFileHandlerName()] = move(fileHandler);
 }
 
-void FileHandlerFactory::unregisterFileHandler(const std::string& fileHandlerName) {
+void FileHandlerFactory::unregisterFileHandler(const string& fileHandlerName) {
   fileHandlerMap_.erase(fileHandlerName);
 }
 
-std::unique_ptr<FileHandler> FileHandlerFactory::getFileHandler(const std::string& name) {
+unique_ptr<FileHandler> FileHandlerFactory::getFileHandler(const string& name) {
   XR_DEV_CHECK_FALSE(name.empty());
   auto handler = fileHandlerMap_.find(name);
   if (handler != fileHandlerMap_.end()) {

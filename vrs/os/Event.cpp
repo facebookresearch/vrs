@@ -18,10 +18,12 @@
 
 #include <vrs/os/Time.h>
 
+using namespace std;
+
 namespace vrs {
 namespace os {
 
-EventChannel::EventChannel(const std::string& name, NotificationMode notificationMode)
+EventChannel::EventChannel(const string& name, NotificationMode notificationMode)
     : name_{name},
       notificationMode_{notificationMode},
       numEventsSinceLastWait_{0},
@@ -32,7 +34,7 @@ EventChannel::EventChannel(const std::string& name, NotificationMode notificatio
       pendingWakeupsCount_{0} {}
 
 EventChannel::~EventChannel() {
-  std::unique_lock<std::mutex> lock(mutex_);
+  unique_lock<mutex> lock(mutex_);
   inDestruction_ = true;
   while (numEntering_ + numListeners_ > 0) {
     // It's not safe to call waitForEvent on an EventChannel that can be concurrently
@@ -41,13 +43,13 @@ EventChannel::~EventChannel() {
     // pending waitForEvent-s it is better to wake them up than to crash.
     wakeupCondition_.notify_all();
     enterCondition_.notify_all();
-    std::condition_variable dummyCond;
-    dummyCond.wait_for(lock, std::chrono::duration<double>(0.001));
+    condition_variable dummyCond;
+    dummyCond.wait_for(lock, chrono::duration<double>(0.001));
   }
 }
 
 void EventChannel::dispatchEvent(void* pointer, int64_t value) {
-  std::unique_lock<std::mutex> lock(mutex_);
+  unique_lock<mutex> lock(mutex_);
 
   mostRecentEvents_.pointer = pointer;
   mostRecentEvents_.value = value;
@@ -72,7 +74,7 @@ EventChannel::waitForEvent(Event& event, double timeoutSec, double lookBackSec) 
   EventChannel::Status status = Status::SUCCESS;
   double startTime = vrs::os::getTimestampSec();
 
-  std::unique_lock<std::mutex> lock(mutex_);
+  unique_lock<mutex> lock(mutex_);
 
   // Pending wake-up is when broadcast event is dispatched but not all listeners have waked up yet.
   // New listener should not enter critical section before all pre-existing listeners have waked up.
@@ -101,7 +103,7 @@ EventChannel::waitForEvent(Event& event, double timeoutSec, double lookBackSec) 
       // At this point, numEventsSinceLastWait is already set to 0.
       numListeners_++;
       bool waitSuccess =
-          wakeupCondition_.wait_for(lock, std::chrono::duration<double>(actualWaitTime), [=] {
+          wakeupCondition_.wait_for(lock, chrono::duration<double>(actualWaitTime), [=] {
             return inDestruction_ || pendingWakeupsCount_ > 0;
           });
       numListeners_--;
@@ -130,7 +132,7 @@ uint32_t EventChannel::getNumEventsSinceLastWait() const {
   return numEventsSinceLastWait_.load();
 }
 
-std::string EventChannel::getName() const {
+string EventChannel::getName() const {
   return name_;
 }
 

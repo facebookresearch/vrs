@@ -51,8 +51,8 @@ DiskFile::~DiskFile() {
   close();
 }
 
-std::unique_ptr<FileHandler> DiskFile::makeNew() const {
-  return std::make_unique<DiskFile>();
+unique_ptr<FileHandler> DiskFile::makeNew() const {
+  return make_unique<DiskFile>();
 }
 
 int DiskFile::close() {
@@ -165,8 +165,8 @@ int64_t DiskFile::getTotalSize() const {
   return lastChunk.offset + lastChunk.size;
 }
 
-vector<std::pair<string, int64_t>> DiskFile::getFileChunks() const {
-  vector<std::pair<string, int64_t>> chunks;
+vector<pair<string, int64_t>> DiskFile::getFileChunks() const {
+  vector<pair<string, int64_t>> chunks;
   for (const Chunk& chunk : chunks_) {
     chunks.emplace_back(make_pair(chunk.path, chunk.size));
   }
@@ -520,9 +520,9 @@ int DiskFile::readFromFile(const string& path, void* data, size_t dataSize) {
 }
 
 int DiskFile::parseUri(FileSpec& inOutFileSpec, size_t colonIndex) const {
-  std::string scheme;
-  std::string path;
-  std::map<string, string> queryParams;
+  string scheme;
+  string path;
+  map<string, string> queryParams;
   IF_ERROR_RETURN(FileSpec::parseUri(inOutFileSpec.uri, scheme, path, queryParams));
 
   if (!XR_VERIFY(scheme == getFileHandlerName())) {

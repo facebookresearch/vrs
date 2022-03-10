@@ -41,7 +41,7 @@ using namespace std;
 using UniqueStreamId = vrs::MultiRecordFileReader::UniqueStreamId;
 
 static double getTimestampSec() {
-  using namespace std::chrono;
+  using namespace chrono;
   return duration_cast<duration<double>>(steady_clock::now().time_since_epoch()).count();
 }
 
@@ -215,7 +215,7 @@ class TestStreamPlayer : public StreamPlayer {
   }
 
  private:
-  using RecordSignature = std::tuple<double, StreamId, Record::Type>;
+  using RecordSignature = tuple<double, StreamId, Record::Type>;
   RecordSignature lastRecord;
   uint32_t recordsProcessedCount = 0;
 };
@@ -227,10 +227,8 @@ TEST_F(MultiRecordFileReaderTest, invalidFilePaths) {
   ASSERT_NE(SUCCESS, MultiRecordFileReader().open(invalidPath));
   const auto invalidFileSpec = FileSpec({invalidPath});
   ASSERT_NE(SUCCESS, MultiRecordFileReader().open(invalidFileSpec));
-  ASSERT_NE(
-      SUCCESS,
-      MultiRecordFileReader().open(std::vector<std::string>{"invalidPath1", "invalidPath2"}));
-  ASSERT_NE(SUCCESS, MultiRecordFileReader().open(std::vector<std::string>{}));
+  ASSERT_NE(SUCCESS, MultiRecordFileReader().open(vector<string>{"invalidPath1", "invalidPath2"}));
+  ASSERT_NE(SUCCESS, MultiRecordFileReader().open(vector<string>{}));
 }
 
 TEST_F(MultiRecordFileReaderTest, relatedFiles) {
@@ -246,7 +244,7 @@ TEST_F(MultiRecordFileReaderTest, relatedFiles) {
     }
   }
   MultiRecordFileReader reader;
-  std::vector<FileSpec> relatedFileSpecs;
+  vector<FileSpec> relatedFileSpecs;
   relatedFileSpecs.reserve(relatedFilePaths.size());
   for (const auto& path : relatedFilePaths) {
     relatedFileSpecs.push_back(FileSpec({path}));
@@ -347,7 +345,7 @@ TEST_F(MultiRecordFileReaderTest, multiFile) {
     const IndexRecord::RecordInfo* record = streamIndex[position];
     ASSERT_TRUE(isTimestampLE(reader.getRecordByTime(stream, record->timestamp), record));
     ASSERT_TRUE(isTimestampLE(
-        reader.getRecordByTime(stream, record->timestamp - std::numeric_limits<double>::epsilon()),
+        reader.getRecordByTime(stream, record->timestamp - numeric_limits<double>::epsilon()),
         record));
   }
   ASSERT_EQ(reader.getRecordCount(), reader.getRecordIndex(nullptr));
@@ -445,7 +443,7 @@ TEST_F(MultiRecordFileReaderTest, singleFile) {
   ASSERT_EQ(record, reader.getRecordByTime(stream, record->timestamp));
   ASSERT_EQ(
       record,
-      reader.getRecordByTime(stream, record->timestamp - std::numeric_limits<double>::epsilon()));
+      reader.getRecordByTime(stream, record->timestamp - numeric_limits<double>::epsilon()));
   EXPECT_EQ(record->streamId, reader.getUniqueStreamId(record));
   ASSERT_EQ(nullptr, reader.getRecordByTime(unknownStream, record->timestamp));
   ASSERT_EQ(nullptr, reader.getRecord(numTotalRecords));
@@ -521,10 +519,10 @@ TEST_F(MultiRecordFileReaderTest, getFirstAndLastRecord) {
   const auto* firstUndefinedRecord = reader.getFirstRecord(Record::Type::UNDEFINED);
   ASSERT_EQ(
       firstDataRecord->timestamp,
-      *std::min_element(expectedTimestamps.begin(), expectedTimestamps.end()));
+      *min_element(expectedTimestamps.begin(), expectedTimestamps.end()));
   ASSERT_EQ(
       lastDataRecord->timestamp,
-      *std::max_element(expectedTimestamps.begin(), expectedTimestamps.end()));
+      *max_element(expectedTimestamps.begin(), expectedTimestamps.end()));
   ASSERT_EQ(firstUndefinedRecord, nullptr);
 
   reader.close();
@@ -642,7 +640,7 @@ class StreamIdCollisionTester {
     auto tagKey = getExpectedRecordCountTagKey(type);
     auto expectedCountStr = reader_.getTag(streamId, tagKey);
     EXPECT_FALSE(expectedCountStr.empty());
-    return std::stoi(expectedCountStr);
+    return stoi(expectedCountStr);
   }
 
   uint32_t validateRecordCount(UniqueStreamId streamId, Record::Type type) const {

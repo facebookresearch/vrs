@@ -26,7 +26,7 @@ using namespace vrs;
 
 namespace {
 
-template <typename T, std::size_t N>
+template <typename T, size_t N>
 void sequenceInit(MatrixND<T, N>& matrix, T start = 1) {
   T v = start;
   for (size_t x = 0; x < N; x++) {
@@ -37,7 +37,7 @@ void sequenceInit(MatrixND<T, N>& matrix, T start = 1) {
   }
 }
 
-template <typename T, std::size_t N>
+template <typename T, size_t N>
 void sequenceInit(DataPieceValue<MatrixND<T, N>>& field, T start = 1) {
   MatrixND<T, N> matrix;
   sequenceInit(matrix, start);
@@ -140,7 +140,7 @@ TEST_F(DataLayoutTester, testDataLayout) {
   testConfig.printLayout(cout);
 #endif
   string json = testConfig.asJson(JsonFormatProfile::ExternalPretty);
-  size_t lineCount = static_cast<size_t>(std::count(json.begin(), json.end(), '\n'));
+  size_t lineCount = static_cast<size_t>(count(json.begin(), json.end(), '\n'));
   EXPECT_EQ(lineCount, 410);
 #if JSON_DUMP
   cout << "Json: " << json << endl;
@@ -156,7 +156,7 @@ TEST_F(DataLayoutTester, testDefault) {
 
   Bool boolsInit[2]{true, false};
   EXPECT_TRUE(refConfig.bools_.set(boolsInit));
-  std::vector<Bool> bools;
+  vector<Bool> bools;
   EXPECT_TRUE(refConfig.bools_.get(bools));
   EXPECT_EQ(bools.size(), 2);
   EXPECT_EQ(bools[0], true);
@@ -260,10 +260,10 @@ TEST_F(DataLayoutTester, testDataLayoutMatcher) {
   EXPECT_FALSE(newConfig.calibration3_.isAvailable());
 
   // Set the fixed data to random values
-  std::srand(12345);
+  srand(12345);
   auto& fixedData = oldConfig.getFixedData();
   for (int8_t& data : fixedData) {
-    data = static_cast<int8_t>(std::rand());
+    data = static_cast<int8_t>(rand());
   }
   // See that we find the same values when using the new and the old layout,
   // when data fields match between the two.
@@ -532,7 +532,7 @@ TEST_F(DataLayoutTester, testOptionalFields) {
 ///
 /// Definitions, so that we can use numeric_limits<Bool>::lowest(), etc in our tests.
 template <>
-class std::numeric_limits<Bool> {
+class numeric_limits<Bool> {
  public:
   static Bool lowest() {
     return false;
@@ -728,7 +728,7 @@ TEST_F(DataLayoutTester, testSerialization) {
   manualLayout.endLayout();
   manualLayout.requireAllPieces();
 
-  std::unique_ptr<DataLayout> newManualLayout = DataLayout::makeFromJson(manualLayout.asJson());
+  unique_ptr<DataLayout> newManualLayout = DataLayout::makeFromJson(manualLayout.asJson());
 #if JSON_DUMP
   cout << "Json: " << manualLayout.asJson(JsonFormatProfile::EXTERNAL_PRETTY) << endl;
   cout << "New Json: " << newManualLayout.get()->asJson(JsonFormatProfile::EXTERNAL_PRETTY) << endl;

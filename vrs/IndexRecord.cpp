@@ -33,6 +33,7 @@
 #include "ProgressLogger.h"
 
 namespace {
+using namespace std;
 using namespace vrs;
 using namespace vrs::IndexRecord;
 
@@ -42,14 +43,14 @@ const uint32_t kMaxBatchSize = 100000;
 // used when there are too few index entries for compression to reasonably work...
 #if IS_ANDROID_PLATFORM()
 CompressionPreset kDefaultCompression = CompressionPreset::ZstdLight;
-const std::array<CompressionPreset, 4> kCompressionLevels = {
+const array<CompressionPreset, 4> kCompressionLevels = {
     CompressionPreset::None,
     CompressionPreset::ZstdFast,
     CompressionPreset::ZstdMedium,
     CompressionPreset::ZstdTight};
 #else // !IS_ANDROID_PLATFORM()
 CompressionPreset kDefaultCompression = CompressionPreset::ZstdTight;
-const std::array<CompressionPreset, 3> kCompressionLevels = {
+const array<CompressionPreset, 3> kCompressionLevels = {
     CompressionPreset::None,
     CompressionPreset::ZstdMedium,
     CompressionPreset::ZstdTight};
@@ -89,7 +90,7 @@ int writeDiskInfos(
     Compressor& compressor,
     CompressionPreset preset = CompressionPreset::None,
     size_t maxWriteSize = 0) {
-  std::map<RecordSignature, uint32_t> recordCounter;
+  map<RecordSignature, uint32_t> recordCounter;
   // Write the count of records, and one RecordIndexStruct for each (in batch of fixed size)
   uint32_t recordsLeft = static_cast<uint32_t>(records.size());
   vector<DiskRecordInfo> recordStructs;
@@ -541,7 +542,7 @@ int IndexRecord::Reader::readDiskInfo(vector<DiskRecordInfo>& outRecords) {
   const size_t kMaxChunkSize = 8 * 1024 * 1024;
   size_t completedSize = 0;
   while (completedSize < totalSize) {
-    const size_t chunkSize = std::min(kMaxChunkSize, totalSize - completedSize);
+    const size_t chunkSize = min(kMaxChunkSize, totalSize - completedSize);
     if (file_.read(reinterpret_cast<char*>(outRecords.data()) + completedSize, chunkSize) != 0) {
       XR_LOGW("Failed to read entire index.");
       return file_.getLastError();
@@ -606,7 +607,7 @@ int IndexRecord::Reader::rebuildIndex(bool writeFixedIndex) {
   streamIds_.clear();
   index_.clear();
   sortErrorCount_ = 0;
-  diskIndex_ = writeFixedIndex ? std::make_unique<deque<IndexRecord::DiskRecordInfo>>() : nullptr;
+  diskIndex_ = writeFixedIndex ? make_unique<deque<IndexRecord::DiskRecordInfo>>() : nullptr;
   const size_t kFirstAllocation = 10000; // arbitrary start
   index_.reserve(kFirstAllocation);
   // maybe headers are larger now: allocate a possibly larger buffer than FileFormat::RecordHeader

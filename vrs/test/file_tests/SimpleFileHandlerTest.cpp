@@ -28,6 +28,7 @@
 // It demonstrates how to create a VRS file with an image stream, using RecordFormat & DataLayout.
 // The produced VRS file can actually be played like a video by VRSplayer.
 
+using namespace std;
 using namespace vrs;
 
 namespace {
@@ -113,7 +114,7 @@ class ImageStream : public Recordable {
   const Record* createFrame(uint32_t frameNumber) {
     // simulate some image content
     const size_t frameBufferSize = kFrameWidth * kFrameHeight * kPixelByteSize;
-    std::vector<uint8_t> frameBuffer(frameBufferSize);
+    vector<uint8_t> frameBuffer(frameBufferSize);
     for (uint32_t n = 0; n < frameBufferSize; ++n) {
       frameBuffer[n] = static_cast<uint8_t>(frameNumber + n);
     }
@@ -209,7 +210,7 @@ struct SimpleFileHandlerTest : testing::Test {
 
       if (frameIndex % 5 == 0) {
         // every 5th record, push all the records to be written in a background thread
-        fileWriter.writeRecordsAsync(std::numeric_limits<double>::max());
+        fileWriter.writeRecordsAsync(numeric_limits<double>::max());
       }
     }
 
@@ -250,7 +251,7 @@ struct SimpleFileHandlerTest : testing::Test {
 } // namespace
 
 TEST_F(SimpleFileHandlerTest, simpleCreation) {
-  const std::string testPath = os::getTempFolder() + "SyncSimpleFileHandlerTest.vrs";
+  const string testPath = os::getTempFolder() + "SyncSimpleFileHandlerTest.vrs";
   ASSERT_EQ(createFileAtOnce(testPath), 0);
 
   checkFileHandler(testPath);
@@ -259,7 +260,7 @@ TEST_F(SimpleFileHandlerTest, simpleCreation) {
 }
 
 TEST_F(SimpleFileHandlerTest, asyncCreation) {
-  const std::string testPath = os::getTempFolder() + "AsyncSimpleFileHandlerTest.vrs";
+  const string testPath = os::getTempFolder() + "AsyncSimpleFileHandlerTest.vrs";
   ASSERT_EQ(createFileStreamingToDisk(testPath), 0);
 
   checkFileHandler(testPath);
@@ -268,10 +269,10 @@ TEST_F(SimpleFileHandlerTest, asyncCreation) {
 }
 
 TEST_F(SimpleFileHandlerTest, openFileWithJsonPath) {
-  const std::string testPath = os::getTempFolder() + "VRSJsonFilePathTest.vrs";
+  const string testPath = os::getTempFolder() + "VRSJsonFilePathTest.vrs";
   ASSERT_EQ(createFileAtOnce(testPath), 0);
 
-  const std::string jsonPath = FileSpec({testPath}).toJson();
+  const string jsonPath = FileSpec({testPath}).toJson();
   checkFileHandler(jsonPath);
 
   os::remove(testPath);
@@ -279,10 +280,10 @@ TEST_F(SimpleFileHandlerTest, openFileWithJsonPath) {
 
 TEST_F(SimpleFileHandlerTest, openFileWithJsonPathForExistingFiles) {
   vrs::RecordFileReader file;
-  std::string kChunkedFile = coretech::getTestDataDir() + "/VRS_Files/chunks.vrs";
-  std::string kChunkedFile2 = coretech::getTestDataDir() + "/VRS_Files/chunks.vrs_1";
-  std::string kChunkedFile3 = coretech::getTestDataDir() + "/VRS_Files/chunks.vrs_2";
-  const std::string jsonPath = FileSpec({kChunkedFile, kChunkedFile2, kChunkedFile3}).toJson();
+  string kChunkedFile = coretech::getTestDataDir() + "/VRS_Files/chunks.vrs";
+  string kChunkedFile2 = coretech::getTestDataDir() + "/VRS_Files/chunks.vrs_1";
+  string kChunkedFile3 = coretech::getTestDataDir() + "/VRS_Files/chunks.vrs_2";
+  const string jsonPath = FileSpec({kChunkedFile, kChunkedFile2, kChunkedFile3}).toJson();
   ASSERT_EQ(file.openFile(jsonPath), 0);
   EXPECT_EQ(file.getRecordCount(), 306); // number of records if all chunks are found
   EXPECT_EQ(file.getFileChunks().size(), 3);

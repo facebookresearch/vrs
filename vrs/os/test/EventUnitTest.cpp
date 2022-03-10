@@ -55,15 +55,15 @@ struct EventTest : public testing::Test {
   }
 
   void startDispatchThread(bool synchronous = false) {
-    dispatchThread = std::make_unique<std::thread>(dispatchEvents, this, synchronous);
+    dispatchThread = make_unique<thread>(dispatchEvents, this, synchronous);
   }
 
   void startWaitThread(vector<double>& waitIntervals) {
-    waitThreads.push_back(std::make_unique<std::thread>(waitOnEvents, this, waitIntervals));
+    waitThreads.push_back(make_unique<thread>(waitOnEvents, this, waitIntervals));
   }
 
   void waitForLaunch() {
-    std::unique_lock<std::mutex> lock(launchLock);
+    unique_lock<mutex> lock(launchLock);
     ++launchReady;
     if (launchReady == launchTarget) {
       launched = true;
@@ -74,7 +74,7 @@ struct EventTest : public testing::Test {
   }
 
   void launch() {
-    std::unique_lock<std::mutex> lock(launchLock);
+    unique_lock<mutex> lock(launchLock);
     launchTarget = (dispatchThread ? 1 : 0) + waitThreads.size();
     if (launchReady == launchTarget) {
       launched = true;
@@ -94,13 +94,13 @@ struct EventTest : public testing::Test {
   const double
       wait_time_sec; // Assume 50 ms after threaded started, we are already waiting on event.
   unique_ptr<EventChannel> testEventChannel;
-  std::mutex launchLock;
-  std::condition_variable launchCond;
+  mutex launchLock;
+  condition_variable launchCond;
   uint32_t launchReady;
   uint32_t launchTarget;
   bool launched;
-  unique_ptr<std::thread> dispatchThread;
-  vector<unique_ptr<std::thread>> waitThreads;
+  unique_ptr<thread> dispatchThread;
+  vector<unique_ptr<thread>> waitThreads;
   vector<pair<double, void*>> eventParams;
   EventChannel::Event event;
 };
@@ -109,7 +109,7 @@ void* dispatchEvents(void* data, bool synchronous) {
   EventTest* test = static_cast<EventTest*>(data);
   test->waitForLaunch();
   for (auto i : test->eventParams) {
-    std::this_thread::sleep_for(std::chrono::duration<double>(i.first));
+    this_thread::sleep_for(chrono::duration<double>(i.first));
     if (synchronous) {
       // waiting for an event has the effect of completing any previous wakeups
       EventChannel::Event e;
@@ -125,7 +125,7 @@ void waitOnEvents(void* data, vector<double> waitIntervals) {
   test->waitForLaunch();
   EventChannel::Event event;
   for (auto interval : waitIntervals) {
-    std::this_thread::sleep_for(std::chrono::duration<double>(interval));
+    this_thread::sleep_for(chrono::duration<double>(interval));
     EventChannel::Status status =
         test->testEventChannel->waitForEvent(event, EventChannel::kInfiniteTimeout, 0);
     EXPECT_EQ(EventChannel::Status::SUCCESS, status);
@@ -158,7 +158,7 @@ void EventTest::runDispatchAndWait(EventChannel::NotificationMode mode) {
   addEventInstance(0.0, nullptr);
   startDispatchThread();
   launch();
-  std::this_thread::sleep_for(std::chrono::duration<double>(wait_time_sec));
+  this_thread::sleep_for(chrono::duration<double>(wait_time_sec));
 
   EXPECT_EQ(EventChannel::Status::TIMEOUT, testEventChannel->waitForEvent(event, 0, 0.0));
   EXPECT_EQ(0, testEventChannel->getNumEventsSinceLastWait());
@@ -178,7 +178,7 @@ void EventTest::runDispatchAndWaitWithLookback(EventChannel::NotificationMode mo
   EXPECT_EQ(0, testEventChannel->getNumEventsSinceLastWait());
   startDispatchThread();
   launch();
-  std::this_thread::sleep_for(std::chrono::duration<double>(wait_time_sec));
+  this_thread::sleep_for(chrono::duration<double>(wait_time_sec));
 
   EXPECT_EQ(1, testEventChannel->getNumEventsSinceLastWait());
   EXPECT_EQ(
@@ -203,7 +203,7 @@ void EventTest::runNumPastEvents(EventChannel::NotificationMode mode) {
   addEventInstance(0.0, nullptr); // we can get this event with look-back long enough
   startDispatchThread();
   launch();
-  std::this_thread::sleep_for(std::chrono::duration<double>(wait_time_sec));
+  this_thread::sleep_for(chrono::duration<double>(wait_time_sec));
 
   EXPECT_EQ(2, testEventChannel->getNumEventsSinceLastWait());
   EXPECT_EQ(

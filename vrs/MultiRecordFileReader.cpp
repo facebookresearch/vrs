@@ -44,8 +44,8 @@ static bool timestampLT(const IndexRecord::RecordInfo* lhs, double rhsTimestamp)
   return lhs->timestamp < rhsTimestamp;
 }
 
-int MultiRecordFileReader::open(const std::vector<std::string>& paths) {
-  std::vector<FileSpec> fileSpecs;
+int MultiRecordFileReader::open(const vector<string>& paths) {
+  vector<FileSpec> fileSpecs;
   fileSpecs.reserve(paths.size());
   for (const auto& path : paths) {
     FileSpec fileSpec;
@@ -55,7 +55,7 @@ int MultiRecordFileReader::open(const std::vector<std::string>& paths) {
   return open(fileSpecs);
 }
 
-int MultiRecordFileReader::open(const std::vector<FileSpec>& fileSpecs) {
+int MultiRecordFileReader::open(const vector<FileSpec>& fileSpecs) {
   if (fileSpecs.empty()) {
     XR_LOGE("At least one file must be opened");
     return INVALID_REQUEST;
@@ -186,15 +186,15 @@ const StreamTags& MultiRecordFileReader::getTags(UniqueStreamId uniqueStreamId) 
   return reader->getTags(streamId);
 }
 
-vector<std::pair<string, int64_t>> MultiRecordFileReader::getFileChunks() const {
+vector<pair<string, int64_t>> MultiRecordFileReader::getFileChunks() const {
   if (!isOpened_) {
-    static const vector<std::pair<string, int64_t>> emptyVector;
+    static const vector<pair<string, int64_t>> emptyVector;
     return emptyVector;
   }
   if (hasSingleFile()) {
     return readers_.front()->getFileChunks();
   }
-  vector<std::pair<string, int64_t>> fileChunks;
+  vector<pair<string, int64_t>> fileChunks;
   fileChunks.reserve(readers_.size());
   for (size_t i = 0; i < readers_.size(); i++) {
     fileChunks.emplace_back(filePaths_[i], readers_[i]->getTotalSourceSize());
@@ -252,7 +252,7 @@ uint32_t MultiRecordFileReader::getRecordIndex(const IndexRecord::RecordInfo* re
     // Weeding out illegal records (which don't belong to any of the underlying readers)
     return getRecordCount();
   }
-  auto lowerIt = std::lower_bound(
+  auto lowerIt = lower_bound(
       recordIndex_->begin(),
       recordIndex_->end(),
       record,
@@ -467,7 +467,7 @@ const IndexRecord::RecordInfo* MultiRecordFileReader::getRecordByTime(double tim
     return readers_.front()->getRecordByTime(timestamp);
   }
   const auto lowerBound =
-      std::lower_bound(recordIndex_->cbegin(), recordIndex_->cend(), timestamp, timestampLT);
+      lower_bound(recordIndex_->cbegin(), recordIndex_->cend(), timestamp, timestampLT);
   return lowerBound == recordIndex_->cend() ? nullptr : *lowerBound;
 }
 
@@ -510,7 +510,7 @@ const IndexRecord::RecordInfo* MultiRecordFileReader::getNearestRecordByTime(
   return vrs::getNearestRecordByTime(*recordIndex_, timestamp, epsilon);
 }
 
-std::unique_ptr<FileHandler> MultiRecordFileReader::getFileHandler() const {
+unique_ptr<FileHandler> MultiRecordFileReader::getFileHandler() const {
   if (readers_.empty()) {
     return nullptr;
   }
@@ -631,7 +631,7 @@ void MultiRecordFileReader::createConsolidatedIndex() {
   // We will store only one element from each RecordFileReader index and perform a K-way merge.
   priority_queue<
       const IndexRecord::RecordInfo*,
-      std::vector<const IndexRecord::RecordInfo*>,
+      vector<const IndexRecord::RecordInfo*>,
       decltype(recordComparatorGT_)>
       recordPQueue(recordComparatorGT_);
   // Stores the last valid (terminal) RecordInfo* for each RecordFileReader index.
@@ -645,7 +645,7 @@ void MultiRecordFileReader::createConsolidatedIndex() {
     terminalRecordPtrs.emplace(&readerIndex.back());
     indexSize += readerIndex.size();
   }
-  recordIndex_ = make_unique<std::vector<const IndexRecord::RecordInfo*>>();
+  recordIndex_ = make_unique<vector<const IndexRecord::RecordInfo*>>();
   recordIndex_->reserve(indexSize);
   while (!recordPQueue.empty()) {
     const auto record = recordPQueue.top();
@@ -709,8 +709,7 @@ void MultiRecordFileReader::initializeUniqueStreamIds() {
         uniqueStreamId = generateUniqueStreamId(streamId);
       }
       readerStreamIdToUniqueMap_[readerPtr.get()][streamId] = uniqueStreamId;
-      uniqueToStreamIdReaderPairMap_.emplace(
-          uniqueStreamId, std::make_pair(streamId, readerPtr.get()));
+      uniqueToStreamIdReaderPairMap_.emplace(uniqueStreamId, make_pair(streamId, readerPtr.get()));
       uniqueStreamIds_.emplace(uniqueStreamId);
     }
   }

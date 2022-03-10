@@ -52,9 +52,9 @@ uint64_t XXH64Digester::digest() {
 }
 
 string XXH64Digester::digestToString() {
-  std::stringstream stream;
+  stringstream stream;
   uint64_t xxHash64 = digest();
-  stream << std::setfill('0') << std::setw(sizeof(uint64_t) * 2) << std::hex << xxHash64;
+  stream << setfill('0') << setw(sizeof(uint64_t) * 2) << hex << xxHash64;
   return stream.str();
 }
 

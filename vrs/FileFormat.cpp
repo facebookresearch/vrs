@@ -29,6 +29,7 @@
 #include "ErrorCode.h"
 #include "IndexRecord.h"
 
+using namespace std;
 using namespace std::chrono;
 
 namespace vrs {
@@ -63,9 +64,9 @@ void FileHeader::init(uint32_t magic1, uint32_t magic2, uint32_t magic3, uint32_
   // so we override the 30 lsb (~1s) with random bits.
   // creationId is now an approximate number of ns since Unix EPOCH, with 30 bits guaranteed random.
   // Note: this is not perfect unicity, but good enough to avoid collisions in a local file cache.
-  std::random_device rd;
-  std::mt19937_64 engine(rd());
-  std::uniform_int_distribution<uint32_t> distribution;
+  random_device rd;
+  mt19937_64 engine(rd());
+  uniform_int_distribution<uint32_t> distribution;
   uint32_t randomBits = distribution(engine);
   const uint64_t c30bits = (1 << 30) - 1; // 30 lsb set
   id = (id & ~c30bits) | (randomBits & c30bits);
@@ -112,14 +113,14 @@ int64_t FileHeader::getEndOfUserRecordsOffset(int64_t fileSize) const {
       case kOriginalFileFormatVersion:
         // index record always in the back, firstUserRecordOffset is 0
         if (indexRecordOffset.get() > 0) {
-          return std::min<int64_t>(fileSize, indexRecordOffset.get());
+          return min<int64_t>(fileSize, indexRecordOffset.get());
         }
         break;
       case kFrontIndexFileFormatVersion:
       case kZstdFormatVersion:
         // index maybe before or after the user records, and firstUserRecordOffset should be valid.
         if (indexRecordOffset.get() > 0 && indexRecordOffset.get() > firstUserRecordOffset.get()) {
-          return std::min<int64_t>(fileSize, indexRecordOffset.get());
+          return min<int64_t>(fileSize, indexRecordOffset.get());
         }
         break;
     }
@@ -209,7 +210,7 @@ bool printVRSFileInternals(FileHandler& file) {
        << char((fileFormatVersion >> 8) & 0xff) << char((fileFormatVersion >> 16) & 0xff)
        << char((fileFormatVersion >> 24) & 0xff) << "', "
        << (fileHeader.isFormatSupported() ? "supported." : "NOT SUPPORTED.") << endl;
-  cout << "Creation ID: " << std::hex << fileHeader.creationId.get() << std::dec << '.' << endl;
+  cout << "Creation ID: " << hex << fileHeader.creationId.get() << dec << '.' << endl;
   time_t creationTimeSec = static_cast<time_t>(fileHeader.creationId.get() / 1000000000);
   cout << "Creation date: " << put_time(localtime(&creationTimeSec), "%c %Z.") << '\n';
   cout << "File header size: " << fileHeader.fileHeaderSize.get() << " bytes";

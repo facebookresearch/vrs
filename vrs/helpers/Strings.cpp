@@ -203,7 +203,7 @@ string make_printable(const string& str) {
   return sanitized;
 }
 
-bool getBool(const std::map<string, string>& m, const string& field, bool& outValue) {
+bool getBool(const map<string, string>& m, const string& field, bool& outValue) {
   const auto iter = m.find(field);
   if (iter != m.end() && !iter->second.empty()) {
     outValue = iter->second != "0" && iter->second != "false";
@@ -212,52 +212,52 @@ bool getBool(const std::map<string, string>& m, const string& field, bool& outVa
   return false;
 }
 
-bool getInt(const std::map<string, string>& m, const string& field, int& outValue) {
+bool getInt(const map<string, string>& m, const string& field, int& outValue) {
   const auto iter = m.find(field);
   if (iter != m.end() && !iter->second.empty()) {
     try {
       outValue = stoi(iter->second);
       return true;
-    } catch (std::logic_error&) {
+    } catch (logic_error&) {
       /* do nothing */
     }
   }
   return false;
 }
 
-bool getInt64(const std::map<string, string>& m, const string& field, int64_t& outValue) {
+bool getInt64(const map<string, string>& m, const string& field, int64_t& outValue) {
   const auto iter = m.find(field);
   if (iter != m.end() && !iter->second.empty()) {
     try {
       outValue = stoll(iter->second);
       return true;
-    } catch (std::logic_error&) {
+    } catch (logic_error&) {
       /* do nothing */
     }
   }
   return false;
 }
 
-bool getUInt64(const std::map<string, string>& m, const string& field, uint64_t& outValue) {
+bool getUInt64(const map<string, string>& m, const string& field, uint64_t& outValue) {
   const auto iter = m.find(field);
   if (iter != m.end() && !iter->second.empty()) {
     try {
       outValue = stoull(iter->second);
       return true;
-    } catch (std::logic_error&) {
+    } catch (logic_error&) {
       /* do nothing */
     }
   }
   return false;
 }
 
-bool getDouble(const std::map<string, string>& m, const string& field, double& outValue) {
+bool getDouble(const map<string, string>& m, const string& field, double& outValue) {
   const auto iter = m.find(field);
   if (iter != m.end() && !iter->second.empty()) {
     try {
       outValue = stod(iter->second);
       return true;
-    } catch (std::logic_error&) {
+    } catch (logic_error&) {
       /* do nothing */
     }
   }

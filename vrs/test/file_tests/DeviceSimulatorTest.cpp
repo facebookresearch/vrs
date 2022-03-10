@@ -24,6 +24,7 @@
 
 #include <vrs/test/helpers/VRSTestsHelpers.h>
 
+using namespace std;
 using namespace vrs;
 using namespace vrs::test;
 
@@ -34,7 +35,7 @@ struct DeviceSimulator : testing::Test {};
 } // namespace
 
 TEST_F(DeviceSimulator, classicIndex) {
-  const std::string testPath = os::getTempFolder() + "ClassicIndex.vrs";
+  const string testPath = os::getTempFolder() + "ClassicIndex.vrs";
 
   CreateParams t(testPath);
   EXPECT_EQ(threadedCreateRecords(t), 0);
@@ -56,7 +57,7 @@ TEST_F(DeviceSimulator, classicIndex) {
 }
 
 TEST_F(DeviceSimulator, singleThread) {
-  const std::string testPath = os::getTempFolder() + "SingleThread.vrs";
+  const string testPath = os::getTempFolder() + "SingleThread.vrs";
 
   CreateParams t(testPath);
   EXPECT_EQ(singleThreadCreateRecords(t), 0);
@@ -73,7 +74,7 @@ TEST_F(DeviceSimulator, singleThread) {
 }
 
 TEST_F(DeviceSimulator, preallocateIndex) {
-  const std::string testPath = os::getTempFolder() + "PreallocateTest.vrs";
+  const string testPath = os::getTempFolder() + "PreallocateTest.vrs";
 
   // preallocate for the exact number of records
   EXPECT_EQ(
@@ -92,7 +93,7 @@ TEST_F(DeviceSimulator, preallocateIndex) {
 }
 
 TEST_F(DeviceSimulator, preallocateTooFewIndex) {
-  const std::string testPath = os::getTempFolder() + "PreallocateTooFewTest.vrs";
+  const string testPath = os::getTempFolder() + "PreallocateTooFewTest.vrs";
 
   // preallocate for too few records
   EXPECT_EQ(threadedCreateRecords(CreateParams(testPath).setPreallocateIndexSize(5)), 0);
@@ -110,7 +111,7 @@ TEST_F(DeviceSimulator, preallocateTooFewIndex) {
 }
 
 TEST_F(DeviceSimulator, preallocateTooManyIndex) {
-  const std::string testPath = os::getTempFolder() + "PreallocateTooManyTest.vrs";
+  const string testPath = os::getTempFolder() + "PreallocateTooManyTest.vrs";
 
   // preallocate for too many records
   EXPECT_EQ(
@@ -139,7 +140,7 @@ struct ChunkCollector : public NewChunkHandler {
   map<size_t, string>& chunks;
 };
 
-void checkChunks(const map<size_t, std::string>& chunks, const std::string& path, size_t count) {
+void checkChunks(const map<size_t, string>& chunks, const string& path, size_t count) {
   EXPECT_EQ(chunks.size(), count);
   if (chunks.size() > 0) {
     auto iter = chunks.begin();
@@ -149,20 +150,20 @@ void checkChunks(const map<size_t, std::string>& chunks, const std::string& path
     while (++iter != chunks.end()) {
       ++index;
       EXPECT_EQ(iter->first, index);
-      EXPECT_STREQ(iter->second.c_str(), (path + '_' + std::to_string(index)).c_str());
+      EXPECT_STREQ(iter->second.c_str(), (path + '_' + to_string(index)).c_str());
     }
   }
 }
 
 TEST_F(DeviceSimulator, splitIndex) {
-  const std::string testPath = os::getTempFolder() + "SplitIndex.vrs";
+  const string testPath = os::getTempFolder() + "SplitIndex.vrs";
 
   map<size_t, string> chunks;
   EXPECT_EQ(
       threadedCreateRecords(CreateParams(testPath, kLongFileConfig)
                                 .setTestOptions(TestOptions::SPLIT_HEADER)
                                 .setMaxChunkSizeMB(1)
-                                .setChunkHandler(std::make_unique<ChunkCollector>(chunks))),
+                                .setChunkHandler(make_unique<ChunkCollector>(chunks))),
       0);
   checkRecordCountAndIndex(CheckParams(testPath, kLongFileConfig)); // baseline: all ok
   checkChunks(chunks, testPath, 3);
@@ -182,7 +183,7 @@ TEST_F(DeviceSimulator, splitIndex) {
       threadedCreateRecords(CreateParams(testPath, kLongFileConfig)
                                 .setTestOptions(TestOptions::SPLIT_HEADER)
                                 .setMaxChunkSizeMB(100)
-                                .setChunkHandler(std::make_unique<ChunkCollector>(chunks))),
+                                .setChunkHandler(make_unique<ChunkCollector>(chunks))),
       0);
   checkChunks(chunks, testPath, 2);
   ::filesystem::resize_file(testPath, static_cast<uintmax_t>(indexRecordHeaderEnd));

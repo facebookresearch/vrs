@@ -85,7 +85,7 @@ void printTags(ostream& out, const map<string, string>& tags) {
   for (const auto& iter : tags) {
     out << "  Tag: " << iter.first << " = " << make_printable(iter.second);
     if (iter.first == tag_conventions::kCaptureTimeEpoch) {
-      time_t creationTimeSec = static_cast<time_t>(std::stoul(iter.second));
+      time_t creationTimeSec = static_cast<time_t>(stoul(iter.second));
       if (creationTimeSec > 1000000) {
         cout << put_time(localtime(&creationTimeSec), " -- %c %Z");
       }
@@ -210,11 +210,11 @@ void printOverview(
     out << "No open file." << endl;
     return;
   }
-  const vector<std::pair<string, int64_t>> chunks = recordFile.getFileChunks();
+  const vector<pair<string, int64_t>> chunks = recordFile.getFileChunks();
   if (chunks.empty()) {
     out << "No chunk found." << endl;
   } else if (chunks.size() == 1) {
-    const std::pair<string, int64_t>& file = chunks[0];
+    const pair<string, int64_t>& file = chunks[0];
     out << "VRS file: '" << file.first << "', " << humanReadableFileSize(file.second) << "."
         << endl;
   } else {
@@ -227,7 +227,7 @@ void printOverview(
     if (details && Details::ChunkList) {
       out << ":" << endl;
       for (size_t index = 0; index < chunks.size(); index++) {
-        const std::pair<string, int64_t>& chunk = chunks[index];
+        const pair<string, int64_t>& chunk = chunks[index];
         out << "  Chunk #" << index << ": '" << chunk.first << "', " << (chunk.second) << "."
             << endl;
       }
@@ -430,8 +430,8 @@ string jsonOverview(RecordFileReader& recordFile, const set<StreamId>& streams, 
   JsonDocument::AllocatorType& allocator = doc.GetAllocator();
 
   int64_t fileSize;
-  const vector<std::pair<string, int64_t>> chunks = recordFile.getFileChunks();
-  const std::pair<string, int64_t>& file = chunks[0];
+  const vector<pair<string, int64_t>> chunks = recordFile.getFileChunks();
+  const pair<string, int64_t>& file = chunks[0];
   if (details && Details::Basics) {
     doc.AddMember(
         stringToJvalue("file_name", allocator), stringToJvalue(file.first, allocator), allocator);
@@ -475,8 +475,8 @@ string jsonOverview(RecordFileReader& recordFile, const set<StreamId>& streams, 
     JsonValue numOfDevices = stringToJvalue("number_of_devices", allocator);
     doc.AddMember(numOfDevices, static_cast<uint64_t>(streams.size()), allocator);
     size_t recordCount = 0;
-    double startTime = std::numeric_limits<double>::max();
-    double endTime = std::numeric_limits<double>::lowest();
+    double startTime = numeric_limits<double>::max();
+    double endTime = numeric_limits<double>::lowest();
     bool addTimes = false;
     for (auto id : streams) {
       const auto& index = recordFile.getIndex(id);

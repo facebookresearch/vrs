@@ -37,7 +37,7 @@ static const uint32_t kFrame0Size = 320 * 240;
 static vector<uint8_t> sFrame0;
 
 // Compress using different presets
-static std::vector<vrs::CompressionPreset> sCompression = {
+static vector<vrs::CompressionPreset> sCompression = {
     vrs::CompressionPreset::Lz4Fast,
     vrs::CompressionPreset::ZstdFast,
     vrs::CompressionPreset::ZstdLight};
@@ -45,8 +45,8 @@ static std::vector<vrs::CompressionPreset> sCompression = {
 static size_t sCompressionIndex = 0;
 
 void initFrame0() {
-  std::default_random_engine generator;
-  std::uniform_int_distribution<uint32_t> distribution;
+  default_random_engine generator;
+  uniform_int_distribution<uint32_t> distribution;
   sFrame0.resize(kFrame0Size);
   for (uint32_t k = 0; k < kFrame0Size; k++) {
     sFrame0[k] = static_cast<uint8_t>(distribution(generator));
@@ -209,7 +209,7 @@ class RecordableTest : public Recordable, StreamPlayer {
     }
   }
 
-  static const char* getTag(const map<string, string>& tags, std::string name) {
+  static const char* getTag(const map<string, string>& tags, string name) {
     auto iter = tags.find(name);
     if (iter != tags.end()) {
       return iter->second.c_str();
@@ -443,7 +443,7 @@ class RecordableTest : public Recordable, StreamPlayer {
         double frameDuration = static_cast<double>(frame) / kFrameRate;
         if (wallDuration < frameDuration) {
           const double sleepDuration = frameDuration - wallDuration;
-          std::this_thread::sleep_for(std::chrono::duration<double>(sleepDuration));
+          this_thread::sleep_for(chrono::duration<double>(sleepDuration));
         }
       }
       // each thread has its own counter, and checks that it is not too far ahead of another thread,
@@ -516,7 +516,7 @@ class RecordableTest : public Recordable, StreamPlayer {
       double frameDuration = static_cast<double>(frame) / kFrameRate;
       if (wallDuration < frameDuration) {
         const double sleepDuration = frameDuration - wallDuration;
-        std::this_thread::sleep_for(std::chrono::duration<double>(sleepDuration));
+        this_thread::sleep_for(chrono::duration<double>(sleepDuration));
       }
       // Add second recordable late, to force the use of a tags record
       if (frame == (kFrameCount + 2) / 3) {
@@ -584,7 +584,7 @@ struct RecordableTester : testing::Test {
 static size_t deleteEveryChunk(const string& path) {
   RecordFileReader file;
   EXPECT_EQ(file.openFile(path), 0);
-  vector<std::pair<string, int64_t>> chunks = file.getFileChunks();
+  vector<pair<string, int64_t>> chunks = file.getFileChunks();
   file.closeFile();
   for (auto& chunk : chunks) {
     os::remove(chunk.first);

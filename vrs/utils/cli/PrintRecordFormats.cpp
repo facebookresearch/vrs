@@ -43,7 +43,7 @@ string printRecordFormats(FilteredFileReader& filteredReader) {
         for (size_t block = 0; block < format.getUsedBlocksCount(); block++) {
           if (format.getContentBlock(block).getContentType() == ContentType::DATA_LAYOUT) {
             ContentBlockId blockId(id.getTypeId(), iter.first.first, iter.first.second, block);
-            std::unique_ptr<DataLayout> dl = filteredReader.reader.getDataLayout(id, blockId);
+            unique_ptr<DataLayout> dl = filteredReader.reader.getDataLayout(id, blockId);
             if (dl) {
               ss << "Content block " << block << ": " << dl->asJson(spec) << endl;
             } else {

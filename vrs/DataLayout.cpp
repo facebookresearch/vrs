@@ -563,9 +563,8 @@ DataPieceString* DataLayout::findDataPieceString(const string& label) const {
   return nullptr;
 }
 
-void DataLayout::forEachDataPiece(
-    std::function<void(const DataPiece*)> callback,
-    DataPieceType type) const {
+void DataLayout::forEachDataPiece(function<void(const DataPiece*)> callback, DataPieceType type)
+    const {
   if (type == DataPieceType::Undefined || type == DataPieceType::Value ||
       type == DataPieceType::Array) {
     for (const DataPiece* piece : fixedSizePieces_) {
@@ -583,7 +582,7 @@ void DataLayout::forEachDataPiece(
   }
 }
 
-void DataLayout::forEachDataPiece(std::function<void(DataPiece*)> callback, DataPieceType type) {
+void DataLayout::forEachDataPiece(function<void(DataPiece*)> callback, DataPieceType type) {
   if (type == DataPieceType::Undefined || type == DataPieceType::Value ||
       type == DataPieceType::Array) {
     for (DataPiece* piece : fixedSizePieces_) {
@@ -764,18 +763,18 @@ string compactString(const string& str) {
 }
 
 template <typename T>
-void adjustPrecision(const T&, std::ostream&) {}
+void adjustPrecision(const T&, ostream&) {}
 
 template <>
-void adjustPrecision<double>(const double& v, std::ostream& str) {
+void adjustPrecision<double>(const double& v, ostream& str) {
   // if the value looks like a count of seconds since EPOCH between 2015 and 2035, then
   // use fixed 3 digit precision, otherwise let the C++ library format the number...
   const double kEpoch2015 = 1420070400; // Jan 1, 2015
   const double kEpoch2040 = 2051222400; // Jan 1, 2035
   if (v >= kEpoch2015 && v < kEpoch2040) {
-    str << std::fixed << std::setprecision(3);
+    str << fixed << setprecision(3);
   } else {
-    str << std::defaultfloat;
+    str << defaultfloat;
   }
 }
 

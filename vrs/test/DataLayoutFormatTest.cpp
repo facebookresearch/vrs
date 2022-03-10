@@ -113,7 +113,7 @@ void check(
 
 template <typename T, size_t S>
 void check(const vrs::DataPieceArray<T>& v, const vrs::DataPieceArray<T>& r) {
-  std::vector<T> value, ref;
+  vector<T> value, ref;
   v.get(value);
   r.get(ref);
   EXPECT_EQ(value, ref);
@@ -240,7 +240,7 @@ class RecordableDevice : public Recordable {
 
     // Don't allocate on the stack as e.g. the default stack size on XROS is 64K
     ImageSpecType imageBufferSize = kHeight * kWidth * kBytesPerPixel;
-    auto image = std::make_unique<std::uint8_t[]>(imageBufferSize);
+    auto image = make_unique<uint8_t[]>(imageBufferSize);
     createRecord(
         getTimeStamp(),
         Record::Type::DATA,
@@ -325,7 +325,7 @@ struct DataLayoutFormatTester : testing::Test {
     return fileReader.closeFile();
   }
 
-  std::string fileName = os::getTempFolder() + "DataLayoutFormatTester.vrs";
+  string fileName = os::getTempFolder() + "DataLayoutFormatTester.vrs";
 };
 
 } // namespace

@@ -27,9 +27,9 @@ TelemetryLogger& TelemetryLogger::getInstance() {
   return *getStaticInstance().get();
 }
 
-std::unique_ptr<TelemetryLogger> TelemetryLogger::setLogger(
-    std::unique_ptr<TelemetryLogger>&& telemetryLogger) {
-  std::unique_ptr<TelemetryLogger> previousLogger;
+unique_ptr<TelemetryLogger> TelemetryLogger::setLogger(
+    unique_ptr<TelemetryLogger>&& telemetryLogger) {
+  unique_ptr<TelemetryLogger> previousLogger;
   getStaticInstance().swap(telemetryLogger);
   return previousLogger;
 }
@@ -74,8 +74,8 @@ void TelemetryLogger::logTraffic(
       event.error429Count);
 }
 
-std::unique_ptr<TelemetryLogger>& TelemetryLogger::getStaticInstance() {
-  static std::unique_ptr<TelemetryLogger> sInstance = std::make_unique<TelemetryLogger>();
+unique_ptr<TelemetryLogger>& TelemetryLogger::getStaticInstance() {
+  static unique_ptr<TelemetryLogger> sInstance = make_unique<TelemetryLogger>();
   return sInstance;
 }
 

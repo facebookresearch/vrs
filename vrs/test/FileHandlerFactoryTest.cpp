@@ -40,7 +40,7 @@ class FakeHandler : public DiskFile {
   FakeHandler(const string& name) {
     fileHandlerName_ = name;
   }
-  std::unique_ptr<FileHandler> makeNew() const override {
+  unique_ptr<FileHandler> makeNew() const override {
     return make_unique<FakeHandler>(fileHandlerName_);
   }
   int open(const string& filePath) override {
@@ -49,26 +49,25 @@ class FakeHandler : public DiskFile {
   int openSpec(const FileSpec& fileSpec) override {
     return 0;
   }
-  int delegateOpen(const string& path, std::unique_ptr<FileHandler>& outNewDelegate) override {
+  int delegateOpen(const string& path, unique_ptr<FileHandler>& outNewDelegate) override {
     outNewDelegate.reset();
     return 0;
   }
-  virtual int delegateOpenSpec(
-      const FileSpec& fileSpec,
-      std::unique_ptr<FileHandler>& outNewDelegate) override {
+  virtual int delegateOpenSpec(const FileSpec& fileSpec, unique_ptr<FileHandler>& outNewDelegate)
+      override {
     outNewDelegate.reset();
     return 0;
   }
 };
 
-static int openVRSFile(const string& path, std::unique_ptr<FileHandler>& outFile) {
+static int openVRSFile(const string& path, unique_ptr<FileHandler>& outFile) {
   FileSpec fileSpec;
   IF_ERROR_RETURN(RecordFileReader::vrsFilePathToFileSpec(path, fileSpec));
   return FileHandlerFactory::getInstance().delegateOpen(fileSpec, outFile);
 }
 
 TEST_F(FileHandlerFactoryTest, ANDROID_DISABLED(OpenSomeRealVRSFiles)) {
-  std::unique_ptr<FileHandler> file;
+  unique_ptr<FileHandler> file;
 
   EXPECT_EQ(openVRSFile(kFirstChunk, file), 0);
   EXPECT_EQ(
@@ -95,7 +94,7 @@ TEST_F(FileHandlerFactoryTest, testBadFileHandler) {
 
 TEST_F(FileHandlerFactoryTest, openCustomSchemeUri) {
   FileHandlerFactory& factory = FileHandlerFactory::getInstance();
-  std::unique_ptr<FileHandler> file;
+  unique_ptr<FileHandler> file;
 
   EXPECT_NE(factory.delegateOpen(kUriSchemeFile, file), 0); // fails: no handler for "myscheme"
   EXPECT_FALSE((file));

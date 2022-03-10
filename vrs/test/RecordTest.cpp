@@ -23,6 +23,7 @@
 
 #include <vrs/test/helpers/VRSTestsHelpers.h>
 
+using namespace std;
 using namespace vrs;
 using namespace vrs::test;
 
@@ -78,7 +79,7 @@ TEST_F(RecordTester, streamIdTest) {
   StreamId id(RecordableTypeId::UnitTest1, 1);
   EXPECT_EQ(
       id.getNumericName(),
-      std::to_string(static_cast<int>(id.getTypeId())) + "-" + std::to_string(id.getInstanceId()));
+      to_string(static_cast<int>(id.getTypeId())) + "-" + to_string(id.getInstanceId()));
   EXPECT_EQ(StreamId::fromNumericName(id.getNumericName()), id);
   EXPECT_EQ(StreamId::fromNumericName("1-0"), StreamId(static_cast<RecordableTypeId>(1), 0));
   EXPECT_EQ(StreamId::fromNumericName("123-2"), StreamId(static_cast<RecordableTypeId>(123), 2));
@@ -275,7 +276,7 @@ union ArrayUnion {
 };
 
 TEST_F(RecordTester, initRecordTest) {
-  std::vector<Record::uninitialized_byte> buffer;
+  vector<Record::uninitialized_byte> buffer;
   buffer.reserve(100);
   buffer.resize(1);
   // init reserved capacity to our pattern

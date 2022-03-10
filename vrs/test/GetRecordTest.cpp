@@ -25,7 +25,7 @@ using namespace vrs;
 
 namespace {
 struct GetRecordTester : testing::Test {
-  std::string kTestFile = string(coretech::getTestDataDir()) + "/VRS_Files/sample_file.vrs";
+  string kTestFile = string(coretech::getTestDataDir()) + "/VRS_Files/sample_file.vrs";
 };
 } // namespace
 
@@ -201,20 +201,20 @@ TEST_F(GetRecordTester, GetRecordTest) {
   EXPECT_EQ(file.getRecordCount(), 307);
   EXPECT_EQ(file.getStreams().size(), 3);
 
-  std::mt19937 gen(123456); // constant seed, to always do the same tests
+  mt19937 gen(123456); // constant seed, to always do the same tests
 
   // random type generator
   vector<Record::Type> types = {
       Record::Type::CONFIGURATION, Record::Type::STATE, Record::Type::DATA};
-  std::uniform_int_distribution<size_t> typeIndex(0, types.size() - 1);
+  uniform_int_distribution<size_t> typeIndex(0, types.size() - 1);
   // random stream id generator
   vector<StreamId> ids;
-  std::copy(file.getStreams().begin(), file.getStreams().end(), std::back_inserter(ids));
-  std::uniform_int_distribution<size_t> idIndex(0, ids.size() - 1);
+  copy(file.getStreams().begin(), file.getStreams().end(), back_inserter(ids));
+  uniform_int_distribution<size_t> idIndex(0, ids.size() - 1);
   for (int k = 0; k < 5000; k++) {
     StreamId id = ids[idIndex(gen)];
     // random index generator
-    std::uniform_int_distribution<uint32_t> indexNumber(0, file.getIndex(id).size());
+    uniform_int_distribution<uint32_t> indexNumber(0, file.getIndex(id).size());
     check(file, id, types[typeIndex(gen)], indexNumber(gen));
   }
 

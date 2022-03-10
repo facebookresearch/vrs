@@ -22,6 +22,7 @@
 #include <vrs/RecordFormatStreamPlayer.h>
 #include <vrs/os/Utils.h>
 
+using namespace std;
 using namespace vrs;
 
 namespace {
@@ -55,7 +56,7 @@ struct CustomBlob {
       blob[k] = dataAt(k, size);
     }
   }
-  static void checkData(std::vector<uint8_t>& blob) {
+  static void checkData(vector<uint8_t>& blob) {
     for (size_t k = 0; k < blob.size(); k++) {
       EXPECT_EQ(blob[k], dataAt(k, blob.size()));
     }
@@ -64,7 +65,7 @@ struct CustomBlob {
   static uint8_t dataAt(size_t k, size_t maxSize) {
     return static_cast<uint8_t>(k ^ maxSize);
   }
-  std::vector<uint8_t> blob;
+  vector<uint8_t> blob;
 };
 
 // Datalayout giving specs of both an image block and a custom block size
@@ -255,7 +256,7 @@ class CustomStreamPlayer : public RecordFormatStreamPlayer {
       GTEST_NONFATAL_FAILURE_("Unknown custom block size!");
       return false;
     }
-    std::vector<uint8_t> customData(size);
+    vector<uint8_t> customData(size);
     EXPECT_EQ(record.reader->read(customData), 0);
     CustomBlob::checkData(customData);
     if (record.recordType == Record::Type::CONFIGURATION) {
@@ -348,7 +349,7 @@ struct CustomBlockTest : testing::Test {
 } // namespace
 
 TEST_F(CustomBlockTest, simpleCreation) {
-  const std::string testPath = os::getTempFolder() + "CustomBlockTest_simpleCreation.vrs";
+  const string testPath = os::getTempFolder() + "CustomBlockTest_simpleCreation.vrs";
   ASSERT_EQ(createFileAtOnce(testPath), 0);
 
   checkFileHandler(testPath);

@@ -77,7 +77,7 @@ const char* getSimpleVRSErrorName(int errorCode) {
 int newDomainErrorCode(vrs::ErrorDomain errorDomain, int64_t errorCode) {
   static mutex sRangeIndexMapMutex;
   static map<int, map<int64_t, int>> sRangeIndexMap;
-  std::unique_lock<mutex> lock(sRangeIndexMapMutex);
+  unique_lock<mutex> lock(sRangeIndexMapMutex);
   map<int64_t, int>& indexMap = sRangeIndexMap[errorDomainToErrorCodeStart(errorDomain)];
   int& newErrorCode = indexMap[errorCode]; // create a code of value 0 if it didn't exist
   if (newErrorCode != 0) {
@@ -97,7 +97,7 @@ static mutex sDomainErrorRegistryMutex;
 } // namespace
 
 namespace vrs {
-std::string errorCodeToMessage(int errorCode) {
+string errorCodeToMessage(int errorCode) {
   if (errorCode < 0 || (errorCode > 0 && errorCode < kPlatformUserErrorsStart)) {
     return os::fileErrorToString(errorCode);
   }
@@ -106,7 +106,7 @@ std::string errorCodeToMessage(int errorCode) {
     return errorName;
   }
   {
-    std::unique_lock<mutex> lock(sDomainErrorRegistryMutex);
+    unique_lock<mutex> lock(sDomainErrorRegistryMutex);
     auto iter = sDomainErrorRegistry.find(errorCode);
     if (iter != sDomainErrorRegistry.end()) {
       return iter->second;
@@ -122,20 +122,20 @@ string errorCodeToMessageWithCode(int errorCode) {
 ErrorDomain newErrorDomain(const string& domainName) {
   static mutex sCustomDomainMapMutex;
   static map<string, ErrorDomain> sCustomDomainMap;
-  std::unique_lock<mutex> lock(sCustomDomainMapMutex);
+  unique_lock<mutex> lock(sCustomDomainMapMutex);
   ErrorDomain& errorDomain = sCustomDomainMap[domainName];
   if (static_cast<int>(errorDomain) == 0) {
     errorDomain = static_cast<ErrorDomain>(
         static_cast<int>(ErrorDomain::CustomDomains) +
         static_cast<int>(sCustomDomainMap.size() - 1));
-    std::unique_lock<mutex> domain_lock(sDomainErrorRegistryMutex);
+    unique_lock<mutex> domain_lock(sDomainErrorRegistryMutex);
     sDomainErrorRegistry[errorDomainToErrorCodeStart(errorDomain)] = domainName;
   }
   return errorDomain;
 }
 
 int domainErrorCode(ErrorDomain errorDomain, int64_t errorCode, const char* errorMessage) {
-  std::unique_lock<mutex> lock(sDomainErrorRegistryMutex);
+  unique_lock<mutex> lock(sDomainErrorRegistryMutex);
   static bool sInternalDomainsRegistered = false;
   if (!sInternalDomainsRegistered) {
     sInternalDomainsRegistered = true;

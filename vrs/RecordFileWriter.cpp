@@ -170,11 +170,11 @@ struct WriterThreadData {
   atomic<bool> shouldEndThread; // set when this thread should finish-up & end
   os::EventChannel writeEventChannel; // wake the background thread to write prepared records
 
-  std::recursive_mutex mutex; // mutex to protect access to the following fields
+  recursive_mutex mutex; // mutex to protect access to the following fields
   RecordFileWriter::RecordBatches recordsReadyToWrite;
-  std::atomic<bool> hasRecordsReadyToWrite;
+  atomic<bool> hasRecordsReadyToWrite;
   function<double()> maxTimestampProvider; // for auto-writing records
-  std::atomic<double> autoCollectDelay; // for auto-writing records
+  atomic<double> autoCollectDelay; // for auto-writing records
 
   CompressionThreadsData compressionThreadsData_;
 
@@ -211,7 +211,7 @@ struct PurgeThreadData {
       "PurgeEventChannel",
       os::EventChannel::NotificationMode::UNICAST};
 
-  std::recursive_mutex mutex; // mutex to protect access to the following fields
+  recursive_mutex mutex; // mutex to protect access to the following fields
   function<double()> maxTimestampProvider; // for purging records, protected by mutex
   double autoPurgeDelay; // for purging records records, protected by mutex
   atomic<bool> purgingPaused_;
@@ -221,7 +221,7 @@ struct PurgeThreadData {
 };
 
 double WriterThreadData::getBackgroundThreadWaitTime(const double& nextAutoCollectTime) {
-  double waitDelay = autoCollectDelay.load(std::memory_order_relaxed);
+  double waitDelay = autoCollectDelay.load(memory_order_relaxed);
   if (waitDelay != 0.) {
     if (nextAutoCollectTime != 0.) {
       waitDelay = nextAutoCollectTime - os::getTimestampSec();
@@ -247,12 +247,12 @@ RecordFileWriter::RecordFileWriter()
       writerThreadData_{nullptr},
       purgeThreadData_{nullptr} {
   setMaxChunkSizeMB(0);
-  initCreatedThreadCallback_ = [](std::thread&, ThreadRole, int) {};
+  initCreatedThreadCallback_ = [](thread&, ThreadRole, int) {};
 }
 
 void RecordFileWriter::addRecordable(Recordable* recordable) {
   { // mutex guard
-    std::lock_guard<std::mutex> lock(recordablesMutex_);
+    lock_guard<mutex> lock(recordablesMutex_);
     for (auto r : recordables_) {
       if (r != recordable && !XR_VERIFY(r->getStreamId() != recordable->getStreamId())) {
         return;
@@ -285,7 +285,7 @@ void RecordFileWriter::addRecordable(Recordable* recordable) {
 vector<Recordable*> RecordFileWriter::getRecordables() const {
   vector<Recordable*> recordables;
   { // mutex guard
-    std::lock_guard<std::mutex> lock(recordablesMutex_);
+    lock_guard<mutex> lock(recordablesMutex_);
     recordables.reserve(recordables_.size());
     for (auto recordable : recordables_) {
       recordables.push_back(recordable);
@@ -358,18 +358,17 @@ void RecordFileWriter::backgroundWriterThreadActivity() {
         backgroundWriteCollectedRecord();
       }
     } else if (status == os::EventChannel::Status::TIMEOUT) {
-      if (writerThreadData_->autoCollectDelay.load(std::memory_order_relaxed) != 0.) {
+      if (writerThreadData_->autoCollectDelay.load(memory_order_relaxed) != 0.) {
         bool somethingToWrite = false;
         { // mutex guard
-          std::unique_lock<std::recursive_mutex> guard{writerThreadData_->mutex};
-          double autoCollectDelay =
-              writerThreadData_->autoCollectDelay.load(std::memory_order_relaxed);
+          unique_lock<recursive_mutex> guard{writerThreadData_->mutex};
+          double autoCollectDelay = writerThreadData_->autoCollectDelay.load(memory_order_relaxed);
           if (autoCollectDelay != 0. && writerThreadData_->maxTimestampProvider != nullptr) {
             nextAutoCollectTime = os::getTimestampSec() + autoCollectDelay;
             unique_ptr<RecordBatch> newBatch = make_unique<RecordBatch>();
             if (collectOldRecords(*newBatch, writerThreadData_->maxTimestampProvider()) > 0) {
               writerThreadData_->recordsReadyToWrite.emplace_back(move(newBatch));
-              writerThreadData_->hasRecordsReadyToWrite.store(true, std::memory_order_relaxed);
+              writerThreadData_->hasRecordsReadyToWrite.store(true, memory_order_relaxed);
               somethingToWrite = true;
             }
           }
@@ -416,7 +415,7 @@ void RecordFileWriter::backgroundPurgeThreadActivity() {
     } else {
       double maxTimestamp = numeric_limits<double>::lowest();
       { // mutex guard
-        std::unique_lock<std::recursive_mutex> guard{purgeThreadData_->mutex};
+        unique_lock<recursive_mutex> guard{purgeThreadData_->mutex};
         if (purgeThreadData_->maxTimestampProvider != nullptr) {
           maxTimestamp = purgeThreadData_->maxTimestampProvider();
         }
@@ -457,8 +456,7 @@ int RecordFileWriter::createFileAsync(const string& filePath, bool splitHead) {
   }
   writerThreadData_ = new WriterThreadData(); // Does not yet start the background thread.
   // Now it is safe to start the background thread.
-  writerThreadData_->saveThread =
-      std::thread{&RecordFileWriter::backgroundWriterThreadActivity, this};
+  writerThreadData_->saveThread = thread{&RecordFileWriter::backgroundWriterThreadActivity, this};
   return 0;
 }
 
@@ -471,13 +469,13 @@ int RecordFileWriter::createChunkedFile(
     size_t maxChunkSizeMB,
     unique_ptr<NewChunkHandler>&& chunkHandler) {
   setMaxChunkSizeMB(maxChunkSizeMB);
-  newChunkHandler_ = std::move(chunkHandler);
+  newChunkHandler_ = move(chunkHandler);
   return createFileAsync(filePath, true);
 }
 
 void RecordFileWriter::setMaxChunkSizeMB(size_t maxChunkSizeMB) {
   const size_t kMB = 1024 * 1024;
-  const uint64_t kMaxFileSize = static_cast<uint64_t>(std::numeric_limits<int64_t>::max());
+  const uint64_t kMaxFileSize = static_cast<uint64_t>(numeric_limits<int64_t>::max());
   if (maxChunkSizeMB == 0 || static_cast<uint64_t>(maxChunkSizeMB) >= kMaxFileSize / kMB) {
     maxChunkSize_ = kMaxFileSize; // 0 means max chunk size
   } else {
@@ -502,9 +500,9 @@ int RecordFileWriter::writeRecordsAsync(double maxTimestamp) {
   unique_ptr<RecordBatch> recordBatch = make_unique<RecordBatch>();
   if (collectOldRecords(*recordBatch, maxTimestamp) > 0) {
     { // mutex guard
-      std::unique_lock<std::recursive_mutex> guard{writerThreadData_->mutex};
+      unique_lock<recursive_mutex> guard{writerThreadData_->mutex};
       writerThreadData_->recordsReadyToWrite.emplace_back(move(recordBatch));
-      writerThreadData_->hasRecordsReadyToWrite.store(true, std::memory_order_relaxed);
+      writerThreadData_->hasRecordsReadyToWrite.store(true, memory_order_relaxed);
     } // mutex guard
     writerThreadData_->writeEventChannel.dispatchEvent();
   }
@@ -516,9 +514,9 @@ int RecordFileWriter::autoWriteRecordsAsync(function<double()> maxTimestampProvi
     return INVALID_REQUEST;
   }
   { // mutex guard
-    std::unique_lock<std::recursive_mutex> guard{writerThreadData_->mutex};
+    unique_lock<recursive_mutex> guard{writerThreadData_->mutex};
     writerThreadData_->maxTimestampProvider = maxTimestampProvider;
-    writerThreadData_->autoCollectDelay.store(delay, std::memory_order_relaxed);
+    writerThreadData_->autoCollectDelay.store(delay, memory_order_relaxed);
   } // mutex guard
   writeRecordsAsync(maxTimestampProvider());
   return 0;
@@ -526,7 +524,7 @@ int RecordFileWriter::autoWriteRecordsAsync(function<double()> maxTimestampProvi
 
 int RecordFileWriter::autoPurgeRecords(function<double()> maxTimestampProvider, double delay) {
   if (purgeThreadData_) {
-    std::unique_lock<std::recursive_mutex> guard{purgeThreadData_->mutex};
+    unique_lock<recursive_mutex> guard{purgeThreadData_->mutex};
     purgeThreadData_->maxTimestampProvider = maxTimestampProvider;
     purgeThreadData_->autoPurgeDelay = delay;
     purgeThreadData_->purgeEventChannel.dispatchEvent();
@@ -537,15 +535,14 @@ int RecordFileWriter::autoPurgeRecords(function<double()> maxTimestampProvider, 
         writerThreadData_ &&
             !writerThreadData_->shouldEndThread); // we are saving in the background
     // only start the thread once purgeThreadData_ has been set (race condition on start)
-    purgeThreadData_->purgeThread =
-        std::thread{&RecordFileWriter::backgroundPurgeThreadActivity, this};
+    purgeThreadData_->purgeThread = thread{&RecordFileWriter::backgroundPurgeThreadActivity, this};
   }
   return 0;
 }
 
 void RecordFileWriter::trackBackgroundThreadQueueByteSize() {
   if (!queueByteSize_) {
-    queueByteSize_ = std::make_unique<std::atomic<uint64_t>>();
+    queueByteSize_ = make_unique<atomic<uint64_t>>();
   }
 }
 
@@ -633,14 +630,14 @@ void RecordFileWriter::backgroundWriteCollectedRecord() {
 
 bool RecordFileWriter::addRecordsReadyToWrite(
     RecordFileWriter::SortedRecords& inOutRecordsToWrite) {
-  if (!writerThreadData_->hasRecordsReadyToWrite.load(std::memory_order_relaxed)) {
+  if (!writerThreadData_->hasRecordsReadyToWrite.load(memory_order_relaxed)) {
     return false;
   }
   RecordBatches batches;
   { // mutex guard
-    std::unique_lock<std::recursive_mutex> guard{writerThreadData_->mutex};
+    unique_lock<recursive_mutex> guard{writerThreadData_->mutex};
     batches.swap(writerThreadData_->recordsReadyToWrite);
-    writerThreadData_->hasRecordsReadyToWrite.store(false, std::memory_order_relaxed);
+    writerThreadData_->hasRecordsReadyToWrite.store(false, memory_order_relaxed);
   } // mutex guard
   uint64_t addedSize = addRecordBatchesToSortedRecords(batches, inOutRecordsToWrite);
   if (queueByteSize_) {
@@ -767,7 +764,7 @@ int RecordFileWriter::createFile(const string& filePath, bool splitHead) {
   }
 
   if (!spec.isDiskFile()) {
-    std::unique_ptr<WriteFileHandler> writeFile{dynamic_cast<WriteFileHandler*>(
+    unique_ptr<WriteFileHandler> writeFile{dynamic_cast<WriteFileHandler*>(
         FileHandlerFactory::getInstance().getFileHandler(spec.fileHandlerName).release())};
     if (!writeFile) {
       XR_LOGE("Found no WriteFileHandler named {}.", spec.fileHandlerName);
@@ -789,7 +786,7 @@ int RecordFileWriter::createFile(const string& filePath, bool splitHead) {
       }
       splitHead = true;
     }
-    file_ = std::move(writeFile);
+    file_ = move(writeFile);
   } else if (spec.chunks.size() != 1) {
     XR_LOGE("File creation using {} requires a single file chunk.", spec.fileHandlerName);
     return INVALID_FILE_SPEC;

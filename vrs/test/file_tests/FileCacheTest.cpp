@@ -24,6 +24,7 @@
 #include <vrs/RecordFileReader.h>
 #include <vrs/os/Utils.h>
 
+using namespace std;
 using namespace vrs;
 
 namespace {
@@ -34,14 +35,14 @@ struct FileCacheTest : testing::Test {};
 
 TEST_F(FileCacheTest, cacheTest) {
   const string mainFolder = os::getTempFolder();
-  const std::string cacheName = "unit_test_vrs_file_cache";
+  const string cacheName = "unit_test_vrs_file_cache";
   ASSERT_EQ(FileCache::makeFileCache(cacheName, mainFolder), 0);
   FileCache* fcache = FileCache::getFileCache();
   EXPECT_NE(fcache, nullptr);
   string location;
   EXPECT_EQ(fcache->getFile("123.txt", location), FILE_NOT_FOUND);
   {
-    std::ofstream out(location);
+    ofstream out(location);
     out << location;
   }
   string location2;
@@ -55,7 +56,7 @@ TEST_F(FileCacheTest, cacheTest) {
 
 TEST_F(FileCacheTest, cacheDomainTest) {
   const string mainFolder = os::getTempFolder();
-  const std::string cacheName = "unit_test_vrs_file_cache";
+  const string cacheName = "unit_test_vrs_file_cache";
   ASSERT_EQ(FileCache::makeFileCache(cacheName, mainFolder), 0);
   FileCache* fcache = FileCache::getFileCache();
   EXPECT_NE(fcache, nullptr);
@@ -63,7 +64,7 @@ TEST_F(FileCacheTest, cacheDomainTest) {
   string domain = "domain";
   EXPECT_EQ(fcache->getFile(domain, "123.txt", location), FILE_NOT_FOUND);
   {
-    std::ofstream out(location);
+    ofstream out(location);
     out << location;
   }
   string location2;
@@ -77,7 +78,7 @@ TEST_F(FileCacheTest, cacheDomainTest) {
   domain = "domain2";
   EXPECT_EQ(fcache->getFile(domain, location), FILE_NOT_FOUND);
   {
-    std::ofstream out(location);
+    ofstream out(location);
     out << location;
   }
   EXPECT_EQ(fcache->getFile(domain, "123.txt", location2), INVALID_DISK_DATA);
@@ -110,7 +111,7 @@ void testDetails(const string& cacheFile, const RecordFileReader& reader, const 
 }
 
 TEST_F(FileCacheTest, detailsTest) {
-  std::string kTestFile = string(coretech::getTestDataDir()) + "/VRS_Files/sample_file.vrs";
+  string kTestFile = string(coretech::getTestDataDir()) + "/VRS_Files/sample_file.vrs";
   const string cacheFile = os::getTempFolder() + "detailsTest.vrsi";
   RecordFileReader reader;
   ASSERT_EQ(reader.openFile(kTestFile), 0);

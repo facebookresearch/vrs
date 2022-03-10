@@ -63,13 +63,13 @@ void RecordFileReader::setOpenProgressLogger(ProgressLogger* progressLogger) {
   }
 }
 
-void RecordFileReader::setFileHandler(std::unique_ptr<FileHandler> fileHandler) {
+void RecordFileReader::setFileHandler(unique_ptr<FileHandler> fileHandler) {
   if (fileHandler) {
-    file_ = std::move(fileHandler);
+    file_ = move(fileHandler);
   }
 }
 
-std::unique_ptr<FileHandler> RecordFileReader::getFileHandler() const {
+unique_ptr<FileHandler> RecordFileReader::getFileHandler() const {
   return file_->makeNew();
 }
 
@@ -386,7 +386,7 @@ int RecordFileReader::readFileDetails(
   if (tagsPlayer) {
     MAYBE_UNUSED size_t sizeBefore = recordIndex_.size();
     recordIndex_.erase(
-        std::remove_if(
+        remove_if(
             recordIndex_.begin(),
             recordIndex_.end(),
             [](const IndexRecord::RecordInfo& record) {
@@ -557,7 +557,7 @@ const IndexRecord::RecordInfo* RecordFileReader::getRecord(
     const IndexRecord::RecordInfo* record = index[searchIndex];
     if (record->recordType == recordType && hitCount++ == indexNumber) {
       // save this request's result, to speed-up sequential reads
-      lastRequest_[queryType] = std::make_pair(indexNumber, searchIndex);
+      lastRequest_[queryType] = make_pair(indexNumber, searchIndex);
       return record;
     }
   }
@@ -582,8 +582,7 @@ static bool timeCompare(const IndexRecord::RecordInfo& lhs, const IndexRecord::R
 
 const IndexRecord::RecordInfo* RecordFileReader::getRecordByTime(double timestamp) const {
   IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type());
-  auto lowerBound =
-      std::lower_bound(recordIndex_.begin(), recordIndex_.end(), firstTime, timeCompare);
+  auto lowerBound = lower_bound(recordIndex_.begin(), recordIndex_.end(), firstTime, timeCompare);
   if (lowerBound != recordIndex_.end()) {
     return &*lowerBound;
   }
@@ -594,8 +593,7 @@ const IndexRecord::RecordInfo* RecordFileReader::getRecordByTime(
     Record::Type recordType,
     double timestamp) const {
   IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type());
-  auto lowerBound =
-      std::lower_bound(recordIndex_.begin(), recordIndex_.end(), firstTime, timeCompare);
+  auto lowerBound = lower_bound(recordIndex_.begin(), recordIndex_.end(), firstTime, timeCompare);
   while (lowerBound != recordIndex_.end() && lowerBound->recordType != recordType) {
     ++lowerBound;
   }
@@ -615,7 +613,7 @@ const IndexRecord::RecordInfo* RecordFileReader::getRecordByTime(
   const vector<const IndexRecord::RecordInfo*>& index = getIndex(streamId);
   const IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type());
 
-  auto lowerBound = std::lower_bound(index.begin(), index.end(), &firstTime, ptrTimeCompare);
+  auto lowerBound = lower_bound(index.begin(), index.end(), &firstTime, ptrTimeCompare);
   // The stream index is a vector of pointers in the recordIndex_ vector!
   if (lowerBound != index.end()) {
     return *lowerBound;
@@ -630,7 +628,7 @@ const IndexRecord::RecordInfo* RecordFileReader::getRecordByTime(
   const vector<const IndexRecord::RecordInfo*>& index = getIndex(streamId);
   const IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type());
 
-  auto lowerBound = std::lower_bound(index.begin(), index.end(), &firstTime, ptrTimeCompare);
+  auto lowerBound = lower_bound(index.begin(), index.end(), &firstTime, ptrTimeCompare);
   while (lowerBound != index.end() && (*lowerBound)->recordType != recordType) {
     ++lowerBound;
   }
@@ -653,8 +651,7 @@ const IndexRecord::RecordInfo* RecordFileReader::getNearestRecordByTime(
 
   const IndexRecord::RecordInfo* nearest = nullptr;
   const IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type());
-  auto lowerBound =
-      std::lower_bound(recordIndex_.begin(), recordIndex_.end(), firstTime, timeCompare);
+  auto lowerBound = lower_bound(recordIndex_.begin(), recordIndex_.end(), firstTime, timeCompare);
 
   auto start = (lowerBound == recordIndex_.begin()) ? lowerBound : lowerBound - 1;
   auto end = (lowerBound == recordIndex_.end()) ? lowerBound : lowerBound + 1;
@@ -681,7 +678,7 @@ uint32_t RecordFileReader::getRecordStreamIndex(const IndexRecord::RecordInfo* r
     // Records are sorted in the global index, and a stream's index is a subset of the global index,
     // sorted as well even though they are pointers.
     // So we can search for the pointer directly in the stream's index by value using lower_bound.
-    auto match = std::lower_bound(index.begin(), index.end(), record);
+    auto match = lower_bound(index.begin(), index.end(), record);
     if (match != index.end()) {
       return static_cast<uint32_t>(match - index.begin());
     }
@@ -881,7 +878,7 @@ int RecordFileReader::readAllRecords() {
   return error;
 }
 
-vector<std::pair<string, int64_t>> RecordFileReader::getFileChunks() const {
+vector<pair<string, int64_t>> RecordFileReader::getFileChunks() const {
   return file_->getFileChunks();
 }
 
@@ -1024,12 +1021,12 @@ int RecordFileReader::readRecord(
 }
 
 const IndexRecord::RecordInfo* getNearestRecordByTime(
-    const std::vector<const IndexRecord::RecordInfo*>& index,
+    const vector<const IndexRecord::RecordInfo*>& index,
     double timestamp,
     double epsilon) {
   const IndexRecord::RecordInfo* nearest = nullptr;
   const IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type());
-  auto lowerBound = std::lower_bound(index.begin(), index.end(), &firstTime, ptrTimeCompare);
+  auto lowerBound = lower_bound(index.begin(), index.end(), &firstTime, ptrTimeCompare);
 
   auto start = (lowerBound == index.begin()) ? lowerBound : lowerBound - 1;
   auto end = (lowerBound == index.end()) ? lowerBound : lowerBound + 1;

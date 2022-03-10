@@ -38,7 +38,7 @@ RecordManager::RecordManager()
       creationOrder_{0} {}
 
 RecordManager::~RecordManager() {
-  std::unique_lock<std::mutex> guard{mutex_};
+  unique_lock<mutex> guard{mutex_};
   // Records should never be deleted directly by anyone else,
   // so their destructor is private. Which means even containers
   // are not allowed to do that, so we're forced to manually handle that.
@@ -58,7 +58,7 @@ Record* RecordManager::createRecord(
     const DataSource& data) {
   // Step 1: find a record to reuse, if there is any
   Record* record = nullptr;
-  std::unique_lock<std::mutex> guard{mutex_};
+  unique_lock<mutex> guard{mutex_};
   const size_t dataSize = data.getDataSize();
   const size_t maxSize = getAcceptableOverCapacity(dataSize);
   // reuse the most recently inserted records first, as they're less likely to have been swapped out
@@ -114,7 +114,7 @@ Record* RecordManager::createRecord(
 
 uint32_t RecordManager::purgeOldRecords(double oldestTimestamp, bool recycleBuffers) {
   uint32_t count = 0;
-  std::unique_lock<std::mutex> guard{mutex_};
+  unique_lock<mutex> guard{mutex_};
   // we purge everything "old", but we keep the newest state & configuration records,
   // and all TagsRecords
   Record* lastState = nullptr;
@@ -159,7 +159,7 @@ uint32_t RecordManager::purgeOldRecords(double oldestTimestamp, bool recycleBuff
 }
 
 void RecordManager::purgeCache() {
-  std::unique_lock<std::mutex> guard{mutex_};
+  unique_lock<mutex> guard{mutex_};
   for (Record* record : cache_) {
     delete record;
   }
@@ -168,9 +168,9 @@ void RecordManager::purgeCache() {
 
 void RecordManager::collectOldRecords(double maxAge, list<Record*>& outCollectedRecords) {
   outCollectedRecords.clear();
-  std::lock_guard<std::mutex> guard{mutex_};
+  lock_guard<mutex> guard{mutex_};
   if (!activeRecords_.empty()) {
-    auto iterator = std::upper_bound(
+    auto iterator = upper_bound(
         activeRecords_.begin(), activeRecords_.end(), maxAge, [](double age, Record* record) {
           return age < record->timestamp_;
         });
@@ -190,7 +190,7 @@ size_t RecordManager::getAdjustedRecordBufferSize(size_t requestedSize) {
     return requestedSize + percentOverAllocation;
   }
   // Use min, not max, to prevent massive over-allocation!
-  return requestedSize + std::min<size_t>(minBytesOverAllocation_, percentOverAllocation);
+  return requestedSize + min<size_t>(minBytesOverAllocation_, percentOverAllocation);
 }
 
 size_t RecordManager::getAcceptableOverCapacity(size_t capacity) const {
@@ -199,7 +199,7 @@ size_t RecordManager::getAcceptableOverCapacity(size_t capacity) const {
 
 void RecordManager::recycle(Record* record) {
   { // mutex scope limiting
-    std::unique_lock<std::mutex> guard{mutex_};
+    unique_lock<mutex> guard{mutex_};
     if (cache_.size() < maxCacheSize_) {
       record->timestamp_ = os::getTimestampSec();
       cache_.emplace_back(record);

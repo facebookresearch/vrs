@@ -75,7 +75,7 @@ void Recordable::resetNewInstanceIds() {
 }
 
 uint16_t Recordable::getNewInstanceId(RecordableTypeId typeId) {
-  static std::mutex sMutex_;
+  static mutex sMutex_;
   static map<RecordableTypeId, uint16_t> sInstanceIds;
 
   unique_lock<mutex> guard{sMutex_};

@@ -47,7 +47,7 @@ int FileHandler::open(const string& filePath) {
   return openSpec(fileSpec);
 }
 
-int FileHandler::delegateOpen(const string& path, std::unique_ptr<FileHandler>& outNewDelegate) {
+int FileHandler::delegateOpen(const string& path, unique_ptr<FileHandler>& outNewDelegate) {
   FileSpec fileSpec;
   int status = parseFilePath(path, fileSpec);
   if (status != 0) {
@@ -60,7 +60,7 @@ int FileHandler::delegateOpen(const string& path, std::unique_ptr<FileHandler>& 
 
 int FileHandler::delegateOpenSpec(
     const FileSpec& fileSpec,
-    std::unique_ptr<FileHandler>& outNewDelegate) {
+    unique_ptr<FileHandler>& outNewDelegate) {
   // if provided with a delegate, then ask the delegate first...
   if (outNewDelegate) {
     if (outNewDelegate->openSpec(fileSpec) == SUCCESS) {
@@ -145,7 +145,7 @@ int FileSpec::parseUri(
     const string& uri,
     string& outScheme,
     string& outPath,
-    std::map<string, string>& outQueryParams) {
+    map<string, string>& outQueryParams) {
   // Parse URI following https://en.wikipedia.org/wiki/Uniform_Resource_Identifier.
   // URI should look like <schema>:<path>?<query> while <schema> corresponds to file handler name.
   // The query should be used to specify additional fields for each file handler.
@@ -225,7 +225,7 @@ int FileSpec::fromPathJsonUri(const string& pathJsonUri) {
         fileHandlerName = pathJsonUri.substr(0, colon);
         uri = pathJsonUri;
         // give a chance to a file handler named after the uri scheme, if any, to parse the uri.
-        std::unique_ptr<FileHandler> handler =
+        unique_ptr<FileHandler> handler =
             FileHandlerFactory::getInstance().getFileHandler(fileHandlerName);
         if (handler) {
           return handler->parseUri(*this, colon);

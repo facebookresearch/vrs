@@ -22,6 +22,8 @@
 #define DEFAULT_LOG_CHANNEL "LegacyFormatsProvider"
 #include <logging/Log.h>
 
+using namespace std;
+
 namespace vrs {
 
 LegacyFormatsProvider::~LegacyFormatsProvider() = default;
@@ -71,7 +73,7 @@ unique_ptr<DataLayout> RecordFormatRegistrar::getLatestDataLayout(
 }
 
 bool RecordFormatRegistrar::addRecordFormat(
-    map<std::string, std::string>& inOutRecordFormatRegister,
+    map<string, string>& inOutRecordFormatRegister,
     Record::Type recordType,
     uint32_t formatVersion,
     const RecordFormat& format,
@@ -89,7 +91,7 @@ bool RecordFormatRegistrar::addRecordFormat(
   // It's too easy to tell in RecordFormat that you're using a DataLayout,
   // and not specify that DataLayout (or at the wrong index). Let's warn the VRS user!
   size_t usedBlocks = format.getUsedBlocksCount();
-  size_t maxIndex = std::max<size_t>(usedBlocks, layouts.size());
+  size_t maxIndex = max<size_t>(usedBlocks, layouts.size());
   for (size_t index = 0; index < maxIndex; ++index) {
     if (index < usedBlocks &&
         format.getContentBlock(index).getContentType() == ContentType::DATA_LAYOUT) {
@@ -115,7 +117,7 @@ bool RecordFormatRegistrar::addRecordFormat(
 }
 
 void RecordFormatRegistrar::getRecordFormats(
-    const map<std::string, std::string>& recordFormatRegister,
+    const map<string, string>& recordFormatRegister,
     RecordFormatMap& outFormats) {
   for (const auto& tag : recordFormatRegister) {
     Record::Type recordType;
@@ -128,7 +130,7 @@ void RecordFormatRegistrar::getRecordFormats(
 }
 
 unique_ptr<DataLayout> RecordFormatRegistrar::getDataLayout(
-    const map<std::string, std::string>& recordFormatRegister,
+    const map<string, string>& recordFormatRegister,
     const ContentBlockId& blockId) {
   string tagName = RecordFormat::getDataLayoutTagName(
       blockId.getRecordType(), blockId.getFormatVersion(), blockId.getBlockIndex());
@@ -139,8 +141,7 @@ unique_ptr<DataLayout> RecordFormatRegistrar::getDataLayout(
   return nullptr;
 }
 
-const map<std::string, std::string>& RecordFormatRegistrar::getLegacyRegistry(
-    RecordableTypeId typeId) {
+const map<string, string>& RecordFormatRegistrar::getLegacyRegistry(RecordableTypeId typeId) {
   if (legacyRecordFormats_.find(typeId) == legacyRecordFormats_.end()) {
     for (auto& provider : providers_) {
       provider->registerLegacyRecordFormats(typeId);

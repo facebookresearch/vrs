@@ -27,6 +27,7 @@
 #include <vrs/FileCache.h>
 #include <vrs/StreamPlayer.h>
 
+using namespace std;
 using namespace vrs;
 using namespace vrs::test;
 
@@ -117,13 +118,13 @@ class DawnCamera : public Recordable {
 
   const Record* createFrame(uint32_t frameNumber) {
     uint32_t frameSize = getSizeOfFrame(frameNumber);
-    std::vector<uint8_t> buffer(frameSize);
+    vector<uint8_t> buffer(frameSize);
     for (uint32_t n = 0; n < frameSize; ++n) {
       buffer[n] = static_cast<uint8_t>(frameNumber ^ (7 * n) ^ (11 * (frameNumber + n)));
     }
     frameData_.cameraIndex.set(cameraIndex_);
     frameData_.frameNumber.set(frameNumber);
-    frameData_.str.stage(std::to_string(frameNumber));
+    frameData_.str.stage(to_string(frameNumber));
     return createRecord(
         getFrameTime(frameNumber),
         Record::Type::DATA,
@@ -159,17 +160,17 @@ struct ThreadParam {
   RecordFileWriter& fileWriter;
   DawnCamera& camera;
   double startTime;
-  std::atomic<int>& myCounter;
-  std::atomic<int>& limitCounter;
+  atomic<int>& myCounter;
+  atomic<int>& limitCounter;
   bool& fatalError;
   const FileConfig& fileConfig;
   bool realtime;
 };
 
 unique_ptr<deque<IndexRecord::DiskRecordInfo>> createPreliminaryIndex(
-    std::array<std::unique_ptr<DawnCamera>, kCameraCount>& cameras,
+    array<unique_ptr<DawnCamera>, kCameraCount>& cameras,
     CreateParams& p) {
-  auto preliminaryIndex = std::make_unique<deque<IndexRecord::DiskRecordInfo>>();
+  auto preliminaryIndex = make_unique<deque<IndexRecord::DiskRecordInfo>>();
   deque<IndexRecord::DiskRecordInfo>& index = *preliminaryIndex;
   for (auto& camera : cameras) {
     camera->addStateRecord(index);
@@ -195,7 +196,7 @@ void createRecordsThreadTask(ThreadParam* param) {
       double frameTime = param->camera.getFrameTime(frame);
       if (wallTime < frameTime) {
         const double sleepDuration = frameTime - wallTime;
-        std::this_thread::sleep_for(std::chrono::duration<double>(sleepDuration));
+        this_thread::sleep_for(chrono::duration<double>(sleepDuration));
       }
     }
     param->camera.createFrame(frame);
@@ -213,7 +214,7 @@ void createRecordsThreadTask(ThreadParam* param) {
     // which could lead to records being written out of order and fail the test
     param->myCounter.operator++();
     while (param->myCounter.load() > param->limitCounter.load() + 2 && !param->fatalError) {
-      std::this_thread::yield();
+      this_thread::yield();
     }
   }
   double wallTime = os::getTimestampSec() - param->startTime;
@@ -229,7 +230,7 @@ void createRecordsThreadTask(ThreadParam* param) {
 namespace vrs {
 namespace test {
 
-void deleteChunkedFile(const std::string& path) {
+void deleteChunkedFile(const string& path) {
   FileSpec spec;
   if (RecordFileReader::vrsFilePathToFileSpec(path, spec) == 0) {
     for (const auto& chunk : spec.chunks) {
@@ -252,15 +253,15 @@ void RecordFileWriterTester::skipFinalizeIndexRecord(RecordFileWriter& writer) {
 
 int threadedCreateRecords(CreateParams& p) {
   Recordable::resetNewInstanceIds();
-  std::array<std::unique_ptr<DawnCamera>, kCameraCount> cameras;
+  array<unique_ptr<DawnCamera>, kCameraCount> cameras;
   RecordFileWriter fileWriter;
   fileWriter.setTag("fileTag1", "fileValue1");
   fileWriter.setTag("fileTag2", "fileValue2");
-  std::array<std::atomic<int>, kCameraCount> counters;
-  std::vector<ThreadParam> threadParams;
+  array<atomic<int>, kCameraCount> counters;
+  vector<ThreadParam> threadParams;
   bool fatalError = false;
   for (uint32_t cameraIndex = 0; cameraIndex < kCameraCount; cameraIndex++) {
-    cameras[cameraIndex] = std::make_unique<DawnCamera>(cameraIndex, kLongFileConfig);
+    cameras[cameraIndex] = make_unique<DawnCamera>(cameraIndex, kLongFileConfig);
     fileWriter.addRecordable(cameras[cameraIndex].get());
     counters[cameraIndex] = 0;
     threadParams.push_back(ThreadParam{
@@ -285,10 +286,10 @@ int threadedCreateRecords(CreateParams& p) {
     fileWriter.setMaxChunkSizeMB(p.maxChunkSizeMB);
     RETURN_ON_FAILURE(fileWriter.createFileAsync(p.path));
   }
-  std::vector<std::thread> threads;
+  vector<thread> threads;
   threads.reserve(kCameraCount);
   for (uint32_t threadIndex = 0; threadIndex < kCameraCount; threadIndex++) {
-    threads.push_back(std::thread{&createRecordsThreadTask, &threadParams[threadIndex]});
+    threads.push_back(thread{&createRecordsThreadTask, &threadParams[threadIndex]});
   }
   for (uint32_t threadIndex = 0; threadIndex < kCameraCount; threadIndex++) {
     XR_LOGD("Joining thread #{}", threadIndex);
@@ -307,12 +308,12 @@ int threadedCreateRecords(CreateParams& p) {
 
 int singleThreadCreateRecords(CreateParams& p) {
   Recordable::resetNewInstanceIds();
-  std::array<std::unique_ptr<DawnCamera>, kCameraCount> cameras;
+  array<unique_ptr<DawnCamera>, kCameraCount> cameras;
   RecordFileWriter fileWriter;
   fileWriter.setTag("fileTag1", "fileValue1");
   fileWriter.setTag("fileTag2", "fileValue2");
   for (uint32_t cameraIndex = 0; cameraIndex < kCameraCount; cameraIndex++) {
-    cameras[cameraIndex] = std::make_unique<DawnCamera>(cameraIndex, kLongFileConfig);
+    cameras[cameraIndex] = make_unique<DawnCamera>(cameraIndex, kLongFileConfig);
     DawnCamera* camera = cameras[cameraIndex].get();
     fileWriter.addRecordable(camera);
     camera->setRecordableIsActive(true);
@@ -355,7 +356,7 @@ void checkRecordCountAndIndex(const CheckParams& p) {
   FileCache::disableFileCache();
   RecordFileReader reader;
   ForwardDiskFile* diskFile = new ForwardDiskFile();
-  reader.setFileHandler(std::unique_ptr<FileHandler>(diskFile));
+  reader.setFileHandler(unique_ptr<FileHandler>(diskFile));
   int openFileStatus = reader.openFile(p.filePath);
   EXPECT_EQ(openFileStatus, 0);
   if (openFileStatus != 0) {

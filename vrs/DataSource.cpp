@@ -52,20 +52,20 @@ DataSourceChunk DataSource::kEmptyDataSourceChunk;
 
 NonContiguousChunk::NonContiguousChunk(
     const void* data,
-    std::size_t blockSize,
-    std::size_t numBlocks,
-    std::size_t strideInBytes)
+    size_t blockSize,
+    size_t numBlocks,
+    size_t strideInBytes)
     : vrs::DataSourceChunk{data, blockSize * numBlocks},
       blockSize_{blockSize},
       numBlocks_{numBlocks},
       strideInBytes_{strideInBytes} {}
 
-void NonContiguousChunk::fillAndAdvanceBuffer(std::uint8_t*& buffer) const {
-  const std::uint8_t* ptr = static_cast<const std::uint8_t*>(data());
+void NonContiguousChunk::fillAndAdvanceBuffer(uint8_t*& buffer) const {
+  const uint8_t* ptr = static_cast<const uint8_t*>(data());
   XR_DEV_CHECK_GT(blockSize_, 0UL); // otherwise the virtual method won't be called
   XR_DEV_CHECK_GT(numBlocks_, 0UL);
-  for (std::size_t b = 0; b < numBlocks_; ++b) {
-    std::memcpy(buffer, ptr, blockSize_);
+  for (size_t b = 0; b < numBlocks_; ++b) {
+    memcpy(buffer, ptr, blockSize_);
     buffer += blockSize_;
     ptr += strideInBytes_;
   }

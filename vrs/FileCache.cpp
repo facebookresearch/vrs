@@ -19,11 +19,13 @@
 
 #include "ErrorCode.h"
 
+using namespace std;
+
 namespace vrs {
 
-std::unique_ptr<FileCache> FileCache::sFileCache;
+unique_ptr<FileCache> FileCache::sFileCache;
 
-int FileCache::makeFileCache(const string& app, const std::string& parentFolder) {
+int FileCache::makeFileCache(const string& app, const string& parentFolder) {
   string appName;
 #if !IS_WINDOWS_PLATFORM()
   appName = '.'; // make folder invisible
@@ -57,10 +59,7 @@ FileCache* FileCache::getFileCache() {
   return sFileCache.get();
 }
 
-int FileCache::getFile(
-    const std::string& domain,
-    const std::string& filename,
-    std::string& outFilePath) {
+int FileCache::getFile(const string& domain, const string& filename, string& outFilePath) {
   string folder = mainFolder_ + domain;
   outFilePath = folder + '/' + filename;
   if (os::isFile(outFilePath)) {
@@ -73,7 +72,7 @@ int FileCache::getFile(
   return FILE_NOT_FOUND;
 }
 
-int FileCache::getFile(const std::string& filename, std::string& outFilePath) {
+int FileCache::getFile(const string& filename, string& outFilePath) {
   outFilePath = mainFolder_ + filename;
   if (os::isFile(outFilePath)) {
     return 0;

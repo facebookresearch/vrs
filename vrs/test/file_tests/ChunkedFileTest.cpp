@@ -52,10 +52,10 @@ int addPies(DiskFile& file, string path) {
 } // namespace
 
 struct ChunkedFileTester : testing::Test {
-  std::string kChunkedFile = getTestDataDir() + "/VRS_Files/chunks.vrs";
-  std::string kChunkedFile2 = getTestDataDir() + "/VRS_Files/chunks.vrs_1";
-  std::string kChunkedFile3 = getTestDataDir() + "/VRS_Files/chunks.vrs_2";
-  std::string kMissingFile = getTestDataDir() + "/VRS_Files/does_not_exist.vrs";
+  string kChunkedFile = getTestDataDir() + "/VRS_Files/chunks.vrs";
+  string kChunkedFile2 = getTestDataDir() + "/VRS_Files/chunks.vrs_1";
+  string kChunkedFile3 = getTestDataDir() + "/VRS_Files/chunks.vrs_2";
+  string kMissingFile = getTestDataDir() + "/VRS_Files/does_not_exist.vrs";
 };
 
 TEST_F(ChunkedFileTester, ChunkedFileTest) {
@@ -73,7 +73,7 @@ TEST_F(ChunkedFileTester, ChunkedFileTest) {
 
 TEST_F(ChunkedFileTester, OpenChunkedFileTest) {
   vrs::RecordFileReader file;
-  std::string jsonPath = FileSpec({kChunkedFile, kChunkedFile2, kChunkedFile3}).toJson();
+  string jsonPath = FileSpec({kChunkedFile, kChunkedFile2, kChunkedFile3}).toJson();
   EXPECT_EQ(file.openFile(jsonPath), 0);
   EXPECT_EQ(file.getRecordCount(), 306); // number of records if all chunks are found
   EXPECT_EQ(file.getFileChunks().size(), 3);
@@ -81,7 +81,7 @@ TEST_F(ChunkedFileTester, OpenChunkedFileTest) {
 
 TEST_F(ChunkedFileTester, MissingChunkChunkedFileTest) {
   vrs::RecordFileReader file;
-  std::string jsonPath = FileSpec({kChunkedFile, kMissingFile, kChunkedFile3}).toJson();
+  string jsonPath = FileSpec({kChunkedFile, kMissingFile, kChunkedFile3}).toJson();
   EXPECT_EQ(file.openFile(jsonPath), DISKFILE_FILE_NOT_FOUND);
 }
 
@@ -117,7 +117,7 @@ TEST_F(ChunkedFileTester, LinkedFileTest) {
 #endif // !IS_WINDOWS_PLATFORM && !IS_XROS_PLATFORM()
 
 TEST_F(ChunkedFileTester, newChunks) {
-  const std::string testPath = os::getTempFolder() + "chunking.vrs";
+  const string testPath = os::getTempFolder() + "chunking.vrs";
 
   // test regular chunking: path not ending with "_1", path + "_1", path + "_2", etc
   DiskFile file;
@@ -125,11 +125,11 @@ TEST_F(ChunkedFileTester, newChunks) {
   FileSpec fileSpec;
   ASSERT_EQ(RecordFileReader::vrsFilePathToFileSpec(testPath, fileSpec), 0);
   file.openSpec(fileSpec);
-  vector<std::pair<string, int64_t>> chunks = file.getFileChunks();
+  vector<pair<string, int64_t>> chunks = file.getFileChunks();
   ASSERT_EQ(chunks.size(), 3);
-  EXPECT_EQ(chunks[0], std::make_pair(testPath, static_cast<int64_t>(sizeof(double))));
-  EXPECT_EQ(chunks[1], std::make_pair(testPath + "_1", static_cast<int64_t>(2 * sizeof(double))));
-  EXPECT_EQ(chunks[2], std::make_pair(testPath + "_2", static_cast<int64_t>(3 * sizeof(double))));
+  EXPECT_EQ(chunks[0], make_pair(testPath, static_cast<int64_t>(sizeof(double))));
+  EXPECT_EQ(chunks[1], make_pair(testPath + "_1", static_cast<int64_t>(2 * sizeof(double))));
+  EXPECT_EQ(chunks[2], make_pair(testPath + "_2", static_cast<int64_t>(3 * sizeof(double))));
 
   // test regular split-head chunking: path ending with "_1", path + "_2", path + "_3", etc
   ASSERT_EQ(addPies(file, testPath + "_1"), 0);
@@ -138,9 +138,9 @@ TEST_F(ChunkedFileTester, newChunks) {
   file.openSpec(fileSpec);
   chunks = file.getFileChunks();
   ASSERT_EQ(chunks.size(), 4);
-  EXPECT_EQ(chunks[0], std::make_pair(testPath, static_cast<int64_t>(sizeof(double))));
-  EXPECT_EQ(chunks[1], std::make_pair(testPath + "_1", static_cast<int64_t>(sizeof(double))));
-  EXPECT_EQ(chunks[2], std::make_pair(testPath + "_2", static_cast<int64_t>(2 * sizeof(double))));
-  EXPECT_EQ(chunks[3], std::make_pair(testPath + "_3", static_cast<int64_t>(3 * sizeof(double))));
+  EXPECT_EQ(chunks[0], make_pair(testPath, static_cast<int64_t>(sizeof(double))));
+  EXPECT_EQ(chunks[1], make_pair(testPath + "_1", static_cast<int64_t>(sizeof(double))));
+  EXPECT_EQ(chunks[2], make_pair(testPath + "_2", static_cast<int64_t>(2 * sizeof(double))));
+  EXPECT_EQ(chunks[3], make_pair(testPath + "_3", static_cast<int64_t>(3 * sizeof(double))));
   vrs::test::deleteChunkedFile(file);
 }

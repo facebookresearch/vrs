@@ -47,7 +47,7 @@
 
 using namespace std;
 
-std::string vrs::os::getOsFingerPrint() {
+string vrs::os::getOsFingerPrint() {
 #if IS_ANDROID_PLATFORM()
   array<char, PROP_VALUE_MAX> osFingerprint;
   int osFingerprintLength = __system_property_get("ro.build.fingerprint", osFingerprint.data());
@@ -115,8 +115,8 @@ std::string vrs::os::getOsFingerPrint() {
 }
 
 #if IS_VRS_OSS_CODE()
-std::string vrs::os::getUniqueSessionId() {
-  std::stringstream sstream;
+string vrs::os::getUniqueSessionId() {
+  stringstream sstream;
   boost::uuids::random_generator generator;
   sstream << generator();
   return sstream.str();

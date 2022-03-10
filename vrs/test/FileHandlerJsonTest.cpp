@@ -22,31 +22,31 @@
 using namespace std;
 
 struct FileHandlerJsonTest : testing::Test {
-  const std::string kJSONPathWithChunks = "{\"chunks\": [\"file1\", \"file2\"]}";
-  const std::string kJSONPathWithSingleChunk = "{\"chunks\": [\"file1\"]}";
-  const std::string kJSONPathWithChunksAndFileHandle =
+  const string kJSONPathWithChunks = "{\"chunks\": [\"file1\", \"file2\"]}";
+  const string kJSONPathWithSingleChunk = "{\"chunks\": [\"file1\"]}";
+  const string kJSONPathWithChunksAndFileHandle =
       "{\"storage\": \"mystorage\",\"chunks\": [\"file1\", \"file2\"]}";
-  const std::string kJSONPathWithChunksAndFileName =
+  const string kJSONPathWithChunksAndFileName =
       "{\"filename\": \"sample.vrs\",\"chunks\": [\"file1\", \"file2\"]}";
-  const std::string kJSONPathWithChunksAndFileSizes =
+  const string kJSONPathWithChunksAndFileSizes =
       "{\"chunk_sizes\": [12345, 67890],\"chunks\": [\"file1\", \"file2\"]}";
-  const std::string kJSONPathWithSingleExtraField =
+  const string kJSONPathWithSingleExtraField =
       "{\"storage\": \"mystorage\",\"chunks\": [\"file1\", \"file2\"],"
       "\"bucketname\": \"bucketname1\"}";
-  const std::string kJSONPathWithMultipleExtraField =
+  const string kJSONPathWithMultipleExtraField =
       "{\"storage\": \"mystorage\",\"chunks\": [\"file1\", \"file2\"],"
       "\"bucketname\": \"bucketname1\", \"extra1\": \"extra1\","
       "\"extra2\": [\"extra2-1\", \"extra2-2\"]}";
-  const std::string kNonJSONPath = "file1";
+  const string kNonJSONPath = "file1";
 
-  const std::string kUriPath = "mystorage:test/path/file.vrs?key1=val1&key2=val2";
-  const std::string kUriPathWithNoHost = "test/path/file.vrs?key1=val1";
-  const std::string kUriPathWithNoHostWithColonSlash = ":test/path/file.vrs?key1=val1";
-  const std::string kUriPathWithNoPath = "mystorage:";
-  const std::string kUriPathWithNoPathWithQuery = "mystorage:?key1=val1";
-  const std::string kUriPathWithInvalidQuery = "mystorage:test/path/file.vrs?key1=";
-  const std::string kUriPathWithInvalidQuery2 = "mystorage:test/path/file.vrs?=val1";
-  const std::string kUriWithEncodedPath = "mystorage:test%2Fpath%2Ffile.vrs";
+  const string kUriPath = "mystorage:test/path/file.vrs?key1=val1&key2=val2";
+  const string kUriPathWithNoHost = "test/path/file.vrs?key1=val1";
+  const string kUriPathWithNoHostWithColonSlash = ":test/path/file.vrs?key1=val1";
+  const string kUriPathWithNoPath = "mystorage:";
+  const string kUriPathWithNoPathWithQuery = "mystorage:?key1=val1";
+  const string kUriPathWithInvalidQuery = "mystorage:test/path/file.vrs?key1=";
+  const string kUriPathWithInvalidQuery2 = "mystorage:test/path/file.vrs?=val1";
+  const string kUriWithEncodedPath = "mystorage:test%2Fpath%2Ffile.vrs";
 };
 
 TEST_F(FileHandlerJsonTest, JSONPathWithChunks) {
@@ -113,7 +113,7 @@ TEST_F(FileHandlerJsonTest, NonJSONPath) {
 }
 
 TEST_F(FileHandlerJsonTest, ParseURI) {
-  std::map<string, string> m;
+  map<string, string> m;
   string fileHandlerName;
   string path;
   EXPECT_EQ(

@@ -31,6 +31,8 @@
 #include "FileHandler.h"
 #include "Record.h"
 
+using namespace std;
+
 namespace vrs {
 
 static size_t kMaxInputBufferSize = 2 * 1024 * 1024; // 2 MB
@@ -100,7 +102,7 @@ void* Decompressor::allocateCompressedDataBuffer(size_t requestSize) {
   if (readSize_ == decodedSize_) {
     // nothing to preserve, just make sure our buffer is big enough & use from the beginning
     if (requestSize > compressedBuffer_.size()) {
-      compressedBuffer_.resize(std::max(kMinInputBufferSize, requestSize));
+      compressedBuffer_.resize(max(kMinInputBufferSize, requestSize));
     }
     decodedSize_ = 0;
     readSize_ = requestSize;
@@ -110,7 +112,7 @@ void* Decompressor::allocateCompressedDataBuffer(size_t requestSize) {
     size_t undecodedSize = readSize_ - decodedSize_;
     if (undecodedSize + requestSize > compressedBuffer_.size()) {
       // the buffer is just too small: we need a new one
-      std::vector<uint8_t> newBuffer;
+      vector<uint8_t> newBuffer;
       newBuffer.resize(undecodedSize + requestSize);
       if (undecodedSize > 0) {
         memcpy(newBuffer.data(), compressedBuffer_.data() + decodedSize_, undecodedSize);
@@ -133,8 +135,8 @@ void* Decompressor::allocateCompressedDataBuffer(size_t requestSize) {
 }
 
 Decompressor::Decompressor() {
-  lz4Context_ = std::make_unique<Lz4Decompressor>();
-  zstdContext_ = std::make_unique<ZstdDecompressor>();
+  lz4Context_ = make_unique<Lz4Decompressor>();
+  zstdContext_ = make_unique<ZstdDecompressor>();
 }
 
 void Decompressor::setCompressionType(CompressionType compressionType) {
@@ -142,7 +144,7 @@ void Decompressor::setCompressionType(CompressionType compressionType) {
 }
 
 size_t Decompressor::getRecommendedInputBufferSize() {
-  return std::max(std::min(lastResult_, kMaxInputBufferSize), kMinInputBufferSize);
+  return max(min(lastResult_, kMaxInputBufferSize), kMinInputBufferSize);
 }
 
 Decompressor::~Decompressor() = default;
@@ -174,11 +176,11 @@ void Decompressor::reset() {
     }                                                                 \
   } while (false)
 
-#define READ_OR_LOG_AND_RETURN(size__)                                                             \
-  do {                                                                                             \
-    size_t readSize__ = std::min(std::min<size_t>(size__, inOutMaxReadSize), kMaxInputBufferSize); \
-    IF_ERROR_LOG_AND_RETURN(file.read(allocateCompressedDataBuffer(readSize__), readSize__));      \
-    inOutMaxReadSize -= readSize__;                                                                \
+#define READ_OR_LOG_AND_RETURN(size__)                                                        \
+  do {                                                                                        \
+    size_t readSize__ = min(min<size_t>(size__, inOutMaxReadSize), kMaxInputBufferSize);      \
+    IF_ERROR_LOG_AND_RETURN(file.read(allocateCompressedDataBuffer(readSize__), readSize__)); \
+    inOutMaxReadSize -= readSize__;                                                           \
   } while (false)
 
 int Decompressor::initFrame(FileHandler& file, size_t& outFrameSize, size_t& inOutMaxReadSize) {

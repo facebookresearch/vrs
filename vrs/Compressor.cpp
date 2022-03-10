@@ -86,7 +86,7 @@ string toString(CompressionPreset preset) {
 }
 
 template <>
-CompressionPreset toEnum<CompressionPreset>(const std::string& name) {
+CompressionPreset toEnum<CompressionPreset>(const string& name) {
   return CompressionPresetConverter::toEnumNoCase(name);
 }
 
