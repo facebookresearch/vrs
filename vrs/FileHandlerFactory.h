@@ -16,6 +16,7 @@
 
 #include <map>
 #include <memory>
+#include <mutex>
 #include <string>
 
 #include "ForwardDefinitions.h"
@@ -61,6 +62,7 @@ class FileHandlerFactory {
   virtual ~FileHandlerFactory() = default;
 
  private:
+  std::mutex mutex_;
   std::map<std::string, std::unique_ptr<FileHandler>> fileHandlerMap_ = {};
 };
 

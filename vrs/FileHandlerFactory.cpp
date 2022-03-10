@@ -69,15 +69,18 @@ int FileHandlerFactory::delegateOpen(
 }
 
 void FileHandlerFactory::registerFileHandler(unique_ptr<FileHandler>&& fileHandler) {
+  unique_lock<mutex> lock(mutex_);
   XR_DEV_CHECK_FALSE(fileHandler->getFileHandlerName().empty());
   fileHandlerMap_[fileHandler->getFileHandlerName()] = move(fileHandler);
 }
 
 void FileHandlerFactory::unregisterFileHandler(const string& fileHandlerName) {
+  unique_lock<mutex> lock(mutex_);
   fileHandlerMap_.erase(fileHandlerName);
 }
 
 unique_ptr<FileHandler> FileHandlerFactory::getFileHandler(const string& name) {
+  unique_lock<mutex> lock(mutex_);
   XR_DEV_CHECK_FALSE(name.empty());
   auto handler = fileHandlerMap_.find(name);
   if (handler != fileHandlerMap_.end()) {
