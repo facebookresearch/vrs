@@ -221,19 +221,14 @@ struct PurgeThreadData {
 };
 
 double WriterThreadData::getBackgroundThreadWaitTime(const double& nextAutoCollectTime) {
-  double waitDelay;
-  if (autoCollectDelay.load(std::memory_order_relaxed) != 0.) {
-    if (nextAutoCollectTime == 0.) {
-      { // mutex guard
-        std::unique_lock<std::recursive_mutex> guard{mutex};
-        waitDelay = autoCollectDelay.load(std::memory_order_relaxed);
-      } // mutex guard
-    } else {
+  double waitDelay = autoCollectDelay.load(std::memory_order_relaxed);
+  if (waitDelay != 0.) {
+    if (nextAutoCollectTime != 0.) {
       waitDelay = nextAutoCollectTime - os::getTimestampSec();
     }
     if (waitDelay < 0) {
       waitDelay = 0;
-    } else if (kMaxAutoCollectDelay > kMaxAutoCollectDelay) {
+    } else if (waitDelay > kMaxAutoCollectDelay) {
       waitDelay = kMaxAutoCollectDelay;
     }
   } else {
