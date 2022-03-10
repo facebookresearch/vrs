@@ -202,7 +202,7 @@ class MotionStream : public Recordable {
     // even if the record is empty.
     return createRecord(getTimestampSec(), Record::Type::STATE, 0);
   }
-  void createDataRecord(const std::vector<Matrix3Dd>& motionData) {
+  void createDataRecord(const vector<Matrix3Dd>& motionData) {
     data_.motionData.stage(motionData);
     createRecord(
         getTimestampSec(), Record::Type::DATA, kDataRecordFormatVersion, DataSource(data_));

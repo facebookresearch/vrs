@@ -29,6 +29,7 @@
 #include <vrs/oss/aria/TimeSyncMetadata.h>
 #include <vrs/oss/aria/WifiBeaconMetadata.h>
 
+using namespace std;
 using namespace vrs;
 
 namespace aria_sample_reader {
@@ -40,7 +41,7 @@ void printDataLayout(const CurrentRecord& r, DataLayout& datalayout) {
       toString(r.recordType),
       r.streamId.getName(),
       r.streamId.getNumericName());
-  datalayout.printLayoutCompact(std::cout, "  ");
+  datalayout.printLayoutCompact(cout, "  ");
 }
 
 class AriaImageSensorPlayer : public RecordFormatStreamPlayer {
@@ -58,7 +59,7 @@ class AriaImageSensorPlayer : public RecordFormatStreamPlayer {
   }
   bool onImageRead(const CurrentRecord& r, size_t /*idx*/, const ContentBlock& cb) override {
     // the image data was not read yet: allocate your own buffer & read!
-    std::vector<uint8_t> frameBytes(cb.getBlockSize());
+    vector<uint8_t> frameBytes(cb.getBlockSize());
     const auto& imageSpec = cb.image();
     // Synchronously read the image data, which is jpg compressed with Aria
     if (cb.image().getImageFormat() == ImageFormat::JPG && r.reader->read(frameBytes) == 0) {
@@ -203,7 +204,7 @@ struct AriaFileReader {
     RecordFileReader reader;
     int status = reader.openFile(vrsFilePath);
     if (status == SUCCESS) {
-      std::vector<std::unique_ptr<StreamPlayer>> streamPlayers;
+      vector<unique_ptr<StreamPlayer>> streamPlayers;
       // Map the devices referenced in the file to stream player objects
       // Just ignore the device(s) you do not care for
       for (auto id : reader.getStreams()) {
@@ -212,29 +213,29 @@ struct AriaFileReader {
           case RecordableTypeId::SlamCameraData:
           case RecordableTypeId::RgbCameraRecordableClass:
           case RecordableTypeId::EyeCameraRecordableClass:
-            streamPlayer = std::make_unique<AriaImageSensorPlayer>();
+            streamPlayer = make_unique<AriaImageSensorPlayer>();
             break;
           case RecordableTypeId::SlamImuData:
           case RecordableTypeId::SlamMagnetometerData:
-            streamPlayer = std::make_unique<AriaMotionSensorPlayer>();
+            streamPlayer = make_unique<AriaMotionSensorPlayer>();
             break;
           case RecordableTypeId::WifiBeaconRecordableClass:
-            streamPlayer = std::make_unique<AriaWifiBeaconPlayer>();
+            streamPlayer = make_unique<AriaWifiBeaconPlayer>();
             break;
           case RecordableTypeId::StereoAudioRecordableClass:
-            streamPlayer = std::make_unique<AriaAudioPlayer>();
+            streamPlayer = make_unique<AriaAudioPlayer>();
             break;
           case RecordableTypeId::BluetoothBeaconRecordableClass:
-            streamPlayer = std::make_unique<AriaBluetoothBeaconPlayer>();
+            streamPlayer = make_unique<AriaBluetoothBeaconPlayer>();
             break;
           case RecordableTypeId::GpsRecordableClass:
-            streamPlayer = std::make_unique<AriaGpsPlayer>();
+            streamPlayer = make_unique<AriaGpsPlayer>();
             break;
           case RecordableTypeId::BarometerRecordableClass:
-            streamPlayer = std::make_unique<AriaBarometerPlayer>();
+            streamPlayer = make_unique<AriaBarometerPlayer>();
             break;
           case RecordableTypeId::TimeRecordableClass:
-            streamPlayer = std::make_unique<AriaTimeSyncPlayer>();
+            streamPlayer = make_unique<AriaTimeSyncPlayer>();
             break;
           default:
             fmt::print("Unexpected stream: {}, {}.\n", id.getNumericName(), id.getName());

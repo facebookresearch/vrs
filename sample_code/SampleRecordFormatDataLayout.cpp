@@ -24,6 +24,7 @@
 #include <vrs/RecordReaders.h>
 #include <vrs/Recordable.h>
 
+using namespace std;
 using namespace vrs;
 
 namespace vrs_sample_code {
@@ -214,7 +215,7 @@ class MyCameraStreamPlayer : public RecordFormatStreamPlayer {
         // The type of frame_counter was changed: use the old version if necessary
         uint64_t frameCounter = myData.frameCounter.isAvailable() ? myData.frameCounter.get()
                                                                   : legacyData.frameCounter.get();
-        std::cout << frameCounter; // use variable to make linter happy...
+        cout << frameCounter; // use variable to make linter happy...
       } break;
 
       default:
@@ -233,7 +234,7 @@ class MyCameraStreamPlayer : public RecordFormatStreamPlayer {
     size_t frameByteCount = block.getBlockSize();
     assert(frameByteCount != 0); // Should not happen, but you want to know if it does!
     assert(frameByteCount != ContentBlock::kSizeUnknown); // Should not happen either...
-    std::vector<uint8_t> frameBytes(frameByteCount);
+    vector<uint8_t> frameBytes(frameByteCount);
     // Synchronously read the image data, all at once, line-by-line, byte-by-byte, as you like...
     if (record.reader->read(frameBytes) == 0) {
       // do something with the image...

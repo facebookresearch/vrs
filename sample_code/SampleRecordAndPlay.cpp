@@ -30,6 +30,7 @@
 #include <vrs/Recordable.h>
 #include <vrs/StreamPlayer.h>
 
+using namespace std;
 using namespace vrs;
 
 namespace vrs_sample_code {
@@ -235,7 +236,7 @@ class StreamPlayerDemo : public RecordFormatStreamPlayer {
         record.timestamp,
         toString(record.recordType),
         record.streamId.getName());
-    myData.printLayout(std::cout); // try printLayoutCompact(), or format as json using asJson()
+    myData.printLayout(cout); // try printLayoutCompact(), or format as json using asJson()
     return true; // read next blocks, if any
   }
 };
@@ -245,10 +246,10 @@ class PlaybackSample {
   /*
    * VRS File playback sample
    */
-  static void readVRSFile(std::string filePath) {
+  static void readVRSFile(string filePath) {
     RecordFileReader reader;
     if (reader.openFile(filePath) == 0) {
-      std::vector<std::unique_ptr<StreamPlayer>> streamPlayers;
+      vector<unique_ptr<StreamPlayer>> streamPlayers;
 
       // When dealing with stream that have a recordable flavor defined,
       // rather than iterating over all the streams of the VRS file, just find the one(s) we need...
@@ -265,7 +266,7 @@ class PlaybackSample {
       // Alternate method ("old" style)
       // Iterate over all the devices found in the file,
       // and hookup the ones you recognize & care for...
-      const std::set<StreamId>& streamIds = reader.getStreams();
+      const set<StreamId>& streamIds = reader.getStreams();
       for (auto id : streamIds) {
         if (id.getTypeId() == RecordableTypeId::SampleDeviceRecordableClass) {
           // The RecordFilePlayer does *not* take ownership of the stream player,

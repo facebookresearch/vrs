@@ -42,7 +42,7 @@ class ImagePlayer : public RecordFormatStreamPlayer {
     //    size_t bytesPerPixel = spec.getBytesPerPixel();
     //    uint32_t lineStrideBytes = spec.getStride();
 
-    std::vector<uint8_t> frameBytes(frameByteCount);
+    vector<uint8_t> frameBytes(frameByteCount);
     // Synchronously read the image data, all at once, or line-by-line, byte-by-byte, as you like...
     if (record.reader->read(frameBytes) == 0) {
       /// do your thing with the image...
@@ -57,10 +57,10 @@ struct SampleImageReader {
   void imageReader(const string& vrsFilePath) {
     RecordFileReader reader;
     if (reader.openFile(vrsFilePath) == 0) {
-      std::vector<std::unique_ptr<StreamPlayer>> streamPlayers;
+      vector<unique_ptr<StreamPlayer>> streamPlayers;
       // Map the devices referenced in the file to stream player objects
       // Just ignore the device(s) you do not care for
-      const std::set<StreamId>& streamIds = reader.getStreams();
+      const set<StreamId>& streamIds = reader.getStreams();
       for (auto id : streamIds) {
         if (id.getTypeId() == RecordableTypeId::SampleDevice) {
           streamPlayers.emplace_back(new ImagePlayer());

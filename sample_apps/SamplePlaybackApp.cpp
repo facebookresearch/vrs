@@ -70,7 +70,7 @@ class ImageStreamPlayer : public RecordFormatStreamPlayer {
     //    size_t bytesPerPixel = spec.getBytesPerPixel();
     //    uint32_t lineStrideBytes = spec.getStride();
 
-    std::vector<uint8_t> frameBytes(frameByteCount);
+    vector<uint8_t> frameBytes(frameByteCount);
     // Synchronously read the image data, all at once, or line-by-line, byte-by-byte, as you like...
     if (record.reader->read(frameBytes) == 0) {
       // In this sample code, we verify that the image data matches the expected pattern.
