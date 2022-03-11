@@ -96,7 +96,7 @@ int filterCopy(
     // Init tracker propgress early, to be sure we track the background thread queue size
     filteredReader.preRollConfigAndState(); // make sure to copy most recent config & state records
     throttledWriter.initTimeRange(startTimestamp, endTimestamp);
-    filteredReader.iterate(&throttledWriter);
+    filteredReader.iterateAdvanced(&throttledWriter);
     for (auto& filter : filters) {
       filter->flush();
     }
@@ -254,11 +254,11 @@ int filterMerge(
   };
   firstRecordFilter.filter.resolveRelativeTimeConstraints(startTimestamp, endTimestamp);
   firstRecordFilter.preRollConfigAndState(recordCollector);
-  firstRecordFilter.iterate(recordCollector);
+  firstRecordFilter.iterateAdvanced(recordCollector);
   for (auto* recordFilter : moreRecordFilters) {
     recordFilter->filter.resolveRelativeTimeConstraints(startTimestamp, endTimestamp);
     recordFilter->preRollConfigAndState(recordCollector);
-    recordFilter->iterate(recordCollector);
+    recordFilter->iterateAdvanced(recordCollector);
   }
   sort(records.begin(), records.end());
 

@@ -163,6 +163,7 @@ struct FilteredFileReader {
   void setMaxTime(double maximumTime, bool relativeToEnd);
 
   // Apply time constrains & get resulting range in one call.
+  // This should be called for proper time range iterations.
   void getConstrainedTimeRange(double& outStartTimestamp, double& outEndTimestamp);
 
   // Get the time range including the data records of the filtered streams only.
@@ -196,13 +197,20 @@ struct FilteredFileReader {
   // This version hands the records to the function provided
   void preRollConfigAndState(RecordReaderFunc recordReaderFunc);
 
-  // Read all the records of the reader than meet the specs
+  // ** Preferred iteration method for code that doesn't require expert internal knowledge **
+  // Determine the time range boundaries based on the file and the filters,
+  // pre-roll config and state records as required, then iterates over records.
+  uint32_t iterateSafe();
+
+  // Read all the records of the reader than meet the specs, assuming time range is already valid.
   // Use a ThrottledWriter object to get a callback after each record is decoded
-  uint32_t iterate(ThrottledWriter* throttledWriter = nullptr);
+  uint32_t iterateAdvanced(ThrottledWriter* throttledWriter = nullptr);
 
   // Iterate and call the provided function for each record
   // Use a ThrottledWriter object to get a callback after each record is decoded
-  void iterate(RecordReaderFunc recordReaderFunc, ThrottledWriter* throttledWriter = nullptr);
+  void iterateAdvanced(
+      RecordReaderFunc recordReaderFunc,
+      ThrottledWriter* throttledWriter = nullptr);
 };
 
 }; // namespace vrs::utils

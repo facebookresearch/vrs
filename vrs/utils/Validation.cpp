@@ -160,7 +160,7 @@ bool iterateChecker(
     cerr << "Time Range invalid: " << reader.getTimeConstraintDescription() << endl;
     return false;
   }
-  reader.iterate(
+  reader.iterateAdvanced(
       [&outDecodedRecords, &outNoError](
           RecordFileReader& recordFileReader, const IndexRecord::RecordInfo& record) {
         outNoError &= (recordFileReader.readRecord(record) == 0);

@@ -574,6 +574,13 @@ void FilteredFileReader::preRollConfigAndState(RecordReaderFunc recordReaderFunc
   }
 }
 
+uint32_t FilteredFileReader::iterateSafe() {
+  double startTimestamp, endTimestamp;
+  getConstrainedTimeRange(startTimestamp, endTimestamp);
+  preRollConfigAndState();
+  return iterateAdvanced();
+}
+
 unique_ptr<deque<IndexRecord::DiskRecordInfo>> FilteredFileReader::buildIndex() {
   auto preliminaryIndex = make_unique<deque<IndexRecord::DiskRecordInfo>>();
   int64_t offset = 0;
@@ -588,17 +595,17 @@ unique_ptr<deque<IndexRecord::DiskRecordInfo>> FilteredFileReader::buildIndex() 
         return true;
       };
   preRollConfigAndState(f);
-  iterate(f);
+  iterateAdvanced(f);
   return preliminaryIndex;
 }
 
-uint32_t FilteredFileReader::iterate(ThrottledWriter* throttledWriter) {
+uint32_t FilteredFileReader::iterateAdvanced(ThrottledWriter* throttledWriter) {
   if (!resolveTimeConstraints()) {
     cerr << "Time Range invalid: " << getTimeConstraintDescription() << endl;
     return 0;
   }
   uint32_t readCounter = 0;
-  iterate(
+  iterateAdvanced(
       [&readCounter](RecordFileReader& recordFileReader, const IndexRecord::RecordInfo& record) {
         LOG_ERROR(recordFileReader.readRecord(record));
         readCounter++;
@@ -611,7 +618,9 @@ uint32_t FilteredFileReader::iterate(ThrottledWriter* throttledWriter) {
   return readCounter;
 }
 
-void FilteredFileReader::iterate(RecordReaderFunc recReaderF, ThrottledWriter* throttledWriter) {
+void FilteredFileReader::iterateAdvanced(
+    RecordReaderFunc recReaderF,
+    ThrottledWriter* throttledWriter) {
   if (!resolveTimeConstraints()) {
     return;
   }

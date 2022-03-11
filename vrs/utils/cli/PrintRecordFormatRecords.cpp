@@ -148,10 +148,7 @@ void printRecordFormatRecords(FilteredFileReader& filteredReader, PrintoutType t
   for (auto id : filteredReader.filter.streams) {
     filteredReader.reader.setStreamPlayer(id, &lister);
   }
-  double startTimestamp, endTimestamp;
-  filteredReader.getConstrainedTimeRange(startTimestamp, endTimestamp);
-  filteredReader.preRollConfigAndState();
-  filteredReader.iterate();
+  filteredReader.iterateSafe();
 }
 
 } // namespace vrs::utils
