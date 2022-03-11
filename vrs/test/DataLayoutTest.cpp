@@ -531,6 +531,7 @@ TEST_F(DataLayoutTester, testOptionalFields) {
 /// For testing only.
 ///
 /// Definitions, so that we can use numeric_limits<Bool>::lowest(), etc in our tests.
+namespace std {
 template <>
 class numeric_limits<Bool> {
  public:
@@ -544,6 +545,7 @@ class numeric_limits<Bool> {
     return false;
   }
 };
+} // namespace std
 
 namespace {
 
