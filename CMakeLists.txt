@@ -15,7 +15,18 @@
 cmake_minimum_required(VERSION 3.12)
 
 set(VRS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-set(CMAKE_MODULE_PATH "${VRS_SOURCE_DIR}/cmake")
+
+# In Meta's repo, OOS-only bits are in an an "oss/" sub-folder
+# OSS_DIR is a relative path to bridge the repo differences
+# so this CMakeLists.txt file works with both layouts.
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/oss")
+  set(OSS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/oss")
+else()
+  set(OSS_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+endif()
+
+
+set(CMAKE_MODULE_PATH "${OSS_DIR}/cmake")
 
 include(${CMAKE_MODULE_PATH}/Platform.cmake)
 include(${CMAKE_MODULE_PATH}/Compiler.cmake)
