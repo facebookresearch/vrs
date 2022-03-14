@@ -156,7 +156,7 @@ bool iterateChecker(
     ThrottledWriter* throttledWriter) {
   outDecodedRecords = 0;
   outNoError = true;
-  if (!reader.resolveTimeConstraints()) {
+  if (!reader.timeRangeValid()) {
     cerr << "Time Range invalid: " << reader.getTimeConstraintDescription() << endl;
     return false;
   }

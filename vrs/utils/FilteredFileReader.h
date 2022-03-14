@@ -76,6 +76,9 @@ struct RecordFilter {
   // Resolve relative time constraints based on the given start & end timestamps
   bool resolveRelativeTimeConstraints(double startTimestamp, double endTimestamp);
   string getTimeConstraintDescription() const;
+
+  // Make sure time constraints have been applied and the resulting time range makes sense
+  bool timeRangeValid() const;
 };
 
 /// Class handling stream interval & bucket decimation
@@ -180,9 +183,8 @@ struct FilteredFileReader {
   void applyRecordableFilters(const vector<string>& filter);
   void applyTypeFilters(const vector<string>& filter);
 
-  // Time constraints can be relative to the begin/end timestamps.
-  // If necessary, convert relative time constraints into relative constraints on the file.
-  bool resolveTimeConstraints();
+  // Validate that relative time constraints (if any) have been applied and the result is valid.
+  bool timeRangeValid() const;
   string getTimeConstraintDescription();
 
   // Make an index of the filtered records. Useful to pre-allocate the index during copy operations.

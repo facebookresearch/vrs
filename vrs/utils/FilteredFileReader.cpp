@@ -402,13 +402,6 @@ bool RecordFilter::resolveRelativeTimeConstraints(double startTimestamp, double 
   return minTime <= maxTime;
 }
 
-bool FilteredFileReader::resolveTimeConstraints() {
-  const auto& index = reader.getIndex();
-  return index.empty()
-      ? true
-      : filter.resolveRelativeTimeConstraints(index.front().timestamp, index.back().timestamp);
-}
-
 string RecordFilter::getTimeConstraintDescription() const {
   bool minLimited = minTime > numeric_limits<double>::lowest();
   bool maxLimited = maxTime < numeric_limits<double>::max();
@@ -422,6 +415,10 @@ string RecordFilter::getTimeConstraintDescription() const {
     oss << " before " << maxTime << " sec";
   }
   return oss.str();
+}
+
+bool RecordFilter::timeRangeValid() const {
+  return !relativeMinTime && !relativeMaxTime && !aroundTime && minTime <= maxTime;
 }
 
 Decimator::Decimator(FilteredFileReader& filteredReader, DecimationParams& params)
@@ -518,8 +515,11 @@ bool Decimator::submitBucket(RecordReaderFunc& recordReaderFunc, ThrottledWriter
   return keepGoing;
 }
 
+bool FilteredFileReader::timeRangeValid() const {
+  return reader.getIndex().empty() || filter.timeRangeValid();
+}
+
 string FilteredFileReader::getTimeConstraintDescription() {
-  resolveTimeConstraints();
   return filter.getTimeConstraintDescription();
 }
 
@@ -537,7 +537,7 @@ void FilteredFileReader::preRollConfigAndState() {
 }
 
 void FilteredFileReader::preRollConfigAndState(RecordReaderFunc recordReaderFunc) {
-  if (!resolveTimeConstraints()) {
+  if (!timeRangeValid()) {
     return;
   }
   if (filter.minTime <= numeric_limits<double>::lowest()) {
@@ -600,7 +600,7 @@ unique_ptr<deque<IndexRecord::DiskRecordInfo>> FilteredFileReader::buildIndex() 
 }
 
 uint32_t FilteredFileReader::iterateAdvanced(ThrottledWriter* throttledWriter) {
-  if (!resolveTimeConstraints()) {
+  if (!timeRangeValid()) {
     cerr << "Time Range invalid: " << getTimeConstraintDescription() << endl;
     return 0;
   }
@@ -621,7 +621,7 @@ uint32_t FilteredFileReader::iterateAdvanced(ThrottledWriter* throttledWriter) {
 void FilteredFileReader::iterateAdvanced(
     RecordReaderFunc recReaderF,
     ThrottledWriter* throttledWriter) {
-  if (!resolveTimeConstraints()) {
+  if (!timeRangeValid()) {
     return;
   }
 
