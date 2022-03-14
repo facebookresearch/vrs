@@ -14,9 +14,9 @@
 
 file (GLOB VRS_SRCS *.cpp *.h *.hpp)
 
-add_library(vrs STATIC ${VRS_SRCS})
-target_include_directories(vrs PUBLIC ${VRS_SOURCE_DIR})
-target_link_libraries(vrs
+add_library(vrslib STATIC ${VRS_SRCS})
+target_include_directories(vrslib PUBLIC ${VRS_SOURCE_DIR})
+target_link_libraries(vrslib
   PUBLIC
     vrs_helpers
     vrs_logging

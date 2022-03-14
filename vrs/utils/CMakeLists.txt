@@ -17,7 +17,7 @@ file (GLOB VRS_UTILS_SRCS *.cpp *.h *.hpp)
 add_library(vrs_utils STATIC ${VRS_UTILS_SRCS})
 target_link_libraries(vrs_utils
   PUBLIC
-    vrs
+    vrslib
     vrs_helpers
     Cereal::Cereal
     Fmt::Fmt

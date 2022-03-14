@@ -22,7 +22,7 @@ add_library(vrs_test_helpers
 )
 target_link_libraries(vrs_test_helpers
   PUBLIC
-    vrs
+    vrslib
     vrs_oss_test_helpers
 )
 target_compile_definitions(vrs_test_helpers PUBLIC GTEST_BUILD)
@@ -48,7 +48,7 @@ add_executable(test_vrs
 )
 target_link_libraries(test_vrs
     PUBLIC
-      vrs
+      vrslib
       vrs_oss_testdatadir
       vrs_test_helpers
       GTest::Main
@@ -65,7 +65,7 @@ add_executable(test_vrs_file_tests
 )
 target_link_libraries(test_vrs_file_tests
   PUBLIC
-    vrs
+    vrslib
     vrs_oss_testdatadir
     vrs_test_helpers
     GTest::Main
