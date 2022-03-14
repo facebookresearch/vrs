@@ -41,6 +41,7 @@ add_subdirectory(vrs/helpers)
 add_subdirectory(vrs/os)
 add_subdirectory(vrs/utils)
 add_subdirectory(vrs/utils/xxhash)
+add_subdirectory(vrs/utils/cli)
 
 # Include oss replacement libraries
 add_subdirectory(vrs/oss)
