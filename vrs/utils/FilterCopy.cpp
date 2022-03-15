@@ -25,14 +25,11 @@ using namespace vrs;
 
 namespace vrs::utils {
 
-void copyMergeDoc(const string& appName) {
-  cout << appName << " --copy combined.vrs <source.vrs>+\n";
-  cout << appName << " --merge combined.vrs <source.vrs>+\n";
+void copyMergeDoc() {
+  cout << "When combining multiple VRS files into a single VRS file, the following rules apply:\n";
   cout << endl;
-  cout << "Combine multiple VRS files into a single VRS file.\n";
-  cout << endl;
-  cout << "File tags will be merged. If a value is declared in multiple file, the value found in\n";
-  cout << "the first file is used.\n";
+  cout << "File tags will be merged. If a tag name is used in multiple file, the value found in\n";
+  cout << "the first file is used, the others are ignored.\n";
   cout << endl;
   cout << "The 'copy' option keeps streams separate, even when two streams found in different\n";
   cout << "source files have the same StreamId.\n";

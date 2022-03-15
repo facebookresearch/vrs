@@ -19,7 +19,7 @@
 namespace vrs::utils {
 
 /// Print documentation explaining the difference between merge & copy operations
-void copyMergeDoc(const string& appName);
+void copyMergeDoc();
 
 void printProgress(const char* status, size_t currentSize, size_t totalSize, bool showProgress);
 
