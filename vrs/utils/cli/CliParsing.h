@@ -46,6 +46,8 @@ bool parseCopyOptions(
     char** argv,
     int& outStatusCode,
     CopyOptions& copyOptions);
+/// Print copy options help
+void printCopyOptionsHelp();
 
 /// Parse tag override options for copy/merge/filter operations.
 /// --file-tag <tag-name> <tag-value>, --stream-tag <tag-name> <tag-value>
@@ -71,6 +73,8 @@ bool parseTagOverrideOptions(
     char** argv,
     int& outStatusCode,
     CopyOptions& copyOptions);
+/// Print tag override help
+void printTagOverrideOptionsHelp();
 
 /// Parse time constraints for record iteration operations, including copy/merge/filter.
 /// --after <t>, --before <t>, --range <start> <end>, --around <center> <radius>, --first-records,
@@ -99,6 +103,8 @@ bool parseTimeAndStreamFilters(
     int& outStatusCode,
     FilteredFileReader& filteredReader,
     RecordFilterParams& outFilters);
+/// Print time and stream filter options help
+void printTimeAndStreamFiltersHelp();
 
 /// Parse decimation options for record iteration operations, including copy/merge/filter.
 /// --decimate <streamId> <interval>, --bucket-interval <interval>, --bucket-max-delta <max-delta>
@@ -124,5 +130,7 @@ bool parseDecimationOptions(
     char** argv,
     int& outStatusCode,
     RecordFilterParams& outFilters);
+/// Print decimation options help
+void printDecimationOptionsHelp();
 
 } // namespace vrs::utils

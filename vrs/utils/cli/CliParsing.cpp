@@ -14,6 +14,7 @@
 
 #include "CliParsing.h"
 
+#include <iostream>
 #include <sstream>
 
 #include <vrs/helpers/Strings.h>
@@ -115,6 +116,16 @@ bool parseCopyOptions(
   return true;
 }
 
+void printCopyOptionsHelp() {
+  cout << "  [ --no-progress ]:"
+          " don't show any progress information (useful for offline usages and basic terminals).\n"
+          "  [ --compression={none|default|fast|tight|zfast|zlight|zmedium|ztight|zmax} ]:"
+          " set compression setting.\n"
+          "  [ --mt <thread-count> ]: use <thread-count> threads for compression while copying.\n"
+          "  [ --chunk-size <nb>[M|G] ]: chunk output file every <nb> number of MB or GB.\n"
+          "    Use 'M' for MB (default), or 'G' for GB.\n";
+}
+
 bool parseTagOverrideOptions(
     const string& appName,
     const string& arg,
@@ -164,6 +175,13 @@ bool parseTagOverrideOptions(
     return false;
   }
   return true;
+}
+
+void printTagOverrideOptionsHelp() {
+  cout << "  [ --file-tag <tagName> <tagValue> ]:"
+          " set a file tag in the copied/merged file.\n"
+          "  [ --stream-tag <recordableTypeId> <tagName> <tagValue> ]:"
+          " set a tag of a particular stream in the copied/merged file.\n";
 }
 
 bool parseTimeAndStreamFilters(
@@ -247,6 +265,28 @@ bool parseTimeAndStreamFilters(
   return true;
 }
 
+void printTimeAndStreamFiltersHelp() {
+  cout << "  [ --before [+|-]<max-timestamp> ]: filter-out records newer than <max-timestamp>.\n"
+          "  [ --after [+|-]<min-timestamp> ]:"
+          " filter-out records equal to or older than <min-timestamp>.\n"
+          "  [ --range [+|-]<min-timestamp> [+|-]<max-timestamp> ]:"
+          " filter-out records outside of the given time range,\n"
+          "    min-timestamp excluded, max-timestamp included.\n"
+          "  [ --around [+|-]<timestamp> <time-range> ]:"
+          " filter-out records outside of <timestamp> -/+<time-range>/2.\n"
+          "    Timestamps starting with an explicit '+' sign are durations relative to the"
+          " first data record's timestamp.\n"
+          "    Negative timestamps are durations relative to the last data record's timestamp.\n"
+          "    All timestamps, durations or intervals are in seconds.\n"
+          "  [ + <recordableTypeId> ]: consider streams of that recordable type ID.\n"
+          "  [ + <recordableTypeId>-<instanceId> ]: consider a specific stream ID.\n"
+          "  [ - <recordableTypeId> ]: ignore all streams of that recordable type ID.\n"
+          "  [ - <recordableTypeId>-<instanceId> ]: ignore a specific stream.\n"
+          "  [ + [configuration|state|data] ]: consider records of that type.\n"
+          "  [ - [configuration|state|data] ]: ignore records of that type.\n"
+          "  [ --first-records ]: only consider the first record of each stream & type.\n";
+}
+
 namespace {
 DecimationParams& getDecimatorParams(RecordFilterParams& filters) {
   if (!filters.decimationParams) {
@@ -307,6 +347,17 @@ bool parseDecimationOptions(
     return false;
   }
   return true;
+}
+
+void printDecimationOptionsHelp() {
+  cout << "  [ --decimate <recordableTypeId>[-<instanceId>] <timestamp_interval> ]:"
+          " output at most one data record\n"
+          "    every <timestamp_interval> for the stream(s) specified.\n"
+          "  [ --bucket-interval <timestamp_interval> ]\n"
+          "  [ --bucket-max-delta <timestamp_delta> ]:"
+          " bucket frames with close timestamps into buckets.\n"
+          "    Only output one frame per stream per bucket."
+          " If frame timestamps are more than max-delta away, skip them.\n";
 }
 
 } // namespace vrs::utils
