@@ -227,7 +227,7 @@ int write(
     const map<StreamId, StreamTags>& streamTags,
     const vector<IndexRecord::RecordInfo>& recordIndex,
     bool fileHasIndex) {
-  DiskFile file;
+  AtomicDiskFile file;
   IF_ERROR_LOG_AND_RETURN(file.create(cacheFile));
   FileFormat::FileHeader fileHeader;
   fileHeader.init(kMagicHeader1, kMagicHeader2, kMagicHeader3, kOriginalFileFormatVersion);

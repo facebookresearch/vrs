@@ -455,7 +455,7 @@ bool DiskFile::isRemoteFileSystem() const {
 }
 
 int DiskFile::writeToFile(const string& path, const void* data, size_t dataSize) {
-  DiskFile file;
+  AtomicDiskFile file;
   IF_ERROR_LOG_AND_RETURN(file.create(path));
   if (dataSize > 0) {
     Compressor compressor;
@@ -533,6 +533,30 @@ int DiskFile::parseUri(FileSpec& inOutFileSpec, size_t colonIndex) const {
   inOutFileSpec.chunks = {path};
 
   return SUCCESS;
+}
+
+AtomicDiskFile::~AtomicDiskFile() {
+  close();
+}
+
+int AtomicDiskFile::create(const std::string& newFilePath) {
+  finalName_ = newFilePath;
+  return DiskFile::create(os::getUniquePath(finalName_, 10));
+}
+
+int AtomicDiskFile::close() {
+  if (chunks_.empty() || finalName_.empty() || finalName_ == chunks_.front().path) {
+    return DiskFile::close();
+  }
+  string currentName = chunks_.front().path;
+  IF_ERROR_RETURN(DiskFile::close());
+  int retry = 3;
+  int status;
+  while ((status = os::rename(currentName, finalName_)) != 0 && os::isFile(currentName) &&
+         retry-- > 0) {
+    os::remove(finalName_); // if there was a collision, make room
+  }
+  return status;
 }
 
 } // namespace vrs

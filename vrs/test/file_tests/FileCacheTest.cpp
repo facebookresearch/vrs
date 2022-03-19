@@ -14,6 +14,7 @@
 
 #include <fstream>
 #include <string>
+#include <thread>
 
 #include <gtest/gtest.h>
 
@@ -84,30 +85,53 @@ TEST_F(FileCacheTest, cacheDomainTest) {
   EXPECT_EQ(fcache->getFile(domain, "123.txt", location2), INVALID_DISK_DATA);
 }
 
-void testDetails(const string& cacheFile, const RecordFileReader& reader, const bool hasIndex) {
-  EXPECT_EQ(
-      FileDetailsCache::write(
-          cacheFile,
-          reader.getStreams(),
-          reader.getTags(),
-          reader.getStreamTags(),
-          reader.getIndex(),
-          hasIndex),
-      0);
+void verifyDetails(
+    const string& cacheFile,
+    const RecordFileReader& reader,
+    const bool hasIndex,
+    bool failOk) {
   set<StreamId> streamIds;
   map<string, string> fileTags;
   map<StreamId, StreamTags> streamTags;
   vector<IndexRecord::RecordInfo> recordIndex;
   bool hasProperIndex;
-  EXPECT_EQ(
-      FileDetailsCache::read(
-          cacheFile, streamIds, fileTags, streamTags, recordIndex, hasProperIndex),
-      0);
-  EXPECT_EQ(streamIds, reader.getStreams());
-  EXPECT_EQ(fileTags, reader.getTags());
-  EXPECT_EQ(streamTags, reader.getStreamTags());
-  EXPECT_EQ(recordIndex, reader.getIndex());
-  EXPECT_EQ(hasIndex, hasProperIndex);
+  int readStatus = FileDetailsCache::read(
+      cacheFile, streamIds, fileTags, streamTags, recordIndex, hasProperIndex);
+  if (readStatus == 0) {
+    EXPECT_EQ(streamIds, reader.getStreams());
+    EXPECT_EQ(fileTags, reader.getTags());
+    EXPECT_EQ(streamTags, reader.getStreamTags());
+    EXPECT_EQ(recordIndex, reader.getIndex());
+    EXPECT_EQ(hasIndex, hasProperIndex);
+  } else {
+    EXPECT_TRUE(failOk || readStatus == 0);
+  }
+}
+
+void testDetails(
+    const string& cacheFile,
+    const RecordFileReader& reader,
+    const bool hasIndex,
+    bool failOk) {
+  int writeStatus = FileDetailsCache::write(
+      cacheFile,
+      reader.getStreams(),
+      reader.getTags(),
+      reader.getStreamTags(),
+      reader.getIndex(),
+      hasIndex);
+  EXPECT_TRUE(failOk || writeStatus == 0);
+  verifyDetails(cacheFile, reader, hasIndex, failOk);
+}
+
+struct ThreadParam {
+  const string& cacheFile;
+  const RecordFileReader& reader;
+  const bool hasIndex;
+};
+
+void createRecordsThreadTask(ThreadParam* param) {
+  testDetails(param->cacheFile, param->reader, param->hasIndex, true);
 }
 
 TEST_F(FileCacheTest, detailsTest) {
@@ -115,6 +139,19 @@ TEST_F(FileCacheTest, detailsTest) {
   const string cacheFile = os::getTempFolder() + "detailsTest.vrsi";
   RecordFileReader reader;
   ASSERT_EQ(reader.openFile(kTestFile), 0);
-  testDetails(cacheFile, reader, true);
-  testDetails(cacheFile, reader, false);
+  testDetails(cacheFile, reader, true, false);
+  testDetails(cacheFile, reader, false, false);
+
+  const uint32_t kThreadCount = thread::hardware_concurrency();
+
+  vector<thread> threads;
+  threads.reserve(kThreadCount);
+  ThreadParam params{cacheFile, reader, false};
+  for (uint32_t threadIndex = 0; threadIndex < kThreadCount; threadIndex++) {
+    threads.push_back(thread{createRecordsThreadTask, &params});
+  }
+  for (uint32_t threadIndex = 0; threadIndex < kThreadCount; threadIndex++) {
+    threads[threadIndex].join();
+  }
+  verifyDetails(cacheFile, reader, false, true);
 }

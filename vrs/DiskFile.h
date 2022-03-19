@@ -162,4 +162,30 @@ class DiskFile : public WriteFileHandler {
   bool readOnly_;
 };
 
+/// Helper class to create a new file with better chances that the content won't be clobbered by
+/// another process creating a file with the same name at the same time.
+/// The file will be created using a unique name, then after it's closed, it will be renamed to
+/// the name requested originally, possibly deleting/replacing what is there.
+/// In practice, it's a best effort atomic file behavior, using a temporary file and late renaming,
+/// appropriate when file integrity matters more than file persistence in case of collision.
+/// The intent:
+/// - if multiple processes try to create a file with the same name at the same time, they don't
+/// overwrite each other's data.
+/// - if a process tries to read the file at about the same time it is being replaced by one or more
+/// other processes, it won't find a file, or it will find an older version of the file, or it will
+/// find a new version, but it won't find a partially written version of the file.
+/// The actual behavior will depend on the actual file system, how atomic its file rename operations
+/// are, and how it handles file locking, but the behavior should be appropriate for storing data
+/// for caching purposes, when its better to fail saving a cache entry, than creating a corrupt one.
+class AtomicDiskFile : public DiskFile {
+ public:
+  ~AtomicDiskFile() override;
+
+  int create(const string& newFilePath) override;
+  int close() override;
+
+ private:
+  string finalName_;
+};
+
 } // namespace vrs
