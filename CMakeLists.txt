@@ -14,17 +14,13 @@
 
 cmake_minimum_required(VERSION 3.12)
 
-set(VRS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-
-# In Meta's repo, OOS-only bits are in an "oss/" sub-folder
-# OSS_DIR is a relative path to bridge the repo differences
-# so this CMakeLists.txt file works with both layouts.
-if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/oss")
-  set(OSS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/oss")
-else()
-  set(OSS_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+# When building within Meta's source tree, a number of OSS-only source files live in an
+# "oss/" sub-folder next to the main vrs/ folder that contains vrs' main source code.
+if ("${VRS_SOURCE_DIR}" STREQUAL "")
+  # open source layout
+  set(VRS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+  set(OSS_DIR "${VRS_SOURCE_DIR}")
 endif()
-
 
 set(CMAKE_MODULE_PATH "${OSS_DIR}/cmake")
 
@@ -48,14 +44,6 @@ include(${CMAKE_MODULE_PATH}/LibrariesSetup.cmake)
 
 # Include the libraries
 add_subdirectory(vrs)
-add_subdirectory(vrs/helpers)
-add_subdirectory(vrs/os)
-add_subdirectory(vrs/utils)
-add_subdirectory(vrs/utils/xxhash)
-add_subdirectory(vrs/utils/cli)
-
-# Include oss replacement libraries
-add_subdirectory(vrs/oss)
 
 # Add the sample apps/code
 add_subdirectory(sample_apps)

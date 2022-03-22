@@ -12,8 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-file (GLOB VRS_SRCS *.cpp *.h *.hpp)
+add_subdirectory(helpers)
+add_subdirectory(os)
+add_subdirectory(oss)
+add_subdirectory(utils)
 
+file (GLOB VRS_SRCS *.cpp *.h *.hpp)
 add_library(vrslib STATIC ${VRS_SRCS})
 target_include_directories(vrslib PUBLIC ${VRS_SOURCE_DIR})
 target_link_libraries(vrslib
