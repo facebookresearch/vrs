@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-file (GLOB VRS_UTILS_SRCS *.cpp *.h *.hpp)
+add_subdirectory(xxhash)
+add_subdirectory(cli)
 
+file (GLOB VRS_UTILS_SRCS *.cpp *.h *.hpp)
 add_library(vrs_utils STATIC ${VRS_UTILS_SRCS})
 target_link_libraries(vrs_utils
   PUBLIC
