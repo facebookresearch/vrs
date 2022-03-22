@@ -143,7 +143,7 @@ void Decompressor::setCompressionType(CompressionType compressionType) {
   compressionType_ = compressionType;
 }
 
-size_t Decompressor::getRecommendedInputBufferSize() {
+size_t Decompressor::getRecommendedInputBufferSize() const {
   return max(min(lastResult_, kMaxInputBufferSize), kMinInputBufferSize);
 }
 

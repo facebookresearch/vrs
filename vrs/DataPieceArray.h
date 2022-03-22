@@ -162,9 +162,8 @@ class DataPieceArray : public DataPiece {
     if (ptr != nullptr && index < count_) {
       writeUnaligned<T>(ptr + index, value);
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
   /// Set array values.
   /// @param arr: C-style array.

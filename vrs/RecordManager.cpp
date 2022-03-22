@@ -136,7 +136,7 @@ uint32_t RecordManager::purgeOldRecords(double oldestTimestamp, bool recycleBuff
       tagsRecords.push_back(record);
       record = nullptr;
     }
-    if (record) {
+    if (record != nullptr) {
       if (recycleBuffers && cache_.size() < maxCacheSize_) {
         cache_.emplace_back(record);
       } else {
@@ -146,10 +146,10 @@ uint32_t RecordManager::purgeOldRecords(double oldestTimestamp, bool recycleBuff
     }
     iter = activeRecords_.begin();
   }
-  if (lastState) {
+  if (lastState != nullptr) {
     activeRecords_.emplace_front(lastState);
   }
-  if (lastConfiguration) {
+  if (lastConfiguration != nullptr) {
     activeRecords_.emplace_front(lastConfiguration);
   }
   if (!tagsRecords.empty()) {
@@ -181,7 +181,7 @@ void RecordManager::collectOldRecords(double maxAge, list<Record*>& outCollected
   }
 }
 
-size_t RecordManager::getAdjustedRecordBufferSize(size_t requestedSize) {
+size_t RecordManager::getAdjustedRecordBufferSize(size_t requestedSize) const {
   if (minPercentOverAllocation_ == 0) {
     return requestedSize + minBytesOverAllocation_; // at most one value set
   }

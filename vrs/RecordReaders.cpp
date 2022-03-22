@@ -61,11 +61,11 @@ int CompressedRecordReader::read(DataReference& destination, uint32_t& outReadSi
         remainingUncompressedSize_);
     return NOT_ENOUGH_DATA;
   }
-  if (destination.getDataPtr1() && destination.getDataSize1() > 0) {
+  if (destination.getDataPtr1() != nullptr && destination.getDataSize1() > 0) {
     IF_ERROR_LOG_AND_RETURN(read(
         destination.getDataPtr1(), destination.getDataSize1(), destination.getSize(), outReadSize));
   }
-  if (destination.getDataPtr2() && destination.getDataSize2() > 0) {
+  if (destination.getDataPtr2() != nullptr && destination.getDataSize2() > 0) {
     uint32_t outReadSize2 = 0;
     IF_ERROR_LOG_AND_RETURN(
         read(destination.getDataPtr2(), destination.getDataSize2(), outReadSize2, outReadSize2));

@@ -739,10 +739,9 @@ bool RecordFileReader::readFirstConfigurationRecord(StreamId streamId, StreamPla
     return false;
   } else if (streamPlayer == nullptr) {
     return readRecord(*config) == 0;
-  } else {
-    streamPlayer->onAttachedToFileReader(*this, streamId);
-    return readRecord(*config, streamPlayer) == 0;
   }
+  streamPlayer->onAttachedToFileReader(*this, streamId);
+  return readRecord(*config, streamPlayer) == 0;
 }
 
 bool RecordFileReader::readFirstConfigurationRecords(StreamPlayer* streamPlayer) {

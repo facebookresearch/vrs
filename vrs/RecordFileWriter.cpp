@@ -183,7 +183,7 @@ struct WriterThreadData {
 
   // set the file error, but only if there was none yet
   void setFileError(int error) {
-    if (error && !fileError) {
+    if (error != 0 && fileError == 0) {
       XR_LOGE("Error writing records: {}, {}", error, errorCodeToMessage(error));
       fileError = error;
     }
@@ -253,7 +253,7 @@ RecordFileWriter::RecordFileWriter()
 void RecordFileWriter::addRecordable(Recordable* recordable) {
   { // mutex guard
     lock_guard<mutex> lock(recordablesMutex_);
-    for (auto r : recordables_) {
+    for (auto* r : recordables_) {
       if (r != recordable && !XR_VERIFY(r->getStreamId() != recordable->getStreamId())) {
         return;
       }
@@ -287,7 +287,7 @@ vector<Recordable*> RecordFileWriter::getRecordables() const {
   { // mutex guard
     lock_guard<mutex> lock(recordablesMutex_);
     recordables.reserve(recordables_.size());
-    for (auto recordable : recordables_) {
+    for (auto* recordable : recordables_) {
       recordables.push_back(recordable);
     }
   } // mutex guard
@@ -336,7 +336,7 @@ int RecordFileWriter::writeToFile(const string& filePath) {
 
 void RecordFileWriter::purgeOldRecords(double maxTimestamp, bool recycleBuffers) {
   uint32_t total = 0;
-  for (auto recordable : getRecordables()) {
+  for (auto* recordable : getRecordables()) {
     total += recordable->getRecordManager().purgeOldRecords(maxTimestamp, recycleBuffers);
   }
   if (total > 0) {
@@ -393,7 +393,7 @@ void RecordFileWriter::backgroundWriterThreadActivity() {
     file_->close();
   }
   // resume purging records, if we were doing that
-  if (purgeThreadData_) {
+  if (purgeThreadData_ != nullptr) {
     purgeThreadData_->purgingPaused_ = false;
     purgeThreadData_->purgeEventChannel.dispatchEvent();
   }
@@ -434,7 +434,7 @@ void RecordFileWriter::backgroundPurgeThreadActivity() {
 }
 
 int RecordFileWriter::createFileAsync(const string& filePath, bool splitHead) {
-  if (writerThreadData_) {
+  if (writerThreadData_ != nullptr) {
     return FILE_ALREADY_OPEN; // only one thread allowed!
   }
   int error = createFile(filePath, splitHead);
@@ -446,11 +446,11 @@ int RecordFileWriter::createFileAsync(const string& filePath, bool splitHead) {
   if (LOG_FILE_OPERATIONS) {
     XR_LOGD("Created file {}", filePath);
   }
-  if (purgeThreadData_) {
+  if (purgeThreadData_ != nullptr) {
     purgeThreadData_->purgingPaused_ = true;
   }
   // make sure we have recent configuration & state records
-  for (auto recordable : getRecordables()) {
+  for (auto* recordable : getRecordables()) {
     recordable->createConfigurationRecord();
     recordable->createStateRecord();
   }
@@ -493,7 +493,7 @@ int RecordFileWriter::preallocateIndex(
 }
 
 int RecordFileWriter::writeRecordsAsync(double maxTimestamp) {
-  if (!writerThreadData_ || writerThreadData_->shouldEndThread) {
+  if (writerThreadData_ == nullptr || writerThreadData_->shouldEndThread) {
     return INVALID_REQUEST;
   }
 
@@ -510,7 +510,7 @@ int RecordFileWriter::writeRecordsAsync(double maxTimestamp) {
 }
 
 int RecordFileWriter::autoWriteRecordsAsync(function<double()> maxTimestampProvider, double delay) {
-  if (!writerThreadData_ || writerThreadData_->shouldEndThread) {
+  if (writerThreadData_ == nullptr || writerThreadData_->shouldEndThread) {
     return INVALID_REQUEST;
   }
   { // mutex guard
@@ -523,7 +523,7 @@ int RecordFileWriter::autoWriteRecordsAsync(function<double()> maxTimestampProvi
 }
 
 int RecordFileWriter::autoPurgeRecords(function<double()> maxTimestampProvider, double delay) {
-  if (purgeThreadData_) {
+  if (purgeThreadData_ != nullptr) {
     unique_lock<recursive_mutex> guard{purgeThreadData_->mutex};
     purgeThreadData_->maxTimestampProvider = maxTimestampProvider;
     purgeThreadData_->autoPurgeDelay = delay;
@@ -541,7 +541,7 @@ int RecordFileWriter::autoPurgeRecords(function<double()> maxTimestampProvider, 
 }
 
 void RecordFileWriter::trackBackgroundThreadQueueByteSize() {
-  if (!queueByteSize_) {
+  if (queueByteSize_ == nullptr) {
     queueByteSize_ = make_unique<atomic<uint64_t>>();
   }
 }
@@ -551,14 +551,14 @@ uint64_t RecordFileWriter::getBackgroundThreadQueueByteSize() {
 }
 
 int RecordFileWriter::closeFileAsync() {
-  if (!writerThreadData_) {
+  if (writerThreadData_ == nullptr) {
     return NO_FILE_OPEN;
   }
   if (!writerThreadData_->shouldEndThread) {
     if (LOG_FILE_OPERATIONS) {
       XR_LOGD("File close request received.");
     }
-    for (auto recordable : getRecordables()) {
+    for (auto* recordable : getRecordables()) {
       recordable->getRecordManager().purgeCache();
     }
     writeRecordsAsync(Record::kMaxTimestamp);
@@ -569,17 +569,17 @@ int RecordFileWriter::closeFileAsync() {
 }
 
 int RecordFileWriter::waitForFileClosed() {
-  if (!writerThreadData_) {
+  if (writerThreadData_ == nullptr) {
     return NO_FILE_OPEN;
   }
   closeFileAsync();
   writerThreadData_->saveThread.join();
   int chunkError = 0;
-  if (newChunkHandler_) {
+  if (newChunkHandler_ != nullptr) {
     newChunkHandler_.reset();
   }
   // free all record memory
-  for (auto recordable : getRecordables()) {
+  for (auto* recordable : getRecordables()) {
     recordable->getRecordManager().purgeCache();
   }
   int diskError = writerThreadData_->fileError;
@@ -740,18 +740,15 @@ uint64_t RecordFileWriter::addRecordBatchesToSortedRecords(
   return addedRecordSize;
 }
 
-#define IF_ERROR_LOG_CLOSE_AND_RETURN(operation__) \
-  {                                                \
-    int operationError__ = operation__;            \
-    if (operationError__ != 0) {                   \
-      XR_LOGE(                                     \
-          "{} failed: {}, {}",                     \
-          #operation__,                            \
-          operationError__,                        \
-          errorCodeToMessage(operationError__));   \
-      head.close();                                \
-      return operationError__;                     \
-    }                                              \
+#define IF_ERROR_LOG_CLOSE_AND_RETURN(operation_)                                                  \
+  {                                                                                                \
+    int operationError_ = operation_;                                                              \
+    if (operationError_ != 0) {                                                                    \
+      XR_LOGE(                                                                                     \
+          "{} failed: {}, {}", #operation_, operationError_, errorCodeToMessage(operationError_)); \
+      head.close();                                                                                \
+      return operationError_;                                                                      \
+    }                                                                                              \
   }
 
 int RecordFileWriter::createFile(const string& filePath, bool splitHead) {
@@ -1096,11 +1093,11 @@ int RecordFileWriter::completeAndCloseFile() {
 }
 
 RecordFileWriter::~RecordFileWriter() {
-  if (writerThreadData_) {
+  if (writerThreadData_ != nullptr) {
     waitForFileClosed();
     delete writerThreadData_;
   }
-  if (purgeThreadData_) {
+  if (purgeThreadData_ != nullptr) {
     purgeThreadData_->shouldEndThread = true;
     purgeThreadData_->purgeEventChannel.dispatchEvent();
     purgeThreadData_->purgeThread.join();

@@ -119,7 +119,7 @@ void FilteredChunksSource::copyTo(uint8_t* buffer) const {
 
 size_t FilteredChunksSource::getFilteredChunksSize(const deque<unique_ptr<ContentChunk>>& chunks) {
   size_t total = 0;
-  for (auto& chunk : chunks) {
+  for (const auto& chunk : chunks) {
     total += chunk->filterBuffer();
   }
   return total;

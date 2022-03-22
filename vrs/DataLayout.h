@@ -427,9 +427,8 @@ class DataLayout {
     }
     if (offset != kNotFound && offset + size <= fixedData_.size()) {
       return reinterpret_cast<T*>(fixedData_.data() + offset);
-    } else {
-      return nullptr;
     }
+    return nullptr;
   }
   /// Get the var size index.
   /// @return The var-size index, const version.
@@ -551,7 +550,7 @@ class ManualDataLayout : public DataLayout {
   /// Add more pieces using "add()", but don't forget to call endLayout() when you're done.
   ManualDataLayout(const DataLayout& layout);
 
-  ~ManualDataLayout();
+  ~ManualDataLayout() override;
 
   /// Transfer ownership a constructed DataPiece for the ManualDataLayout object to hold.
   /// This ensures that all the DataPiece objects of a DataLayout will be deleted when the

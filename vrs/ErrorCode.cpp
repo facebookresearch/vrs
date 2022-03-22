@@ -91,8 +91,8 @@ int newDomainErrorCode(vrs::ErrorDomain errorDomain, int64_t errorCode) {
   return newErrorCode;
 }
 
-static map<int, string> sDomainErrorRegistry;
-static mutex sDomainErrorRegistryMutex;
+map<int, string> sDomainErrorRegistry;
+mutex sDomainErrorRegistryMutex;
 
 } // namespace
 

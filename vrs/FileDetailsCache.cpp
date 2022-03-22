@@ -205,11 +205,11 @@ int readIndexData(
     IF_ERROR_LOG_AND_RETURN(
         decompressor.readFrame(file, diskRecords.data(), frameSize, indexByteSize));
     for (auto& diskRecord : diskRecords) {
-      outIndex.push_back(
-          {diskRecord.timestamp.get(),
-           diskRecord.recordOffset.get(),
-           diskRecord.getStreamId(),
-           static_cast<Record::Type>(diskRecord.recordType.get())});
+      outIndex.emplace_back(
+          diskRecord.timestamp.get(),
+          diskRecord.recordOffset.get(),
+          diskRecord.getStreamId(),
+          static_cast<Record::Type>(diskRecord.recordType.get()));
     }
   }
   if (!XR_VERIFY(indexByteSize == 0 && outIndex.size() == diskIndexSize.get())) {

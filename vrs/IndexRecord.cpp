@@ -632,8 +632,7 @@ int IndexRecord::Reader::rebuildIndex(bool writeFixedIndex) {
       break;
     }
     uint32_t headerPreviousRecordSize = recordHeader->previousRecordSize.get();
-    if (headerPreviousRecordSize != previousRecordSize &&
-        !(hasSplitHeadChunk_ && index_.size() == 0)) {
+    if (headerPreviousRecordSize != previousRecordSize && !(hasSplitHeadChunk_ && index_.empty())) {
       XR_LOGW(
           "Reindexing: record #{}. Previous record size is {}, expected {}.",
           index_.size(),
@@ -660,7 +659,7 @@ int IndexRecord::Reader::rebuildIndex(bool writeFixedIndex) {
         recordHeader->formatVersion.get() == kSplitIndexFormatVersion) {
       int64_t fileSizeUsed = 0;
       readSplitIndexRecord(0, recordHeader->uncompressedSize.get(), fileSizeUsed);
-      if (index_.size() > 0) {
+      if (!index_.empty()) {
         XR_LOGW("Found {} records in the split index.", index_.size());
         // we can skip all the records found in the index
         absolutePosition = fileSizeUsed;

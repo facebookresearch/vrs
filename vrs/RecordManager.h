@@ -103,7 +103,7 @@ class RecordManager {
   /// @param requestedSise: number of bytes needed.
   /// @return Number of bytes that should be allocated.
   /// @internal only VRS itself should need to use this API.
-  size_t getAdjustedRecordBufferSize(size_t requestedSize);
+  size_t getAdjustedRecordBufferSize(size_t requestedSize) const;
 
   /// Get the count of recycled records are currently waiting to be reused.
   /// @return Number of recycled records available.

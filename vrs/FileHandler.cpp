@@ -256,7 +256,7 @@ bool FileSpec::fromJson(const string& jsonStr) {
     getString(uri, document, kUriField);
     extras.clear();
     for (auto iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter) {
-      auto key = iter->name.GetString();
+      const auto* key = iter->name.GetString();
       if (iter->value.IsString() && strcmp(key, kChunkField) != 0 &&
           strcmp(key, kFileHandlerField) != 0 && strcmp(key, kFileNameField) != 0 &&
           strcmp(key, kUriField) != 0) {
@@ -355,7 +355,7 @@ string FileSpec::getXXHash() const {
   digester.update(fileHandlerName);
   digester.update(fileName);
   digester.update(uri);
-  for (auto& chunk : chunks) {
+  for (const auto& chunk : chunks) {
     digester.update(chunk);
   }
   for (auto extra : extras) {
@@ -417,7 +417,7 @@ int FileSpec::decodeQuery(const string& query, string& outKey, string& outValue)
   }
   string key = query.substr(0, equal);
   int status = FileSpec::urldecode(key, outKey);
-  if (status) {
+  if (status != 0) {
     XR_LOGW("Failed to decode key in query {} : {}", key, query);
     return status;
   }
@@ -434,7 +434,7 @@ int FileSpec::decodeQuery(const string& query, string& outKey, string& outValue)
   }
 
   status = FileSpec::urldecode(value, outValue);
-  if (status) {
+  if (status != 0) {
     XR_LOGW("Failed to decode value in query {} : {}", value, query);
     return status;
   }

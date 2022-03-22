@@ -89,9 +89,8 @@ class DataPieceValue : public DataPiece {
     if (ptr != nullptr) {
       writeUnaligned<T>(ptr, value);
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   /// Get default value.

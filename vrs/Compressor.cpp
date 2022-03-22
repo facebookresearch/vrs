@@ -115,7 +115,7 @@ class Compressor::CompressorImpl {
       const void* data,
       size_t dataSize,
       CompressionPreset preset) {
-    auto* prefs = getLz4Preferences(preset);
+    const auto* prefs = getLz4Preferences(preset);
     size_t maxCompressedSize = LZ4F_compressFrameBound(dataSize, prefs);
     // increase our internal buffer size if necessary
     if (buffer.size() < maxCompressedSize) {

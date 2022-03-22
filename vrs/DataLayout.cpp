@@ -199,9 +199,9 @@ string DataLayout::asJson(const JsonFormatProfileSpec& profile) const {
 }
 
 ContentBlock DataLayout::getContentBlock() const {
-  return ContentBlock(
+  return {
       ContentType::DATA_LAYOUT,
-      (varSizePieces_.empty()) ? fixedDataSizeNeeded_ : ContentBlock::kSizeUnknown);
+      (varSizePieces_.empty()) ? fixedDataSizeNeeded_ : ContentBlock::kSizeUnknown};
 }
 
 void DataLayout::initLayout() {
@@ -1395,10 +1395,7 @@ bool DataPieceVector<T>::isSame(const DataPiece* rhs) const {
     return false;
   }
   const DataPieceVector<T>& other = *reinterpret_cast<const DataPieceVector<T>*>(rhs);
-  if (!vrs::isSame(this->defaultValues_, other.defaultValues_)) {
-    return false;
-  }
-  return true;
+  return vrs::isSame(this->defaultValues_, other.defaultValues_);
 }
 
 template <typename T>
@@ -1621,10 +1618,7 @@ bool DataPieceString::isSame(const DataPiece* rhs) const {
     return false;
   }
   const DataPieceString& other = *reinterpret_cast<const DataPieceString*>(rhs);
-  if (defaultString_ != other.defaultString_) {
-    return false;
-  }
-  return true;
+  return defaultString_ == other.defaultString_;
 }
 
 void DataPieceString::serialize(JsonWrapper& rj, const JsonFormatProfileSpec& profile) {

@@ -48,12 +48,12 @@ class NewChunkNotifier {
  public:
   NewChunkNotifier(WriteFileHandler& file, const std::unique_ptr<NewChunkHandler>& chunkHandler)
       : chunkHandler_{chunkHandler.get()} {
-    if (chunkHandler_) {
+    if (chunkHandler_ != nullptr) {
       file.getCurrentChunk(path_, index_);
     }
   }
   void notify(size_t indexOffset = 0, bool isLastChunk = false) {
-    if (chunkHandler_) {
+    if (chunkHandler_ != nullptr) {
       chunkHandler_->newChunk(path_, index_ + indexOffset, isLastChunk);
     }
   }

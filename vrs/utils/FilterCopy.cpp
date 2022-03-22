@@ -263,11 +263,11 @@ int filterMerge(
     deque<IndexRecord::DiskRecordInfo>& index = *preliminaryIndex;
     int64_t offset = 0;
     for (auto& r : records) {
-      index.push_back(
-          {r.record->timestamp,
-           static_cast<uint32_t>(r.record->fileOffset - offset),
-           r.record->streamId,
-           r.record->recordType});
+      index.emplace_back(
+          r.record->timestamp,
+          static_cast<uint32_t>(r.record->fileOffset - offset),
+          r.record->streamId,
+          r.record->recordType);
       offset = r.record->fileOffset;
     }
     recordFileWriter.preallocateIndex(move(preliminaryIndex));

@@ -37,7 +37,7 @@ namespace vrs {
 /// Checks whether a given record belogs to the given reader
 static bool belongsTo(const IndexRecord::RecordInfo* record, const RecordFileReader& reader) {
   const auto& index = reader.getIndex();
-  return index.size() > 0 && record >= &index[0] && record <= &index[index.size() - 1];
+  return !index.empty() && record >= &index[0] && record <= &index[index.size() - 1];
 }
 
 static bool timestampLT(const IndexRecord::RecordInfo* lhs, double rhsTimestamp) {
@@ -648,7 +648,7 @@ void MultiRecordFileReader::createConsolidatedIndex() {
   recordIndex_ = make_unique<vector<const IndexRecord::RecordInfo*>>();
   recordIndex_->reserve(indexSize);
   while (!recordPQueue.empty()) {
-    const auto record = recordPQueue.top();
+    const IndexRecord::RecordInfo* record = recordPQueue.top();
     recordPQueue.pop();
     recordIndex_->push_back(record);
     if (terminalRecordPtrs.find(record) == terminalRecordPtrs.end()) {

@@ -143,7 +143,7 @@ class Writer {
   }
 
   bool hasSplitHead() const {
-    return splitHeadFile_.get() != nullptr;
+    return splitHeadFile_ != nullptr;
   }
 
   void addStream(StreamId id) {

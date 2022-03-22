@@ -94,7 +94,7 @@ TrafficEvent& TrafficEvent::setUrl(const string& aServerName) {
   while (aServerName[end] != 0 && aServerName[end] != '/') {
     end++;
   }
-  serverName.assign(aServerName.data(), start, end - start);
+  serverName.assign(aServerName, start, end - start);
   return *this;
 }
 

@@ -90,11 +90,8 @@ bool FileHeader::looksLikeOurFiles(uint32_t magic1, uint32_t magic2, uint32_t ma
   }
   // It's extremely unlikely that the file & record headers will grow "a lot": filter based on that
   const size_t maxHeaderGrowth = 200;
-  if (fileHeaderSize.get() > sizeof(FileHeader) + maxHeaderGrowth ||
-      recordHeaderSize.get() > sizeof(RecordHeader) + maxHeaderGrowth) {
-    return false;
-  }
-  return true;
+  return fileHeaderSize.get() <= sizeof(FileHeader) + maxHeaderGrowth &&
+      recordHeaderSize.get() <= sizeof(RecordHeader) + maxHeaderGrowth;
 }
 
 bool FileHeader::isFormatSupported() const {

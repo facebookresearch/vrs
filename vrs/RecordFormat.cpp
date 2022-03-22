@@ -375,7 +375,7 @@ string ImageContentBlockSpec::asString() const {
     }
     return ss.str();
   }
-  return string();
+  return {};
 }
 
 uint8_t ImageContentBlockSpec::getChannelCountPerPixel(PixelFormat pixel) {
