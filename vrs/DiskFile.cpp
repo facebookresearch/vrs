@@ -268,10 +268,10 @@ int DiskFile::overwrite(const void* buffer, size_t length) {
     return lastError_;
   }
   do {
-    size_t requestSize = length - lastRWSize_;
+    size_t requestSize = (length > lastRWSize_) ? length - lastRWSize_ : 0;
     if (!isLastChunk()) {
-      int64_t maxRequest = currentChunk_->size - os::fileTell(currentChunk_->file);
-      requestSize = static_cast<size_t>(min<int64_t>(requestSize, maxRequest));
+      int64_t maxRequest = max<int64_t>(currentChunk_->size - os::fileTell(currentChunk_->file), 0);
+      requestSize = min<size_t>(requestSize, static_cast<size_t>(maxRequest));
     }
     size_t writenSize = ::fwrite(
         static_cast<const char*>(buffer) + lastRWSize_, 1, requestSize, currentChunk_->file);
