@@ -77,10 +77,8 @@ int filterCopy(
   writer.addTags(filteredReader.reader.getTags());
   vector<unique_ptr<StreamPlayer>> filters;
   filters.reserve(filteredReader.filter.streams.size());
-  size_t maxRecordCount = 0;
   for (auto id : filteredReader.filter.streams) {
     filters.emplace_back(makeStreamFilter(filteredReader.reader, writer, id, copyOptions));
-    maxRecordCount += filteredReader.reader.getIndex(id).size();
   }
   double startTimestamp, endTimestamp;
   filteredReader.getConstrainedTimeRange(startTimestamp, endTimestamp);
