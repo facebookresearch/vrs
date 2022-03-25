@@ -45,6 +45,9 @@ include(${CMAKE_MODULE_PATH}/LibrariesSetup.cmake)
 # Include the libraries
 add_subdirectory(vrs)
 
+# Add the vrs command line utility
+add_subdirectory(${OSS_DIR}/tools/vrs)
+
 # Add the sample apps/code
 add_subdirectory(sample_apps)
 add_subdirectory(sample_code)

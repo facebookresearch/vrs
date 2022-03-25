@@ -1,0 +1,626 @@
+// Copyright (c) Meta Platforms, Inc. and affiliates.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "VrsCommand.h"
+
+#include <cstdlib>
+#include <cstring>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <string>
+
+#define DEFAULT_LOG_CHANNEL "VrsCommand"
+#include <fmt/format.h>
+#include <logging/Log.h>
+#include <logging/Verify.h>
+
+#include <vrs/ErrorCode.h>
+#include <vrs/FileCache.h>
+#include <vrs/FileHandlerFactory.h>
+#include <vrs/helpers/EnumStringConverter.h>
+#include <vrs/helpers/Rapidjson.hpp>
+#include <vrs/helpers/Strings.h>
+#include <vrs/os/Time.h>
+#include <vrs/os/Utils.h>
+
+#include <vrs/utils/cli/CliParsing.h>
+#include <vrs/utils/cli/CompressionBenchmark.h>
+#include <vrs/utils/cli/ListRecords.h>
+#include <vrs/utils/cli/MakeZeroFilterCopier.h>
+#include <vrs/utils/cli/PrintRecordFormatRecords.h>
+#include <vrs/utils/cli/PrintRecordFormats.h>
+
+//#include "AllExtractor.h"
+//#include "AudioExtractor.h"
+//#include "ImageExtraction.h"
+
+using namespace std;
+using namespace vrs;
+using namespace vrs::utils;
+using vrs::RecordFileInfo::Details;
+
+namespace {
+
+const char* sCommands[] = {
+    "none",
+    "help",
+    "details",
+    "copy",
+    "merge",
+    "check",
+    "checksum",
+    "checksums",
+    "checksum-verbatim",
+    "hexdump",
+    "compare",
+    "compare-verbatim",
+    "debug",
+    "record-formats",
+    "list",
+    "print",
+    "print-details",
+    "print-json",
+    "print-json-pretty",
+    "rage",
+    "extract-images",
+    "extract-audio",
+    "extract-all",
+    "json-description",
+    "compression-benchmark",
+};
+struct CommandConverter : public EnumStringConverter<
+                              Command,
+                              sCommands,
+                              COUNT_OF(sCommands),
+                              Command::None,
+                              Command::None> {
+  static_assert(
+      COUNT_OF(sCommands) == static_cast<size_t>(Command::Count),
+      "Missing GaiaOp name definitions");
+};
+
+static const RecordFileInfo::Details kCopyOpsDetails = Details::MainCounters;
+
+struct CommandSpec {
+  Command cmd;
+  uint32_t maxFiles{1};
+  Details fileDetails = Details::None;
+  bool mainFileIsVRS{true};
+  bool supportFilters{false};
+};
+
+const CommandSpec& getCommandSpec(Command cmd) {
+  static const vector<CommandSpec> sCommandSpecs = {
+      {Command::None, 0},
+      {Command::Help, 0},
+      {Command::Details, 1, Details::Everything},
+      {Command::Copy, 1000, kCopyOpsDetails},
+      {Command::Merge, 1000, kCopyOpsDetails},
+      {Command::Check, 1, Details::MainCounters},
+      {Command::Checksum, 1},
+      {Command::Checksums, 1},
+      {Command::ChecksumVerbatim, 1, Details::None, false},
+      {Command::Hexdump, 1},
+      {Command::Compare, 1000, Details::MainCounters},
+      {Command::CompareVerbatim, 1000, Details::None, false},
+      {Command::Debug, 1, Details::None, false},
+      {Command::PrintRecordFormats, 1},
+      {Command::ListRecords, 1},
+      {Command::PrintRecords, 1},
+      {Command::PrintRecordsDetailed, 1},
+      {Command::PrintRecordsJson, 1},
+      {Command::PrintRecordsJsonPretty, 1},
+      {Command::Rage, 1, Details::Everything},
+      {Command::ExtractImages, 1},
+      {Command::ExtractAudio, 1},
+      {Command::ExtractAll, 1},
+      {Command::JsonDescription, 1},
+      {Command::CompressionBenchmark, 1},
+  };
+  if (!XR_VERIFY(cmd > Command::None && cmd < Command::Count)) {
+    return sCommandSpecs[static_cast<size_t>(Command::None)];
+  }
+  return sCommandSpecs[static_cast<size_t>(cmd)];
+}
+
+} // namespace
+
+#define CMD(H, C) H ":\n  " << appName << " " C "\n"
+
+void printHelp(const string& appName) {
+  cout
+      << CMD("Get details about a VRS files", "[ file.vrs ] [filter-options]")
+
+      << endl
+      << CMD("All the other commands have the following format", "<command> [ arguments ]*")
+
+      << endl
+      << CMD("Show this documentation", "help")
+
+      << endl
+      << CMD("Copy all the streams from one or more files into one",
+             "copy [ vrsfiles.vrs ]+ --to <target.vrs> [copy-options] [tag-options] [filter-options]")
+      << CMD("Merge all the streams from one or more files into one",
+             "merge [ vrsfiles.vrs ]+ --to <target.vrs> [copy-options] [tag-options] [filter-options]")
+      << CMD("Copy all the data from a file into a new one, but with blanked/zeroed image and audio data,\n"
+             "so the copy is much smaller because of lossless compression",
+             "zero <file.vrs> --to <output.vrs>")
+
+      << endl
+      << CMD("Check that a file can be read (checks integrity)",
+             "check <file.vrs> [filter-options]")
+      << CMD("Calculate a checksum for the whole file, at the VRS data level",
+             "checksum <file.vrs> [filter-options]")
+      << CMD("Calculate checksums for each part of the VRS file",
+             "checksums <file.vrs> [filter-options]")
+      << CMD("Calculate a checksum for the whole file, at the raw level (VRS or not)",
+             "checksum-verbatim <file.vrs> [filter-options]")
+      << CMD("Compare a VRS file to one or more files, at the VRS data logical level",
+             "compare <original.vrs> [others.vrs]+ [filter-options]")
+      << CMD("Compare two files at the raw level (VRS or not)",
+             "compare-verbatim <original.vrs> <other.vrs>")
+
+      << endl
+      << CMD("Show RecordFormat and DataLayout definitions", "record-formats <file.vrs>")
+      << CMD("Print records using RecordFormat & DataLayout", "print <file.vrs> [filter-options]")
+      << CMD("Print records with details using RecordFormat & DataLayout",
+             "print-details <file.vrs> [filter-options]")
+      << CMD("Print records as json using RecordFormat & DataLayout",
+             "print-json <file.vrs> [filter-options]")
+      << CMD("Print records as json-pretty using RecordFormat & DataLayout",
+             "print-json-pretty <file.vrs> [filter-options]")
+      << CMD("Print records in hex", "hexdump <file.vrs> [filter-options]")
+      << CMD("Print detailed file info and first records for one-stop diagnostic purposes",
+             "rage <file.vrs>")
+
+      << endl
+      << CMD("Compute some lossless compression benchmarks", "compression-benchmark <file.vrs>")
+
+      << endl
+      << CMD("Fix the file's index in place, if necessary. MIGHT MODIFY THE ORIGINAL FILE",
+             "fix-index <file.vrs>")
+      << CMD("Print VRS file format debug information", "debug <file.vrs>")
+
+      << "\n"
+
+         "Copy options:\n";
+  printCopyOptionsHelp();
+
+  cout << "\n"
+          "Tag options:\n";
+  printTagOverrideOptionsHelp();
+
+  cout << "\n"
+          "Filter options:\n";
+  printTimeAndStreamFiltersHelp();
+  printDecimationOptionsHelp();
+
+  // clang-format off
+//         "\n"
+//         "Data extraction options:\n"
+//         "  [ { -e | --extract-images } <folder_path> ]: extract images in folder_path.\n"
+//         "    RAW images are saved as GREY8, GREY16, RGB8 or RGBA8 PNG, as appropriate.\n"
+//         "  [ --extract-images-raw <folder_path> ]: extract images in folder_path.\n"
+//         "    Writes images in .raw image files without any conversion.\n"
+//         "  [ --extract-audio <folder_path> ]: extract audio in folder_path.\n"
+  // clang-format on
+  cout << endl;
+}
+
+#define SP(x) "  " << appName << " " x "\n"
+
+void printSamples(const string& appName) {
+  cout << endl
+       << "Examples:" << endl
+       << "To peek at what's inside a recording:\n"
+       << SP("src.vrs")
+
+       << "To list records (basic details):\n"
+       << SP("list src.vrs")
+
+       << "To peek at what's inside a recording and print as json:\n"
+       << SP("json-description src.vrs")
+
+       << "To print configuration records as json:\n"
+       << SP("print-json src.vrs + configuration")
+
+       << "To print device id 1001's configuration & state records as json:\n"
+       << SP("print-json src.vrs + 1001 - data")
+
+       << "Copy & clean-up a recording with default compression and rebuilding the index:\n"
+       << SP("copysrc.vrs --to cleanedRecording.vrs")
+
+       << "Recompress a recording with a tighter compression than default:\n"
+       << SP("copy src.vrs --to tight.vrs --compression=ztight")
+
+       << "Remove all ImageStream streams:\n"
+       << SP("src.vrs # to see that '100' is ImageStream...")
+       << SP("copy src.vrs --to noImageStream.vrs - 100")
+
+       << "Extract only two specific streams out of many streams:\n"
+       << SP("src.vrs # to find the ids of the streams we want, for instance 100-1 and 101-1")
+       << SP("copy src.vrs --to extract.vrs + 100-1 + 101-1")
+
+       << "Trim data records in the first 2 seconds and the last second of a recording:\n"
+       << SP("copy src.vrs --to extract.vrs --range +2 -1")
+
+       << "Copy multiple VRS files into a single one, keeping all streams separate:\n"
+       << SP("copy first.vrs second.vrs third.vrs --to new.vrs")
+
+       << "Merge multiple VRS files into a single one, merging streams by type:\n"
+       << SP("merge first.vrs second.vrs third.vrs --to new.vrs")
+
+       //      << "Extract all images as images files:\n"
+       //      << SP("src.vrs -e imageFolder")
+
+       //      << "Save all ImageStream images, recorded in the first 5 seconds:\n"
+       //      << SP("src.vrs # to see that '100' is ImageStream...")
+       //      << SP("src.vrs -e imageFolder + 100 --before +5")
+
+       << endl;
+}
+
+VrsCommand::VrsCommand() {
+  // Detect if we're running from Qt Creator or Nuclide, in which case we don't want file copy
+  // operations to show progress, since those terminal outputs doesn't support overwrites...
+  // This might not work on all platforms, but that's ok, as it's only a nice to have...
+  const char* xpcServiceName = getenv("XPC_SERVICE_NAME");
+  if (xpcServiceName != nullptr &&
+      (strstr(xpcServiceName, "qtcreator") != nullptr ||
+       strstr(xpcServiceName, "Qt Creator") != nullptr)) {
+    copyOptions.showProgress = false;
+  }
+  // Detect running inside Nuclide
+  const char* term = getenv("TERM");
+  if (term != nullptr && strstr(term, "nuclide") != nullptr) {
+    copyOptions.showProgress = false;
+  }
+}
+
+bool VrsCommand::parseCommand(const std::string& appName, const char* cmdName) {
+  cmd = CommandConverter::toEnum(cmdName);
+  if (cmd != Command::None) {
+    return XR_VERIFY(getCommandSpec(cmd).cmd == cmd);
+  }
+  if (processUnrecognizedArgument(appName, cmdName)) {
+    cmd = Command::Details;
+    return XR_VERIFY(getCommandSpec(cmd).cmd == cmd);
+  }
+  cerr << appName << ": '" << cmdName << "' is neither a known command name nor a valid path.\n";
+  return false;
+}
+
+bool VrsCommand::parseArgument(
+    const string& appName,
+    int& argn,
+    int argc,
+    char** argv,
+    int& outStatusCode) {
+  string arg = argv[argn];
+  if (arg == "-to" || arg == "--to") {
+    if (++argn < argc) {
+      targetPath = argv[argn];
+    } else {
+      cerr << appName << ": error. '--copy|-c' requires a destination path." << endl;
+      outStatusCode = EXIT_FAILURE;
+    }
+  } else if (arg == "--fix-index") {
+    autoFixIndex = true;
+  } else if (arg == "--zero") {
+    copyMakeStreamFilterFunction = makeZeroFilterCopier;
+  } else {
+    return parseCopyOptions(appName, arg, argn, argc, argv, outStatusCode, copyOptions) ||
+        parseTagOverrideOptions(appName, arg, argn, argc, argv, outStatusCode, copyOptions) ||
+        parseTimeAndStreamFilters(
+               appName, arg, argn, argc, argv, outStatusCode, filteredReader, filters) ||
+        parseDecimationOptions(appName, arg, argn, argc, argv, outStatusCode, filters);
+  }
+  return true;
+}
+
+bool VrsCommand::processUnrecognizedArgument(const string& appName, const string& arg) {
+  if (!arg.empty() && arg.front() == '-') {
+    cerr << appName << ": Invalid argument: '" << arg << '\'' << endl;
+    return false;
+  }
+  FileSpec spec;
+  bool isAcceptable = false;
+  if (spec.fromPathJsonUri(arg) == 0) {
+    if (spec.isDiskFile()) {
+      isAcceptable = os::isFile(arg);
+    } else {
+      unique_ptr<FileHandler> fileHandler =
+          FileHandlerFactory::getInstance().getFileHandler(spec.fileHandlerName);
+      if (fileHandler) {
+        if (fileHandler->isRemoteFileSystem()) {
+          isAcceptable = true; // trust that the object exists
+        } else {
+          isAcceptable = os::isFile(arg);
+        }
+      }
+    }
+  }
+  if (!isAcceptable) {
+    cerr << appName << ": Invalid file path: '" << arg << '\'' << endl;
+    return false;
+  }
+  size_t maxFileCount = (cmd == Command::None) ? 1 : getCommandSpec(cmd).maxFiles;
+  size_t fileCount = filteredReader.path.empty() ? 0 : (1 + otherFilteredReaders.size());
+  if (fileCount < maxFileCount) {
+    if (filteredReader.path.empty()) {
+      filteredReader.setSource(arg);
+    } else {
+      otherFilteredReaders.emplace_back(arg);
+    }
+  } else {
+    cerr << appName << ": Too many file parameters." << endl;
+    return false;
+  }
+  return true;
+}
+
+bool VrsCommand::openVrsFile() {
+  const auto& cmdSpec = getCommandSpec(cmd);
+  if (cmdSpec.maxFiles < 1) {
+    return true;
+  }
+  if (filteredReader.path.empty()) {
+    cerr << "Missing VRS file arguments." << endl;
+    return false;
+  }
+  if (getCommandSpec(cmd).mainFileIsVRS) {
+    return filteredReader.reader.openFile(filteredReader.path, autoFixIndex) == 0;
+  }
+  return true;
+}
+
+bool VrsCommand::openOtherVrsFile(
+    FilteredFileReader& otherReader,
+    RecordFileInfo::Details details) {
+  if (!otherReader.reader.isOpened()) {
+    // Open the reader, apply the filters and print their overview
+    if (otherReader.reader.openFile(otherReader.path, autoFixIndex) != 0) {
+      cerr << "Error: could not open " << otherReader.path << endl;
+      return false;
+    }
+    otherReader.filter = filteredReader.filter;
+    if (filters.decimationParams) {
+      otherReader.decimator_ = make_unique<Decimator>(otherReader, *filters.decimationParams);
+    }
+    applyFilters(otherReader);
+    if (details != Details::None) {
+      RecordFileInfo::printOverview(cout, otherReader.reader, otherReader.filter.streams, details);
+    }
+  }
+  return true;
+}
+
+bool VrsCommand::openOtherVrsFiles(RecordFileInfo::Details details) {
+  for (FilteredFileReader& otherReader : otherFilteredReaders) {
+    if (!openOtherVrsFile(otherReader, details)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+void VrsCommand::applyFilters(FilteredFileReader& reader) {
+  reader.applyFilters(filters);
+}
+
+int VrsCommand::runCommands() {
+  int statusCode = EXIT_SUCCESS;
+  applyFilters(filteredReader);
+
+  const auto& cmdSpec = getCommandSpec(cmd);
+  if (cmdSpec.mainFileIsVRS && cmdSpec.fileDetails != Details::None) {
+    RecordFileInfo::printOverview(
+        cout, filteredReader.reader, filteredReader.filter.streams, cmdSpec.fileDetails);
+  }
+
+  switch (cmd) {
+    case Command::Help:
+      showHelp = true;
+      break;
+    case Command::Details:
+      // Opening the VRS file already printed the file details...
+      break;
+    case Command::Copy:
+      copyOptions.mergeStreams = false;
+      statusCode = doCopyMerge();
+      break;
+    case Command::Merge:
+      copyOptions.mergeStreams = true;
+      statusCode = doCopyMerge();
+      break;
+    case Command::Check:
+      cout << checkRecords(filteredReader, copyOptions, CheckType::Check) << endl;
+      break;
+    case Command::Checksum:
+      cout << checkRecords(filteredReader, copyOptions, CheckType::Checksum) << endl;
+      break;
+    case Command::Checksums:
+      cout << checkRecords(filteredReader, copyOptions, CheckType::Checksums) << endl;
+      break;
+    case Command::Hexdump:
+      cout << checkRecords(filteredReader, copyOptions, CheckType::HexDump) << endl;
+      break;
+    case Command::ChecksumVerbatim:
+      cout << verbatimChecksum(filteredReader.getPathOrUri(), copyOptions.showProgress) << endl;
+      break;
+    case Command::Compare:
+      for (auto& otherFile : otherFilteredReaders) {
+        cout << "Comparing with ";
+        if (openOtherVrsFile(otherFile, cmdSpec.fileDetails)) {
+          bool areSame = compareVRSfiles(filteredReader, otherFile, copyOptions);
+          cout << (areSame ? "Files are equivalent." : "Files differ.") << endl;
+        }
+      }
+      break;
+    case Command::CompareVerbatim:
+      for (auto& otherFile : otherFilteredReaders) {
+        bool areSame = compareVerbatim(filteredReader, otherFile, copyOptions.showProgress);
+        cout << (areSame ? "Files are identical." : "Files differ.") << endl;
+      }
+      break;
+    case Command::Debug: {
+      cout << "VRS file internals of '" << filteredReader.getPathOrUri() << '\'' << endl;
+      unique_ptr<FileHandler> file;
+      if (filteredReader.openFile(file) != 0 || !FileFormat::printVRSFileInternals(*file)) {
+        statusCode = EXIT_FAILURE;
+      }
+    } break;
+    case Command::PrintRecordFormats:
+      cout << printRecordFormats(filteredReader) << endl;
+      break;
+    case Command::ListRecords:
+      listRecords(filteredReader);
+      break;
+    case Command::PrintRecords:
+      printRecordFormatRecords(filteredReader, PrintoutType::Compact);
+      break;
+    case Command::PrintRecordsDetailed:
+      printRecordFormatRecords(filteredReader, PrintoutType::Details);
+      break;
+    case Command::PrintRecordsJson:
+      printRecordFormatRecords(filteredReader, PrintoutType::JsonCompact);
+      break;
+    case Command::PrintRecordsJsonPretty:
+      printRecordFormatRecords(filteredReader, PrintoutType::JsonPretty);
+      break;
+    case Command::Rage:
+      cout << endl << "First records:" << endl;
+      filteredReader.firstRecordsOnly = true;
+      printRecordFormatRecords(filteredReader, PrintoutType::Details);
+      break;
+    case Command::ExtractImages:
+      cerr << "Not implemented yet" << endl;
+      //      extractImages(targetPath, filteredReader, extractImagesRaw);
+      break;
+    case Command::ExtractAudio:
+      cerr << "Not implemented yet" << endl;
+      //      extractAudio(targetPath, filteredReader);
+      break;
+    case Command::ExtractAll:
+      cerr << "Not implemented yet" << endl;
+      //      extractAll(targetPath, filteredReader);
+      break;
+    case Command::JsonDescription:
+      cout << RecordFileInfo::jsonOverview(
+                  filteredReader.reader,
+                  filteredReader.filter.streams,
+                  RecordFileInfo::Details::Everything)
+           << endl;
+      break;
+    case Command::CompressionBenchmark:
+      statusCode = compressionBenchmark(filteredReader, copyOptions);
+      break;
+    case Command::None:
+    case Command::Count:
+      break;
+  }
+  if (autoFixIndex) {
+    if (!openOtherVrsFiles(Details::MainCounters)) {
+      return EXIT_FAILURE;
+    }
+  }
+
+  return statusCode;
+}
+
+int VrsCommand::doCopyMerge() {
+  int statusCode = SUCCESS;
+  if (targetPath.empty()) {
+    fmt::print(
+        stderr, "Error: Need a local path to do {} operation.\n", CommandConverter::toString(cmd));
+    return EXIT_FAILURE;
+  }
+  double timeBefore = os::getTimestampSec();
+  string commandName = otherFilteredReaders.empty() ? "Copy" : "Merge";
+  if (otherFilteredReaders.empty()) {
+    statusCode = filterCopy(filteredReader, targetPath, copyOptions, copyMakeStreamFilterFunction);
+  } else {
+    // Apply the filters to the other sources after opening them
+    if (!openOtherVrsFiles(kCopyOpsDetails)) {
+      return EXIT_FAILURE;
+    }
+    vector<FilteredFileReader*> recordFilters;
+    for (auto& recordFilter : otherFilteredReaders) {
+      recordFilters.push_back(&recordFilter);
+    }
+    statusCode = filterMerge(filteredReader, recordFilters, targetPath, copyOptions);
+  }
+  if (statusCode != 0) {
+    cerr << commandName << " failed: " << errorCodeToMessage(statusCode) << endl;
+  } else {
+    double duration = os::getTimestampSec() - timeBefore;
+    if (!copyOptions.outUri.empty() && copyOptions.outUri != "gaia:0") {
+      cout << commandName << " successful to " << copyOptions.outUri << endl;
+    }
+    cout << "Wrote " << copyOptions.outRecordCopiedCount << " records in "
+         << helpers::humanReadableDuration(duration) << '.' << endl;
+    // If this is an upload operation, the output file is removed after it is uploaded.
+    // If you directly upload to remote storage, you also don't have a local file.
+    if (!isRemoteFileSystem(targetPath)) {
+      RecordFileReader outputFile;
+      int error = outputFile.openFile(targetPath);
+      if (error == 0) {
+        RecordFileInfo::printOverview(cout, outputFile, kCopyOpsDetails);
+        int64_t sourceSize = filteredReader.reader.getTotalSourceSize();
+        for (const FilteredFileReader& otherSource : otherFilteredReaders) {
+          sourceSize += otherSource.reader.getTotalSourceSize();
+        }
+        int64_t copySize = outputFile.getTotalSourceSize();
+        int64_t change = sourceSize - copySize;
+        cout << "Preset " << vrs::toPrettyName(copyOptions.getCompression()) << ": ";
+        if (change == 0) {
+          cout << "No file size change." << endl;
+        } else {
+          if (change > 0) {
+            cout << "Saved ";
+          } else {
+            cout << "Added ";
+            change = -change;
+          }
+          cout << fmt::format(
+              "{}, {:.2f}% in {}.\n",
+              helpers::humanReadableFileSize(change),
+              100. * change / sourceSize,
+              helpers::humanReadableDuration(duration));
+        }
+      } else {
+        cerr << "Error: could not open copied file '" << filteredReader.getPathOrUri()
+             << "', error #" << error << ": " << errorCodeToMessage(error) << endl;
+        statusCode = EXIT_FAILURE;
+      }
+    }
+  }
+  return statusCode;
+}
+
+bool VrsCommand::isRemoteFileSystem(const string& path) {
+  unique_ptr<FileHandler> filehandler;
+  if (FileHandlerFactory::getInstance().delegateOpen(path, filehandler) != SUCCESS) {
+    return false;
+  }
+  return filehandler->isRemoteFileSystem();
+}
+
+DecimationParams& VrsCommand::getDecimatorParams() {
+  if (!filters.decimationParams) {
+    filters.decimationParams = make_unique<DecimationParams>();
+  }
+  return *filters.decimationParams;
+}

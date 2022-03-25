@@ -46,7 +46,7 @@ inline string trim(const string& line) {
 
 bool TestProcess::start(string arg, bp::ipstream* sout) {
   string path = string(processName_);
-  if (findBinary(path)) {
+  if (XR_VERIFY(findBinary(path))) {
 #if IS_VRS_FB_INTERNAL()
     if (looksLikeAFbCentOSServer()) {
       path = arvr::system_utils::os::getCurrentFBCodeLoader() + ' ' + path;
