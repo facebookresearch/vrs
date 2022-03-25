@@ -181,7 +181,9 @@ int RecordFileReader::doOpenFile(
   const int kOpenTotalStepCount = 5;
   openProgressLogger_->setStepCount(kOpenTotalStepCount);
   LOG_PROGRESS(FileHandlerFactory::getInstance().delegateOpen(fileSpec, file_), error, [&]() {
-    return "Opening " + file_->getFileHandlerName() + " file";
+    const string& fileHandlerName =
+        fileSpec.fileHandlerName.empty() ? file_->getFileHandlerName() : fileSpec.fileHandlerName;
+    return "Opening " + fileHandlerName + " file";
   });
   if (error != 0 || file_->getTotalSize() < static_cast<int64_t>(sizeof(FileFormat::FileHeader))) {
     if (error != 0) {
