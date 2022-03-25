@@ -367,13 +367,16 @@ TEST_F(SimpleFileHandlerTest, pathJsonUriParse) {
   EXPECT_EQ(spec.fromPathJsonUri(path), 0);
   EXPECT_EQ(spec.uri, path);
   EXPECT_EQ(spec.fileHandlerName, "mystorage");
-  EXPECT_TRUE(spec.chunks.empty());
+  chunks = {"123456"};
+  EXPECT_EQ(spec.chunks, chunks);
   EXPECT_TRUE(spec.chunkSizes.empty());
   EXPECT_TRUE(spec.fileName.empty());
   EXPECT_FALSE(spec.hasChunkSizes());
   EXPECT_EQ(spec.getFileSize(), -1);
   EXPECT_EQ(spec.getSourceLocation(), path);
-  EXPECT_EQ(spec.toJson(), "{\"storage\":\"mystorage\",\"source_uri\":\"mystorage:123456\"}");
+  EXPECT_EQ(
+      spec.toJson(),
+      "{\"chunks\":[\"123456\"],\"storage\":\"mystorage\",\"source_uri\":\"mystorage:123456\"}");
   EXPECT_EQ(spec.getEasyPath(), "mystorage:123456");
 
   invalidate(spec);
@@ -399,9 +402,12 @@ TEST_F(SimpleFileHandlerTest, pathJsonUriParse) {
 
   invalidate(spec);
 
-#define CHUNK1                                                                                    \
-  "https://interncache-atn.fbcdn.net/v/t63.8864-7/10000000_118246862403539_6451070337772683264_n" \
-  ".jpg?_nc_sid=6ee997&efg=eyJ1cmxnZW4iOiJwaHBfdXJsZ2VuX2NsaWVudC9lbnRfZ2VuL0VudEdhaWFSZWNvcmRpb" \
+#define PATH1                                 \
+  "//interncache-atn.fbcdn.net/v/t63.8864-7/" \
+  "10000000_118246862403539_6451070337772683264_n.jpg"
+#define CHUNK1                                                                                \
+  "https:" PATH1                                                                              \
+  "?_nc_sid=6ee997&efg=eyJ1cmxnZW4iOiJwaHBfdXJsZ2VuX2NsaWVudC9lbnRfZ2VuL0VudEdhaWFSZWNvcmRpb" \
   "mdGaWxlIn0%3D&_nc_ht=interncache-atn&oh=f2c6e5306b40c4fc788580a1897852cb&oe=5EE6111C"
 #define CHUNK2                                                                                    \
   "https://interncache-atn.fbcdn.net/v/t63.8864-7/10000000_333293020806762_3599126999991320576_n" \
@@ -477,4 +483,39 @@ TEST_F(SimpleFileHandlerTest, pathJsonUriParse) {
       spec.getEasyPath(),
       "{\"chunks\":[\"https://interncach...a1897852cb&oe=5EE6111C\",\"https://interncach...4c53e5b9"
       "3f&oe=5EE84225\",\"https://interncach...323305ecf5&oe=5EE63484\"],\"storage\":\"http\"}");
+
+  EXPECT_EQ(spec.fromPathJsonUri(CHUNK1), 0);
+  EXPECT_EQ(spec.uri, CHUNK1);
+  EXPECT_EQ(spec.fileHandlerName, "https");
+  chunks = {PATH1};
+  EXPECT_EQ(spec.chunks, chunks);
+  EXPECT_TRUE(spec.chunkSizes.empty());
+  EXPECT_EQ(spec.fileName, "");
+  EXPECT_FALSE(spec.hasChunkSizes());
+  EXPECT_EQ(spec.getFileSize(), -1);
+  EXPECT_EQ(spec.getSourceLocation(), "https://interncache-atn.fbcdn.net");
+  const char* json =
+      "{\"chunks\":[\"" PATH1 "\"],\"storage\":\"https\",\"source_uri\":\"" CHUNK1
+      "\",\"_nc_ht\":\"interncache-atn\",\"_nc_sid\":\"6ee997\",\"efg\":\"eyJ1cmxnZW4iOiJwaHBfdXJs"
+      "Z2VuX2NsaWVudC9lbnRfZ2VuL0VudEdhaWFSZWNvcmRpbmdGaWxlIn0=\",\"oe\":\"5EE6111C\",\"oh\":\"f2c"
+      "6e5306b40c4fc788580a1897852cb\"}";
+  EXPECT_EQ(spec.toJson(), json);
+  EXPECT_EQ(spec.getEasyPath(), CHUNK1);
+
+#define PATH "123456"
+#define URI "nfs:" PATH
+#define URIQ URI "?q=1"
+  EXPECT_EQ(spec.fromPathJsonUri(URIQ), 0);
+  EXPECT_EQ(spec.uri, URIQ);
+  EXPECT_EQ(spec.fileHandlerName, "nfs");
+  chunks = {PATH};
+  EXPECT_EQ(spec.chunks, chunks);
+  EXPECT_TRUE(spec.chunkSizes.empty());
+  EXPECT_EQ(spec.fileName, "");
+  EXPECT_FALSE(spec.hasChunkSizes());
+  EXPECT_EQ(spec.getFileSize(), -1);
+  EXPECT_EQ(spec.getSourceLocation(), URI);
+  json = "{\"chunks\":[\"123456\"],\"storage\":\"nfs\",\"source_uri\":\"" URIQ "\",\"q\":\"1\"}";
+  EXPECT_EQ(spec.toJson(), json);
+  EXPECT_EQ(spec.getEasyPath(), URIQ);
 }

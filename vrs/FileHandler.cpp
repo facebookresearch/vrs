@@ -24,6 +24,7 @@
 
 #include <vrs/helpers/Rapidjson.hpp>
 #include <vrs/helpers/Strings.h>
+#include <vrs/os/Utils.h>
 #include <vrs/utils/xxhash/xxhash.h>
 
 #include "DiskFile.h"
@@ -160,7 +161,7 @@ int FileSpec::parseUri(
   }
   // validate url schema
   for (size_t p = 0; p < colon && colon != uri.npos; p++) {
-    char c = uri[p];
+    unsigned char c = static_cast<unsigned char>(uri[p]);
     // from https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Generic_syntax
     if (p == 0 && !isalpha(c)) {
       XR_LOGE("Schema doesn't start with alphabet {}: {}", c, uri);
@@ -183,7 +184,7 @@ int FileSpec::parseUri(
   if (query != uri.npos) {
     size_t start = query + 1;
     for (size_t p = start; p < uri.size(); p++) {
-      char c = uri[p];
+      unsigned char c = static_cast<unsigned char>(uri[p]);
       if (c == '&' || c == ';' || p == uri.size() - 1) {
         string key, value;
         size_t length = (c == '&' || c == ';') ? p - start : p - start + 1;
@@ -204,46 +205,44 @@ int FileSpec::parseUri(
   int status = FileSpec::urldecode(path, outPath);
   if (status) {
     XR_LOGE("Path contains invalid character {}", path);
+    outScheme.clear();
+    outPath.clear();
+    outQueryParams.clear();
     return INVALID_URI_VALUE;
   }
 
-  return 0;
+  return SUCCESS;
 }
 
 int FileSpec::fromPathJsonUri(const string& pathJsonUri) {
   clear();
-  if (pathJsonUri.front() != '{') {
-    auto colon = pathJsonUri.find(':');
-    bool isUri = colon != pathJsonUri.npos && colon > 1;
-    if (isUri) {
-      for (size_t p = 0; p < colon && isUri; p++) {
-        char c = pathJsonUri[p];
-        // from https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Generic_syntax
-        isUri = (p == 0) ? isalpha(c) : isalnum(c) || c == '.' || c == '-' || c == '+' || c == '_';
-      }
-      if (isUri) {
-        fileHandlerName = pathJsonUri.substr(0, colon);
-        uri = pathJsonUri;
-        // give a chance to a file handler named after the uri scheme, if any, to parse the uri.
-        unique_ptr<FileHandler> handler =
-            FileHandlerFactory::getInstance().getFileHandler(fileHandlerName);
-        if (handler) {
-          return handler->parseUri(*this, colon);
-        }
-      } else {
-        XR_LOGW(
-            "The string '{}' looks neither like a valid uri or a valid local file path...",
-            pathJsonUri);
-      }
-    }
-    if (!isUri) {
-      chunks = {pathJsonUri};
-      fileHandlerName = DiskFile::staticName();
-    }
-  } else if (!fromJson(pathJsonUri)) {
-    return FILEPATH_PARSE_ERROR;
+  if (pathJsonUri.front() == '{') {
+    return fromJson(pathJsonUri) ? SUCCESS : FILEPATH_PARSE_ERROR;
   }
-  return SUCCESS;
+  auto colon = pathJsonUri.find(':');
+  bool isUri = colon != pathJsonUri.npos && colon > 1;
+  if (!isUri) {
+    chunks = {pathJsonUri};
+    fileHandlerName = DiskFile::staticName();
+    return SUCCESS;
+  }
+  for (size_t p = 0; p < colon && isUri; p++) {
+    unsigned char c = static_cast<unsigned char>(pathJsonUri[p]);
+    // from https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Generic_syntax
+    isUri = (p == 0) ? isalpha(c) : isalnum(c) || c == '.' || c == '-' || c == '+' || c == '_';
+  }
+  if (!isUri) {
+    return INVALID_URI_FORMAT;
+  }
+  fileHandlerName = pathJsonUri.substr(0, colon);
+  uri = pathJsonUri;
+  // give a chance to a file handler named after the uri scheme, if any, to parse the uri.
+  auto fileHandler = FileHandlerFactory::getInstance().getFileHandler(fileHandlerName);
+  if (fileHandler) {
+    return fileHandler->parseUri(*this, colon);
+  }
+  chunks.resize(1);
+  return parseUri(uri, fileHandlerName, chunks[0], extras);
 }
 
 bool FileSpec::fromJson(const string& jsonStr) {
@@ -314,6 +313,18 @@ int64_t FileSpec::getFileSize() const {
 
 string FileSpec::getSourceLocation() const {
   if (!uri.empty()) {
+    auto colon = uri.find(':');
+    if (colon != string::npos) {
+      auto end = colon;
+      unsigned char c;
+      do {
+        c = static_cast<unsigned char>(uri[++end]);
+      } while (c == '/');
+      do {
+        c = static_cast<unsigned char>(uri[++end]);
+      } while (isalnum(c) != 0 || c == '.' || c == '-' || c == '_');
+      return uri.substr(0, end);
+    }
     return uri;
   }
   return fileHandlerName;
@@ -331,6 +342,9 @@ string FileSpec::getEasyPath() const {
   }
   if (!fileName.empty() && !fileHandlerName.empty()) {
     return "storage: " + fileHandlerName + ", name: " + fileName;
+  }
+  if (chunks.size() == 1 && !fileHandlerName.empty()) {
+    return "storage: " + fileHandlerName + ", name: " + os::getFilename(chunks[0]);
   }
   FileSpec simpleSpec;
   simpleSpec.fileHandlerName = fileHandlerName;
@@ -443,7 +457,7 @@ int FileSpec::decodeQuery(const string& query, string& outKey, string& outValue)
 
 // urldecode logic is copied from Curl_urldecode in
 // https://github.com/curl/curl/blob/master/lib/escape.c
-#define ISXDIGIT(x) (isxdigit((int)((unsigned char)x)))
+#define ISXDIGIT(x) (isxdigit(static_cast<unsigned char>(x)))
 inline char xdigitToChar(char xdigit) {
   return (xdigit <= '9') ? xdigit - '0' : 10 + xdigit - ((xdigit <= 'Z') ? 'A' : 'a');
 }
