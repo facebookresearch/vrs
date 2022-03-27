@@ -887,6 +887,34 @@ int64_t RecordFileReader::getTotalSourceSize() const {
   return file_->getTotalSize();
 }
 
+bool RecordFileReader::isRecordAvailableOrPrefetch(const IndexRecord::RecordInfo& recordInfo) {
+  map<StreamId, StreamPlayer*>::iterator iter = streamPlayers_.find(recordInfo.streamId);
+  StreamPlayer* streamPlayer = (iter == streamPlayers_.end()) ? nullptr : iter->second;
+  if (!file_->isOpened()) {
+    return false;
+  }
+  if (streamPlayer == nullptr) {
+    return false;
+  }
+  IF_ERROR_LOG_AND_RETURN(file_->setPos(recordInfo.fileOffset));
+  FileFormat::RecordHeader recordHeader;
+  if (!file_->isAvailableOrPrefetch(sizeof(recordHeader))) {
+    return false;
+  }
+  // Since the header is immediately available, we read it (cheap) to figure out how much other
+  // data needs to already be in the cache to consider this record complete.
+  int error = file_->read(recordHeader);
+  if (error != 0) {
+    XR_LOGE(
+        "Record #{} Could not read record header: {}",
+        getRecordIndex(&recordInfo),
+        errorCodeToMessageWithCode(error));
+    return false;
+  }
+  uint32_t recordSize = recordHeader.recordSize.get();
+  return file_->isAvailableOrPrefetch(recordSize);
+}
+
 int RecordFileReader::readRecord(const IndexRecord::RecordInfo& recordInfo) {
   map<StreamId, StreamPlayer*>::iterator iter = streamPlayers_.find(recordInfo.streamId);
   StreamPlayer* streamPlayer = (iter == streamPlayers_.end()) ? nullptr : iter->second;

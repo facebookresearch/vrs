@@ -128,6 +128,12 @@ class RecordFileReader {
       const vector<const IndexRecord::RecordInfo*>& records,
       bool clearSequence = true);
 
+  /// Check if a file record is available for immediate loading (e.g. on disk or in-cache).
+  /// If not, begin background prefetching at the requested frame (but do not wait for results).
+  /// @param recordInfo: RecordInfo reference of the record to read.
+  /// @return true if available, false if unavailable (e.g. would require a network fetch).
+  bool isRecordAvailableOrPrefetch(const IndexRecord::RecordInfo& recordInfo);
+
   /// Read a file's record. Preferred way to read records.
   /// @param recordInfo: RecordInfo reference of the record to read.
   /// @return 0 on success, or a non-zero error code.

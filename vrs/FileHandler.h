@@ -239,7 +239,12 @@ class FileHandler {
   /// @param offset: the absolute position to jump to, which may be forward or backward.
   /// @return A status code, 0 meaning success.
   virtual int setPos(int64_t offset) = 0;
-
+  /// Check if a number of bytes are available for immediate return (e.g. on disk or in-cache)
+  /// @param length: the number of bytes to check availability of.
+  /// @return true if available, false if unavailable (e.g. requiring a network fetch)
+  virtual bool isAvailableOrPrefetch(size_t length) {
+    return !isRemoteFileSystem();
+  }
   /// Read a number of bytes, in a chunk aware way.
   /// If fewer than length bytes can be read, an error code is returned,
   /// then use getLastRWSize() to know how many bytes were really read.
