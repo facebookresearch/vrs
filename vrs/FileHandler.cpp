@@ -221,18 +221,15 @@ int FileSpec::fromPathJsonUri(const string& pathJsonUri) {
   }
   auto colon = pathJsonUri.find(':');
   bool isUri = colon != pathJsonUri.npos && colon > 1;
-  if (!isUri) {
-    chunks = {pathJsonUri};
-    fileHandlerName = DiskFile::staticName();
-    return SUCCESS;
-  }
   for (size_t p = 0; p < colon && isUri; p++) {
     unsigned char c = static_cast<unsigned char>(pathJsonUri[p]);
     // from https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Generic_syntax
     isUri = (p == 0) ? isalpha(c) : isalnum(c) || c == '.' || c == '-' || c == '+' || c == '_';
   }
   if (!isUri) {
-    return INVALID_URI_FORMAT;
+    chunks = {pathJsonUri};
+    fileHandlerName = DiskFile::staticName();
+    return SUCCESS;
   }
   fileHandlerName = pathJsonUri.substr(0, colon);
   uri = pathJsonUri;
