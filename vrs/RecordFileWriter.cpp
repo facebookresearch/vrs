@@ -227,6 +227,13 @@ double WriterThreadData::getBackgroundThreadWaitTime(const double& nextAutoColle
       waitDelay = nextAutoCollectTime - os::getTimestampSec();
     }
     if (waitDelay < 0) {
+      if (waitDelay < -1) {
+        XR_LOGW_EVERY_N_SEC(
+            1,
+            "Compressing and saving the recording is {:.3f} seconds behind capturing the data, "
+            "consider changing recording scope, destination, or compression settings.",
+            -waitDelay);
+      }
       waitDelay = 0;
     } else if (waitDelay > kMaxAutoCollectDelay) {
       waitDelay = kMaxAutoCollectDelay;
