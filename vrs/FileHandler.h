@@ -36,6 +36,8 @@ enum class CachingStrategy {
   StreamingBidirectional, ///< Automatically download data "forward" and "backward", using last
                           ///< read-request as a hint.
   ReleaseAfterRead, ///< Same as "Passive" but release used cache blocks immediately after read.
+
+  COUNT
 };
 
 /// \brief Generalized file descriptor class, allowing the efficient representation of complex
