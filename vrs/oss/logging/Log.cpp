@@ -17,6 +17,8 @@
 
 #include <fmt/color.h>
 
+using namespace std;
+
 namespace vrs {
 namespace logging {
 
@@ -49,6 +51,16 @@ void log(Level level, const char* channel, const std::string& message) {
   } else {
     fmt::print(stderr, "[{}][{}]: {}\n", channel, logLevel, message);
   }
+}
+
+void log_every_n_seconds(
+    const char* file,
+    int line,
+    Level level,
+    int nSeconds,
+    const char* channel,
+    const std::string& message) {
+  log(level, channel, message);
 }
 
 } // namespace logging
