@@ -35,6 +35,7 @@
 #include <vrs/os/Time.h>
 #include <vrs/os/Utils.h>
 
+#include <vrs/utils/AudioExtractor.h>
 #include <vrs/utils/cli/CliParsing.h>
 #include <vrs/utils/cli/CompressionBenchmark.h>
 #include <vrs/utils/cli/ListRecords.h>
@@ -43,7 +44,6 @@
 #include <vrs/utils/cli/PrintRecordFormats.h>
 
 //#include "AllExtractor.h"
-//#include "AudioExtractor.h"
 //#include "ImageExtraction.h"
 
 using namespace std;
@@ -74,8 +74,8 @@ const char* sCommands[] = {
     "print-json",
     "print-json-pretty",
     "rage",
-    "extract-images",
-    "extract-audio",
+    "images",
+    "audio",
     "extract-all",
     "json-description",
     "compression-benchmark",
@@ -186,6 +186,16 @@ void printHelp(const string& appName) {
              "rage <file.vrs>")
 
       << endl
+      //      << CMD("Extract extract images in a folder. jpg and png are extracted as is.\n"
+      //             "RAW images are saved as GREY8, GREY16, RGB8 or RGBA8 png files.",
+      //             "images file.vrs --to <folder_path> [filter-options]")
+      //      << CMD("Extract extract images in a folder. jpg and png are extracted as is.\n"
+      //             "Writes RAW images in .raw image files without any conversion.",
+      //             "raw-images file.vrs --to <folder_path> [filter-options]")
+      << CMD("Extract audio data as WAVE file(s) in a folder",
+             "audio file.vrs --to <folder_path> [filter-options]")
+
+      << endl
       << CMD("Compute some lossless compression benchmarks", "compression-benchmark <file.vrs>")
 
       << endl
@@ -193,9 +203,7 @@ void printHelp(const string& appName) {
              "fix-index <file.vrs>")
       << CMD("Print VRS file format debug information", "debug <file.vrs>")
 
-      << "\n"
-
-         "Copy options:\n";
+             "Copy options:\n";
   printCopyOptionsHelp();
 
   cout << "\n"
@@ -206,17 +214,6 @@ void printHelp(const string& appName) {
           "Filter options:\n";
   printTimeAndStreamFiltersHelp();
   printDecimationOptionsHelp();
-
-  // clang-format off
-//         "\n"
-//         "Data extraction options:\n"
-//         "  [ { -e | --extract-images } <folder_path> ]: extract images in folder_path.\n"
-//         "    RAW images are saved as GREY8, GREY16, RGB8 or RGBA8 PNG, as appropriate.\n"
-//         "  [ --extract-images-raw <folder_path> ]: extract images in folder_path.\n"
-//         "    Writes images in .raw image files without any conversion.\n"
-//         "  [ --extract-audio <folder_path> ]: extract audio in folder_path.\n"
-  // clang-format on
-  cout << endl;
 }
 
 #define SP(x) "  " << appName << " " x "\n"
@@ -510,8 +507,7 @@ int VrsCommand::runCommands() {
       //      extractImages(targetPath, filteredReader, extractImagesRaw);
       break;
     case Command::ExtractAudio:
-      cerr << "Not implemented yet" << endl;
-      //      extractAudio(targetPath, filteredReader);
+      extractAudio(targetPath, filteredReader);
       break;
     case Command::ExtractAll:
       cerr << "Not implemented yet" << endl;
