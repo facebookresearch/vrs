@@ -679,6 +679,7 @@ class RecordList {
   RecordList(const pair<StreamId, list<Record*>>& deviceRecords)
       : deviceRecords_{&deviceRecords}, iter_{deviceRecords.second.begin()} {}
   RecordList(const RecordList& rhs) = default;
+  RecordList& operator=(const RecordList& rhs) = default;
 
   // Get the record currently at the front of the
   inline RecordFileWriter::SortRecord getRecord() const {
