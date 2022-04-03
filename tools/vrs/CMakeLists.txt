@@ -30,17 +30,17 @@ target_link_libraries(vrs
 if (UNIT_TESTS)
   enable_testing()
 
-  add_executable(test_ossvrs
+  add_executable(test_vrscli
     VrsCommand.cpp
     test/VrsAppTest.cpp
     test/VrsProcess.h
     test/VrsCommandTest.cpp
   )
-  target_include_directories(test_ossvrs
+  target_include_directories(test_vrscli
     PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR}/..
   )
-  target_link_libraries(test_ossvrs
+  target_link_libraries(test_vrscli
       PUBLIC
         vrs_os
         vrs_test_helpers
@@ -49,7 +49,7 @@ if (UNIT_TESTS)
         vrs_oss_testdatadir
         GTest::Main
   )
-  add_dependencies(test_ossvrs vrs)
+  add_dependencies(test_vrscli vrs)
 
-  gtest_discover_tests(test_ossvrs)
+  gtest_discover_tests(test_vrscli)
 endif()
