@@ -15,6 +15,10 @@
 #define DEFAULT_LOG_CHANNEL "Log"
 #include "Log.h"
 
+#include <chrono>
+#include <map>
+#include <mutex>
+
 #include <fmt/color.h>
 
 using namespace std;
@@ -60,7 +64,17 @@ void log_every_n_seconds(
     int nSeconds,
     const char* channel,
     const std::string& message) {
-  log(level, channel, message);
+  using namespace std::chrono;
+  static mutex sMutex;
+  unique_lock lock(sMutex);
+  static map<tuple<const char*, int>, int64_t> sLastTime;
+  int64_t& lastTime = sLastTime[{file, line}];
+  int64_t now =
+      duration_cast<std::chrono::milliseconds>(steady_clock::now().time_since_epoch()).count();
+  if (lastTime + nSeconds * 1000 < now) {
+    log(level, channel, message);
+    lastTime = now;
+  }
 }
 
 } // namespace logging
