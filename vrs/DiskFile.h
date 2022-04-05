@@ -184,6 +184,8 @@ class AtomicDiskFile : public DiskFile {
   int create(const string& newFilePath) override;
   int close() override;
 
+  void abort();
+
  private:
   string finalName_;
 };

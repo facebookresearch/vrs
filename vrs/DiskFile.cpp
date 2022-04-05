@@ -559,4 +559,18 @@ int AtomicDiskFile::close() {
   return status;
 }
 
+void AtomicDiskFile::abort() {
+  if (isOpened() && !isReadOnly()) {
+    vector<string> chunkPaths;
+    chunkPaths.reserve(chunks_.size());
+    for (const auto& chunk : chunks_) {
+      chunkPaths.emplace_back(chunk.path);
+    }
+    DiskFile::close();
+    for (const string& path : chunkPaths) {
+      os::remove(path);
+    }
+  }
+}
+
 } // namespace vrs
