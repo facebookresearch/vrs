@@ -65,7 +65,7 @@ instructions for macOS and Ubuntu.
   [Brew’s web site](https://brew.sh/).
 - install tools & libraries:
   ```
-  brew install cmake ninja ccache boost fmt cereal lz4 zstd xxhash googletest
+  brew install cmake ninja ccache boost fmt cereal libpng jpeg lz4 zstd xxhash googletest
   brew install node doxygen
   ```
 
@@ -76,7 +76,8 @@ doesn't install recent enough versions of cmake, fmt, lz4, and zstd._
 
 - install tools & libraries:
   ```
-  sudo apt-get install cmake ninja-build ccache libgtest-dev libfmt-dev libcereal-dev liblz4-dev libzstd-dev libxxhash-dev
+  sudo apt-get install cmake ninja-build ccache libgtest-dev libfmt-dev libcereal-dev libjpeg-dev libpng-dev
+  sudo apt-get install liblz4-dev libzstd-dev libxxhash-dev
   sudo apt-get install libboost-system-dev libboost-filesystem-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev
   sudo apt-get install npm doxygen
   ```

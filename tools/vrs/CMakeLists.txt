@@ -24,6 +24,8 @@ target_link_libraries(vrs
     vrs_utils
     vrs_utils_cli
     Fmt::Fmt
+    Png::Png
+    Jpeg::Jpeg
     vrs_logging
 )
 
