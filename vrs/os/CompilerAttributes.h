@@ -17,6 +17,41 @@
 #include <vrs/os/Platform.h>
 
 #if IS_VRS_OSS_CODE()
+
+#if defined(_MSC_VER) && !defined(__clang__)
+
+#define VISIBILITY_DEFAULT __declspec(dllexport)
+#define VISIBILITY_HIDDEN
+#define FORCE_INLINE __forceinline
+#define NOINLINE __declspec(noinline)
+#define RESTRICT __restrict
+#define CURRENT_FUNCTION __FUNCSIG__
+#define UNREACHABLE_CODE() __assume(0)
+
+#ifdef _CPPUNWIND
+#define ARE_EXCEPTIONS_ENABLED() 1
+#else
+#define ARE_EXCEPTIONS_ENABLED() 0
+#endif
+
+#else // !_MSC_VER || __clang__
+
+#define VISIBILITY_DEFAULT __attribute__((visibility("default")))
+#define VISIBILITY_HIDDEN __attribute__((visibility("hidden")))
+#define FORCE_INLINE __attribute__((always_inline)) inline
+#define NOINLINE __attribute__((noinline))
+#define RESTRICT __restrict__
+#define CURRENT_FUNCTION __PRETTY_FUNCTION__
+#define UNREACHABLE_CODE() __builtin_unreachable()
+
+#if (defined(__cpp_exceptions) || defined(__EXCEPTIONS))
+#define ARE_EXCEPTIONS_ENABLED() 1
+#else
+#define ARE_EXCEPTIONS_ENABLED() 0
+#endif
+
+#endif // !_MSC_VER || __clang__
+
 #ifdef _MSC_VER
 
 #if _MSVC_LANG >= 201703L
