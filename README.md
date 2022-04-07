@@ -111,7 +111,7 @@ VRS is documented in three complementary ways:
 1. A high level documentation built using [Docusaurus](https://docusaurus.io/),
    right in the GitHub repo, in the `website` folder.
 2. The API documentation built using
-   [Doxgyen](https://www.doxygen.nl/manual/index.html), or by looking at the
+   [Doxygen](https://www.doxygen.nl/manual/index.html), or by looking at the
    source code. Note that we focus on documenting the API users of VRS should be
    using, while the VRS internal API is less systematically documented. If you
    find a class that isn't well documented, or not documented at all, you should
