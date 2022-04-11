@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+add_subdirectory(converters)
 add_subdirectory(xxhash)
 add_subdirectory(cli)
 
