@@ -24,6 +24,8 @@ find_package(Cereal REQUIRED)
 find_package(Lz4 REQUIRED)
 find_package(Zstd REQUIRED)
 find_package(xxHash REQUIRED)
+find_package(Png REQUIRED)
+find_package(Jpeg REQUIRED)
 
 # Setup unit test infra, but only if unit tests are enabled
 if (UNIT_TESTS)
