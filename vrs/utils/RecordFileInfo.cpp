@@ -251,10 +251,7 @@ void printOverview(
     printCountedName(out, streamIds.size(), "device");
     out << ", ";
     printCountedName(out, recordCounter.recordCount, "record");
-    if (!index.empty()) {
-      out << ", ";
-      printTime(out, &index[0], &index[index.size() - 1], 0, false);
-    }
+
     // using the time range of data records, calculate a record per second rate
     double first = 0;
     double last = 0;
@@ -273,7 +270,8 @@ void printOverview(
       }
     }
     if (last > first) {
-      out << fmt::format(", {:.4g}rps", 1. * (index.size() - skipCount) / (last - first));
+      out << ", data records ";
+      printTime(out, &index[skipCount], &index[index.size() - 1], (index.size() - skipCount), true);
     }
     out << "." << endl;
   }
