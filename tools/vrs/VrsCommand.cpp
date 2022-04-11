@@ -36,15 +36,14 @@
 #include <vrs/os/Utils.h>
 
 #include <vrs/utils/AudioExtractor.h>
+#include <vrs/utils/cli/AllExtractor.h>
 #include <vrs/utils/cli/CliParsing.h>
 #include <vrs/utils/cli/CompressionBenchmark.h>
+#include <vrs/utils/cli/ImageExtraction.h>
 #include <vrs/utils/cli/ListRecords.h>
 #include <vrs/utils/cli/MakeZeroFilterCopier.h>
 #include <vrs/utils/cli/PrintRecordFormatRecords.h>
 #include <vrs/utils/cli/PrintRecordFormats.h>
-
-//#include "AllExtractor.h"
-//#include "ImageExtraction.h"
 
 using namespace std;
 using namespace vrs;
@@ -74,8 +73,8 @@ const char* sCommands[] = {
     "print-json",
     "print-json-pretty",
     "rage",
-    "images",
-    "audio",
+    "extract-images",
+    "extract-audio",
     "extract-all",
     "json-description",
     "compression-benchmark",
@@ -186,14 +185,14 @@ void printHelp(const string& appName) {
              "rage <file.vrs>")
 
       << endl
-      //      << CMD("Extract extract images in a folder. jpg and png are extracted as is.\n"
-      //             "RAW images are saved as GREY8, GREY16, RGB8 or RGBA8 png files.",
-      //             "images file.vrs --to <folder_path> [filter-options]")
-      //      << CMD("Extract extract images in a folder. jpg and png are extracted as is.\n"
-      //             "Writes RAW images in .raw image files without any conversion.",
-      //             "raw-images file.vrs --to <folder_path> [filter-options]")
+      << CMD("Extract images in a folder. jpg and png are extracted as is.\n"
+             "RAW images are saved as GREY8, GREY16, RGB8 or RGBA8 png files,\n"
+             "or as .raw image files without any conversion with the --raw-images options.",
+             "extract-images file.vrs --to <folder_path> [filter-options] [--raw-images]")
       << CMD("Extract audio data as WAVE file(s) in a folder",
-             "audio file.vrs --to <folder_path> [filter-options]")
+             "extract-audio file.vrs --to <folder_path> [filter-options]")
+      << CMD("Extract images and meta data in a folder",
+             "extract-all file.vrs --to <folder_path> [filter-options]")
 
       << endl
       << CMD("Compute some lossless compression benchmarks", "compression-benchmark <file.vrs>")
@@ -259,12 +258,12 @@ void printSamples(const string& appName) {
        << "Merge multiple VRS files into a single one, merging streams by type:\n"
        << SP("merge first.vrs second.vrs third.vrs --to new.vrs")
 
-       //      << "Extract all images as images files:\n"
-       //      << SP("src.vrs -e imageFolder")
+       << "Extract all images as images files:\n"
+       << SP("extract-images file.vrs --to imageFolder")
 
-       //      << "Save all ImageStream images, recorded in the first 5 seconds:\n"
-       //      << SP("src.vrs # to see that '100' is ImageStream...")
-       //      << SP("src.vrs -e imageFolder + 100 --before +5")
+       << "Save all ImageStream images, recorded in the first 5 seconds:\n"
+       << SP("src.vrs # to see that '100' is ImageStream...")
+       << SP("extract-images file.vrs --to imageFolder + 100 --before +5")
 
        << endl;
 }
@@ -315,6 +314,8 @@ bool VrsCommand::parseArgument(
     }
   } else if (arg == "--fix-index") {
     autoFixIndex = true;
+  } else if (arg == "--raw-images") {
+    extractImagesRaw = true;
   } else if (arg == "--zero") {
     copyMakeStreamFilterFunction = makeZeroFilterCopier;
   } else {
@@ -503,15 +504,13 @@ int VrsCommand::runCommands() {
       printRecordFormatRecords(filteredReader, PrintoutType::Details);
       break;
     case Command::ExtractImages:
-      cerr << "Not implemented yet" << endl;
-      //      extractImages(targetPath, filteredReader, extractImagesRaw);
+      extractImages(targetPath, filteredReader, extractImagesRaw);
       break;
     case Command::ExtractAudio:
       extractAudio(targetPath, filteredReader);
       break;
     case Command::ExtractAll:
-      cerr << "Not implemented yet" << endl;
-      //      extractAll(targetPath, filteredReader);
+      extractAll(targetPath, filteredReader);
       break;
     case Command::JsonDescription:
       cout << RecordFileInfo::jsonOverview(

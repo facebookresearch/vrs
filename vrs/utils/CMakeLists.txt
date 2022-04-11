@@ -28,7 +28,10 @@ target_link_libraries(vrs_utils
   PUBLIC
     vrslib
     vrs_helpers
+    vrs_utils_converters
     Cereal::Cereal
     Fmt::Fmt
+    Jpeg::Jpeg
+    Png::Png
 )
 target_include_directories(vrs_utils PUBLIC ${VRS_SOURCE_DIR})
