@@ -134,5 +134,6 @@ struct VrsCommand {
   /// Additional input files for merge operations
   std::list<vrs::utils::FilteredFileReader> otherFilteredReaders;
 
+  /// Extract raw images as ".raw" files instead of converting them to png.
   bool extractImagesRaw = false;
 };
