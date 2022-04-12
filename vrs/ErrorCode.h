@@ -31,8 +31,6 @@ const int kPlatformUserErrorsStart = 200000;
 const int kPlatformUserErrorsStart = 1 << 29; // bit 29 is set for user errors
 #elif IS_LINUX_PLATFORM() || IS_ANDROID_PLATFORM()
 const int kPlatformUserErrorsStart = 1000; // Errorno is 131
-#elif IS_XROS_PLATFORM()
-const int kPlatformUserErrorsStart = 1000; // Use same as linux
 #else
 #error "unknown platform"
 #endif

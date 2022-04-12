@@ -102,10 +102,4 @@
 #include <portability/CompilerAttributes.h>
 #endif
 
-// XROS builds with -Wthread-safety-analysis, which (correctly) flags that the DataLayouter mutex
-// can be used in an unsafe fashion.
-#if IS_XROS_PLATFORM()
-#define DISABLE_THREAD_SAFETY_ANALYSIS __attribute__((no_thread_safety_analysis))
-#else // !IS_XROS_PLATFORM()
 #define DISABLE_THREAD_SAFETY_ANALYSIS
-#endif // !IS_XROS_PLATFORM()

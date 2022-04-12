@@ -63,7 +63,6 @@
 #define IS_MAC_PLATFORM() 0
 #define IS_IOS_PLATFORM() 0
 #define IS_WINDOWS_PLATFORM() 0
-#define IS_XROS_PLATFORM() 0
 
 #else // !defined(__ANDROID__)
 // Linux
@@ -74,7 +73,6 @@
 #define IS_MAC_PLATFORM() 0
 #define IS_IOS_PLATFORM() 0
 #define IS_WINDOWS_PLATFORM() 0
-#define IS_XROS_PLATFORM() 0
 
 #endif // !defined(__ANDROID__)
 
@@ -85,7 +83,6 @@
 #define IS_LINUX_PLATFORM() 0
 #define IS_APPLE_PLATFORM() 1
 #define IS_WINDOWS_PLATFORM() 0
-#define IS_XROS_PLATFORM() 0
 
 // need to distinguish between MacOS and iOS
 #include <TargetConditionals.h>
@@ -116,7 +113,6 @@
 #define IS_MAC_PLATFORM() 0
 #define IS_IOS_PLATFORM() 0
 #define IS_WINDOWS_PLATFORM() 1
-#define IS_XROS_PLATFORM() 0
 
 #else // !ANDROID && !LINUX && !APPLE && !WINDOWS && !MAC && &!IOS
 

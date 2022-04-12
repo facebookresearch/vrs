@@ -41,7 +41,7 @@ struct FileTest : testing::Test {
   }
 };
 
-#if !IS_ANDROID_PLATFORM() && !IS_XROS_PLATFORM()
+#if !IS_ANDROID_PLATFORM()
 TEST_F(FileTest, testDataDirExistsTest) {
   EXPECT_TRUE(os::isDir(testDataDir));
 }
@@ -51,8 +51,6 @@ TEST_F(FileTest, testOsIsDir) {
 #if IS_ANDROID_PLATFORM()
   EXPECT_TRUE(os::isDir("/system/bin"));
   EXPECT_FALSE(os::isDir("/system/super_dummy_name_that_should_not_ever_exist_let_me_tell_you"));
-#elif IS_XROS_PLATFORM()
-  // TBD
 #else
   EXPECT_TRUE(os::isDir(testDataDir));
   EXPECT_FALSE(os::isDir(os::pathJoin(testDataDir, "/filetest/a.txt")));
@@ -76,7 +74,7 @@ TEST_F(FileTest, testOsIsDir) {
 #endif
 }
 
-#if !IS_ANDROID_PLATFORM() && !IS_XROS_PLATFORM()
+#if !IS_ANDROID_PLATFORM()
 
 TEST_F(FileTest, testIsFile) {
   EXPECT_TRUE(os::isFile(os::pathJoin(testDataDir, "/filetest/a.txt")));
@@ -129,9 +127,8 @@ TEST_F(FileTest, testGetFileSize) {
 #endif // !IS_WINDOWS_PLATFORM()
 }
 
-#endif // !IS_ANDROID_PLATFORM() && !IS_XROS_PLATFORM()
+#endif // !IS_ANDROID_PLATFORM()
 
-#if !IS_XROS_PLATFORM()
 struct GetCurrentExecutablePathTest : testing::Test {
   GetCurrentExecutablePathTest() {}
 
@@ -142,7 +139,6 @@ TEST_F(GetCurrentExecutablePathTest, testGetCurrentExecutablePath) {
   EXPECT_TRUE(os::getFileSize(currentExectable) > 0);
   EXPECT_TRUE(os::isDir(os::getParentFolder(currentExectable)));
 }
-#endif
 
 TEST_F(FileTest, testSanitize) {
   vector<const char*> goodNames = {"All good name.txt", "abcdefg", "~.txt"};

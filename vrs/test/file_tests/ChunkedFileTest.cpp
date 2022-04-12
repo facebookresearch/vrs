@@ -85,7 +85,7 @@ TEST_F(ChunkedFileTester, MissingChunkChunkedFileTest) {
   EXPECT_EQ(file.openFile(jsonPath), DISKFILE_FILE_NOT_FOUND);
 }
 
-#if !IS_WINDOWS_PLATFORM() && !IS_XROS_PLATFORM()
+#if !IS_WINDOWS_PLATFORM()
 
 TEST_F(ChunkedFileTester, LinkedFileTest) {
   vrs::RecordFileReader file;
@@ -114,7 +114,7 @@ TEST_F(ChunkedFileTester, LinkedFileTest) {
   EXPECT_EQ(
       RecordFileReader::vrsFilePathToFileSpec(linkedFile, foundSpec), DISKFILE_FILE_NOT_FOUND);
 }
-#endif // !IS_WINDOWS_PLATFORM && !IS_XROS_PLATFORM()
+#endif // !IS_WINDOWS_PLATFORM
 
 TEST_F(ChunkedFileTester, newChunks) {
   const string testPath = os::getTempFolder() + "chunking.vrs";
