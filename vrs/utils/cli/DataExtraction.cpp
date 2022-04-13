@@ -12,18 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "AudioExtraction.h"
+#include "DataExtraction.h"
 
-#define DEFAULT_LOG_CHANNEL "AudioExtraction"
+#define DEFAULT_LOG_CHANNEL "DataExtraction"
 #include <logging/Log.h>
 
+#include <fmt/format.h>
+
+#include <vrs/RecordFileReader.h>
+#include <vrs/helpers/FileMacros.h>
 #include <vrs/os/Utils.h>
 #include <vrs/utils/AudioExtractor.h>
+#include <vrs/utils/DataExtractor.h>
+#include <vrs/utils/ImageExtractor.h>
 
 using namespace std;
-using namespace vrs;
 
 namespace vrs::utils {
+
+void extractImages(const string& path, FilteredFileReader& filteredReader, bool extractImagesRaw) {
+  if (path.length() > 0) {
+    os::makeDirectories(path);
+  }
+  uint32_t imageCounter = 0;
+  deque<unique_ptr<StreamPlayer>> extractors;
+  for (auto id : filteredReader.filter.streams) {
+    if (filteredReader.reader.mightContainImages(id)) {
+      extractors.emplace_back(make_unique<ImageExtractor>(path, imageCounter, extractImagesRaw));
+      filteredReader.reader.setStreamPlayer(id, extractors.back().get());
+    }
+  }
+  filteredReader.iterateSafe();
+  cout << "Found " << imageCounter << " image(s)." << endl;
+}
 
 int extractAudio(const string& path, FilteredFileReader& filteredReader) {
   if (path.length() > 0) {
@@ -53,6 +74,16 @@ int extractAudio(const string& path, FilteredFileReader& filteredReader) {
   cout << "Wrote " << audioFileCount << " audio file(s) from " << streamCount << " stream(s)."
        << endl;
   return 0;
+}
+
+int extractAll(const string& outputFolder, FilteredFileReader& filteredReader) {
+  utils::DataExtractor extractor(filteredReader.reader, outputFolder);
+  for (auto id : filteredReader.filter.streams) {
+    extractor.extract(id);
+  }
+  IF_ERROR_LOG_AND_RETURN(extractor.createOutput());
+  filteredReader.iterateSafe();
+  return extractor.completeOutput();
 }
 
 } // namespace vrs::utils
