@@ -524,7 +524,8 @@ uint32_t ImageContentBlockSpec::getStride() const {
   switch (pixelFormat_) {
     case PixelFormat::YUV_I420_SPLIT:
       return getWidth();
-    case PixelFormat::RAW10: {
+    case PixelFormat::RAW10:
+    case PixelFormat::RAW10_BAYER_RGGB: {
       // groups of 4 pixels use 5 bytes, sharing the 5th for their last two bits
       uint32_t fourPixelsGroupCount = (getWidth() + 3) / 4;
       return fourPixelsGroupCount * 5;
@@ -536,6 +537,8 @@ uint32_t ImageContentBlockSpec::getStride() const {
     }
     default:;
   }
+  // Every pixel format must compute a default stride when none is explicitly provided
+  XR_LOGE("The pixel format {} isn't properly implemented.", toString(pixelFormat_));
   return 0;
 }
 
