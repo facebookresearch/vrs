@@ -35,8 +35,8 @@
 #include <vrs/os/Time.h>
 #include <vrs/os/Utils.h>
 
-#include <vrs/utils/AudioExtractor.h>
 #include <vrs/utils/cli/AllExtractor.h>
+#include <vrs/utils/cli/AudioExtraction.h>
 #include <vrs/utils/cli/CliParsing.h>
 #include <vrs/utils/cli/CompressionBenchmark.h>
 #include <vrs/utils/cli/ImageExtraction.h>
