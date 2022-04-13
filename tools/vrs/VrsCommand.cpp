@@ -191,7 +191,7 @@ void printHelp(const string& appName) {
              "extract-images file.vrs --to <folder_path> [filter-options] [--raw-images]")
       << CMD("Extract audio data as WAVE file(s) in a folder",
              "extract-audio file.vrs --to <folder_path> [filter-options]")
-      << CMD("Extract images and meta data in a folder",
+      << CMD("Extract images, audio, and meta data in a folder",
              "extract-all file.vrs --to <folder_path> [filter-options]")
 
       << endl

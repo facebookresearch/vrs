@@ -161,6 +161,17 @@ bool DataExtractor::DataExtractorStreamPlayer::onImageRead(
   return false;
 }
 
+bool DataExtractor::DataExtractorStreamPlayer::onAudioRead(
+    const CurrentRecord& record,
+    size_t blockIndex,
+    const ContentBlock& audioBlock) {
+  if (!audioExtractor_) {
+    audioExtractor_ =
+        make_unique<AudioExtractor>(outputFolder_, record.streamId, audioFileCounter_);
+  }
+  return audioExtractor_->onAudioRead(record, blockIndex, audioBlock);
+}
+
 bool DataExtractor::DataExtractorStreamPlayer::onCustomBlockRead(
     const CurrentRecord& record,
     size_t blockIndex,
@@ -247,6 +258,13 @@ void DataExtractor::DataExtractorStreamPlayer::wroteImage(const string& filename
   blocks_.emplace_back(fmt::format("{{\"image\":\"{}\"}}", filename));
 }
 
+int DataExtractor::DataExtractorStreamPlayer::completeOutput() {
+  if (audioExtractor_) {
+    audioExtractor_.reset();
+  }
+  return 0;
+}
+
 int DataExtractor::extractAll(const string& vrsFilePath, const string& outputFolder) {
   RecordFileReader reader;
   IF_ERROR_LOG_AND_RETURN(reader.openFile(vrsFilePath));
@@ -301,6 +319,9 @@ int DataExtractor::createOutput() {
 }
 
 int DataExtractor::completeOutput() {
+  for (const auto& iter : extractors_) {
+    iter.second->completeOutput();
+  }
   if (!output_.is_open()) {
     return SUCCESS;
   }
