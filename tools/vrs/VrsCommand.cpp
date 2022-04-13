@@ -35,11 +35,9 @@
 #include <vrs/os/Time.h>
 #include <vrs/os/Utils.h>
 
-#include <vrs/utils/cli/AllExtractor.h>
-#include <vrs/utils/cli/AudioExtraction.h>
 #include <vrs/utils/cli/CliParsing.h>
 #include <vrs/utils/cli/CompressionBenchmark.h>
-#include <vrs/utils/cli/ImageExtraction.h>
+#include <vrs/utils/cli/DataExtraction.h>
 #include <vrs/utils/cli/ListRecords.h>
 #include <vrs/utils/cli/MakeZeroFilterCopier.h>
 #include <vrs/utils/cli/PrintRecordFormatRecords.h>
