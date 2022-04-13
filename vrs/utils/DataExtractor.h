@@ -19,6 +19,7 @@
 #include <memory>
 
 #include <vrs/RecordFileReader.h>
+#include <vrs/utils/AudioExtractor.h>
 #include <vrs/utils/VideoRecordFormatStreamPlayer.h>
 
 namespace vrs::utils {
@@ -61,6 +62,7 @@ class DataExtractor {
     DataExtractorStreamPlayer(std::ofstream& output, const string& outputFolder);
     bool onDataLayoutRead(const CurrentRecord&, size_t blockIndex, DataLayout&) override;
     bool onImageRead(const CurrentRecord&, size_t blockIndex, const ContentBlock&) override;
+    bool onAudioRead(const CurrentRecord& record, size_t, const ContentBlock& audioBlock) override;
     bool onCustomBlockRead(const CurrentRecord&, size_t blockIndex, const ContentBlock&) override;
     bool onUnsupportedBlock(const CurrentRecord&, size_t blockIndex, const ContentBlock&) override;
 
@@ -71,13 +73,17 @@ class DataExtractor {
 
     void wroteImage(const string& filename);
 
+    int completeOutput();
+
    protected:
     std::ofstream& output_;
     const string outputFolder_;
+    std::unique_ptr<AudioExtractor> audioExtractor_;
     std::vector<string> blocks_;
     std::shared_ptr<PixelFrame> inputFrame_;
     std::shared_ptr<PixelFrame> processedFrame_;
     uint32_t imageCounter_ = 0;
+    uint32_t audioFileCounter_ = 0;
   };
 
  private:
