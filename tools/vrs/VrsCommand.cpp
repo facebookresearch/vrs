@@ -502,13 +502,13 @@ int VrsCommand::runCommands() {
       printRecordFormatRecords(filteredReader, PrintoutType::Details);
       break;
     case Command::ExtractImages:
-      extractImages(targetPath, filteredReader, extractImagesRaw);
+      extractImages(targetPath.empty() ? "." : targetPath, filteredReader, extractImagesRaw);
       break;
     case Command::ExtractAudio:
-      extractAudio(targetPath, filteredReader);
+      extractAudio(targetPath.empty() ? "." : targetPath, filteredReader);
       break;
     case Command::ExtractAll:
-      extractAll(targetPath, filteredReader);
+      extractAll(targetPath.empty() ? "." : targetPath, filteredReader);
       break;
     case Command::JsonDescription:
       cout << RecordFileInfo::jsonOverview(
