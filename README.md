@@ -55,9 +55,10 @@ some package system, such as [Brew](https://brew.sh/) on macOS, or
 [apt](<https://en.wikipedia.org/wiki/APT_(software)>) on Ubuntu, and then use
 cmake to build & test. VRS supports many other platforms such as Windows,
 Android, iOS and other flavors of Linux, but we currently only provide
-instructions for macOS and Ubuntu.
+instructions for macOS and Ubuntu. You can also build VRS in a container and
+avoid installing any library on your system.
 
-## Instructions (macOS and Ubuntu)
+## Instructions (macOS and Ubuntu and container)
 
 ### Install build tools & libraries (macOS)
 
@@ -104,6 +105,16 @@ We don’t have equivalent instructions for Windows.
 [vcpkg](https://vcpkg.io/en/index.html) looks like a promising package manager
 for Windows, but the cmake build system needs more massaging to work.\
 Contributions welcome! :-)
+
+## Container build & Usage
+
+- Build VRS in a container and use it on your local data:
+
+```
+cd <path_to_vrs_folder>
+podman/docker build . -t vrs
+podman/docker run -it --volume <your_local_data>:/data vrs:latest
+```
 
 # Documentation & Support
 
