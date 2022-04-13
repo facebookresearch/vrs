@@ -14,8 +14,6 @@
 
 #include "PrintRecordFormatRecords.h"
 
-#include <iostream>
-
 #include <fmt/format.h>
 
 #include <vrs/RecordFormatStreamPlayer.h>
@@ -64,21 +62,21 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
     if (printing_) {
       switch (printoutType_) {
         case PrintoutType::Details:
-          cout << " - DataLayout:" << endl;
+          fmt::print(" - DataLayout:\n");
           datalayout.printLayout(cout, "   ");
           break;
 
         case PrintoutType::Compact:
-          cout << " - DataLayout:" << endl;
+          fmt::print(" - DataLayout:\n");
           datalayout.printLayoutCompact(cout, "   ");
           break;
 
         case PrintoutType::JsonCompact:
-          cout << datalayout.asJson(JsonFormatProfile::ExternalCompact) << endl;
+          fmt::print("{}\n", datalayout.asJson(JsonFormatProfile::ExternalCompact));
           break;
 
         case PrintoutType::JsonPretty:
-          cout << datalayout.asJson(JsonFormatProfile::ExternalPretty) << endl;
+          fmt::print("{}\n", datalayout.asJson(JsonFormatProfile::ExternalPretty));
           break;
 
         case PrintoutType::None:
@@ -90,8 +88,7 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
   bool onImageRead(const CurrentRecord& record, size_t blkIdx, const ContentBlock& cb) override {
     if (printing_) {
       if (printoutType_ == PrintoutType::Compact || printoutType_ == PrintoutType::Details) {
-        cout << " - Image block, " << cb.asString() << ", " << cb.getBlockSize() << " bytes."
-             << endl;
+        fmt::print(" - Image block, {}, {} bytes.\n", cb.asString(), cb.getBlockSize());
       } else {
         fmt::print("{{\"image\":\"{}\"}}\n", cb.asString());
       }
@@ -101,8 +98,7 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
   bool onAudioRead(const CurrentRecord& record, size_t blkIdx, const ContentBlock& cb) override {
     if (printing_) {
       if (printoutType_ == PrintoutType::Compact || printoutType_ == PrintoutType::Details) {
-        cout << " - Audio block, " << cb.asString() << ", " << cb.getBlockSize() << " bytes."
-             << endl;
+        fmt::print(" - Audio block, {}, {} bytes.\n", cb.asString(), cb.getBlockSize());
       } else {
         fmt::print("{{\"audio\":\"{}\"}}\n", cb.asString());
       }
@@ -112,8 +108,7 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
   bool onCustomBlockRead(const CurrentRecord& r, size_t blkIdx, const ContentBlock& cb) override {
     if (printing_) {
       if (printoutType_ == PrintoutType::Compact || printoutType_ == PrintoutType::Details) {
-        cout << " - Custom block, " << cb.asString() << ", " << cb.getBlockSize() << " bytes."
-             << endl;
+        fmt::print(" - Custom block, {}, {} bytes.\n", cb.asString(), cb.getBlockSize());
       } else {
         fmt::print("{{\"custom\":\"{}\"}}\n", cb.asString());
       }
@@ -123,11 +118,11 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
   bool onUnsupportedBlock(const CurrentRecord& r, size_t blkIdx, const ContentBlock& cb) override {
     if (printing_) {
       if (printoutType_ == PrintoutType::Compact || printoutType_ == PrintoutType::Details) {
-        cout << " - Unsupported block, " << cb.asString();
+        fmt::print(" - Unsupported block, {}", cb.asString());
         if (cb.getBlockSize() == ContentBlock::kSizeUnknown) {
-          cout << ", size unknown." << endl;
+          fmt::print(", size unknown.\n");
         } else {
-          cout << ", " << cb.getBlockSize() << " bytes." << endl;
+          fmt::print(", {} bytes.\n", cb.getBlockSize());
         }
       } else {
         fmt::print("{{\"unsupported\":\"{}\"}}\n", cb.asString());
@@ -138,7 +133,7 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
   bool readContentBlockData(const CurrentRecord& record, const ContentBlock& contentBlock) {
     size_t blockSize = contentBlock.getBlockSize();
     if (blockSize == ContentBlock::kSizeUnknown) {
-      cerr << "  *** Content block size unknown! ***" << endl;
+      fmt::print(stderr, "  *** Content block size unknown! ***\n");
       return false;
     }
     vector<char> data(blockSize);
@@ -146,7 +141,7 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
     if (readStatus == 0) {
       return true; // read next blocks, if any
     }
-    cerr << "  *** Failed to read content: " << errorCodeToMessage(readStatus) << " ***" << endl;
+    fmt::print(stderr, "  *** Failed to read content: {} ***\n", errorCodeToMessage(readStatus));
     return false;
   }
   void enablePrinting() {
