@@ -252,26 +252,28 @@ void printOverview(
     out << ", ";
     printCountedName(out, recordCounter.recordCount, "record");
 
-    // using the time range of data records, calculate a record per second rate
-    double first = 0;
-    double last = 0;
-    size_t skipCount = 0; // count of non-data records before the first data record
-    for (const auto& record : index) {
-      ++skipCount;
-      if (record.recordType == Record::Type::DATA) {
-        first = record.timestamp;
-        break;
-      }
+    // considering only data records, calculate a data record range and data record per second
+    uint32_t first = 0; // count of non-data records before the first data record
+    while (first < index.size() && index[first].recordType != Record::Type::DATA) {
+      ++first;
     }
-    for (auto iter = index.rbegin(); iter != index.rend(); ++iter) {
-      if (iter->recordType == Record::Type::DATA) {
-        last = iter->timestamp;
-        break;
+    if (first < index.size()) {
+      uint32_t last = 0;
+      uint32_t recordCount = 0;
+      for (uint32_t k = first; k < index.size(); ++k) {
+        if (index[k].recordType == Record::Type::DATA) {
+          last = k;
+          ++recordCount;
+        }
       }
-    }
-    if (last > first) {
-      out << ", data records ";
-      printTime(out, &index[skipCount], &index[index.size() - 1], (index.size() - skipCount), true);
+      if (recordCount == 1) {
+        out << ", 1 data record ";
+      } else {
+        out << ", " << recordCount << " data records ";
+      }
+      printTime(out, &index[first], &index[last], recordCount, true);
+    } else {
+      out << ", no data record";
     }
     out << "." << endl;
   }
