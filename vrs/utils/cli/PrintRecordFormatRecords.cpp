@@ -16,6 +16,8 @@
 
 #include <iostream>
 
+#include <fmt/format.h>
+
 #include <vrs/RecordFormatStreamPlayer.h>
 
 using namespace std;
@@ -35,22 +37,21 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
       if (decoder != readers_.end()) {
         recordFormat = decoder->second.recordFormat.asString();
       } else {
-        recordFormat = "<undefined>";
+        recordFormat = "<no RecordFormat definition>";
       }
-      printf(
-          "%.03f %s [%s], %s record, %s = %d bytes total.\n",
+      fmt::print(
+          "{:.3f} {} [{}], {} record, {} = {} bytes total.\n",
           record.timestamp,
-          record.streamId.getName().c_str(),
-          record.streamId.getNumericName().c_str(),
+          record.streamId.getName(),
+          record.streamId.getNumericName(),
           Record::typeName(record.recordType),
-          recordFormat.c_str(),
+          recordFormat,
           record.recordSize);
     } else {
-      printf(
-          "{ \"record\": { \"timestamp\": %.03f, \"device\": \"%d-%hu\", \"type\": \"%s\", \"size\": %d } }\n",
+      fmt::print(
+          "{{\"record\":{{\"timestamp\":{:.3f},\"device\":\"{}\",\"type\":\"{}\",\"size\":{}}}}}\n",
           record.timestamp,
-          static_cast<int>(record.streamId.getTypeId()),
-          record.streamId.getInstanceId(),
+          record.streamId.getNumericName(),
           Record::typeName(record.recordType),
           record.recordSize);
     }
@@ -86,7 +87,7 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
     if (printoutType_ == PrintoutType::Compact || printoutType_ == PrintoutType::Details) {
       cout << " - Image block, " << cb.asString() << ", " << cb.getBlockSize() << " bytes." << endl;
     } else {
-      printf("{ \"image\": \"%s\" }\n", cb.asString().c_str());
+      fmt::print("{{\"image\":\"{}\"}}\n", cb.asString());
     }
     return readContentBlockData(record, cb);
   }
@@ -94,7 +95,7 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
     if (printoutType_ == PrintoutType::Compact || printoutType_ == PrintoutType::Details) {
       cout << " - Audio block, " << cb.asString() << ", " << cb.getBlockSize() << " bytes." << endl;
     } else {
-      printf("{ \"audio\": \"%s\" }\n", cb.asString().c_str());
+      fmt::print("{{\"audio\":\"{}\"}}\n", cb.asString());
     }
     return readContentBlockData(record, cb);
   }
@@ -103,7 +104,7 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
       cout << " - Custom block, " << cb.asString() << ", " << cb.getBlockSize() << " bytes."
            << endl;
     } else {
-      printf("{ \"custom\": \"%s\" }\n", cb.asString().c_str());
+      fmt::print("{{\"custom\":\"{}\"}}\n", cb.asString());
     }
     return readContentBlockData(r, cb);
   }
@@ -116,7 +117,7 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
         cout << ", " << cb.getBlockSize() << " bytes." << endl;
       }
     } else {
-      printf("{ \"unsupported\": \"%s\" }\n", cb.asString().c_str());
+      fmt::print("{{\"unsupported\":\"{}\"}}\n", cb.asString());
     }
     return readContentBlockData(r, cb);
   }

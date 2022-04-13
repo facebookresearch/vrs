@@ -14,6 +14,8 @@
 
 #include "ListRecords.h"
 
+#include <fmt/format.h>
+
 #include <vrs/ForwardDefinitions.h>
 #include <vrs/StreamPlayer.h>
 
@@ -40,11 +42,11 @@ class RecordLister : public StreamPlayer {
   }
 
   void list(const CurrentRecord& record) {
-    printf(
-        "%.03f %s - %s, %s record, %d bytes.\n",
+    fmt::print(
+        "{:.3f} {} [{}], {} record, {} bytes total.\n",
         record.timestamp,
-        record.streamId.getNumericName().c_str(),
-        record.streamId.getName().c_str(),
+        record.streamId.getName(),
+        record.streamId.getNumericName(),
         Record::typeName(record.recordType),
         record.recordSize);
   }
