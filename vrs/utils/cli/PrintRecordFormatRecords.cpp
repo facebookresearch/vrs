@@ -30,94 +30,108 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
  public:
   explicit DataLayoutPrinter(PrintoutType type) : printoutType_{type} {}
   bool processRecordHeader(const CurrentRecord& record, DataReference& outDataReference) override {
-    if (printoutType_ == PrintoutType::Compact || printoutType_ == PrintoutType::Details) {
-      const auto& decoder = readers_.find(tuple<StreamId, Record::Type, uint32_t>(
-          record.streamId, record.recordType, record.formatVersion));
-      string recordFormat;
-      if (decoder != readers_.end()) {
-        recordFormat = decoder->second.recordFormat.asString();
+    if (printing_) {
+      if (printoutType_ == PrintoutType::Compact || printoutType_ == PrintoutType::Details) {
+        const auto& decoder = readers_.find(tuple<StreamId, Record::Type, uint32_t>(
+            record.streamId, record.recordType, record.formatVersion));
+        string recordFormat;
+        if (decoder != readers_.end()) {
+          recordFormat = decoder->second.recordFormat.asString();
+        } else {
+          recordFormat = "<no RecordFormat definition>";
+        }
+        fmt::print(
+            "{:.3f} {} [{}], {} record, {} = {} bytes total.\n",
+            record.timestamp,
+            record.streamId.getName(),
+            record.streamId.getNumericName(),
+            Record::typeName(record.recordType),
+            recordFormat,
+            record.recordSize);
       } else {
-        recordFormat = "<no RecordFormat definition>";
+        fmt::print(
+            "{{\"record\":{{\"timestamp\":{:.3f},\"device\":\"{}\",\"type\":\"{}\",\"size\":{}}}}}\n",
+            record.timestamp,
+            record.streamId.getNumericName(),
+            Record::typeName(record.recordType),
+            record.recordSize);
       }
-      fmt::print(
-          "{:.3f} {} [{}], {} record, {} = {} bytes total.\n",
-          record.timestamp,
-          record.streamId.getName(),
-          record.streamId.getNumericName(),
-          Record::typeName(record.recordType),
-          recordFormat,
-          record.recordSize);
-    } else {
-      fmt::print(
-          "{{\"record\":{{\"timestamp\":{:.3f},\"device\":\"{}\",\"type\":\"{}\",\"size\":{}}}}}\n",
-          record.timestamp,
-          record.streamId.getNumericName(),
-          Record::typeName(record.recordType),
-          record.recordSize);
     }
     return RecordFormatStreamPlayer::processRecordHeader(record, outDataReference);
   }
 
   bool onDataLayoutRead(const CurrentRecord& r, size_t blkIdx, DataLayout& datalayout) override {
-    switch (printoutType_) {
-      case PrintoutType::Details:
-        cout << " - DataLayout:" << endl;
-        datalayout.printLayout(cout, "   ");
-        break;
+    if (printing_) {
+      switch (printoutType_) {
+        case PrintoutType::Details:
+          cout << " - DataLayout:" << endl;
+          datalayout.printLayout(cout, "   ");
+          break;
 
-      case PrintoutType::Compact:
-        cout << " - DataLayout:" << endl;
-        datalayout.printLayoutCompact(cout, "   ");
-        break;
+        case PrintoutType::Compact:
+          cout << " - DataLayout:" << endl;
+          datalayout.printLayoutCompact(cout, "   ");
+          break;
 
-      case PrintoutType::JsonCompact:
-        cout << datalayout.asJson(JsonFormatProfile::ExternalCompact) << endl;
-        break;
+        case PrintoutType::JsonCompact:
+          cout << datalayout.asJson(JsonFormatProfile::ExternalCompact) << endl;
+          break;
 
-      case PrintoutType::JsonPretty:
-        cout << datalayout.asJson(JsonFormatProfile::ExternalPretty) << endl;
-        break;
+        case PrintoutType::JsonPretty:
+          cout << datalayout.asJson(JsonFormatProfile::ExternalPretty) << endl;
+          break;
 
-      case PrintoutType::None:
-        break;
+        case PrintoutType::None:
+          break;
+      }
     }
     return true; // read next blocks, if any
   }
   bool onImageRead(const CurrentRecord& record, size_t blkIdx, const ContentBlock& cb) override {
-    if (printoutType_ == PrintoutType::Compact || printoutType_ == PrintoutType::Details) {
-      cout << " - Image block, " << cb.asString() << ", " << cb.getBlockSize() << " bytes." << endl;
-    } else {
-      fmt::print("{{\"image\":\"{}\"}}\n", cb.asString());
+    if (printing_) {
+      if (printoutType_ == PrintoutType::Compact || printoutType_ == PrintoutType::Details) {
+        cout << " - Image block, " << cb.asString() << ", " << cb.getBlockSize() << " bytes."
+             << endl;
+      } else {
+        fmt::print("{{\"image\":\"{}\"}}\n", cb.asString());
+      }
     }
     return readContentBlockData(record, cb);
   }
   bool onAudioRead(const CurrentRecord& record, size_t blkIdx, const ContentBlock& cb) override {
-    if (printoutType_ == PrintoutType::Compact || printoutType_ == PrintoutType::Details) {
-      cout << " - Audio block, " << cb.asString() << ", " << cb.getBlockSize() << " bytes." << endl;
-    } else {
-      fmt::print("{{\"audio\":\"{}\"}}\n", cb.asString());
+    if (printing_) {
+      if (printoutType_ == PrintoutType::Compact || printoutType_ == PrintoutType::Details) {
+        cout << " - Audio block, " << cb.asString() << ", " << cb.getBlockSize() << " bytes."
+             << endl;
+      } else {
+        fmt::print("{{\"audio\":\"{}\"}}\n", cb.asString());
+      }
     }
     return readContentBlockData(record, cb);
   }
   bool onCustomBlockRead(const CurrentRecord& r, size_t blkIdx, const ContentBlock& cb) override {
-    if (printoutType_ == PrintoutType::Compact || printoutType_ == PrintoutType::Details) {
-      cout << " - Custom block, " << cb.asString() << ", " << cb.getBlockSize() << " bytes."
-           << endl;
-    } else {
-      fmt::print("{{\"custom\":\"{}\"}}\n", cb.asString());
+    if (printing_) {
+      if (printoutType_ == PrintoutType::Compact || printoutType_ == PrintoutType::Details) {
+        cout << " - Custom block, " << cb.asString() << ", " << cb.getBlockSize() << " bytes."
+             << endl;
+      } else {
+        fmt::print("{{\"custom\":\"{}\"}}\n", cb.asString());
+      }
     }
     return readContentBlockData(r, cb);
   }
   bool onUnsupportedBlock(const CurrentRecord& r, size_t blkIdx, const ContentBlock& cb) override {
-    if (printoutType_ == PrintoutType::Compact || printoutType_ == PrintoutType::Details) {
-      cout << " - Unsupported block, " << cb.asString();
-      if (cb.getBlockSize() == ContentBlock::kSizeUnknown) {
-        cout << ", size unknown." << endl;
+    if (printing_) {
+      if (printoutType_ == PrintoutType::Compact || printoutType_ == PrintoutType::Details) {
+        cout << " - Unsupported block, " << cb.asString();
+        if (cb.getBlockSize() == ContentBlock::kSizeUnknown) {
+          cout << ", size unknown." << endl;
+        } else {
+          cout << ", " << cb.getBlockSize() << " bytes." << endl;
+        }
       } else {
-        cout << ", " << cb.getBlockSize() << " bytes." << endl;
+        fmt::print("{{\"unsupported\":\"{}\"}}\n", cb.asString());
       }
-    } else {
-      fmt::print("{{\"unsupported\":\"{}\"}}\n", cb.asString());
     }
     return readContentBlockData(r, cb);
   }
@@ -135,9 +149,13 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
     cerr << "  *** Failed to read content: " << errorCodeToMessage(readStatus) << " ***" << endl;
     return false;
   }
+  void enablePrinting() {
+    printing_ = true;
+  }
 
  private:
   PrintoutType printoutType_;
+  bool printing_{false};
 };
 
 } // namespace
@@ -149,7 +167,13 @@ void printRecordFormatRecords(FilteredFileReader& filteredReader, PrintoutType t
   for (auto id : filteredReader.filter.streams) {
     filteredReader.reader.setStreamPlayer(id, &lister);
   }
-  filteredReader.iterateSafe();
+  double startTimestamp, endTimestamp;
+  filteredReader.getConstrainedTimeRange(startTimestamp, endTimestamp);
+  // Required to Load RecordFormat & DataLayout definitions from filtered-out configuration records!
+  filteredReader.preRollConfigAndState();
+  // do not print records during pre-roll!
+  lister.enablePrinting();
+  filteredReader.iterateAdvanced();
 }
 
 } // namespace vrs::utils

@@ -61,7 +61,10 @@ void listRecords(utils::FilteredFileReader& filteredReader) {
   for (auto id : filteredReader.filter.streams) {
     filteredReader.reader.setStreamPlayer(id, &lister);
   }
-  filteredReader.iterateSafe();
+  // this option doesn't use RecordFormat, and it's only a record list: no need to preroll at all!
+  double startTimestamp, endTimestamp;
+  filteredReader.getConstrainedTimeRange(startTimestamp, endTimestamp);
+  filteredReader.iterateAdvanced();
 }
 
 } // namespace vrs::utils
