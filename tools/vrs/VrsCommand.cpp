@@ -477,8 +477,11 @@ int VrsCommand::runCommands() {
       break;
     case Command::Debug: {
       cout << "VRS file internals of '" << filteredReader.getPathOrUri() << '\'' << endl;
+      FileSpec spec;
       unique_ptr<FileHandler> file;
-      if (filteredReader.openFile(file) != 0 || !FileFormat::printVRSFileInternals(*file)) {
+      if (RecordFileReader::vrsFilePathToFileSpec(filteredReader.getPathOrUri(), spec) != 0 ||
+          FileHandlerFactory::getInstance().delegateOpen(spec, file) != 0 ||
+          !FileFormat::printVRSFileInternals(*file)) {
         statusCode = EXIT_FAILURE;
       }
     } break;
