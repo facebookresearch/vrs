@@ -228,8 +228,8 @@ void printOverview(
       out << ":" << endl;
       for (size_t index = 0; index < chunks.size(); index++) {
         const pair<string, int64_t>& chunk = chunks[index];
-        out << "  Chunk #" << index << ": '" << chunk.first << "', " << (chunk.second) << "."
-            << endl;
+        out << "  Chunk #" << index << ": '" << chunk.first << "', "
+            << humanReadableFileSize(chunk.second) << "." << endl;
       }
     } else {
       out << ", starting with " << chunks[0].first << '.' << endl;
