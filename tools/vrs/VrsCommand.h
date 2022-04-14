@@ -49,6 +49,7 @@ enum class Command {
   ExtractAudio,
   ExtractAll,
   JsonDescription,
+  FixIndex,
   CompressionBenchmark,
   Count
 };
@@ -117,9 +118,6 @@ struct VrsCommand {
   vrs::utils::RecordFilterParams filters;
   /// Helper to use when setting up decimation, to make sure it's created & intialized before use
   vrs::utils::DecimationParams& getDecimatorParams();
-
-  /// If requireAndOpenVrsFile is true and the file is local, fix the VRS file index if needed.
-  bool autoFixIndex = false;
 
   /// Force showing the tool's help documentation
   bool showHelp = false;

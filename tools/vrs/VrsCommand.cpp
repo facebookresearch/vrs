@@ -75,6 +75,7 @@ const char* sCommands[] = {
     "extract-audio",
     "extract-all",
     "json-description",
+    "fix-index",
     "compression-benchmark",
 };
 struct CommandConverter : public EnumStringConverter<
@@ -95,7 +96,6 @@ struct CommandSpec {
   uint32_t maxFiles{1};
   Details fileDetails = Details::None;
   bool mainFileIsVRS{true};
-  bool supportFilters{false};
 };
 
 const CommandSpec& getCommandSpec(Command cmd) {
@@ -124,6 +124,7 @@ const CommandSpec& getCommandSpec(Command cmd) {
       {Command::ExtractAudio, 1},
       {Command::ExtractAll, 1},
       {Command::JsonDescription, 1},
+      {Command::FixIndex, 1000, Details::Basics},
       {Command::CompressionBenchmark, 1},
   };
   if (!XR_VERIFY(cmd > Command::None && cmd < Command::Count)) {
@@ -196,8 +197,8 @@ void printHelp(const string& appName) {
       << CMD("Compute some lossless compression benchmarks", "compression-benchmark <file.vrs>")
 
       << endl
-      << CMD("Fix the file's index in place, if necessary. MIGHT MODIFY THE ORIGINAL FILE",
-             "fix-index <file.vrs>")
+      << CMD("Fix VRS index in place, if necessary. MIGHT MODIFY THE ORIGINAL FILES IF NEEDED.",
+             "fix-index <file.vrs> [<file2.vrs>+")
       << CMD("Print VRS file format debug information", "debug <file.vrs>")
 
              "Copy options:\n";
@@ -310,8 +311,6 @@ bool VrsCommand::parseArgument(
       cerr << appName << ": error. '--copy|-c' requires a destination path." << endl;
       outStatusCode = EXIT_FAILURE;
     }
-  } else if (arg == "--fix-index") {
-    autoFixIndex = true;
   } else if (arg == "--raw-images") {
     extractImagesRaw = true;
   } else if (arg == "--zero") {
@@ -377,7 +376,7 @@ bool VrsCommand::openVrsFile() {
     return false;
   }
   if (getCommandSpec(cmd).mainFileIsVRS) {
-    return filteredReader.reader.openFile(filteredReader.path, autoFixIndex) == 0;
+    return filteredReader.reader.openFile(filteredReader.path, cmd == Command::FixIndex) == 0;
   }
   return true;
 }
@@ -387,7 +386,7 @@ bool VrsCommand::openOtherVrsFile(
     RecordFileInfo::Details details) {
   if (!otherReader.reader.isOpened()) {
     // Open the reader, apply the filters and print their overview
-    if (otherReader.reader.openFile(otherReader.path, autoFixIndex) != 0) {
+    if (otherReader.reader.openFile(otherReader.path, cmd == Command::FixIndex) != 0) {
       cerr << "Error: could not open " << otherReader.path << endl;
       return false;
     }
@@ -432,6 +431,11 @@ int VrsCommand::runCommands() {
       break;
     case Command::Details:
       // Opening the VRS file already printed the file details...
+      break;
+    case Command::FixIndex:
+      if (!openOtherVrsFiles(cmdSpec.fileDetails)) {
+        statusCode = EXIT_FAILURE;
+      }
       break;
     case Command::Copy:
       copyOptions.mergeStreams = false;
@@ -523,11 +527,6 @@ int VrsCommand::runCommands() {
     case Command::None:
     case Command::Count:
       break;
-  }
-  if (autoFixIndex) {
-    if (!openOtherVrsFiles(Details::MainCounters)) {
-      return EXIT_FAILURE;
-    }
   }
 
   return statusCode;
