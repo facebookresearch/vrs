@@ -69,7 +69,7 @@ Without the following properties, `image/raw` image content blocks can not be in
 - Required properties: width, height, pixel format.
 - Optional properties: stride.
 
-When properties are provided using the Datalayout Conventions, all additional properties must be provided by a single `DataLayout` structure in one record. For example, you must not put the pixel format in the configuration record, and then put the image dimensions in the data record. You must put both the pixel format and the image dimensions in the `DataLayout` of the configuration record, or you must put both of them in the `DataLayout` of the data record.
+When properties are provided using the Datalayout Conventions, all additional properties must be provided by a single `DataLayout` structure in one record. For example, you must not put the pixel format in the configuration record, and then put the image dimensions in the data record. You must either put both the pixel format and the image dimensions in a configuration record's `DataLayout`, or you must put them both in a `DataLayout` just before the image content block.
 
 ### `image/jpg` and `image/png`
 

@@ -134,8 +134,8 @@ To read the VRS documentation with Docusaurus using a web browser (macOS):
 
 ```
 cd <top_vrs_repo_folder>/website
-npm build
-npm serve
+yarn
+yarn start
 ```
 
 The API documentation can also be built using:
@@ -169,6 +169,17 @@ tuned for details.
   - a stream with metadata and uncompressed images
   - a stream with audio images
 
+# Tools
+
+Part of this repo, the `vrs` command line tool allows you to examine and
+manipulate VRS files, usually by generating a modified copy of an original
+recording. It can also extract images, dump metadata for human or computer
+consumtion (json). The vrs command line tool can be found at `tools/vrs`.
+
+The `vrsplayer` tool is planned for open sourcing within a few month. It is
+basically a player that can "play" the content of a VRS file containing image
+and/or audio streams.
+
 # Contributing
 
 We welcome contributions! See [CONTRIBUTING](CONTRIBUTING.md) for details on how
@@ -179,8 +190,6 @@ to get started, and our [code of conduct](CODE_OF_CONDUCT.md).
 In this first release of VRS for open source, only the core components of VRS
 are provided. We are working on open sourcing more code:
 
-- `VRStool`: a command line tool to manipulate VRS files.
-- `VRSplayer`: a basic "player", to view VRS file like multi-stream video files.
 - `pyvrs`: a Python library to work with VRS files in Python.
 - integration with PyTorch, so ML jobs can consume VRS files as training data.
 - tooling to build VRS container files optimized for PyTorch training.

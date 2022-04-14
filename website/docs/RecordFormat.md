@@ -45,7 +45,7 @@ You can assemble as many content blocks as you like in a record, which might loo
 
 Again, these text descriptions are generated and parsed for you, so you don't need to worry about their syntax.
 
-The`RecordFormat` and `DataLayout` descriptions of a stream's records are stored in the VRS tags of the stream. You will only see these text descriptions when you are using tools to dump a stream's VRS tags. VRS tags are associated with each stream for VRS internal usage, and are kept separate from the user stream tags.
+The `RecordFormat` and `DataLayout` descriptions of a stream's records are stored in the VRS tags of the stream. You will only see these text descriptions when you are using tools to dump a stream's VRS tags. VRS tags are associated with each stream for VRS internal usage, and are kept separate from the user stream tags.
 
 In practice, the majority of the records used in VRS today use one of the following record formats:
 
