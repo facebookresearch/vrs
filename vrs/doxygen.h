@@ -48,8 +48,8 @@ coming from sensors, or timestamps don't make sense for your use case, then VRS 
 <li>Metadata content blocks contain raw sensor data described once per stream, making the file
   format very efficient. The marginal cost of adding 1 byte of data to each metadata content
   block of a stream is 1 byte per record (or less, when lossless compression happens).<br/></li>
-<li>Records can be losslessly compressed using lz4 or zstd, which are can be fast enough to do
-  compress during recording.<br/></li>
+<li>Records can be losslessly compressed using lz4 or zstd, which can be fast enough to do
+  realtime compression while recording.<br/></li>
 <li>Multiple threads can create records concurrently for the same file.<br/></li>
 <li>VRS supports huge file size (tested with multi terabytes use cases).<br/></li>
 <li>VRS supports chunked files: auto-chunking on creation, automated chunk detection for playback.
