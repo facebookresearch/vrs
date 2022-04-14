@@ -118,7 +118,7 @@ bool parseCopyOptions(
 
 void printCopyOptionsHelp() {
   cout << "  [ --no-progress ]:"
-          " don't show any progress information (useful for offline usages and basic terminals).\n"
+          " don't show any progress information (useful for offline usage with basic terminals).\n"
           "  [ --compression={none|default|fast|tight|zfast|zlight|zmedium|ztight|zmax} ]:"
           " set compression setting.\n"
           "  [ --mt <thread-count> ]: use <thread-count> threads for compression while copying.\n"
@@ -178,9 +178,9 @@ bool parseTagOverrideOptions(
 }
 
 void printTagOverrideOptionsHelp() {
-  cout << "  [ --file-tag <tagName> <tagValue> ]:"
+  cout << "  [ --file-tag <tag_name> <tag_value> ]:"
           " set a file tag in the copied/merged file.\n"
-          "  [ --stream-tag <recordableTypeId> <tagName> <tagValue> ]:"
+          "  [ --stream-tag <recordable_type_id> <tag_name> <tag_value> ]:"
           " set a tag of a particular stream in the copied/merged file.\n";
 }
 
@@ -278,10 +278,10 @@ void printTimeAndStreamFiltersHelp() {
           " first data record's timestamp.\n"
           "    Negative timestamps are durations relative to the last data record's timestamp.\n"
           "    All timestamps, durations or intervals are in seconds.\n"
-          "  [ + <recordableTypeId> ]: consider streams of that recordable type ID.\n"
-          "  [ + <recordableTypeId>-<instanceId> ]: consider a specific stream ID.\n"
-          "  [ - <recordableTypeId> ]: ignore all streams of that recordable type ID.\n"
-          "  [ - <recordableTypeId>-<instanceId> ]: ignore a specific stream.\n"
+          "  [ + <recordable_type_id> ]: consider streams of that recordable type ID.\n"
+          "  [ + <recordable_type_id>-<instance_id> ]: consider a specific stream ID.\n"
+          "  [ - <recordable_type_id> ]: ignore all streams of that recordable type ID.\n"
+          "  [ - <recordable_type_id>-<instance_id> ]: ignore a specific stream.\n"
           "  [ + [configuration|state|data] ]: consider records of that type.\n"
           "  [ - [configuration|state|data] ]: ignore records of that type.\n"
           "  [ --first-records ]: only consider the first record of each stream & type.\n";
@@ -350,7 +350,7 @@ bool parseDecimationOptions(
 }
 
 void printDecimationOptionsHelp() {
-  cout << "  [ --decimate <recordableTypeId>[-<instanceId>] <timestamp_interval> ]:"
+  cout << "  [ --decimate <recordable_type_id>[-<instance_id>] <timestamp_interval> ]:"
           " output at most one data record\n"
           "    every <timestamp_interval> for the stream(s) specified.\n"
           "  [ --bucket-interval <timestamp_interval> ]\n"

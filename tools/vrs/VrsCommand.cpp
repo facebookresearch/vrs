@@ -157,20 +157,8 @@ void printHelp(const string& appName) {
              "zero <file.vrs> --to <output.vrs>")
 
       << endl
-      << CMD("Check that a file can be read (checks integrity)",
-             "check <file.vrs> [filter-options]")
-      << CMD("Calculate a checksum for the whole file, at the VRS data level",
-             "checksum <file.vrs> [filter-options]")
-      << CMD("Calculate checksums for each part of the VRS file",
-             "checksums <file.vrs> [filter-options]")
-      << CMD("Calculate a checksum for the whole file, at the raw level (VRS or not)",
-             "checksum-verbatim <file.vrs> [filter-options]")
-      << CMD("Compare a VRS file to one or more files, at the VRS data logical level",
-             "compare <original.vrs> [others.vrs]+ [filter-options]")
-      << CMD("Compare two files at the raw level (VRS or not)",
-             "compare-verbatim <original.vrs> <other.vrs>")
-
-      << endl
+      << CMD("List records, with their timestamp, stream name and identifier, and record type.",
+             "list <file.vrs> [filter-options]")
       << CMD("Show RecordFormat and DataLayout definitions", "record-formats <file.vrs>")
       << CMD("Print records using RecordFormat & DataLayout", "print <file.vrs> [filter-options]")
       << CMD("Print records with details using RecordFormat & DataLayout",
@@ -179,7 +167,6 @@ void printHelp(const string& appName) {
              "print-json <file.vrs> [filter-options]")
       << CMD("Print records as json-pretty using RecordFormat & DataLayout",
              "print-json-pretty <file.vrs> [filter-options]")
-      << CMD("Print records in hex", "hexdump <file.vrs> [filter-options]")
       << CMD("Print detailed file info and first records for one-stop diagnostic purposes",
              "rage <file.vrs>")
 
@@ -194,24 +181,42 @@ void printHelp(const string& appName) {
              "extract-all file.vrs --to <folder_path> [filter-options]")
 
       << endl
+      << CMD("Check that a file can be read (checks integrity)",
+             "check <file.vrs> [filter-options]")
+      << CMD("Calculate a checksum for the whole file, at the VRS data level",
+             "checksum <file.vrs> [filter-options]")
+      << CMD("Calculate checksums for each part of the VRS file",
+             "checksums <file.vrs> [filter-options]")
+      << CMD("Calculate a checksum for the whole file, at the raw level (VRS or not)",
+             "checksum-verbatim <file.vrs> [filter-options]")
+      << CMD("Calculate checksums for each part of the VRS file, print records in hex",
+             "hexdump <file.vrs> [filter-options]")
+      << CMD("Compare a VRS file to one or more files, at the VRS data logical level",
+             "compare <original.vrs> [others.vrs]+ [filter-options]")
+      << CMD("Compare two files at the raw level (VRS or not)",
+             "compare-verbatim <original.vrs> <other.vrs>")
+
+      << endl
       << CMD("Compute some lossless compression benchmarks", "compression-benchmark <file.vrs>")
 
       << endl
+      << "Special Commands:" << endl
       << CMD("Fix VRS index in place, if necessary. MIGHT MODIFY THE ORIGINAL FILES IF NEEDED.",
              "fix-index <file.vrs> [<file2.vrs>+")
       << CMD("Print VRS file format debug information", "debug <file.vrs>")
 
-             "Copy options:\n";
+      << "\n"
+      << "Filter options:\n";
+  printTimeAndStreamFiltersHelp();
+  printDecimationOptionsHelp();
+
+  cout << "\n"
+          "Copy options:\n";
   printCopyOptionsHelp();
 
   cout << "\n"
-          "Tag options:\n";
+          "Tag override options:\n";
   printTagOverrideOptionsHelp();
-
-  cout << "\n"
-          "Filter options:\n";
-  printTimeAndStreamFiltersHelp();
-  printDecimationOptionsHelp();
 }
 
 #define SP(x) "  " << appName << " " x "\n"
