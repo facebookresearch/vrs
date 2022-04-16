@@ -16,7 +16,7 @@ const repoUrl = 'https://github.com/facebookresearch/vrs';
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 (module.exports = {
   title: 'VRS',
-  tagline: 'A file format designed to record & playback streams of AR/VR sensor data.',
+  tagline: 'A file format designed to record & playback streams of XR sensor data.',
   url: 'https://facebookresearch.github.io/vrs',
   baseUrl: '/vrs/',
   onBrokenLinks: 'throw',
