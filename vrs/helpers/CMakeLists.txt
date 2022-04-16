@@ -13,18 +13,34 @@
 # limitations under the License.
 
 add_library(vrs_helpers_strings INTERFACE)
-target_include_directories(vrs_helpers_strings INTERFACE ${VRS_SOURCE_DIR})
+target_include_directories(vrs_helpers_strings
+  INTERFACE
+  $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:include>
+)
 
 file(GLOB VRS_HELPERS_SRCS *.cpp *.h *.hpp)
 
-add_library(vrs_helpers STATIC ${VRS_HELPERS_SRCS})
+add_library(vrs_helpers ${VRS_HELPERS_SRCS})
 target_link_libraries(vrs_helpers
-    PUBLIC
+    PRIVATE
         vrs_helpers_strings
         vrs_os
+    PUBLIC
         Cereal::Cereal
 )
-target_include_directories(vrs_helpers PUBLIC ${VRS_SOURCE_DIR})
+target_include_directories(vrs_helpers
+  PUBLIC
+  $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:include>
+)
+
+install(TARGETS vrs_helpers vrs_helpers_strings EXPORT VRSLibTargets
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
+)
 
 if (UNIT_TESTS)
   enable_testing()

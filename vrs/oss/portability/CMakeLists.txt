@@ -21,3 +21,10 @@ set_target_properties(
 target_link_libraries(vrs_oss_portability
   INTERFACE
     Boost::filesystem)
+
+install(TARGETS vrs_oss_portability EXPORT VRSLibTargets
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
+)
