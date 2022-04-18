@@ -86,6 +86,15 @@ void PixelFrame::init(shared_ptr<PixelFrame>& inOutFrame, const ImageContentBloc
   }
 }
 
+void PixelFrame::swap(PixelFrame& other) {
+  if (!hasSamePixels(other.imageSpec_)) {
+    ImageContentBlockSpec tempSpec = other.imageSpec_;
+    other.imageSpec_ = imageSpec_;
+    imageSpec_ = tempSpec;
+  }
+  frameBytes_.swap(other.frameBytes_);
+}
+
 bool PixelFrame::hasSamePixels(const ImageContentBlockSpec& spec) const {
   return getPixelFormat() == spec.getPixelFormat() && getWidth() == spec.getWidth() &&
       getHeight() == spec.getHeight() && getStride() == spec.getStride();
@@ -159,7 +168,8 @@ PixelFormat PixelFrame::getNormalizedPixelFormat(
                         : vrs::PixelFormat::GREY8;
 }
 
-bool PixelFrame::normalizeFrame(shared_ptr<PixelFrame>& normalizedFrame, bool grey16supported) {
+bool PixelFrame::normalizeFrame(shared_ptr<PixelFrame>& normalizedFrame, bool grey16supported)
+    const {
   uint16_t bitsToShift = 0;
   uint32_t componentCount = 0;
   vrs::PixelFormat format = imageSpec_.getPixelFormat();
@@ -367,7 +377,7 @@ bool PixelFrame::normalizeFrame(shared_ptr<PixelFrame>& normalizedFrame, bool gr
 
 bool PixelFrame::normalizeToPixelFormat(
     shared_ptr<PixelFrame>& convertedFrame,
-    PixelFormat targetPixelFormat) {
+    PixelFormat targetPixelFormat) const {
   return false;
 }
 

@@ -68,6 +68,8 @@ class PixelFrame {
   }
 #endif
 
+  void swap(PixelFrame& other);
+
   const ImageContentBlockSpec& getSpec() const {
     return imageSpec_;
   }
@@ -165,16 +167,18 @@ class PixelFrame {
 
   /// Convert the internal frame to a simpler format, if necessary.
   /// Returns false if the frame could not be converted, or the format doesn't need conversion.
-  bool normalizeFrame(std::shared_ptr<PixelFrame>& normalizedFrame, bool grey16supported);
+  bool normalizeFrame(std::shared_ptr<PixelFrame>& normalizedFrame, bool grey16supported) const;
+
+  static PixelFormat getNormalizedPixelFormat(PixelFormat sourcePixelFormat, bool grey16supported);
 
  private:
-  static PixelFormat getNormalizedPixelFormat(PixelFormat sourcePixelFormat, bool grey16supported);
   /// Conversion from an external buffer
   /// @param convertedFrame: frame to convert to. May not be allocated yet.
   /// @param targetPixelFormat: pixel format to target. Expect GREY8, GREY16 and RGB8 to work.
   /// @return True if the conversion happened, otherwise, the buffer is left in an undefined state.
   /// Note that the actual conversion format is set in imageSpec_, and it could be different...
-  bool normalizeToPixelFormat(std::shared_ptr<PixelFrame>& outFrame, PixelFormat targetPixelFormat);
+  bool normalizeToPixelFormat(std::shared_ptr<PixelFrame>& outFrame, PixelFormat targetPixelFormat)
+      const;
 
  private:
   ImageContentBlockSpec imageSpec_;
