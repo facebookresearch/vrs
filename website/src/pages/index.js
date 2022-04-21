@@ -21,7 +21,7 @@ const features = [
     //imageUrl: 'img/VRS-Icon.svg',
     description: (
       <>
-        A very effiscient data collection file format, so sensor data can be recorded in realtime on device.
+        A very efficient data collection file format, so sensor data can be recorded in realtime on device.
       </>
     ),
   },
