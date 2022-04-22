@@ -23,15 +23,27 @@ if (VRS_UTILS_FB_SRCS)
   list(REMOVE_ITEM VRS_UTILS_SRCS ${VRS_UTILS_FB_SRCS})
 endif()
 
-add_library(vrs_utils STATIC ${VRS_UTILS_SRCS})
+add_library(vrs_utils ${VRS_UTILS_SRCS})
 target_link_libraries(vrs_utils
-  PUBLIC
+  PRIVATE
     vrslib
     vrs_helpers
     vrs_utils_converters
-    Cereal::Cereal
     Fmt::Fmt
     Jpeg::Jpeg
     Png::Png
+    Cereal::Cereal
+    vrs_logging
 )
-target_include_directories(vrs_utils PUBLIC ${VRS_SOURCE_DIR})
+target_include_directories(vrs_utils
+  INTERFACE
+  $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:include>
+)
+
+install(TARGETS vrs_utils EXPORT VRSLibTargets
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
+)

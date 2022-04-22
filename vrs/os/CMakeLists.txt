@@ -19,10 +19,15 @@ if (VRS_OS_FB_SRCS)
   list(REMOVE_ITEM VRS_OS_SRCS ${VRS_OS_FB_SRCS})
 endif()
 
-add_library(vrs_os STATIC ${VRS_OS_SRCS})
-target_include_directories(vrs_os PUBLIC ${VRS_SOURCE_DIR})
+add_library(vrs_os ${VRS_OS_SRCS})
+target_include_directories(vrs_os
+  PUBLIC
+  $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:include>
+)
+
 target_link_libraries(vrs_os
-    PUBLIC
+    PRIVATE
         vrs_platform
         vrs_logging
         Boost::system
@@ -31,11 +36,23 @@ target_link_libraries(vrs_os
         Boost::chrono
         Boost::date_time
 )
+target_compile_definitions(vrs_os INTERFACE OSS_BUILD_MODE)
 
 add_library(vrs_platform INTERFACE)
-target_include_directories(vrs_platform INTERFACE ${VRS_SOURCE_DIR})
+target_include_directories(vrs_platform
+  INTERFACE
+  $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:include>
+)
 # When building with cmake, always enable OSS build mode
 target_compile_definitions(vrs_platform INTERFACE OSS_BUILD_MODE)
+
+install(TARGETS vrs_os vrs_platform EXPORT VRSLibTargets
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
+)
 
 if (UNIT_TESTS)
   enable_testing()

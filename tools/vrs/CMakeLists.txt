@@ -15,11 +15,11 @@
 file(GLOB VRS_UTIL_SRCS *.cpp *.h)
 add_executable(vrs ${VRS_UTIL_SRCS})
 target_include_directories(vrs
-  PUBLIC
+  PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 target_link_libraries(vrs
-  PUBLIC
+  PRIVATE
     vrslib
     vrs_utils
     vrs_utils_cli
@@ -27,6 +27,10 @@ target_link_libraries(vrs
     Png::Png
     Jpeg::Jpeg
     vrs_logging
+)
+
+install(TARGETS vrs EXPORT VRSLibTargets
+  RUNTIME DESTINATION bin
 )
 
 if (UNIT_TESTS)

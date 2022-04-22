@@ -13,13 +13,23 @@
 # limitations under the License.
 
 file (GLOB VRS_UTILS_CONVERTERS_SRCS *.cpp *.h *.hpp)
-add_library(vrs_utils_converters STATIC ${VRS_UTILS_CONVERTERS_SRCS})
+add_library(vrs_utils_converters ${VRS_UTILS_CONVERTERS_SRCS})
 target_link_libraries(vrs_utils_converters
-  PUBLIC
+  PRIVATE
     vrs_logging
     vrs_os
 )
-target_include_directories(vrs_utils_converters PUBLIC ${VRS_SOURCE_DIR})
+target_include_directories(vrs_utils_converters
+  PUBLIC
+  $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+install(TARGETS vrs_utils_converters EXPORT VRSLibTargets
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
+)
 
 if (UNIT_TESTS)
   enable_testing()
