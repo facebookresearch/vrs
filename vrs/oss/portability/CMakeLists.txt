@@ -15,9 +15,18 @@
 # This library is a minimal replacement for the portability library used at Meta.
 
 add_library(vrs_oss_portability INTERFACE)
-set_target_properties(
-  vrs_oss_portability PROPERTIES
-  INTERFACE_INCLUDE_DIRECTORIES ${VRS_SOURCE_DIR}/vrs/oss)
+target_include_directories(
+  vrs_oss_portability
+  INTERFACE
+    $<BUILD_INTERFACE:${VRS_SOURCE_DIR}/vrs/oss>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 target_link_libraries(vrs_oss_portability
   INTERFACE
     Boost::filesystem)
+
+install(TARGETS vrs_oss_portability EXPORT VRSLibTargets
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
+)
