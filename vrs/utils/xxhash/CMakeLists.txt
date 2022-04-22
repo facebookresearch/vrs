@@ -14,12 +14,22 @@
 
 file (GLOB VRS_XXHASH_SRCS *.cpp *.h *.hpp)
 
-add_library(vrs_utils_xxhash STATIC ${VRS_XXHASH_SRCS})
-target_include_directories(vrs_utils_xxhash PUBLIC ${VRS_SOURCE_DIR})
-target_link_libraries(vrs_utils_xxhash
+add_library(vrs_utils_xxhash ${VRS_XXHASH_SRCS})
+target_include_directories(vrs_utils_xxhash
   PUBLIC
+  $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+target_link_libraries(vrs_utils_xxhash
+  PRIVATE
     vrs_logging
     xxHash::xxHash
+)
+install(TARGETS vrs_utils_xxhash EXPORT VRSLibTargets
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
 )
 
 if (UNIT_TESTS)

@@ -17,10 +17,22 @@
 
 file (GLOB VRS_LOGGING_SRCS *.cpp *.h *.hpp)
 
-add_library(vrs_logging STATIC ${VRS_LOGGING_SRCS})
-target_include_directories(vrs_logging PUBLIC ${VRS_SOURCE_DIR}/vrs/oss)
+add_library(vrs_logging ${VRS_LOGGING_SRCS})
+target_include_directories(vrs_logging
+  INTERFACE
+  $<BUILD_INTERFACE:${VRS_SOURCE_DIR}/vrs/oss>
+  $<INSTALL_INTERFACE:include>
+)
+
 target_link_libraries(vrs_logging
-    PUBLIC
+    PRIVATE
         vrs_platform
         Fmt::Fmt
+)
+
+install(TARGETS vrs_logging EXPORT VRSLibTargets
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
 )

@@ -1,0 +1,7 @@
+@PACKAGE_INIT@
+set(PACKAGE_VERSION "1.0")
+include("${CMAKE_CURRENT_LIST_DIR}/vrslibTargets.cmake")
+
+# Library setup
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/LibrariesSetup.cmake)

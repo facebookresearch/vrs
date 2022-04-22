@@ -18,8 +18,12 @@ add_subdirectory(oss)
 add_subdirectory(utils)
 
 file (GLOB VRS_SRCS *.cpp *.h *.hpp)
-add_library(vrslib STATIC ${VRS_SRCS})
-target_include_directories(vrslib PUBLIC ${VRS_SOURCE_DIR})
+add_library(vrslib ${VRS_SRCS})
+target_include_directories(vrslib
+  PUBLIC
+  $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:include>
+)
 target_link_libraries(vrslib
   PUBLIC
     vrs_helpers
@@ -28,6 +32,50 @@ target_link_libraries(vrslib
     vrs_utils_xxhash
     Lz4::Lz4
     Zstd::Zstd
+)
+
+install(TARGETS vrslib EXPORT VRSLibTargets
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
+)
+
+install(EXPORT VRSLibTargets
+  NAMESPACE vrs::
+  FILE vrslibTargets.cmake
+  DESTINATION lib/cmake/vrslib)
+
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(vrslibConfig.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/vrslibConfig.cmake
+  INSTALL_DESTINATION ${LIB_INSTALL_DIR}/vrslib/cmake)
+
+
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/vrslibConfigVersion.cmake"
+  VERSION "1.0"
+  COMPATIBILITY AnyNewerVersion
+)
+
+install(
+  DIRECTORY .
+  DESTINATION include/vrs
+  COMPONENT headers
+  FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h"
+)
+
+install(
+  DIRECTORY ../cmake
+  DESTINATION lib/cmake/vrslib
+  FILES_MATCHING PATTERN "*.cmake"
+)
+
+install(FILES
+  "${CMAKE_CURRENT_BINARY_DIR}/vrslibConfig.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/vrslibConfigVersion.cmake"
+  DESTINATION lib/cmake/vrslib
 )
 
 if (UNIT_TESTS)
