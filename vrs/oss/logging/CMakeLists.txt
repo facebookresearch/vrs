@@ -25,7 +25,7 @@ target_include_directories(vrs_logging
 )
 
 target_link_libraries(vrs_logging
-    PRIVATE
+    PUBLIC
         vrs_platform
         Fmt::Fmt
 )

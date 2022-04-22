@@ -32,7 +32,6 @@ target_link_libraries(vrs_utils
     Fmt::Fmt
     Jpeg::Jpeg
     Png::Png
-  PUBLIC
     Cereal::Cereal
     vrs_logging
 )

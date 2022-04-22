@@ -36,6 +36,7 @@ target_link_libraries(vrs_os
         Boost::chrono
         Boost::date_time
 )
+target_compile_definitions(vrs_os INTERFACE OSS_BUILD_MODE)
 
 add_library(vrs_platform INTERFACE)
 target_include_directories(vrs_platform

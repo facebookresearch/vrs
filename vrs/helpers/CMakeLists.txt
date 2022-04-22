@@ -25,8 +25,8 @@ add_library(vrs_helpers ${VRS_HELPERS_SRCS})
 target_link_libraries(vrs_helpers
     PRIVATE
         vrs_helpers_strings
-        vrs_os
     PUBLIC
+        vrs_os
         Cereal::Cereal
 )
 target_include_directories(vrs_helpers
