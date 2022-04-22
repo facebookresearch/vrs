@@ -17,8 +17,8 @@
 file(GLOB SAMPLE_CODE_APP_SRCS *.cpp *.h *.hpp)
 add_library(sample_code_app ${SAMPLE_CODE_APP_SRCS})
 target_link_libraries(sample_code_app
-    PUBLIC
-        vrslib
-        vrs_logging
-        vrs_os
+  PUBLIC
+    vrslib
+    vrs_logging
+    vrs_os
 )

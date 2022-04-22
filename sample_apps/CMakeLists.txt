@@ -14,23 +14,23 @@
 
 add_executable(aria_file_reader "AriaFileReader.cpp")
 target_link_libraries(aria_file_reader
-    PUBLIC
-        vrslib
-        Fmt::Fmt
+  PUBLIC
+    vrslib
+    Fmt::Fmt
 )
 
 add_executable(sample_playback_app "SamplePlaybackApp.cpp")
 target_link_libraries(sample_playback_app
-    PUBLIC
-        vrslib
-        vrs_logging
-        vrs_os
+  PUBLIC
+    vrslib
+    vrs_logging
+    vrs_os
 )
 
 add_executable(sample_recording_app "SampleRecordingApp.cpp")
 target_link_libraries(sample_recording_app
-    PUBLIC
-        vrslib
-        vrs_logging
-        vrs_os
+  PUBLIC
+    vrslib
+    vrs_logging
+    vrs_os
 )

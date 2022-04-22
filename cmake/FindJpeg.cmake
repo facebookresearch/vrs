@@ -31,5 +31,6 @@ if (Jpeg_FOUND AND NOT (TARGET Jpeg::Jpeg))
   set_target_properties(Jpeg::Jpeg
     PROPERTIES
       IMPORTED_LOCATION ${Jpeg_LIBRARIES}
-      INTERFACE_INCLUDE_DIRECTORIES ${Jpeg_INCLUDE_DIRS})
+      INTERFACE_INCLUDE_DIRECTORIES ${Jpeg_INCLUDE_DIRS}
+  )
 endif()

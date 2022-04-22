@@ -15,24 +15,24 @@
 add_library(vrs_helpers_strings INTERFACE)
 target_include_directories(vrs_helpers_strings
   INTERFACE
-  $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
-  $<INSTALL_INTERFACE:include>
+    $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include>
 )
 
 file(GLOB VRS_HELPERS_SRCS *.cpp *.h *.hpp)
 
 add_library(vrs_helpers ${VRS_HELPERS_SRCS})
 target_link_libraries(vrs_helpers
-    PRIVATE
-        vrs_helpers_strings
-    PUBLIC
-        vrs_os
-        Cereal::Cereal
+  PRIVATE
+    vrs_helpers_strings
+  PUBLIC
+    vrs_os
+    Cereal::Cereal
 )
 target_include_directories(vrs_helpers
   PUBLIC
-  $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
-  $<INSTALL_INTERFACE:include>
+    $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include>
 )
 
 install(TARGETS vrs_helpers vrs_helpers_strings EXPORT VRSLibTargets
@@ -47,9 +47,9 @@ if (UNIT_TESTS)
 
   add_executable(test_vrs_helpers test/StringsTest.cpp)
   target_link_libraries(test_vrs_helpers
-      PUBLIC
-        vrs_helpers
-        GTest::Main
+    PUBLIC
+      vrs_helpers
+      GTest::Main
   )
 
   gtest_discover_tests(test_vrs_helpers)

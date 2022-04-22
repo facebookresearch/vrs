@@ -21,8 +21,8 @@ target_link_libraries(vrs_utils_converters
 )
 target_include_directories(vrs_utils_converters
   PUBLIC
-  $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
-  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 install(TARGETS vrs_utils_converters EXPORT VRSLibTargets
   LIBRARY DESTINATION lib

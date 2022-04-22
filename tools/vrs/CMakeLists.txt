@@ -47,13 +47,13 @@ if (UNIT_TESTS)
       ${CMAKE_CURRENT_SOURCE_DIR}/..
   )
   target_link_libraries(test_vrscli
-      PUBLIC
-        vrs_os
-        vrs_test_helpers
-        vrs_utils
-        vrs_utils_cli
-        vrs_oss_testdatadir
-        GTest::Main
+    PUBLIC
+      vrs_os
+      vrs_test_helpers
+      vrs_utils
+      vrs_utils_cli
+      vrs_oss_testdatadir
+      GTest::Main
   )
   add_dependencies(test_vrscli vrs)
 

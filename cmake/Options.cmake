@@ -13,8 +13,7 @@
 # limitations under the License.
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "")
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING
-    "Type of build: Debug or Release." FORCE)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Type of build: Debug or Release." FORCE)
 endif()
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
 

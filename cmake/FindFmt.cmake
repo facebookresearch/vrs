@@ -20,9 +20,10 @@ mark_as_advanced(Fmt_LIBRARY)
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(
-    Fmt
-    DEFAULT_MSG
-    Fmt_LIBRARY Fmt_INCLUDE_DIR)
+  Fmt
+  DEFAULT_MSG
+  Fmt_LIBRARY Fmt_INCLUDE_DIR
+)
 
 if (Fmt_FOUND)
     set(Fmt_LIBRARIES ${Fmt_LIBRARY})
@@ -30,9 +31,11 @@ if (Fmt_FOUND)
     add_library(Fmt::Fmt UNKNOWN IMPORTED)
     set_target_properties(
       Fmt::Fmt PROPERTIES
-      INTERFACE_INCLUDE_DIRECTORIES "${Fmt_INCLUDE_DIR}")
+      INTERFACE_INCLUDE_DIRECTORIES "${Fmt_INCLUDE_DIR}"
+    )
     set_target_properties(
       Fmt::Fmt PROPERTIES
       IMPORTED_LINK_INTERFACE_LANGUAGES "C"
-      IMPORTED_LOCATION "${Fmt_LIBRARY}")
+      IMPORTED_LOCATION "${Fmt_LIBRARY}"
+    )
 endif()

@@ -31,5 +31,6 @@ if (Zstd_FOUND AND NOT (TARGET Zstd::Zstd))
   set_target_properties(Zstd::Zstd
     PROPERTIES
       IMPORTED_LOCATION ${Zstd_LIBRARIES}
-      INTERFACE_INCLUDE_DIRECTORIES ${Zstd_INCLUDE_DIRS})
+      INTERFACE_INCLUDE_DIRECTORIES ${Zstd_INCLUDE_DIRS}
+  )
 endif()

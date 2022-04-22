@@ -22,27 +22,27 @@ endif()
 add_library(vrs_os ${VRS_OS_SRCS})
 target_include_directories(vrs_os
   PUBLIC
-  $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
-  $<INSTALL_INTERFACE:include>
+    $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include>
 )
 
 target_link_libraries(vrs_os
-    PRIVATE
-        vrs_platform
-        vrs_logging
-        Boost::system
-        Boost::filesystem
-        Boost::thread
-        Boost::chrono
-        Boost::date_time
+  PRIVATE
+    vrs_platform
+    vrs_logging
+    Boost::system
+    Boost::filesystem
+    Boost::thread
+    Boost::chrono
+    Boost::date_time
 )
 target_compile_definitions(vrs_os INTERFACE OSS_BUILD_MODE)
 
 add_library(vrs_platform INTERFACE)
 target_include_directories(vrs_platform
   INTERFACE
-  $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
-  $<INSTALL_INTERFACE:include>
+    $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include>
 )
 # When building with cmake, always enable OSS build mode
 target_compile_definitions(vrs_platform INTERFACE OSS_BUILD_MODE)
@@ -63,10 +63,10 @@ if (UNIT_TESTS)
     test/UtilsTest.cpp
   )
   target_link_libraries(test_vrs_os
-      PUBLIC
-        vrs_os
-        vrs_oss_testdatadir
-        GTest::Main
+    PUBLIC
+      vrs_os
+      vrs_oss_testdatadir
+      GTest::Main
   )
 
   gtest_discover_tests(test_vrs_os)

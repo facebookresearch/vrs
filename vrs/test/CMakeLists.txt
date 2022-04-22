@@ -47,11 +47,11 @@ add_executable(test_vrslib
   TestProcessTest.cpp
 )
 target_link_libraries(test_vrslib
-    PUBLIC
-      vrslib
-      vrs_oss_testdatadir
-      vrs_test_helpers
-      GTest::Main
+  PUBLIC
+    vrslib
+    vrs_oss_testdatadir
+    vrs_test_helpers
+    GTest::Main
 )
 add_dependencies(test_vrslib testedtool)
 target_compile_definitions(test_vrslib PUBLIC GTEST_BUILD)

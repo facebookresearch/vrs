@@ -17,8 +17,8 @@ file (GLOB VRS_XXHASH_SRCS *.cpp *.h *.hpp)
 add_library(vrs_utils_xxhash ${VRS_XXHASH_SRCS})
 target_include_directories(vrs_utils_xxhash
   PUBLIC
-  $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
-  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 target_link_libraries(vrs_utils_xxhash
   PRIVATE

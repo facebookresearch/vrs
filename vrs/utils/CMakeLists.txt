@@ -37,8 +37,8 @@ target_link_libraries(vrs_utils
 )
 target_include_directories(vrs_utils
   INTERFACE
-  $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
-  $<INSTALL_INTERFACE:include>
+    $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include>
 )
 
 install(TARGETS vrs_utils EXPORT VRSLibTargets

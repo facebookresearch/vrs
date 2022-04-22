@@ -18,7 +18,8 @@ find_package(Boost REQUIRED
     chrono
     date_time
     system
-    thread)
+    thread
+)
 find_package(Fmt REQUIRED)
 find_package(Cereal REQUIRED)
 find_package(Lz4 REQUIRED)

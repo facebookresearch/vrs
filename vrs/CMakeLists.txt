@@ -21,8 +21,8 @@ file (GLOB VRS_SRCS *.cpp *.h *.hpp)
 add_library(vrslib ${VRS_SRCS})
 target_include_directories(vrslib
   PUBLIC
-  $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
-  $<INSTALL_INTERFACE:include>
+    $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include>
 )
 target_link_libraries(vrslib
   PUBLIC
@@ -44,13 +44,15 @@ install(TARGETS vrslib EXPORT VRSLibTargets
 install(EXPORT VRSLibTargets
   NAMESPACE vrs::
   FILE vrslibTargets.cmake
-  DESTINATION lib/cmake/vrslib)
+  DESTINATION lib/cmake/vrslib
+)
 
 include(CMakePackageConfigHelpers)
 
 configure_package_config_file(vrslibConfig.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/vrslibConfig.cmake
-  INSTALL_DESTINATION ${LIB_INSTALL_DIR}/vrslib/cmake)
+  INSTALL_DESTINATION ${LIB_INSTALL_DIR}/vrslib/cmake
+)
 
 
 write_basic_package_version_file(
