@@ -54,7 +54,6 @@ configure_package_config_file(vrslibConfig.cmake.in
   INSTALL_DESTINATION ${LIB_INSTALL_DIR}/vrslib/cmake
 )
 
-
 write_basic_package_version_file(
   "${CMAKE_CURRENT_BINARY_DIR}/vrslibConfigVersion.cmake"
   VERSION "1.0"

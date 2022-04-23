@@ -112,6 +112,37 @@ ninja all
 ctest -j8
 ```
 
+- To include VRS in your cmake project:
+
+```
+cd <path_to_build_folder>
+ninja install # install VRS on your system as a library cmake can find
+```
+
+In your cmake project (probably one your project's `CMakeLists.txt` files):
+
+```
+find_package(vrslib REQUIRED) # find the vrs package, break if not found
+
+add_executable(your_app your_app.cpp) # that's your app
+target_link_libraries(your_app vrs::vrslib) # so your app can use the vrs includes and libraries
+```
+
+You can then use VRS in your `your_app.cpp` code:
+
+```
+#include <vrs/RecordFileReader.h>
+
+int main() {
+  vrs::RecordFileReader reader;
+  if (reader.openFile("myfile.vrs") == 0) {
+    do something...
+  }
+  return 0;
+}
+
+```
+
 ## Windows Support
 
 We don’t have equivalent instructions for Windows.
