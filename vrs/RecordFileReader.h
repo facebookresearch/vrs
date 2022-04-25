@@ -99,7 +99,7 @@ class RecordFileReader {
   /// Hook a stream player to a specific stream after opening a file and before reading records.
   /// The file player does *not* take ownership of the StreamPlayer.
   /// Using the same StreamPlayer instance for multiple streams is supported.
-  /// So the caller is responsible for deleting the StreamPlayer objets after the file is read.
+  /// So the caller is responsible for deleting the StreamPlayer objects after the file is read.
   /// Disconnect the StreamPlayer by passing a nullptr for the stream id.
   /// @param streamId: StreamId to hook the stream player to.
   /// @param streamPlayer: StreamPlayer to attach.
