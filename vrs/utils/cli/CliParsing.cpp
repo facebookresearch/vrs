@@ -29,23 +29,6 @@ inline bool isSigned(const char* str) {
   return *str == '+' || *str == '-';
 }
 
-StreamId parseStreamId(const string& id) {
-  StreamId result;
-  stringstream ss(id);
-  int32_t typeIdNum;
-  if (ss >> typeIdNum) {
-    RecordableTypeId typeId = static_cast<RecordableTypeId>(typeIdNum);
-    if (ss.peek() == '-') {
-      ss.ignore();
-      uint16_t instanceId;
-      if (ss >> instanceId) {
-        result = {typeId, instanceId};
-      }
-    }
-  }
-  return result;
-}
-
 } // namespace
 
 bool parseCopyOptions(
@@ -151,7 +134,7 @@ bool parseTagOverrideOptions(
   } else if (arg == "--stream-tag") {
     if (argn + 3 < argc) {
       const string streamId = string(argv[++argn]);
-      StreamId id = parseStreamId(streamId);
+      StreamId id = StreamId::fromNumericName(streamId);
       if (!id.isValid()) {
         cerr << appName << ": error. '--stream-tag' invalid stream id '" << streamId << "'."
              << endl;
