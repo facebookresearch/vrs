@@ -134,7 +134,7 @@ const map<RecordableTypeId, const char*>& getRecordableTypeIdRegistry() {
   /// Recordable Class Ids -- end
 
 #if IS_VRS_FB_INTERNAL()
-#include "StreamId_fb.hpp"
+#include "StreamId_fb.h"
 #endif
 
     // Pretend devices for testing
