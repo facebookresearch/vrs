@@ -142,7 +142,7 @@ bool parseTagOverrideOptions(
         cerr << appName << ": error. '--file-tag' requires a real tag name." << endl;
         outStatusCode = EXIT_FAILURE;
       } else {
-        copyOptions.tagOverrides.fileTags[tagName] = tagValue;
+        copyOptions.getTagOverrider().fileTags[tagName] = tagValue;
       }
     } else {
       cerr << appName << ": error. '--file-tag' requires a tag name & a tag value." << endl;
@@ -163,7 +163,7 @@ bool parseTagOverrideOptions(
           cerr << appName << ": error. '--stream-tag' requires a real tag name." << endl;
           outStatusCode = EXIT_FAILURE;
         } else {
-          copyOptions.tagOverrides.streamTags[id][tagName] = tagValue;
+          copyOptions.getTagOverrider().streamTags[id][tagName] = tagValue;
         }
       }
     } else {

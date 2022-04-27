@@ -15,6 +15,7 @@
 #pragma once
 
 #include <deque>
+#include <memory>
 
 #include <vrs/Compressor.h>
 #include <vrs/RecordFormatStreamPlayer.h>
@@ -25,16 +26,19 @@ namespace vrs::utils {
 using std::deque;
 using std::unique_ptr;
 
-struct TagOverrides {
+// Default but customizable copy options tag overrider
+struct TagOverrider {
   map<string, string> fileTags;
   map<StreamId, map<string, string>> streamTags;
 
-  void overrideTags(RecordFileWriter& writer) const;
+  virtual ~TagOverrider() = default;
+  virtual void overrideTags(RecordFileWriter& writer) const;
 };
 
 // Optional parameters for copy (or merge) operations, to override defaults
 struct CopyOptions {
   CopyOptions(bool showProgress = true) : showProgress{showProgress} {}
+  CopyOptions(const CopyOptions& rhs);
 
   // Compression preset of the output file. Use this method to set the user's explicit choice.
   void setCompressionPreset(CompressionPreset preset) {
@@ -48,6 +52,8 @@ struct CopyOptions {
     return userCompressionPreset == CompressionPreset::Undefined ? defaultCompressionPreset
                                                                  : userCompressionPreset;
   }
+  // Get tag overrider. Use default implementation if not already specified.
+  TagOverrider& getTagOverrider();
   // Size of the compression threads pool. Will be limited to HW concurency.
   unsigned compressionPoolSize = std::numeric_limits<unsigned>::max();
   // Printout text output to stdout, to monitor progress
@@ -58,8 +64,8 @@ struct CopyOptions {
   bool jsonOutput = false;
   // To automatically chunk the output file, specify a max chunk size in MB. 0 means no chunking.
   size_t maxChunkSizeMB = 0;
-  // For copy/merge operations: set of tags to override in the output file
-  TagOverrides tagOverrides;
+  // For copy/merge operations: optional and customizable tag overrider
+  unique_ptr<TagOverrider> tagOverrider;
   // For merge operations only: tell if streams with the same RecordableTypeId should be merged.
   bool mergeStreams = false;
   // Count the number of records copied. Set during the copy/merge operation.

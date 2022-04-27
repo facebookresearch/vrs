@@ -48,7 +48,21 @@ Writer::createRecord(double timestamp, Record::Type type, uint32_t formatVersion
   return Recordable::createRecord(timestamp, type, formatVersion, src);
 }
 
-void TagOverrides::overrideTags(RecordFileWriter& writer) const {
+CopyOptions::CopyOptions(const CopyOptions& rhs)
+    : compressionPoolSize{rhs.compressionPoolSize},
+      showProgress{rhs.showProgress},
+      graceWindow{rhs.graceWindow},
+      jsonOutput{rhs.jsonOutput},
+      maxChunkSizeMB{rhs.maxChunkSizeMB},
+      mergeStreams{rhs.mergeStreams} {
+  if (rhs.tagOverrider) {
+    TagOverrider& thisTagOverrider = getTagOverrider();
+    thisTagOverrider.fileTags = rhs.tagOverrider->fileTags;
+    thisTagOverrider.streamTags = rhs.tagOverrider->streamTags;
+  }
+}
+
+void TagOverrider::overrideTags(RecordFileWriter& writer) const {
   writer.addTags(fileTags);
   if (!streamTags.empty()) {
     for (Recordable* recordable : writer.getRecordables()) {
@@ -58,6 +72,13 @@ void TagOverrides::overrideTags(RecordFileWriter& writer) const {
       }
     }
   }
+}
+
+TagOverrider& CopyOptions::getTagOverrider() {
+  if (!tagOverrider) {
+    tagOverrider = make_unique<TagOverrider>();
+  }
+  return *tagOverrider;
 }
 
 Copier::Copier(

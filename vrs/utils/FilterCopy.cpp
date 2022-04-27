@@ -82,7 +82,9 @@ int filterCopy(
   }
   double startTimestamp, endTimestamp;
   filteredReader.getConstrainedTimeRange(startTimestamp, endTimestamp);
-  copyOptions.tagOverrides.overrideTags(writer);
+  if (copyOptions.tagOverrider) {
+    copyOptions.tagOverrider->overrideTags(writer);
+  }
   if (throttledFileDelegate->shouldPreallocateIndex()) {
     writer.preallocateIndex(filteredReader.buildIndex());
   }
@@ -238,7 +240,9 @@ int filterMerge(
     }
   }
 
-  copyOptions.tagOverrides.overrideTags(throttledWriter.getWriter());
+  if (copyOptions.tagOverrider) {
+    copyOptions.tagOverrider->overrideTags(throttledWriter.getWriter());
+  }
 
   // create a time-sorted list of all the records (pre-flight only: no actual read)
   deque<SourceRecord> records;
