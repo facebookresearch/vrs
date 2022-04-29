@@ -36,12 +36,12 @@
 */
 
 :root {
-  --ifm-color-primary: #2F2E66;
+  --ifm-color-primary: #2f2e66;
   --ifm-code-font-size: 90%;
 }
 
 html[data-theme='dark'] {
-  --ifm-color-primary: #aFaEe6;
+  --ifm-color-primary: #afaee6;
 }
 
 .docusaurus-highlight-code-line {
@@ -51,6 +51,6 @@ html[data-theme='dark'] {
   padding: 0 var(--ifm-pre-padding);
 }
 
-.button.button--secondary.button--outline.glean:not(.button--active):not(:hover) {
+.button.button--secondary.button--outline:not(.button--active):not(:hover) {
   color: var(--ifm-font-color-base-inverse)
 }
