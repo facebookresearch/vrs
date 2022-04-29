@@ -17,7 +17,7 @@ const repoUrl = 'https://github.com/facebookresearch/vrs';
 (module.exports = {
   title: 'VRS',
   tagline: 'A file format designed to record & playback streams of XR sensor data.',
-  url: 'https://facebookresearch.github.io/vrs',
+  url: 'https://facebookresearch.github.io',
   baseUrl: '/vrs/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
