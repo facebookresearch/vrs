@@ -14,6 +14,7 @@ import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import styles from './styles.module.css';
+import useThemeContext from '@theme/hooks/useThemeContext';
 
 const features = [
   {
@@ -60,6 +61,20 @@ function Feature({imageUrl, title, description}) {
   );
 }
 
+function LogoImage() {
+  const {isDarkTheme} = useThemeContext();
+  const logoWhite = useBaseUrl('img/VRS-Logo.svg');
+  const logo = useBaseUrl('img/VRS-Logo-DarkMode.svg');
+  return (
+    <img
+      className={styles.heroLogo}
+      src={isDarkTheme ? logoWhite : logo}
+      alt="VRS Logo"
+      width="600"
+    />
+  );
+}
+
 export default function Home() {
   const context = useDocusaurusContext();
   const {siteConfig = {}} = context;
@@ -69,7 +84,7 @@ export default function Home() {
       description="A file format designed to record & playback streams of XR sensor data">
       <header className={clsx('hero hero--primary', styles.heroBanner)}>
         <div className="container">
-          <h1 className="hero__title">{siteConfig.title}</h1>
+          <LogoImage />
           <p className="hero__subtitle">{siteConfig.tagline}</p>
           <div className={styles.buttons}>
             <Link
