@@ -22,16 +22,20 @@ const features = [
     //imageUrl: 'img/VRS-Icon.svg',
     description: (
       <>
-        A very efficient data collection file format, so sensor data can be recorded in realtime on device.
+        Multi-Stream<div/>
+        Thread-Safe<div/>
+        Lossless Compression<div/>
       </>
     ),
   },
   {
-    title: 'Powerful Data Format',
+    title: 'Resilient Data Format',
     //imageUrl: 'img/VRS-Icon.svg',
     description: (
       <>
-		While most space efficient, file format changes don&#x27;t break compatibility, with lossless compression.
+        Self-Described<div/>
+        Compact Binary Representation<div/>
+		    Change Resilient<div/>
       </>
     ),
   },
@@ -40,7 +44,9 @@ const features = [
     //imageUrl: 'img/VRS-Icon.svg',
     description: (
       <>
-		Store metadata, images, audio and more.
+        Rich Metadata<div/>
+		    Images (raw or compressed)<div/>
+        Audio<div/>
       </>
     ),
   },
@@ -63,12 +69,12 @@ function Feature({imageUrl, title, description}) {
 
 function LogoImage() {
   const {isDarkTheme} = useThemeContext();
-  const logoWhite = useBaseUrl('img/VRS-Logo.svg');
-  const logo = useBaseUrl('img/VRS-Logo-DarkMode.svg');
+  const logoBlackText = useBaseUrl('img/VRS-Logo.svg');
+  const logoWhiteText = useBaseUrl('img/VRS-Logo-DarkMode.svg');
   return (
     <img
-      className={styles.heroLogo}
-      src={isDarkTheme ? logoWhite : logo}
+      className={styles.vrsBanner}
+      src={isDarkTheme ? logoBlackText : logoWhiteText}
       alt="VRS Logo"
       width="600"
     />
@@ -82,7 +88,7 @@ export default function Home() {
     <Layout
       title={`VRS | Sensor Data File Format`}
       description="A file format designed to record & playback streams of XR sensor data">
-      <header className={clsx('hero hero--primary', styles.heroBanner)}>
+      <header className={clsx('hero hero--primary', styles.vrsBanner)}>
         <div className="container">
           <LogoImage />
           <p className="hero__subtitle">{siteConfig.tagline}</p>

@@ -12,7 +12,7 @@
  * and scoped locally.
  */
 
-.heroBanner {
+.vrsBanner {
   padding: 4rem 0;
   text-align: center;
   position: relative;
@@ -20,8 +20,8 @@
 }
 
 @media screen and (max-width: 966px) {
-  .heroBanner {
-    padding: 2rem;
+  .vrsBanner {
+    padding: 1rem;
   }
 }
 
@@ -34,7 +34,7 @@
 .features {
   display: flex;
   align-items: center;
-  padding: 2rem 0;
+  padding: 3rem;
   width: 100%;
 }
 

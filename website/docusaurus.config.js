@@ -95,51 +95,19 @@ const repoUrl = 'https://github.com/facebookresearch/vrs';
         style: 'dark',
         links: [
           {
-            title: 'Legal:',
-          },
-          {
-            items: [
-              {
-                  label: 'Privacy',
-                  href: 'https://opensource.facebook.com/legal/privacy/',
-              },
-            ],
-          },
-          {
-            items: [
-              {
-                  label: 'Terms',
-                  href: 'https://opensource.facebook.com/legal/terms/',
-              },
-            ],
-          },
-          {
-            items: [
-              {
-                  label: 'Data Policy',
-                  href: 'https://opensource.facebook.com/legal/data-policy/',
-              },
-            ],
-          },
-          {
-            items: [
-              {
-                  label: 'Cookie Policy',
-                  href: 'https://opensource.facebook.com/legal/cookie-policy/',
-              },
-            ],
-          },
-
-/*
-          {
             title: 'Learn',
             items: [
               {
                 label: 'Documentation',
                 to: 'docs/Overview',
               },
+              {
+                  label: 'Sample Code',
+                  href: 'https://github.com/facebookresearch/vrs/tree/main/sample_code',
+              },
             ],
           },
+/*
           {
             title: 'Community',
             items: [
@@ -153,17 +121,18 @@ const repoUrl = 'https://github.com/facebookresearch/vrs';
               },
             ],
           },
+*/
           {
             title: 'Legal',
             // Please do not remove the privacy and terms, it's a legal requirement.
             items: [
               {
-                label: 'Privacy',
-                href: 'https://opensource.facebook.com/legal/privacy/',
+                  label: 'Privacy',
+                  href: 'https://opensource.facebook.com/legal/privacy/',
               },
               {
-                label: 'Terms',
-                href: 'https://opensource.facebook.com/legal/terms/',
+                  label: 'Terms',
+                  href: 'https://opensource.facebook.com/legal/terms/',
               },
             ],
           },
@@ -172,16 +141,15 @@ const repoUrl = 'https://github.com/facebookresearch/vrs';
             // Please do not remove the privacy and terms, it's a legal requirement.
             items: [
               {
-                label: 'Data Policy',
-                href: 'https://opensource.facebook.com/legal/data-policy/',
+                  label: 'Data Policy',
+                  href: 'https://opensource.facebook.com/legal/data-policy/',
               },
               {
-                label: 'Cookie Policy',
-                href: 'https://opensource.facebook.com/legal/cookie-policy/',
+                  label: 'Cookie Policy',
+                  href: 'https://opensource.facebook.com/legal/cookie-policy/',
               },
             ],
           },
-*/
         ],
         logo: {
           alt: 'Facebook Open Source Logo',
@@ -189,7 +157,7 @@ const repoUrl = 'https://github.com/facebookresearch/vrs';
           href: 'https://opensource.facebook.com',
         },
         // Please do not remove the credits, help to publicize Docusaurus :)
-        copyright: `Copyright © ${new Date().getFullYear()} Facebook, Inc. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Meta Platforms, Inc. Built with Docusaurus.`,
       },
     }),
 });
