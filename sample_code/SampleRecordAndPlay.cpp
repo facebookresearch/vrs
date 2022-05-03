@@ -186,10 +186,12 @@ class RecordSample {
      VRS file creation, method #2:
      Create records as data comes in, and write to disk as you go to avoid using lots of memory.
 
-     Note: make all these calls from the same thread, or in a synchronized way with your own
-     locking! Each recordable may create data concurrently from each other, but may not create data
-     while calling writeRecordsAsync(), closeFileAsync() or waitForFileClosed(). It is perfectly
-     fine to create data between the "XXX-Async" calls, which should be fast.
+     Note: setup and stop recording from the same thread, or in a synchronized way with your own
+     locking. Only the calls to writeRecordsAsync(), closeFileAsync() or waitForFileClosed() need to
+     be synchronized with each other.
+     Recordable objects may create records concurrently at any time after the initial setup.
+     It is perfectly fine to keep creating records even after closing the file, provided old records
+     get purged from memory, maybe using autoPurgeRecords().
   */
   static void createVRSFileOnTheFly() {
     RecordableDemo recordable;
