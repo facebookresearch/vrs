@@ -19,18 +19,25 @@
     "prettier:diff": "prettier --config .prettierrc --list-different \"**/*.{js,jsx,ts,tsx,md,mdx}\""
   },
   "dependencies": {
+    "@algolia/client-search": "^4.9.1",
     "@docusaurus/core": "2.0.0-beta.14",
     "@docusaurus/preset-classic": "2.0.0-beta.14",
+    "@docusaurus/theme-classic": "2.0.0-beta.14",
     "@mdx-js/react": "^1.6.21",
     "@svgr/webpack": "^5.5.0",
+    "@types/react": "^16.8.0",
     "clsx": "^1.1.1",
     "docusaurus-plugin-internaldocs-fb": "0.10.7",
     "file-loader": "^6.2.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "url-loader": "^4.1.1"
+    "react-loadable": "^5.5.0",
+    "typescript": "^2.7",
+    "url-loader": "^4.1.1",
+    "webpack": "^5.0.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.11.0",
     "@babel/eslint-parser": "^7.13.10",
     "eslint": "^7.20.0",
     "eslint-config-airbnb": "^18.2.1",
