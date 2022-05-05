@@ -71,68 +71,70 @@ $(function() {
 <div class="title">TagsRecord.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">// Copyright (c) Meta Platforms, Inc. and affiliates.</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">//</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">// you may not use this file except in compliance with the License.</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">// You may obtain a copy of the License at</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment">//</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment">//     http://www.apache.org/licenses/LICENSE-2.0</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment">//</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment">// Unless required by applicable law or agreed to in writing, software</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment">// distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment">// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment">// See the License for the specific language governing permissions and</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment">// limitations under the License.</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#pragma once</span></div>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * Copyright (c) Meta Platforms, Inc. and affiliates.</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> * you may not use this file except in compliance with the License.</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> * You may obtain a copy of the License at</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment"> *     http://www.apache.org/licenses/LICENSE-2.0</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> * Unless required by applicable law or agreed to in writing, software</span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment"> * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment"> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment"> * See the License for the specific language governing permissions and</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="comment"> * limitations under the License.</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment"> */</span></div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &lt;functional&gt;</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;limits&gt;</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &quot;DataLayout.h&quot;</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &quot;RecordFormatStreamPlayer.h&quot;</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacevrs.html">vrs</a> {</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#pragma once</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &lt;functional&gt;</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;limits&gt;</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &quot;DataLayout.h&quot;</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &quot;RecordFormatStreamPlayer.h&quot;</span></div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="structvrs_1_1_tags_record.html">   26</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structvrs_1_1_tags_record.html">TagsRecord</a> : <span class="keyword">public</span> <a class="code" href="classvrs_1_1_auto_data_layout.html">AutoDataLayout</a> {</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <span class="keyword">enum</span> { kTagsVersion = 1 };</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  constexpr <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">double</span> kTagsRecordTimestamp = std::numeric_limits&lt;double&gt;::lowest();</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacevrs.html">vrs</a> {</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
+<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="structvrs_1_1_tags_record.html">   28</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structvrs_1_1_tags_record.html">TagsRecord</a> : <span class="keyword">public</span> <a class="code" href="classvrs_1_1_auto_data_layout.html">AutoDataLayout</a> {</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <span class="keyword">enum</span> { kTagsVersion = 1 };</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <a class="code" href="classvrs_1_1_data_piece_string_map.html">DataPieceStringMap&lt;string&gt;</a> vrsTags{<span class="stringliteral">&quot;vrs_tags&quot;</span>};</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <a class="code" href="classvrs_1_1_data_piece_string_map.html">DataPieceStringMap&lt;string&gt;</a> userTags{<span class="stringliteral">&quot;user_tags&quot;</span>};</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <a class="code" href="classvrs_1_1_auto_data_layout_end.html">AutoDataLayoutEnd</a> end;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;};</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="classvrs_1_1_tags_record_player.html">   38</a></span>&#160;<span class="keyword">class </span><a class="code" href="classvrs_1_1_tags_record_player.html">TagsRecordPlayer</a> : <span class="keyword">public</span> <a class="code" href="classvrs_1_1_record_format_stream_player.html">RecordFormatStreamPlayer</a> {</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <a class="code" href="classvrs_1_1_tags_record_player.html">TagsRecordPlayer</a>(<a class="code" href="classvrs_1_1_record_file_reader.html">RecordFileReader</a>* fileReader, map&lt;StreamId, StreamTags&gt;&amp; streamTags);</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <span class="keywordtype">void</span> prepareToReadTagsFor(<a class="code" href="classvrs_1_1_stream_id.html">StreamId</a> <span class="keywordtype">id</span>);</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  constexpr <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">double</span> kTagsRecordTimestamp = std::numeric_limits&lt;double&gt;::lowest();</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <a class="code" href="classvrs_1_1_data_piece_string_map.html">DataPieceStringMap&lt;string&gt;</a> vrsTags{<span class="stringliteral">&quot;vrs_tags&quot;</span>};</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <a class="code" href="classvrs_1_1_data_piece_string_map.html">DataPieceStringMap&lt;string&gt;</a> userTags{<span class="stringliteral">&quot;user_tags&quot;</span>};</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <a class="code" href="classvrs_1_1_auto_data_layout_end.html">AutoDataLayoutEnd</a> end;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;};</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
+<div class="line"><a name="l00040"></a><span class="lineno"><a class="line" href="classvrs_1_1_tags_record_player.html">   40</a></span>&#160;<span class="keyword">class </span><a class="code" href="classvrs_1_1_tags_record_player.html">TagsRecordPlayer</a> : <span class="keyword">public</span> <a class="code" href="classvrs_1_1_record_format_stream_player.html">RecordFormatStreamPlayer</a> {</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <a class="code" href="classvrs_1_1_tags_record_player.html">TagsRecordPlayer</a>(<a class="code" href="classvrs_1_1_record_file_reader.html">RecordFileReader</a>* fileReader, map&lt;StreamId, StreamTags&gt;&amp; streamTags);</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classvrs_1_1_tags_record_player.html#a551db81d7f8968efcc9cd772e1e6cc35">onDataLayoutRead</a>(<span class="keyword">const</span> <a class="code" href="structvrs_1_1_current_record.html">CurrentRecord</a>&amp; record, <span class="keywordtype">size_t</span> blockIndex, <a class="code" href="classvrs_1_1_data_layout.html">DataLayout</a>&amp;) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <span class="keywordtype">void</span> prepareToReadTagsFor(<a class="code" href="classvrs_1_1_stream_id.html">StreamId</a> <span class="keywordtype">id</span>);</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  map&lt;StreamId, StreamTags&gt;&amp; streamTags_;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <a class="code" href="structvrs_1_1_tags_record.html">TagsRecord</a> tags_;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;};</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;} <span class="comment">// namespace vrs</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classvrs_1_1_tags_record_player.html#a551db81d7f8968efcc9cd772e1e6cc35">onDataLayoutRead</a>(<span class="keyword">const</span> <a class="code" href="structvrs_1_1_current_record.html">CurrentRecord</a>&amp; record, <span class="keywordtype">size_t</span> blockIndex, <a class="code" href="classvrs_1_1_data_layout.html">DataLayout</a>&amp;) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  map&lt;StreamId, StreamTags&gt;&amp; streamTags_;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <a class="code" href="structvrs_1_1_tags_record.html">TagsRecord</a> tags_;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;};</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;} <span class="comment">// namespace vrs</span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="astructvrs_1_1_tags_record_html"><div class="ttname"><a href="structvrs_1_1_tags_record.html">vrs::TagsRecord</a></div><div class="ttdoc">DataLayout definition used in tag records, which is a VRS internal record type.</div><div class="ttdef"><b>Definition:</b> TagsRecord.h:26</div></div>
-<div class="ttc" id="astructvrs_1_1_current_record_html"><div class="ttname"><a href="structvrs_1_1_current_record.html">vrs::CurrentRecord</a></div><div class="ttdoc">Class describing which record is being read. Most fields are really self explanatory.</div><div class="ttdef"><b>Definition:</b> StreamPlayer.h:25</div></div>
-<div class="ttc" id="aclassvrs_1_1_auto_data_layout_end_html"><div class="ttname"><a href="classvrs_1_1_auto_data_layout_end.html">vrs::AutoDataLayoutEnd</a></div><div class="ttdoc">For use within an AutoDataLayout class, to end the AutoDataLayout's construction.</div><div class="ttdef"><b>Definition:</b> DataLayout.h:532</div></div>
+<div class="ttc" id="astructvrs_1_1_tags_record_html"><div class="ttname"><a href="structvrs_1_1_tags_record.html">vrs::TagsRecord</a></div><div class="ttdoc">DataLayout definition used in tag records, which is a VRS internal record type.</div><div class="ttdef"><b>Definition:</b> TagsRecord.h:28</div></div>
+<div class="ttc" id="astructvrs_1_1_current_record_html"><div class="ttname"><a href="structvrs_1_1_current_record.html">vrs::CurrentRecord</a></div><div class="ttdoc">Class describing which record is being read. Most fields are really self explanatory.</div><div class="ttdef"><b>Definition:</b> StreamPlayer.h:27</div></div>
+<div class="ttc" id="aclassvrs_1_1_auto_data_layout_end_html"><div class="ttname"><a href="classvrs_1_1_auto_data_layout_end.html">vrs::AutoDataLayoutEnd</a></div><div class="ttdoc">For use within an AutoDataLayout class, to end the AutoDataLayout's construction.</div><div class="ttdef"><b>Definition:</b> DataLayout.h:534</div></div>
 <div class="ttc" id="aclassvrs_1_1_data_piece_string_map_html"><div class="ttname"><a href="classvrs_1_1_data_piece_string_map.html">vrs::DataPieceStringMap&lt; string &gt;</a></div></div>
-<div class="ttc" id="aclassvrs_1_1_tags_record_player_html"><div class="ttname"><a href="classvrs_1_1_tags_record_player.html">vrs::TagsRecordPlayer</a></div><div class="ttdoc">StreamPlayer to decode the content of VRS tag records.</div><div class="ttdef"><b>Definition:</b> TagsRecord.h:38</div></div>
-<div class="ttc" id="aclassvrs_1_1_auto_data_layout_html"><div class="ttname"><a href="classvrs_1_1_auto_data_layout.html">vrs::AutoDataLayout</a></div><div class="ttdoc">Specialized DataLayout class to declare a DataLayout in struct format.</div><div class="ttdef"><b>Definition:</b> DataLayout.h:526</div></div>
-<div class="ttc" id="anamespacevrs_html"><div class="ttname"><a href="namespacevrs.html">vrs</a></div><div class="ttdef"><b>Definition:</b> Compressor.cpp:80</div></div>
-<div class="ttc" id="aclassvrs_1_1_stream_id_html"><div class="ttname"><a href="classvrs_1_1_stream_id.html">vrs::StreamId</a></div><div class="ttdoc">VRS stream identifier class.</div><div class="ttdef"><b>Definition:</b> StreamId.h:211</div></div>
-<div class="ttc" id="aclassvrs_1_1_data_layout_html"><div class="ttname"><a href="classvrs_1_1_data_layout.html">vrs::DataLayout</a></div><div class="ttdoc">The DataLayout class describes the data stored inside a DataLayoutContentBlock.</div><div class="ttdef"><b>Definition:</b> DataLayout.h:184</div></div>
-<div class="ttc" id="aclassvrs_1_1_record_file_reader_html"><div class="ttname"><a href="classvrs_1_1_record_file_reader.html">vrs::RecordFileReader</a></div><div class="ttdoc">The class to read VRS files.</div><div class="ttdef"><b>Definition:</b> RecordFileReader.h:58</div></div>
-<div class="ttc" id="aclassvrs_1_1_record_format_stream_player_html"><div class="ttname"><a href="classvrs_1_1_record_format_stream_player.html">vrs::RecordFormatStreamPlayer</a></div><div class="ttdoc">Specialized StreamPlayer designed to handle records which format is managed by RecordFormat,...</div><div class="ttdef"><b>Definition:</b> RecordFormatStreamPlayer.h:58</div></div>
-<div class="ttc" id="aclassvrs_1_1_tags_record_player_html_a551db81d7f8968efcc9cd772e1e6cc35"><div class="ttname"><a href="classvrs_1_1_tags_record_player.html#a551db81d7f8968efcc9cd772e1e6cc35">vrs::TagsRecordPlayer::onDataLayoutRead</a></div><div class="ttdeci">bool onDataLayoutRead(const CurrentRecord &amp;record, size_t blockIndex, DataLayout &amp;) override</div><div class="ttdef"><b>Definition:</b> TagsRecord.cpp:50</div></div>
+<div class="ttc" id="aclassvrs_1_1_tags_record_player_html"><div class="ttname"><a href="classvrs_1_1_tags_record_player.html">vrs::TagsRecordPlayer</a></div><div class="ttdoc">StreamPlayer to decode the content of VRS tag records.</div><div class="ttdef"><b>Definition:</b> TagsRecord.h:40</div></div>
+<div class="ttc" id="aclassvrs_1_1_auto_data_layout_html"><div class="ttname"><a href="classvrs_1_1_auto_data_layout.html">vrs::AutoDataLayout</a></div><div class="ttdoc">Specialized DataLayout class to declare a DataLayout in struct format.</div><div class="ttdef"><b>Definition:</b> DataLayout.h:528</div></div>
+<div class="ttc" id="anamespacevrs_html"><div class="ttname"><a href="namespacevrs.html">vrs</a></div><div class="ttdef"><b>Definition:</b> Compressor.cpp:82</div></div>
+<div class="ttc" id="aclassvrs_1_1_stream_id_html"><div class="ttname"><a href="classvrs_1_1_stream_id.html">vrs::StreamId</a></div><div class="ttdoc">VRS stream identifier class.</div><div class="ttdef"><b>Definition:</b> StreamId.h:213</div></div>
+<div class="ttc" id="aclassvrs_1_1_data_layout_html"><div class="ttname"><a href="classvrs_1_1_data_layout.html">vrs::DataLayout</a></div><div class="ttdoc">The DataLayout class describes the data stored inside a DataLayoutContentBlock.</div><div class="ttdef"><b>Definition:</b> DataLayout.h:186</div></div>
+<div class="ttc" id="aclassvrs_1_1_record_file_reader_html"><div class="ttname"><a href="classvrs_1_1_record_file_reader.html">vrs::RecordFileReader</a></div><div class="ttdoc">The class to read VRS files.</div><div class="ttdef"><b>Definition:</b> RecordFileReader.h:60</div></div>
+<div class="ttc" id="aclassvrs_1_1_record_format_stream_player_html"><div class="ttname"><a href="classvrs_1_1_record_format_stream_player.html">vrs::RecordFormatStreamPlayer</a></div><div class="ttdoc">Specialized StreamPlayer designed to handle records which format is managed by RecordFormat,...</div><div class="ttdef"><b>Definition:</b> RecordFormatStreamPlayer.h:60</div></div>
+<div class="ttc" id="aclassvrs_1_1_tags_record_player_html_a551db81d7f8968efcc9cd772e1e6cc35"><div class="ttname"><a href="classvrs_1_1_tags_record_player.html#a551db81d7f8968efcc9cd772e1e6cc35">vrs::TagsRecordPlayer::onDataLayoutRead</a></div><div class="ttdeci">bool onDataLayoutRead(const CurrentRecord &amp;record, size_t blockIndex, DataLayout &amp;) override</div><div class="ttdef"><b>Definition:</b> TagsRecord.cpp:52</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

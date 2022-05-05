@@ -71,166 +71,168 @@ $(function() {
 <div class="title">TagConventions.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">// Copyright (c) Meta Platforms, Inc. and affiliates.</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">//</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">// you may not use this file except in compliance with the License.</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">// You may obtain a copy of the License at</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment">//</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment">//     http://www.apache.org/licenses/LICENSE-2.0</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment">//</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment">// Unless required by applicable law or agreed to in writing, software</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment">// distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment">// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment">// See the License for the specific language governing permissions and</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment">// limitations under the License.</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#pragma once</span></div>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * Copyright (c) Meta Platforms, Inc. and affiliates.</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> * you may not use this file except in compliance with the License.</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> * You may obtain a copy of the License at</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment"> *     http://www.apache.org/licenses/LICENSE-2.0</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> * Unless required by applicable law or agreed to in writing, software</span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment"> * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment"> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment"> * See the License for the specific language governing permissions and</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="comment"> * limitations under the License.</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment"> */</span></div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment">// clang-format off</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#pragma once</span></div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="comment">/*</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="comment">  These tag names are pure conventions VRS users may want to follow when creating their VRS files.</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="comment">*/</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;vrs/RecordFileWriter.h&gt;</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="comment">// clang-format off</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="comment">/*</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="comment">  These tag names are pure conventions VRS users may want to follow when creating their VRS files.</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="comment">*/</span></div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacevrs.html">vrs</a> {</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &lt;vrs/RecordFileWriter.h&gt;</span></div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
-<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="namespacevrs_1_1tag__conventions.html">   28</a></span>&#160;<span class="keyword">namespace </span>tag_conventions {</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="comment">// Overall identification, HW &amp; SW independent</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacevrs.html">vrs</a> {</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
+<div class="line"><a name="l00030"></a><span class="lineno"><a class="line" href="namespacevrs_1_1tag__conventions.html">   30</a></span>&#160;<span class="keyword">namespace </span>tag_conventions {</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="comment">// Project name: overarching project name.</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kProjectName = <span class="stringliteral">&quot;project_name&quot;</span>;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="comment">// EPOCH time in seconds since Jan 1, 1970, when the capture started. Uses C&#39;s &#39;time(NULL)&#39;</span></div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kCaptureTimeEpoch = <span class="stringliteral">&quot;capture_time_epoch&quot;</span>;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="comment">// Session ID: unique identifier which can be used to recognize the session</span></div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kSessionId = <span class="stringliteral">&quot;session_id&quot;</span>;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  <span class="comment">// Capture type: description of the recording session context</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <span class="comment">// Ex: &quot;calibration&quot;, &quot;data_collection&quot;, &quot;test&quot;</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kCaptureType = <span class="stringliteral">&quot;capture_type&quot;</span>;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="comment">// A set of tags.</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kTagSet = <span class="stringliteral">&quot;tag_set&quot;</span>;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  std::string <a class="code" href="namespacevrs_1_1tag__conventions.html#a3b2b814f54288677df0458c512ed432a">addUniqueSessionId</a>(<a class="code" href="classvrs_1_1_record_file_writer.html">RecordFileWriter</a>&amp; writer);</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="namespacevrs_1_1tag__conventions.html#ad3e1542bb4141147369a2abf335c4efe">addCaptureTime</a>(<a class="code" href="classvrs_1_1_record_file_writer.html">RecordFileWriter</a>&amp; writer);</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="namespacevrs_1_1tag__conventions.html#a476bbcbb15e95d2da63d23f91c9f76a1">addTagSet</a>(<a class="code" href="classvrs_1_1_record_file_writer.html">RecordFileWriter</a>&amp; writer, <span class="keyword">const</span> vector&lt;string&gt;&amp; tags);</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="comment">// Hardware components</span></div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="comment">// For dependent devices with their own id/serial (controllers?), tag at the stream level</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="comment">// Device Type: device type, maybe the code name of the device/prototype</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kDeviceType = <span class="stringliteral">&quot;device_type&quot;</span>;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="comment">// Device version: device version name. Ex: &quot;proto0&quot;, &quot;EVT2&quot;</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kDeviceVersion = <span class="stringliteral">&quot;device_version&quot;</span>;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  <span class="comment">// Device Serial: serial number of the main HW (in case of multi part HW)</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kDeviceSerial = <span class="stringliteral">&quot;device_serial&quot;</span>;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  <span class="comment">// Device ID: user code identification of the device</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kDeviceId = <span class="stringliteral">&quot;device_id&quot;</span>;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <span class="comment">// Hardware configuration: description of the hardware setup</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kHardwareConfiguration = <span class="stringliteral">&quot;hardware_configuration&quot;</span>;</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  <span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt; <span class="keyword">inline</span> <span class="comment">// vrs::RecordFileWriter or vrs::Recordable</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno"><a class="line" href="namespacevrs_1_1tag__conventions.html#ad54ca81705a9275b739472459494fe6c">   76</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="namespacevrs_1_1tag__conventions.html#ad54ca81705a9275b739472459494fe6c">addDevice</a>(T&amp; writer, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; type, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; serialNumber, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; version) {</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    writer.setTag(kDeviceType, type);</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    writer.setTag(kDeviceSerial, serialNumber);</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    writer.setTag(kDeviceVersion, version);</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  }</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  <span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt; <span class="keyword">inline</span> <span class="comment">// vrs::RecordFileWriter or vrs::Recordable</span></div>
-<div class="line"><a name="l00085"></a><span class="lineno"><a class="line" href="namespacevrs_1_1tag__conventions.html#af6414b6b6430f35cc640116adc42226f">   85</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="namespacevrs_1_1tag__conventions.html#af6414b6b6430f35cc640116adc42226f">addDeviceId</a>(T&amp; writer, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <span class="keywordtype">id</span>) {</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    writer.setTag(kDeviceId, <span class="keywordtype">id</span>);</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  }</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="comment">// Software components</span></div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="comment">// For dependent devices with their own SW/FW (controllers?), tag at the stream level</span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  <span class="comment">// OS fingerprint: Operating system build signature</span></div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kOsFingerprint = <span class="stringliteral">&quot;os_fingerprint&quot;</span>;</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  <span class="comment">// SW compile time: when the recording software was compiled</span></div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kSoftwareCompileDate = <span class="stringliteral">&quot;software_compile_date&quot;</span>;</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  <span class="comment">// SW revision: source control revision of the software</span></div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kSoftwareRevision = <span class="stringliteral">&quot;software_revision&quot;</span>;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  <span class="comment">// FW compile time: when the recording firmware was compiled</span></div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kFirmwareCompileDate = <span class="stringliteral">&quot;firmware_compile_date&quot;</span>;</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  <span class="comment">// FW revision: source control revision of the firmware</span></div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kFirmwareRevision = <span class="stringliteral">&quot;firmware_revision&quot;</span>;</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="namespacevrs_1_1tag__conventions.html#a308301349e9faf7f628dad11b4d8c39b">addOsFingerprint</a>(<a class="code" href="classvrs_1_1_record_file_writer.html">RecordFileWriter</a>&amp; writer);</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  <span class="keyword">inline</span></div>
-<div class="line"><a name="l00111"></a><span class="lineno"><a class="line" href="namespacevrs_1_1tag__conventions.html#a67ff625be83d2f948f1116fb04c51931">  111</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="namespacevrs_1_1tag__conventions.html#a67ff625be83d2f948f1116fb04c51931">addSoftwareDetails</a>(<a class="code" href="classvrs_1_1_record_file_writer.html">RecordFileWriter</a>&amp; writer, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; compileDate, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; rev) {</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    writer.<a class="code" href="classvrs_1_1_record_file_writer.html#a245ce789938f697fb32802969a940439">setTag</a>(kSoftwareCompileDate, compileDate);</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    writer.<a class="code" href="classvrs_1_1_record_file_writer.html#a245ce789938f697fb32802969a940439">setTag</a>(kSoftwareRevision, rev);</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  }</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  <span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt; <span class="comment">// vrs::RecordFileWriter or vrs::Recordable</span></div>
-<div class="line"><a name="l00120"></a><span class="lineno"><a class="line" href="namespacevrs_1_1tag__conventions.html#ad9135ebbeceb88923b448684130e210a">  120</a></span>&#160;  <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="namespacevrs_1_1tag__conventions.html#ad9135ebbeceb88923b448684130e210a">addFirmwareDetails</a>(T&amp; writer, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; fwCompileDate, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; fwRevision) {</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    writer.setTag(kFirmwareCompileDate, fwCompileDate);</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    writer.setTag(kFirmwareRevision, fwRevision);</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;  }</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160; </div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="comment">// For streams which may have multiple instances in the same recording</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="comment">// Overall identification, HW &amp; SW independent</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="comment">// Project name: overarching project name.</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kProjectName = <span class="stringliteral">&quot;project_name&quot;</span>;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="comment">// EPOCH time in seconds since Jan 1, 1970, when the capture started. Uses C&#39;s &#39;time(NULL)&#39;</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kCaptureTimeEpoch = <span class="stringliteral">&quot;capture_time_epoch&quot;</span>;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  <span class="comment">// Session ID: unique identifier which can be used to recognize the session</span></div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kSessionId = <span class="stringliteral">&quot;session_id&quot;</span>;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="comment">// Capture type: description of the recording session context</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="comment">// Ex: &quot;calibration&quot;, &quot;data_collection&quot;, &quot;test&quot;</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kCaptureType = <span class="stringliteral">&quot;capture_type&quot;</span>;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <span class="comment">// A set of tags.</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kTagSet = <span class="stringliteral">&quot;tag_set&quot;</span>;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  std::string <a class="code" href="namespacevrs_1_1tag__conventions.html#a3b2b814f54288677df0458c512ed432a">addUniqueSessionId</a>(<a class="code" href="classvrs_1_1_record_file_writer.html">RecordFileWriter</a>&amp; writer);</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="namespacevrs_1_1tag__conventions.html#ad3e1542bb4141147369a2abf335c4efe">addCaptureTime</a>(<a class="code" href="classvrs_1_1_record_file_writer.html">RecordFileWriter</a>&amp; writer);</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="namespacevrs_1_1tag__conventions.html#a476bbcbb15e95d2da63d23f91c9f76a1">addTagSet</a>(<a class="code" href="classvrs_1_1_record_file_writer.html">RecordFileWriter</a>&amp; writer, <span class="keyword">const</span> vector&lt;string&gt;&amp; tags);</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="comment">// Hardware components</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="comment">// For dependent devices with their own id/serial (controllers?), tag at the stream level</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="comment">// Device Type: device type, maybe the code name of the device/prototype</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kDeviceType = <span class="stringliteral">&quot;device_type&quot;</span>;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  <span class="comment">// Device version: device version name. Ex: &quot;proto0&quot;, &quot;EVT2&quot;</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kDeviceVersion = <span class="stringliteral">&quot;device_version&quot;</span>;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  <span class="comment">// Device Serial: serial number of the main HW (in case of multi part HW)</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kDeviceSerial = <span class="stringliteral">&quot;device_serial&quot;</span>;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <span class="comment">// Device ID: user code identification of the device</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kDeviceId = <span class="stringliteral">&quot;device_id&quot;</span>;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  <span class="comment">// Hardware configuration: description of the hardware setup</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kHardwareConfiguration = <span class="stringliteral">&quot;hardware_configuration&quot;</span>;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  <span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt; <span class="keyword">inline</span> <span class="comment">// vrs::RecordFileWriter or vrs::Recordable</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno"><a class="line" href="namespacevrs_1_1tag__conventions.html#ad54ca81705a9275b739472459494fe6c">   78</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="namespacevrs_1_1tag__conventions.html#ad54ca81705a9275b739472459494fe6c">addDevice</a>(T&amp; writer, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; type, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; serialNumber, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; version) {</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    writer.setTag(kDeviceType, type);</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    writer.setTag(kDeviceSerial, serialNumber);</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    writer.setTag(kDeviceVersion, version);</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  }</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  <span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt; <span class="keyword">inline</span> <span class="comment">// vrs::RecordFileWriter or vrs::Recordable</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno"><a class="line" href="namespacevrs_1_1tag__conventions.html#af6414b6b6430f35cc640116adc42226f">   87</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="namespacevrs_1_1tag__conventions.html#af6414b6b6430f35cc640116adc42226f">addDeviceId</a>(T&amp; writer, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; <span class="keywordtype">id</span>) {</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    writer.setTag(kDeviceId, <span class="keywordtype">id</span>);</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  }</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="comment">// Software components</span></div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="comment">// For dependent devices with their own SW/FW (controllers?), tag at the stream level</span></div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  <span class="comment">// OS fingerprint: Operating system build signature</span></div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kOsFingerprint = <span class="stringliteral">&quot;os_fingerprint&quot;</span>;</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  <span class="comment">// SW compile time: when the recording software was compiled</span></div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kSoftwareCompileDate = <span class="stringliteral">&quot;software_compile_date&quot;</span>;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  <span class="comment">// SW revision: source control revision of the software</span></div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kSoftwareRevision = <span class="stringliteral">&quot;software_revision&quot;</span>;</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  <span class="comment">// FW compile time: when the recording firmware was compiled</span></div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kFirmwareCompileDate = <span class="stringliteral">&quot;firmware_compile_date&quot;</span>;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  <span class="comment">// FW revision: source control revision of the firmware</span></div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kFirmwareRevision = <span class="stringliteral">&quot;firmware_revision&quot;</span>;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="namespacevrs_1_1tag__conventions.html#a308301349e9faf7f628dad11b4d8c39b">addOsFingerprint</a>(<a class="code" href="classvrs_1_1_record_file_writer.html">RecordFileWriter</a>&amp; writer);</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  <span class="keyword">inline</span></div>
+<div class="line"><a name="l00113"></a><span class="lineno"><a class="line" href="namespacevrs_1_1tag__conventions.html#a67ff625be83d2f948f1116fb04c51931">  113</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="namespacevrs_1_1tag__conventions.html#a67ff625be83d2f948f1116fb04c51931">addSoftwareDetails</a>(<a class="code" href="classvrs_1_1_record_file_writer.html">RecordFileWriter</a>&amp; writer, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; compileDate, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; rev) {</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    writer.<a class="code" href="classvrs_1_1_record_file_writer.html#a245ce789938f697fb32802969a940439">setTag</a>(kSoftwareCompileDate, compileDate);</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    writer.<a class="code" href="classvrs_1_1_record_file_writer.html#a245ce789938f697fb32802969a940439">setTag</a>(kSoftwareRevision, rev);</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  }</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;  <span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt; <span class="comment">// vrs::RecordFileWriter or vrs::Recordable</span></div>
+<div class="line"><a name="l00122"></a><span class="lineno"><a class="line" href="namespacevrs_1_1tag__conventions.html#ad9135ebbeceb88923b448684130e210a">  122</a></span>&#160;  <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="namespacevrs_1_1tag__conventions.html#ad9135ebbeceb88923b448684130e210a">addFirmwareDetails</a>(T&amp; writer, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; fwCompileDate, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; fwRevision) {</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    writer.setTag(kFirmwareCompileDate, fwCompileDate);</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    writer.setTag(kFirmwareRevision, fwRevision);</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;  }</div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160; </div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  <span class="comment">// Device role: which &quot;role&quot; has this device in the system.</span></div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  <span class="comment">// Ex: &quot;top-right camera&quot;, &quot;left controller&quot;</span></div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kDeviceRole = <span class="stringliteral">&quot;device_role&quot;</span>; <span class="comment">// When relevant</span></div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160; </div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="comment">// Key configuration/settings (when relevant, never required)</span></div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="comment">// For streams which may have multiple instances in the same recording</span></div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160; </div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  <span class="comment">// Device role: which &quot;role&quot; has this device in the system.</span></div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;  <span class="comment">// Ex: &quot;top-right camera&quot;, &quot;left controller&quot;</span></div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kDeviceRole = <span class="stringliteral">&quot;device_role&quot;</span>; <span class="comment">// When relevant</span></div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160; </div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;  <span class="comment">// Intensity target used by dynamic exposure control. How to fill it:</span></div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;  <span class="comment">// * Do not fill it or fill it with -1 when unknown.</span></div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;  <span class="comment">// * Fill it with 0 when using fixed exposure settings.</span></div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;  <span class="comment">// * Fill it with the right intensity target when using dynamic exposure</span></div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kDynamicExposureTarget = <span class="stringliteral">&quot;iot_dynamic_exposure_target&quot;</span>;</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160; </div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;<span class="comment">// Helper functions</span></div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;<span class="comment"></span>  <span class="keywordtype">string</span> <a class="code" href="namespacevrs_1_1tag__conventions.html#a10efe48b49b0cccf675fc6db2b7db2e2">makeTagSet</a>(<span class="keyword">const</span> vector&lt;string&gt;&amp; tags);</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="namespacevrs_1_1tag__conventions.html#a85949c7993b4f9e3c474b12d6e804e36">parseTagSet</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; jsonTagSet, vector&lt;string&gt;&amp; outVectorTagSet);</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160; </div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;<span class="comment">/*</span></div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;<span class="comment"> * Sample: Santa Cruz + controllers</span></div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;<span class="comment"> * File tags:</span></div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;<span class="comment"> *  kProjectName = &quot;Santa Cruz&quot;</span></div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;<span class="comment"> *  kCaptureTimeEpoch = &quot;1520364293&quot;</span></div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;<span class="comment"> *  kSessionId = &quot;5584bdc43&quot;</span></div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<span class="comment"> *  kCaptureType = &quot;calibration&quot;   &lt;- other use case: &quot;INSIDE_OUT_TRACKER_RECORDING&quot;...</span></div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;<span class="comment"> *  kDeviceType = &quot;Santa Cruz&quot;</span></div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;<span class="comment"> *  kDeviceVersion = &quot;EVT3&quot;             &lt;- main device (HMD for Santa Cruz)</span></div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;<span class="comment"> *  kDeviceSerial = &quot;0ba3602ffbee80b9&quot;  &lt;- of HMD</span></div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;<span class="comment"> *  kHardwareConfiguration = &quot;hmd + 2 hand controllers&quot;</span></div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;<span class="comment"> *  kOsFingerprint = &quot;oculus/vr_santa_cruz_proto1/proto1:7.1.1/N9F27L/863:userdev/dev-keys&quot;</span></div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;<span class="comment"> *  kSoftwareCompileDate = &quot;Sep 26 2017 19:06:45&quot;</span></div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;<span class="comment"> *  kSoftwareRevision = &quot;185ea53a5584bdc43640ba3602ccbee80b91d33e&quot;</span></div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;<span class="comment"> *  kFirmwareCompileDate = &quot;Sep 20 2017 15:26:25&quot;</span></div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;<span class="comment"> *  kFirmwareRevision = &quot;265ea53b5584bdc43640ba3602ffbee80b91d43a&quot;</span></div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;<span class="comment"> * Controller stream tags (for each stream)</span></div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;<span class="comment"> *  kDeviceType = &quot;Santa Cruz Controller&quot;</span></div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;<span class="comment"> *  kDeviceVersion = &quot;EVT0&quot;</span></div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;<span class="comment"> *  kDeviceSerial = &quot;bee80b91d3&quot;</span></div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;<span class="comment"> *  kDeviceId = &quot;left controller&quot;</span></div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;<span class="comment"> *  kFirmwareCompileDate = &quot;Sep 20 2017 15:26:25&quot;</span></div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;<span class="comment"> *  kFirmwareRevision = &quot;265ea53b5584bdc43640ba3602ffbee80b91d43a&quot;</span></div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;<span class="comment"> */</span></div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160; </div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;} <span class="comment">// namespace tag_conventions</span></div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;} <span class="comment">// namespace vrs</span></div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;<span class="comment">// Key configuration/settings (when relevant, never required)</span></div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160; </div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;  <span class="comment">// Intensity target used by dynamic exposure control. How to fill it:</span></div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;  <span class="comment">// * Do not fill it or fill it with -1 when unknown.</span></div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;  <span class="comment">// * Fill it with 0 when using fixed exposure settings.</span></div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  <span class="comment">// * Fill it with the right intensity target when using dynamic exposure</span></div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;  constexpr <span class="keyword">const</span> <span class="keywordtype">char</span>* kDynamicExposureTarget = <span class="stringliteral">&quot;iot_dynamic_exposure_target&quot;</span>;</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160; </div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;<span class="comment">// Helper functions</span></div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;<span class="comment"></span>  <span class="keywordtype">string</span> <a class="code" href="namespacevrs_1_1tag__conventions.html#a10efe48b49b0cccf675fc6db2b7db2e2">makeTagSet</a>(<span class="keyword">const</span> vector&lt;string&gt;&amp; tags);</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="namespacevrs_1_1tag__conventions.html#a85949c7993b4f9e3c474b12d6e804e36">parseTagSet</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; jsonTagSet, vector&lt;string&gt;&amp; outVectorTagSet);</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160; </div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;<span class="comment">/*</span></div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;<span class="comment"> * Sample: Santa Cruz + controllers</span></div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;<span class="comment"> * File tags:</span></div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;<span class="comment"> *  kProjectName = &quot;Santa Cruz&quot;</span></div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<span class="comment"> *  kCaptureTimeEpoch = &quot;1520364293&quot;</span></div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;<span class="comment"> *  kSessionId = &quot;5584bdc43&quot;</span></div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;<span class="comment"> *  kCaptureType = &quot;calibration&quot;   &lt;- other use case: &quot;INSIDE_OUT_TRACKER_RECORDING&quot;...</span></div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;<span class="comment"> *  kDeviceType = &quot;Santa Cruz&quot;</span></div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;<span class="comment"> *  kDeviceVersion = &quot;EVT3&quot;             &lt;- main device (HMD for Santa Cruz)</span></div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;<span class="comment"> *  kDeviceSerial = &quot;0ba3602ffbee80b9&quot;  &lt;- of HMD</span></div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;<span class="comment"> *  kHardwareConfiguration = &quot;hmd + 2 hand controllers&quot;</span></div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;<span class="comment"> *  kOsFingerprint = &quot;oculus/vr_santa_cruz_proto1/proto1:7.1.1/N9F27L/863:userdev/dev-keys&quot;</span></div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;<span class="comment"> *  kSoftwareCompileDate = &quot;Sep 26 2017 19:06:45&quot;</span></div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;<span class="comment"> *  kSoftwareRevision = &quot;185ea53a5584bdc43640ba3602ccbee80b91d33e&quot;</span></div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;<span class="comment"> *  kFirmwareCompileDate = &quot;Sep 20 2017 15:26:25&quot;</span></div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;<span class="comment"> *  kFirmwareRevision = &quot;265ea53b5584bdc43640ba3602ffbee80b91d43a&quot;</span></div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;<span class="comment"> * Controller stream tags (for each stream)</span></div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;<span class="comment"> *  kDeviceType = &quot;Santa Cruz Controller&quot;</span></div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;<span class="comment"> *  kDeviceVersion = &quot;EVT0&quot;</span></div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;<span class="comment"> *  kDeviceSerial = &quot;bee80b91d3&quot;</span></div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;<span class="comment"> *  kDeviceId = &quot;left controller&quot;</span></div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;<span class="comment"> *  kFirmwareCompileDate = &quot;Sep 20 2017 15:26:25&quot;</span></div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;<span class="comment"> *  kFirmwareRevision = &quot;265ea53b5584bdc43640ba3602ffbee80b91d43a&quot;</span></div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;<span class="comment"> */</span></div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160; </div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;} <span class="comment">// namespace tag_conventions</span></div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;} <span class="comment">// namespace vrs</span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="anamespacevrs_1_1tag__conventions_html_a3b2b814f54288677df0458c512ed432a"><div class="ttname"><a href="namespacevrs_1_1tag__conventions.html#a3b2b814f54288677df0458c512ed432a">vrs::tag_conventions::addUniqueSessionId</a></div><div class="ttdeci">std::string addUniqueSessionId(RecordFileWriter &amp;writer)</div><div class="ttdef"><b>Definition:</b> TagConventions.cpp:61</div></div>
-<div class="ttc" id="anamespacevrs_1_1tag__conventions_html_a85949c7993b4f9e3c474b12d6e804e36"><div class="ttname"><a href="namespacevrs_1_1tag__conventions.html#a85949c7993b4f9e3c474b12d6e804e36">vrs::tag_conventions::parseTagSet</a></div><div class="ttdeci">bool parseTagSet(const string &amp;jsonTagSet, vector&lt; string &gt; &amp;outVectorTagSet)</div><div class="ttdef"><b>Definition:</b> TagConventions.cpp:49</div></div>
-<div class="ttc" id="aclassvrs_1_1_record_file_writer_html_a245ce789938f697fb32802969a940439"><div class="ttname"><a href="classvrs_1_1_record_file_writer.html#a245ce789938f697fb32802969a940439">vrs::RecordFileWriter::setTag</a></div><div class="ttdeci">void setTag(const string &amp;tagName, const string &amp;tagValue)</div><div class="ttdef"><b>Definition:</b> RecordFileWriter.cpp:598</div></div>
-<div class="ttc" id="anamespacevrs_1_1tag__conventions_html_a10efe48b49b0cccf675fc6db2b7db2e2"><div class="ttname"><a href="namespacevrs_1_1tag__conventions.html#a10efe48b49b0cccf675fc6db2b7db2e2">vrs::tag_conventions::makeTagSet</a></div><div class="ttdeci">string makeTagSet(const vector&lt; string &gt; &amp;tags)</div><div class="ttdef"><b>Definition:</b> TagConventions.cpp:40</div></div>
-<div class="ttc" id="anamespacevrs_1_1tag__conventions_html_ad3e1542bb4141147369a2abf335c4efe"><div class="ttname"><a href="namespacevrs_1_1tag__conventions.html#ad3e1542bb4141147369a2abf335c4efe">vrs::tag_conventions::addCaptureTime</a></div><div class="ttdeci">void addCaptureTime(RecordFileWriter &amp;writer)</div><div class="ttdef"><b>Definition:</b> TagConventions.cpp:24</div></div>
-<div class="ttc" id="anamespacevrs_1_1tag__conventions_html_af6414b6b6430f35cc640116adc42226f"><div class="ttname"><a href="namespacevrs_1_1tag__conventions.html#af6414b6b6430f35cc640116adc42226f">vrs::tag_conventions::addDeviceId</a></div><div class="ttdeci">void addDeviceId(T &amp;writer, const string &amp;id)</div><div class="ttdef"><b>Definition:</b> TagConventions.h:85</div></div>
-<div class="ttc" id="anamespacevrs_html"><div class="ttname"><a href="namespacevrs.html">vrs</a></div><div class="ttdef"><b>Definition:</b> Compressor.cpp:80</div></div>
-<div class="ttc" id="anamespacevrs_1_1tag__conventions_html_ad9135ebbeceb88923b448684130e210a"><div class="ttname"><a href="namespacevrs_1_1tag__conventions.html#ad9135ebbeceb88923b448684130e210a">vrs::tag_conventions::addFirmwareDetails</a></div><div class="ttdeci">void addFirmwareDetails(T &amp;writer, const string &amp;fwCompileDate, const string &amp;fwRevision)</div><div class="ttdef"><b>Definition:</b> TagConventions.h:120</div></div>
-<div class="ttc" id="anamespacevrs_1_1tag__conventions_html_a476bbcbb15e95d2da63d23f91c9f76a1"><div class="ttname"><a href="namespacevrs_1_1tag__conventions.html#a476bbcbb15e95d2da63d23f91c9f76a1">vrs::tag_conventions::addTagSet</a></div><div class="ttdeci">void addTagSet(RecordFileWriter &amp;writer, const vector&lt; string &gt; &amp;tags)</div><div class="ttdef"><b>Definition:</b> TagConventions.cpp:32</div></div>
-<div class="ttc" id="aclassvrs_1_1_record_file_writer_html"><div class="ttname"><a href="classvrs_1_1_record_file_writer.html">vrs::RecordFileWriter</a></div><div class="ttdoc">The class to create VRS files.</div><div class="ttdef"><b>Definition:</b> RecordFileWriter.h:88</div></div>
-<div class="ttc" id="anamespacevrs_1_1tag__conventions_html_a67ff625be83d2f948f1116fb04c51931"><div class="ttname"><a href="namespacevrs_1_1tag__conventions.html#a67ff625be83d2f948f1116fb04c51931">vrs::tag_conventions::addSoftwareDetails</a></div><div class="ttdeci">void addSoftwareDetails(RecordFileWriter &amp;writer, const string &amp;compileDate, const string &amp;rev)</div><div class="ttdef"><b>Definition:</b> TagConventions.h:111</div></div>
-<div class="ttc" id="anamespacevrs_1_1tag__conventions_html_a308301349e9faf7f628dad11b4d8c39b"><div class="ttname"><a href="namespacevrs_1_1tag__conventions.html#a308301349e9faf7f628dad11b4d8c39b">vrs::tag_conventions::addOsFingerprint</a></div><div class="ttdeci">void addOsFingerprint(RecordFileWriter &amp;writer)</div><div class="ttdef"><b>Definition:</b> TagConventions.cpp:28</div></div>
-<div class="ttc" id="anamespacevrs_1_1tag__conventions_html_ad54ca81705a9275b739472459494fe6c"><div class="ttname"><a href="namespacevrs_1_1tag__conventions.html#ad54ca81705a9275b739472459494fe6c">vrs::tag_conventions::addDevice</a></div><div class="ttdeci">void addDevice(T &amp;writer, const string &amp;type, const string &amp;serialNumber, const string &amp;version)</div><div class="ttdef"><b>Definition:</b> TagConventions.h:76</div></div>
+<div class="ttc" id="anamespacevrs_1_1tag__conventions_html_a3b2b814f54288677df0458c512ed432a"><div class="ttname"><a href="namespacevrs_1_1tag__conventions.html#a3b2b814f54288677df0458c512ed432a">vrs::tag_conventions::addUniqueSessionId</a></div><div class="ttdeci">std::string addUniqueSessionId(RecordFileWriter &amp;writer)</div><div class="ttdef"><b>Definition:</b> TagConventions.cpp:63</div></div>
+<div class="ttc" id="anamespacevrs_1_1tag__conventions_html_a85949c7993b4f9e3c474b12d6e804e36"><div class="ttname"><a href="namespacevrs_1_1tag__conventions.html#a85949c7993b4f9e3c474b12d6e804e36">vrs::tag_conventions::parseTagSet</a></div><div class="ttdeci">bool parseTagSet(const string &amp;jsonTagSet, vector&lt; string &gt; &amp;outVectorTagSet)</div><div class="ttdef"><b>Definition:</b> TagConventions.cpp:51</div></div>
+<div class="ttc" id="aclassvrs_1_1_record_file_writer_html_a245ce789938f697fb32802969a940439"><div class="ttname"><a href="classvrs_1_1_record_file_writer.html#a245ce789938f697fb32802969a940439">vrs::RecordFileWriter::setTag</a></div><div class="ttdeci">void setTag(const string &amp;tagName, const string &amp;tagValue)</div><div class="ttdef"><b>Definition:</b> RecordFileWriter.cpp:600</div></div>
+<div class="ttc" id="anamespacevrs_1_1tag__conventions_html_a10efe48b49b0cccf675fc6db2b7db2e2"><div class="ttname"><a href="namespacevrs_1_1tag__conventions.html#a10efe48b49b0cccf675fc6db2b7db2e2">vrs::tag_conventions::makeTagSet</a></div><div class="ttdeci">string makeTagSet(const vector&lt; string &gt; &amp;tags)</div><div class="ttdef"><b>Definition:</b> TagConventions.cpp:42</div></div>
+<div class="ttc" id="anamespacevrs_1_1tag__conventions_html_ad3e1542bb4141147369a2abf335c4efe"><div class="ttname"><a href="namespacevrs_1_1tag__conventions.html#ad3e1542bb4141147369a2abf335c4efe">vrs::tag_conventions::addCaptureTime</a></div><div class="ttdeci">void addCaptureTime(RecordFileWriter &amp;writer)</div><div class="ttdef"><b>Definition:</b> TagConventions.cpp:26</div></div>
+<div class="ttc" id="anamespacevrs_1_1tag__conventions_html_af6414b6b6430f35cc640116adc42226f"><div class="ttname"><a href="namespacevrs_1_1tag__conventions.html#af6414b6b6430f35cc640116adc42226f">vrs::tag_conventions::addDeviceId</a></div><div class="ttdeci">void addDeviceId(T &amp;writer, const string &amp;id)</div><div class="ttdef"><b>Definition:</b> TagConventions.h:87</div></div>
+<div class="ttc" id="anamespacevrs_html"><div class="ttname"><a href="namespacevrs.html">vrs</a></div><div class="ttdef"><b>Definition:</b> Compressor.cpp:82</div></div>
+<div class="ttc" id="anamespacevrs_1_1tag__conventions_html_ad9135ebbeceb88923b448684130e210a"><div class="ttname"><a href="namespacevrs_1_1tag__conventions.html#ad9135ebbeceb88923b448684130e210a">vrs::tag_conventions::addFirmwareDetails</a></div><div class="ttdeci">void addFirmwareDetails(T &amp;writer, const string &amp;fwCompileDate, const string &amp;fwRevision)</div><div class="ttdef"><b>Definition:</b> TagConventions.h:122</div></div>
+<div class="ttc" id="anamespacevrs_1_1tag__conventions_html_a476bbcbb15e95d2da63d23f91c9f76a1"><div class="ttname"><a href="namespacevrs_1_1tag__conventions.html#a476bbcbb15e95d2da63d23f91c9f76a1">vrs::tag_conventions::addTagSet</a></div><div class="ttdeci">void addTagSet(RecordFileWriter &amp;writer, const vector&lt; string &gt; &amp;tags)</div><div class="ttdef"><b>Definition:</b> TagConventions.cpp:34</div></div>
+<div class="ttc" id="aclassvrs_1_1_record_file_writer_html"><div class="ttname"><a href="classvrs_1_1_record_file_writer.html">vrs::RecordFileWriter</a></div><div class="ttdoc">The class to create VRS files.</div><div class="ttdef"><b>Definition:</b> RecordFileWriter.h:90</div></div>
+<div class="ttc" id="anamespacevrs_1_1tag__conventions_html_a67ff625be83d2f948f1116fb04c51931"><div class="ttname"><a href="namespacevrs_1_1tag__conventions.html#a67ff625be83d2f948f1116fb04c51931">vrs::tag_conventions::addSoftwareDetails</a></div><div class="ttdeci">void addSoftwareDetails(RecordFileWriter &amp;writer, const string &amp;compileDate, const string &amp;rev)</div><div class="ttdef"><b>Definition:</b> TagConventions.h:113</div></div>
+<div class="ttc" id="anamespacevrs_1_1tag__conventions_html_a308301349e9faf7f628dad11b4d8c39b"><div class="ttname"><a href="namespacevrs_1_1tag__conventions.html#a308301349e9faf7f628dad11b4d8c39b">vrs::tag_conventions::addOsFingerprint</a></div><div class="ttdeci">void addOsFingerprint(RecordFileWriter &amp;writer)</div><div class="ttdef"><b>Definition:</b> TagConventions.cpp:30</div></div>
+<div class="ttc" id="anamespacevrs_1_1tag__conventions_html_ad54ca81705a9275b739472459494fe6c"><div class="ttname"><a href="namespacevrs_1_1tag__conventions.html#ad54ca81705a9275b739472459494fe6c">vrs::tag_conventions::addDevice</a></div><div class="ttdeci">void addDevice(T &amp;writer, const string &amp;type, const string &amp;serialNumber, const string &amp;version)</div><div class="ttdef"><b>Definition:</b> TagConventions.h:78</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">
