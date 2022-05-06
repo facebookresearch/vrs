@@ -10,7 +10,7 @@ var searchData=
   ['threadrole_770',['ThreadRole',['../namespacevrs.html#ac78cdeb41c8573010548993b9d2f00c6',1,'vrs']]],
   ['timerecordableclass_771',['TimeRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a9e52b3b00f9ebed2b1b13f9fc47b15d8',1,'vrs']]],
   ['timestamp_772',['timestamp',['../structvrs_1_1_file_format_1_1_record_header.html#a314de8fe422f6b88cdcb699b3762582a',1,'vrs::FileFormat::RecordHeader::timestamp()'],['../structvrs_1_1_index_record_1_1_record_info.html#a74510568cacf67c9d7078fc61496dbf2',1,'vrs::IndexRecord::RecordInfo::timestamp()']]],
-  ['toenum_773',['toEnum',['../namespacevrs.html#ab12754d25a80c112f9ae24826658e48b',1,'vrs']]],
+  ['toenum_773',['toEnum',['../namespacevrs.html#a7accfde5718a6a84e3b968810eaa1240',1,'vrs']]],
   ['tostring_774',['toString',['../namespacevrs.html#af87f451e56851c8a363092ef43203c94',1,'vrs::toString(Record::Type recordType)'],['../namespacevrs.html#a424beafadfa3efc3e78cee0816bdc9e0',1,'vrs::toString(AudioFormat audioFormat)'],['../namespacevrs.html#af2c341ef17cabec1913efbe4ba376385',1,'vrs::toString(AudioSampleFormat audioSampleFormat)'],['../namespacevrs.html#aceae789404e1ab5172198cfec03995c5',1,'vrs::toString(RecordableTypeId typeId)']]],
   ['touchinputrecordableclass_775',['TouchInputRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5aabaa257caebfd3c1b2df551ce051c148',1,'vrs']]],
   ['trackbackgroundthreadqueuebytesize_776',['trackBackgroundThreadQueueByteSize',['../classvrs_1_1_record_file_writer.html#ae13cabd33d9e7b2b7f7a97d52c13291a',1,'vrs::RecordFileWriter']]],
