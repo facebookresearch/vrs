@@ -390,6 +390,22 @@ bool PixelFrame::normalizeFrame(shared_ptr<PixelFrame>& normalizedFrame, bool gr
         }
       }
     }
+  } else if (imageSpec_.getPixelFormat() == vrs::PixelFormat::RGB_IR_RAW_4X4) {
+    // This is a placeholder implementation that simply writes out the source data in R, G and B.
+    const uint8_t* srcPtr = rdata();
+    const size_t srcStride = getStride();
+    uint8_t* outPtr = normalizedFrame->wdata();
+    const size_t outStride = normalizedFrame->getStride();
+    const uint32_t width = getWidth();
+    for (uint32_t h = 0; h < getHeight(); h++, srcPtr += srcStride, outPtr += outStride) {
+      const uint8_t* lineSrcPtr = srcPtr;
+      uint8_t* lineOutPtr = outPtr;
+      for (uint32_t w = 0; w < width; w++, lineSrcPtr++, lineOutPtr += 3) {
+        lineOutPtr[0] = lineSrcPtr[0];
+        lineOutPtr[1] = lineSrcPtr[0];
+        lineOutPtr[2] = lineSrcPtr[0];
+      }
+    }
   } else if (format == vrs::PixelFormat::GREY16 && bitsToShift > 0) {
     // 12/10 bit pixel scaling to 16 bit
     const uint16_t* srcPtr = reinterpret_cast<const uint16_t*>(rdata());

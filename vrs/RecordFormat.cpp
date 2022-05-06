@@ -388,7 +388,6 @@ uint8_t ImageContentBlockSpec::getChannelCountPerPixel(PixelFormat pixel) {
     case PixelFormat::GREY16:
     case PixelFormat::DEPTH32F:
     case PixelFormat::SCALAR64F:
-    case PixelFormat::RGB_IR_RAW_4X4:
     case PixelFormat::BAYER8_RGGB:
     case PixelFormat::RAW10_BAYER_RGGB:
     case PixelFormat::RAW10:
@@ -398,6 +397,7 @@ uint8_t ImageContentBlockSpec::getChannelCountPerPixel(PixelFormat pixel) {
     case PixelFormat::RGB10:
     case PixelFormat::RGB12:
     case PixelFormat::RGB32F:
+    case PixelFormat::RGB_IR_RAW_4X4:
     case PixelFormat::YUV_I420_SPLIT:
     case PixelFormat::YUY2:
       return 3; // Typically Red/Green/Blue, or YUV of some kind
