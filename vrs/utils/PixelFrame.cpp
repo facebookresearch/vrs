@@ -30,15 +30,11 @@ using namespace std;
 namespace {
 /// normalize floating point pixels to grey8
 template <class Float>
-void NormalizeBuffer(
-    const uint8_t* pixelPtr,
-    uint8_t* outPtr,
-    uint32_t pixelCount,
-    size_t pixelStride) {
+void normalizeBuffer(const uint8_t* pixelPtr, uint8_t* outPtr, uint32_t pixelCount) {
   const Float* srcPtr = reinterpret_cast<const Float*>(pixelPtr);
   Float min = *srcPtr;
   Float max = *srcPtr;
-  for (uint32_t pixelIndex = 0; pixelIndex < pixelCount; pixelIndex += pixelStride) {
+  for (uint32_t pixelIndex = 0; pixelIndex < pixelCount; ++pixelIndex) {
     const Float pixel = srcPtr[pixelIndex];
     if (pixel < min) {
       min = pixel;
@@ -48,16 +44,59 @@ void NormalizeBuffer(
   }
   if (min >= max) {
     // for constant input, blank the image
-    for (uint32_t pixelIndex = 0; pixelIndex < pixelCount; pixelIndex += pixelStride) {
-      outPtr[pixelIndex] = 0;
-    }
+    memset(outPtr, 0, pixelCount);
   } else {
-    const Float range = static_cast<Float>(numeric_limits<uint8_t>::max());
-    for (uint32_t pixelIndex = 0; pixelIndex < pixelCount; pixelIndex += pixelStride) {
-      outPtr[pixelIndex] = static_cast<uint8_t>((srcPtr[pixelIndex] - min) * range / (max - min));
+    const Float factor = numeric_limits<uint8_t>::max() / (max - min);
+    for (uint32_t pixelIndex = 0; pixelIndex < pixelCount; ++pixelIndex) {
+      outPtr[pixelIndex] = static_cast<uint8_t>((srcPtr[pixelIndex] - min) * factor);
     }
   }
 }
+
+void normalizeRGBXfloatToRGB8(
+    const uint8_t* pixelPtr,
+    uint8_t* outPtr,
+    uint32_t pixelCount,
+    size_t channelCount) {
+  const float* srcPtr = reinterpret_cast<const float*>(pixelPtr);
+  float minR = *srcPtr;
+  float maxR = minR;
+  float minG = srcPtr[1];
+  float maxG = minG;
+  float minB = srcPtr[2];
+  float maxB = minB;
+  for (uint32_t pixelIndex = 0; pixelIndex < pixelCount; ++pixelIndex, srcPtr += channelCount) {
+    float pixelR = srcPtr[0];
+    if (pixelR < minR) {
+      minR = pixelR;
+    } else if (pixelR > maxR) {
+      maxR = pixelR;
+    }
+    float pixelG = srcPtr[1];
+    if (pixelG < minG) {
+      minG = pixelG;
+    } else if (pixelG > maxG) {
+      maxG = pixelG;
+    }
+    float pixelB = srcPtr[2];
+    if (pixelB < minB) {
+      minB = pixelB;
+    } else if (pixelB > maxB) {
+      maxB = pixelB;
+    }
+  }
+  const float factorR = maxR > minR ? numeric_limits<uint8_t>::max() / (maxR - minR) : 0;
+  const float factorG = maxG > minG ? numeric_limits<uint8_t>::max() / (maxG - minG) : 0;
+  const float factorB = maxB > minB ? numeric_limits<uint8_t>::max() / (maxB - minB) : 0;
+  srcPtr = reinterpret_cast<const float*>(pixelPtr);
+  for (uint32_t pixelIndex = 0; pixelIndex < pixelCount; ++pixelIndex) {
+    *outPtr++ = static_cast<uint8_t>((srcPtr[0] - minR) * factorR);
+    *outPtr++ = static_cast<uint8_t>((srcPtr[1] - minG) * factorG);
+    *outPtr++ = static_cast<uint8_t>((srcPtr[2] - minB) * factorB);
+    srcPtr += channelCount;
+  }
+}
+
 } // namespace
 
 namespace vrs::utils {
@@ -296,20 +335,16 @@ bool PixelFrame::normalizeFrame(shared_ptr<PixelFrame>& normalizedFrame, bool gr
     }
   } else if (imageSpec_.getPixelFormat() == vrs::PixelFormat::RGB32F) {
     // normalize float pixels to rgb8
-    for (size_t i = 0; i < 3; ++i) {
-      NormalizeBuffer<float>(rdata() + i, normalizedFrame->wdata(), getWidth() * getHeight(), 3);
-    }
+    normalizeRGBXfloatToRGB8(rdata(), normalizedFrame->wdata(), getWidth() * getHeight(), 3);
   } else if (imageSpec_.getPixelFormat() == vrs::PixelFormat::RGBA32F) {
     // normalize float pixels to rgb8, drop alpha channel
-    for (size_t i = 0; i < 3; ++i) {
-      NormalizeBuffer<float>(rdata() + i, normalizedFrame->wdata(), getWidth() * getHeight(), 4);
-    }
+    normalizeRGBXfloatToRGB8(rdata(), normalizedFrame->wdata(), getWidth() * getHeight(), 4);
   } else if (imageSpec_.getPixelFormat() == vrs::PixelFormat::DEPTH32F) {
     // normalize float pixels to grey8
-    NormalizeBuffer<float>(rdata(), normalizedFrame->wdata(), getWidth() * getHeight(), 1);
+    normalizeBuffer<float>(rdata(), normalizedFrame->wdata(), getWidth() * getHeight());
   } else if (imageSpec_.getPixelFormat() == vrs::PixelFormat::SCALAR64F) {
     // normalize double pixels to grey8
-    NormalizeBuffer<double>(rdata(), normalizedFrame->wdata(), getWidth() * getHeight(), 1);
+    normalizeBuffer<double>(rdata(), normalizedFrame->wdata(), getWidth() * getHeight());
   } else if (imageSpec_.getPixelFormat() == vrs::PixelFormat::BAYER8_RGGB) {
     // display as grey8(copy) for now
     const uint8_t* srcPtr = rdata();
