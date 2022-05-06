@@ -213,6 +213,26 @@ string unescapeString(const char* str, size_t length) {
 
 namespace vrs {
 
+template <>
+ImageFormat toEnum<>(const string& name) {
+  return ImageFormatConverter::toEnumNoCase(name.c_str());
+}
+
+template <>
+PixelFormat toEnum<>(const string& name) {
+  return PixelFormatConverter::toEnumNoCase(name.c_str());
+}
+
+template <>
+AudioFormat toEnum<>(const string& name) {
+  return AudioFormatConverter::toEnumNoCase(name.c_str());
+}
+
+template <>
+AudioSampleFormat toEnum<>(const string& name) {
+  return AudioSampleFormatConverter::toEnumNoCase(name.c_str());
+}
+
 ImageContentBlockSpec::ImageContentBlockSpec(
     const ImageContentBlockSpec& imageSpec,
     double keyFrameTimestamp,
