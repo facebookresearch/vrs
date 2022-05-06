@@ -67,7 +67,7 @@ last ones in the list.
 - `Record.h`: `Record`, used when creating data.
 - `RecordManager.h`: `RecordManager`, to manage a `Recordable` object's `Record`
   objects during file creation.
-- `StreamPlayer.h`: `StreamPlaer`, the base class defining core callbacks when
+- `StreamPlayer.h`: `StreamPlayer`, the base class defining core callbacks when
   reading records.
 - `ContentBlockReader.h`: `ContentBlockReader` and associates, to read
   `ContentBlock` parts.
