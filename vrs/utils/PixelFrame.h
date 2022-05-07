@@ -108,6 +108,11 @@ class PixelFrame {
   /// Clear the pixel buffer
   void blankFrame();
 
+  /// Read a RAW, PNG, or JPEG encoded frame into the internal buffer.
+  /// @return True if the frame type is supported & the frame was read.
+  static bool
+  readFrame(std::shared_ptr<PixelFrame>& frame, RecordReader* reader, const ContentBlock& cb);
+
   /// Read a RAW frame into the internal buffer.
   /// @return True if the frame type is supported & the frame was read.
   bool readRawFrame(RecordReader* reader, const ImageContentBlockSpec& inputImageSpec);

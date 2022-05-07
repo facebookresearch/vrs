@@ -47,3 +47,18 @@ install(TARGETS vrs_utils EXPORT VRSLibTargets
   RUNTIME DESTINATION bin
   INCLUDES DESTINATION include
 )
+
+if (UNIT_TESTS)
+  enable_testing()
+
+  file (GLOB VRS_UTILS_TEST_SRCS test/*.cpp)
+  add_executable(test_vrs_utils ${VRS_UTILS_TEST_SRCS})
+  target_link_libraries(test_vrs_utils
+    PUBLIC
+      vrs_utils
+      vrs_oss_testdatadir
+      GTest::Main
+  )
+
+  gtest_discover_tests(test_vrs_utils)
+endif()

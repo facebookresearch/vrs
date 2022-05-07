@@ -145,6 +145,26 @@ void PixelFrame::blankFrame() {
   memset(wdata(), 0, frameBytes_.size());
 }
 
+bool PixelFrame::readFrame(
+    shared_ptr<PixelFrame>& frame,
+    RecordReader* reader,
+    const ContentBlock& cb) {
+  if (!XR_VERIFY(cb.getContentType() == ContentType::IMAGE)) {
+    return false;
+  }
+  switch (cb.image().getImageFormat()) {
+    case ImageFormat::RAW:
+      return readRawFrame(frame, reader, cb.image());
+    case ImageFormat::PNG:
+      return readPngFrame(frame, reader, cb.getBlockSize());
+    case ImageFormat::JPG:
+      return readJpegFrame(frame, reader, cb.getBlockSize());
+    default:
+      return false;
+  }
+  return false;
+}
+
 bool PixelFrame::readRawFrame(RecordReader* reader, const ImageContentBlockSpec& inputImageSpec) {
   // Read multiplane images as is
   if (inputImageSpec.getPlaneCount() != 1) {
@@ -203,28 +223,34 @@ void PixelFrame::normalizeFrame(
 PixelFormat PixelFrame::getNormalizedPixelFormat(
     PixelFormat sourcePixelFormat,
     bool grey16supported) {
-  return ImageContentBlockSpec::getChannelCountPerPixel(sourcePixelFormat) > 1
-      ? vrs::PixelFormat::RGB8
-      : grey16supported ? vrs::PixelFormat::GREY16
-                        : vrs::PixelFormat::GREY8;
+  return ImageContentBlockSpec::getChannelCountPerPixel(sourcePixelFormat) > 1 ? PixelFormat::RGB8
+      : grey16supported                                                        ? PixelFormat::GREY16
+                                                                               : PixelFormat::GREY8;
+}
+
+inline uint8_t clipToUint8(int value) {
+  return value < 0 ? 0 : (value > 255 ? 255 : static_cast<uint8_t>(value));
 }
 
 bool PixelFrame::normalizeFrame(shared_ptr<PixelFrame>& normalizedFrame, bool grey16supported)
     const {
   uint16_t bitsToShift = 0;
   uint32_t componentCount = 0;
-  vrs::PixelFormat format = imageSpec_.getPixelFormat();
+  PixelFormat srcFormat = imageSpec_.getPixelFormat();
   // See if we can convert to something simple enough using Ocean
-  vrs::PixelFormat targetPixelFormat =
-      getNormalizedPixelFormat(imageSpec_.getPixelFormat(), grey16supported);
-  if (format == targetPixelFormat) {
+  PixelFormat targetPixelFormat = getNormalizedPixelFormat(srcFormat, grey16supported);
+  if (srcFormat == targetPixelFormat) {
     return false;
+  }
+  if (normalizedFrame.get() == this) {
+    normalizedFrame.reset();
   }
   if (normalizeToPixelFormat(normalizedFrame, targetPixelFormat)) {
     return true;
   }
-  switch (format) {
-    case vrs::PixelFormat::YUV_I420_SPLIT: {
+  PixelFormat format = srcFormat;
+  switch (srcFormat) {
+    case PixelFormat::YUV_I420_SPLIT: {
       // buffer truncation to greyscale when ocean isn't available
       const uint32_t width = imageSpec_.getWidth();
       const uint32_t height = imageSpec_.getHeight();
@@ -239,89 +265,93 @@ bool PixelFrame::normalizeFrame(shared_ptr<PixelFrame>& normalizedFrame, bool gr
       }
       return true;
     }
-    case vrs::PixelFormat::GREY10:
+    case PixelFormat::GREY10:
       if (grey16supported) {
-        format = vrs::PixelFormat::GREY16;
+        format = PixelFormat::GREY16;
         bitsToShift = 6;
         componentCount = 1;
       } else {
-        format = vrs::PixelFormat::GREY8;
+        format = PixelFormat::GREY8;
         bitsToShift = 2;
         componentCount = 1;
       }
       break;
-    case vrs::PixelFormat::GREY12:
+    case PixelFormat::GREY12:
       if (grey16supported) {
-        format = vrs::PixelFormat::GREY16;
+        format = PixelFormat::GREY16;
         bitsToShift = 4;
         componentCount = 1;
       } else {
-        format = vrs::PixelFormat::GREY8;
+        format = PixelFormat::GREY8;
         bitsToShift = 4;
         componentCount = 1;
       }
       break;
-    case vrs::PixelFormat::GREY16:
+    case PixelFormat::GREY16:
       if (grey16supported) {
         // nothing to do!
       } else {
-        format = vrs::PixelFormat::GREY8;
+        format = PixelFormat::GREY8;
         bitsToShift = 8;
         componentCount = 1;
       }
       break;
-    case vrs::PixelFormat::RGB10:
-      format = vrs::PixelFormat::RGB8;
+    case PixelFormat::RGB10:
+      format = PixelFormat::RGB8;
       bitsToShift = 2;
       componentCount = 3;
       break;
-    case vrs::PixelFormat::RGB12:
-      format = vrs::PixelFormat::RGB8;
+    case PixelFormat::RGB12:
+      format = PixelFormat::RGB8;
       bitsToShift = 4;
       componentCount = 3;
       break;
-    case vrs::PixelFormat::BGR8:
-      format = vrs::PixelFormat::RGB8;
+    case PixelFormat::BGR8:
+      format = PixelFormat::RGB8;
       componentCount = 3;
       break;
-    case vrs::PixelFormat::RGB32F:
-      format = vrs::PixelFormat::RGB8;
+    case PixelFormat::RGB32F:
+      format = PixelFormat::RGB8;
       componentCount = 3;
       break;
-    case vrs::PixelFormat::RGBA32F:
-      format = vrs::PixelFormat::RGB8;
+    case PixelFormat::RGBA32F:
+      format = PixelFormat::RGB8;
       componentCount = 3;
       break;
-    case vrs::PixelFormat::DEPTH32F:
-    case vrs::PixelFormat::SCALAR64F:
-    case vrs::PixelFormat::BAYER8_RGGB:
-      format = vrs::PixelFormat::GREY8;
+    case PixelFormat::DEPTH32F:
+    case PixelFormat::SCALAR64F:
+    case PixelFormat::BAYER8_RGGB:
+      format = PixelFormat::GREY8;
       componentCount = 1;
       break;
-    case vrs::PixelFormat::RGB_IR_RAW_4X4:
-      format = vrs::PixelFormat::RGB8;
+    case PixelFormat::RGB_IR_RAW_4X4:
+      format = PixelFormat::RGB8;
       componentCount = 1;
       break;
-    case vrs::PixelFormat::RAW10:
-    case vrs::PixelFormat::RAW10_BAYER_RGGB:
+    case PixelFormat::RAW10:
+    case PixelFormat::RAW10_BAYER_RGGB:
       if (grey16supported) {
-        format = vrs::PixelFormat::GREY16;
+        format = PixelFormat::GREY16;
         bitsToShift = 6;
         componentCount = 1;
       } else {
-        format = vrs::PixelFormat::GREY8;
+        format = PixelFormat::GREY8;
         bitsToShift = 2;
         componentCount = 1;
       }
       break;
+    case PixelFormat::YUY2:
+      format = PixelFormat::RGB8;
+      componentCount = 3;
+      break;
     default:
       break;
   }
-  if (format == imageSpec_.getPixelFormat()) {
+  if (format == srcFormat) {
     return false; // no conversion needed or supported
   }
   init(normalizedFrame, format, getWidth(), getHeight());
-  if (imageSpec_.getPixelFormat() == vrs::PixelFormat::BGR8) {
+  if (srcFormat == PixelFormat::BGR8) {
     // swap R & B
     const uint8_t* srcPtr = rdata();
     uint8_t* outPtr = normalizedFrame->wdata();
@@ -333,19 +363,19 @@ bool PixelFrame::normalizeFrame(shared_ptr<PixelFrame>& normalizedFrame, bool gr
       srcPtr += 3;
       outPtr += 3;
     }
-  } else if (imageSpec_.getPixelFormat() == vrs::PixelFormat::RGB32F) {
+  } else if (srcFormat == PixelFormat::RGB32F) {
     // normalize float pixels to rgb8
     normalizeRGBXfloatToRGB8(rdata(), normalizedFrame->wdata(), getWidth() * getHeight(), 3);
-  } else if (imageSpec_.getPixelFormat() == vrs::PixelFormat::RGBA32F) {
+  } else if (srcFormat == PixelFormat::RGBA32F) {
     // normalize float pixels to rgb8, drop alpha channel
     normalizeRGBXfloatToRGB8(rdata(), normalizedFrame->wdata(), getWidth() * getHeight(), 4);
-  } else if (imageSpec_.getPixelFormat() == vrs::PixelFormat::DEPTH32F) {
+  } else if (srcFormat == PixelFormat::DEPTH32F) {
     // normalize float pixels to grey8
     normalizeBuffer<float>(rdata(), normalizedFrame->wdata(), getWidth() * getHeight());
-  } else if (imageSpec_.getPixelFormat() == vrs::PixelFormat::SCALAR64F) {
+  } else if (srcFormat == PixelFormat::SCALAR64F) {
     // normalize double pixels to grey8
     normalizeBuffer<double>(rdata(), normalizedFrame->wdata(), getWidth() * getHeight());
-  } else if (imageSpec_.getPixelFormat() == vrs::PixelFormat::BAYER8_RGGB) {
+  } else if (srcFormat == PixelFormat::BAYER8_RGGB) {
     // display as grey8(copy) for now
     const uint8_t* srcPtr = rdata();
     uint8_t* outPtr = normalizedFrame->wdata();
@@ -353,10 +383,8 @@ bool PixelFrame::normalizeFrame(shared_ptr<PixelFrame>& normalizedFrame, bool gr
     for (uint32_t i = 0; i < pixelCount; ++i) {
       outPtr[i] = srcPtr[i];
     }
-  } else if (
-      imageSpec_.getPixelFormat() == vrs::PixelFormat::RAW10 ||
-      imageSpec_.getPixelFormat() == vrs::PixelFormat::RAW10_BAYER_RGGB) {
-    if (format == vrs::PixelFormat::GREY16) {
+  } else if (srcFormat == PixelFormat::RAW10 || srcFormat == PixelFormat::RAW10_BAYER_RGGB) {
+    if (format == PixelFormat::GREY16) {
       // Convert from RAW10 to GREY10 directly into the output buffer
       if (!convertRaw10ToGrey10(
               normalizedFrame->wdata(), rdata(), getWidth(), getHeight(), getStride())) {
@@ -390,7 +418,7 @@ bool PixelFrame::normalizeFrame(shared_ptr<PixelFrame>& normalizedFrame, bool gr
         }
       }
     }
-  } else if (imageSpec_.getPixelFormat() == vrs::PixelFormat::RGB_IR_RAW_4X4) {
+  } else if (srcFormat == PixelFormat::RGB_IR_RAW_4X4) {
     // This is a placeholder implementation that simply writes out the source data in R, G and B.
     const uint8_t* srcPtr = rdata();
     const size_t srcStride = getStride();
@@ -406,7 +434,34 @@ bool PixelFrame::normalizeFrame(shared_ptr<PixelFrame>& normalizedFrame, bool gr
         lineOutPtr[2] = lineSrcPtr[0];
       }
     }
-  } else if (format == vrs::PixelFormat::GREY16 && bitsToShift > 0) {
+  } else if (srcFormat == PixelFormat::YUY2) {
+    // Unoptimized default version of YUY2 to RGB8 conversion
+    const uint8_t* srcPtr = rdata();
+    const size_t srcStride = getStride();
+    uint8_t* outPtr = normalizedFrame->wdata();
+    const size_t outStride = normalizedFrame->getStride();
+    const uint32_t width = getWidth();
+    for (uint32_t h = 0; h < getHeight(); h++, srcPtr += srcStride, outPtr += outStride) {
+      const uint8_t* lineSrcPtr = srcPtr;
+      uint8_t* lineOutPtr = outPtr;
+      for (uint32_t w = 0; w < width / 2; w++, lineSrcPtr += 4, lineOutPtr += 6) {
+        int y0 = lineSrcPtr[0];
+        int u0 = lineSrcPtr[1];
+        int y1 = lineSrcPtr[2];
+        int v0 = lineSrcPtr[3];
+        int c = y0 - 16;
+        int d = u0 - 128;
+        int e = v0 - 128;
+        lineOutPtr[2] = clipToUint8((298 * c + 516 * d + 128) >> 8); // blue
+        lineOutPtr[1] = clipToUint8((298 * c - 100 * d - 208 * e + 128) >> 8); // green
+        lineOutPtr[0] = clipToUint8((298 * c + 409 * e + 128) >> 8); // red
+        c = y1 - 16;
+        lineOutPtr[5] = clipToUint8((298 * c + 516 * d + 128) >> 8); // blue
+        lineOutPtr[4] = clipToUint8((298 * c - 100 * d - 208 * e + 128) >> 8); // green
+        lineOutPtr[3] = clipToUint8((298 * c + 409 * e + 128) >> 8); // red
+      }
+    }
+  } else if (format == PixelFormat::GREY16 && bitsToShift > 0) {
     // 12/10 bit pixel scaling to 16 bit
     const uint16_t* srcPtr = reinterpret_cast<const uint16_t*>(rdata());
     uint16_t* outPtr = reinterpret_cast<uint16_t*>(normalizedFrame->wdata());
