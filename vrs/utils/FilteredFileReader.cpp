@@ -39,40 +39,47 @@ using namespace vrs;
 
 namespace {
 
-// string ids: a text description of one or more streams.
-// const set<StreamId>& fileStreams: set of known streams
-// set<StreamId>& outStreamIds: set of stream ids extracted
-// returns true if no parsing error occurred.
-// Supported forms for ids:
-//   N-M  where N is a recordable type id as a number, and M an instance id (also a number)
-//   N-   where N is a recordable type id as a number.
-//        Returns all the streams in fileStreams with that recordable type id
-//   N    Same as N-
-// Actual examples: 1004-1 or 1005- or 1005
-bool stringToIds(const string& ids, const set<StreamId>& fileStreams, set<StreamId>& outStreamIds) {
+/// @param ids: a text description of one or more streams.
+/// @param reader: an open file
+/// @param outStreamIds: on exit, a set of stream ids extracted
+/// @return true if no parsing error occurred.
+/// Supported forms for ids:
+///   N-M  where N is a recordable type id as a number, and M an instance id (also a number)
+///   N-   where N is a recordable type id as a number.
+///        Returns all the streams in the file with that recordable type id
+///   N    Same as N-
+///   N-<flavor> Returns all the streams in the file with that recordable type id and flavor
+/// Actual examples: 1004-1 or 1005- or 1005 or 100-test/synthetic/grey8
+bool stringToIds(const string& ids, RecordFileReader& reader, set<StreamId>& outStreamIds) {
+  StreamId singleId = StreamId::fromNumericName(ids);
+  if (singleId.isValid()) {
+    outStreamIds.insert(singleId);
+    return true;
+  }
   stringstream ss(ids);
   int typeIdNum;
   bool error = false;
   if (ss >> typeIdNum) {
+    bool multiTypeId = false;
     RecordableTypeId typeId = static_cast<RecordableTypeId>(typeIdNum);
-    bool singleRecordable = false;
     if (ss.peek() == '-') {
       ss.ignore();
-      uint16_t instanceId;
-      if (ss >> instanceId) {
-        outStreamIds.insert({typeId, instanceId});
-        singleRecordable = true;
+      string flavor;
+      ss >> flavor;
+      if (!flavor.empty()) {
+        vector<StreamId> flavorIds = reader.getStreams(typeId, flavor);
+        outStreamIds.insert(flavorIds.begin(), flavorIds.end());
       } else {
-        string rest;
-        if (ss >> rest && !rest.empty()) {
-          error = true;
-        }
+        multiTypeId = true;
       }
-    } else if (!ss.eof()) {
+    } else if (ss.eof()) {
+      multiTypeId = true;
+    } else {
       error = true;
     }
-    if (!error && !singleRecordable) {
-      for (const auto& id : fileStreams) {
+    if (multiTypeId) {
+      // No instance ID were provided, insert all the streams with that RecordableTypeId.
+      for (const auto& id : reader.getStreams()) {
         if (id.getTypeId() == typeId) {
           outStreamIds.insert(id);
         }
@@ -292,18 +299,16 @@ void FilteredFileReader::applyRecordableFilters(const vector<string>& filters) {
   for (auto iter = filters.begin(); iter != filters.end(); ++iter) {
     if (*iter == "+") {
       set<StreamId> argIds;
-      stringToIds(*(++iter), fileStreams, argIds);
+      stringToIds(*(++iter), reader, argIds);
       if (!newSet) {
         // first command is add? start from empty set
         newSet = make_unique<set<StreamId>>(move(argIds));
       } else {
-        for (auto id : argIds) {
-          newSet->insert(id);
-        }
+        newSet->insert(argIds.begin(), argIds.end());
       }
     } else if (*iter == "-") {
       set<StreamId> argIds;
-      stringToIds(*(++iter), fileStreams, argIds);
+      stringToIds(*(++iter), reader, argIds);
       if (!newSet) {
         // first command is remove? start with set of all known streams
         newSet = make_unique<set<StreamId>>(fileStreams);
@@ -428,10 +433,9 @@ Decimator::Decimator(FilteredFileReader& filteredReader, DecimationParams& param
       bucketInterval_{params.bucketInterval},
       bucketMaxTimestampDelta_{params.bucketMaxTimestampDelta},
       graceWindow_{bucketInterval_ * 1.2} {
-  const auto& fileStreams = filteredReader_.reader.getStreams();
   for (const auto& interval : params.decimationIntervals) {
     set<StreamId> argIds;
-    stringToIds(interval.first, fileStreams, argIds);
+    stringToIds(interval.first, filteredReader_.reader, argIds);
     for (auto id : argIds) {
       decimationIntervals_[id] = interval.second;
     }
