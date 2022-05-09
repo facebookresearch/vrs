@@ -66,13 +66,13 @@ TEST_F(FilteredFileReaderTest, includeStreams) {
     utils::RecordFilterParams filters;
     filters.includeStream("100-");
     filteredReader.applyFilters(filters);
-    EXPECT_EQ(filteredReader.filter.streams.size(), 19);
+    EXPECT_EQ(filteredReader.filter.streams.size(), 5);
   }
   {
     utils::RecordFilterParams filters;
     filters.includeStream("100");
     filteredReader.applyFilters(filters);
-    EXPECT_EQ(filteredReader.filter.streams.size(), 19);
+    EXPECT_EQ(filteredReader.filter.streams.size(), 5);
   }
   {
     utils::RecordFilterParams filters;
@@ -82,9 +82,9 @@ TEST_F(FilteredFileReaderTest, includeStreams) {
   }
   {
     utils::RecordFilterParams filters;
+    filters.includeStream("100-1");
+    filters.includeStream("100-3");
     filters.includeStream("100-5");
-    filters.includeStream("100-7");
-    filters.includeStream("100-10");
     filters.includeStream("101-10");
     filteredReader.applyFilters(filters);
     EXPECT_EQ(filteredReader.filter.streams.size(), 3);
@@ -106,15 +106,16 @@ TEST_F(FilteredFileReaderTest, includeExcludeStreams) {
     filteredReader.applyFilters(filters);
     EXPECT_EQ(filteredReader.filter.streams.size(), 1);
 
-    filters.includeStream("100-10");
-    filters.includeStream("100-15");
+    filters.includeStream("100");
     filters.excludeStream("100-test/synthetic/nope");
     filters.excludeStream("100-test/synthetic/grey8");
     filteredReader.applyFilters(filters);
-    EXPECT_EQ(filteredReader.filter.streams.size(), 2);
+    EXPECT_EQ(filteredReader.filter.streams.size(), 4);
 
     filters.includeStream("100-");
+    filters.includeStream("214");
+    filters.excludeStream("100-test/synthetic/raw10");
     filteredReader.applyFilters(filters);
-    EXPECT_EQ(filteredReader.filter.streams.size(), 19);
+    EXPECT_EQ(filteredReader.filter.streams.size(), 15);
   }
 }
