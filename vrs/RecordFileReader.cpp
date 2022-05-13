@@ -187,6 +187,15 @@ int RecordFileReader::doOpenFile(
         fileSpec.fileHandlerName.empty() ? file_->getFileHandlerName() : fileSpec.fileHandlerName;
     return "Opening " + fileHandlerName + " file";
   });
+  // log remote file handler names with success/failure status
+  if (file_ && file_->isRemoteFileSystem()) {
+    OperationContext context{"RecordFileReader::doOpenFile", file_->getFileHandlerName()};
+    if (error != 0) {
+      TelemetryLogger::error(context, errorCodeToMessageWithCode(error));
+    } else {
+      TelemetryLogger::info(context, "success");
+    }
+  }
   if (error != 0 || file_->getTotalSize() < static_cast<int64_t>(sizeof(FileFormat::FileHeader))) {
     if (error != 0) {
       XR_LOGE(
