@@ -205,7 +205,7 @@ int FileSpec::parseUri(
   string path =
       (colon != uri.npos) ? uri.substr(colon + 1, query - colon - 1) : uri.substr(0, query);
   int status = FileSpec::urldecode(path, outPath);
-  if (status) {
+  if (status != 0) {
     XR_LOGE("Path contains invalid character {}", path);
     outScheme.clear();
     outPath.clear();
