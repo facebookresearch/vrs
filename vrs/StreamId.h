@@ -98,6 +98,7 @@ enum class RecordableTypeId : uint16_t {
   TemperatureRecordableClass = 246, ///< For temperature data streams.
   BarometerRecordableClass = 247, ///< For barometer data streams.
   PhotoplethysmogramRecordableClass = 248, ///< For photoplethysmography data streams.
+  EMGRecordableClass = 249, ///< For electromyography data streams
 
   // << Calibration, Setup, Diagnostic, etc >>
   CalibrationRecordableClass = 260, ///< For calibration data streams.
