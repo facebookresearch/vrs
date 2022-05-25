@@ -8,17 +8,33 @@ on:
 
 jobs:
   build:
-    name: Build VRS on ubuntu-latest
-    runs-on: ubuntu-latest
+    name: Build VRS on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest,  macOS-latest]
 
     steps:
       - uses: actions/checkout@v2
 
       - name: Install dependencies
         run: |
-          sudo apt-get install cmake ninja-build ccache libgtest-dev libfmt-dev libcereal-dev libjpeg-dev libpng-dev
-          sudo apt-get install liblz4-dev libzstd-dev libxxhash-dev
-          sudo apt-get install libboost-system-dev libboost-filesystem-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo apt-get install \
+              cmake ninja-build ccache libgtest-dev libfmt-dev libcereal-dev
+              libjpeg-dev libpng-dev \
+              liblz4-dev libzstd-dev libxxhash-dev \
+              libboost-system-dev libboost-filesystem-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev
+
+          elif [ "$RUNNER_OS" == "macOS" ]; then
+              brew install ninja cmake ccache googletest glog fmt cereal\
+                  libpng jpeg \
+                  lz4 zstd xxhash \
+                  boost
+          else
+              echo "$RUNNER_OS not supported"
+              exit 1
+          fi
 
       - name: Configure
         shell: bash
