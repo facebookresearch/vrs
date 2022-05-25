@@ -29,10 +29,10 @@ target_link_libraries(vrs_utils
     vrslib
     vrs_helpers
     vrs_utils_converters
-    Fmt::Fmt
-    Jpeg::Jpeg
-    Png::Png
-    Cereal::Cereal
+    fmt::fmt
+    JPEG::JPEG
+    PNG::PNG
+    cereal::cereal
     vrs_logging
 )
 target_include_directories(vrs_utils

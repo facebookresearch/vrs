@@ -27,7 +27,7 @@ target_link_libraries(vrs_helpers
     vrs_helpers_strings
   PUBLIC
     vrs_os
-    Cereal::Cereal
+    cereal::cereal
 )
 target_include_directories(vrs_helpers
   PUBLIC

@@ -12,25 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# - Find Jpeg
-# Find the Jpeg compression library and includes
-#
-# Jpeg_INCLUDE_DIRS - where to find jpeglib.h, etc.
-# Jpeg_LIBRARIES - List of libraries when using Jpeg.
-# Jpeg_FOUND - True if Jpeg found.
-
-find_path(Jpeg_INCLUDE_DIRS NAMES jpeglib.h)
-find_library(Jpeg_LIBRARIES NAMES jpeg)
-mark_as_advanced(Jpeg_LIBRARIES Jpeg_INCLUDE_DIRS)
-
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(Jpeg DEFAULT_MSG Jpeg_LIBRARIES Jpeg_INCLUDE_DIRS)
-
-if (Jpeg_FOUND AND NOT (TARGET Jpeg::Jpeg))
-  add_library(Jpeg::Jpeg UNKNOWN IMPORTED)
-  set_target_properties(Jpeg::Jpeg
-    PROPERTIES
-      IMPORTED_LOCATION ${Jpeg_LIBRARIES}
-      INTERFACE_INCLUDE_DIRECTORIES ${Jpeg_INCLUDE_DIRS}
-  )
-endif()
+find_package(JPEG REQUIRED)
