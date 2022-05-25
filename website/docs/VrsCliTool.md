@@ -92,7 +92,7 @@ Found 3 devices, 307 records, 301 data records from 1493865.291 to 1493866.378 (
 - count of data records: "301 data records"
 - data records timestamp range (if applicable): "data records from 1493865.291 to 1493866.378"
 - time duration when data records are available (if applicable): "1.087s"
-- data records rate in rps (records per second, if applicable): "275rps"
+- data records rate in rps ("records per second", if applicable): "275rps"
 
 ### Part 2: Stream Information (Once per Stream)
 
@@ -342,13 +342,13 @@ Specifying record filters options as additional parameters works with most comma
 
 _Options: `--before [+|-]<max-timestamp>`, `--after [+|-]<min-timestamp>`, ` --range [+|-]<min-timestamp> [+|-]<max-timestamp>`, `--around [+|-]<timestamp> <time-range>`._
 
-To only print records which timestamps is less than the absolute timestamp `1493866`:
+To only print records which timestamps is less than the absolute timestamp `1493866`, do:
 
 ```
 vrs print file.vrs --before 1493866
 ```
 
-Because timestamps aren't vary from file to file, there are shortcuts to compute timestamps relative to the file's first and last data records. By convention, timestamps specified with a '+' sign are relative to the first data record timestamp. Timestamps specified with a '-' sign are relative to the last data record timestamp.
+Because timestamps vary from file to file, there are shortcuts to compute timestamps relative to the file's first and last data records. By convention, timestamps specified with a '+' sign are relative to the first data record's timestamp. Timestamps specified with a '-' sign are relative to the last data record's timestamp.
 
 Therefore, to print records up to 1 second after the first data record, do:
 
@@ -419,7 +419,7 @@ to:
 
 `vrs list vrs/oss/test_data/VRS_Files/simulated.vrs + 214-1 --decimate 214-1 1`.
 
-The options `--bucket-interval` and `--bucket-max-delta` work together, and work across all streams. Use `--bucket-interval` to create "buckets" at regular intervales throughout the file, from which at most one record per stream will be kept. Add the `--bucket-max-delta` to restrict the size of these buckets (this option doesn't work alone).
+The options `--bucket-interval` and `--bucket-max-delta` work together, and work across all streams. Use `--bucket-interval` to create "buckets" at regular intervals throughout the file, from which at most one record per stream will be kept. Add the `--bucket-max-delta` to restrict the size of these buckets (this option doesn't work alone).
 
 ## Data Extraction
 
@@ -458,7 +458,7 @@ _Commands: `copy`, `merge`._
 
 ### Copying Files
 
-The primary use of the `copy` command is to copy records from an existing VRS into a new VRS file. Using filter options, you can selectively copy parts of a file into a new one. Maybe you'll select a subset of streams? Maybe you'll truncate the file by timestamp? Maybe you'll decimate the file? Maybe you'll use a combination of the above.
+The primary use of the `copy` command is to copy records from an existing VRS into a new VRS file. Use the filter options in conjunction with the copy command to selectively copy parts of a file into a new one. With the filters you can do things like select a subset of streams, truncate a file by timestamp, or decimate a file.
 
 In its most basic form, a copy operation looks like this:
 
@@ -472,9 +472,9 @@ This will simply copy all the records from `original.vrs` and create a new VRS f
 - at the lowest level, all the records are decompressed, then recompressed in the new file, maybe using a different lossless compression setting. Commonly, during capture, files are compressed only very lightly, because data is generated too quickly and/or enough CPU bandwidth isn't available to compress more. During a copy operation, by default, `zstd` is used at the "zlight" level (`zstd` level "3"), but you can select a different lossless compression setting, such as "zmedium" (`zstd` level 5), or "ztight" (`zstd` level 18). Note that if decompression speed is critical for you, you can use `lz4` instead of `zstd`, at the expense of compression ratio.
 - the file is "cleaned-up", records are sorted if they were out of order, and an optimized index is created, possibly making the file slightly more efficient to read.
 
-To control the lossless compression applied at the record level, use the `--compression=<level>` option, where `<level>` is one of `none`, `fast`, `tight`, `zfast`, `zlight`, `zmedium`, `ztight`, `zmax`. In practice, `zlight` or `zmedium` are likely to be your best options, because `ztight` and `zmax` usually offer minimal gain while being much slower.
+To control the lossless compression applied at the record level, use the `--compression=<level>` option, where `<level>` is one of `none`, `fast`, `tight`, `zfast`, `zlight`, `zmedium`, `ztight`, `zmax`. The compression levels which name starts with a `z` use `zstd`, while the others use `lz4`. In practice, `zlight` or `zmedium` are likely to be your best options, because `ztight` and `zmax` usually offer marginal size gains while being too slow to be practical.
 
-To copy 10 seconds of a file, skipping the first 2 seconds of data records, with tighter compression, use:
+To copy 10 seconds of a file with `zmedium` compression while skipping the first 2 seconds of data records, use:
 
 ```
 vrs copy original.vrs --to new.vrs --range +2 +12 --compression=zmedium
@@ -489,7 +489,7 @@ Stream instance ID numbers might not be preserved in the output VRS file. Stream
 
 #### Overwriting Tags
 
-VRS file modifications during copies are possible, but only simple modifications are offered by the `vrs` command line tool.
+VRS file content modifications during copies are possible, but only simple modifications are offered by the `vrs` command line tool.
 
 Overwriting file and stream tags can be very useful.
 
@@ -504,11 +504,11 @@ You can set or overwrite as many file and stream tags as you need, by using the 
 
 ##### Zero Files
 
-The `--zero` option let's you copy all the data, but clearing all image and audio data with zeros, which, because of lossless compression at the record level, will dramatically reduce the size of files with image and audio data. Zeroed files can easily be over 99% smaller. This can be useful for several reasons:
+The `--zero` option lets you copy all the data. Clearing all image and audio data with zeros will dramatically reduce the size of files that have this type of data. This is mainly due to the lossless compression at the record level. Zeroed files can be over 99% smaller than the original files. This can be useful for several reasons:
 
 - you now have a lightweight version of a file, that contains all its metadata.
-- since images and audio data are cleared, the copy is probably anonymized, should there be no sensitive data in the metadata of the file.
-- this file is identical to the original, except for the image and audio data (obviously), which can make it convenient to share over the internet to debug some issues not related to the image and audio data.
+- since images and audio data are cleared, the copy might be anonymized, should there be no sensitive data in the metadata of the file.
+- this file is identical to the original, except for the image and audio data (obviously), which can make it convenient to share over the internet to debug issues not related to the image and audio data.
 
 ### Merging Files
 
@@ -576,15 +576,15 @@ The `check` command "simply" decodes every record in the VRS file and prints how
 - the file has an index or it was rebuilt (see the logs to tell)
 - the records are found where they were expected
 - the records were read successfully
-- the records were decompressed successfully.
+- the records were decompressed successfully (VRS-internal lossless decompression only).
 
 ```
 vrs check file.vrs
 ```
 
-Records are referenced from the file's index, and they also have a header in the file, just before the actual record payload. The two metadata must match or an error is reported. Records are usually losslessly compressed with lz4 or zstd, when they are large enough (over 200 bytes?), which provides some level of corruption detection, because compressed payloads have an internal checksum.
+Records are all referenced in the file's index. They also have a header in the file just before the actual record payload. These two pieces of metadata must match otherwise an error is reported. Records are usually losslessly compressed with lz4 or zstd when record size exceeds a certain number (around 200 bytes). This provides some level of corruption detection, because compressed payloads have an internal checksum.
 
-Such file corruptions rarely happen and can usually be traced back to a corrupt file transfer.
+This type of file corruption rarely happens, and can usually be traced back to a corrupt file transfer.
 
 ### Checksums
 
@@ -600,15 +600,15 @@ A logical data checksum can be generated for a VRS file, which will checksum:
 vrs checksum file.vrs
 ```
 
-The intent is that you can copy a VRS file using the `copy` command, change lossless compression level, and though the files will be very different at the file system level, maybe have different stream instance IDs, they will still be identical from a checksum standpoint.
+The intent is that you can copy a VRS file using the `copy` command, change the lossless compression level, and though the files are very different at the file system level, they will still be identical from a VRS logical content and checksum standpoint.
 
-If two files to check out, you can use the `checksums` command to have individual checksums, which might reveal which part(s) are different.
+If two files do not have the same checksum, use the `checksums` command to have separate checksums, which should reveal which parts are different.
 
 If you can checksum any file at the file system level, regardless of whether the file is a VRS file or not, using the `checksum-verbatim` command.
 
 ### Viewing Records
 
-If you are curious about how records look like inside, you can use the `hexdump` command, which will print records payload, uncompressed, in hexadecimal, after a minimal header per record. You'll probably want to combine this option with the filtering options, to limit the size of the output...
+If you are curious about how records look like inside a VRS file, you can use the `hexdump` command. This will print record payloads, uncompressed, in hexadecimal, after a minimal header per record. You will probably want to combine this option with the filtering options, to limit the size of the output.
 
 ### Comparing Files
 
@@ -630,22 +630,22 @@ vrs compare-verbatim file1.vrs file2.vrs
 
 _Commands: `fix-index`, `debug`, `rage`._
 
-If a VRS recording was interrupted during creation, the VRS file is likely to not have a proper index. Maybe the recording app crashed, or the system ran out of disk space. By design, this situation is "fine", whatever was written is "safe": an index will be rebuilt by scanning the file, and discovering the records and their metadata by walking the list of daisy-chained records. But this process can be slow if the file is large and/or the disk slow. In order to "fix" such files, you have two options:
+If a VRS recording was interrupted during creation, the VRS file probably won't have a proper index, because it is written to disk last at the end of the file. Maybe the recording app crashed, or the system ran out of disk space. By design, this situation is ok, and whatever was written is "safe": an index will be rebuilt by scanning the file, discovering records and their metadata by walking the list of daisy-chained records. But this process can be slow if the file is large and/or the disk slow. In order to "fix" such files, you have two options:
 
 - copy the recording using the `vrs copy` command. The new recording will have a proper index.
-- use the `fix-index` command, to patch the original file in place. The command might truncate the end of the file to get rid of incomplete data, which is usually simply the last record what wasn't fully written out, then the rebuilt index will be written out at the end of the file, provided there is enough disk space for it.
+- use the `fix-index` command, to patch the original file in place. The command might truncate the end of the file to get rid of incomplete data, which is usually simply the last record what wasn't fully written out, then the rebuilt index will be written out at the end of the file, provided there is enough disk space for it. Because the original recording file is modified, it is a bit riskier, but much faster, than copying the file. Note that normally, the resulting file contains the same data, as partially written records can't be recovered by VRS either way.
 
 ```
 vrs fix-index file1.vrs
 ```
 
-Do produce enough information for a bug report about a file that's not working right, you can use the command:
+To produce enough information for a bug report about a file that's not working right, you use the command:
 
 ```
 vrs rage file.vrs
 ```
 
-This command simply produces the combined information of `vrs details` and `vrs print-details file.vrs --first-records` in one operation.
+This command simply produces the combined information of `vrs details` and `vrs print-details file.vrs --first-records` in one easy to remember command.
 
 To check some VRS internal data structures and display some diagnostic information about a VRS file, use:
 
@@ -653,4 +653,4 @@ To check some VRS internal data structures and display some diagnostic informati
 vrs debug file.vrs
 ```
 
-This option is mostly meant for the VRS file format maintainers.
+This option is mostly meant for the VRS file format maintainers, and we mention it here for completeness.
