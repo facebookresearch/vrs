@@ -16,7 +16,7 @@ add_executable(aria_file_reader "AriaFileReader.cpp")
 target_link_libraries(aria_file_reader
   PUBLIC
     vrslib
-    Fmt::Fmt
+    fmt::fmt
 )
 
 add_executable(sample_playback_app "SamplePlaybackApp.cpp")

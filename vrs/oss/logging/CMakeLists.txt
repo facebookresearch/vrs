@@ -27,7 +27,7 @@ target_include_directories(vrs_logging
 target_link_libraries(vrs_logging
   PUBLIC
     vrs_platform
-    Fmt::Fmt
+    fmt::fmt
 )
 
 install(TARGETS vrs_logging EXPORT VRSLibTargets
