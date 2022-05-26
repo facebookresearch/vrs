@@ -20,13 +20,13 @@ find_package(Boost REQUIRED
     system
     thread
 )
-find_package(Fmt REQUIRED)
+find_package(FmtLib REQUIRED)
 find_package(Cereal REQUIRED)
 find_package(Lz4 REQUIRED)
 find_package(Zstd REQUIRED)
 find_package(xxHash REQUIRED)
-find_package(Png REQUIRED)
-find_package(Jpeg REQUIRED)
+find_package(PNG REQUIRED)
+find_package(JPEG REQUIRED)
 
 # Setup unit test infra, but only if unit tests are enabled
 if (UNIT_TESTS)

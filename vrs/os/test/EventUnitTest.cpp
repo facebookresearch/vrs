@@ -20,6 +20,7 @@
 #include <gtest/gtest.h>
 
 #include <vrs/os/Event.h>
+#include <vrs/os/Platform.h>
 
 using namespace std;
 
@@ -189,6 +190,7 @@ void EventTest::runDispatchAndWaitWithLookback(EventChannel::NotificationMode mo
   EXPECT_EQ(0, event.numMissedEvents);
 }
 
+#if !(IS_VRS_OSS_CODE() && IS_MAC_PLATFORM())
 TEST_F(EventTest, DispatchAndWaitWithLookbackUnicast) {
   runDispatchAndWaitWithLookback(EventChannel::NotificationMode::UNICAST);
 }
@@ -221,6 +223,7 @@ TEST_F(EventTest, NumPastEventsUnicast) {
 TEST_F(EventTest, NumPastEventsBroadcast) {
   runNumPastEvents(EventChannel::NotificationMode::BROADCAST);
 }
+#endif
 
 void EventTest::runSpuriousWakeup(EventChannel::NotificationMode mode) {
   setupEvent(mode);
