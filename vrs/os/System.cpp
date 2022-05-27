@@ -39,10 +39,8 @@
 
 #endif
 
-#if IS_VRS_OSS_CODE()
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
-#endif
 
 #define DEFAULT_LOG_CHANNEL "OsSystem"
 #include <logging/Log.h>
@@ -116,11 +114,9 @@ string vrs::os::getOsFingerPrint() {
 #endif
 }
 
-#if IS_VRS_OSS_CODE()
 string vrs::os::getUniqueSessionId() {
   stringstream sstream;
   boost::uuids::random_generator generator;
   sstream << generator();
   return sstream.str();
 }
-#endif
