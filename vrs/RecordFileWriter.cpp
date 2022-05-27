@@ -401,6 +401,9 @@ void RecordFileWriter::backgroundWriterThreadActivity() {
         errorCodeToMessage(writerThreadData_->fileError));
     file_->close();
   }
+  if (queueByteSize_) {
+    queueByteSize_->store(0, memory_order_relaxed);
+  }
   // resume purging records, if we were doing that
   if (purgeThreadData_ != nullptr) {
     purgeThreadData_->purgingPaused_ = false;
@@ -457,6 +460,9 @@ int RecordFileWriter::createFileAsync(const string& filePath, bool splitHead) {
   }
   if (purgeThreadData_ != nullptr) {
     purgeThreadData_->purgingPaused_ = true;
+  }
+  if (queueByteSize_) {
+    queueByteSize_->store(0, memory_order_relaxed);
   }
   // make sure we have recent configuration & state records
   for (auto* recordable : getRecordables()) {
