@@ -178,6 +178,15 @@ class PixelFrame {
 
   static PixelFormat getNormalizedPixelFormat(PixelFormat sourcePixelFormat, bool grey16supported);
 
+  /// Conversion in place from RGBA to RGB (no memory allocation)
+  /// @return True if the conversion was performed, false if source wasn't an RGBA frame.
+  bool inplaceRgbaToRgb();
+
+  /// Convert current RGBA frame to RGB, with allocation of a PixelFrame, if necessary.
+  /// @param outRgbFrame: a shared pointer to a PixelFrame. Does not need to be allocated yet.
+  /// @return True if the conversion was performed, false if source wasn't an RGBA frame.
+  bool convertRgbaToRgb(std::shared_ptr<PixelFrame>& outRgbFrame) const;
+
  private:
   /// Conversion from an external buffer
   /// @param convertedFrame: frame to convert to. May not be allocated yet.

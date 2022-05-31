@@ -142,7 +142,20 @@ bool PixelFrame::hasSamePixels(const ImageContentBlockSpec& spec) const {
 }
 
 void PixelFrame::blankFrame() {
-  memset(wdata(), 0, frameBytes_.size());
+  if (getPixelFormat() != PixelFormat::RGBA8) {
+    memset(wdata(), 0, frameBytes_.size());
+  } else {
+    uint32_t solidBlack = 0xff000000;
+    uint32_t stride = getStride();
+    uint32_t width = getWidth();
+    uint8_t* pixels = wdata();
+    for (uint32_t h = 0; h < getHeight(); ++h) {
+      uint32_t* line = reinterpret_cast<uint32_t*>(pixels + h * stride);
+      for (uint32_t w = 0; w < width; ++w) {
+        line[w] = solidBlack;
+      }
+    }
+  }
 }
 
 bool PixelFrame::readFrame(
@@ -226,6 +239,54 @@ PixelFormat PixelFrame::getNormalizedPixelFormat(
   return ImageContentBlockSpec::getChannelCountPerPixel(sourcePixelFormat) > 1 ? PixelFormat::RGB8
       : grey16supported                                                        ? PixelFormat::GREY16
                                                                                : PixelFormat::GREY8;
+}
+
+bool PixelFrame::inplaceRgbaToRgb() {
+  if (getPixelFormat() != PixelFormat::RGBA8) {
+    return false;
+  }
+  uint32_t width = getWidth();
+  uint32_t height = getHeight();
+  ImageContentBlockSpec rgbSpec(PixelFormat::RGB8, width, height);
+  size_t stride = getStride();
+  size_t rgbStride = rgbSpec.getStride();
+  for (uint32_t h = 0; h < height; ++h) {
+    const uint8_t* srcPtr = rdata() + h * stride;
+    uint8_t* outPtr = wdata() + h * rgbStride;
+    for (uint32_t w = 0; w < width; ++w) {
+      outPtr[0] = srcPtr[0];
+      outPtr[1] = srcPtr[1];
+      outPtr[2] = srcPtr[2];
+      outPtr += 3;
+      srcPtr += 4;
+    }
+  }
+  imageSpec_ = rgbSpec;
+  frameBytes_.resize(imageSpec_.getHeight() * imageSpec_.getStride());
+  return true;
+}
+
+bool PixelFrame::convertRgbaToRgb(std::shared_ptr<PixelFrame>& outRgbFrame) const {
+  if (getPixelFormat() != PixelFormat::RGBA8) {
+    return false;
+  }
+  uint32_t width = getWidth();
+  uint32_t height = getHeight();
+  init(outRgbFrame, ImageContentBlockSpec(PixelFormat::RGB8, width, height));
+  size_t srcStride = getStride();
+  size_t outStride = outRgbFrame->getStride();
+  for (uint32_t h = 0; h < height; ++h) {
+    const uint8_t* srcPtr = rdata() + h * srcStride;
+    uint8_t* outPtr = outRgbFrame->wdata() + h * outStride;
+    for (uint32_t w = 0; w < width; ++w) {
+      outPtr[0] = srcPtr[0];
+      outPtr[1] = srcPtr[1];
+      outPtr[2] = srcPtr[2];
+      outPtr += 3;
+      srcPtr += 4;
+    }
+  }
+  return true;
 }
 
 inline uint8_t clipToUint8(int value) {
