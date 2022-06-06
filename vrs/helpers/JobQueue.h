@@ -47,6 +47,9 @@ class JobQueue {
     condition_.notify_one();
   }
   bool waitForJob(T& outValue, double waitTime) {
+    if (waitTime <= 0) {
+      return getJob(outValue);
+    }
     double limit = os::getTimestampSec() + waitTime;
     std::unique_lock<std::mutex> locker(mutex_);
     double actualWaitTime;
