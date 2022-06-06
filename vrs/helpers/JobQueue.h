@@ -46,6 +46,7 @@ class JobQueue {
     queue_.emplace_back(std::move(value));
     condition_.notify_one();
   }
+  /// Wait for a job up to a specified wait time, or until the queue was ended
   bool waitForJob(T& outValue, double waitTime) {
     if (waitTime <= 0) {
       return getJob(outValue);
@@ -63,6 +64,16 @@ class JobQueue {
     queue_.pop_front();
     return true;
   }
+  /// Wait for a job until one is available, or the queue was ended
+  bool waitForJob(T& outValue) {
+    while (!hasEnded_) {
+      if (waitForJob(outValue, 5)) {
+        return true;
+      }
+    }
+    return false;
+  }
+  /// get a pending job, if any, but don't wait
   bool getJob(T& outValue) {
     std::unique_lock<std::mutex> locker(mutex_);
     if (queue_.empty()) {

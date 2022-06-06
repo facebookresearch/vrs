@@ -102,12 +102,10 @@ class CompressionWorker {
   void threadActivity() {
     initCreatedThreadCallback_(thread_, ThreadRole::Compression, threadIndex_);
 
-    while (!workQueue_.hasEnded()) {
-      CompressionJob* job;
-      if (workQueue_.waitForJob(job, 1 /* second */)) {
-        job->performJob();
-        resultsQueue_.sendJob(job);
-      }
+    CompressionJob* job;
+    while (workQueue_.waitForJob(job)) {
+      job->performJob();
+      resultsQueue_.sendJob(job);
     }
   }
 
