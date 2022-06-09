@@ -12,7 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.16)
+
+# Make it simpler to find Qt.
+# If CMAKE_PREFIX_PATH isn't set and the env variable QT_DIR is, use it!
+if ("${CMAKE_PREFIX_PATH}" STREQUAL "" AND EXISTS "$ENV{QT_DIR}")
+  message(STATUS "Setting CMAKE_PREFIX_PATH from QT_DIR=$ENV{QT_DIR}")
+  set(CMAKE_PREFIX_PATH "$ENV{QT_DIR}")
+endif()
 
 # When building within Meta's source tree, a number of OSS-only source files live in an
 # "oss/" sub-folder next to the main vrs/ folder that contains vrs' main source code.
@@ -48,6 +55,9 @@ add_subdirectory(vrs)
 
 # Add the vrs command line utility
 add_subdirectory(${OSS_DIR}/tools/vrs)
+
+# Add the vrsplayer tool
+add_subdirectory(${OSS_DIR}/tools/vrsplayer)
 
 # Add the sample apps/code
 add_subdirectory(sample_apps)

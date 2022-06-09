@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-file(GLOB VRS_UTIL_SRCS *.cpp *.h)
-add_executable(vrs ${VRS_UTIL_SRCS})
+file(GLOB TOOLS_VRS_SRCS *.cpp *.h)
+add_executable(vrs ${TOOLS_VRS_SRCS})
 target_include_directories(vrs
   PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/..
