@@ -80,6 +80,7 @@ avoid installing any library on your system.
 - install tools & libraries:
   ```
   brew install cmake ninja ccache boost fmt cereal libpng jpeg lz4 zstd xxhash googletest
+  brew install qt5 portaudio # for vrsplayer
   brew install node doxygen
   ```
 
@@ -93,6 +94,7 @@ doesn't install recent enough versions of cmake, fmt, lz4, and zstd._
   sudo apt-get install cmake ninja-build ccache libgtest-dev libfmt-dev libcereal-dev libjpeg-dev libpng-dev
   sudo apt-get install liblz4-dev libzstd-dev libxxhash-dev
   sudo apt-get install libboost-system-dev libboost-filesystem-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev
+  sudo apt-get install qtbase5-dev portaudio19-dev # for vrsplayer
   sudo apt-get install npm doxygen
   ```
 
@@ -103,6 +105,26 @@ doesn't install recent enough versions of cmake, fmt, lz4, and zstd._
 ```
 cmake -S <path_to_vrs_folder> -B <path_to_build_folder> '-GCodeBlocks - Ninja'
 ```
+
+If you want to build vrsplayer, you need to specify where your installation of
+Qt is. Where Qt is depends on how you've installed it, using a package manager
+such as Brew or APT, or downloading it directly from
+[Qt's official website](https://www.qt.io/download).
+
+To tell cmake where to find Qt, you can either add
+`-DCMAKE_PREFIX_PATH=<path_to_qt>` to the cmake command above, or set the
+environment variable `QT_DIR=<path_to_qt>` to point to your Qt installation
+(same path). As a sanity check, you should be able to find the qmake tool at
+`<path_to_qt>/bin/qmake`.
+
+Note: We ran into strange build issues when Qt5 and Qt6 were both installed at
+the same time via Brew on macOS, but uninstalling either fixed the problem.
+
+### Qt 5 or QT 6?
+
+At this time, vrsplayer is mostly tested using Qt 5.15.3 LTS, but the code has
+been updated to build and run with Qt 6.3.0. However, testing was pretty
+limited.
 
 - Build everything & run tests:
 
@@ -210,3 +232,12 @@ are provided. We are working on open sourcing more code:
 # License
 
 VRS is released under the [Apache 2.0 license](LICENSE).
+
+vrsplayer requires an installation of Qt 5.15+ or Qt 6.3+ on your system, maybe
+using Brew (macOS) or APT (Linux), as demonstrated above, or using an offical
+distribution from [Qt's official website](https://www.qt.io/download). If found,
+vrsplayer will be built and will link dynamically against the LGPL v3 Qt
+libraries.
+
+We provide no pre-built binaries, so you must build vrsplayer from source to use
+it.
