@@ -204,14 +204,16 @@ podman/docker run -it --volume <your_local_data>:/data vrs:latest
 
 # Tools
 
-Part of this repo, the `vrs` command line tool allows you to examine and
-manipulate VRS files, usually by generating a modified copy of an original
+The `vrs` command line tool allows you to inspect and extract data out of VRS
+files. It can create new VRS files by generating a modified copy of an original
 recording. It can also extract images, dump metadata for human or computer
-consumtion (json). The vrs command line tool can be found at `tools/vrs`.
+consumption (json). The vrs command line tool can be found at `tools/vrs`. It has
+many options,
+[documented here](https://facebookresearch.github.io/vrs/docs/VrsCliTool).
 
-The `vrsplayer` tool is planned for open sourcing within a few month. It is
-basically a player that can "play" the content of a VRS file containing image
-and/or audio streams.
+`vrsplayer` is a GUI tool which can "play" VRS files as multi-stream video files
+and audio files. It also provides ways to visualize record's metadata as they
+are played.
 
 # Contributing
 
@@ -234,7 +236,7 @@ are provided. We are working on open sourcing more code:
 VRS is released under the [Apache 2.0 license](LICENSE).
 
 vrsplayer requires an installation of Qt 5.15+ or Qt 6.3+ on your system, maybe
-using Brew (macOS) or APT (Linux), as demonstrated above, or using an offical
+using Brew (macOS) or APT (Linux), as demonstrated above, or using an official
 distribution from [Qt's official website](https://www.qt.io/download). If found,
 vrsplayer will be built and will link dynamically against the LGPL v3 Qt
 libraries.
