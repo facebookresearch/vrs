@@ -19,11 +19,13 @@ if (NOT TARGET cereal::cereal)
   mark_as_advanced(CEREAL_INCLUDE_DIR)
 
   include(FindPackageHandleStandardArgs)
+  set(FPHSA_NAME_MISMATCHED 1) # Suppress warnings, see https://cmake.org/cmake/help/v3.17/module/FindPackageHandleStandardArgs.html
   find_package_handle_standard_args(
     cereal
     DEFAULT_MSG
     CEREAL_INCLUDE_DIR
   )
+  unset(FPHSA_NAME_MISMATCHED)
   add_library(cereal::cereal INTERFACE IMPORTED)
   set_target_properties(
     cereal::cereal PROPERTIES
