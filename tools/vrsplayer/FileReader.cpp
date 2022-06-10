@@ -23,13 +23,18 @@
 
 #include <qapplication.h>
 #include <qboxlayout.h>
-#include <qdesktopwidget.h>
 #include <qevent.h>
 #include <qjsonarray.h>
 #include <qjsondocument.h>
 #include <qjsonobject.h>
 #include <qprogressdialog.h>
 #include <qstring.h>
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+#include <qdesktopwidget.h>
+#else
+#include <qscreen.h>
+#endif
 
 #define DEFAULT_LOG_CHANNEL "FileReader"
 #include <logging/Log.h>
@@ -344,7 +349,11 @@ vector<FrameWidget*> FileReader::openFile(QVBoxLayout* videoFrames, QWidget* wid
         relayout();
       } else {
         // Go over layout options, to find the one that matches the screen's aspect ratio the best
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
         QSize screenSize = QApplication::desktop()->screenGeometry(widget).size();
+#else
+        QSize screenSize = widget->screen()->size();
+#endif
         float screenRatio = static_cast<float>(screenSize.width()) / screenSize.height();
         // screenRatio = 1.77; // 24" monitor simulation
         // screenRatio = 2560.0f / 1600; // 30" monitor simulation

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-find_package(QT NAMES Qt5 COMPONENTS Core Gui Widgets)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Gui Widgets)
 if (QT_FOUND)
   message(STATUS "Found Qt${QT_VERSION_MAJOR}, including vrsplayer target")
   find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Gui Widgets)

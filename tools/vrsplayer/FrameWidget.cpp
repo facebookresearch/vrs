@@ -19,11 +19,15 @@
 #include <sstream>
 
 #include <qapplication.h>
-#include <qdesktopwidget.h>
-#include <qimage.h>
 #include <qmenu.h>
 #include <qpainter.h>
 #include <qsizepolicy.h>
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+#include <qdesktopwidget.h>
+#else
+#include <qscreen.h>
+#endif
 
 #define DEFAULT_LOG_CHANNEL "FrameWidget"
 #include <logging/Log.h>
@@ -169,8 +173,12 @@ void FrameWidget::updateMinMaxSize() {
     QSize size = getImageSize();
     setMinimumSize(size.scaled(100, 100, Qt::KeepAspectRatio));
     setBaseSize(size);
-    QSize screen = QApplication::desktop()->screenGeometry(this).size().operator*=(0.95);
-    setMaximumSize(size.scaled(screen, Qt::KeepAspectRatio));
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+    QSize screenSize = QApplication::desktop()->screenGeometry(this).size().operator*=(0.95);
+#else
+    QSize screenSize = screen()->geometry().size() * 0.95;
+#endif
+    setMaximumSize(size.scaled(screenSize, Qt::KeepAspectRatio));
   }
 }
 

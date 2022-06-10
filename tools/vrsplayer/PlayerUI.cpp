@@ -77,7 +77,11 @@ class JumpSlider : public QSlider {
     initStyleOption(&opt);
     QRect sr = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, this);
     if (event->button() == Qt::LeftButton && sr.contains(event->pos()) == false) {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
       int newVal = minimum() + ((maximum() - minimum()) * event->x()) / width();
+#else
+      int newVal = minimum() + ((maximum() - minimum()) * event->position().x()) / width();
+#endif
       event->accept();
       sliderMoved(newVal);
     }
@@ -271,7 +275,11 @@ void PlayerUI::openPath(const QString& path) {
 }
 
 void PlayerUI::resizeToDefault() {
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
   QSize fullSize = QApplication::desktop()->screenGeometry(this).size();
+#else
+  QSize fullSize = screen()->size();
+#endif
   window()->setMaximumSize(fullSize);
   // resize to default size & center on the current screen
   window()->resize(fullSize * kDefaultScreenOccupationRatio);
@@ -279,11 +287,19 @@ void PlayerUI::resizeToDefault() {
       Qt::LeftToRight,
       Qt::AlignCenter,
       window()->size(),
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
       qApp->desktop()->availableGeometry(window())));
+#else
+      screen()->geometry()));
+#endif
 }
 
 void PlayerUI::resizeIfNecessary() {
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
   QRect screenRect = QApplication::desktop()->screenGeometry(this);
+#else
+  QRect screenRect = screen()->geometry();
+#endif
   QRect windowRect = geometry();
   QRect windowInScreen(mapToGlobal(windowRect.topLeft()), mapToGlobal(windowRect.bottomRight()));
   if (screenRect.contains(windowInScreen)) {
