@@ -288,7 +288,7 @@ vector<FrameWidget*> FileReader::openFile(QVBoxLayout* videoFrames, QWidget* wid
     const auto& ids = fileReader_->getStreams();
     for (StreamId id : ids) {
       if (imageReaders_.find(id) == imageReaders_.end()) {
-        bool mightContainImagesOrAudio = true;
+        bool mightContainImagesOrAudio = false;
         if (fileReader_->mightContainImages(id)) {
           FrameWidget* frame = new FrameWidget();
           frame->setTypeToShow(recordType_);
