@@ -80,7 +80,7 @@ void PlayerWindow::createMenus() {
   fileMenu_->addAction(openAction);
 
   QAction* openPathOrUriAction = new QAction("Open Path or URI...", this);
-  openPathOrUriAction->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_O);
+  openPathOrUriAction->setShortcut(Qt::CTRL | Qt::SHIFT | Qt::Key_O);
   openPathOrUriAction->setStatusTip("Open a recording using a path or URI...");
   connect(openPathOrUriAction, &QAction::triggered, &player_, &vrsp::PlayerUI::openPathChooser);
   fileMenu_->addAction(openPathOrUriAction);
@@ -158,7 +158,7 @@ void PlayerWindow::updateLayoutMenu(
       recallAction = make_unique<QAction>(QString("Recall Preset '" + key + "'"), this);
     }
     if (++number < 10) {
-      recallAction->setShortcut(Qt::CTRL + Qt::Key_0 + number);
+      recallAction->setShortcut(Qt::CTRL | static_cast<Qt::Key>(Qt::Key_0 + number));
     }
     connect(recallAction.get(), &QAction::triggered, [this, key]() { player_.recallPreset(key); });
     layoutMenu_->addAction(recallAction.get());
