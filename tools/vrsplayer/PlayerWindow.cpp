@@ -85,6 +85,13 @@ void PlayerWindow::createMenus() {
   connect(openPathOrUriAction, &QAction::triggered, &player_, &vrsp::PlayerUI::openPathChooser);
   fileMenu_->addAction(openPathOrUriAction);
 
+  fileMenu_->addSeparator();
+  QAction* saveFrames = new QAction("Save All Frames to...", this);
+  saveFrames->setShortcut(Qt::CTRL | Qt::Key_S);
+  saveFrames->setStatusTip("Save Visible Frames to Folder...");
+  connect(saveFrames, &QAction::triggered, &player_, &vrsp::PlayerUI::saveFrames);
+  fileMenu_->addAction(saveFrames);
+
 #if !IS_MAC_PLATFORM()
   fileMenu_->addSeparator();
   fileMenu_->addAction(aboutAction);

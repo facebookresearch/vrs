@@ -61,6 +61,7 @@ class PlayerUI : public QWidget {
  public slots:
   void openFileChooser();
   void openPathChooser();
+  void saveFrames();
   void openLastFile();
   void backwardPressed();
   void stopPressed();

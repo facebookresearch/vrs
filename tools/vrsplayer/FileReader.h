@@ -141,6 +141,7 @@ class FileReader : public QObject {
   void disableStream(StreamId id);
   void moveStream(StreamId id, bool beforeNotAfter);
   void saveFrame(StreamId id);
+  void saveFrames();
   void savePreset(const QString& preset);
   void recallPreset(const QString& preset);
   void deletePreset(const QString& preset);

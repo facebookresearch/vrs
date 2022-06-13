@@ -245,6 +245,10 @@ void PlayerUI::openPathChooser() {
   }
 }
 
+void PlayerUI::saveFrames() {
+  fileReader_.saveFrames();
+}
+
 void PlayerUI::openLastFile() {
   QString lastPath = settings_.value(kLastFilePathSetting).toString();
   // Clear setting to avoid crash loops

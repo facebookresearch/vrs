@@ -1032,6 +1032,42 @@ void FileReader::saveFrame(vrs::StreamId id) {
   }
 }
 
+void FileReader::saveFrames() {
+  if (state_ == FileReaderState::Playing) {
+    pause();
+  } else if (state_ != FileReaderState::Paused) {
+    return;
+  }
+  unique_lock<recursive_mutex> guard{mutex_};
+  if (!fileReader_ || lastReadRecords_.empty()) {
+    return;
+  }
+  QString defaultDir = QStandardPaths::standardLocations(QStandardPaths::DownloadLocation)
+                           .value(0, QDir::homePath());
+  QString dir = QFileDialog::getExistingDirectory(
+      playerUi_,
+      "Save Frames At...",
+      defaultDir,
+      QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+  if (dir.isEmpty()) {
+    return;
+  }
+  for (auto id : visibleStreams_) {
+    auto iter = lastReadRecords_.find(id);
+    if (iter == lastReadRecords_.end()) {
+      continue;
+    }
+    FramePlayer& framePlayer = *imageReaders_[id];
+    size_t frameIndex = iter->second;
+    const auto& record = fileReader_->getIndex()[frameIndex];
+    string filename = framePlayer.getFrameName(frameIndex, record);
+    QString path = dir + '/' + filename.c_str();
+    if (!framePlayer.saveFrameNowOrOnNextRead(path.toStdString())) {
+      fileReader_->readRecord(record);
+    }
+  }
+}
+
 void FileReader::savePreset(const QString& preset) {
   layoutPresets_[preset] = configurationAsVariant();
   layoutConfigChanged();
