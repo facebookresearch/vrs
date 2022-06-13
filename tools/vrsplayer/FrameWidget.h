@@ -117,6 +117,7 @@ class FrameWidget : public QWidget {
   }
 
   void swapImage(shared_ptr<PixelFrame>& image);
+  int saveImage(const string& path);
 
   void setTypeToShow(Record::Type type) {
     typeToShow_ = type;
@@ -134,6 +135,7 @@ class FrameWidget : public QWidget {
   void shouldHideStream();
   void shouldMoveBefore();
   void shouldMoveAfter();
+  void shouldSaveFrame();
 
  public slots:
   void ShowContextMenu(const QPoint& pos);
@@ -153,6 +155,7 @@ class FrameWidget : public QWidget {
   QColor overlayColor_{Qt::yellow};
   int rotation_{0};
   bool flipped_{false};
+  bool hasFrame_{false};
 };
 
 } // namespace vrsp

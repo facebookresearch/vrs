@@ -80,6 +80,10 @@ class FramePlayer : public QObject, public VideoRecordFormatStreamPlayer {
   }
   void setBlankMode(bool blankOn);
 
+  string getFrameName(size_t index, const vrs::IndexRecord::RecordInfo& record);
+  // Try to save. Returns true if the frame was saved, false if save happens on next frame read
+  bool saveFrameNowOrOnNextRead(const std::string& path);
+
   void imageJobsThreadActivity();
 
  public slots:
@@ -89,13 +93,15 @@ class FramePlayer : public QObject, public VideoRecordFormatStreamPlayer {
   std::mutex frameMutex_;
   vector<shared_ptr<PixelFrame>> inputFrames_;
   vector<shared_ptr<PixelFrame>> convertedframes_;
-  bool needsConvertedFrame_{};
+  bool needsConvertedFrame_{false};
+  vrs::ImageFormat imageFormat_{vrs::ImageFormat::UNDEFINED};
   StreamId id_;
   FrameWidget* widget_;
   MetaDataCollector descriptions_;
   bool visible_{true};
   bool blankMode_{true};
   bool firstImage_{true};
+  string saveNextFramePath_;
   Fps dataFps_;
   FileReaderState state_{};
 
@@ -105,6 +111,7 @@ class FramePlayer : public QObject, public VideoRecordFormatStreamPlayer {
   void makeBlankFrame(shared_ptr<PixelFrame>& frame);
   shared_ptr<PixelFrame> getFrame(bool inputNotConvertedFrame);
   void recycle(shared_ptr<PixelFrame>& frame, bool inputNotConvertedFrame);
+  bool saveFrame(const CurrentRecord& record, const ContentBlock& contentBlock);
 };
 
 } // namespace vrsp

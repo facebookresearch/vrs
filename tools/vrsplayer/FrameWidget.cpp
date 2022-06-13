@@ -19,9 +19,12 @@
 #include <sstream>
 
 #include <qapplication.h>
+#include <qfiledialog.h>
+#include <qfileinfo.h>
 #include <qmenu.h>
 #include <qpainter.h>
 #include <qsizepolicy.h>
+#include <qstandardpaths.h>
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
 #include <qdesktopwidget.h>
@@ -75,7 +78,7 @@ void FrameWidget::paintEvent(QPaintEvent* evt) {
   painter.setPen(overlayColor_);
   bool hasImage = false;
   { // mutex scoope
-    unique_lock lock(mutex_);
+    unique_lock<mutex> lock;
     PixelFrame* image = image_.get();
     if (image != nullptr) {
       QImage::Format qformat;
@@ -157,7 +160,7 @@ int FrameWidget::heightForWidth(int w) const {
 }
 
 void FrameWidget::swapImage(shared_ptr<PixelFrame>& image) {
-  unique_lock lock(mutex_);
+  unique_lock<mutex> lock;
   imageFps_.newFrame();
   bool resize = image && image->qsize() != imageSize_;
   image_.swap(image);
@@ -166,6 +169,15 @@ void FrameWidget::swapImage(shared_ptr<PixelFrame>& image) {
     updateMinMaxSize();
   }
   setNeedsUpdate();
+  hasFrame_ = true;
+}
+
+int FrameWidget::saveImage(const std::string& path) {
+  unique_lock<mutex> lock;
+  if (image_) {
+    return image_->writeAsPng(path);
+  }
+  return FAILURE;
 }
 
 void FrameWidget::updateMinMaxSize() {
@@ -223,12 +235,19 @@ void FrameWidget::ShowContextMenu(const QPoint& pos) {
   connect(&hide, &QAction::triggered, [this]() { emit this->shouldHideStream(); });
   contextMenu.addAction(&hide);
 
+  QAction saveFrame("Save Frame As...", this);
+  if (hasFrame_) {
+    contextMenu.addSeparator();
+    connect(&saveFrame, &QAction::triggered, [this]() { emit this->shouldSaveFrame(); });
+    contextMenu.addAction(&saveFrame);
+  }
+
   contextMenu.exec(mapToGlobal(pos));
 }
 
 void FrameWidget::blank() {
   {
-    unique_lock lock(mutex_);
+    unique_lock<mutex> lock;
     if (image_) {
       image_->blankFrame();
     }
@@ -238,6 +257,7 @@ void FrameWidget::blank() {
   imageFps_.reset();
   drawFps_.reset();
   setNeedsUpdate();
+  hasFrame_ = false;
 }
 
 void FrameWidget::setDeviceName(const string& deviceName) {

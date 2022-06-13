@@ -24,10 +24,12 @@
 #include <qapplication.h>
 #include <qboxlayout.h>
 #include <qevent.h>
+#include <qfiledialog.h>
 #include <qjsonarray.h>
 #include <qjsondocument.h>
 #include <qjsonobject.h>
 #include <qprogressdialog.h>
+#include <qstandardpaths.h>
 #include <qstring.h>
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
@@ -305,6 +307,7 @@ vector<FrameWidget*> FileReader::openFile(QVBoxLayout* videoFrames, QWidget* wid
               frame, &FrameWidget::shouldMoveBefore, [this, id]() { this->moveStream(id, true); });
           connect(
               frame, &FrameWidget::shouldMoveAfter, [this, id]() { this->moveStream(id, false); });
+          connect(frame, &FrameWidget::shouldSaveFrame, [this, id]() { this->saveFrame(id); });
           connect(
               this, &FileReader::mediaStateChanged, imageReader, &FramePlayer::mediaStateChanged);
           // decode first config & data record, to init the image size
@@ -1005,6 +1008,28 @@ void FileReader::moveStream(StreamId id, bool beforeNotAfter) {
     }
   }
   relayout();
+}
+
+void FileReader::saveFrame(vrs::StreamId id) {
+  pause();
+  unique_lock<recursive_mutex> guard{mutex_};
+  if (!fileReader_ || lastReadRecords_.find(id) == lastReadRecords_.end()) {
+    return;
+  }
+  FramePlayer& framePlayer = *imageReaders_[id];
+  size_t frameIndex = lastReadRecords_[id];
+  const auto& record = fileReader_->getIndex()[frameIndex];
+  string filename = framePlayer.getFrameName(frameIndex, record);
+  QString dir = QStandardPaths::standardLocations(QStandardPaths::DownloadLocation)
+                    .value(0, QDir::homePath());
+  QString path =
+      QFileDialog::getSaveFileName(playerUi_, "Save Frame As...", dir + '/' + filename.c_str());
+  if (path.isEmpty()) {
+    return;
+  }
+  if (!framePlayer.saveFrameNowOrOnNextRead(path.toStdString())) {
+    fileReader_->readRecord(record);
+  }
 }
 
 void FileReader::savePreset(const QString& preset) {

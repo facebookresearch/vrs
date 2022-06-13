@@ -20,6 +20,12 @@
 
 #include <fmt/format.h>
 
+#define DEFAULT_LOG_CHANNEL "FramePlayer"
+#include <logging/Log.h>
+
+#include <vrs/DiskFile.h>
+#include <vrs/IndexRecord.h>
+
 namespace vrsp {
 
 using namespace std;
@@ -56,12 +62,16 @@ bool FramePlayer::onImageRead(
     const CurrentRecord& record,
     size_t /*blockIndex*/,
     const ContentBlock& contentBlock) {
+  if (!saveNextFramePath_.empty()) {
+    return saveFrame(record, contentBlock);
+  }
   widget_->setDataFps(dataFps_.newFrame()); // fps counter for images read from file
   const auto& spec = contentBlock.image();
   shared_ptr<PixelFrame> frame = getFrame(true);
   bool frameValid = false;
   unique_ptr<ImageJob> job;
-  switch (spec.getImageFormat()) {
+  imageFormat_ = spec.getImageFormat();
+  switch (imageFormat_) {
     case vrs::ImageFormat::RAW:
       // RAW images are read from disk directly, but pixel format conversion is asynchronous
       frameValid = PixelFrame::readRawFrame(frame, record.reader, spec);
@@ -160,7 +170,7 @@ void FramePlayer::makeBlankFrame(shared_ptr<PixelFrame>& frame) {
 }
 
 shared_ptr<PixelFrame> FramePlayer::getFrame(bool inputNotConvertedFrame) {
-  unique_lock lock(frameMutex_);
+  unique_lock<mutex> lock(frameMutex_);
   vector<shared_ptr<PixelFrame>>& frames = inputNotConvertedFrame ? inputFrames_ : convertedframes_;
   if (frames.empty()) {
     return nullptr;
@@ -173,7 +183,7 @@ shared_ptr<PixelFrame> FramePlayer::getFrame(bool inputNotConvertedFrame) {
 void FramePlayer::recycle(shared_ptr<PixelFrame>& frame, bool inputNotConvertedFrame) {
   if (frame) {
     {
-      unique_lock lock(frameMutex_);
+      unique_lock<mutex> lock(frameMutex_);
       vector<shared_ptr<PixelFrame>>& frames =
           inputNotConvertedFrame ? inputFrames_ : convertedframes_;
       if (frames.size() < 10) {
@@ -200,11 +210,66 @@ void FramePlayer::setBlankMode(bool blankOn) {
   }
 }
 
+string FramePlayer::getFrameName(size_t index, const vrs::IndexRecord::RecordInfo& record) {
+  string extension = (imageFormat_ == vrs::ImageFormat::JPG) ? "jpg" : "png";
+  return fmt::format(
+      "{}-{:05}-{:.3f}.{}", record.streamId.getNumericName(), index, record.timestamp, extension);
+}
+
 void FramePlayer::mediaStateChanged(FileReaderState state) {
   if (state != state_) {
     dataFps_.reset();
     state_ = state;
   }
+}
+
+bool FramePlayer::saveFrameNowOrOnNextRead(const std::string& path) {
+  if (imageFormat_ == vrs::ImageFormat::VIDEO) {
+    // Save the frame visible in the Widget
+    if (widget_->saveImage(path) == 0) {
+      XR_LOGI("Saved video frame as '{}'", path);
+    }
+    return true;
+  }
+  // We need to read the record again to save the best data possible
+  saveNextFramePath_ = path;
+  return false;
+}
+
+bool FramePlayer::saveFrame(
+    const vrs::CurrentRecord& record,
+    const vrs::ContentBlock& contentBlock) {
+  const auto& spec = contentBlock.image();
+  switch (spec.getImageFormat()) {
+    case vrs::ImageFormat::RAW: {
+      shared_ptr<PixelFrame> frame;
+      if (PixelFrame::readRawFrame(frame, record.reader, spec)) {
+        shared_ptr<PixelFrame> normalizedFrame;
+        PixelFrame::normalizeFrame(frame, normalizedFrame, true);
+        if (normalizedFrame->writeAsPng(saveNextFramePath_) == 0) {
+          XR_LOGI("Saved raw frame as '{}'", saveNextFramePath_);
+        }
+      }
+    } break;
+    case vrs::ImageFormat::JPG:
+    case vrs::ImageFormat::PNG:
+    case vrs::ImageFormat::VIDEO: {
+      vector<uint8_t> buffer;
+      buffer.resize(contentBlock.getBlockSize());
+      vrs::AtomicDiskFile file;
+      if (record.reader->read(buffer) == 0 && file.create(saveNextFramePath_) == 0) {
+        if (file.write(buffer.data(), buffer.size()) != 0) {
+          file.abort();
+        } else {
+          XR_LOGI("Saved {} frame as '{}'", toString(spec.getImageFormat()), saveNextFramePath_);
+        }
+      }
+    } break;
+    default:
+      break;
+  }
+  saveNextFramePath_.clear();
+  return true;
 }
 
 void FramePlayer::imageJobsThreadActivity() {
