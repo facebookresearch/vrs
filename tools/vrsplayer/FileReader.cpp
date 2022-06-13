@@ -1020,13 +1020,12 @@ void FileReader::saveFrame(vrs::StreamId id) {
   size_t frameIndex = lastReadRecords_[id];
   const auto& record = fileReader_->getIndex()[frameIndex];
   string filename = framePlayer.getFrameName(frameIndex, record);
-  QString dir = QStandardPaths::standardLocations(QStandardPaths::DownloadLocation)
-                    .value(0, QDir::homePath());
-  QString path =
-      QFileDialog::getSaveFileName(playerUi_, "Save Frame As...", dir + '/' + filename.c_str());
+  QString path = QFileDialog::getSaveFileName(
+      playerUi_, "Save Frame As...", getInitialSaveLocation() + '/' + filename.c_str());
   if (path.isEmpty()) {
     return;
   }
+  lastSaveLocation_ = QFileInfo(path).absoluteDir().absolutePath();
   if (!framePlayer.saveFrameNowOrOnNextRead(path.toStdString())) {
     fileReader_->readRecord(record);
   }
@@ -1042,16 +1041,15 @@ void FileReader::saveFrames() {
   if (!fileReader_ || lastReadRecords_.empty()) {
     return;
   }
-  QString defaultDir = QStandardPaths::standardLocations(QStandardPaths::DownloadLocation)
-                           .value(0, QDir::homePath());
   QString dir = QFileDialog::getExistingDirectory(
       playerUi_,
       "Save Frames At...",
-      defaultDir,
+      getInitialSaveLocation(),
       QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
   if (dir.isEmpty()) {
     return;
   }
+  lastSaveLocation_ = dir;
   for (auto id : visibleStreams_) {
     auto iter = lastReadRecords_.find(id);
     if (iter == lastReadRecords_.end()) {
@@ -1066,6 +1064,15 @@ void FileReader::saveFrames() {
       fileReader_->readRecord(record);
     }
   }
+}
+
+QString FileReader::getInitialSaveLocation() {
+  QFileInfo fileInfo(lastSaveLocation_);
+  if (fileInfo.exists() && fileInfo.isDir()) {
+    return lastSaveLocation_;
+  }
+  return QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation)
+      .value(0, QDir::homePath());
 }
 
 void FileReader::savePreset(const QString& preset) {

@@ -173,6 +173,7 @@ class FileReader : public QObject {
   void layoutConfigChanged();
   void restoreCurrentConfig();
   int readRecordIfNeeded(const vrs::IndexRecord::RecordInfo& record, size_t recordIndex, bool log);
+  QString getInitialSaveLocation();
 
   std::vector<FrameWidget*> openFile(QVBoxLayout* videoFrames, QWidget* parent);
   void closeFile();
@@ -197,6 +198,7 @@ class FileReader : public QObject {
   uint32_t firstDataRecordIndex_;
   double lastShownTime_;
   size_t nextRecord_;
+  QString lastSaveLocation_;
   VideoTime time_;
   bool runThread_{true};
   EventChannel waitEvent_{"video_wait", EventChannel::NotificationMode::UNICAST};
