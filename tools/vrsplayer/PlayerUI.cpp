@@ -362,7 +362,7 @@ void PlayerUI::savePreset() {
   bool ok;
   QString text = QInputDialog::getText(
                      nullptr,
-                     "Save Prset",
+                     "Save Preset",
                      "Preset Name:",
                      QLineEdit::Normal,
                      "",

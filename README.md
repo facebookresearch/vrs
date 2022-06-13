@@ -120,11 +120,11 @@ environment variable `QT_DIR=<path_to_qt>` to point to your Qt installation
 Note: We ran into strange build issues when Qt5 and Qt6 were both installed at
 the same time via Brew on macOS, but uninstalling either fixed the problem.
 
-### Qt 5 or QT 6?
+### Qt 5 or Qt 6
 
 At this time, vrsplayer is mostly tested using Qt 5.15.3 LTS, but the code has
-been updated to build and run with Qt 6.3.0. However, testing was pretty
-limited.
+been updated to build and run with Qt 6.3.0. However, testing with Qt 6 was
+pretty superficial.
 
 - Build everything & run tests:
 
@@ -239,7 +239,7 @@ vrsplayer requires an installation of Qt 5.15+ or Qt 6.3+ on your system, maybe
 using Brew (macOS) or APT (Linux), as demonstrated above, or using an official
 distribution from [Qt's official website](https://www.qt.io/download). If found,
 vrsplayer will be built and will link dynamically against the LGPL v3 Qt
-libraries.
+libraries at runtime.
 
 We provide no pre-built binaries, so you must build vrsplayer from source to use
 it.
