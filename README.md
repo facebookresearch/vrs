@@ -213,7 +213,8 @@ has many options,
 
 `vrsplayer` is a GUI tool which can "play" VRS files as multi-stream video files
 and audio files. It also provides ways to visualize record's metadata as they
-are played.
+are played. For more information, see the
+[`vrsplayer` documentation](https://facebookresearch.github.io/vrs/docs/vrsplayer).
 
 # Contributing
 
