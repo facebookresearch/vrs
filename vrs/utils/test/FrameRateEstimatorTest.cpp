@@ -34,29 +34,37 @@ inline uint32_t intFps(const vector<IndexRecord::RecordInfo>& index, vrs::Stream
 
 TEST_F(FrameRateEstimatorTest, frameRateEstimatorTest) {
   utils::FilteredFileReader filteredReaderTestOne;
-  utils::FilteredFileReader filteredReaderTestTwo;
   filteredReaderTestOne.setSource(
       os::pathJoin(coretech::getTestDataDir(), "VRS_Files/sample_file.vrs"));
-  filteredReaderTestTwo.setSource(
-      os::pathJoin(coretech::getTestDataDir(), "VRS_Files/VRSTestRecording.vrs"));
 
   utils::RecordFilterParams filterParams;
-  int statusOne = filteredReaderTestOne.openFile(filterParams);
-  ASSERT_EQ(0, statusOne);
+  int status = filteredReaderTestOne.openFile(filterParams);
+  ASSERT_EQ(0, status);
   const auto& index = filteredReaderTestOne.reader.getIndex();
 
   EXPECT_EQ(intFps(index, {RecordableTypeId::AudioStream, 1}), 90);
   EXPECT_EQ(intFps(index, {RecordableTypeId::ForwardCameraRecordableClass, 1}), 90);
   EXPECT_EQ(intFps(index, {RecordableTypeId::MotionRecordableClass, 1}), 90);
 
-  int statusTwo = filteredReaderTestTwo.openFile(filterParams);
-  ASSERT_EQ(0, statusTwo);
+  utils::FilteredFileReader filteredReaderTestTwo;
+  filteredReaderTestTwo.setSource(os::pathJoin(coretech::getTestDataDir(), "VRS_Files/chunks.vrs"));
+
+  status = filteredReaderTestTwo.openFile(filterParams);
+  ASSERT_EQ(0, status);
   const auto& index2 = filteredReaderTestTwo.reader.getIndex();
 
-  EXPECT_EQ(intFps(index2, {RecordableTypeId::Proto0IMUHAL, 1}), 501);
-  EXPECT_EQ(intFps(index2, {RecordableTypeId::Proto0ControllerSyncPulseHAL, 1}), 30);
-  EXPECT_EQ(intFps(index2, {RecordableTypeId::Proto0CameraHALSlam, 1}), 30);
-  EXPECT_EQ(intFps(index2, {RecordableTypeId::Proto0CameraHALSlam, 2}), 30);
-  EXPECT_EQ(intFps(index2, {RecordableTypeId::Proto0CameraHALSlam, 3}), 30);
-  EXPECT_EQ(intFps(index2, {RecordableTypeId::Proto0CameraHALSlam, 4}), 30);
+  EXPECT_EQ(intFps(index2, {RecordableTypeId::ForwardCameraRecordableClass, 1}), 96);
+  EXPECT_EQ(intFps(index2, {RecordableTypeId::MotionRecordableClass, 1}), 96);
+
+  utils::FilteredFileReader filteredReaderTestThree;
+  filteredReaderTestThree.setSource(
+      os::pathJoin(coretech::getTestDataDir(), "VRS_Files/simulated.vrs"));
+
+  status = filteredReaderTestThree.openFile(filterParams);
+  ASSERT_EQ(0, status);
+  const auto& index3 = filteredReaderTestThree.reader.getIndex();
+
+  EXPECT_EQ(intFps(index3, {RecordableTypeId::RgbCameraRecordableClass, 1}), 5);
+  EXPECT_EQ(intFps(index3, {RecordableTypeId::SlamCameraData, 1}), 15);
+  EXPECT_EQ(intFps(index3, {RecordableTypeId::SlamImuData, 1}), 1000);
 }
