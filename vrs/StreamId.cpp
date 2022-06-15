@@ -127,6 +127,7 @@ const map<RecordableTypeId, const char*>& getRecordableTypeIdRegistry() {
     {RecordableTypeId::MocapRecordableClass, "Mocap Data Class"},
     {RecordableTypeId::PointCloudRecordableClass, "Point Cloud Data Class"},
     {RecordableTypeId::MapRecordableClass, "Map Data Class"},
+    {RecordableTypeId::SensorVarianceBiasRecordableClass, "Sensor Variance/Bias Data Class"},
 
     /// << Annotations >>
     {RecordableTypeId::AnnotationRecordableClass, "Annotation Data Class"},

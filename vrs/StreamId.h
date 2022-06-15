@@ -149,6 +149,7 @@ enum class RecordableTypeId : uint16_t {
   MocapRecordableClass = 375, ///< For motion capture data streams.
   PointCloudRecordableClass = 376, ///< For point cloud data streams.
   MapRecordableClass = 377, ///< For map data streams.
+  SensorVarianceBiasRecordableClass = 378, /// For sensor variance/bias results.
 
   // << Annotations >>
   AnnotationRecordableClass = 400, ///< For annotation streams.
