@@ -22,6 +22,7 @@
 
 namespace vrs::utils {
 
+/// Estimate the framerate of a particular stream by examining the file's index only
 double frameRateEstimationFps(
     const std::vector<vrs::IndexRecord::RecordInfo>& index,
     vrs::StreamId id);

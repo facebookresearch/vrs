@@ -19,6 +19,9 @@
 #include <limits>
 #include <map>
 
+#define DEFAULT_LOG_CHANNEL "FrameRateEstimator"
+#include <logging/Log.h>
+
 #include <vrs/IndexRecord.h>
 
 using namespace std;
@@ -72,6 +75,8 @@ struct Bucket {
 
 namespace vrs::utils {
 
+#define LOG_BUCKETS 0 // for debugging purposes
+
 double frameRateEstimationFps(const vector<IndexRecord::RecordInfo>& index, vrs::StreamId id) {
   double start = std::numeric_limits<double>::max();
   map<uint32_t, Bucket> buckets;
@@ -114,6 +119,11 @@ double frameRateEstimationFps(const vector<IndexRecord::RecordInfo>& index, vrs:
     }
     return sum.getAverage();
   }
+#if LOG_BUCKETS
+  for (const auto& bucket : buckets) {
+    XR_LOGI("Bucket around {} ms: {} values", bucket.first, bucket.second.count);
+  }
+#endif
   // enough samples: accumulate buckets starting with the one with the most hits
   auto mostIter = buckets.find(maxBucketIndex);
   sum.add(mostIter->second);
@@ -146,6 +156,9 @@ double frameRateEstimationFps(const vector<IndexRecord::RecordInfo>& index, vrs:
       break;
     }
   }
+#if LOG_BUCKETS
+  XR_LOGI("Final Estimation: {:.02f} fps, {} ms", sum.getAverage(), int(1000. / sum.getAverage()));
+#endif
   return sum.getAverage();
 }
 
