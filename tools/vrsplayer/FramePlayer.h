@@ -84,6 +84,10 @@ class FramePlayer : public QObject, public VideoRecordFormatStreamPlayer {
   // Try to save. Returns true if the frame was saved, false if save happens on next frame read
   bool saveFrameNowOrOnNextRead(const std::string& path);
 
+  void setEstimatedFps(int estimatedFps) {
+    estimatedFps_ = estimatedFps;
+  }
+
   void imageJobsThreadActivity();
 
  public slots:
@@ -102,6 +106,7 @@ class FramePlayer : public QObject, public VideoRecordFormatStreamPlayer {
   bool blankMode_{true};
   bool firstImage_{true};
   string saveNextFramePath_;
+  int estimatedFps_;
   Fps dataFps_;
   FileReaderState state_{};
 

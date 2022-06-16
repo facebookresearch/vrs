@@ -132,6 +132,9 @@ bool FramePlayer::onImageRead(
       if (!frame->hasSamePixels(spec)) {
         fmt::print(" -> {}", frame->getSpec().asString());
       }
+      if (estimatedFps_ != 0) {
+        fmt::print(", {} fps", estimatedFps_);
+      }
       frame->blankFrame();
       blankMode_ = true;
     }

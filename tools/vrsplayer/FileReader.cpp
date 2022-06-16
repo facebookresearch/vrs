@@ -44,6 +44,7 @@
 #include <vrs/ErrorCode.h>
 #include <vrs/helpers/EnumStringConverter.h>
 #include <vrs/os/Utils.h>
+#include <vrs/utils/FrameRateEstimator.h>
 #include <vrs/utils/RecordFileInfo.h>
 
 #include "AudioPlayer.h"
@@ -294,9 +295,10 @@ vector<FrameWidget*> FileReader::openFile(QVBoxLayout* videoFrames, QWidget* wid
         if (fileReader_->mightContainImages(id)) {
           FrameWidget* frame = new FrameWidget();
           frame->setTypeToShow(recordType_);
-          FramePlayer* imageReader = new FramePlayer(id, frame);
-          fileReader_->setStreamPlayer(id, imageReader);
-          imageReaders_[id].reset(imageReader);
+          FramePlayer* player = new FramePlayer(id, frame);
+          fileReader_->setStreamPlayer(id, player);
+          player->setEstimatedFps(static_cast<int>(utils::frameRateEstimationFps(index, id) + 0.5));
+          imageReaders_[id].reset(player);
           connect(frame, &FrameWidget::orientationChanged, [this]() {
             if (layoutUpdatesEnabled_) {
               relayout();
@@ -308,8 +310,7 @@ vector<FrameWidget*> FileReader::openFile(QVBoxLayout* videoFrames, QWidget* wid
           connect(
               frame, &FrameWidget::shouldMoveAfter, [this, id]() { this->moveStream(id, false); });
           connect(frame, &FrameWidget::shouldSaveFrame, [this, id]() { this->saveFrame(id); });
-          connect(
-              this, &FileReader::mediaStateChanged, imageReader, &FramePlayer::mediaStateChanged);
+          connect(this, &FileReader::mediaStateChanged, player, &FramePlayer::mediaStateChanged);
           // decode first config & data record, to init the image size
           readFirstRecord(id, Record::Type::CONFIGURATION);
           readFirstRecord(id, Record::Type::STATE);
