@@ -7,7 +7,7 @@ import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
 
 VRS is a file format optimized to record and playback streams of sensor data, such as images, audio, and other discrete sensors (IMU, temperature, etc.), that are stored in per-device streams of time-stamped records.
 
-VRS was first created to record images and sensor data produced by early prototypes of the Quest device, to develop the device’s positional tracking system known as [Insight](https://ai.facebook.com/blog/powered-by-ai-oculus-insight/), Quest's hand tracking software, and more to come.
+VRS was first created to record images and sensor data produced by early prototypes of the [Meta Quest device](https://store.facebook.com/quest/products/quest-2), to develop the device’s positional tracking system known as [Oculus Insight](https://ai.facebook.com/blog/powered-by-ai-oculus-insight/), [Meta Quest 2's hand tracking](https://store.facebook.com/help/quest/articles/headsets-and-accessories/controllers-and-hand-tracking/hand-tracking-quest-2/), and more to come.
 
 [Project Aria](https://about.facebook.com/realitylabs/projectaria/) records its data as VRS files.
 
@@ -19,8 +19,8 @@ VRS is designed to record similar looking bundles of data produced repeatedly ov
 
   <TabItem value="good_cases" label="Good Use Cases" default>
 VRS is very well suited to record and playback:
-<li>Data produced by the cameras and sensors of a Quest device, including IMUs.</li>
-<li>Data produced by the cameras and sensors of an Aria device, including positional tracking cameras, eye tracking cameras, barometer sensors, GPS and BT beacons, multi-channel audio.</li>
+<li>Data produced by the cameras and sensors of a Meta Quest device, including IMUs.</li>
+<li>Data produced by the cameras and sensors of [Project Aria Glasses](https://about.facebook.com/realitylabs/projectaria/), including positional tracking cameras, eye tracking cameras, barometer sensors, GPS and BT beacons, multi-channel audio.</li>
 <li>Data produced in burst of activity, such as keyboard or mouse input data.</li>
 <li>TCP/IP or USB packets.</li>
   </TabItem>
