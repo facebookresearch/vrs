@@ -20,7 +20,7 @@ VRS is designed to record similar looking bundles of data produced repeatedly ov
   <TabItem value="good_cases" label="Good Use Cases" default>
 VRS is very well suited to record and playback:
 <li>Data produced by the cameras and sensors of a Meta Quest device, including IMUs.</li>
-<li>Data produced by the cameras and sensors of [Project Aria Glasses](https://about.facebook.com/realitylabs/projectaria/), including positional tracking cameras, eye tracking cameras, barometer sensors, GPS and BT beacons, multi-channel audio.</li>
+<li>Data produced by the cameras and sensors of Project Aria Glasses, including positional tracking cameras, eye tracking cameras, barometer sensors, GPS and BT beacons, multi-channel audio.</li>
 <li>Data produced in burst of activity, such as keyboard or mouse input data.</li>
 <li>TCP/IP or USB packets.</li>
   </TabItem>
