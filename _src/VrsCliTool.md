@@ -444,7 +444,7 @@ Note that images in RAW format will be saved as png files, and that this operati
 
 `extract-audio` will extract audio data in .wav files, one per stream.
 
-`extract-all` will extract images, audio data, and metadata. The medata is extracted in a single .jsons file that contains a succession of json messages, one per line. Each line corresponds to a single record, in timestamp order, so it is possible to parse it even if the number of records is huge. Saving all the data in a single file prevents saturating your disk with possibly millions of small files.
+`extract-all` will extract images, audio data, and metadata. The metadata is extracted in a single .jsons file that contains a succession of json messages, one per line. Each line corresponds to a single record, in timestamp order, so it is possible to parse it even if the number of records is huge. Saving all the data in a single file prevents saturating your disk with possibly millions of small files.
 
 Of course, the filtering options work with the extract commands, so you can extract only some of the streams, or only a few seconds of recording, etc. For instance, the following command will extract images from the `200-1` stream only, that are in the 10 first seconds of that stream, and at most 1 image per second of data.
 
@@ -521,7 +521,7 @@ vrs merge original.vrs original2.vrs original3.vrs --to new.vrs
 
 <!-- prettier-ignore -->
 :::danger
-Attention, while both `copy` and `merge` allow you to merge multiple files into a single output VRS file, their behavior is be very different!
+Attention, while both `copy` and `merge` allow you to merge multiple files into a single output VRS file, their behavior is very different!
 :::
 
 Because VRS files must have timestamps in a single time domain, it is assumed that all the files merged are using the same time domain, but effectively, no validation is performed for you: you need to know what you're doing!
