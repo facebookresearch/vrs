@@ -69,9 +69,9 @@ static const uint32_t kConfigurationVersion = 1;
 static const uint32_t kDataVersion = 1;
 
 struct FileConfig {
-  FileConfig(uint32_t frameRate_, uint32_t simulationDurationMs_) {
-    frameRate = frameRate_;
-    simulationDurationMs = simulationDurationMs_;
+  FileConfig(uint32_t _frameRate, uint32_t _simulationDurationMs) {
+    frameRate = _frameRate;
+    simulationDurationMs = _simulationDurationMs;
     frameCount = simulationDurationMs * frameRate / 1000;
     totalRecordCount = kCameraCount * (2 + frameCount);
   }
