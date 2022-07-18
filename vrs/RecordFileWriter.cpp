@@ -788,13 +788,6 @@ int RecordFileWriter::createFile(const string& filePath, bool splitHead) {
       // The rest of the file, which contains all the data records, can be written forward in one
       // pass, as it is being generated (no edits needed). In the upload case, the file's head will
       // need be uploaded and prepended to the uploaded data, after the file is closed.
-      if (spec.chunks.size() < 2) {
-        XR_LOGE(
-            "To write files with {}, you need to have at least 2 chunks "
-            "['file head temporary local path', 'upload destination']...",
-            spec.fileHandlerName);
-        return INVALID_FILE_SPEC;
-      }
       splitHead = true;
     }
     file_ = move(writeFile);
