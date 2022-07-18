@@ -32,6 +32,7 @@
 
 #include <vrs/helpers/FileMacros.h>
 #include <vrs/helpers/Strings.h>
+#include <vrs/os/Platform.h>
 #include <vrs/os/Utils.h>
 
 #include "Compressor.h"
@@ -392,6 +393,10 @@ int DiskFile::addChunk(const string& chunkFilePath) {
     lastError_ = errno;
     return lastError_;
   }
+#if IS_ANDROID_PLATFORM()
+  const size_t kBufferingSize = 128 * 1024;
+  IF_ERROR_LOG(setvbuf(newFile, nullptr, _IOFBF, kBufferingSize));
+#endif
   filesOpenCount_++;
   int64_t chunkOffset = 0;
   if (currentChunk_ != nullptr && currentChunk_->file != nullptr) {
