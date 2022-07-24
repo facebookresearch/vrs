@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <string>
+#include <vector>
 
 #include <vrs/os/Platform.h>
 
@@ -74,6 +75,7 @@ int makeDirectories(const std::string& dir);
 /// File path helpers
 bool isDir(const std::string& path);
 bool isFile(const std::string& path);
+std::vector<std::string> listDir(const std::string& dir);
 bool pathExists(const std::string& path);
 int64_t getFileSize(const std::string& path);
 std::string getFilename(const std::string& path);

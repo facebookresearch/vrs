@@ -66,6 +66,7 @@ constexpr auto kRegularFileType = boost::filesystem::file_type::regular_file;
 #endif
 
 using std::string;
+using std::vector;
 
 namespace vrs {
 namespace os {
@@ -332,6 +333,16 @@ bool isFile(const string& path) {
     return false;
   }
   return type == kRegularFileType; // Not supporting block-, character-, socket files
+}
+
+vector<string> listDir(const string& dir) {
+  vector<string> result;
+  if (isDir(dir)) {
+    for (const auto& entry : fs::directory_iterator(dir)) {
+      result.push_back(entry.path().string());
+    }
+  }
+  return result;
 }
 
 bool pathExists(const string& path) {
