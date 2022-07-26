@@ -23,7 +23,7 @@ import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import styles from './styles.module.css';
-import useThemeContext from '@theme/hooks/useThemeContext';
+import {useColorMode} from '@docusaurus/theme-common';
 
 const features = [
   {
@@ -74,13 +74,13 @@ function Feature({imageUrl, title, description}) {
 }
 
 function LogoImage() {
-  const {isDarkTheme} = useThemeContext();
+  const {colorMode} = useColorMode();
   const logoBlackText = useBaseUrl('img/VRS-Logo.svg');
   const logoWhiteText = useBaseUrl('img/VRS-Logo-DarkMode.svg');
   return (
     <img
       className={styles.vrsBanner}
-      src={isDarkTheme ? logoBlackText : logoWhiteText}
+      src={colorMode === 'dark' ? logoBlackText : logoWhiteText}
       alt="VRS Logo"
       width="600"
     />

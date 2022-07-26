@@ -18,7 +18,7 @@
 
 // Force staticdocs rebuild #1
 
-const {fbContent, fbInternalOnly} = require('internaldocs-fb-helpers');
+const {fbContent, fbInternalOnly} = require('docusaurus-plugin-internaldocs-fb/internal');
 const repoUrl = 'https://github.com/facebookresearch/vrs';
 
 // With JSDoc @type annotations, IDEs can provide config autocompletion
