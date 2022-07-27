@@ -21,7 +21,7 @@ jobs:
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
             sudo apt-get install \
-              cmake ninja-build ccache libgtest-dev libfmt-dev libcereal-dev \
+              cmake ninja-build ccache libgtest-dev libgmock-dev libfmt-dev libcereal-dev \
               libjpeg-dev libpng-dev \
               liblz4-dev libzstd-dev libxxhash-dev \
               libboost-system-dev libboost-filesystem-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev \
