@@ -19,8 +19,6 @@
 #include <algorithm>
 #include <fstream>
 
-#include <gmock/gmock-matchers.h>
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <TestDataDir/TestDataDir.h>
@@ -33,7 +31,6 @@
 
 using namespace std;
 using namespace vrs;
-using ::testing::UnorderedElementsAreArray;
 
 struct FileTest : testing::Test {
   FileTest() {}
@@ -235,15 +232,14 @@ TEST_F(FileTest, testFileResize) {
 }
 
 TEST_F(FileTest, testListDir) {
-  string testDir = os::pathJoin(testDataDir, "filetest", "testlistdir");
-  os::remove(testDir);
-  EXPECT_EQ(os::makeDirectories(testDir), 0);
+  string testDir = os::pathJoin(os::getTempFolder(), "filetest", "testlistdir");
+  ASSERT_EQ(os::makeDirectories(testDir), 0);
   vector<string> expectedFiles = {
       os::pathJoin(testDir, "a.txt"),
       os::pathJoin(testDir, "b.txt"),
       os::pathJoin(testDir, "c.txt")};
   for (const string& name : expectedFiles) {
-    EXPECT_EQ(os::fileClose(os::fileOpen(name, "w")), 0);
+    ASSERT_EQ(os::fileClose(os::fileOpen(name, "w")), 0);
   }
   vector<string> files = os::listDir(testDir);
   for (string& name : files) {
@@ -251,5 +247,7 @@ TEST_F(FileTest, testListDir) {
     // Windows platforms.
     std::replace(name.begin(), name.end(), '\\', '/');
   }
-  ASSERT_THAT(files, UnorderedElementsAreArray(expectedFiles));
+  sort(files.begin(), files.end());
+  sort(expectedFiles.begin(), expectedFiles.end());
+  EXPECT_EQ(files, expectedFiles);
 }
