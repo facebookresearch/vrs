@@ -19,8 +19,6 @@
 #include <algorithm>
 #include <fstream>
 
-#include <gmock/gmock-matchers.h>
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <TestDataDir/TestDataDir.h>
@@ -33,7 +31,6 @@
 
 using namespace std;
 using namespace vrs;
-using ::testing::UnorderedElementsAreArray;
 
 struct FileTest : testing::Test {
   FileTest() {}
@@ -251,5 +248,7 @@ TEST_F(FileTest, testListDir) {
     // Windows platforms.
     std::replace(name.begin(), name.end(), '\\', '/');
   }
-  ASSERT_THAT(files, UnorderedElementsAreArray(expectedFiles));
+  sort(files.begin(), files.end());
+  sort(expectedFiles.begin(), expectedFiles.end());
+  EXPECT_EQ(files, expectedFiles);
 }
