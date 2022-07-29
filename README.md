@@ -91,7 +91,7 @@ doesn't install recent enough versions of cmake, fmt, lz4, and zstd._
 
 - install tools & libraries:
   ```
-  sudo apt-get install cmake ninja-build ccache libgtest-dev libfmt-dev libcereal-dev libjpeg-dev libpng-dev
+  sudo apt-get install cmake ninja-build ccache libgtest-dev libgmock-dev libfmt-dev libcereal-dev libjpeg-dev libpng-dev
   sudo apt-get install liblz4-dev libzstd-dev libxxhash-dev
   sudo apt-get install libboost-system-dev libboost-filesystem-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev
   sudo apt-get install qtbase5-dev portaudio19-dev # for vrsplayer
