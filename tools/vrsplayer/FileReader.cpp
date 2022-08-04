@@ -68,6 +68,7 @@ struct FileReaderStateConverter : public EnumStringConverter<
 
 QString kLastMaxPerRow("last_max_per_row");
 QString kVisibleStreams("visible_streams");
+QString kDefaultPreset("Default"); // name shown in the UI
 QString kLastConfiguration("last_configuration");
 QString kLayoutPresets("layout_presets");
 
@@ -345,7 +346,7 @@ vector<FrameWidget*> FileReader::openFile(QVBoxLayout* videoFrames, QWidget* wid
         }
       }
     }
-    restoreCurrentConfig();
+    restoreDefaultConfig();
     sanitizeVisibleStreams();
     setTimeRange(startTime, endTime, firstDataRecordIndex);
     if (!imageReaders_.empty()) {
@@ -1130,7 +1131,11 @@ void FileReader::layoutConfigChanged() {
       configurationAsVariant());
 }
 
-void FileReader::restoreCurrentConfig() {
+void FileReader::restoreDefaultConfig() {
+  if (layoutPresets_.contains(kDefaultPreset)) {
+    applyConfiguration(layoutPresets_[kDefaultPreset]);
+    return;
+  }
   QVariant currentConfig = fileConfig_->value(kLastConfiguration);
   if (!currentConfig.isValid()) {
     // restore previous settings

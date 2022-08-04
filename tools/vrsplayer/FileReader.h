@@ -171,7 +171,7 @@ class FileReader : public QObject {
   QVariant configurationAsVariant();
   void applyConfiguration(const QVariant& config);
   void layoutConfigChanged();
-  void restoreCurrentConfig();
+  void restoreDefaultConfig();
   int readRecordIfNeeded(const vrs::IndexRecord::RecordInfo& record, size_t recordIndex, bool log);
   QString getInitialSaveLocation();
 
