@@ -41,6 +41,7 @@ struct RecordInfo;
 class RecordFormat;
 class DataLayout;
 class ContentBlock;
+struct CurrentRecord;
 enum class ContentType : uint8_t;
 enum class ImageFormat : uint8_t;
 enum class PixelFormat : uint8_t;
