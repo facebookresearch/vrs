@@ -17,6 +17,7 @@
 #pragma once
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -30,6 +31,7 @@ using std::move;
 using std::pair;
 using std::string;
 using std::tuple;
+using std::unique_ptr;
 using std::vector;
 
 /// Type of a record's block.
@@ -552,6 +554,52 @@ class ContentBlock {
   AudioContentBlockSpec audioSpec_;
 };
 
+/// Map a pair of record type/format version to a record format, for a particular stream.
+typedef map<pair<Record::Type, uint32_t>, RecordFormat> RecordFormatMap;
+
+/// \brief Helper to identify a particular content block within a file.
+///
+/// A ContentBlock is the part of a record, a defined by RecordFormat.
+/// A ContentBlock is uniquely identified by this combo:
+/// - a recordable type id,
+/// - a record type,
+/// - a record format version,
+/// - a block index.
+class ContentBlockId {
+ public:
+  ContentBlockId(
+      RecordableTypeId typeId,
+      Record::Type recordType,
+      uint32_t formatVersion,
+      size_t blockIndex)
+      : typeId(typeId),
+        recordType(recordType),
+        formatVersion(formatVersion),
+        blockIndex(blockIndex) {}
+
+  RecordableTypeId getRecordableTypeId() const {
+    return typeId;
+  }
+
+  Record::Type getRecordType() const {
+    return recordType;
+  }
+
+  uint32_t getFormatVersion() const {
+    return formatVersion;
+  }
+
+  size_t getBlockIndex() const {
+    return blockIndex;
+  }
+
+ private:
+  RecordableTypeId typeId;
+  Record::Type recordType;
+  uint32_t formatVersion;
+  size_t blockIndex;
+};
+
 /// \brief Description of the format of a VRS record as a succession of typed blocks of content.
 ///
 /// A RecordFormat description can be associated with each record type & record format version,
@@ -696,54 +744,25 @@ class RecordFormat {
       Record::Type& recordType,
       uint32_t& formatVersion);
 
- private:
-  vector<ContentBlock> blocks_;
-};
-
-/// Map a pair of record type/format version to a record format, for a particular stream.
-typedef map<pair<Record::Type, uint32_t>, RecordFormat> RecordFormatMap;
-
-/// \brief Helper to identify a particular content block within a file.
-///
-/// A ContentBlock is the part of a record, a defined by RecordFormat.
-/// A ContentBlock is uniquely identified by this combo:
-/// - a recordable type id,
-/// - a record type,
-/// - a record format version,
-/// - a block index.
-class ContentBlockId {
- public:
-  ContentBlockId(
-      RecordableTypeId typeId,
+  /// VRS internal utility to add record format definitions to a container.
+  /// This container might be the VRS tags for a Recordable, or a legacy registry.
+  static bool addRecordFormat(
+      map<string, string>& inOutRecordFormatRegister,
       Record::Type recordType,
       uint32_t formatVersion,
-      size_t blockIndex)
-      : typeId(typeId),
-        recordType(recordType),
-        formatVersion(formatVersion),
-        blockIndex(blockIndex) {}
+      const RecordFormat& format,
+      const vector<const DataLayout*>& layouts);
 
-  RecordableTypeId getRecordableTypeId() const {
-    return typeId;
-  }
+  static void getRecordFormats(
+      const map<string, string>& recordFormatRegister,
+      RecordFormatMap& outFormats);
 
-  Record::Type getRecordType() const {
-    return recordType;
-  }
-
-  uint32_t getFormatVersion() const {
-    return formatVersion;
-  }
-
-  size_t getBlockIndex() const {
-    return blockIndex;
-  }
+  static unique_ptr<DataLayout> getDataLayout(
+      const map<string, string>& recordFormatRegister,
+      const ContentBlockId& blockId);
 
  private:
-  RecordableTypeId typeId;
-  Record::Type recordType;
-  uint32_t formatVersion;
-  size_t blockIndex;
+  vector<ContentBlock> blocks_;
 };
 
 } // namespace vrs

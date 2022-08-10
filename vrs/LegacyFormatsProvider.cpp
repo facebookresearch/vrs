@@ -42,11 +42,11 @@ RecordFormatRegistrar& RecordFormatRegistrar::getInstance() {
 void RecordFormatRegistrar::getLegacyRecordFormats(
     RecordableTypeId id,
     RecordFormatMap& outFormats) {
-  getRecordFormats(getLegacyRegistry(id), outFormats);
+  RecordFormat::getRecordFormats(getLegacyRegistry(id), outFormats);
 }
 
 unique_ptr<DataLayout> RecordFormatRegistrar::getLegacyDataLayout(const ContentBlockId& blockId) {
-  return getDataLayout(getLegacyRegistry(blockId.getRecordableTypeId()), blockId);
+  return RecordFormat::getDataLayout(getLegacyRegistry(blockId.getRecordableTypeId()), blockId);
 }
 
 unique_ptr<DataLayout> RecordFormatRegistrar::getLatestDataLayout(
@@ -62,7 +62,7 @@ unique_ptr<DataLayout> RecordFormatRegistrar::getLatestDataLayout(
       // start from the back, as the first DataLayout blocks are deemed less relevant (arbitrary).
       while (block-- > 0) { // carefully iterate backwards with an unsigned index
         if (format.getContentBlock(block).getContentType() == ContentType::DATA_LAYOUT) {
-          unique_ptr<DataLayout> layout = getDataLayout(
+          unique_ptr<DataLayout> layout = RecordFormat::getDataLayout(
               legacyRecordFormats_[typeId], {typeId, recordType, iter->first.second, block});
           if (layout) {
             return layout;
@@ -72,75 +72,6 @@ unique_ptr<DataLayout> RecordFormatRegistrar::getLatestDataLayout(
     }
   }
   return {};
-}
-
-bool RecordFormatRegistrar::addRecordFormat(
-    map<string, string>& inOutRecordFormatRegister,
-    Record::Type recordType,
-    uint32_t formatVersion,
-    const RecordFormat& format,
-    const vector<const DataLayout*>& layouts) {
-  inOutRecordFormatRegister[RecordFormat::getRecordFormatTagName(recordType, formatVersion)] =
-      format.asString();
-  for (size_t index = 0; index < layouts.size(); ++index) {
-    const DataLayout* layout = layouts[index];
-    if (layout != nullptr) {
-      inOutRecordFormatRegister[RecordFormat::getDataLayoutTagName(
-          recordType, formatVersion, index)] = layout->asJson();
-    }
-  }
-  bool allGood = true;
-  // It's too easy to tell in RecordFormat that you're using a DataLayout,
-  // and not specify that DataLayout (or at the wrong index). Let's warn the VRS user!
-  size_t usedBlocks = format.getUsedBlocksCount();
-  size_t maxIndex = max<size_t>(usedBlocks, layouts.size());
-  for (size_t index = 0; index < maxIndex; ++index) {
-    if (index < usedBlocks &&
-        format.getContentBlock(index).getContentType() == ContentType::DATA_LAYOUT) {
-      if (index >= layouts.size() || layouts[index] == nullptr) {
-        XR_LOGE(
-            "Missing DataLayout definition for Type:{}, FormatVersion:{}, Block #{}",
-            toString(recordType),
-            formatVersion,
-            index);
-        allGood = false;
-      }
-    } else if (index < layouts.size() && layouts[index] != nullptr) {
-      XR_LOGE(
-          "DataLayout definition provided from non-DataLayout block. "
-          "Type: {}, FormatVersion:{}, Layout definition index:{}",
-          toString(recordType),
-          formatVersion,
-          index);
-      allGood = false;
-    }
-  }
-  return allGood;
-}
-
-void RecordFormatRegistrar::getRecordFormats(
-    const map<string, string>& recordFormatRegister,
-    RecordFormatMap& outFormats) {
-  for (const auto& tag : recordFormatRegister) {
-    Record::Type recordType;
-    uint32_t formatVersion;
-    if (RecordFormat::parseRecordFormatTagName(tag.first, recordType, formatVersion) &&
-        outFormats.find({recordType, formatVersion}) == outFormats.end()) {
-      outFormats[{recordType, formatVersion}].set(tag.second);
-    }
-  }
-}
-
-unique_ptr<DataLayout> RecordFormatRegistrar::getDataLayout(
-    const map<string, string>& recordFormatRegister,
-    const ContentBlockId& blockId) {
-  string tagName = RecordFormat::getDataLayoutTagName(
-      blockId.getRecordType(), blockId.getFormatVersion(), blockId.getBlockIndex());
-  const auto iter = recordFormatRegister.find(tagName);
-  if (iter != recordFormatRegister.end()) {
-    return DataLayout::makeFromJson(iter->second);
-  }
-  return nullptr;
 }
 
 const map<string, string>& RecordFormatRegistrar::getLegacyRegistry(RecordableTypeId typeId) {

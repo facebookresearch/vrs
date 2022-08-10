@@ -16,7 +16,7 @@
 
 #include "Recordable.h"
 #include "DataLayout.h"
-#include "LegacyFormatsProvider.h"
+#include "RecordFormat.h"
 
 #define DEFAULT_LOG_CHANNEL "Recordable"
 #include <logging/Checks.h>
@@ -49,8 +49,7 @@ bool Recordable::addRecordFormat(
     uint32_t formatVersion,
     const RecordFormat& format,
     vector<const DataLayout*> layouts) {
-  return RecordFormatRegistrar::addRecordFormat(
-      tags_.vrs, recordType, formatVersion, format, layouts);
+  return RecordFormat::addRecordFormat(tags_.vrs, recordType, formatVersion, format, layouts);
 }
 
 void Recordable::setTag(const string& tagName, const string& tagValue) {

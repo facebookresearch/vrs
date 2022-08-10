@@ -798,7 +798,7 @@ bool RecordFileReader::getRecordFormat(
 
 uint32_t RecordFileReader::getRecordFormats(StreamId streamId, RecordFormatMap& outFormats) const {
   outFormats.clear();
-  RecordFormatRegistrar::getRecordFormats(getTags(streamId).vrs, outFormats);
+  RecordFormat::getRecordFormats(getTags(streamId).vrs, outFormats);
   RecordFormatRegistrar::getInstance().getLegacyRecordFormats(streamId.getTypeId(), outFormats);
   return static_cast<uint32_t>(outFormats.size());
 }
@@ -807,7 +807,7 @@ unique_ptr<DataLayout> RecordFileReader::getDataLayout(
     StreamId streamId,
     const ContentBlockId& blockId) const {
   const map<string, string>& vrsTags = getTags(streamId).vrs;
-  unique_ptr<DataLayout> layout = RecordFormatRegistrar::getDataLayout(vrsTags, blockId);
+  unique_ptr<DataLayout> layout = RecordFormat::getDataLayout(vrsTags, blockId);
   if (!layout) {
     layout = RecordFormatRegistrar::getInstance().getLegacyDataLayout(blockId);
   }

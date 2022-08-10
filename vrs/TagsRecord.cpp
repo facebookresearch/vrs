@@ -20,7 +20,7 @@
 #include <logging/Log.h>
 
 #include "DescriptionRecord.h"
-#include "LegacyFormatsProvider.h"
+#include "RecordFormat.h"
 #include "Recordable.h"
 
 namespace vrs {
@@ -41,7 +41,7 @@ void TagsRecordPlayer::prepareToReadTagsFor(StreamId id) {
   readers_[tuple<StreamId, Record::Type, uint32_t>(
                id, Record::Type::TAGS, TagsRecord::kTagsVersion)]
       .recordFormat = tags_.getContentBlock();
-  RecordFormatRegistrar::addRecordFormat(
+  RecordFormat::addRecordFormat(
       streamTags_[id].vrs,
       Record::Type::TAGS,
       TagsRecord::kTagsVersion,

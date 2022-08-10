@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include "RecordFormat.h"
 
 namespace vrs {
@@ -70,23 +68,6 @@ class RecordFormatRegistrar {
   /// that information. Therefore, approximate matches are better than nothing.
   unique_ptr<DataLayout> getLatestDataLayout(RecordableTypeId typeId, Record::Type recordType);
 
-  /// VRS internal utility to add record format definitions to a container.
-  /// This container might be the VRS tags for a Recordable, or a legacy registry.
-  static bool addRecordFormat(
-      map<string, string>& inOutRecordFormatRegister,
-      Record::Type recordType,
-      uint32_t formatVersion,
-      const RecordFormat& format,
-      const vector<const DataLayout*>& layouts);
-
-  static void getRecordFormats(
-      const map<string, string>& recordFormatRegister,
-      RecordFormatMap& outFormats);
-
-  static unique_ptr<DataLayout> getDataLayout(
-      const map<string, string>& recordFormatRegister,
-      const ContentBlockId& blockId);
-
   /// VRS internal method to register a legacy record format. Do not call directly.
   /// @internal
   bool addLegacyRecordFormat(
@@ -95,7 +76,7 @@ class RecordFormatRegistrar {
       uint32_t formatVersion,
       const RecordFormat& format,
       const vector<const DataLayout*>& layouts) {
-    return addRecordFormat(
+    return RecordFormat::addRecordFormat(
         legacyRecordFormats_[typeId], recordType, formatVersion, format, layouts);
   }
 

@@ -28,6 +28,7 @@
 #define DEFAULT_LOG_CHANNEL "RecordFormat"
 #include <logging/Log.h>
 
+#include <vrs/DataLayout.h>
 #include <vrs/helpers/EnumStringConverter.h>
 
 using namespace std;
@@ -1047,6 +1048,75 @@ bool RecordFormat::parseRecordFormatTagName(
     XR_LOGE("Failed to parse '{}'.", str);
   }
   return parseSuccess && *str == 0;
+}
+
+bool RecordFormat::addRecordFormat(
+    map<string, string>& inOutRecordFormatRegister,
+    Record::Type recordType,
+    uint32_t formatVersion,
+    const RecordFormat& format,
+    const vector<const DataLayout*>& layouts) {
+  inOutRecordFormatRegister[RecordFormat::getRecordFormatTagName(recordType, formatVersion)] =
+      format.asString();
+  for (size_t index = 0; index < layouts.size(); ++index) {
+    const DataLayout* layout = layouts[index];
+    if (layout != nullptr) {
+      inOutRecordFormatRegister[RecordFormat::getDataLayoutTagName(
+          recordType, formatVersion, index)] = layout->asJson();
+    }
+  }
+  bool allGood = true;
+  // It's too easy to tell in RecordFormat that you're using a DataLayout,
+  // and not specify that DataLayout (or at the wrong index). Let's warn the VRS user!
+  size_t usedBlocks = format.getUsedBlocksCount();
+  size_t maxIndex = max<size_t>(usedBlocks, layouts.size());
+  for (size_t index = 0; index < maxIndex; ++index) {
+    if (index < usedBlocks &&
+        format.getContentBlock(index).getContentType() == ContentType::DATA_LAYOUT) {
+      if (index >= layouts.size() || layouts[index] == nullptr) {
+        XR_LOGE(
+            "Missing DataLayout definition for Type:{}, FormatVersion:{}, Block #{}",
+            toString(recordType),
+            formatVersion,
+            index);
+        allGood = false;
+      }
+    } else if (index < layouts.size() && layouts[index] != nullptr) {
+      XR_LOGE(
+          "DataLayout definition provided from non-DataLayout block. "
+          "Type: {}, FormatVersion:{}, Layout definition index:{}",
+          toString(recordType),
+          formatVersion,
+          index);
+      allGood = false;
+    }
+  }
+  return allGood;
+}
+
+void RecordFormat::getRecordFormats(
+    const map<string, string>& recordFormatRegister,
+    RecordFormatMap& outFormats) {
+  for (const auto& tag : recordFormatRegister) {
+    Record::Type recordType;
+    uint32_t formatVersion;
+    if (RecordFormat::parseRecordFormatTagName(tag.first, recordType, formatVersion) &&
+        outFormats.find({recordType, formatVersion}) == outFormats.end()) {
+      outFormats[{recordType, formatVersion}].set(tag.second);
+    }
+  }
+}
+
+unique_ptr<DataLayout> RecordFormat::getDataLayout(
+    const map<string, string>& recordFormatRegister,
+    const ContentBlockId& blockId) {
+  string tagName = RecordFormat::getDataLayoutTagName(
+      blockId.getRecordType(), blockId.getFormatVersion(), blockId.getBlockIndex());
+  const auto iter = recordFormatRegister.find(tagName);
+  if (iter != recordFormatRegister.end()) {
+    return DataLayout::makeFromJson(iter->second);
+  }
+  return nullptr;
 }
 
 string toString(ContentType contentType) {
