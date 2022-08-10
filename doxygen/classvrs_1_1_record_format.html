@@ -164,6 +164,14 @@ static string&#160;</td><td class="memItemRight" valign="bottom"><b>getDataLayou
 <tr class="separator:a3b2e8d681bfdcc57896fe0f248786f10"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d5f442664f607cdc28cb51f008ebed8"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_format.html#a1d5f442664f607cdc28cb51f008ebed8">parseRecordFormatTagName</a> (const string &amp;tagName, <a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> &amp;recordType, uint32_t &amp;formatVersion)</td></tr>
 <tr class="separator:a1d5f442664f607cdc28cb51f008ebed8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4bb88867e1f983ab46cf8cff83b4e69f"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_format.html#a4bb88867e1f983ab46cf8cff83b4e69f">addRecordFormat</a> (map&lt; string, string &gt; &amp;inOutRecordFormatRegister, <a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> recordType, uint32_t formatVersion, const <a class="el" href="classvrs_1_1_record_format.html">RecordFormat</a> &amp;format, const vector&lt; const <a class="el" href="classvrs_1_1_data_layout.html">DataLayout</a> * &gt; &amp;layouts)</td></tr>
+<tr class="separator:a4bb88867e1f983ab46cf8cff83b4e69f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a62594b4d2f1e4209fa3797eaff78ecfe"><td class="memItemLeft" align="right" valign="top"><a id="a62594b4d2f1e4209fa3797eaff78ecfe"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>getRecordFormats</b> (const map&lt; string, string &gt; &amp;recordFormatRegister, <a class="el" href="namespacevrs.html#a952b31358e6db377269e28e77ba53100">RecordFormatMap</a> &amp;outFormats)</td></tr>
+<tr class="separator:a62594b4d2f1e4209fa3797eaff78ecfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec742d59daaa246af44bd40b4e95bfb6"><td class="memItemLeft" align="right" valign="top"><a id="aec742d59daaa246af44bd40b4e95bfb6"></a>
+static unique_ptr&lt; <a class="el" href="classvrs_1_1_data_layout.html">DataLayout</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getDataLayout</b> (const map&lt; string, string &gt; &amp;recordFormatRegister, const <a class="el" href="classvrs_1_1_content_block_id.html">ContentBlockId</a> &amp;blockId)</td></tr>
+<tr class="separator:aec742d59daaa246af44bd40b4e95bfb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Description of the format of a VRS record as a succession of typed blocks of content. </p>
@@ -269,6 +277,61 @@ static string&#160;</td><td class="memItemRight" valign="bottom"><b>getDataLayou
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="a4bb88867e1f983ab46cf8cff83b4e69f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4bb88867e1f983ab46cf8cff83b4e69f">&#9670;&nbsp;</a></span>addRecordFormat()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool vrs::RecordFormat::addRecordFormat </td>
+          <td>(</td>
+          <td class="paramtype">map&lt; string, string &gt; &amp;&#160;</td>
+          <td class="paramname"><em>inOutRecordFormatRegister</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a>&#160;</td>
+          <td class="paramname"><em>recordType</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>formatVersion</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classvrs_1_1_record_format.html">RecordFormat</a> &amp;&#160;</td>
+          <td class="paramname"><em>format</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const vector&lt; const <a class="el" href="classvrs_1_1_data_layout.html">DataLayout</a> * &gt; &amp;&#160;</td>
+          <td class="paramname"><em>layouts</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>VRS internal utility to add record format definitions to a container. This container might be the VRS tags for a <a class="el" href="classvrs_1_1_recordable.html" title="Class to override to implement a record producing device, or virtual device.">Recordable</a>, or a legacy registry. </p>
+
+</div>
+</div>
 <a id="af68349884716c4b1a5905651d1619e5c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af68349884716c4b1a5905651d1619e5c">&#9670;&nbsp;</a></span>asString()</h2>
 

@@ -98,14 +98,6 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:a3b33ca51bf0e2f9cdc0e520f172e79f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2a79405605799c2ff55740382013db8c"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classvrs_1_1_record_format_registrar.html">RecordFormatRegistrar</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_format_registrar.html#a2a79405605799c2ff55740382013db8c">getInstance</a> ()</td></tr>
 <tr class="separator:a2a79405605799c2ff55740382013db8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1566ca72683319c170e5b921dbfb0226"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_format_registrar.html#a1566ca72683319c170e5b921dbfb0226">addRecordFormat</a> (map&lt; string, string &gt; &amp;inOutRecordFormatRegister, <a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> recordType, uint32_t formatVersion, const <a class="el" href="classvrs_1_1_record_format.html">RecordFormat</a> &amp;format, const vector&lt; const <a class="el" href="classvrs_1_1_data_layout.html">DataLayout</a> * &gt; &amp;layouts)</td></tr>
-<tr class="separator:a1566ca72683319c170e5b921dbfb0226"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a158a959a0543934b6db42b2e0c1112cf"><td class="memItemLeft" align="right" valign="top"><a id="a158a959a0543934b6db42b2e0c1112cf"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>getRecordFormats</b> (const map&lt; string, string &gt; &amp;recordFormatRegister, <a class="el" href="namespacevrs.html#a952b31358e6db377269e28e77ba53100">RecordFormatMap</a> &amp;outFormats)</td></tr>
-<tr class="separator:a158a959a0543934b6db42b2e0c1112cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abb1523df07e3aa9112aff5eeecc3eab0"><td class="memItemLeft" align="right" valign="top"><a id="abb1523df07e3aa9112aff5eeecc3eab0"></a>
-static unique_ptr&lt; <a class="el" href="classvrs_1_1_data_layout.html">DataLayout</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getDataLayout</b> (const map&lt; string, string &gt; &amp;recordFormatRegister, const <a class="el" href="classvrs_1_1_content_block_id.html">ContentBlockId</a> &amp;blockId)</td></tr>
-<tr class="separator:abb1523df07e3aa9112aff5eeecc3eab0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Utility class to handle record format registry manipulations. </p>
@@ -162,61 +154,6 @@ static unique_ptr&lt; <a class="el" href="classvrs_1_1_data_layout.html">DataLay
 </table>
 </div><div class="memdoc">
 <p>VRS internal method to register a legacy record format. Do not call directly. </p>
-
-</div>
-</div>
-<a id="a1566ca72683319c170e5b921dbfb0226"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1566ca72683319c170e5b921dbfb0226">&#9670;&nbsp;</a></span>addRecordFormat()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool vrs::RecordFormatRegistrar::addRecordFormat </td>
-          <td>(</td>
-          <td class="paramtype">map&lt; string, string &gt; &amp;&#160;</td>
-          <td class="paramname"><em>inOutRecordFormatRegister</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a>&#160;</td>
-          <td class="paramname"><em>recordType</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>formatVersion</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classvrs_1_1_record_format.html">RecordFormat</a> &amp;&#160;</td>
-          <td class="paramname"><em>format</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const vector&lt; const <a class="el" href="classvrs_1_1_data_layout.html">DataLayout</a> * &gt; &amp;&#160;</td>
-          <td class="paramname"><em>layouts</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>VRS internal utility to add record format definitions to a container. This container might be the VRS tags for a <a class="el" href="classvrs_1_1_recordable.html" title="Class to override to implement a record producing device, or virtual device.">Recordable</a>, or a legacy registry. </p>
 
 </div>
 </div>
