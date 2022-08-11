@@ -225,7 +225,7 @@ int filterMerge(
           reader.setStreamPlayer(id, existingCopiers[index]);
           Writer& writer = existingCopiers[index]->getWriter();
           // merge new user & vrs tags into the existing stream tags
-          const StreamTags& writtenTags = writer.getRecordableTags();
+          const StreamTags& writtenTags = writer.getStreamTags();
           const StreamTags& newTags = reader.getTags(id);
           StreamTags streamTags;
           string tagSource = id.getName() + " of " + recordFilter->path;

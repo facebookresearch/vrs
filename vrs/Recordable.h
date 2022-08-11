@@ -185,7 +185,7 @@ class Recordable {
   }
   /// Get all the tags at once, both internal & user tags.
   /// @return All the user and VRS tags.
-  const StreamTags& getRecordableTags() const {
+  const StreamTags& getStreamTags() const {
     return tags_;
   }
 

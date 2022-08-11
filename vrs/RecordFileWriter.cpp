@@ -270,7 +270,7 @@ void RecordFileWriter::addRecordable(Recordable* recordable) {
   if (isWriting()) {
     // The file has been created already, so we must create a TagsRecord for the recordable's tags.
     TagsRecord tagsRecord;
-    const StreamTags& tags = recordable->getRecordableTags();
+    const StreamTags& tags = recordable->getStreamTags();
     tagsRecord.userTags.stage(tags.user);
     tagsRecord.vrsTags.stage(tags.vrs);
     recordable->createRecord(
@@ -807,7 +807,7 @@ int RecordFileWriter::createFile(const string& filePath, bool splitHead) {
   IF_ERROR_LOG_CLOSE_AND_RETURN(head.write(fileHeader_))
   map<StreamId, const StreamTags*> streamTags;
   for (auto* recordable : getRecordables()) {
-    streamTags[recordable->getStreamId()] = &(recordable->getRecordableTags());
+    streamTags[recordable->getStreamId()] = &(recordable->getStreamTags());
     indexRecordWriter_.addStream(recordable->getStreamId());
   }
   lastRecordSize_ = 0;
