@@ -257,6 +257,11 @@ class Recordable {
         : recordManager_.createRecord(timestampSec, recordType, formatVersion, data);
   }
 
+  /// When direct edits of VRS tags is conventient (record filters)
+  map<string, string>& getVRSTags() {
+    return tags_.vrs;
+  }
+
  private:
   const RecordableTypeId typeId_;
   const uint16_t instanceId_;

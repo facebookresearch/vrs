@@ -91,6 +91,10 @@ class Writer : public Recordable {
   const Record* createRecord(const CurrentRecord& record, DataSource& source);
   const Record*
   createRecord(double timestamp, Record::Type type, uint32_t formatVersion, DataSource& src);
+
+  map<string, string>& getVRSTags() {
+    return Recordable::getVRSTags();
+  }
 };
 
 // Helper to copy a RecordFileReader's given stream's records, to a RecordFileWriter.
@@ -212,6 +216,11 @@ class RecordFilterCopier : public RecordFormatStreamPlayer {
   // Called after all the content chunks have been received. By default, write-out new record.
   virtual void finishRecordProcessing(const CurrentRecord& record);
 
+  // For advanced operateions, like altering RecordFormat definitions
+  Writer& getWriter() {
+    return writer_;
+  }
+
  protected:
   bool processRecordHeader(const CurrentRecord& record, DataReference& outDataReference) override;
   void processRecord(const CurrentRecord& record, uint32_t readSize) override;
@@ -221,9 +230,6 @@ class RecordFilterCopier : public RecordFormatStreamPlayer {
   bool onUnsupportedBlock(const CurrentRecord& record, size_t idx, const ContentBlock& cb) override;
   /// after processing a datalayout, make sure it's written out in the record
   void pushDataLayout(DataLayout& dataLayout);
-  Writer& getWriter() {
-    return writer_;
-  }
 
   Writer writer_;
   RecordFileWriter& fileWriter_;
