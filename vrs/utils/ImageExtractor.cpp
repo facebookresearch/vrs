@@ -54,22 +54,9 @@ bool writeImage(
     uint32_t imageCounter,
     double timeStamp) {
   const auto& imageFormat = imageContectBlockSpec.getImageFormat();
-  if (!XR_VERIFY(
-          imageFormat == ImageFormat::JPG || imageFormat == ImageFormat::PNG ||
-          imageFormat == ImageFormat::RAW || imageFormat == ImageFormat::VIDEO)) {
-    return false; // unsupported formats
-  }
   string filenamePostfix;
   string extension;
   switch (imageFormat) {
-    case ImageFormat::JPG: {
-      extension = ".jpg";
-      break;
-    }
-    case ImageFormat::PNG: {
-      extension = ".png";
-      break;
-    }
     case ImageFormat::RAW: {
       extension = ".raw";
 
@@ -91,8 +78,8 @@ bool writeImage(
       break;
     }
     default:
-      filenamePostfix.clear();
-      extension.clear();
+      extension = "." + toString(imageFormat);
+      break;
   }
 
   string path = fmt::format(
@@ -129,8 +116,22 @@ bool ImageExtractor::onImageRead(const CurrentRecord& record, size_t, const Cont
   const StreamId id = record.streamId;
   auto format = ib.image().getImageFormat();
 
-  if (format == ImageFormat::JPG || format == ImageFormat::PNG ||
-      (extractImagesRaw_ && (format == ImageFormat::RAW || format == ImageFormat::VIDEO))) {
+  if (!extractImagesRaw_ && format == ImageFormat::RAW) {
+    if (PixelFrame::readRawFrame(inputFrame_, record.reader, ib.image())) {
+      PixelFrame::normalizeFrame(inputFrame_, processedFrame_, kSupportGrey16Export);
+      writePngImage(*processedFrame_, folderPath_, id, imageCounter_, record.timestamp);
+      return true;
+    }
+  } else if (!extractImagesRaw_ && format == ImageFormat::VIDEO) {
+    if (!inputFrame_) {
+      inputFrame_ = make_shared<PixelFrame>(ib.image());
+    }
+    if (tryToDecodeFrame(*inputFrame_, record, ib) == 0) {
+      PixelFrame::normalizeFrame(inputFrame_, processedFrame_, kSupportGrey16Export);
+      writePngImage(*processedFrame_, folderPath_, id, imageCounter_, record.timestamp);
+      return true;
+    }
+  } else {
     vector<uint8_t> imageData;
     imageData.resize(ib.getBlockSize());
     int readStatus = record.reader->read(imageData.data(), ib.getBlockSize());
@@ -144,21 +145,6 @@ bool ImageExtractor::onImageRead(const CurrentRecord& record, size_t, const Cont
       return false;
     }
     if (writeImage(ib.image(), imageData, folderPath_, id, imageCounter_, record.timestamp)) {
-      return true;
-    }
-  } else if (format == ImageFormat::RAW) {
-    if (PixelFrame::readRawFrame(inputFrame_, record.reader, ib.image())) {
-      PixelFrame::normalizeFrame(inputFrame_, processedFrame_, kSupportGrey16Export);
-      writePngImage(*processedFrame_, folderPath_, id, imageCounter_, record.timestamp);
-      return true;
-    }
-  } else if (format == ImageFormat::VIDEO) {
-    if (!inputFrame_) {
-      inputFrame_ = make_shared<PixelFrame>(ib.image());
-    }
-    if (tryToDecodeFrame(*inputFrame_, record, ib) == 0) {
-      PixelFrame::normalizeFrame(inputFrame_, processedFrame_, kSupportGrey16Export);
-      writePngImage(*processedFrame_, folderPath_, id, imageCounter_, record.timestamp);
       return true;
     }
   }

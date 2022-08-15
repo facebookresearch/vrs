@@ -117,6 +117,9 @@ class PixelFrame {
   /// @return True if the frame type is supported & the frame was read.
   bool readRawFrame(RecordReader* reader, const ImageContentBlockSpec& inputImageSpec);
 
+  /// Read a compressed image, except for video codec compression.
+  bool readCompressedFrame(const vector<uint8_t>& pixels, ImageFormat imageFormat);
+
   static bool readRawFrame(
       std::shared_ptr<PixelFrame>& frame,
       RecordReader* reader,
@@ -145,13 +148,13 @@ class PixelFrame {
   /// @return True if the frame type is supported & the frame was read.
   bool readPngFrame(const std::vector<uint8_t>& pngBuffer, bool decodePixels = true);
 
+  static bool
+  readPngFrame(std::shared_ptr<PixelFrame>& frame, RecordReader* reader, const uint32_t sizeBytes);
+
   /// Save image as PNG
   /// @param path: path of the file to write
   /// @return A status code, 0 meaning success.
   int writeAsPng(const string& path);
-
-  static bool
-  readPngFrame(std::shared_ptr<PixelFrame>& frame, RecordReader* reader, const uint32_t sizeBytes);
 
   /// Normalize an input frame if possible and as necessary,
   /// which means it has one of the following pixel formats:

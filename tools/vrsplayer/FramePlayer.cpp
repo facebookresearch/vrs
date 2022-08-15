@@ -71,45 +71,28 @@ bool FramePlayer::onImageRead(
   bool frameValid = false;
   unique_ptr<ImageJob> job;
   imageFormat_ = spec.getImageFormat();
-  switch (imageFormat_) {
-    case vrs::ImageFormat::RAW:
-      // RAW images are read from disk directly, but pixel format conversion is asynchronous
-      frameValid = PixelFrame::readRawFrame(frame, record.reader, spec);
-      if (!firstImage_ && frameValid) {
-        job = make_unique<ImageJob>(vrs::ImageFormat::RAW);
-      }
-      break;
-    case vrs::ImageFormat::JPG:
-      if (firstImage_) {
-        frameValid = PixelFrame::readJpegFrame(frame, record.reader, contentBlock.getBlockSize());
-      } else {
-        // JPG decoding & pixel format conversion happen asynchronously
-        job = make_unique<ImageJob>(vrs::ImageFormat::JPG);
-        job->buffer.resize(contentBlock.getBlockSize());
-        frameValid = (record.reader->read(job->buffer) == 0);
-      }
-      break;
-    case vrs::ImageFormat::PNG:
-      if (firstImage_) {
-        frameValid = PixelFrame::readPngFrame(frame, record.reader, contentBlock.getBlockSize());
-      } else {
-        // PNG decoding & pixel format conversion happen asynchronously
-        job = make_unique<ImageJob>(vrs::ImageFormat::PNG);
-        job->buffer.resize(contentBlock.getBlockSize());
-        frameValid = (record.reader->read(job->buffer) == 0);
-      }
-      break;
-    case vrs::ImageFormat::VIDEO:
-      // Video codec decompression happens here, but pixel format conversion is asynchronous
-      PixelFrame::init(frame, contentBlock.image());
-      frameValid = (tryToDecodeFrame(*frame, record, contentBlock) == 0);
-      if (!firstImage_ && frameValid) {
-        job = make_unique<ImageJob>(vrs::ImageFormat::VIDEO);
-      }
-      break;
-    default:
-      frameValid = false;
-      break;
+  if (imageFormat_ == vrs::ImageFormat::RAW) {
+    // RAW images are read from disk directly, but pixel format conversion is asynchronous
+    frameValid = PixelFrame::readRawFrame(frame, record.reader, spec);
+    if (!firstImage_ && frameValid) {
+      job = make_unique<ImageJob>(vrs::ImageFormat::RAW);
+    }
+  } else if (imageFormat_ == vrs::ImageFormat::VIDEO) {
+    // Video codec decompression happens here, but pixel format conversion is asynchronous
+    PixelFrame::init(frame, contentBlock.image());
+    frameValid = (tryToDecodeFrame(*frame, record, contentBlock) == 0);
+    if (!firstImage_ && frameValid) {
+      job = make_unique<ImageJob>(vrs::ImageFormat::VIDEO);
+    }
+  } else {
+    if (firstImage_) {
+      frameValid = PixelFrame::readFrame(frame, record.reader, contentBlock);
+    } else {
+      // decoding & pixel format conversion happen asynchronously
+      job = make_unique<ImageJob>(imageFormat_);
+      job->buffer.resize(contentBlock.getBlockSize());
+      frameValid = (record.reader->read(job->buffer) == 0);
+    }
   }
   if (frameValid && job) {
     job->frame = move(frame);
@@ -214,7 +197,7 @@ void FramePlayer::setBlankMode(bool blankOn) {
 }
 
 string FramePlayer::getFrameName(size_t index, const vrs::IndexRecord::RecordInfo& record) {
-  string extension = (imageFormat_ == vrs::ImageFormat::JPG) ? "jpg" : "png";
+  string extension = toString(imageFormat_);
   return fmt::format(
       "{}-{:05}-{:.3f}.{}", record.streamId.getNumericName(), index, record.timestamp, extension);
 }
@@ -243,33 +226,26 @@ bool FramePlayer::saveFrame(
     const vrs::CurrentRecord& record,
     const vrs::ContentBlock& contentBlock) {
   const auto& spec = contentBlock.image();
-  switch (spec.getImageFormat()) {
-    case vrs::ImageFormat::RAW: {
-      shared_ptr<PixelFrame> frame;
-      if (PixelFrame::readRawFrame(frame, record.reader, spec)) {
-        shared_ptr<PixelFrame> normalizedFrame;
-        PixelFrame::normalizeFrame(frame, normalizedFrame, true);
-        if (normalizedFrame->writeAsPng(saveNextFramePath_) == 0) {
-          XR_LOGI("Saved raw frame as '{}'", saveNextFramePath_);
-        }
+  if (spec.getImageFormat() == vrs::ImageFormat::RAW) {
+    shared_ptr<PixelFrame> frame;
+    if (PixelFrame::readRawFrame(frame, record.reader, spec)) {
+      shared_ptr<PixelFrame> normalizedFrame;
+      PixelFrame::normalizeFrame(frame, normalizedFrame, true);
+      if (normalizedFrame->writeAsPng(saveNextFramePath_) == 0) {
+        XR_LOGI("Saved raw frame as '{}'", saveNextFramePath_);
       }
-    } break;
-    case vrs::ImageFormat::JPG:
-    case vrs::ImageFormat::PNG:
-    case vrs::ImageFormat::VIDEO: {
-      vector<uint8_t> buffer;
-      buffer.resize(contentBlock.getBlockSize());
-      vrs::AtomicDiskFile file;
-      if (record.reader->read(buffer) == 0 && file.create(saveNextFramePath_) == 0) {
-        if (file.write(buffer.data(), buffer.size()) != 0) {
-          file.abort();
-        } else {
-          XR_LOGI("Saved {} frame as '{}'", toString(spec.getImageFormat()), saveNextFramePath_);
-        }
+    }
+  } else {
+    vector<uint8_t> buffer;
+    buffer.resize(contentBlock.getBlockSize());
+    vrs::AtomicDiskFile file;
+    if (record.reader->read(buffer) == 0 && file.create(saveNextFramePath_) == 0) {
+      if (file.write(buffer.data(), buffer.size()) != 0) {
+        file.abort();
+      } else {
+        XR_LOGI("Saved {} frame as '{}'", toString(spec.getImageFormat()), saveNextFramePath_);
       }
-    } break;
-    default:
-      break;
+    }
   }
   saveNextFramePath_.clear();
   return true;
@@ -285,24 +261,13 @@ void FramePlayer::imageJobsThreadActivity() {
       frame = move(job->frame);
     }
     bool frameValid = false;
-    switch (job->imageFormat) {
-      case vrs::ImageFormat::RAW:
-      case vrs::ImageFormat::VIDEO:
-        frameValid = (frame != nullptr);
-        break;
-      case vrs::ImageFormat::JPG:
-      case vrs::ImageFormat::PNG: {
-        if (!frame) {
-          frame = make_shared<PixelFrame>();
-        }
-        if (job->imageFormat == vrs::ImageFormat::JPG) {
-          frameValid = frame->readJpegFrame(job->buffer);
-        } else {
-          frameValid = frame->readPngFrame(job->buffer);
-        }
-      } break;
-      default:
-        break;
+    if (job->imageFormat == vrs::ImageFormat::RAW || job->imageFormat == vrs::ImageFormat::VIDEO) {
+      frameValid = (frame != nullptr);
+    } else {
+      if (!frame) {
+        frame = make_shared<PixelFrame>();
+      }
+      frameValid = frame->readCompressedFrame(job->buffer, job->imageFormat);
     }
     if (frameValid) {
       convertFrame(frame);

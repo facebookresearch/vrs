@@ -165,13 +165,19 @@ bool PixelFrame::readFrame(
   if (!XR_VERIFY(cb.getContentType() == ContentType::IMAGE)) {
     return false;
   }
+  if (cb.image().getImageFormat() == ImageFormat::VIDEO) {
+    return false;
+  }
+  if (!frame) {
+    frame = make_shared<PixelFrame>();
+  }
   switch (cb.image().getImageFormat()) {
     case ImageFormat::RAW:
-      return readRawFrame(frame, reader, cb.image());
+      return frame->readRawFrame(reader, cb.image());
     case ImageFormat::PNG:
-      return readPngFrame(frame, reader, cb.getBlockSize());
+      return frame->readPngFrame(reader, cb.getBlockSize());
     case ImageFormat::JPG:
-      return readJpegFrame(frame, reader, cb.getBlockSize());
+      return frame->readJpegFrame(reader, cb.getBlockSize());
     default:
       return false;
   }
@@ -212,6 +218,18 @@ bool PixelFrame::readRawFrame(RecordReader* reader, const ImageContentBlockSpec&
     wdata += frameStride;
   }
   return true;
+}
+
+bool PixelFrame::readCompressedFrame(const std::vector<uint8_t>& pixels, ImageFormat imageFormat) {
+  switch (imageFormat) {
+    case vrs::ImageFormat::JPG:
+      return readJpegFrame(pixels);
+    case vrs::ImageFormat::PNG:
+      return readPngFrame(pixels);
+    default:
+      return false;
+  }
+  return false;
 }
 
 bool PixelFrame::readRawFrame(

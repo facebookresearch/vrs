@@ -47,22 +47,9 @@ bool DataExtractor::DataExtractorStreamPlayer::writeImage(
     const ImageContentBlockSpec& spec,
     const vector<uint8_t>& imageData) {
   const auto& imageFormat = spec.getImageFormat();
-  if (!XR_VERIFY(
-          imageFormat == vrs::ImageFormat::JPG || imageFormat == vrs::ImageFormat::PNG ||
-          imageFormat == vrs::ImageFormat::RAW || imageFormat == vrs::ImageFormat::VIDEO)) {
-    return false; // unsupported formats
-  }
   string filenamePostfix;
   string extension;
   switch (imageFormat) {
-    case vrs::ImageFormat::JPG: {
-      extension = ".jpg";
-      break;
-    }
-    case vrs::ImageFormat::PNG: {
-      extension = ".png";
-      break;
-    }
     case vrs::ImageFormat::RAW: {
       extension = ".raw";
 
@@ -84,8 +71,9 @@ bool DataExtractor::DataExtractorStreamPlayer::writeImage(
       break;
     }
     default:
-      filenamePostfix.clear();
-      extension.clear();
+      // save buffer using default extension
+      extension = "." + toString(imageFormat);
+      break;
   }
 
   if (imageCounter_ <= 1) {
@@ -131,16 +119,7 @@ bool DataExtractor::DataExtractorStreamPlayer::onImageRead(
   imageCounter_++;
   auto format = imageBlock.image().getImageFormat();
 
-  if (format == vrs::ImageFormat::JPG || format == vrs::ImageFormat::PNG) {
-    vector<uint8_t> imageData;
-    imageData.resize(imageBlock.getBlockSize());
-    if (!XR_VERIFY(record.reader->read(imageData.data(), imageBlock.getBlockSize()) == 0)) {
-      return false;
-    }
-    if (writeImage(record, imageBlock.image(), imageData)) {
-      return true;
-    }
-  } else if (format == vrs::ImageFormat::RAW) {
+  if (format == vrs::ImageFormat::RAW) {
     if (PixelFrame::readRawFrame(inputFrame_, record.reader, imageBlock.image())) {
       PixelFrame::normalizeFrame(inputFrame_, processedFrame_, true);
       writePngImage(record);
@@ -153,6 +132,13 @@ bool DataExtractor::DataExtractorStreamPlayer::onImageRead(
     if (tryToDecodeFrame(*inputFrame_, record, imageBlock) == 0) {
       PixelFrame::normalizeFrame(inputFrame_, processedFrame_, true);
       writePngImage(record);
+      return true;
+    }
+  } else {
+    vector<uint8_t> imageData;
+    imageData.resize(imageBlock.getBlockSize());
+    if (XR_VERIFY(record.reader->read(imageData.data(), imageBlock.getBlockSize()) == 0) &&
+        writeImage(record, imageBlock.image(), imageData)) {
       return true;
     }
   }
