@@ -82,6 +82,7 @@ enum class PixelFormat : uint8_t {
   BAYER8_RGGB, ///< 8 bit per pixel, RGGB bayer pattern.
   RAW10, ///< https://developer.android.com/reference/android/graphics/ImageFormat#RAW10
   RAW10_BAYER_RGGB, ///< 10 bit per pixel, RGGB bayer pattern.
+  BAYER8_BGGR, ///< 8 bit per pixel, BGGR bayer pattern.
 
   COUNT, ///< Count of values in this enum type. @internal
 };

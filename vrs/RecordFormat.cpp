@@ -99,10 +99,12 @@ static_assert(static_cast<int>(ImageFormat::PNG) == 3, "ImageFormat enum values 
 static_assert(static_cast<int>(ImageFormat::VIDEO) == 4, "ImageFormat enum values CHANGED!");
 
 // These text names may NEVER BE CHANGED, as they are used in data layout definitions!!
-const char* sPixelFormatNames[] = {
-    "undefined", "grey8",      "bgr8",    "depth32f",    "rgb8",   "yuv_i420_split",  "rgba8",
-    "rgb10",     "rgb12",      "grey10",  "grey12",      "grey16", "rgb32F",          "scalar64F",
-    "yuy2",      "rgb_ir_4x4", "rgba32F", "bayer8_rggb", "raw10",  "raw10_bayer_rggb"};
+const char* sPixelFormatNames[] = {"undefined",  "grey8",          "bgr8",   "depth32f",
+                                   "rgb8",       "yuv_i420_split", "rgba8",  "rgb10",
+                                   "rgb12",      "grey10",         "grey12", "grey16",
+                                   "rgb32F",     "scalar64F",      "yuy2",   "rgb_ir_4x4",
+                                   "rgba32F",    "bayer8_rggb",    "raw10",  "raw10_bayer_rggb",
+                                   "bayer8_bggr"};
 
 struct PixelFormatConverter : public EnumStringConverter<
                                   PixelFormat,
@@ -130,6 +132,7 @@ static_assert(static_cast<int>(PixelFormat::RAW10) == 18, "PixelFormat enum valu
 static_assert(
     static_cast<int>(PixelFormat::RAW10_BAYER_RGGB) == 19,
     "PixelFormat enum values CHANGED!");
+static_assert(static_cast<int>(PixelFormat::BAYER8_BGGR) == 20, "PixelFormat enum values CHANGED!");
 const char* sAudioFormatNames[] = {"undefined", "pcm"};
 struct AudioFormatConverter : public EnumStringConverter<
                                   AudioFormat,
@@ -410,6 +413,7 @@ uint8_t ImageContentBlockSpec::getChannelCountPerPixel(PixelFormat pixel) {
     case PixelFormat::DEPTH32F:
     case PixelFormat::SCALAR64F:
     case PixelFormat::BAYER8_RGGB:
+    case PixelFormat::BAYER8_BGGR:
     case PixelFormat::RAW10_BAYER_RGGB:
     case PixelFormat::RAW10:
       return 1; // greyscale, or "depth", or any form of single numeric value per pixel
@@ -441,6 +445,7 @@ size_t ImageContentBlockSpec::getBytesPerPixel(PixelFormat pixel) {
     case PixelFormat::GREY8:
     case PixelFormat::RGB_IR_RAW_4X4:
     case PixelFormat::BAYER8_RGGB:
+    case PixelFormat::BAYER8_BGGR:
       return 1;
     case PixelFormat::GREY10:
     case PixelFormat::GREY12:
