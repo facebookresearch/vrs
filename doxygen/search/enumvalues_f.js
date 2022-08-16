@@ -1,7 +1,8 @@
 var searchData=
 [
-  ['raw_1670',['RAW',['../namespacevrs.html#a7e8db761dcf6ba474ce112c82babb6c3a633d6abff0a3fc22404347728d195059',1,'vrs']]],
-  ['raw10_1671',['RAW10',['../namespacevrs.html#a0fbbb88591f21313dd46736fba5a7aa5a2b6df18bd0e12726443b70240e785a5c',1,'vrs']]],
+  ['raw_1669',['RAW',['../namespacevrs.html#a7e8db761dcf6ba474ce112c82babb6c3a633d6abff0a3fc22404347728d195059',1,'vrs']]],
+  ['raw10_1670',['RAW10',['../namespacevrs.html#a0fbbb88591f21313dd46736fba5a7aa5a2b6df18bd0e12726443b70240e785a5c',1,'vrs']]],
+  ['raw10_5fbayer_5fbggr_1671',['RAW10_BAYER_BGGR',['../namespacevrs.html#a0fbbb88591f21313dd46736fba5a7aa5a7b0ee132cb9ca0d0e440e79e4ecfbbb6',1,'vrs']]],
   ['raw10_5fbayer_5frggb_1672',['RAW10_BAYER_RGGB',['../namespacevrs.html#a0fbbb88591f21313dd46736fba5a7aa5a3238dc2bd7adf5ddcf8ada7e1ddf4fc7',1,'vrs']]],
   ['releaseafterread_1673',['ReleaseAfterRead',['../namespacevrs.html#acb1b4358038394407db2b2dc6200afaea633b1508ec21803c516e3d437d20a0de',1,'vrs']]],
   ['resultrecordableclass_1674',['ResultRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5abdd40bddf4cdd25426c1a5adfda5f1d4',1,'vrs']]],
