@@ -132,7 +132,9 @@ static_assert(static_cast<int>(PixelFormat::RAW10) == 18, "PixelFormat enum valu
 static_assert(
     static_cast<int>(PixelFormat::RAW10_BAYER_RGGB) == 19,
     "PixelFormat enum values CHANGED!");
-static_assert(static_cast<int>(PixelFormat::BAYER8_BGGR) == 20, "PixelFormat enum values CHANGED!");
+static_assert(
+    static_cast<int>(PixelFormat::RAW10_BAYER_BGGR) == 20,
+    "PixelFormat enum values CHANGED!");
 const char* sAudioFormatNames[] = {"undefined", "pcm"};
 struct AudioFormatConverter : public EnumStringConverter<
                                   AudioFormat,
@@ -413,8 +415,8 @@ uint8_t ImageContentBlockSpec::getChannelCountPerPixel(PixelFormat pixel) {
     case PixelFormat::DEPTH32F:
     case PixelFormat::SCALAR64F:
     case PixelFormat::BAYER8_RGGB:
-    case PixelFormat::BAYER8_BGGR:
     case PixelFormat::RAW10_BAYER_RGGB:
+    case PixelFormat::RAW10_BAYER_BGGR:
     case PixelFormat::RAW10:
       return 1; // greyscale, or "depth", or any form of single numeric value per pixel
     case PixelFormat::BGR8:
@@ -445,7 +447,6 @@ size_t ImageContentBlockSpec::getBytesPerPixel(PixelFormat pixel) {
     case PixelFormat::GREY8:
     case PixelFormat::RGB_IR_RAW_4X4:
     case PixelFormat::BAYER8_RGGB:
-    case PixelFormat::BAYER8_BGGR:
       return 1;
     case PixelFormat::GREY10:
     case PixelFormat::GREY12:
@@ -473,6 +474,7 @@ size_t ImageContentBlockSpec::getBytesPerPixel(PixelFormat pixel) {
     case PixelFormat::YUV_I420_SPLIT:
     case PixelFormat::RAW10:
     case PixelFormat::RAW10_BAYER_RGGB:
+    case PixelFormat::RAW10_BAYER_BGGR:
     case PixelFormat::UNDEFINED:
     case PixelFormat::COUNT:
       return ContentBlock::kSizeUnknown;
