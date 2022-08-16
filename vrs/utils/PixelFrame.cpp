@@ -400,6 +400,7 @@ bool PixelFrame::normalizeFrame(shared_ptr<PixelFrame>& normalizedFrame, bool gr
     case PixelFormat::DEPTH32F:
     case PixelFormat::SCALAR64F:
     case PixelFormat::BAYER8_RGGB:
+    case PixelFormat::BAYER8_BGGR:
       format = PixelFormat::GREY8;
       componentCount = 1;
       break;
@@ -454,7 +455,7 @@ bool PixelFrame::normalizeFrame(shared_ptr<PixelFrame>& normalizedFrame, bool gr
   } else if (srcFormat == PixelFormat::SCALAR64F) {
     // normalize double pixels to grey8
     normalizeBuffer<double>(rdata(), normalizedFrame->wdata(), getWidth() * getHeight());
-  } else if (srcFormat == PixelFormat::BAYER8_RGGB) {
+  } else if (srcFormat == PixelFormat::BAYER8_RGGB || srcFormat == PixelFormat::BAYER8_BGGR) {
     // display as grey8(copy) for now
     const uint8_t* srcPtr = rdata();
     uint8_t* outPtr = normalizedFrame->wdata();
