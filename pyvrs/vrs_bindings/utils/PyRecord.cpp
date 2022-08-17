@@ -119,9 +119,9 @@ void pybind_record(py::module& m) {
       .value("RGB_IR_RAW_4X4", vrs::PixelFormat::RGB_IR_RAW_4X4)
       .value("RGBA32F", vrs::PixelFormat::RGB_IR_RAW_4X4)
       .value("BAYER8_RGGB", vrs::PixelFormat::BAYER8_RGGB)
-      .value("BAYER8_BGGR", vrs::PixelFormat::BAYER8_BGGR)
       .value("RAW10", vrs::PixelFormat::RAW10)
-      .value("RAW10_BAYER_RGGB", vrs::PixelFormat::RAW10_BAYER_RGGB);
+      .value("RAW10_BAYER_RGGB", vrs::PixelFormat::RAW10_BAYER_RGGB)
+      .value("RAW10_BAYER_BGGR", vrs::PixelFormat::RAW10_BAYER_BGGR);
 
   static_assert(int(vrs::PixelFormat::COUNT) == 21, "Update the VRS PixelFormat Python bindings!");
 
