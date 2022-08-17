@@ -99,12 +99,12 @@ static_assert(static_cast<int>(ImageFormat::PNG) == 3, "ImageFormat enum values 
 static_assert(static_cast<int>(ImageFormat::VIDEO) == 4, "ImageFormat enum values CHANGED!");
 
 // These text names may NEVER BE CHANGED, as they are used in data layout definitions!!
-const char* sPixelFormatNames[] = {"undefined",  "grey8",          "bgr8",   "depth32f",
-                                   "rgb8",       "yuv_i420_split", "rgba8",  "rgb10",
-                                   "rgb12",      "grey10",         "grey12", "grey16",
-                                   "rgb32F",     "scalar64F",      "yuy2",   "rgb_ir_4x4",
-                                   "rgba32F",    "bayer8_rggb",    "raw10",  "raw10_bayer_rggb",
-                                   "bayer8_bggr"};
+const char* sPixelFormatNames[] = {
+    "undefined",       "grey8",   "bgr8",        "depth32f",  "rgb8",
+    "yuv_i420_split",  "rgba8",   "rgb10",       "rgb12",     "grey10",
+    "grey12",          "grey16",  "rgb32F",      "scalar64F", "yuy2",
+    "rgb_ir_4x4",      "rgba32F", "bayer8_rggb", "raw10",     "raw10_bayer_rggb",
+    "raw10_bayer_bggr"};
 
 struct PixelFormatConverter : public EnumStringConverter<
                                   PixelFormat,
@@ -555,7 +555,8 @@ uint32_t ImageContentBlockSpec::getStride() const {
     case PixelFormat::YUV_I420_SPLIT:
       return getWidth();
     case PixelFormat::RAW10:
-    case PixelFormat::RAW10_BAYER_RGGB: {
+    case PixelFormat::RAW10_BAYER_RGGB:
+    case PixelFormat::RAW10_BAYER_BGGR: {
       // groups of 4 pixels use 5 bytes, sharing the 5th for their last two bits
       uint32_t fourPixelsGroupCount = (getWidth() + 3) / 4;
       return fourPixelsGroupCount * 5;
