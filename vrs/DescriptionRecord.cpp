@@ -125,7 +125,7 @@ jsonToNameAndTags(const string& jsonStr, string& outName, map<string, string>& o
   using namespace fb_rapidjson;
   Document document;
   document.Parse(jsonStr.c_str());
-  if (!XR_VERIFY(document.IsObject(), "Inproper name & tags: '{}'")) {
+  if (!XR_VERIFY(document.IsObject(), "Inproper name & tags")) {
     return false;
   }
   Value::ConstMemberIterator name = document.FindMember(kNameLabel);
