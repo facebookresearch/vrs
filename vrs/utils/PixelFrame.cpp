@@ -178,6 +178,8 @@ bool PixelFrame::readFrame(
       return frame->readPngFrame(reader, cb.getBlockSize());
     case ImageFormat::JPG:
       return frame->readJpegFrame(reader, cb.getBlockSize());
+    case ImageFormat::JXL:
+      return frame->readJxlFrame(reader, cb.getBlockSize());
     default:
       return false;
   }
@@ -224,6 +226,8 @@ bool PixelFrame::readCompressedFrame(const std::vector<uint8_t>& pixels, ImageFo
   switch (imageFormat) {
     case vrs::ImageFormat::JPG:
       return readJpegFrame(pixels);
+    case vrs::ImageFormat::JXL:
+      return readJxlFrame(pixels);
     case vrs::ImageFormat::PNG:
       return readPngFrame(pixels);
     default:

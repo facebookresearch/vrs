@@ -80,7 +80,7 @@ struct ContentTypeFormatConverter : public EnumStringConverter<
 };
 
 // These text names may NEVER BE CHANGED, as they are used in data layout definitions!!
-const char* sImageFormatNames[] = {"undefined", "raw", "jpg", "png", "video"};
+const char* sImageFormatNames[] = {"undefined", "raw", "jpg", "png", "video", "jxl"};
 struct ImageFormatConverter : public EnumStringConverter<
                                   ImageFormat,
                                   sImageFormatNames,
@@ -97,6 +97,7 @@ static_assert(static_cast<int>(ImageFormat::RAW) == 1, "ImageFormat enum values 
 static_assert(static_cast<int>(ImageFormat::JPG) == 2, "ImageFormat enum values CHANGED!");
 static_assert(static_cast<int>(ImageFormat::PNG) == 3, "ImageFormat enum values CHANGED!");
 static_assert(static_cast<int>(ImageFormat::VIDEO) == 4, "ImageFormat enum values CHANGED!");
+static_assert(static_cast<int>(ImageFormat::JXL) == 5, "ImageFormat enum values CHANGED!");
 
 // These text names may NEVER BE CHANGED, as they are used in data layout definitions!!
 const char* sPixelFormatNames[] = {
