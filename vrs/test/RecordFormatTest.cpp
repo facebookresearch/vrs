@@ -76,6 +76,10 @@ TEST_F(RecordFormatTest, testBlockFormat) {
   EXPECT_EQ(jpg.getContentType(), ContentType::IMAGE);
   EXPECT_EQ(jpg.image().getImageFormat(), ImageFormat::JPG);
 
+  ContentBlock jxl("image/jxl");
+  EXPECT_EQ(jxl.getContentType(), ContentType::IMAGE);
+  EXPECT_EQ(jxl.image().getImageFormat(), ImageFormat::JXL);
+
   ContentBlock weird("image/weird");
   EXPECT_EQ(weird.getContentType(), ContentType::IMAGE);
   EXPECT_EQ(weird.image().getImageFormat(), ImageFormat::UNDEFINED);

@@ -53,6 +53,7 @@ enum class ImageFormat : uint8_t {
   JPG, ///< JPEG data.
   PNG, ///< PNG data.
   VIDEO, ///< Video codec encoded frame.
+  JXL, ///< JPEG-XL data.
   COUNT ///< Count of values in this enum type. @internal
 };
 

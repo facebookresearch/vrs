@@ -18,6 +18,7 @@
 
 #include <cstdint>
 
+#include <functional>
 #include <vector>
 
 // Make this class usable both when Qt is available, and when not
@@ -31,6 +32,8 @@
 #include <vrs/utils/VideoFrameHandler.h>
 
 namespace vrs::utils {
+
+using PixelFrameDecoder = std::function<bool(PixelFrame& out, const vector<uint8_t>&, bool decode)>;
 
 /// Helper class to read & convert images read using RecordFormat into simpler, but maybe degraded,
 /// pixel buffer, that can easily be displayed, or saved to disk as jpg or png.
@@ -136,6 +139,21 @@ class PixelFrame {
 
   static bool
   readJpegFrame(std::shared_ptr<PixelFrame>& frame, RecordReader* reader, const uint32_t sizeBytes);
+
+  /// Read a JPEG-XL encoded frame into the internal buffer.
+  /// @return True if the frame type is supported & the frame was read.
+  /// Returns false, if no decoder was installed, or the data couldn't be decoded correctly.
+  bool readJxlFrame(RecordReader* reader, const uint32_t sizeBytes);
+  /// Decode a JPEG-XL encoded frame into the internal buffer.
+  /// @param buffer: jpeg-xl data, possibly read from a valid jxl file (the whole file).
+  /// @param decodePixels: if true, decode the image in the buffer, otherwise, only read the format.
+  /// @return True if the frame type is supported & the frame was read.
+  /// Returns false, if no decoder was installed, or the data couldn't be decoded correctly.
+  bool readJxlFrame(const std::vector<uint8_t>& buffer, bool decodePixels = true);
+
+  /// Temporary: to avoid linkage issues, jepg-xl is optional for now and support is explicit.
+  /// At best, provide a decoder when the app is initialized, before using jpeg-xl images.
+  static void setJxlDecoder(const PixelFrameDecoder& decoder);
 
   /// Read a PNG encoded frame into the internal buffer.
   /// @param reader: The record reader to read data from.
