@@ -393,10 +393,8 @@ void RecordFileWriter::backgroundWriterThreadActivity() {
   if (writerThreadData_->fileError == 0) {
     writerThreadData_->setFileError(completeAndCloseFile());
   } else {
-    XR_LOGW(
-        "Closed file with error #{}, {}",
-        writerThreadData_->fileError,
-        errorCodeToMessage(writerThreadData_->fileError));
+    auto fileError = writerThreadData_->fileError.load(std::memory_order_relaxed);
+    XR_LOGW("Closed file with error #{}, {}", fileError, errorCodeToMessage(fileError));
     file_->close();
   }
   if (queueByteSize_) {
