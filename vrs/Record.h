@@ -157,7 +157,7 @@ class Record final {
   };
 
  private:
-  friend RecordManager;
+  friend class RecordManager;
 
   /// Records are created & deleted exclusively by a Recordable's RecordManager.
   Record(RecordManager& recordManager) : recordManager_(recordManager) {}
