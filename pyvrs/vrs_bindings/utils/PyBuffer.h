@@ -114,8 +114,8 @@ class PyImageContentBlockSpec {
     return spec_;
   }
 
-  void initMap();
-  map<string, py::object> map;
+  void initAttributesMap();
+  map<string, py::object> attributesMap;
 
  private:
   ImageContentBlockSpec spec_;
@@ -159,8 +159,8 @@ class PyAudioContentBlockSpec {
     return spec_.getSampleFormat();
   }
 
-  void initMap();
-  map<string, py::object> map;
+  void initAttributesMap();
+  map<string, py::object> attributesMap;
 
  private:
   AudioContentBlockSpec spec_;
@@ -181,8 +181,8 @@ class PyContentBlock {
     return blockSize == ContentBlock::kSizeUnknown ? -1 : static_cast<int>(blockSize);
   }
 
-  void initMap();
-  map<string, py::object> map;
+  void initAttributesMap();
+  map<string, py::object> attributesMap;
 
  private:
   ContentBlock block_;

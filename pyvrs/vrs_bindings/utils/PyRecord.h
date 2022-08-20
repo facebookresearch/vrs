@@ -80,8 +80,8 @@ struct PyRecord {
   vector<PyImageContentBlockSpec> imageSpecs;
 
   /// members and methods to set up dictionary interface.
-  void initMap();
-  map<string, py::object> map;
+  void initAttributesMap();
+  map<string, py::object> attributesMap;
 };
 
 /// Binds methods and classes for PyRecord.

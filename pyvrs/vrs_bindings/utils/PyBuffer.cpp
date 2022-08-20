@@ -63,36 +63,36 @@ const constexpr char* kContentBlockBufferSizeKey = "buffer_size";
 
 namespace pyvrs {
 
-void PyImageContentBlockSpec::initMap() {
-  if (map.empty()) {
-    map[kImageSpecWidthKey] = PYWRAP(getWidth());
-    map[kImageSpecHeightKey] = PYWRAP(getHeight());
-    map[kImageSpecStrideKey] = PYWRAP(getStride());
-    map[kImageSpecPixelFormatKey] = PYWRAP(getPixelFormatAsString());
-    map[kImageSpecImageFormatKey] = PYWRAP(getImageFormatAsString());
-    map[kImageSpecBytesPerPixelKey] = PYWRAP(getBytesPerPixel());
-    map[kImageSpecBufferSizeKey] = PYWRAP(getBlockSize());
-    map[kImageSpecCodecNameKey] = PYWRAP(getCodecName());
-    map[kImageSpecCodecQualityKey] = PYWRAP(getCodecQuality());
-    map[kImageSpecKeyFrameTimestampKey] = PYWRAP(getKeyFrameTimestamp());
-    map[kImageSpecKeyFrameIndexKey] = PYWRAP(getKeyFrameIndex());
+void PyImageContentBlockSpec::initAttributesMap() {
+  if (attributesMap.empty()) {
+    attributesMap[kImageSpecWidthKey] = PYWRAP(getWidth());
+    attributesMap[kImageSpecHeightKey] = PYWRAP(getHeight());
+    attributesMap[kImageSpecStrideKey] = PYWRAP(getStride());
+    attributesMap[kImageSpecPixelFormatKey] = PYWRAP(getPixelFormatAsString());
+    attributesMap[kImageSpecImageFormatKey] = PYWRAP(getImageFormatAsString());
+    attributesMap[kImageSpecBytesPerPixelKey] = PYWRAP(getBytesPerPixel());
+    attributesMap[kImageSpecBufferSizeKey] = PYWRAP(getBlockSize());
+    attributesMap[kImageSpecCodecNameKey] = PYWRAP(getCodecName());
+    attributesMap[kImageSpecCodecQualityKey] = PYWRAP(getCodecQuality());
+    attributesMap[kImageSpecKeyFrameTimestampKey] = PYWRAP(getKeyFrameTimestamp());
+    attributesMap[kImageSpecKeyFrameIndexKey] = PYWRAP(getKeyFrameIndex());
   }
 }
 
-void PyAudioContentBlockSpec::initMap() {
-  if (map.empty()) {
-    map[kAudioSpecSampleCountKey] = PYWRAP(getSampleCount());
-    map[kAudioSpecSampleFormatKey] = PYWRAP(getSampleFormatAsString());
-    map[kAudioSpecSampleBlockStrideKey] = PYWRAP(getSampleBlockStride());
-    map[kAudioSpecChannelCountKey] = PYWRAP(getChannelCount());
-    map[kAudioSpecSampleRateKey] = PYWRAP(getSampleRate());
-    map[kAudioSpecBufferSizeKey] = PYWRAP(getBlockSize());
+void PyAudioContentBlockSpec::initAttributesMap() {
+  if (attributesMap.empty()) {
+    attributesMap[kAudioSpecSampleCountKey] = PYWRAP(getSampleCount());
+    attributesMap[kAudioSpecSampleFormatKey] = PYWRAP(getSampleFormatAsString());
+    attributesMap[kAudioSpecSampleBlockStrideKey] = PYWRAP(getSampleBlockStride());
+    attributesMap[kAudioSpecChannelCountKey] = PYWRAP(getChannelCount());
+    attributesMap[kAudioSpecSampleRateKey] = PYWRAP(getSampleRate());
+    attributesMap[kAudioSpecBufferSizeKey] = PYWRAP(getBlockSize());
   }
 }
 
-void PyContentBlock::initMap() {
-  if (map.empty()) {
-    map[kContentBlockBufferSizeKey] = PYWRAP(static_cast<uint32_t>(getBufferSize()));
+void PyContentBlock::initAttributesMap() {
+  if (attributesMap.empty()) {
+    attributesMap[kContentBlockBufferSizeKey] = PYWRAP(static_cast<uint32_t>(getBufferSize()));
   }
 }
 
