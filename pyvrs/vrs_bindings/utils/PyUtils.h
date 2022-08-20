@@ -294,37 +294,37 @@ inline PyObject* pyObject(const char* s) {
 #define PYWRAP(val) pyWrap(pyObject(val))
 #define DEF_GETITEM(m, class)                                    \
   m.def("__getitem__", [](class& dict, const std::string& key) { \
-    dict.initMap();                                              \
+    dict.initAttributesMap();                                    \
     try {                                                        \
-      return dict.map.at(key);                                   \
+      return dict.attributesMap.at(key);                         \
     } catch (const std::out_of_range&) {                         \
       throw py::key_error("key '" + key + "' does not exist.");  \
     }                                                            \
   });
 
-#define DEF_LEN(m, class)       \
-  m.def(                        \
-      "__len__",                \
-      [](class& dict) {         \
-        dict.initMap();         \
-        return dict.map.size(); \
-      },                        \
+#define DEF_LEN(m, class)                 \
+  m.def(                                  \
+      "__len__",                          \
+      [](class& dict) {                   \
+        dict.initAttributesMap();         \
+        return dict.attributesMap.size(); \
+      },                                  \
       py::keep_alive<0, 1>());
-#define DEF_ITER(m, class)                                              \
-  m.def(                                                                \
-      "__iter__",                                                       \
-      [](class& dict) {                                                 \
-        dict.initMap();                                                 \
-        return py::make_key_iterator(dict.map.begin(), dict.map.end()); \
-      },                                                                \
+#define DEF_ITER(m, class)                                                                  \
+  m.def(                                                                                    \
+      "__iter__",                                                                           \
+      [](class& dict) {                                                                     \
+        dict.initAttributesMap();                                                           \
+        return py::make_key_iterator(dict.attributesMap.begin(), dict.attributesMap.end()); \
+      },                                                                                    \
       py::keep_alive<0, 1>());
-#define DEF_ITEM(m, class)                                          \
-  m.def(                                                            \
-      "items",                                                      \
-      [](class& dict) {                                             \
-        dict.initMap();                                             \
-        return py::make_iterator(dict.map.begin(), dict.map.end()); \
-      },                                                            \
+#define DEF_ITEM(m, class)                                                              \
+  m.def(                                                                                \
+      "items",                                                                          \
+      [](class& dict) {                                                                 \
+        dict.initAttributesMap();                                                       \
+        return py::make_iterator(dict.attributesMap.begin(), dict.attributesMap.end()); \
+      },                                                                                \
       py::keep_alive<0, 1>());
 #define DEF_DICT_FUNC(m, class) \
   DEF_GETITEM(m, class)         \

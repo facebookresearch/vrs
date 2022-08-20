@@ -74,20 +74,21 @@ PyRecord::PyRecord(const IndexRecord::RecordInfo& info, int32_t recordIndex_, Re
   }
 }
 
-void PyRecord::initMap() {
-  if (map.empty()) {
-    map[kRecordFormatVersionKey] = PYWRAP(recordFormatVersion);
-    map[kRecordIndexKey] = PYWRAP(recordIndex);
-    map[kRecordTypeKey] = PYWRAP(recordType);
-    map[kRecordableIdKey] = PYWRAP(streamId);
-    map[kStreamIdKey] = PYWRAP(streamId);
-    map[kTimestampKey] = PYWRAP(recordTimestamp);
-    map[kImageCountKey] = PYWRAP(static_cast<uint32_t>(imageBlocks.size()));
-    map[kAudioBlockCountKey] = PYWRAP(static_cast<uint32_t>(audioBlocks.size()));
-    map[kCustomBlockCountKey] = PYWRAP(static_cast<uint32_t>(customBlocks.size()));
-    map[kMetadataCountKey] = PYWRAP(static_cast<uint32_t>(datalayoutBlocks.size()));
+void PyRecord::initAttributesMap() {
+  if (attributesMap.empty()) {
+    attributesMap[kRecordFormatVersionKey] = PYWRAP(recordFormatVersion);
+    attributesMap[kRecordIndexKey] = PYWRAP(recordIndex);
+    attributesMap[kRecordTypeKey] = PYWRAP(recordType);
+    attributesMap[kRecordableIdKey] = PYWRAP(streamId);
+    attributesMap[kStreamIdKey] = PYWRAP(streamId);
+    attributesMap[kTimestampKey] = PYWRAP(recordTimestamp);
+    attributesMap[kImageCountKey] = PYWRAP(static_cast<uint32_t>(imageBlocks.size()));
+    attributesMap[kAudioBlockCountKey] = PYWRAP(static_cast<uint32_t>(audioBlocks.size()));
+    attributesMap[kCustomBlockCountKey] = PYWRAP(static_cast<uint32_t>(customBlocks.size()));
+    attributesMap[kMetadataCountKey] = PYWRAP(static_cast<uint32_t>(datalayoutBlocks.size()));
     if (!unsupportedBlocks.empty()) {
-      map[kUnsupportedBlockCountKey] = PYWRAP(static_cast<uint32_t>(unsupportedBlocks.size()));
+      attributesMap[kUnsupportedBlockCountKey] =
+          PYWRAP(static_cast<uint32_t>(unsupportedBlocks.size()));
     }
   }
 }
