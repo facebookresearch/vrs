@@ -19,6 +19,7 @@
 #include <png.h>
 #include <cerrno>
 
+#include <atomic>
 #include <deque>
 #include <vector>
 
@@ -185,7 +186,7 @@ bool PixelFrame::readPngFrame(
 
 namespace {
 
-atomic<uint32_t> sAllocSize = 128 * 1024;
+atomic<uint32_t> sAllocSize{128 * 1024};
 
 struct uninitialized_byte final {
   uninitialized_byte() {} // do not use '= default' as it will initialize byte!
