@@ -170,9 +170,10 @@ class PixelFrame {
   readPngFrame(std::shared_ptr<PixelFrame>& frame, RecordReader* reader, const uint32_t sizeBytes);
 
   /// Save image as PNG
-  /// @param path: path of the file to write
+  /// @param path: path of the file to write, if no outBuffer is provided
+  /// @param outBuffer: if provided, a vector where to write the data, instead of writing to disk
   /// @return A status code, 0 meaning success.
-  int writeAsPng(const string& path);
+  int writeAsPng(const string& path, std::vector<uint8_t>* const outBuffer = nullptr);
 
   /// Normalize an input frame if possible and as necessary,
   /// which means it has one of the following pixel formats:
