@@ -1,0 +1,163 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>pyvrs.utils module &#8212; pyvrs  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="pyvrs.slice module" href="slice.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="slice.html" title="pyvrs.slice module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyvrs  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">API Documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">pyvrs.utils module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-pyvrs.utils">
+<span id="pyvrs-utils-module"></span><h1>pyvrs.utils module<a class="headerlink" href="#module-pyvrs.utils" title="Permalink to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyvrs.utils.filter_by_record_type">
+<span class="sig-prename descclassname"><span class="pre">pyvrs.utils.</span></span><span class="sig-name descname"><span class="pre">filter_by_record_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">available_record_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_record_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/pyvrs/utils.html#filter_by_record_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyvrs.utils.filter_by_record_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter a set record types based on the provided record types. Filter only succeeds on
+exact matches.
+:param available_record_types: A set of record types in a file.
+:param requested_record_types: A set of record types you are interested in.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A set of record types in available_record_types that is also in requested_record_types.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyvrs.utils.filter_by_stream_ids">
+<span class="sig-prename descclassname"><span class="pre">pyvrs.utils.</span></span><span class="sig-name descname"><span class="pre">filter_by_stream_ids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">available_stream_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regex_stream_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/pyvrs/utils.html#filter_by_stream_ids"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyvrs.utils.filter_by_stream_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter a set of stream_ids based on the provided regex stream_ids.
+:param available_stream_ids: A set of stream_ids in a file.
+:param regex_stream_ids: regex of the stream ids that you are interested in.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A set of stream_ids in available_stream_ids that matches the one of the regex in regex_stream_ids.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyvrs.utils.get_recordable_type_id_name">
+<span class="sig-prename descclassname"><span class="pre">pyvrs.utils.</span></span><span class="sig-name descname"><span class="pre">get_recordable_type_id_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/pyvrs/utils.html#get_recordable_type_id_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyvrs.utils.get_recordable_type_id_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a human readable string what the recordable is.
+:param stream_id: stream_id you are interested in.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The name of recordable_type_id for the given stream id.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyvrs.utils.string_of_set">
+<span class="sig-prename descclassname"><span class="pre">pyvrs.utils.</span></span><span class="sig-name descname"><span class="pre">string_of_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Set</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/pyvrs/utils.html#string_of_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyvrs.utils.string_of_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a pretty string representation of a set (with elements ordered).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyvrs.utils.stringify_metadata_keys">
+<span class="sig-prename descclassname"><span class="pre">pyvrs.utils.</span></span><span class="sig-name descname"><span class="pre">stringify_metadata_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/pyvrs/utils.html#stringify_metadata_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyvrs.utils.stringify_metadata_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>remove unambiguous types from metadata dicts. If the type is overloaded, converts to a
+key&lt;type&gt; string representation.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyvrs.utils.tags_to_justified_table_str">
+<span class="sig-prename descclassname"><span class="pre">pyvrs.utils.</span></span><span class="sig-name descname"><span class="pre">tags_to_justified_table_str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/pyvrs/utils.html#tags_to_justified_table_str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyvrs.utils.tags_to_justified_table_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a nice table representation of tags for easy viewing.</p>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="slice.html"
+                          title="previous chapter">pyvrs.slice module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/modules/utils.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="slice.html" title="pyvrs.slice module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyvrs  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >API Documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">pyvrs.utils module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Meta Reality Labs Research.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+    </div>
+  </body>
+</html>

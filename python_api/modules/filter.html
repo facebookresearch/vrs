@@ -1,0 +1,493 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>pyvrs.filter module &#8212; pyvrs  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pyvrs.reader module" href="reader.html" />
+    <link rel="prev" title="pyvrs.base" href="base.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="reader.html" title="pyvrs.reader module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="base.html" title="pyvrs.base"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyvrs  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">API Documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">pyvrs.filter module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-pyvrs.filter">
+<span id="pyvrs-filter-module"></span><h1>pyvrs.filter module<a class="headerlink" href="#module-pyvrs.filter" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyvrs.filter.FilteredVRSReader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyvrs.filter.</span></span><span class="sig-name descname"><span class="pre">FilteredVRSReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader" title="pyvrs.base.BaseVRSReader"><span class="pre">BaseVRSReader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_filter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyvrs.filter.RecordFilter" title="pyvrs.filter.RecordFilter"><span class="pre">RecordFilter</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyvrs/filter.html#FilteredVRSReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyvrs.filter.FilteredVRSReader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader" title="pyvrs.base.BaseVRSReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseVRSReader</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>FilteredVRSReader represents subset of VRSReader after applying filter.
+This class essentially has the exact same methods as VRSReader but operates against subset of the file.
+Note that you can’t <cite>re-filter</cite> an already filtered VRSReader.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="pyvrs.filter.FilteredVRSReader.file_tags">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">file_tags</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pyvrs.filter.FilteredVRSReader.file_tags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a dict of all file tags present in this VRS file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>{&lt;tag&gt;: &lt;value&gt;}</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary of all file tags</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvrs.filter.FilteredVRSReader.find_stream">
+<span class="sig-name descname"><span class="pre">find_stream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recordable_type_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/pyvrs/filter.html#FilteredVRSReader.find_stream"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyvrs.filter.FilteredVRSReader.find_stream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find stream matching recordable type and tag, and return its stream id.
+This call isn’t affected by the filter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>recordable_type_id</strong> – stream_id is <cite>&lt;recordable_type_id&gt;-&lt;instance_id&gt;</cite></p></li>
+<li><p><strong>tag_name</strong> – tag name that you are interested in</p></li>
+<li><p><strong>tag_value</strong> – tag value that you are interested in</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Stream ID that starts with recordable_type_id and has a given tag pair.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvrs.filter.FilteredVRSReader.find_streams">
+<span class="sig-name descname"><span class="pre">find_streams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recordable_type_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flavor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/pyvrs/filter.html#FilteredVRSReader.find_streams"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyvrs.filter.FilteredVRSReader.find_streams" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find streams matching recordable type and flavor, and return sets of stream ids.
+This call isn’t affected by the filter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>recordable_type_id</strong> – stream_id is <cite>&lt;recordable_type_id&gt;-&lt;instance_id&gt;</cite></p></li>
+<li><p><strong>tag_name</strong> – tag name that you are interested in</p></li>
+<li><p><strong>tag_value</strong> – tag value that you are interested in</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A set of stream IDs that start with recordable_type_id and has a given flavor.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvrs.filter.FilteredVRSReader.get_estimated_frame_rate">
+<span class="sig-name descname"><span class="pre">get_estimated_frame_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/pyvrs/filter.html#FilteredVRSReader.get_estimated_frame_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyvrs.filter.FilteredVRSReader.get_estimated_frame_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the estimated frame rate for the given stream_id.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>stream_id</strong> – stream_id that you are interested in.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The estimated frame rate.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvrs.filter.FilteredVRSReader.get_record_index_by_time">
+<span class="sig-name descname"><span class="pre">get_record_index_by_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../_modules/pyvrs/filter.html#FilteredVRSReader.get_record_index_by_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyvrs.filter.FilteredVRSReader.get_record_index_by_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get index in filtered records by timestamp.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stream_id</strong> – stream_id that you are interested in.</p></li>
+<li><p><strong>timestamp</strong> – timestamp that you are interested in.</p></li>
+<li><p><strong>epsilon</strong> – Optional argument. If specified we search for record in range of
+(timestamp-epsilon)-(timestamp+epsilon) and returns the nearest record.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvrs.filter.FilteredVRSReader.get_records_count">
+<span class="sig-name descname"><span class="pre">get_records_count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">RecordType</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../_modules/pyvrs/filter.html#FilteredVRSReader.get_records_count"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyvrs.filter.FilteredVRSReader.get_records_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of records for the stream_id &amp; record_type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stream_id</strong> – stream_id you are interested in.</p></li>
+<li><p><strong>record_type</strong> – record type you are interested in.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number of records for stream_id &amp; record type</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvrs.filter.FilteredVRSReader.get_stream_info">
+<span class="sig-name descname"><span class="pre">get_stream_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/pyvrs/filter.html#FilteredVRSReader.get_stream_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyvrs.filter.FilteredVRSReader.get_stream_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get details about a stream.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>stream_id</strong> – stream_id you are interested in.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An information about the stream in a dictionary.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvrs.filter.FilteredVRSReader.get_timestamp_for_index">
+<span class="sig-name descname"><span class="pre">get_timestamp_for_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/pyvrs/filter.html#FilteredVRSReader.get_timestamp_for_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyvrs.filter.FilteredVRSReader.get_timestamp_for_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the timestamp corresponding to the given index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> – the index for the record</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A timestamp corresponds to the index</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvrs.filter.FilteredVRSReader.get_timestamp_list">
+<span class="sig-name descname"><span class="pre">get_timestamp_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/pyvrs/filter.html#FilteredVRSReader.get_timestamp_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyvrs.filter.FilteredVRSReader.get_timestamp_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the list of timestamps corresponding to the given indices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>indices</strong> – the list of indices we want to get the timestamp.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of timestamps correspond to the indices, if indices are None, we get the full timestamp list.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyvrs.filter.FilteredVRSReader.max_filter_timestamp">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_filter_timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyvrs.filter.FilteredVRSReader.max_filter_timestamp" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of max_timestamp when user called filter method on VRSReader.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyvrs.filter.FilteredVRSReader.max_timestamp">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyvrs.filter.FilteredVRSReader.max_timestamp" title="Permalink to this definition">¶</a></dt>
+<dd><p>The timestamp for the last record that this reader is configured to read, given current filters.
+Return 0 if there are no record.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvrs.filter.FilteredVRSReader.might_contain_audio">
+<span class="sig-name descname"><span class="pre">might_contain_audio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/pyvrs/filter.html#FilteredVRSReader.might_contain_audio"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyvrs.filter.FilteredVRSReader.might_contain_audio" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the given stream_id contains an audio data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>stream_id</strong> – stream_id that you are interested in.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Based on the config record, return if the stream contains an audio data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvrs.filter.FilteredVRSReader.might_contain_images">
+<span class="sig-name descname"><span class="pre">might_contain_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/pyvrs/filter.html#FilteredVRSReader.might_contain_images"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyvrs.filter.FilteredVRSReader.might_contain_images" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the given stream_id contains an image data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>stream_id</strong> – stream_id that you are interested in.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Based on the config record, return if the stream contains an image data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyvrs.filter.FilteredVRSReader.min_filter_timestamp">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">min_filter_timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyvrs.filter.FilteredVRSReader.min_filter_timestamp" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of min_timestamp when user called filter method on VRSReader.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyvrs.filter.FilteredVRSReader.min_timestamp">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">min_timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyvrs.filter.FilteredVRSReader.min_timestamp" title="Permalink to this definition">¶</a></dt>
+<dd><p>The timestamp for the first record that this reader is configured to read, given current filters.
+Return 0 if there are no record.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyvrs.filter.FilteredVRSReader.n_records">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_records</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#pyvrs.filter.FilteredVRSReader.n_records" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of records that this reader is configured to read, given current filters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvrs.filter.FilteredVRSReader.read_next_record">
+<span class="sig-name descname"><span class="pre">read_next_record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="record.html#pyvrs.record.VRSRecord" title="pyvrs.record.VRSRecord"><span class="pre">VRSRecord</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/pyvrs/filter.html#FilteredVRSReader.read_next_record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyvrs.filter.FilteredVRSReader.read_next_record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the first record that matches stream_id and record_type and its index is greater or equal than given index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stream_id</strong> – stream_id that you are interested in.</p></li>
+<li><p><strong>record_type</strong> – record_type that you are interested in.</p></li>
+<li><p><strong>index</strong> – the absolute index in the file. Based on this index, try to find the previous record that matches stream_id &amp; record_type</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>VRSRecord if there is a record, otherwise None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvrs.filter.FilteredVRSReader.read_prev_record">
+<span class="sig-name descname"><span class="pre">read_prev_record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="record.html#pyvrs.record.VRSRecord" title="pyvrs.record.VRSRecord"><span class="pre">VRSRecord</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/pyvrs/filter.html#FilteredVRSReader.read_prev_record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyvrs.filter.FilteredVRSReader.read_prev_record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the last record that matches stream_id and record_type and its index is smaller or equal than given index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stream_id</strong> – stream_id that you are interested in.</p></li>
+<li><p><strong>record_type</strong> – record_type that you are interested in.</p></li>
+<li><p><strong>index</strong> – the absolute index in the file. Based on this index, try to find the previous record that matches stream_id &amp; record_type</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>VRSRecord if there is a record, otherwise None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvrs.filter.FilteredVRSReader.read_record_by_time">
+<span class="sig-name descname"><span class="pre">read_record_by_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="record.html#pyvrs.record.VRSRecord" title="pyvrs.record.VRSRecord"><span class="pre">VRSRecord</span></a></span></span><a class="reference internal" href="../_modules/pyvrs/filter.html#FilteredVRSReader.read_record_by_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyvrs.filter.FilteredVRSReader.read_record_by_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read record by timestamp.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stream_id</strong> – stream_id that you are interested in.</p></li>
+<li><p><strong>timestamp</strong> – timestamp that you are interested in.</p></li>
+<li><p><strong>epsilon</strong> – Optional argument. If specified we search for record in range of
+(timestamp-epsilon)-(timestamp+epsilon) and returns the nearest record.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>VRSRecord corresponds to the stream_id &amp; timestamp.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>TimestampNotFoundError</strong> – If epsilon is not None and the record doesn’t exist within the time range.</p></li>
+<li><p><strong>ValueError</strong> – If epsilon is None and the record isn’t found using lower_bound.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyvrs.filter.FilteredVRSReader.record_types">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">record_types</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pyvrs.filter.FilteredVRSReader.record_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>The set of record types that this reader is configured to read, given current
+filters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvrs.filter.FilteredVRSReader.set_image_conversion">
+<span class="sig-name descname"><span class="pre">set_image_conversion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conversion</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ImageConversion</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/pyvrs/filter.html#FilteredVRSReader.set_image_conversion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyvrs.filter.FilteredVRSReader.set_image_conversion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set default image conversion policy, and clears any stream specific setting.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>conversion</strong> – The image conversion you want to apply for all streams.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvrs.filter.FilteredVRSReader.set_stream_image_conversion">
+<span class="sig-name descname"><span class="pre">set_stream_image_conversion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conversion</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ImageConversion</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/pyvrs/filter.html#FilteredVRSReader.set_stream_image_conversion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyvrs.filter.FilteredVRSReader.set_stream_image_conversion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set image conversion policy for a specific stream.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stream_id</strong> – The stream_id you want to apply image conversion to.</p></li>
+<li><p><strong>conversion</strong> – The image conversion you want to apply for a specific stream.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyvrs.filter.FilteredVRSReader.set_stream_type_image_conversion">
+<span class="sig-name descname"><span class="pre">set_stream_type_image_conversion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recordable_type_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conversion</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ImageConversion</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../_modules/pyvrs/filter.html#FilteredVRSReader.set_stream_type_image_conversion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyvrs.filter.FilteredVRSReader.set_stream_type_image_conversion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set image conversion policy for streams of a specific device type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>recordable_type_id</strong> – The recordable_type_id you want to apply image conversion to.
+If you specify 1000, streams with id 1000-* are the targets.</p></li>
+<li><p><strong>conversion</strong> – The image conversion you want to apply for a specific stream.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number of streams affected.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyvrs.filter.FilteredVRSReader.stream_ids">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stream_ids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pyvrs.filter.FilteredVRSReader.stream_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>The set of stream ids that this reader is configured to read, given current
+filters.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyvrs.filter.FilteredVRSReader.stream_tags">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stream_tags</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pyvrs.filter.FilteredVRSReader.stream_tags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a dict of all file tags present in this VRS file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>{&lt;tag&gt;: &lt;value&gt;}</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary of all file tags</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyvrs.filter.RecordFilter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyvrs.filter.</span></span><span class="sig-name descname"><span class="pre">RecordFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stream_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyvrs/filter.html#RecordFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyvrs.filter.RecordFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>RecordFilter represents a filter that’s applied to the VRS file.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyvrs.filter.RecordFilter.max_timestamp">
+<span class="sig-name descname"><span class="pre">max_timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyvrs.filter.RecordFilter.max_timestamp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyvrs.filter.RecordFilter.min_timestamp">
+<span class="sig-name descname"><span class="pre">min_timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#pyvrs.filter.RecordFilter.min_timestamp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyvrs.filter.RecordFilter.record_types">
+<span class="sig-name descname"><span class="pre">record_types</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pyvrs.filter.RecordFilter.record_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyvrs.filter.RecordFilter.stream_ids">
+<span class="sig-name descname"><span class="pre">stream_ids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#pyvrs.filter.RecordFilter.stream_ids" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyvrs.filter.SyncFilteredVRSReader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyvrs.filter.</span></span><span class="sig-name descname"><span class="pre">SyncFilteredVRSReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader" title="pyvrs.base.BaseVRSReader"><span class="pre">BaseVRSReader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_filter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyvrs.filter.RecordFilter" title="pyvrs.filter.RecordFilter"><span class="pre">RecordFilter</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyvrs/filter.html#SyncFilteredVRSReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyvrs.filter.SyncFilteredVRSReader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyvrs.filter.FilteredVRSReader" title="pyvrs.filter.FilteredVRSReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">FilteredVRSReader</span></code></a></p>
+<p>Synchrnous version of FilteredVRSReader.</p>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="base.html"
+                          title="previous chapter">pyvrs.base</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="reader.html"
+                          title="next chapter">pyvrs.reader module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/modules/filter.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="reader.html" title="pyvrs.reader module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="base.html" title="pyvrs.base"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pyvrs  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >API Documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">pyvrs.filter module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Meta Reality Labs Research.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+    </div>
+  </body>
+</html>
