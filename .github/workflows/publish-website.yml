@@ -18,7 +18,14 @@ jobs:
       uses: actions/checkout@v2
     - name: Install dependencies
       run: |
-        sudo apt-get install doxygen
+        sudo apt-get install \
+              cmake ninja-build ccache libgtest-dev libfmt-dev libcereal-dev \
+              libjpeg-dev libpng-dev \
+              liblz4-dev libzstd-dev libxxhash-dev \
+              libboost-system-dev libboost-filesystem-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev \
+              qtbase5-dev portaudio19-dev doxygen
+        python -m pip install -U pip
+        python -m pip install pybind11[global] sphinx
     - name: Build the Website
       run: |
         cd website
