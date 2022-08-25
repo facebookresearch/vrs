@@ -31,7 +31,7 @@ class DataLayout;
 
 /// \brief VRS internal class to manage the records of a specific Recordable after their creation.
 ///
-/// Each Recordable has its own RecordManager to minize (ideally avoid) inter-thread locking.
+/// Each Recordable has its own RecordManager to minimize (ideally avoid) inter-thread locking.
 /// All timestamps are in seconds since some arbitrary point in time, and must be using the same
 /// time domain for the entire VRS file.
 /// @internal
@@ -40,6 +40,8 @@ class RecordManager {
 
  public:
   RecordManager();
+  RecordManager(const RecordManager&) = delete;
+  void operator=(const RecordManager&) = delete;
   ~RecordManager();
 
   /// Create & hold a record using the given parameters. RecordManager is responsible for deleting
