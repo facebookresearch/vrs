@@ -15,6 +15,7 @@
  */
 
 #include "PyBuffer.h"
+#include "vrs/RecordFormat.h"
 
 #include <functional> // multiplies
 #include <numeric> // accumulate
@@ -98,53 +99,28 @@ void PyContentBlock::initAttributesMap() {
 
 void ImageBuffer::initBytesFromPyBuffer(const py::buffer& b) {
   ImageFormat imageFormat = spec.getImageFormat();
-  //  If the image is not in a raw pixel buffer form, return a simple array of bytes.
-  if (imageFormat == ImageFormat::JPG || imageFormat == ImageFormat::PNG ||
-      imageFormat == ImageFormat::VIDEO) {
-    /* Request a buffer descriptor from Python */
-    py::buffer_info info = b.request();
-    size_t size = info.itemsize;
-    for (py::ssize_t i = 0; i < info.ndim; i++) {
-      size *= info.shape[i];
-    }
+  /* Request a buffer descriptor from Python */
+  py::buffer_info info = b.request();
+  size_t size = info.itemsize;
+  for (py::ssize_t i = 0; i < info.ndim; i++) {
+    size *= info.shape[i];
+  }
 
-    const uint8_t* begin = reinterpret_cast<const uint8_t*>(info.ptr);
-
-    bytes.assign(begin, begin + size);
+  if (imageFormat == ImageFormat::RAW && size != spec.getRawImageSize()) {
+    XR_LOGE(
+        "Buffer size {} doesn't match the expected image size {}", size, spec.getRawImageSize());
+    bytes.clear();
+    return;
+  }
+  if (imageFormat == ImageFormat::UNDEFINED || imageFormat == ImageFormat::COUNT) {
+    XR_LOGW("Invalid image format: {}", toString(imageFormat));
+    bytes.clear();
     return;
   }
 
-  if (XR_VERIFY(imageFormat == ImageFormat::RAW)) {
-    size_t bytesPerPixel = spec.getBytesPerPixel();
-    uint32_t channelCount = spec.getChannelCountPerPixel();
-    uint32_t stride = spec.getStride();
-    if (bytesPerPixel == ContentBlock::kSizeUnknown) {
-      XR_LOGE("bytesPerPixel for this '{}' image is unknown.", spec.asString());
-    }
-    if (spec.getPixelFormat() == PixelFormat::YUV_I420_SPLIT) {
-      // YUV_I420_SPLIT is a weird format, needs special handling
-      bytesPerPixel = 1;
-      channelCount = 1;
-    }
-    // Prepare a vector for the buffer dimensions and strides. For single channel images these
-    // vectors have two items (rows & cols). For >1 channel images, three entries are
-    // required.
-    vector<uint32_t> shapes = {spec.getHeight(), stride};
-    if (channelCount > 1) {
-      shapes.push_back(channelCount);
-    }
-    size_t shapesProduct = accumulate(shapes.begin(), shapes.end(), 1U, multiplies<>());
+  const uint8_t* begin = reinterpret_cast<const uint8_t*>(info.ptr);
 
-    /* Request a buffer descriptor from Python */
-    py::buffer_info info = b.request();
-
-    size_t bufferLength = (bytesPerPixel / channelCount) * shapesProduct;
-    const uint8_t* begin = reinterpret_cast<const uint8_t*>(info.ptr);
-    bytes.assign(begin, begin + bufferLength);
-  } else {
-    XR_LOGW("Invalid image format: {}", toString(imageFormat));
-    bytes.clear();
-  }
+  bytes.assign(begin, begin + size);
 }
 
 py::buffer_info bufferInfoFromVector(vector<uint8_t>& vec) {
