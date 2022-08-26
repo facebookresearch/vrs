@@ -83,6 +83,12 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a96b6079ce4b9d35d4e3a61f23bef99b4"><td class="memItemLeft" align="right" valign="top"><a id="a96b6079ce4b9d35d4e3a61f23bef99b4"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>RecordManager</b> (const <a class="el" href="classvrs_1_1_record_manager.html">RecordManager</a> &amp;)=delete</td></tr>
+<tr class="separator:a96b6079ce4b9d35d4e3a61f23bef99b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c10706db80a21f491664f969f80fe63"><td class="memItemLeft" align="right" valign="top"><a id="a9c10706db80a21f491664f969f80fe63"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classvrs_1_1_record_manager.html">RecordManager</a> &amp;)=delete</td></tr>
+<tr class="separator:a9c10706db80a21f491664f969f80fe63"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac9609c8bd45a8ec1f2c98ef032e0a1c4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classvrs_1_1_record.html">Record</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_manager.html#ac9609c8bd45a8ec1f2c98ef032e0a1c4">createRecord</a> (double timestamp, <a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> type, uint32_t formatVersion, const <a class="el" href="classvrs_1_1_data_source.html">DataSource</a> &amp;data)</td></tr>
 <tr class="separator:ac9609c8bd45a8ec1f2c98ef032e0a1c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5a2b2380b4e3af398631f0471dc09a28"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_manager.html#a5a2b2380b4e3af398631f0471dc09a28">purgeOldRecords</a> (double oldestTimestamp, bool recycleBuffers=true)</td></tr>
@@ -114,7 +120,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Record</b></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>VRS internal class to manage the records of a specific <a class="el" href="classvrs_1_1_recordable.html" title="Class to override to implement a record producing device, or virtual device.">Recordable</a> after their creation. </p>
-<p>Each <a class="el" href="classvrs_1_1_recordable.html" title="Class to override to implement a record producing device, or virtual device.">Recordable</a> has its own <a class="el" href="classvrs_1_1_record_manager.html" title="VRS internal class to manage the records of a specific Recordable after their creation.">RecordManager</a> to minize (ideally avoid) inter-thread locking. All timestamps are in seconds since some arbitrary point in time, and must be using the same time domain for the entire VRS file. </p>
+<p>Each <a class="el" href="classvrs_1_1_recordable.html" title="Class to override to implement a record producing device, or virtual device.">Recordable</a> has its own <a class="el" href="classvrs_1_1_record_manager.html" title="VRS internal class to manage the records of a specific Recordable after their creation.">RecordManager</a> to minimize (ideally avoid) inter-thread locking. All timestamps are in seconds since some arbitrary point in time, and must be using the same time domain for the entire VRS file. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a6267f35dcc1d838dfe7bbb83725e9fb0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6267f35dcc1d838dfe7bbb83725e9fb0">&#9670;&nbsp;</a></span>collectOldRecords()</h2>
