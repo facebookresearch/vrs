@@ -26,6 +26,7 @@ target_link_libraries(vrs_helpers
   PRIVATE
     vrs_helpers_strings
   PUBLIC
+    vrs_logging
     vrs_os
     cereal::cereal
 )
