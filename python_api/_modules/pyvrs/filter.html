@@ -134,7 +134,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Dictionary of all file tags: {&lt;tag&gt;: &lt;value&gt;}</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reader</span><span class="o">.</span><span class="n">file_tags</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reader</span><span class="o">.</span><span class="n">file_tags</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">stream_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
@@ -144,7 +144,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Dictionary of all file tags: {&lt;tag&gt;: &lt;value&gt;}</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reader</span><span class="o">.</span><span class="n">stream_tags</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reader</span><span class="o">.</span><span class="n">stream_tags</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_records</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
@@ -464,7 +464,9 @@
                 <span class="n">tags_to_justified_table_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_tags</span><span class="p">),</span>
                 <span class="n">f</span><span class="s2">&quot;{len(self)}/{len(self._reader)} records are enabled (based on filters)&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;Automatic configuration record reading is </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="s2">&quot;enabled&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auto_read_configuration_records</span> <span class="k">else</span> <span class="s2">&quot;disabled&quot;</span>
+                    <span class="s2">&quot;enabled&quot;</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reader</span><span class="o">.</span><span class="n">_auto_read_configuration_records</span>
+                    <span class="k">else</span> <span class="s2">&quot;disabled&quot;</span>
                 <span class="p">),</span>
                 <span class="s2">&quot;Available Stream IDs: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">string_of_set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reader</span><span class="o">.</span><span class="n">stream_ids</span><span class="p">)</span>
