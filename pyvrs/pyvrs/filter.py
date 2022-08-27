@@ -93,7 +93,7 @@ class FilteredVRSReader(BaseVRSReader, ABC):
         Returns:
             Dictionary of all file tags: {<tag>: <value>}
         """
-        return self._reader.file_tags()
+        return self._reader.file_tags
 
     @property
     def stream_tags(self) -> Mapping[str, Mapping[str, Any]]:
@@ -103,7 +103,7 @@ class FilteredVRSReader(BaseVRSReader, ABC):
         Returns:
             Dictionary of all file tags: {<tag>: <value>}
         """
-        return self._reader.stream_tags()
+        return self._reader.stream_tags
 
     @property
     def n_records(self) -> int:
@@ -423,7 +423,9 @@ class SyncFilteredVRSReader(FilteredVRSReader):
                 tags_to_justified_table_str(self.file_tags),
                 f"{len(self)}/{len(self._reader)} records are enabled (based on filters)",
                 "Automatic configuration record reading is {}".format(
-                    "enabled" if self._auto_read_configuration_records else "disabled"
+                    "enabled"
+                    if self._reader._auto_read_configuration_records
+                    else "disabled"
                 ),
                 "Available Stream IDs: {}".format(
                     string_of_set(self._reader.stream_ids)
