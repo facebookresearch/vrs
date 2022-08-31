@@ -198,7 +198,7 @@ void mem_png_flush(png_structp png_ptr) {}
 
 } // namespace
 
-int PixelFrame::writeAsPng(const string& filename, std::vector<uint8_t>* const outBuffer) {
+int PixelFrame::writeAsPng(const string& filename, std::vector<uint8_t>* const outBuffer) const {
   PixelFormat pixelFormat = this->getPixelFormat();
   if (!XR_VERIFY(
           pixelFormat == PixelFormat::GREY8 || pixelFormat == PixelFormat::GREY16 ||

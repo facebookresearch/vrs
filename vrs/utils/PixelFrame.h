@@ -173,7 +173,7 @@ class PixelFrame {
   /// @param path: path of the file to write, if no outBuffer is provided
   /// @param outBuffer: if provided, a vector where to write the data, instead of writing to disk
   /// @return A status code, 0 meaning success.
-  int writeAsPng(const string& path, std::vector<uint8_t>* const outBuffer = nullptr);
+  int writeAsPng(const string& path, std::vector<uint8_t>* const outBuffer = nullptr) const;
 
   /// Normalize an input frame if possible and as necessary,
   /// which means it has one of the following pixel formats:

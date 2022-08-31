@@ -45,6 +45,7 @@ void extractImages(const string& path, FilteredFileReader& filteredReader, bool 
     }
   }
   filteredReader.iterateSafe();
+  extractors.clear();
   cout << "Found " << imageCounter << " image(s)." << endl;
 }
 

@@ -17,7 +17,7 @@
 #include "ImageExtractor.h"
 
 #include <fstream>
-#include <iostream>
+#include <thread>
 
 #include <fmt/format.h>
 
@@ -27,44 +27,31 @@
 
 using namespace std;
 using namespace vrs;
-
-using utils::PixelFrame;
+using namespace utils;
 
 namespace {
 
 const bool kSupportGrey16Export = true;
 
-void writePngImage(
-    PixelFrame& image,
-    const string& folderPath,
-    StreamId id,
-    uint32_t imageCounter,
-    double timeStamp) {
-  string path = fmt::format(
-      "{}/{}-{:05}-{:.3f}.png", folderPath, id.getNumericName(), imageCounter, timeStamp);
-  cout << "Writing " << path << endl;
-  image.writeAsPng(path);
-}
-
-bool writeImage(
-    const ImageContentBlockSpec& imageContectBlockSpec,
+bool writeRawImage(
+    const ImageContentBlockSpec& imageSpec,
     const vector<uint8_t>& imageData,
     const string& folderPath,
     StreamId id,
     uint32_t imageCounter,
-    double timeStamp) {
-  const auto& imageFormat = imageContectBlockSpec.getImageFormat();
+    double timestamp) {
+  const auto& imageFormat = imageSpec.getImageFormat();
   string filenamePostfix;
   string extension;
   switch (imageFormat) {
     case ImageFormat::RAW: {
-      extension = ".raw";
+      extension = "raw";
 
       // encode image format into filename
-      string pixelFormat = imageContectBlockSpec.getPixelFormatAsString();
-      uint32_t width = imageContectBlockSpec.getWidth();
-      uint32_t height = imageContectBlockSpec.getHeight();
-      uint32_t rawstride = imageContectBlockSpec.getRawStride();
+      string pixelFormat = imageSpec.getPixelFormatAsString();
+      uint32_t width = imageSpec.getWidth();
+      uint32_t height = imageSpec.getHeight();
+      uint32_t rawstride = imageSpec.getRawStride();
 
       filenamePostfix = "-" + pixelFormat + "-" + to_string(width) + "x" + to_string(height);
       if (rawstride > 0) {
@@ -73,21 +60,21 @@ bool writeImage(
       break;
     }
     case ImageFormat::VIDEO: {
-      extension = "." + imageContectBlockSpec.getCodecName();
-      filenamePostfix += "#" + to_string(imageContectBlockSpec.getKeyFrameIndex());
+      extension = imageSpec.getCodecName();
+      filenamePostfix += "#" + to_string(imageSpec.getKeyFrameIndex());
       break;
     }
     default:
-      extension = "." + toString(imageFormat);
+      extension = toString(imageFormat);
       break;
   }
 
   string path = fmt::format(
-      "{}/{}-{:05}-{:.3f}{}{}",
+      "{}/{}-{:05}-{:.3f}{}.{}",
       folderPath,
       id.getNumericName(),
       imageCounter,
-      timeStamp,
+      timestamp,
       filenamePostfix,
       extension);
 
@@ -96,7 +83,7 @@ bool writeImage(
     XR_LOGE("Cannot open file {} for writing", path);
     return false;
   }
-  cout << "Writing " << path << endl;
+  fmt::print("Writing {}\n", path);
   if (!file.write((const char*)imageData.data(), imageData.size())) {
     XR_LOGE("Failed to write file {}", path);
     return false;
@@ -105,30 +92,130 @@ bool writeImage(
   return true;
 }
 
+enum JobType { SaveToPng, EndQueue };
+
+struct ImageJob {
+  ImageJob(const string& folderPath, StreamId id, double timestamp, uint32_t imageCounter)
+      : jobType{JobType::SaveToPng},
+        folderPath{folderPath},
+        id{id},
+        timestamp{timestamp},
+        imageCounter{imageCounter},
+        frame{make_shared<PixelFrame>()} {}
+  ImageJob(JobType jobType, const string& folderPath) : jobType{jobType}, folderPath{folderPath} {}
+
+  void saveAsPng() {
+    shared_ptr<PixelFrame> normalFrame;
+    PixelFrame::normalizeFrame(frame, normalFrame, kSupportGrey16Export);
+    string path = fmt::format(
+        "{}/{}-{:05}-{:.3f}.png", folderPath, id.getNumericName(), imageCounter, timestamp);
+    fmt::print("Writing {}\n", path);
+    normalFrame->writeAsPng(path);
+  }
+
+  JobType jobType;
+
+  const string& folderPath;
+  StreamId id;
+  double timestamp;
+  uint32_t imageCounter;
+  shared_ptr<PixelFrame> frame;
+};
+
+class ImageProcessor {
+ public:
+  static ImageProcessor& get() {
+    static ImageProcessor sImageProcessor;
+    return sImageProcessor;
+  }
+
+  JobQueue<unique_ptr<ImageJob>>& getImageQueue() {
+    return imageQueue_;
+  }
+
+  void startThreadPool() {
+    unique_lock<mutex> locker(mutex_);
+    while (threadPool_.size() < thread::hardware_concurrency()) {
+      threadPool_.emplace_back(&ImageProcessor::saveImagesThreadActivity, this);
+    }
+  }
+
+  void endThreadPool() {
+    unique_lock<mutex> locker(mutex_);
+    if (threadPool_.size() > 0) {
+      JobQueue<unique_ptr<ImageJob>>& imageQueue = getImageQueue();
+      string fakePath;
+      imageQueue.sendJob(make_unique<ImageJob>(JobType::EndQueue, fakePath));
+      for (auto& thread : threadPool_) {
+        if (thread.joinable()) {
+          thread.join();
+        }
+      }
+      threadPool_.clear();
+    }
+  }
+
+  void saveImagesThreadActivity() {
+    unique_ptr<ImageJob> job;
+    while (imageQueue_.waitForJob(job)) {
+      switch (job->jobType) {
+        case JobType::SaveToPng:
+          job->saveAsPng();
+          break;
+        case JobType::EndQueue:
+          imageQueue_.endQueue();
+          break;
+      }
+      job.reset();
+    }
+  }
+
+ private:
+  mutex mutex_;
+  deque<thread> threadPool_;
+  JobQueue<unique_ptr<ImageJob>> imageQueue_;
+};
+
 } // namespace
 
 namespace vrs {
 namespace utils {
 
+ImageExtractor::ImageExtractor(
+    const string& folderPath,
+    uint32_t& counter,
+    const bool extractImagesRaw)
+    : folderPath_{folderPath}, imageFileCounter_{counter}, extractImagesRaw_(extractImagesRaw) {
+  ImageProcessor::get().startThreadPool();
+}
+
+ImageExtractor::~ImageExtractor() {
+  ImageProcessor::get().endThreadPool();
+}
+
 bool ImageExtractor::onImageRead(const CurrentRecord& record, size_t, const ContentBlock& ib) {
+  JobQueue<unique_ptr<ImageJob>>& imageQueue = ImageProcessor::get().getImageQueue();
+  while (imageQueue.getQueueSize() > 2 * thread::hardware_concurrency()) {
+    this_thread::sleep_for(chrono::milliseconds(50));
+  }
+
   imageFileCounter_++;
   imageCounter_++;
   const StreamId id = record.streamId;
   auto format = ib.image().getImageFormat();
 
   if (!extractImagesRaw_ && format == ImageFormat::RAW) {
-    if (PixelFrame::readRawFrame(inputFrame_, record.reader, ib.image())) {
-      PixelFrame::normalizeFrame(inputFrame_, processedFrame_, kSupportGrey16Export);
-      writePngImage(*processedFrame_, folderPath_, id, imageCounter_, record.timestamp);
+    unique_ptr<ImageJob> job =
+        make_unique<ImageJob>(folderPath_, id, record.timestamp, imageCounter_);
+    if (PixelFrame::readRawFrame(job->frame, record.reader, ib.image())) {
+      imageQueue.sendJob(move(job));
       return true;
     }
   } else if (!extractImagesRaw_ && format == ImageFormat::VIDEO) {
-    if (!inputFrame_) {
-      inputFrame_ = make_shared<PixelFrame>(ib.image());
-    }
-    if (tryToDecodeFrame(*inputFrame_, record, ib) == 0) {
-      PixelFrame::normalizeFrame(inputFrame_, processedFrame_, kSupportGrey16Export);
-      writePngImage(*processedFrame_, folderPath_, id, imageCounter_, record.timestamp);
+    unique_ptr<ImageJob> job =
+        make_unique<ImageJob>(folderPath_, id, record.timestamp, imageCounter_);
+    if (tryToDecodeFrame(*job->frame, record, ib) == 0) {
+      imageQueue.sendJob(move(job));
       return true;
     }
   } else {
@@ -144,9 +231,8 @@ bool ImageExtractor::onImageRead(const CurrentRecord& record, size_t, const Cont
           errorCodeToMessage(readStatus));
       return false;
     }
-    if (writeImage(ib.image(), imageData, folderPath_, id, imageCounter_, record.timestamp)) {
-      return true;
-    }
+    writeRawImage(ib.image(), imageData, folderPath_, id, imageCounter_, record.timestamp);
+    return true;
   }
   XR_LOGW("Could not convert image for {}, format: {}", id.getName(), ib.asString());
   return false;

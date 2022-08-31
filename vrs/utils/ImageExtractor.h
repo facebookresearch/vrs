@@ -17,7 +17,9 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
+#include <vrs/helpers/JobQueue.h>
 #include <vrs/utils/PixelFrame.h>
 #include <vrs/utils/VideoRecordFormatStreamPlayer.h>
 
@@ -26,15 +28,16 @@ namespace utils {
 
 class ImageExtractor : public utils::VideoRecordFormatStreamPlayer {
  public:
-  ImageExtractor(const string& folderPath, uint32_t& counter, const bool extractImagesRaw)
-      : folderPath_{folderPath}, imageFileCounter_{counter}, extractImagesRaw_(extractImagesRaw) {}
+  ImageExtractor(const string& folderPath, uint32_t& counter, const bool extractImagesRaw);
+  ~ImageExtractor() override;
+
   bool onImageRead(const CurrentRecord& record, size_t, const ContentBlock& ib) override;
   bool onUnsupportedBlock(const CurrentRecord& record, size_t, const ContentBlock& cb) override;
 
+  void saveImagesThreadActivity();
+
  protected:
   const string& folderPath_;
-  std::shared_ptr<PixelFrame> inputFrame_;
-  std::shared_ptr<PixelFrame> processedFrame_;
   uint32_t& imageFileCounter_;
   uint32_t imageCounter_ = 0;
   const bool extractImagesRaw_;
