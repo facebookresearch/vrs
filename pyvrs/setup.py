@@ -23,7 +23,14 @@ from setuptools.command.build_ext import build_ext
 
 ROOT_DIR = Path(__file__).parent.parent.resolve()
 if os.path.basename(ROOT_DIR) != "vrs":
-    ROOT_DIR = os.path.abspath(os.path.join(ROOT_DIR, "../libraries/vrs"))
+    # Check if it is FB repo
+    FB_ROOT_PATH = os.path.abspath(os.path.join(ROOT_DIR, "../libraries/vrs"))
+    if os.path.exists(FB_ROOT_PATH):
+        ROOT_DIR = FB_ROOT_PATH
+    else:
+        PYPI_ROOT_PATH = os.path.abspath(os.path.join(ROOT_DIR, ".."))
+        if os.path.exists(PYPI_ROOT_PATH):
+            ROOT_DIR = PYPI_ROOT_PATH
 
 
 class CMakeExtension(Extension):
