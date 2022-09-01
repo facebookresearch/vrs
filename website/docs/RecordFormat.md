@@ -442,4 +442,24 @@ Historically, `DataLayout` was designed to be backward compatible with our early
 
 For each record type in a stream, there is one `RecordFormat`, with its own set of `DataLayout` definitions, which is the dictionary of field types and labels in the datalayout content blocks of the stream. Each `DataLayout` block in the record contains only its own data, in raw binary form, which reduces processing overhead to a minimum. Therefore, the marginal cost of a `DataPieceValue<uint8_t>`, before compression, is one byte per record, regardless of its label, and even if it is the only field in the datalayout content block.
 
-When reading and writing records, no binary-ascii conversions are made, only binary copies, and no pre or post processing of the source code is required. `DataLayout` definitions are as readable as possible, since they are `struct` definitions. The `DataLayout` definition is interpreted only once when the file is read, and the `DataLayout`, that the reader expects, is mapped only once to the `DataLayout` that is actually present in the record. Therefore, reading the fields of a `DataLayout` happens in amortized constant time, with no parsing of any kind, since only pointer and size checks are required. If a field is not available in a record, the default value for that type is returned, and the `isAvailable()` method can be used to check.
+When reading and writing records, no binary-ascii conversions are made, only binary copies, and no pre or post processing of the source code is required. `DataLayout` definitions are as readable as possible, since they are `struct` definitions. The `DataLayout` definition is interpreted only once when the file is read, and the `DataLayout` that the reader expects is mapped only once to the `DataLayout` that is actually present in the stream. Therefore, reading the fields of a `DataLayout` happens in amortized constant time, with no parsing of any kind, since only pointer and size checks are required. If a field is not available in a record, the default value for that type is returned, and the `isAvailable()` method can be used to check.
+
+### What is `DataLayout` “really” good at?
+
+All the power of `DataLayout` lies in its ability to amortize costs. Amortized, `DataLayout` objects...
+
+- ...store one byte of payload at the cost of 1 byte of storage (or less, because of record level compression).
+- ...have zero serialization/deserialization overhead, both on read and write, including when handling data version mismatch (that’s when the data stored in a file and the definition you have when reading that file don’t match).
+- ...have constant field access time, no matter how many you have.
+- ...are pure binary containers (no string conversions, unlike json).
+- ...require no pre-processor/code generation: `DataLayout` definitions are directly compiled by a C++ compiler.
+- ...minimize memory allocations overhead. It’s possible to create and read records without memory allocations beyond record management, even when dealing with variable size arrays (vectors). Again, amortized.
+- ...look, behave, and feel like a simple C++ struct: they are very readable, very easy and efficient to read and write to.
+
+The key assumption VRS makes is that data collected within each stream is extremely repetitive throughout a particular file, and everything is done to leverage that property to the fullest. So `DataLayout` stores definitions once per file, parses them once per file-read, maps the `DataLayout` format expected to the `DataLayout` found in the stream once, so all the relatively expensive operations are done only once.
+
+### What is `DataLayout` not good at?
+
+- seamless integration with existing data representations. You will need to write converters to copy your data source(s) to your `DataLayout` definitions, field by field.
+- Nested definitions are supported, but with limitations. See [this documentation (in the “Example 2: nested definitions” tab) for details](https://facebookresearch.github.io/vrs/docs/RecordFormat#datalayout-examples). For 99% of sensor data use cases, `DataLayout` works great and this limitation isn’t even apparent, but for advanced use cases with more structured data and variable formats, of when you have nested definitions with variable size data, `DataLayout` conversion becomes a pain point.
+- complex data structures, in particular, arbitrary data structures that might change with every record, or not be known at compile time, so that converter code can not be written. In that case, you might need to use a self-described container, such as json or msgpack (which is a binary version of json). Looking at the needs of sensor data collection, this should be rare, or needed only for configuration records, which is fine, because it’s typically a one record need, and the trade offs are radically different when you need to do an operation once during setup vs. N million times in realtime. For instance, camera calibration is often stored as json in a `DataLayout` of a configuration record, and there is no reason to change that.
