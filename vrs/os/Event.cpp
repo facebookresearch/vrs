@@ -20,6 +20,9 @@
 
 #include <vrs/os/Time.h>
 
+#define DEFAULT_LOG_CHANNEL "EventChannel"
+#include <logging/Verify.h>
+
 using namespace std;
 
 namespace vrs {
@@ -38,7 +41,9 @@ EventChannel::EventChannel(const string& name, NotificationMode notificationMode
 EventChannel::~EventChannel() {
   unique_lock<mutex> lock(mutex_);
   inDestruction_ = true;
-  while (numEntering_ + numListeners_ > 0) {
+  // NOTE: waiting 3 times should be long enough
+  int maxLoopCount = 3;
+  while ((numEntering_ + numListeners_ > 0) && XR_VERIFY(maxLoopCount-- > 0)) {
     // It's not safe to call waitForEvent on an EventChannel that can be concurrently
     // destroyed; we might be really unlucky and it doesn't enter waitForEvent
     // until after the destruction is complete.  On the other hand, if there are
@@ -84,6 +89,10 @@ EventChannel::waitForEvent(Event& event, double timeoutSec, double lookBackSec) 
     numEntering_++;
     enterCondition_.wait(lock, [=] { return pendingWakeupsCount_ == 0; });
     numEntering_--;
+    if (inDestruction_) {
+      // This EventChannel is already being destructed, exit ASAP.
+      return Status::FAILURE;
+    }
   }
 
   // At here, we still have the lock.
