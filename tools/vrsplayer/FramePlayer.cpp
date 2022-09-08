@@ -107,12 +107,15 @@ bool FramePlayer::onImageRead(
         record.streamId.getTypeName(),
         getCurrentRecordFormatReader()->recordFormat.asString(),
         spec.asString());
+    if (frameValid && spec.getImageFormat() != vrs::ImageFormat::RAW) {
+      fmt::print(" - {}", frame->getSpec().asString());
+    }
     blankMode_ = false;
   }
   if (frameValid) {
     convertFrame(frame);
     if (firstImage_) {
-      if (!frame->hasSamePixels(spec)) {
+      if (needsConvertedFrame_) {
         fmt::print(" -> {}", frame->getSpec().asString());
       }
       if (estimatedFps_ != 0) {
