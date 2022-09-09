@@ -16,6 +16,7 @@
 
 #include "RecordFileWriter.h"
 
+#include <algorithm>
 #include <functional>
 #include <mutex>
 #include <queue>
@@ -302,10 +303,7 @@ vector<Recordable*> RecordFileWriter::getRecordables() const {
 }
 
 void RecordFileWriter::setCompressionThreadPoolSize(size_t size) {
-  if (size == kMaxThreadPoolSizeForHW) {
-    size = thread::hardware_concurrency();
-  }
-  compressionThreadPoolSize_ = size;
+  compressionThreadPoolSize_ = min<size_t>(size, thread::hardware_concurrency());
 }
 
 void RecordFileWriter::setInitCreatedThreadCallback(
