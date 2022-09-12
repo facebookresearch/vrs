@@ -185,12 +185,17 @@ py::buffer_info convertContentBlockBuffer(ContentBlockBuffer& block) {
       case vrs::PixelFormat::BGR8:
       case vrs::PixelFormat::RGB8:
       case vrs::PixelFormat::RGBA8:
-      case vrs::PixelFormat::RGB_IR_RAW_4X4:
       case vrs::PixelFormat::BAYER8_RGGB:
         pixelFormat = py::format_descriptor<uint8_t>::format();
         break;
       case vrs::PixelFormat::UNDEFINED:
       case vrs::PixelFormat::COUNT:
+        pixelFormat = py::format_descriptor<uint8_t>::format();
+        break;
+      case vrs::PixelFormat::RGB_IR_RAW_4X4:
+        // RGB_IR_RAW_4X4 packs 3 channels into one pixel. We present the buffer compressed, as if
+        // there was only 1 channel.
+        channelCount = 1;
         pixelFormat = py::format_descriptor<uint8_t>::format();
         break;
     } // do not add a default, to force implementation when a new pixel format is added
