@@ -84,7 +84,8 @@ bool PixelFrame::readJxlFrame(RecordReader* reader, const uint32_t sizeBytes) {
 bool PixelFrame::readJxlFrame(const vector<uint8_t>& jxlBuf, bool decodePixels) {
 #ifdef JXL_IS_AVAILABLE
   auto dec = getThreadDecoder();
-  JXL_CHECK(JxlDecoderSubscribeEvents(dec, JXL_DEC_BASIC_INFO | JXL_DEC_FULL_IMAGE));
+  JXL_CHECK(JxlDecoderSubscribeEvents(
+      dec, JXL_DEC_BASIC_INFO | JXL_DEC_COLOR_ENCODING | JXL_DEC_FULL_IMAGE));
 
   JXL_CHECK(JxlDecoderSetInput(dec, jxlBuf.data(), jxlBuf.size()));
   JxlDecoderCloseInput(dec);
@@ -99,6 +100,18 @@ bool PixelFrame::readJxlFrame(const vector<uint8_t>& jxlBuf, bool decodePixels) 
       case JXL_DEC_NEED_MORE_INPUT:
         XR_LOGE("JPEG XL decoder: need more input");
         return false;
+
+      case JXL_DEC_COLOR_ENCODING: {
+        JxlColorEncoding colorEncoding;
+        if (JxlDecoderGetColorAsEncodedProfile(
+                dec, &format, JXL_COLOR_PROFILE_TARGET_ORIGINAL, &colorEncoding) ==
+                JXL_DEC_SUCCESS &&
+            colorEncoding.color_space == JXL_COLOR_SPACE_GRAY) {
+          colorEncoding.gamma = 0.5;
+          colorEncoding.transfer_function = JXL_TRANSFER_FUNCTION_GAMMA;
+          JxlDecoderSetPreferredColorProfile(dec, &colorEncoding);
+        }
+      } break;
 
       case JXL_DEC_BASIC_INFO: {
         JxlBasicInfo info = {};
