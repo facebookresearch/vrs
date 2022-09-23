@@ -33,8 +33,6 @@
 
 namespace vrs::utils {
 
-using PixelFrameDecoder = std::function<bool(PixelFrame& out, const vector<uint8_t>&, bool decode)>;
-
 /// Helper class to read & convert images read using RecordFormat into simpler, but maybe degraded,
 /// pixel buffer, that can easily be displayed, or saved to disk as jpg or png.
 ///
@@ -150,10 +148,6 @@ class PixelFrame {
   /// @return True if the frame type is supported & the frame was read.
   /// Returns false, if no decoder was installed, or the data couldn't be decoded correctly.
   bool readJxlFrame(const std::vector<uint8_t>& buffer, bool decodePixels = true);
-
-  /// Temporary: to avoid linkage issues, jepg-xl is optional for now and support is explicit.
-  /// At best, provide a decoder when the app is initialized, before using jpeg-xl images.
-  static void setJxlDecoder(const PixelFrameDecoder& decoder);
 
   /// Read a PNG encoded frame into the internal buffer.
   /// @param reader: The record reader to read data from.
