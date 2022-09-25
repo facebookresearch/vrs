@@ -32,6 +32,7 @@ target_link_libraries(vrs_utils
     fmt::fmt
     JPEG::JPEG
     PNG::PNG
+    TurboJpeg::TurboJpeg
     cereal::cereal
     vrs_logging
 )
