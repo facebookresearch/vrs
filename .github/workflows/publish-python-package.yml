@@ -28,16 +28,18 @@ jobs:
     - name: Install dependencies
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
-            sudo apt-get install \
+            sudo apt-get update
+            sudo apt-get upgrade
+            sudo apt-get install -o Acquire::Retries=5 \
               cmake ninja-build ccache libgtest-dev libfmt-dev libcereal-dev \
-              libjpeg-dev libpng-dev \
+              libturbojpeg-dev libpng-dev \
               liblz4-dev libzstd-dev libxxhash-dev \
               libboost-system-dev libboost-filesystem-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev \
               portaudio19-dev
 
           elif [ "$RUNNER_OS" == "macOS" ]; then
               brew install ninja cmake ccache googletest glog fmt cereal \
-                  jpeg libpng \
+                  jpeg-turbo libpng \
                   lz4 zstd xxhash \
                   boost \
                   portaudio pybind11

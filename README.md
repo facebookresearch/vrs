@@ -79,7 +79,7 @@ avoid installing any library on your system.
   [Brew’s web site](https://brew.sh/).
 - install tools & libraries:
   ```
-  brew install cmake ninja ccache boost fmt cereal libpng jpeg lz4 zstd xxhash glog googletest
+  brew install cmake ninja ccache boost fmt cereal libpng jpeg-turbo lz4 zstd xxhash glog googletest
   brew install qt5 portaudio pybind11
   brew install node doxygen
   python -m pip install -U pip
@@ -93,7 +93,7 @@ doesn't install recent enough versions of cmake, fmt, lz4, and zstd._
 
 - install tools & libraries:
   ```
-  sudo apt-get install cmake ninja-build ccache libgtest-dev libfmt-dev libcereal-dev libjpeg-dev libpng-dev
+  sudo apt-get install cmake ninja-build ccache libgtest-dev libfmt-dev libcereal-dev libturbojpeg-dev libpng-dev
   sudo apt-get install liblz4-dev libzstd-dev libxxhash-dev
   sudo apt-get install libboost-system-dev libboost-filesystem-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev
   sudo apt-get install qtbase5-dev portaudio19-dev

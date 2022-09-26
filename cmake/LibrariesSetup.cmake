@@ -27,6 +27,7 @@ find_package(Zstd REQUIRED)
 find_package(xxHash REQUIRED)
 find_package(PNG REQUIRED)
 find_package(JPEG REQUIRED)
+find_package(TurboJpeg REQUIRED)
 
 # Setup unit test infra, but only if unit tests are enabled
 if (UNIT_TESTS)
