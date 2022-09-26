@@ -17,6 +17,7 @@
 #include "PixelFrame.h"
 
 #include <jpeglib.h>
+#include <turbojpeg.h>
 
 #define DEFAULT_LOG_CHANNEL "PixelFrameJpeg"
 #include <logging/Log.h>
@@ -76,6 +77,57 @@ bool PixelFrame::readJpegFrame(
     frame = make_shared<PixelFrame>();
   }
   return frame->readJpegFrame(reader, sizeBytes);
+}
+
+bool PixelFrame::jpgCompress(vector<uint8_t>& outBuffer, uint32_t quality) {
+  return jpgCompress(imageSpec_, frameBytes_, outBuffer, quality);
+}
+
+bool PixelFrame::jpgCompress(
+    const ImageContentBlockSpec& pixelSpec,
+    const vector<uint8_t>& pixels,
+    vector<uint8_t>& outBuffer,
+    uint32_t quality) {
+  if (!XR_VERIFY(pixelSpec.getImageFormat() == ImageFormat::RAW) ||
+      !XR_VERIFY(
+          pixelSpec.getPixelFormat() == PixelFormat::RGB8 ||
+          pixelSpec.getPixelFormat() == PixelFormat::GREY8)) {
+    return false;
+  }
+  const bool isGrey8 = (pixelSpec.getChannelCountPerPixel() == 1);
+  long unsigned int jpegDataSize = 0;
+  unsigned char* jpegData = nullptr;
+  const uint8_t* input = pixels.data();
+
+  tjhandle _jpegCompressor = tjInitCompress();
+
+  if (!XR_VERIFY(
+          tjCompress2(
+              _jpegCompressor,
+              input,
+              pixelSpec.getWidth(),
+              pixelSpec.getStride(),
+              pixelSpec.getHeight(),
+              isGrey8 ? TJPF_GRAY : TJPF_RGB,
+              &jpegData,
+              &jpegDataSize,
+              isGrey8 ? TJSAMP_GRAY : TJSAMP_444,
+              quality,
+              TJFLAG_FASTDCT) == 0)) {
+    tjDestroy(_jpegCompressor);
+    return false;
+  }
+
+  XR_VERIFY(tjDestroy(_jpegCompressor) == 0);
+
+  if (XR_VERIFY(jpegData != nullptr)) {
+    outBuffer.resize(jpegDataSize);
+    memcpy(outBuffer.data(), jpegData, jpegDataSize);
+    tjFree(jpegData);
+    return true;
+  }
+  outBuffer.clear();
+  return false;
 }
 
 } // namespace vrs::utils
