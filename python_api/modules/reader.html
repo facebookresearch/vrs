@@ -15,6 +15,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -583,6 +584,52 @@ If you specify 1000, streams with id 1000-* are the targets.</p></li>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">pyvrs.reader module</a><ul>
+<li><a class="reference internal" href="#pyvrs.reader.AsyncVRSReader"><code class="docutils literal notranslate"><span class="pre">AsyncVRSReader</span></code></a><ul>
+<li><a class="reference internal" href="#pyvrs.reader.AsyncVRSReader.filtered_by_fields"><code class="docutils literal notranslate"><span class="pre">AsyncVRSReader.filtered_by_fields()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pyvrs.reader.SyncVRSReader"><code class="docutils literal notranslate"><span class="pre">SyncVRSReader</span></code></a><ul>
+<li><a class="reference internal" href="#pyvrs.reader.SyncVRSReader.filtered_by_fields"><code class="docutils literal notranslate"><span class="pre">SyncVRSReader.filtered_by_fields()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader"><code class="docutils literal notranslate"><span class="pre">VRSReader</span></code></a><ul>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader.close"><code class="docutils literal notranslate"><span class="pre">VRSReader.close()</span></code></a></li>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader.file_tags"><code class="docutils literal notranslate"><span class="pre">VRSReader.file_tags</span></code></a></li>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader.filtered_by_fields"><code class="docutils literal notranslate"><span class="pre">VRSReader.filtered_by_fields()</span></code></a></li>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader.find_stream"><code class="docutils literal notranslate"><span class="pre">VRSReader.find_stream()</span></code></a></li>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader.find_streams"><code class="docutils literal notranslate"><span class="pre">VRSReader.find_streams()</span></code></a></li>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader.get_estimated_frame_rate"><code class="docutils literal notranslate"><span class="pre">VRSReader.get_estimated_frame_rate()</span></code></a></li>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader.get_record_index_by_time"><code class="docutils literal notranslate"><span class="pre">VRSReader.get_record_index_by_time()</span></code></a></li>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader.get_records_count"><code class="docutils literal notranslate"><span class="pre">VRSReader.get_records_count()</span></code></a></li>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader.get_stream_info"><code class="docutils literal notranslate"><span class="pre">VRSReader.get_stream_info()</span></code></a></li>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader.get_timestamp_for_index"><code class="docutils literal notranslate"><span class="pre">VRSReader.get_timestamp_for_index()</span></code></a></li>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader.get_timestamp_list"><code class="docutils literal notranslate"><span class="pre">VRSReader.get_timestamp_list()</span></code></a></li>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader.max_timestamp"><code class="docutils literal notranslate"><span class="pre">VRSReader.max_timestamp</span></code></a></li>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader.might_contain_audio"><code class="docutils literal notranslate"><span class="pre">VRSReader.might_contain_audio()</span></code></a></li>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader.might_contain_images"><code class="docutils literal notranslate"><span class="pre">VRSReader.might_contain_images()</span></code></a></li>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader.min_timestamp"><code class="docutils literal notranslate"><span class="pre">VRSReader.min_timestamp</span></code></a></li>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader.n_records"><code class="docutils literal notranslate"><span class="pre">VRSReader.n_records</span></code></a></li>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader.read_next_record"><code class="docutils literal notranslate"><span class="pre">VRSReader.read_next_record()</span></code></a></li>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader.read_prev_record"><code class="docutils literal notranslate"><span class="pre">VRSReader.read_prev_record()</span></code></a></li>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader.read_record_by_time"><code class="docutils literal notranslate"><span class="pre">VRSReader.read_record_by_time()</span></code></a></li>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader.record_types"><code class="docutils literal notranslate"><span class="pre">VRSReader.record_types</span></code></a></li>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader.set_image_conversion"><code class="docutils literal notranslate"><span class="pre">VRSReader.set_image_conversion()</span></code></a></li>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader.set_stream_image_conversion"><code class="docutils literal notranslate"><span class="pre">VRSReader.set_stream_image_conversion()</span></code></a></li>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader.set_stream_type_image_conversion"><code class="docutils literal notranslate"><span class="pre">VRSReader.set_stream_type_image_conversion()</span></code></a></li>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader.stream_ids"><code class="docutils literal notranslate"><span class="pre">VRSReader.stream_ids</span></code></a></li>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader.stream_tags"><code class="docutils literal notranslate"><span class="pre">VRSReader.stream_tags</span></code></a></li>
+<li><a class="reference internal" href="#pyvrs.reader.VRSReader.time_range"><code class="docutils literal notranslate"><span class="pre">VRSReader.time_range</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
     <h4>Previous topic</h4>
     <p class="topless"><a href="filter.html"
                           title="previous chapter">pyvrs.filter module</a></p>
@@ -635,7 +682,7 @@ If you specify 1000, streams with id 1000-* are the targets.</p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Meta Reality Labs Research.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>

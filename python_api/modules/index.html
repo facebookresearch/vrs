@@ -15,6 +15,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -50,12 +51,155 @@
 <h1>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this heading">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="base.html">pyvrs.base</a></li>
-<li class="toctree-l1"><a class="reference internal" href="filter.html">pyvrs.filter module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reader.html">pyvrs.reader module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="record.html">pyvrs.record module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="slice.html">pyvrs.slice module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="utils.html">pyvrs.utils module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="base.html">pyvrs.base</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader"><code class="docutils literal notranslate"><span class="pre">BaseVRSReader</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader.file_tags"><code class="docutils literal notranslate"><span class="pre">BaseVRSReader.file_tags</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader.find_stream"><code class="docutils literal notranslate"><span class="pre">BaseVRSReader.find_stream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader.find_streams"><code class="docutils literal notranslate"><span class="pre">BaseVRSReader.find_streams()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader.get_estimated_frame_rate"><code class="docutils literal notranslate"><span class="pre">BaseVRSReader.get_estimated_frame_rate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader.get_record_index_by_time"><code class="docutils literal notranslate"><span class="pre">BaseVRSReader.get_record_index_by_time()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader.get_records_count"><code class="docutils literal notranslate"><span class="pre">BaseVRSReader.get_records_count()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader.get_stream_info"><code class="docutils literal notranslate"><span class="pre">BaseVRSReader.get_stream_info()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader.get_timestamp_for_index"><code class="docutils literal notranslate"><span class="pre">BaseVRSReader.get_timestamp_for_index()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader.get_timestamp_list"><code class="docutils literal notranslate"><span class="pre">BaseVRSReader.get_timestamp_list()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader.max_timestamp"><code class="docutils literal notranslate"><span class="pre">BaseVRSReader.max_timestamp</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader.might_contain_audio"><code class="docutils literal notranslate"><span class="pre">BaseVRSReader.might_contain_audio()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader.might_contain_images"><code class="docutils literal notranslate"><span class="pre">BaseVRSReader.might_contain_images()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader.min_timestamp"><code class="docutils literal notranslate"><span class="pre">BaseVRSReader.min_timestamp</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader.n_records"><code class="docutils literal notranslate"><span class="pre">BaseVRSReader.n_records</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader.read_next_record"><code class="docutils literal notranslate"><span class="pre">BaseVRSReader.read_next_record()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader.read_prev_record"><code class="docutils literal notranslate"><span class="pre">BaseVRSReader.read_prev_record()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader.read_record_by_time"><code class="docutils literal notranslate"><span class="pre">BaseVRSReader.read_record_by_time()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader.record_types"><code class="docutils literal notranslate"><span class="pre">BaseVRSReader.record_types</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader.set_image_conversion"><code class="docutils literal notranslate"><span class="pre">BaseVRSReader.set_image_conversion()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader.set_stream_image_conversion"><code class="docutils literal notranslate"><span class="pre">BaseVRSReader.set_stream_image_conversion()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader.set_stream_type_image_conversion"><code class="docutils literal notranslate"><span class="pre">BaseVRSReader.set_stream_type_image_conversion()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader.stream_ids"><code class="docutils literal notranslate"><span class="pre">BaseVRSReader.stream_ids</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader.stream_tags"><code class="docutils literal notranslate"><span class="pre">BaseVRSReader.stream_tags</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#pyvrs.base.BaseVRSReader.time_range"><code class="docutils literal notranslate"><span class="pre">BaseVRSReader.time_range</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="filter.html">pyvrs.filter module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="filter.html#pyvrs.filter.FilteredVRSReader"><code class="docutils literal notranslate"><span class="pre">FilteredVRSReader</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.FilteredVRSReader.file_tags"><code class="docutils literal notranslate"><span class="pre">FilteredVRSReader.file_tags</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.FilteredVRSReader.find_stream"><code class="docutils literal notranslate"><span class="pre">FilteredVRSReader.find_stream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.FilteredVRSReader.find_streams"><code class="docutils literal notranslate"><span class="pre">FilteredVRSReader.find_streams()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.FilteredVRSReader.get_estimated_frame_rate"><code class="docutils literal notranslate"><span class="pre">FilteredVRSReader.get_estimated_frame_rate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.FilteredVRSReader.get_record_index_by_time"><code class="docutils literal notranslate"><span class="pre">FilteredVRSReader.get_record_index_by_time()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.FilteredVRSReader.get_records_count"><code class="docutils literal notranslate"><span class="pre">FilteredVRSReader.get_records_count()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.FilteredVRSReader.get_stream_info"><code class="docutils literal notranslate"><span class="pre">FilteredVRSReader.get_stream_info()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.FilteredVRSReader.get_timestamp_for_index"><code class="docutils literal notranslate"><span class="pre">FilteredVRSReader.get_timestamp_for_index()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.FilteredVRSReader.get_timestamp_list"><code class="docutils literal notranslate"><span class="pre">FilteredVRSReader.get_timestamp_list()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.FilteredVRSReader.max_filter_timestamp"><code class="docutils literal notranslate"><span class="pre">FilteredVRSReader.max_filter_timestamp</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.FilteredVRSReader.max_timestamp"><code class="docutils literal notranslate"><span class="pre">FilteredVRSReader.max_timestamp</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.FilteredVRSReader.might_contain_audio"><code class="docutils literal notranslate"><span class="pre">FilteredVRSReader.might_contain_audio()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.FilteredVRSReader.might_contain_images"><code class="docutils literal notranslate"><span class="pre">FilteredVRSReader.might_contain_images()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.FilteredVRSReader.min_filter_timestamp"><code class="docutils literal notranslate"><span class="pre">FilteredVRSReader.min_filter_timestamp</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.FilteredVRSReader.min_timestamp"><code class="docutils literal notranslate"><span class="pre">FilteredVRSReader.min_timestamp</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.FilteredVRSReader.n_records"><code class="docutils literal notranslate"><span class="pre">FilteredVRSReader.n_records</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.FilteredVRSReader.read_next_record"><code class="docutils literal notranslate"><span class="pre">FilteredVRSReader.read_next_record()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.FilteredVRSReader.read_prev_record"><code class="docutils literal notranslate"><span class="pre">FilteredVRSReader.read_prev_record()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.FilteredVRSReader.read_record_by_time"><code class="docutils literal notranslate"><span class="pre">FilteredVRSReader.read_record_by_time()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.FilteredVRSReader.record_types"><code class="docutils literal notranslate"><span class="pre">FilteredVRSReader.record_types</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.FilteredVRSReader.set_image_conversion"><code class="docutils literal notranslate"><span class="pre">FilteredVRSReader.set_image_conversion()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.FilteredVRSReader.set_stream_image_conversion"><code class="docutils literal notranslate"><span class="pre">FilteredVRSReader.set_stream_image_conversion()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.FilteredVRSReader.set_stream_type_image_conversion"><code class="docutils literal notranslate"><span class="pre">FilteredVRSReader.set_stream_type_image_conversion()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.FilteredVRSReader.stream_ids"><code class="docutils literal notranslate"><span class="pre">FilteredVRSReader.stream_ids</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.FilteredVRSReader.stream_tags"><code class="docutils literal notranslate"><span class="pre">FilteredVRSReader.stream_tags</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="filter.html#pyvrs.filter.RecordFilter"><code class="docutils literal notranslate"><span class="pre">RecordFilter</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.RecordFilter.max_timestamp"><code class="docutils literal notranslate"><span class="pre">RecordFilter.max_timestamp</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.RecordFilter.min_timestamp"><code class="docutils literal notranslate"><span class="pre">RecordFilter.min_timestamp</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.RecordFilter.record_types"><code class="docutils literal notranslate"><span class="pre">RecordFilter.record_types</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="filter.html#pyvrs.filter.RecordFilter.stream_ids"><code class="docutils literal notranslate"><span class="pre">RecordFilter.stream_ids</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="filter.html#pyvrs.filter.SyncFilteredVRSReader"><code class="docutils literal notranslate"><span class="pre">SyncFilteredVRSReader</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reader.html">pyvrs.reader module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reader.html#pyvrs.reader.AsyncVRSReader"><code class="docutils literal notranslate"><span class="pre">AsyncVRSReader</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.AsyncVRSReader.filtered_by_fields"><code class="docutils literal notranslate"><span class="pre">AsyncVRSReader.filtered_by_fields()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reader.html#pyvrs.reader.SyncVRSReader"><code class="docutils literal notranslate"><span class="pre">SyncVRSReader</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.SyncVRSReader.filtered_by_fields"><code class="docutils literal notranslate"><span class="pre">SyncVRSReader.filtered_by_fields()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader"><code class="docutils literal notranslate"><span class="pre">VRSReader</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader.close"><code class="docutils literal notranslate"><span class="pre">VRSReader.close()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader.file_tags"><code class="docutils literal notranslate"><span class="pre">VRSReader.file_tags</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader.filtered_by_fields"><code class="docutils literal notranslate"><span class="pre">VRSReader.filtered_by_fields()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader.find_stream"><code class="docutils literal notranslate"><span class="pre">VRSReader.find_stream()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader.find_streams"><code class="docutils literal notranslate"><span class="pre">VRSReader.find_streams()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader.get_estimated_frame_rate"><code class="docutils literal notranslate"><span class="pre">VRSReader.get_estimated_frame_rate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader.get_record_index_by_time"><code class="docutils literal notranslate"><span class="pre">VRSReader.get_record_index_by_time()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader.get_records_count"><code class="docutils literal notranslate"><span class="pre">VRSReader.get_records_count()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader.get_stream_info"><code class="docutils literal notranslate"><span class="pre">VRSReader.get_stream_info()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader.get_timestamp_for_index"><code class="docutils literal notranslate"><span class="pre">VRSReader.get_timestamp_for_index()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader.get_timestamp_list"><code class="docutils literal notranslate"><span class="pre">VRSReader.get_timestamp_list()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader.max_timestamp"><code class="docutils literal notranslate"><span class="pre">VRSReader.max_timestamp</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader.might_contain_audio"><code class="docutils literal notranslate"><span class="pre">VRSReader.might_contain_audio()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader.might_contain_images"><code class="docutils literal notranslate"><span class="pre">VRSReader.might_contain_images()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader.min_timestamp"><code class="docutils literal notranslate"><span class="pre">VRSReader.min_timestamp</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader.n_records"><code class="docutils literal notranslate"><span class="pre">VRSReader.n_records</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader.read_next_record"><code class="docutils literal notranslate"><span class="pre">VRSReader.read_next_record()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader.read_prev_record"><code class="docutils literal notranslate"><span class="pre">VRSReader.read_prev_record()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader.read_record_by_time"><code class="docutils literal notranslate"><span class="pre">VRSReader.read_record_by_time()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader.record_types"><code class="docutils literal notranslate"><span class="pre">VRSReader.record_types</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader.set_image_conversion"><code class="docutils literal notranslate"><span class="pre">VRSReader.set_image_conversion()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader.set_stream_image_conversion"><code class="docutils literal notranslate"><span class="pre">VRSReader.set_stream_image_conversion()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader.set_stream_type_image_conversion"><code class="docutils literal notranslate"><span class="pre">VRSReader.set_stream_type_image_conversion()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader.stream_ids"><code class="docutils literal notranslate"><span class="pre">VRSReader.stream_ids</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader.stream_tags"><code class="docutils literal notranslate"><span class="pre">VRSReader.stream_tags</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reader.html#pyvrs.reader.VRSReader.time_range"><code class="docutils literal notranslate"><span class="pre">VRSReader.time_range</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="record.html">pyvrs.record module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="record.html#pyvrs.record.VRSBlocks"><code class="docutils literal notranslate"><span class="pre">VRSBlocks</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="record.html#pyvrs.record.VRSRecord"><code class="docutils literal notranslate"><span class="pre">VRSRecord</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="record.html#pyvrs.record.VRSRecord.audio_blocks"><code class="docutils literal notranslate"><span class="pre">VRSRecord.audio_blocks</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="record.html#pyvrs.record.VRSRecord.audio_specs"><code class="docutils literal notranslate"><span class="pre">VRSRecord.audio_specs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="record.html#pyvrs.record.VRSRecord.custom_block_specs"><code class="docutils literal notranslate"><span class="pre">VRSRecord.custom_block_specs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="record.html#pyvrs.record.VRSRecord.custom_blocks"><code class="docutils literal notranslate"><span class="pre">VRSRecord.custom_blocks</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="record.html#pyvrs.record.VRSRecord.format_version"><code class="docutils literal notranslate"><span class="pre">VRSRecord.format_version</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="record.html#pyvrs.record.VRSRecord.image_blocks"><code class="docutils literal notranslate"><span class="pre">VRSRecord.image_blocks</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="record.html#pyvrs.record.VRSRecord.image_specs"><code class="docutils literal notranslate"><span class="pre">VRSRecord.image_specs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="record.html#pyvrs.record.VRSRecord.metadata_blocks"><code class="docutils literal notranslate"><span class="pre">VRSRecord.metadata_blocks</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="record.html#pyvrs.record.VRSRecord.n_audio_blocks"><code class="docutils literal notranslate"><span class="pre">VRSRecord.n_audio_blocks</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="record.html#pyvrs.record.VRSRecord.n_blocks_in_total"><code class="docutils literal notranslate"><span class="pre">VRSRecord.n_blocks_in_total</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="record.html#pyvrs.record.VRSRecord.n_custom_blocks"><code class="docutils literal notranslate"><span class="pre">VRSRecord.n_custom_blocks</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="record.html#pyvrs.record.VRSRecord.n_image_blocks"><code class="docutils literal notranslate"><span class="pre">VRSRecord.n_image_blocks</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="record.html#pyvrs.record.VRSRecord.n_metadata_blocks"><code class="docutils literal notranslate"><span class="pre">VRSRecord.n_metadata_blocks</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="record.html#pyvrs.record.VRSRecord.record_index"><code class="docutils literal notranslate"><span class="pre">VRSRecord.record_index</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="record.html#pyvrs.record.VRSRecord.record_type"><code class="docutils literal notranslate"><span class="pre">VRSRecord.record_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="record.html#pyvrs.record.VRSRecord.stream_id"><code class="docutils literal notranslate"><span class="pre">VRSRecord.stream_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="record.html#pyvrs.record.VRSRecord.timestamp"><code class="docutils literal notranslate"><span class="pre">VRSRecord.timestamp</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="slice.html">pyvrs.slice module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="slice.html#pyvrs.slice.AsyncVRSReaderSlice"><code class="docutils literal notranslate"><span class="pre">AsyncVRSReaderSlice</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="slice.html#pyvrs.slice.VRSReaderSlice"><code class="docutils literal notranslate"><span class="pre">VRSReaderSlice</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="slice.html#pyvrs.slice.async_index_or_slice_records"><code class="docutils literal notranslate"><span class="pre">async_index_or_slice_records()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="slice.html#pyvrs.slice.index_or_slice_records"><code class="docutils literal notranslate"><span class="pre">index_or_slice_records()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">pyvrs.utils module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#pyvrs.utils.filter_by_record_type"><code class="docutils literal notranslate"><span class="pre">filter_by_record_type()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#pyvrs.utils.filter_by_stream_ids"><code class="docutils literal notranslate"><span class="pre">filter_by_stream_ids()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#pyvrs.utils.get_recordable_type_id_name"><code class="docutils literal notranslate"><span class="pre">get_recordable_type_id_name()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#pyvrs.utils.string_of_set"><code class="docutils literal notranslate"><span class="pre">string_of_set()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#pyvrs.utils.stringify_metadata_keys"><code class="docutils literal notranslate"><span class="pre">stringify_metadata_keys()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#pyvrs.utils.tags_to_justified_table_str"><code class="docutils literal notranslate"><span class="pre">tags_to_justified_table_str()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </div>
 </section>
@@ -119,7 +263,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Meta Reality Labs Research.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.1.
     </div>
   </body>
 </html>
