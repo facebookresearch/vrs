@@ -67,19 +67,17 @@
 using namespace std;
 
 namespace {
-map<thread::id, JxlDecoderPtr>& getDecoders() {
-  static map<thread::id, JxlDecoderPtr> sEncoders;
-  return sEncoders;
-}
 
-JxlDecoderPtr& getThreadDecoderSmartPtr() {
+template <class T>
+T& getThreadObject() {
   static mutex sMutex;
   unique_lock<mutex> locker(sMutex);
-  return getDecoders()[this_thread::get_id()];
+  static map<thread::id, T> sObjects;
+  return sObjects[this_thread::get_id()];
 }
 
-JxlDecoder* getThreadDecoder() {
-  auto& decoder = getThreadDecoderSmartPtr();
+JxlDecoder* getThreadJxlDecoder() {
+  auto& decoder = getThreadObject<JxlDecoderPtr>();
   if (decoder) {
     JxlDecoderReset(decoder.get());
   } else {
@@ -88,16 +86,8 @@ JxlDecoder* getThreadDecoder() {
   return decoder.get();
 }
 
-map<thread::id, JxlEncoderPtr>& getJxlEncoders() {
-  static map<thread::id, JxlEncoderPtr> sEncoders;
-  return sEncoders;
-}
-
 JxlEncoder* getThreadJxlEncoder() {
-  static mutex sMutex;
-  unique_lock<mutex> locker(sMutex);
-
-  auto& encoder = getJxlEncoders()[this_thread::get_id()];
+  auto& encoder = getThreadObject<JxlEncoderPtr>();
   if (encoder) {
     JxlEncoderReset(encoder.get());
   } else {
@@ -147,7 +137,10 @@ bool PixelFrame::readJxlFrame(RecordReader* reader, const uint32_t sizeBytes) {
 
 bool PixelFrame::readJxlFrame(const vector<uint8_t>& jxlBuf, bool decodePixels) {
 #ifdef JXL_IS_AVAILABLE
-  auto dec = getThreadDecoder();
+  auto dec = getThreadJxlDecoder();
+  if (!XR_VERIFY(dec != nullptr)) {
+    return false;
+  }
   DEC_CHECK(JxlDecoderSubscribeEvents(
       dec, JXL_DEC_BASIC_INFO | JXL_DEC_COLOR_ENCODING | JXL_DEC_FULL_IMAGE));
 
@@ -272,6 +265,9 @@ bool PixelFrame::jxlCompress(
   const float butteraugli = percentNotDistance ? percent_to_butteraugli_distance(quality) : quality;
 
   JxlEncoder* enc = getThreadJxlEncoder();
+  if (!XR_VERIFY(enc != nullptr)) {
+    return false;
+  }
 
   const uint32_t channels = pixelSpec.getChannelCountPerPixel();
 
@@ -290,7 +286,7 @@ bool PixelFrame::jxlCompress(
       break;
 
     default:
-      return false; // Should have been rejected by canConvert()
+      return false;
   }
   basic_info.uses_original_profile = (butteraugli <= 0) ? JXL_TRUE : JXL_FALSE;
 
@@ -335,7 +331,7 @@ bool PixelFrame::jxlCompress(
   uint8_t* outData{};
   JxlEncoderStatus encoderStatus;
   do {
-    size_t allocatedSize = memBuffer.allocateSpace(outData, allocSize / 5);
+    size_t allocatedSize = memBuffer.allocateSpace(outData, allocSize);
     size_t remainingSize = allocatedSize;
     encoderStatus = JxlEncoderProcessOutput(enc, &outData, &remainingSize);
     if (JXL_ENC_SUCCESS != encoderStatus && JXL_ENC_NEED_MORE_OUTPUT != encoderStatus) {
