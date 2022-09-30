@@ -795,7 +795,17 @@ int RecordFileWriter::createFile(const string& filePath, bool splitHead) {
   WriteFileHandler& head = splitHead ? indexRecordWriter_.initSplitHead() : *file_;
   error = head.create(spec.chunks.front());
   if (error != 0) {
-    XR_LOGW("createFile '{}' failed: {}, {}", filePath, error, errorCodeToMessage(error));
+    if (!splitHead && filePath == spec.chunks.front()) {
+      XR_LOGE("Failed to create '{}': {}, {}", filePath, error, errorCodeToMessage(error));
+    } else {
+      XR_LOGE(
+          "Failed to create {}'{}' at '{}': {}, {}",
+          splitHead ? "the split head for " : "",
+          filePath,
+          spec.chunks.front(),
+          error,
+          errorCodeToMessage(error));
+    }
     return error;
   }
   fileHeader_.init();
