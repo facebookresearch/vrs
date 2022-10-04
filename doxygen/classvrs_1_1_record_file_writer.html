@@ -72,6 +72,7 @@ $(function() {
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-attribs">Static Public Attributes</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="#friends">Friends</a> &#124;
 <a href="classvrs_1_1_record_file_writer-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -124,7 +125,7 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad3a1faddddafd31345419dd1845533c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c39b244d61c2784ac96504c2da8c94d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#a0c39b244d61c2784ac96504c2da8c94d">purgeOldRecords</a> (double maxTimestamp, bool recycleBuffers=true)</td></tr>
 <tr class="separator:a0c39b244d61c2784ac96504c2da8c94d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af25ac696634369b6a4ed573876aeec45"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#af25ac696634369b6a4ed573876aeec45">createFileAsync</a> (const string &amp;filePath)</td></tr>
+<tr class="memitem:af25ac696634369b6a4ed573876aeec45"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#af25ac696634369b6a4ed573876aeec45">createFileAsync</a> (const string &amp;filePath)</td></tr>
 <tr class="separator:af25ac696634369b6a4ed573876aeec45"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a961580b64a0d3e7b1e08cd1dbe542c5b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#a961580b64a0d3e7b1e08cd1dbe542c5b">createChunkedFile</a> (const string &amp;filePath, size_t maxChunkSizeMB=0, unique_ptr&lt; <a class="el" href="classvrs_1_1_new_chunk_handler.html">NewChunkHandler</a> &gt; &amp;&amp;chunkHandler=nullptr)</td></tr>
 <tr class="separator:a961580b64a0d3e7b1e08cd1dbe542c5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -146,7 +147,7 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ac7d5ba84186faf5026df2a6607d27da4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acfc62c321a72cb16c5fba1c128f16676"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#acfc62c321a72cb16c5fba1c128f16676">closeFileAsync</a> ()</td></tr>
 <tr class="separator:acfc62c321a72cb16c5fba1c128f16676"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4f17115d0823c49cad9537a444175106"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#a4f17115d0823c49cad9537a444175106">waitForFileClosed</a> ()</td></tr>
+<tr class="memitem:a4f17115d0823c49cad9537a444175106"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#a4f17115d0823c49cad9537a444175106">waitForFileClosed</a> ()</td></tr>
 <tr class="separator:a4f17115d0823c49cad9537a444175106"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a245ce789938f697fb32802969a940439"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#a245ce789938f697fb32802969a940439">setTag</a> (const string &amp;tagName, const string &amp;tagValue)</td></tr>
 <tr class="separator:a245ce789938f697fb32802969a940439"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -166,6 +167,12 @@ Static Public Attributes</h2></td></tr>
 <tr class="memitem:a0c72ff93e13a557f5eed3e668f3de468"><td class="memItemLeft" align="right" valign="top"><a id="a0c72ff93e13a557f5eed3e668f3de468"></a>
 static constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><b>kMaxThreadPoolSizeForHW</b> = UINT32_MAX</td></tr>
 <tr class="separator:a0c72ff93e13a557f5eed3e668f3de468"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr class="memitem:aa42829c98ee8c2f8317a641b5ee09daa"><td class="memItemLeft" align="right" valign="top"><a id="aa42829c98ee8c2f8317a641b5ee09daa"></a>
+unique_ptr&lt; <a class="el" href="classvrs_1_1_write_file_handler.html">WriteFileHandler</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>file_</b></td></tr>
+<tr class="separator:aa42829c98ee8c2f8317a641b5ee09daa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -415,6 +422,9 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>::vrs::test::Record
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">int vrs::RecordFileWriter::createFileAsync </td>
@@ -424,6 +434,11 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>::vrs::test::Record
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Create a VRS file to write to in a background thread. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -737,6 +752,9 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>::vrs::test::Record
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">int vrs::RecordFileWriter::waitForFileClosed </td>
@@ -745,6 +763,11 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>::vrs::test::Record
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 <p>Start writing all the pending records, and wait for the file to be written &amp; closed. </p><dl class="section return"><dt>Returns</dt><dd>A status code: 0 if no error occurred, a file system error code otherwise. </dd></dl>
 
