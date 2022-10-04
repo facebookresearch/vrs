@@ -44,6 +44,9 @@ TEST(RecordManager, CollectOldRecords) {
   EXPECT_EQ(recordData.size(), 134);
   EXPECT_DOUBLE_EQ(recordData.front()->getTimestamp(), 0.0);
   EXPECT_DOUBLE_EQ(recordData.back()->getTimestamp(), 1.33);
+  for (auto* r : recordData) {
+    r->recycle();
+  }
 
   // Call backwards in time. There shouldn't be anything.
   list<Record*> noRecords;
