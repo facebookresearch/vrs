@@ -68,7 +68,7 @@ void log_every_n_seconds(
     const std::string& message) {
   using namespace std::chrono;
   static mutex sMutex;
-  unique_lock lock(sMutex);
+  unique_lock<mutex> lock(sMutex);
   static map<tuple<const char*, int>, int64_t> sLastTime;
   int64_t& lastTime = sLastTime[{file, line}];
   int64_t now =
