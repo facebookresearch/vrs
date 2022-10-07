@@ -117,6 +117,7 @@ enum class RecordableTypeId : uint16_t {
   UsbRecordableClass = 284, ///< For USB data streams.
   TimeRecordableClass = 285, ///< For time data streams.
   AttentionRecordableClass = 286, ///< For attention data streams.
+  GMSRecordableClass = 287, ///< For GMS location data stream.
 
   // << User Input >>
   InputRecordableClass = 300, ///< For user input data streams.
