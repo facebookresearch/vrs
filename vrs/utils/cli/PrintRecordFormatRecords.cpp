@@ -31,6 +31,7 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
   explicit DataLayoutPrinter(PrintoutType type) : printoutType_{type} {}
   bool processRecordHeader(const CurrentRecord& record, DataReference& outDataReference) override {
     if (printing_) {
+      recordCount_++;
       if (printoutType_ == PrintoutType::Compact || printoutType_ == PrintoutType::Details) {
         const auto& decoder = readers_.find(tuple<StreamId, Record::Type, uint32_t>(
             record.streamId, record.recordType, record.formatVersion));
@@ -48,7 +49,7 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
             Record::typeName(record.recordType),
             recordFormat,
             record.recordSize);
-      } else {
+      } else if (printoutType_ != PrintoutType::None) {
         fmt::print(
             "{{\"record\":{{\"timestamp\":{:.3f},\"device\":\"{}\",\"type\":\"{}\",\"size\":{}}}}}\n",
             record.timestamp,
@@ -62,6 +63,7 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
 
   bool onDataLayoutRead(const CurrentRecord& r, size_t blkIdx, DataLayout& datalayout) override {
     if (printing_) {
+      datalayoutCount_++;
       switch (printoutType_) {
         case PrintoutType::Details:
           fmt::print(" - DataLayout:\n");
@@ -89,9 +91,10 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
   }
   bool onImageRead(const CurrentRecord& record, size_t blkIdx, const ContentBlock& cb) override {
     if (printing_) {
+      imageCount_++;
       if (printoutType_ == PrintoutType::Compact || printoutType_ == PrintoutType::Details) {
         fmt::print(" - Image block, {}, {} bytes.\n", cb.asString(), cb.getBlockSize());
-      } else {
+      } else if (printoutType_ != PrintoutType::None) {
         fmt::print("{{\"image\":\"{}\"}}\n", cb.asString());
       }
     }
@@ -99,9 +102,10 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
   }
   bool onAudioRead(const CurrentRecord& record, size_t blkIdx, const ContentBlock& cb) override {
     if (printing_) {
+      audioCount_++;
       if (printoutType_ == PrintoutType::Compact || printoutType_ == PrintoutType::Details) {
         fmt::print(" - Audio block, {}, {} bytes.\n", cb.asString(), cb.getBlockSize());
-      } else {
+      } else if (printoutType_ != PrintoutType::None) {
         fmt::print("{{\"audio\":\"{}\"}}\n", cb.asString());
       }
     }
@@ -109,9 +113,10 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
   }
   bool onCustomBlockRead(const CurrentRecord& r, size_t blkIdx, const ContentBlock& cb) override {
     if (printing_) {
+      customCount_++;
       if (printoutType_ == PrintoutType::Compact || printoutType_ == PrintoutType::Details) {
         fmt::print(" - Custom block, {}, {} bytes.\n", cb.asString(), cb.getBlockSize());
-      } else {
+      } else if (printoutType_ != PrintoutType::None) {
         fmt::print("{{\"custom\":\"{}\"}}\n", cb.asString());
       }
     }
@@ -119,6 +124,7 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
   }
   bool onUnsupportedBlock(const CurrentRecord& r, size_t blkIdx, const ContentBlock& cb) override {
     if (printing_) {
+      unsupportedCount_++;
       if (printoutType_ == PrintoutType::Compact || printoutType_ == PrintoutType::Details) {
         fmt::print(" - Unsupported block, {}", cb.asString());
         if (cb.getBlockSize() == ContentBlock::kSizeUnknown) {
@@ -126,7 +132,7 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
         } else {
           fmt::print(", {} bytes.\n", cb.getBlockSize());
         }
-      } else {
+      } else if (printoutType_ != PrintoutType::None) {
         fmt::print("{{\"unsupported\":\"{}\"}}\n", cb.asString());
       }
     }
@@ -149,10 +155,35 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
   void enablePrinting() {
     printing_ = true;
   }
+  void printSummary() const {
+    fmt::print("Decoded {} records", recordCount_);
+    if (datalayoutCount_ != 0) {
+      fmt::print(", {} datalayouts", datalayoutCount_);
+    }
+    if (imageCount_ != 0) {
+      fmt::print(", {} images", imageCount_);
+    }
+    if (audioCount_ != 0) {
+      fmt::print(", {} audio content blocks", audioCount_);
+    }
+    if (customCount_ != 0) {
+      fmt::print(", {} custom content blocks", customCount_);
+    }
+    if (unsupportedCount_ != 0) {
+      fmt::print(", {} unsupported content blocks", unsupportedCount_);
+    }
+    fmt::print(".\n");
+  }
 
  private:
   PrintoutType printoutType_;
   bool printing_{false};
+  uint32_t recordCount_{0};
+  uint32_t datalayoutCount_{0};
+  uint32_t imageCount_{0};
+  uint32_t audioCount_{0};
+  uint32_t customCount_{0};
+  uint32_t unsupportedCount_{0};
 };
 
 } // namespace
@@ -171,6 +202,9 @@ void printRecordFormatRecords(FilteredFileReader& filteredReader, PrintoutType t
   // do not print records during pre-roll!
   lister.enablePrinting();
   filteredReader.iterateAdvanced();
+  if (type == PrintoutType::None) {
+    lister.printSummary();
+  }
 }
 
 } // namespace vrs::utils
