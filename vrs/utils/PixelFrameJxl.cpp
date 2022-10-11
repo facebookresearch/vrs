@@ -16,6 +16,7 @@
 
 #include "PixelFrame.h"
 
+#include <algorithm>
 #include <map>
 #include <mutex>
 #include <thread>
@@ -269,19 +270,24 @@ bool PixelFrame::jxlCompress(
     return false;
   }
 
-  const uint32_t channels = pixelSpec.getChannelCountPerPixel();
+  const uint32_t totalChannels = pixelSpec.getChannelCountPerPixel();
+  const uint32_t colorChannels = min<uint32_t>(totalChannels, 3);
+  const uint32_t extraChannels = totalChannels - colorChannels;
 
-  JxlPixelFormat pixel_format = {channels, JXL_TYPE_UINT8, JXL_NATIVE_ENDIAN, 0};
+  JxlPixelFormat pixel_format = {totalChannels, JXL_TYPE_UINT8, JXL_NATIVE_ENDIAN, 0};
 
   JxlBasicInfo basic_info = {};
   JxlEncoderInitBasicInfo(&basic_info); // Default set to RGB8
   basic_info.xsize = pixelSpec.getWidth();
   basic_info.ysize = pixelSpec.getHeight();
-  basic_info.num_color_channels = channels;
+  basic_info.num_color_channels = colorChannels;
+  basic_info.num_extra_channels = extraChannels;
   switch (pixelSpec.getPixelFormat()) {
     case PixelFormat::GREY8:
     case PixelFormat::RGB8:
+    case PixelFormat::RGBA8:
       basic_info.bits_per_sample = 8;
+      basic_info.alpha_bits = (extraChannels > 0) ? 8 : 0;
       pixel_format.data_type = JXL_TYPE_UINT8;
       break;
 
