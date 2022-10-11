@@ -89,7 +89,8 @@ avoid installing any library on your system.
 ### Install build tools & libraries (Ubuntu)
 
 _These instructions are validated using Ubuntu 20.04, whereas Ubuntu 18.04
-doesn't install recent enough versions of cmake, fmt, lz4, and zstd._
+doesn't install recent enough versions of cmake, fmt, lz4, and zstd, and is
+therefore not supported._
 
 - install tools & libraries:
   ```
