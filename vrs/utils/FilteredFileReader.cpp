@@ -333,7 +333,7 @@ void FilteredFileReader::applyRecordableFilters(const vector<string>& filters) {
 
 void FilteredFileReader::applyTypeFilters(const vector<string>& filters) {
   set<Record::Type> types = {Record::Type::CONFIGURATION, Record::Type::DATA, Record::Type::STATE};
-  set<Record::Type>* newSet = nullptr;
+  std::unique_ptr<set<Record::Type>> newSet = nullptr;
   for (auto iter = filters.begin(); iter != filters.end(); ++iter) {
     const bool isPlus = *iter == "+";
     Record::Type readType = stringToType(*(++iter));
@@ -341,13 +341,13 @@ void FilteredFileReader::applyTypeFilters(const vector<string>& filters) {
       if (isPlus) {
         if (newSet == nullptr) {
           // first command is add? start from empty set
-          newSet = new set<Record::Type>();
+          newSet = std::make_unique<set<Record::Type>>();
         }
         newSet->insert(readType);
       } else { // if it's not a '+', then it was a '-'
         if (newSet == nullptr) {
           // first command is remove? start with set of all known streams
-          newSet = new set<Record::Type>(types);
+          newSet = std::make_unique<set<Record::Type>>(types);
         }
         newSet->erase(readType);
       }
