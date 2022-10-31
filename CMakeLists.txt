@@ -56,15 +56,22 @@ include(${CMAKE_MODULE_PATH}/LibrariesSetup.cmake)
 # Include the libraries
 add_subdirectory(vrs)
 
-# Add the vrs command line utility
-add_subdirectory(${OSS_DIR}/tools/vrs)
+OPTION(BUILD_TOOLS "Build all of the tools" ON)
+OPTION(BUILD_SAMPLES "Build sample code and sample apps" ON)
 
-# Add the vrsplayer tool
-add_subdirectory(${OSS_DIR}/tools/vrsplayer)
+if (BUILD_TOOLS)
+  # Add the vrs command line utility
+  add_subdirectory(${OSS_DIR}/tools/vrs)
 
-# Add python binding
-add_subdirectory(${PYVRS_DIR} pyvrs)
+  # Add the vrsplayer tool
+  add_subdirectory(${OSS_DIR}/tools/vrsplayer)
 
-# Add the sample apps/code
-add_subdirectory(sample_apps)
-add_subdirectory(sample_code)
+  # Add python binding
+  add_subdirectory(${PYVRS_DIR} pyvrs)
+endif()
+
+if (BUILD_SAMPLES)
+  # Add the sample apps/code
+  add_subdirectory(sample_apps)
+  add_subdirectory(sample_code)
+endif()

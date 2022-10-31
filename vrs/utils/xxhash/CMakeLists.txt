@@ -21,7 +21,7 @@ target_include_directories(vrs_utils_xxhash
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 target_link_libraries(vrs_utils_xxhash
-  PRIVATE
+  PUBLIC
     vrs_logging
     xxHash::xxHash
 )
