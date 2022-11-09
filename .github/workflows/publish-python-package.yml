@@ -17,49 +17,47 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-
     - name: Set up Miniconda with Python ${{ matrix.python-version }}
       uses: conda-incubator/setup-miniconda@v2
       with:
         auto-update-conda: true
         miniconda-version: "latest"
         python-version: ${{ matrix.python-version }}
-
     - name: Install dependencies
-        run: |
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            sudo apt-get update
-            sudo apt-get upgrade
-            sudo apt-get install -o Acquire::Retries=5 \
-              cmake ninja-build ccache libgtest-dev libfmt-dev libcereal-dev \
-              libturbojpeg-dev libpng-dev \
-              liblz4-dev libzstd-dev libxxhash-dev \
-              libboost-system-dev libboost-filesystem-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev \
-              portaudio19-dev
+      run: |
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          sudo apt-get update
+          sudo apt-get upgrade
+          sudo apt-get install -o Acquire::Retries=5 \
+            cmake ninja-build ccache libgtest-dev libfmt-dev libcereal-dev \
+            libturbojpeg-dev libpng-dev \
+            liblz4-dev libzstd-dev libxxhash-dev \
+            libboost-system-dev libboost-filesystem-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev \
+            portaudio19-dev
 
-          elif [ "$RUNNER_OS" == "macOS" ]; then
-              brew install ninja cmake ccache googletest glog fmt cereal \
-                  jpeg-turbo libpng \
-                  lz4 zstd xxhash \
-                  boost \
-                  portaudio pybind11
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+            brew install ninja cmake ccache googletest glog fmt cereal \
+                jpeg-turbo libpng \
+                lz4 zstd xxhash \
+                boost \
+                portaudio pybind11
 
-          else
-              echo "$RUNNER_OS not supported"
-              exit 1
-          fi
+        else
+            echo "$RUNNER_OS not supported"
+            exit 1
+        fi
     - name: Install python dependencies
-        run: |
-          pip install -U pip
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            pip install pybind11[global]
-          fi
-          pip install numpy typing dataclasses pytest parameterized Pillow
-          pip install --upgrade build setuptools setuptools_scm wheel
+      run: |
+        pip install -U pip
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          pip install pybind11[global]
+        fi
+        pip install numpy typing dataclasses pytest parameterized Pillow
+        pip install --upgrade build setuptools setuptools_scm wheel
 
-    -name: Build packages (wheel and source distribution)
-        run: |
-          python -m build --sdist --wheel pyvrs --outdir .
+    - name: Build packages (wheel and source distribution)
+      run: |
+        python -m build --sdist --wheel pyvrs --outdir .
 
     # While setting up the workflow push to test.pypi.org instead of pypi.org
     - name: Deploy to Test PyPI
