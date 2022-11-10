@@ -94,7 +94,7 @@ Inheritance diagram for vrs::DataLayout:</div>
   <map id="vrs::DataLayout_map" name="vrs::DataLayout_map">
 <area href="classvrs_1_1_auto_data_layout.html" title="Specialized DataLayout class to declare a DataLayout in struct format." alt="vrs::AutoDataLayout" shape="rect" coords="0,56,327,80"/>
 <area href="classvrs_1_1_empty_data_layout.html" title="When you just need a placeholder for a DataLayout." alt="vrs::EmptyDataLayout" shape="rect" coords="337,56,664,80"/>
-<area href="classvrs_1_1_manual_data_layout.html" title="Specialiazed DataLayout for programmatic DataLayout generation." alt="vrs::ManualDataLayout" shape="rect" coords="674,56,1001,80"/>
+<area href="classvrs_1_1_manual_data_layout.html" title="Specialized DataLayout for programmatic DataLayout generation." alt="vrs::ManualDataLayout" shape="rect" coords="674,56,1001,80"/>
 <area href="classvrs_1_1datalayout__conventions_1_1_audio_spec.html" title="DataLayout definitions use to describe what&#39;s in an audio content block." alt="vrs::datalayout_conventions::AudioSpec" shape="rect" coords="337,112,664,136"/>
 <area href="classvrs_1_1datalayout__conventions_1_1_image_spec.html" title="DataLayout definitions use to describe what&#39;s in an image content block." alt="vrs::datalayout_conventions::ImageSpec" shape="rect" coords="337,168,664,192"/>
 <area href="classvrs_1_1datalayout__conventions_1_1_next_content_block_size_spec.html" title="DataLayout only containing the size of the content block following." alt="vrs::datalayout_conventions::NextContentBlockSizeSpec" shape="rect" coords="337,224,664,248"/>
@@ -312,7 +312,7 @@ Anatomy of a DataLayout</h1>
 </ul>
 <p><a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> supports the following POD types:</p><ul>
 <li>native C/C++ types, like int8, int16, int32, int64, signed or unsigned, float &amp; double.</li>
-<li><a class="el" href="classvrs_1_1_bool.html" title="Substitude for bool POD type, which can be used safely in DataPiece templates.">Bool</a>, which is a replacement for bool, because vector&lt;bool&gt; is not an STL container, see <a href="https://stackoverflow.com/questions/17794569/why-is-vectorbool-not-a-stl-container">https://stackoverflow.com/questions/17794569/why-is-vectorbool-not-a-stl-container</a></li>
+<li><a class="el" href="classvrs_1_1_bool.html" title="Substitute for bool POD type, which can be used safely in DataPiece templates.">Bool</a>, which is a replacement for bool, because vector&lt;bool&gt; is not an STL container, see <a href="https://stackoverflow.com/questions/17794569/why-is-vectorbool-not-a-stl-container">https://stackoverflow.com/questions/17794569/why-is-vectorbool-not-a-stl-container</a></li>
 <li>2, 3 &amp; 4 D points, 3 &amp; 4 D matrices, of types int32, float &amp; double, for instance: Point2Df: a 2 dimension point using float. Matrix4Dd: a 4 dimension matrix using double.</li>
 </ul>
 <p>DataPieceValue&lt;T&gt; and DataPieceArray&lt;T&gt; are the two fixed size <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> template classes.</p>
@@ -334,7 +334,7 @@ Anatomy of a DataLayout</h1>
 <li>write the varData_ buffer.</li>
 </ol>
 <p>Therefore, to read &amp; write the data of a <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> from &amp; to disk, there is no encoding of the data, unlike with json, which guaranties the bit accuracy of your data. That can be critically important when using float &amp; double numbers.</p>
-<p>Of course, all of this is the reponsibility of VRS itself. </p>
+<p>Of course, all of this is the responsibility of VRS itself. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ab4b397a6aba99ed3279f685e65672738"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab4b397a6aba99ed3279f685e65672738">&#9670;&nbsp;</a></span>~DataLayout()</h2>
@@ -991,7 +991,7 @@ template&lt;class T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>Size to fit the variable-size data writen to its variable-size DataPieces fields. Won't match varData_'s size, unless <a class="el" href="classvrs_1_1_data_layout.html#a9996c20a5c837693bdca551244345981">collectVariableDataAndUpdateIndex()</a> was called. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Size to fit the variable-size data written to its variable-size DataPieces fields. Won't match varData_'s size, unless <a class="el" href="classvrs_1_1_data_layout.html#a9996c20a5c837693bdca551244345981">collectVariableDataAndUpdateIndex()</a> was called. </dd></dl>
 
 </div>
 </div>

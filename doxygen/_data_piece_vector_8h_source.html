@@ -116,11 +116,11 @@ $(function() {
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">sizeof</span>(T) * stagedValues_.size();</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  }</div>
 <div class="line"><a name="l00060"></a><span class="lineno"><a class="line" href="classvrs_1_1_data_piece_vector.html#a62bdfcfd466bd6e00285235c7e65ebeb">   60</a></span>&#160;  <span class="keywordtype">size_t</span> <a class="code" href="classvrs_1_1_data_piece_vector.html#a62bdfcfd466bd6e00285235c7e65ebeb">collectVariableData</a>(int8_t* data, <span class="keywordtype">size_t</span> bufferSize)<span class="keyword"> const override </span>{</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">size_t</span> writenSize = min(bufferSize, <a class="code" href="classvrs_1_1_data_piece_vector.html#aa9809943503b38ac321ae7b7f73ccbf0">getVariableSize</a>());</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keywordflow">if</span> (writenSize &gt; 0) {</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      memcpy(data, stagedValues_.data(), writenSize);</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">size_t</span> writtenSize = min(bufferSize, <a class="code" href="classvrs_1_1_data_piece_vector.html#aa9809943503b38ac321ae7b7f73ccbf0">getVariableSize</a>());</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keywordflow">if</span> (writtenSize &gt; 0) {</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      memcpy(data, stagedValues_.data(), writtenSize);</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    }</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keywordflow">return</span> writenSize;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keywordflow">return</span> writtenSize;</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  }</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
 <div class="line"><a name="l00070"></a><span class="lineno"><a class="line" href="classvrs_1_1_data_piece_vector.html#a5de63fe12eb0b5beaaa1d0c7339d03b6">   70</a></span>&#160;  <span class="keyword">const</span> vector&lt;T&gt;&amp; <a class="code" href="classvrs_1_1_data_piece_vector.html#a5de63fe12eb0b5beaaa1d0c7339d03b6">stagedValues</a>()<span class="keyword"> const </span>{</div>
