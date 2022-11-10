@@ -54,7 +54,7 @@ struct RecordFormatReader {
 ///
 /// For each of the record's content blocks a specific callback will be called depending on the type
 /// of content block. The content blocks are decoded in order, until they are all read, some
-/// decoding error occured, or a callback returns false.
+/// decoding error occurred, or a callback returns false.
 /// The block's index is passed in case you need to disambiguate successive blocks of the same type,
 /// or need to know when a new block is started.
 class RecordFormatStreamPlayer : public StreamPlayer {
@@ -183,7 +183,7 @@ class RecordFormatStreamPlayer : public StreamPlayer {
   RecordFileReader* recordFileReader_{};
 
   // Keep the readers all separate,
-  // in case the same RecordFormatStreamPlayer is handling mulitple streams.
+  // in case the same RecordFormatStreamPlayer is handling multiple streams.
   map<tuple<StreamId, Record::Type, uint32_t>, RecordFormatReader> readers_;
   map<pair<StreamId, Record::Type>, RecordFormatReader*> lastReader_;
   RecordFormatReader* currentReader_{};

@@ -182,7 +182,7 @@ struct JsonFormatProfileSpec {
 /// data, unlike with json, which guaranties the bit accuracy of your data.
 /// That can be critically important when using float & double numbers.
 ///
-/// Of course, all of this is the reponsibility of VRS itself.
+/// Of course, all of this is the responsibility of VRS itself.
 class DataLayout {
  protected:
   DataLayout() = default;
@@ -252,7 +252,7 @@ class DataLayout {
   /// @internal
   size_t getVarDataSizeFromIndex() const;
 
-  /// @return Size to fit the variable-size data writen to its variable-size DataPieces fields.
+  /// @return Size to fit the variable-size data written to its variable-size DataPieces fields.
   /// Won't match varData_'s size, unless collectVariableDataAndUpdateIndex() was called.
   /// @internal
   size_t getVarDataSizeNeeded() const;
@@ -515,7 +515,7 @@ class EmptyDataLayout : public DataLayout {
 /// All the DataPiece objects will be automatically registered in the DataLayout,
 /// allowing the DataLayout to references all its DataPiece objects.
 ///
-/// Exemple:
+/// Example:
 ///
 ///   class MyConfig : public AutoDataLayout {
 ///     DataPieceValue<uint32_t> exposureMode{"exposure_mode"};
@@ -536,10 +536,10 @@ class AutoDataLayoutEnd {
   AutoDataLayoutEnd();
 };
 
-/// \brief Specialiazed DataLayout for programmatic DataLayout generation.
+/// \brief Specialized DataLayout for programmatic DataLayout generation.
 ///
 /// Helper class to build a DataLayout manually, piece-by-piece.
-/// Make sure to call endLayout as soon as you're no longer adding pieces, to release a blobal lock.
+/// Make sure to call endLayout as soon as you're no longer adding pieces, to release a global lock.
 class ManualDataLayout : public DataLayout {
  public:
   /// Build a DataLayout from a json definition.

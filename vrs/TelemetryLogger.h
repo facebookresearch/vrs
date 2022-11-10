@@ -81,7 +81,7 @@ struct LogEvent {
 
 /// \brief Telemetry event specialized to report cloud traffic
 ///
-/// A key goal of telemetry is to monitor traffic to cloud storage solutions, so we can mesure
+/// A key goal of telemetry is to monitor traffic to cloud storage solutions, so we can measure
 /// resource usage and detect excessive traffic. This requires logging every network transaction,
 /// as opposed to sparse events, giving leverage to custom implementation optimizations not possible
 /// with a generic event.
@@ -201,7 +201,7 @@ class TelemetryLogger {
     getStaticInstance()->logTraffic(operationContext, event);
   }
 
-  /// Actuall methods that implement the behaviors
+  /// Actual methods that implement the behaviors
   virtual void logEvent(LogEvent&& event);
   virtual void logTraffic(const OperationContext& operationContext, const TrafficEvent& event);
 

@@ -101,7 +101,7 @@ class CompressedRecordReader : public RecordReader {
   void finish() override;
 
  private:
-  int read(void* dest, uint32_t destSize, uint32_t overalSize, uint32_t& outReadSize);
+  int read(void* dest, uint32_t destSize, uint32_t overallSize, uint32_t& outReadSize);
 
   Decompressor decompressor_;
 };

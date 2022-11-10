@@ -87,7 +87,7 @@ using namespace std;
 // compares work as expected.
 static string stripInstanceId(const string& oldName) {
   if (oldName.size() < 4) {
-    return oldName; // "x #1" is the shortest immaginable.
+    return oldName; // "x #1" is the shortest imaginable.
   }
   size_t suffix = oldName.rfind(" #");
   // verify everything after is a digit
@@ -110,7 +110,7 @@ static void jsonToTags(const string& jsonTags, map<string, string>& outTags) {
   outTags.clear();
   Document document;
   document.Parse(jsonTags.c_str());
-  if (XR_VERIFY(document.IsObject(), "Inproper tags: '{}'", jsonTags)) {
+  if (XR_VERIFY(document.IsObject(), "Improper tags: '{}'", jsonTags)) {
     for (Value::ConstMemberIterator itr = document.MemberBegin(); itr != document.MemberEnd();
          ++itr) {
       if (itr->name.IsString() && itr->value.IsString()) {
@@ -125,7 +125,7 @@ jsonToNameAndTags(const string& jsonStr, string& outName, map<string, string>& o
   using namespace fb_rapidjson;
   Document document;
   document.Parse(jsonStr.c_str());
-  if (!XR_VERIFY(document.IsObject(), "Inproper name & tags")) {
+  if (!XR_VERIFY(document.IsObject(), "Improper name & tags")) {
     return false;
   }
   Value::ConstMemberIterator name = document.FindMember(kNameLabel);

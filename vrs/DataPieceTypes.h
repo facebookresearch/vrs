@@ -26,7 +26,7 @@ using std::size_t;
 
 #pragma pack(push, 1)
 
-/// \brief Substitude for bool POD type, which can be used safely in DataPiece templates.
+/// \brief Substitute for bool POD type, which can be used safely in DataPiece templates.
 ///
 /// Shamelessly fake bool class, to workaround vector<bool> NOT being a regular container.
 /// Should behave like a bool, except that vector<Bool> will be a regular vector.

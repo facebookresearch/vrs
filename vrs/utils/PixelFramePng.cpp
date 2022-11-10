@@ -90,12 +90,12 @@ bool PixelFrame::readPngFrame(const vector<uint8_t>& pngBuffer, bool decodePixel
   }
   png_bytep* rowPtrs = nullptr;
   if (setjmp(png_jmpbuf(pngPtr))) {
-    // An error occured, so clean up what we have allocated so far.
+    // An error occurred, so clean up what we have allocated so far.
     png_destroy_read_struct(&pngPtr, &infoPtr, (png_infopp)0);
     if (rowPtrs != nullptr) {
       delete[] rowPtrs;
     }
-    XR_LOGE("An error occured while reading the PNG file.");
+    XR_LOGE("An error occurred while reading the PNG file.");
     // libPNG will jump to here if something goes wrong.
     return false;
   }

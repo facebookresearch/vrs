@@ -48,7 +48,7 @@ struct CurrentRecord {
 /// For each record, the stream player will be presented the record in a callback named
 /// processXXXHeader(), which will tell if the record should be read by returning true, in which
 /// case the callback is expected to set the provided DataReference to tell where the record's data
-/// should be read. Unpon completion of the read, the matching processXXX() callback will be
+/// should be read. Upon completion of the read, the matching processXXX() callback will be
 /// invoked, allowing the StreamPlayer to interpret/use the read data.
 class StreamPlayer {
  public:

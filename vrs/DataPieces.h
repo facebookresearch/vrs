@@ -133,16 +133,16 @@ class DataPiece {
     tags_[kUnit] = unit;
   }
 
-  /// Get the decription of a DataPiece.
+  /// Get the description of a DataPiece.
   /// @param outDescription: Reference to a string to set.
   /// @return True, if the unit tag was found, and outDescription was set. False, otherwise.
   bool getDescription(string& outDescription) const {
     return getTag(kDescription, outDescription);
   }
-  /// Set the decription of a DataPiece.
-  /// @param decription: Human readable description of the DataPiece.
-  void setDescription(const string& decription) {
-    tags_[kDescription] = decription;
+  /// Set the description of a DataPiece.
+  /// @param description: Human readable description of the DataPiece.
+  void setDescription(const string& description) {
+    tags_[kDescription] = description;
   }
 
   /// Specify if the DataPiece is required when mapping to another DataLayout.

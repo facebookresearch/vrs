@@ -139,7 +139,7 @@ class PixelFrame {
   readJpegFrame(std::shared_ptr<PixelFrame>& frame, RecordReader* reader, const uint32_t sizeBytes);
 
   /// Compress pixel frame to jpg. Supports ImageFormat::RAW and PixelFormat::RGB8 or GREY8 only.
-  /// @param outBuffer: on exit, the jpg payload wich can be saved as a .jpg file
+  /// @param outBuffer: on exit, the jpg payload which can be saved as a .jpg file
   /// @param quality: jpg quality setting, from 1 to 100
   /// @return True if the image and pixel formats are supported, the compression succeeded, and
   /// outBuffer was set. If returning False, do not use outBuffer.
@@ -148,7 +148,7 @@ class PixelFrame {
   /// Compress pixel frame to jpg. See other variant of jpgCompress for specs.
   /// @param pixelSpec: specs of the pixel buffer.
   /// @param pixels: the raw pixel buffer.
-  /// @param outBuffer: on exit, the jpg payload wich can be saved as a .jpg file.
+  /// @param outBuffer: on exit, the jpg payload which can be saved as a .jpg file.
   /// outBuffer may be the same as pixels.
   /// @param quality: jpg quality setting, from 1 to 100
   /// @return True if the image and pixel formats are supported, the compression succeeded, and
@@ -171,7 +171,7 @@ class PixelFrame {
   bool readJxlFrame(const std::vector<uint8_t>& buffer, bool decodePixels = true);
 
   /// Compress pixel frame to jxl. Supports ImageFormat::RAW and PixelFormat::RGB8 or GREY8 only.
-  /// @param outBuffer: on exit, the jxl payload wich can be saved as a .jxl file
+  /// @param outBuffer: on exit, the jxl payload which can be saved as a .jxl file
   /// @param quality: jxl quality setting, from 20 to 100 for percentage, or 0 to 15 for distance.
   /// @param percentNotDistance: if true quality is a percentage (default), 100% being lossless.
   /// If false, quality is a Butteraugli distance (Google "Butteraugli" for details), where
@@ -192,7 +192,7 @@ class PixelFrame {
   /// Compress pixel frame to jxl. Supports ImageFormat::RAW and PixelFormat::RGB8 or GREY8 only.
   /// @param pixelSpec: specs of the pixel buffer.
   /// @param pixels: the raw pixel buffer.
-  /// @param outBuffer: on exit, the jxl payload wich can be saved as a .jxl file.
+  /// @param outBuffer: on exit, the jxl payload which can be saved as a .jxl file.
   /// outBuffer may be the same as pixels.
   /// @param quality: jxl quality setting, from 20 to 100 for percentage, or 0 to 15 for distance.
   /// @param percentNotDistance: if true quality is a percentage (default), 100% being lossless.

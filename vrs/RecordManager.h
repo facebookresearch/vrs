@@ -104,7 +104,7 @@ class RecordManager {
   /// Get how many bytes should actually be allocated when we want to use a specific number of
   /// bytes. This number may be greater than the requested size, to improve the ability to reuse an
   /// allocated buffer without having to reallocate memory. See setRecordBufferOverAllocationMins().
-  /// @param requestedSise: number of bytes needed.
+  /// @param requestedSize: number of bytes needed.
   /// @return Number of bytes that should be allocated.
   /// @internal only VRS itself should need to use this API.
   size_t getAdjustedRecordBufferSize(size_t requestedSize) const;

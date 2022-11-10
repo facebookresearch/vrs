@@ -32,7 +32,7 @@ namespace vrs {
 namespace {
 // ContentBlocks may rely on the most recent configuration record to fully define the format of
 // their content. When we detect that an image or audio block's format can't be fully defined, we
-// log a warning to help debug the problem. Maybe the configuraion record exists, but wasn't read
+// log a warning to help debug the problem. Maybe the configuration record exists, but wasn't read
 // yet? Maybe the last read configuration record has a later timestamp than the data record?
 bool mayUsePastConfigurationReader(
     const CurrentRecord& record,
@@ -112,7 +112,7 @@ size_t ContentBlockReader::findContentBlockSize(
     const CurrentRecord& record,
     RecordFormatStreamPlayer& player) {
   uint32_t size32;
-  // Have we successfuly mapped the content block size already?
+  // Have we successfully mapped the content block size already?
   if (contentBlockSizeSpec_ && contentBlockSizeSpec_->isMapped() &&
       contentBlockSizeSpec_->nextContentBlockSize.get(size32)) {
     return size32;
@@ -233,7 +233,7 @@ bool AudioBlockReader::audioContentFromAudioSpec(
   AudioSampleFormat sampleFormat = AudioSampleFormat::UNDEFINED;
   uint8_t numChannels = 0;
   uint32_t sampleRate = 0;
-  // checke minimal set of required fields
+  // check minimal set of required fields
   if ((audioSpec.sampleType.get(sampleFormat) && sampleFormat > AudioSampleFormat::UNDEFINED &&
        sampleFormat < AudioSampleFormat::COUNT) &&
       (audioSpec.channelCount.get(numChannels) && numChannels > 0) &&

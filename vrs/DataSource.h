@@ -43,7 +43,7 @@ struct DataLayoutChunk {
   /// Constructor to reference a DataLayout, which must outlive this DataLayoutChunk.
   explicit DataLayoutChunk(DataLayout& dataLayout);
 
-  /// Get the data size required to hold all of the DataLayot's data.
+  /// Get the data size required to hold all of the DataLayout's data.
   size_t size() const {
     return layoutFixedSize_ + layoutVariableSize_;
   }
@@ -142,7 +142,7 @@ class NonContiguousChunk final : public vrs::DataSourceChunk {
 /// and DataSourceChunk object may point to internal data buffers, possibly owned by device drivers.
 ///
 /// DataSource's default implementation holds 2 DataLayoutChunk objects, and 3 DataSourceChunk
-/// objects, in that order, which covers standard use cases, as each only optionaly contains data.
+/// objects, in that order, which covers standard use cases, as each only optionally contains data.
 ///
 /// For more advanced needs, you can override copyTo() and copy data at the provided location the
 /// way you like, but you must provide the exact amount of data upfront in the constructor.
