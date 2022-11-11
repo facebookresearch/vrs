@@ -16,9 +16,13 @@
 
 #include "PyBuffer.h"
 #include "vrs/RecordFormat.h"
+#include "vrs/utils/PixelFrame.h"
 
+#include <pybind11/detail/common.h>
 #include <functional> // multiplies
+#include <memory>
 #include <numeric> // accumulate
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -63,6 +67,57 @@ const constexpr char* kContentBlockBufferSizeKey = "buffer_size";
 } // namespace
 
 namespace pyvrs {
+
+ImageBuffer jxlCompress(
+    const ImageContentBlockSpec& spec,
+    const vector<uint8_t>& bytes,
+    float quality,
+    bool percentNotDistance = true) {
+  if (!XR_VERIFY(spec.getImageFormat() == ImageFormat::RAW)) {
+    // jxlCompression is only supported for ImageFormat::RAW.
+    throw py::value_error(
+        "Image format not supported for JXL compression: " + spec.getImageFormatAsString());
+  }
+  vector<uint8_t> outBuffer;
+  if (!utils::PixelFrame::jxlCompress(spec, bytes, outBuffer, quality, percentNotDistance)) {
+    // jxlCompression was unsuccessful. Throw an error.
+    throw std::runtime_error("JXL compression unsuccessful.");
+  }
+  // Compression was successful. Contruct a new ImageBuffer with JXL image format and return
+  return ImageBuffer(
+      PyImageContentBlockSpec(ImageContentBlockSpec(
+          ImageFormat::JXL, spec.getPixelFormat(), spec.getWidth(), spec.getHeight())),
+      move(outBuffer));
+}
+
+ImageBuffer
+jpgCompress(const ImageContentBlockSpec& spec, const vector<uint8_t>& bytes, uint32_t quality) {
+  if (!XR_VERIFY(spec.getImageFormat() == ImageFormat::RAW)) {
+    // jpgCompression is only supported for ImageFormat::RAW.
+    throw py::value_error(
+        "Image format not supported for JPG compression: " + spec.getImageFormatAsString());
+  }
+  vector<uint8_t> outBuffer;
+  if (!utils::PixelFrame::jpgCompress(spec, bytes, outBuffer, quality)) {
+    // jpgCompression was unsuccessful. Throw an error.
+    throw std::runtime_error("JPG compression unsuccessful.");
+  }
+  // Compression was successful. Contruct a new ImageBuffer with JPG image format and return
+  return ImageBuffer(
+      PyImageContentBlockSpec(ImageContentBlockSpec(
+          ImageFormat::JPG, spec.getPixelFormat(), spec.getWidth(), spec.getHeight())),
+      move(outBuffer));
+}
+
+ImageBuffer decompress(const ImageContentBlockSpec& spec, const vector<uint8_t>& bytes) {
+  utils::PixelFrame frame;
+  if (!frame.readCompressedFrame(bytes, spec.getImageFormat())) {
+    // Reading compressed format failed. Throw an error
+    throw std::runtime_error("Reading compressed buffer failed.");
+  }
+  // Reading compressed frame was successful.
+  return ImageBuffer(PyImageContentBlockSpec(frame.getSpec()), move(frame.getBuffer()));
+}
 
 void PyImageContentBlockSpec::initAttributesMap() {
   if (attributesMap.empty()) {
@@ -131,6 +186,18 @@ py::buffer_info bufferInfoFromVector(vector<uint8_t>& vec) {
       1, // Number of dimensions
       {static_cast<ssize_t>(vec.size())}, // Buffer dimensions
       {static_cast<ssize_t>(sizeof(uint8_t))}); // Strides (in bytes) for each index
+}
+
+ImageBuffer ImageBuffer::jxlCompress(float quality, bool percentNotDistance) const {
+  return pyvrs::jxlCompress(spec.getImageContentBlockSpec(), bytes, quality, percentNotDistance);
+}
+
+ImageBuffer ImageBuffer::jpgCompress(uint32_t quality) const {
+  return pyvrs::jpgCompress(spec.getImageContentBlockSpec(), bytes, quality);
+}
+
+ImageBuffer ImageBuffer::decompress() const {
+  return pyvrs::decompress(spec.getImageContentBlockSpec(), bytes);
 }
 
 py::buffer_info convertContentBlockBuffer(ContentBlockBuffer& block) {
@@ -357,6 +424,18 @@ py::buffer_info convertContentBlockBuffer(ContentBlockBuffer& block) {
   return bufferInfoFromVector(block.bytes);
 }
 
+ImageBuffer ContentBlockBuffer::jxlCompress(float quality, bool percentNotDistance) const {
+  return pyvrs::jxlCompress(spec.image(), bytes, quality, percentNotDistance);
+}
+
+ImageBuffer ContentBlockBuffer::jpgCompress(uint32_t quality) const {
+  return pyvrs::jpgCompress(spec.image(), bytes, quality);
+}
+
+ImageBuffer ContentBlockBuffer::decompress() const {
+  return pyvrs::decompress(spec.image(), bytes);
+}
+
 py::buffer_info convertImageBlockBuffer(ImageBuffer& block) {
   const PyImageContentBlockSpec& imageSpec = block.spec;
   const ImageFormat imageFormat = imageSpec.getImageFormat();
@@ -505,6 +584,9 @@ void pybind_buffer(py::module& m) {
   DEF_DICT_FUNC(contentBlock, PyContentBlock)
 
   py::class_<pyvrs::ContentBlockBuffer>(m, "Buffer", py::buffer_protocol())
+      .def("jxl_compress", &pyvrs::ContentBlockBuffer::jxlCompress)
+      .def("jpg_compress", &pyvrs::ContentBlockBuffer::jpgCompress)
+      .def("decompress", &pyvrs::ContentBlockBuffer::decompress)
       .def_buffer([](pyvrs::ContentBlockBuffer& block) -> py::buffer_info {
         return pyvrs::convertContentBlockBuffer(block);
       });
@@ -512,6 +594,9 @@ void pybind_buffer(py::module& m) {
   py::class_<pyvrs::ImageBuffer>(m, "ImageBuffer", py::buffer_protocol())
       .def(py::init<const PyImageContentBlockSpec&, const py::buffer&>())
       .def(py::init<const PyImageContentBlockSpec&, int64_t, const py::buffer&>())
+      .def("jxl_compress", &pyvrs::ImageBuffer::jxlCompress)
+      .def("jpg_compress", &pyvrs::ImageBuffer::jpgCompress)
+      .def("decompress", &pyvrs::ImageBuffer::decompress)
       .def_readonly("spec", &pyvrs::ImageBuffer::spec)
       .def_readonly("bytes", &pyvrs::ImageBuffer::bytes)
       .def_readwrite("record_index", &pyvrs::ImageBuffer::recordIndex)

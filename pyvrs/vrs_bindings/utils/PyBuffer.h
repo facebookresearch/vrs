@@ -102,6 +102,10 @@ class PyImageContentBlockSpec {
     return spec_.getImageFormat();
   }
 
+  ImageContentBlockSpec getImageContentBlockSpec() const {
+    return spec_;
+  }
+
   PixelFormat getPixelFormat() const {
     return spec_.getPixelFormat();
   }
@@ -188,17 +192,6 @@ class PyContentBlock {
   ContentBlock block_;
 };
 
-/// \brief Helper class to hold a content block binary data.
-/// Exposed to Python using protocol_buffer, optimized using the content spec.
-struct ContentBlockBuffer {
-  explicit ContentBlockBuffer(const ContentBlock& block)
-      : spec{block}, structuredArray{false}, bytesAdjusted{false} {}
-  ContentBlock spec;
-  vector<uint8_t> bytes;
-  bool structuredArray; // should the buffer be returned as a 1 dimension uint8_t array?
-  bool bytesAdjusted; // was the buffer endian swapped and/or realigned?
-};
-
 /// \brief Helper struct to hold an image data.
 /// Exposed to Python using protocol_buffer, optimized using the content spec.
 /// This class auto converts buffer to follow the pixel format on read.
@@ -228,9 +221,28 @@ struct ImageBuffer {
   }
   void initBytesFromPyBuffer(const py::buffer& b);
 
+  ImageBuffer jxlCompress(float quality, bool percentNotDistance = true) const;
+  ImageBuffer jpgCompress(uint32_t quality) const;
+  ImageBuffer decompress() const;
+
   PyImageContentBlockSpec spec;
   vector<uint8_t> bytes;
   int64_t recordIndex{-1}; // only used by AsyncImageFilter
+};
+
+/// \brief Helper class to hold a content block binary data.
+/// Exposed to Python using protocol_buffer, optimized using the content spec.
+struct ContentBlockBuffer {
+  explicit ContentBlockBuffer(const ContentBlock& block)
+      : spec{block}, structuredArray{false}, bytesAdjusted{false} {}
+  ImageBuffer jxlCompress(float quality, bool percentNotDistance = true) const;
+  ImageBuffer jpgCompress(uint32_t quality) const;
+  ImageBuffer decompress() const;
+
+  ContentBlock spec;
+  vector<uint8_t> bytes;
+  bool structuredArray; // should the buffer be returned as a 1 dimension uint8_t array?
+  bool bytesAdjusted; // was the buffer endian swapped and/or realigned?
 };
 
 /// \brief Helper struct to hold a binary data.
