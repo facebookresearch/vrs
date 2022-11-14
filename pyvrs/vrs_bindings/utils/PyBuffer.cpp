@@ -563,7 +563,8 @@ void pybind_buffer(py::module& m) {
           .def("get_image_format", &PyImageContentBlockSpec::getImageFormat)
           .def("get_width", &PyImageContentBlockSpec::getWidth)
           .def("get_height", &PyImageContentBlockSpec::getHeight)
-          .def("get_stride", &PyImageContentBlockSpec::getStride);
+          .def("get_stride", &PyImageContentBlockSpec::getStride)
+          .def("__str__", [](const PyImageContentBlockSpec& spec) { return spec.asString(); });
   DEF_DICT_FUNC(imageSpec, PyImageContentBlockSpec)
 
   auto audioSpec =
@@ -576,11 +577,14 @@ void pybind_buffer(py::module& m) {
           .def_property_readonly(
               kAudioSpecChannelCountKey, &PyAudioContentBlockSpec::getChannelCount)
           .def_property_readonly(kAudioSpecSampleRateKey, &PyAudioContentBlockSpec::getSampleRate)
-          .def_property_readonly(kAudioSpecBufferSizeKey, &PyAudioContentBlockSpec::getBlockSize);
+          .def_property_readonly(kAudioSpecBufferSizeKey, &PyAudioContentBlockSpec::getBlockSize)
+          .def("__str__", [](const PyAudioContentBlockSpec& spec) { return spec.asString(); });
   DEF_DICT_FUNC(audioSpec, PyAudioContentBlockSpec)
 
-  auto contentBlock = py::class_<PyContentBlock>(m, "ContentBlock")
-                          .def_property_readonly("buffer_size", &PyContentBlock::getBufferSize);
+  auto contentBlock =
+      py::class_<PyContentBlock>(m, "ContentBlock")
+          .def_property_readonly("buffer_size", &PyContentBlock::getBufferSize)
+          .def("__str__", [](const PyContentBlock& block) { return block.asString(); });
   DEF_DICT_FUNC(contentBlock, PyContentBlock)
 
   py::class_<pyvrs::ContentBlockBuffer>(m, "Buffer", py::buffer_protocol())
@@ -589,6 +593,14 @@ void pybind_buffer(py::module& m) {
       .def("decompress", &pyvrs::ContentBlockBuffer::decompress)
       .def_buffer([](pyvrs::ContentBlockBuffer& block) -> py::buffer_info {
         return pyvrs::convertContentBlockBuffer(block);
+      })
+      .def("__str__", [](const pyvrs::ContentBlockBuffer& block) {
+        return fmt::format(
+            "{}, {} bytes, structured: {}, adjusted: {}",
+            block.spec.asString(),
+            block.bytes.size(),
+            block.structuredArray,
+            block.bytesAdjusted);
       });
 
   py::class_<pyvrs::ImageBuffer>(m, "ImageBuffer", py::buffer_protocol())
@@ -603,6 +615,13 @@ void pybind_buffer(py::module& m) {
       // only exposes block.bytes
       .def_buffer([](pyvrs::ImageBuffer& block) -> py::buffer_info {
         return pyvrs::convertImageBlockBuffer(block);
+      })
+      .def("__str__", [](const pyvrs::ImageBuffer& image) {
+        return fmt::format(
+            "{}, {} bytes, record #{}",
+            image.spec.asString(),
+            image.bytes.size(),
+            image.recordIndex);
       });
 
   py::class_<pyvrs::BinaryBuffer>(m, "BinaryBuffer", py::buffer_protocol())

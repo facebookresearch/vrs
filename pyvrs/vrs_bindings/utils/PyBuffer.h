@@ -163,6 +163,10 @@ class PyAudioContentBlockSpec {
     return spec_.getSampleFormat();
   }
 
+  string asString() const {
+    return spec_.asString();
+  }
+
   void initAttributesMap();
   map<string, py::object> attributesMap;
 
@@ -183,6 +187,10 @@ class PyContentBlock {
   int getBufferSize() const {
     size_t blockSize = block_.getBlockSize();
     return blockSize == ContentBlock::kSizeUnknown ? -1 : static_cast<int>(blockSize);
+  }
+
+  string asString() const {
+    return block_.asString();
   }
 
   void initAttributesMap();
