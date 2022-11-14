@@ -99,7 +99,9 @@ void pybind_record(py::module& m) {
       .value("UNDEFINED", vrs::ImageFormat::UNDEFINED)
       .value("RAW", vrs::ImageFormat::RAW)
       .value("JPG", vrs::ImageFormat::JPG)
-      .value("PNG", vrs::ImageFormat::PNG);
+      .value("JXL", vrs::ImageFormat::JXL)
+      .value("PNG", vrs::ImageFormat::PNG)
+      .value("VIDEO", vrs::ImageFormat::VIDEO);
 
   py::enum_<vrs::PixelFormat>(m, "PixelFormat", py::arithmetic())
       .value("UNDEFINED", vrs::PixelFormat::UNDEFINED)
