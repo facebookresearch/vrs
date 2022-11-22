@@ -67,6 +67,7 @@ void DataLayout::collectVariableDataAndUpdateIndex() {
 
 void DataLayout::collectVariableDataAndUpdateIndex(void* destination) {
   int8_t* data = reinterpret_cast<int8_t*>(destination);
+  DataLayout::IndexEntry* varSizeIndex = getVarSizeIndex();
   size_t offset = 0;
   for (size_t index = 0; index < varSizePieces_.size(); ++index) {
     DataPiece* piece = varSizePieces_[index];
@@ -81,7 +82,7 @@ void DataLayout::collectVariableDataAndUpdateIndex(void* destination) {
           size);
     }
     data += size;
-    IndexEntry& indexEntry = getVarSizeIndex()[index];
+    IndexEntry& indexEntry = varSizeIndex[index];
     indexEntry.setOffset(offset);
     indexEntry.setLength(size);
     offset += size;
