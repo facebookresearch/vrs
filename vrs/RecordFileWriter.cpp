@@ -892,8 +892,10 @@ int RecordFileWriter::writeRecordsSingleThread(SortedRecords& records, int lastE
         XR_LOGE("Write failed: {}, {}", error, errorCodeToMessage(error));
       } else {
         writtenRecords++;
-        indexRecordWriter_.addRecord(
-            record->getTimestamp(), lastRecordSize_, r.streamId, record->getRecordType());
+        if (!skipFinalizeIndexRecords_) {
+          indexRecordWriter_.addRecord(
+              record->getTimestamp(), lastRecordSize_, r.streamId, record->getRecordType());
+        }
         currentChunkSize += lastRecordSize_;
       }
     }
@@ -1008,8 +1010,10 @@ int RecordFileWriter::writeRecordsMultiThread(
         if (error != 0) {
           XR_LOGE("Write failed: {}, {}", error, errorCodeToMessage(error));
         } else {
-          indexRecordWriter_.addRecord(
-              record->getTimestamp(), lastRecordSize_, id, record->getRecordType());
+          if (!skipFinalizeIndexRecords_) {
+            indexRecordWriter_.addRecord(
+                record->getTimestamp(), lastRecordSize_, id, record->getRecordType());
+          }
           writtenRecords++;
           currentChunkSize += lastRecordSize_;
         }
