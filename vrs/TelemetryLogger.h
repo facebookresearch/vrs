@@ -37,15 +37,15 @@ struct OperationContext {
   OperationContext(const OperationContext& rhs)
       : operation{rhs.operation}, sourceLocation{rhs.sourceLocation} {}
   OperationContext(OperationContext&& rhs)
-      : operation{move(rhs.operation)}, sourceLocation{move(rhs.sourceLocation)} {}
+      : operation{std::move(rhs.operation)}, sourceLocation{std::move(rhs.sourceLocation)} {}
 
   bool operator<(const OperationContext& rhs) const {
     return operation < rhs.operation ||
         (operation == rhs.operation && sourceLocation < rhs.sourceLocation);
   }
   OperationContext& operator=(OperationContext&& rhs) {
-    operation = move(rhs.operation);
-    sourceLocation = move(rhs.sourceLocation);
+    operation = std::move(rhs.operation);
+    sourceLocation = std::move(rhs.sourceLocation);
     return *this;
   }
 };
@@ -60,16 +60,16 @@ struct LogEvent {
       const string& serverReply)
       : type{type}, operationContext{opContext}, message{message}, serverReply{serverReply} {}
   LogEvent(LogEvent&& rhs)
-      : type{move(rhs.type)},
+      : type{std::move(rhs.type)},
         operationContext{std::move(rhs.operationContext)},
-        message{move(rhs.message)},
-        serverReply{move(rhs.serverReply)} {}
+        message{std::move(rhs.message)},
+        serverReply{std::move(rhs.serverReply)} {}
 
   LogEvent& operator=(LogEvent&& rhs) {
-    type = move(rhs.type);
+    type = std::move(rhs.type);
     operationContext = std::move(rhs.operationContext);
-    message = move(rhs.message);
-    serverReply = move(rhs.serverReply);
+    message = std::move(rhs.message);
+    serverReply = std::move(rhs.serverReply);
     return *this;
   }
 
