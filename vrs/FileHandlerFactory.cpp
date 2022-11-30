@@ -55,7 +55,7 @@ int FileHandlerFactory::delegateOpen(
       outNewDelegate.reset();
       return REQUESTED_FILE_HANDLER_UNAVAILABLE;
     }
-    outNewDelegate = move(newHandler);
+    outNewDelegate = std::move(newHandler);
   }
   // default to a disk file
   if (!outNewDelegate) {
@@ -72,8 +72,10 @@ int FileHandlerFactory::delegateOpen(
 
 void FileHandlerFactory::registerFileHandler(unique_ptr<FileHandler>&& fileHandler) {
   unique_lock<mutex> lock(mutex_);
-  XR_DEV_CHECK_FALSE(fileHandler->getFileHandlerName().empty());
-  fileHandlerMap_[fileHandler->getFileHandlerName()] = move(fileHandler);
+  const auto fileHandlerName = fileHandler->getFileHandlerName();
+  XR_DEV_CHECK_FALSE(fileHandlerName.empty());
+  fileHandlerMap_[fileHandlerName] = std::move(fileHandler);
+
 }
 
 void FileHandlerFactory::unregisterFileHandler(const string& fileHandlerName) {
