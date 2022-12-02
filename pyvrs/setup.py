@@ -81,19 +81,30 @@ class CMakeBuild(build_ext):
         )
 
 
-setup(
-    name="pyvrs",
-    version="1.0.0",
-    description="Python API for VRS",
-    url="https://github.com/facebookresearch/vrs",
-    author="Meta Reality Labs Research",
-    license="Apache-2.0",
-    install_requires=["numpy", "typing", "dataclasses"],
-    python_requires=">=3.7",
-    packages=find_packages(),
-    zip_safe=False,
-    ext_modules=[CMakeExtension("pyvrs/vrsbindings", sourcedir=ROOT_DIR)],
-    cmdclass={
-        "build_ext": CMakeBuild,
-    },
-)
+def main():
+    cwd = os.path.dirname(os.path.abspath(__file__))
+    with open(os.path.join(cwd, "README.md"), encoding="utf-8") as f:
+        long_description = f.read()
+
+    setup(
+        name="pyvrs",
+        version="1.0.0",
+        description="Python API for VRS",
+        long_description=long_description,
+        long_description_content_type="text/markdown",
+        url="https://github.com/facebookresearch/vrs",
+        author="Meta Reality Labs Research",
+        license="Apache-2.0",
+        install_requires=["numpy", "typing", "dataclasses"],
+        python_requires=">=3.7",
+        packages=find_packages(),
+        zip_safe=False,
+        ext_modules=[CMakeExtension("pyvrs/vrsbindings", sourcedir=ROOT_DIR)],
+        cmdclass={
+            "build_ext": CMakeBuild,
+        },
+    )
+
+
+if __name__ == "__main__":
+    main()
