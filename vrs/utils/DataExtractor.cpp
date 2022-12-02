@@ -272,7 +272,7 @@ void DataExtractor::extract(StreamId id) {
   auto extractor = make_unique<DataExtractorStreamPlayer>(
       output_, os::pathJoin(outputFolder_, id.getNumericName()));
   reader_.setStreamPlayer(id, extractor.get());
-  extractors_[id] = move(extractor);
+  extractors_[id] = std::move(extractor);
 }
 
 int DataExtractor::createOutput() {
