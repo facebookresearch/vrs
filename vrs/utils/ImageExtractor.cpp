@@ -208,14 +208,14 @@ bool ImageExtractor::onImageRead(const CurrentRecord& record, size_t, const Cont
     unique_ptr<ImageJob> job =
         make_unique<ImageJob>(folderPath_, id, record.timestamp, imageCounter_);
     if (PixelFrame::readRawFrame(job->frame, record.reader, ib.image())) {
-      imageQueue.sendJob(move(job));
+      imageQueue.sendJob(std::move(job));
       return true;
     }
   } else if (!extractImagesRaw_ && format == ImageFormat::VIDEO) {
     unique_ptr<ImageJob> job =
         make_unique<ImageJob>(folderPath_, id, record.timestamp, imageCounter_);
     if (tryToDecodeFrame(*job->frame, record, ib) == 0) {
-      imageQueue.sendJob(move(job));
+      imageQueue.sendJob(std::move(job));
       return true;
     }
   } else {
