@@ -302,7 +302,7 @@ void FilteredFileReader::applyRecordableFilters(const vector<string>& filters) {
       stringToIds(*(++iter), reader, argIds);
       if (!newSet) {
         // first command is add? start from empty set
-        newSet = make_unique<set<StreamId>>(move(argIds));
+        newSet = make_unique<set<StreamId>>(std::move(argIds));
       } else {
         newSet->insert(argIds.begin(), argIds.end());
       }
@@ -354,9 +354,9 @@ void FilteredFileReader::applyTypeFilters(const vector<string>& filters) {
     }
   }
   if (newSet != nullptr) {
-    this->filter.types = move(*newSet);
+    this->filter.types = std::move(*newSet);
   } else {
-    this->filter.types = move(types);
+    this->filter.types = std::move(types);
   }
 }
 
