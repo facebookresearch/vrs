@@ -276,7 +276,7 @@ int filterMerge(
           r.record->recordType);
       offset = r.record->fileOffset;
     }
-    recordFileWriter.preallocateIndex(move(preliminaryIndex));
+    recordFileWriter.preallocateIndex(std::move(preliminaryIndex));
   }
 
   int mergeResult = throttledFileDelegate->createFile(pathToCopy);
