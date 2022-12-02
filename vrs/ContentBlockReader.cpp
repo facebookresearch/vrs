@@ -96,7 +96,7 @@ unique_ptr<ContentBlockReader> ContentBlockReader::build(
       break;
 
     case ContentType::DATA_LAYOUT:
-      reader = new DataLayoutBlockReader(recordFormat, blockIndex, move(blockLayout));
+      reader = new DataLayoutBlockReader(recordFormat, blockIndex, std::move(blockLayout));
       break;
 
     case ContentType::COUNT:
