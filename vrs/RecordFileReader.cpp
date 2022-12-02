@@ -67,7 +67,7 @@ void RecordFileReader::setOpenProgressLogger(ProgressLogger* progressLogger) {
 
 void RecordFileReader::setFileHandler(unique_ptr<FileHandler> fileHandler) {
   if (fileHandler) {
-    file_ = move(fileHandler);
+    file_ = std::move(fileHandler);
   }
 }
 
