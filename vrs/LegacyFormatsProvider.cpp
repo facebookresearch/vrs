@@ -31,7 +31,7 @@ namespace vrs {
 LegacyFormatsProvider::~LegacyFormatsProvider() = default;
 
 void RecordFormatRegistrar::registerProvider(unique_ptr<LegacyFormatsProvider> provider) {
-  getInstance().providers_.emplace_back(move(provider));
+  getInstance().providers_.emplace_back(std::move(provider));
 }
 
 RecordFormatRegistrar& RecordFormatRegistrar::getInstance() {
