@@ -38,9 +38,17 @@ include(${CMAKE_MODULE_PATH}/Platform.cmake)
 include(${CMAKE_MODULE_PATH}/Compiler.cmake)
 include(${CMAKE_MODULE_PATH}/Options.cmake)
 
+# --- Version numbers for generated libraries ---
+file(READ "${OSS_DIR}/version.txt" VRS_DEFAULT_VERSION)
+# Strip trailing newline
+string(REGEX REPLACE "\n$" "" VRS_DEFAULT_VERSION "${VRS_DEFAULT_VERSION}")
+if ("${VRS_DEFAULT_VERSION}x" STREQUAL "x")
+  message(FATAL_ERROR "Could not get version number from file 'version.txt'")
+endif()
+
 # Declare the project, make cmake chose/test the compiler, etc
 project(vrs
-  VERSION 1.0
+  VERSION ${VRS_DEFAULT_VERSION}
   DESCRIPTION "Meta VRS File Format Project"
   LANGUAGES CXX
 )

@@ -33,6 +33,33 @@ if os.path.basename(ROOT_DIR) != "vrs":
             ROOT_DIR = PYPI_ROOT_PATH
 
 
+def _get_sha():
+    sha = "Unknown"
+    try:
+        sha = (
+            subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=str(ROOT_DIR))
+            .decode("ascii")
+            .strip()
+        )
+    except Exception:
+        pass
+    return sha
+
+
+def get_version():
+    path = os.path.join(ROOT_DIR, "version.txt")
+    if not os.path.exists(path):
+        path = os.path.join(ROOT_DIR, "oss/version.txt")
+    version = open(path, "r").read().strip()
+
+    if os.getenv("PYVRS_TEST_BUILD"):
+        sha = _get_sha()
+        if sha != "Unknown":
+            version += "+" + sha[:7]
+
+    return version
+
+
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=""):
         Extension.__init__(self, name, sources=[])
@@ -88,7 +115,7 @@ def main():
 
     setup(
         name="pyvrs",
-        version="1.0.0",
+        version=get_version(),
         description="Python API for VRS",
         long_description=long_description,
         long_description_content_type="text/markdown",
