@@ -1710,7 +1710,7 @@ ManualDataLayout::ManualDataLayout(const string& json) : ManualDataLayout() {
 DataPiece* ManualDataLayout::add(unique_ptr<DataPiece> piece) {
   DataPiece* dataPiece = piece.get();
   if (dataPiece != nullptr) {
-    manualPieces.emplace_back(move(piece));
+    manualPieces.emplace_back(std::move(piece));
   }
   return dataPiece;
 }
