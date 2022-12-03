@@ -101,7 +101,8 @@ void RecordFormatStreamPlayer::processRecord(const CurrentRecord& record, uint32
               blockIndex);
         }
       }
-      readers.emplace_back(ContentBlockReader::build(recordFormat, blockIndex, move(blockLayout)));
+      readers.emplace_back(
+          ContentBlockReader::build(recordFormat, blockIndex, std::move(blockLayout)));
     }
     ContentBlockReader* reader = readers[blockIndex].get();
     if (reader == nullptr) {
