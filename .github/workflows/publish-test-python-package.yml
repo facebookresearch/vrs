@@ -56,7 +56,7 @@ jobs:
       PYVRS_TEST_BUILD: 1
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-20.04]
         python-version: ["3.7", "3.8", "3.9", "3.10"]
 
     steps:
@@ -98,7 +98,7 @@ jobs:
     needs:
     - build-bin-macos
     - build-bin-linux
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - name: Download all the dists
