@@ -9,7 +9,7 @@ on:
 
 jobs:
   build_docs_job:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         python-version: [3.6]
