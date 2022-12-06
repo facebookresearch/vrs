@@ -56,11 +56,11 @@ PyRecord::PyRecord(const IndexRecord::RecordInfo& info, int32_t recordIndex_, Re
   recordTimestamp = info.timestamp;
   streamId = info.streamId.getNumericName();
   recordFormatVersion = record.recordFormatVersion;
-  datalayoutBlocks = move(record.datalayoutBlocks);
-  imageBlocks = move(record.images);
-  audioBlocks = move(record.audioBlocks);
-  customBlocks = move(record.customBlocks);
-  unsupportedBlocks = move(record.unsupportedBlocks);
+  datalayoutBlocks = std::move(record.datalayoutBlocks);
+  imageBlocks = std::move(record.images);
+  audioBlocks = std::move(record.audioBlocks);
+  customBlocks = std::move(record.customBlocks);
+  unsupportedBlocks = std::move(record.unsupportedBlocks);
 
   // Set specs
   for (const auto& audioBlock : audioBlocks) {
