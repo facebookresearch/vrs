@@ -75,7 +75,6 @@ void FileHandlerFactory::registerFileHandler(unique_ptr<FileHandler>&& fileHandl
   const auto fileHandlerName = fileHandler->getFileHandlerName();
   XR_DEV_CHECK_FALSE(fileHandlerName.empty());
   fileHandlerMap_[fileHandlerName] = std::move(fileHandler);
-
 }
 
 void FileHandlerFactory::unregisterFileHandler(const string& fileHandlerName) {
