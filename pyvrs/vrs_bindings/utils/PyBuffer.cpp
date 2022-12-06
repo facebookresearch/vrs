@@ -87,7 +87,7 @@ ImageBuffer jxlCompress(
   return ImageBuffer(
       PyImageContentBlockSpec(ImageContentBlockSpec(
           ImageFormat::JXL, spec.getPixelFormat(), spec.getWidth(), spec.getHeight())),
-      move(outBuffer));
+      std::move(outBuffer));
 }
 
 ImageBuffer
@@ -106,7 +106,7 @@ jpgCompress(const ImageContentBlockSpec& spec, const vector<uint8_t>& bytes, uin
   return ImageBuffer(
       PyImageContentBlockSpec(ImageContentBlockSpec(
           ImageFormat::JPG, spec.getPixelFormat(), spec.getWidth(), spec.getHeight())),
-      move(outBuffer));
+      std::move(outBuffer));
 }
 
 ImageBuffer decompress(const ImageContentBlockSpec& spec, const vector<uint8_t>& bytes) {
@@ -116,7 +116,7 @@ ImageBuffer decompress(const ImageContentBlockSpec& spec, const vector<uint8_t>&
     throw std::runtime_error("Reading compressed buffer failed.");
   }
   // Reading compressed frame was successful.
-  return ImageBuffer(PyImageContentBlockSpec(frame.getSpec()), move(frame.getBuffer()));
+  return ImageBuffer(PyImageContentBlockSpec(frame.getSpec()), std::move(frame.getBuffer()));
 }
 
 void PyImageContentBlockSpec::initAttributesMap() {
