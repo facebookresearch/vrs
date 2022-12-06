@@ -208,7 +208,7 @@ struct ImageBuffer {
   ImageBuffer(const PyImageContentBlockSpec& imageSpec, const vector<uint8_t>& imageBytes)
       : spec{imageSpec}, bytes{imageBytes} {}
   ImageBuffer(const PyImageContentBlockSpec& imageSpec, vector<uint8_t>&& bytes)
-      : spec{imageSpec}, bytes{move(bytes)} {}
+      : spec{imageSpec}, bytes{std::move(bytes)} {}
   ImageBuffer(const PyImageContentBlockSpec& imageSpec, const py::buffer& b) : spec{imageSpec} {
     initBytesFromPyBuffer(b);
   }
@@ -219,7 +219,7 @@ struct ImageBuffer {
   ImageBuffer(const ImageContentBlockSpec& imageSpec, const vector<uint8_t>& imageBytes)
       : spec{imageSpec}, bytes{imageBytes} {}
   ImageBuffer(const ImageContentBlockSpec& imageSpec, vector<uint8_t>&& bytes)
-      : spec{imageSpec}, bytes{move(bytes)} {}
+      : spec{imageSpec}, bytes{std::move(bytes)} {}
   ImageBuffer(const ImageContentBlockSpec& imageSpec, const py::buffer& b) : spec{imageSpec} {
     initBytesFromPyBuffer(b);
   }
