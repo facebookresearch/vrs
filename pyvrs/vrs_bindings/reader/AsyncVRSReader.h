@@ -86,7 +86,7 @@ class AwaitableRecord {
   AwaitableRecord(uint32_t index, AsyncJobQueue& queue) : index_{index}, queue_{queue} {}
 
   void scheduleJob(std::unique_ptr<AsyncJob>&& job) const {
-    queue_.sendJob(move(job));
+    queue_.sendJob(std::move(job));
   }
 
   uint32_t getIndex() const {
