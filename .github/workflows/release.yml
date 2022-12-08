@@ -1,0 +1,191 @@
+name: VRS Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Release Type (major/minor/patch)'
+        default: 'patch'
+        required: true
+
+jobs:
+  get-next-version:
+    if: github.repository == 'facebookresearch/vrs'
+    runs-on: ubuntu-20.04
+    steps:
+      - name: checkout-repo-content
+        uses: actions/checkout@v2
+
+      - name: setup-python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: get next version and tag
+        id: get-next-version-and-tag
+        run: |
+          output=$(python3 release_utils.py --release-type ${{ github.event.inputs.name }})
+          echo $output
+          new_version=$(echo $output | awk '{print $1}')
+          new_tag=$(echo $output | awk '{print $2}')
+          echo "new version is $new_version"
+          echo "new tag is $new_tag"
+          echo ::set-output name=version::$new_version
+          echo ::set-output name=tag::$new_tag
+    outputs:
+      new_version: ${{ steps.get-next-version-and-tag.outputs.version }}
+      new_tag: ${{ steps.get-next-version-and-tag.outputs.tag }}
+  # - update the version file
+  # - commit it to main
+  # - build and upload the pypi package
+  # - create release on github
+  update-version:
+    if: github.repository == 'facebookresearch/vrs'
+    runs-on: ubuntu-20.04
+    needs: get-next-version
+    steps:
+      - name: checkout-repo-content
+        uses: actions/checkout@v2
+
+      - name: setup-python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      # update the version number in version.py
+      - name: update version
+        id: update-version
+        run : |
+          echo "current folder = $PWD"
+          echo "current branch = $(git branch --show-current)"
+          output=$(python3 release_utils.py --release-type ${{ github.event.inputs.name }} --update-version)
+
+      # add and commit the updated version.py to main
+      - name: add and commit to main
+        uses: EndBug/add-and-commit@v7.5.0
+        with:
+          author_name: ${{ secrets.AUTHOR_NAME }}
+          author_email: ${{ secrets.AUTHOR_EMAIL }}
+
+          branch: main
+          default_author: github_actor
+          message: '${{ needs.get-next-version.outputs.new_version }} release'
+          pathspec_error_handling: exitAtEnd
+
+          # Arguments for the git pull command. Use NO-PULL to avoid the action pulling at all.
+          # Default: '--no-rebase'
+          pull: 'NO-PULL'
+          tag: '${{ needs.get-next-version.outputs.new_tag }}'
+
+  # Once version.txt is updated, build the PYPI packages
+  build-bin-macos:
+    if: github.repository == 'facebookresearch/vrs'
+    needs:
+    - update-version:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest]
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          brew install ninja cmake ccache googletest glog fmt cereal \
+            jpeg-turbo libpng \
+            lz4 zstd xxhash \
+            boost \
+            portaudio pybind11
+
+      - name: Install python dependencies
+        run: |
+          pip install -U pip
+          pip install numpy typing dataclasses pytest parameterized Pillow
+          pip install --upgrade build setuptools setuptools_scm wheel
+
+      - name: Build packages (wheel and source distribution)
+        run: |
+          python -m build --sdist --wheel --outdir dist/ pyvrs
+          ls -l dist
+      - name: Store the binary wheel
+        uses: actions/upload-artifact@v2
+        with:
+          name: python-package-distributions
+          path: dist
+
+  build-bin-linux:
+    if: github.repository == 'facebookresearch/vrs'
+    needs:
+    - update-version:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04]
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get upgrade
+          sudo apt-get install -o Acquire::Retries=5 \
+            cmake ninja-build ccache libgtest-dev libfmt-dev libcereal-dev \
+            libturbojpeg-dev libpng-dev \
+            liblz4-dev libzstd-dev libxxhash-dev \
+            libboost-system-dev libboost-filesystem-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev \
+            portaudio19-dev
+      - name: Install python dependencies
+        run: |
+          pip install -U pip
+          pip install pybind11[global]
+          pip install numpy typing dataclasses pytest parameterized Pillow
+          pip install --upgrade build setuptools setuptools_scm wheel
+
+      - name: Build packages (wheel and source distribution)
+        run: |
+          python -m build --sdist --wheel --outdir dist/ pyvrs
+          ls -l dist
+      - name: Store ${{ matrix.manylinux-python-target }} binary wheel
+        uses: actions/upload-artifact@v2
+        with:
+          name: python-package-distributions
+          path: dist
+  deploy:
+    needs:
+    - get-next-version
+    - build-bin-macos
+    - build-bin-linux
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Download all the dists
+        uses: actions/download-artifact@v2
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Deploy to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_TOKEN }}
+      # create the release on github
+      - name: Create release on github
+        uses: ncipollo/release-action@v1
+        with:
+          tag: '${{ needs.get-next-version.outputs.new_tag }}'
