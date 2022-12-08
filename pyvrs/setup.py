@@ -114,7 +114,7 @@ def main():
         long_description = f.read()
 
     setup(
-        name="pyvrs",
+        name="vrs",
         version=get_version(),
         description="Python API for VRS",
         long_description=long_description,
