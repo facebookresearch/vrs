@@ -1,16 +1,14 @@
 name: Publish Python package to test.pypi.org
 
 on:
-  # run every day at 1am
+  # run every day at 2:30 PST
   schedule:
-    - cron: '0 1 * * *'
+    - cron: '30 10 * * *'
 
 jobs:
   build-bin-macos:
     if: github.repository == 'facebookresearch/vrs'
     runs-on: ${{ matrix.os }}
-    env:
-      PYVRS_TEST_BUILD: 1
     strategy:
       matrix:
         os: [macos-latest]
@@ -52,8 +50,6 @@ jobs:
   build-bin-linux:
     if: github.repository == 'facebookresearch/vrs'
     runs-on: ${{ matrix.os }}
-    env:
-      PYVRS_TEST_BUILD: 1
     strategy:
       matrix:
         os: [ubuntu-20.04]
@@ -106,7 +102,6 @@ jobs:
         with:
           name: python-package-distributions
           path: dist/
-      # While setting up the workflow push to test.pypi.org instead of pypi.org
       - name: Deploy to Test PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
