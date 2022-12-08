@@ -81,7 +81,7 @@ jobs:
   build-bin-macos:
     if: github.repository == 'facebookresearch/vrs'
     needs:
-    - update-version:
+    - update-version
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -124,7 +124,7 @@ jobs:
   build-bin-linux:
     if: github.repository == 'facebookresearch/vrs'
     needs:
-    - update-version:
+    - update-version
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -161,7 +161,7 @@ jobs:
         run: |
           python -m build --sdist --wheel --outdir dist/ pyvrs
           ls -l dist
-      - name: Store ${{ matrix.manylinux-python-target }} binary wheel
+      - name: Store the binary wheel
         uses: actions/upload-artifact@v2
         with:
           name: python-package-distributions
