@@ -281,5 +281,18 @@ bool readUInt32(const char*& str, uint32_t& outValue) {
   return true;
 }
 
+bool replaceAll(string& inOutString, const string& token, const string& replacement) {
+  bool replaced = false;
+  if (!token.empty()) {
+    size_t pos = inOutString.find(token, 0);
+    while (pos != string::npos) {
+      inOutString.replace(pos, token.length(), replacement);
+      replaced = true;
+      pos = inOutString.find(token, pos + replacement.length());
+    }
+  }
+  return replaced;
+}
+
 } // namespace helpers
 } // namespace vrs

@@ -249,3 +249,31 @@ TEST_F(StringsHelpersTester, readUnsignedInt32) {
   const char* strWord = "vrs";
   EXPECT_EQ(readUInt32(strWord, outInt), false);
 }
+
+TEST_F(StringsHelpersTester, replaceAllTest) {
+  string str = "hello world";
+  EXPECT_TRUE(helpers::replaceAll(str, " ", "_"));
+  EXPECT_EQ(str, "hello_world");
+
+  EXPECT_TRUE(helpers::replaceAll(str, "world", "worlds"));
+  EXPECT_EQ(str, "hello_worlds");
+
+  str = "hello\\nworld\\nI'm\\ncoming\\n";
+  EXPECT_TRUE(helpers::replaceAll(str, "\\n", "\n"));
+  EXPECT_EQ(str, "hello\nworld\nI'm\ncoming\n");
+  EXPECT_FALSE(helpers::replaceAll(str, "a", "b"));
+  EXPECT_EQ(str, "hello\nworld\nI'm\ncoming\n");
+
+  str = "hello";
+  EXPECT_TRUE(helpers::replaceAll(str, str, "bye"));
+  EXPECT_EQ(str, "bye");
+
+  str = "[[[]]]";
+  EXPECT_TRUE(helpers::replaceAll(str, "[", "{"));
+  EXPECT_TRUE(helpers::replaceAll(str, "]]]", "}"));
+  EXPECT_EQ(str, "{{{}");
+  EXPECT_TRUE(helpers::replaceAll(str, "}", "}}}}"));
+  EXPECT_EQ(str, "{{{}}}}");
+  EXPECT_TRUE(helpers::replaceAll(str, "{", "{{"));
+  EXPECT_EQ(str, "{{{{{{}}}}");
+}

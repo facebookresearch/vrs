@@ -69,6 +69,14 @@ bool startsWith(const std::string& text, const std::string& prefix);
 /// @return True if text ends with suffix. Case insensitive.
 bool endsWith(const std::string& text, const std::string& suffix);
 
+/// Replace all occurences of a string within another string
+/// @param inOutString: the string to modify with the replacement(s)
+/// @param token: text to replace
+/// @param replacement: text to replace token with
+/// The function can't fail. Only full instances of token in the original string will be replaced.
+/// @return true if at least once instance of token was found and replaced.
+bool replaceAll(std::string& inOutString, const std::string& token, const std::string& replacement);
+
 /// Helper to get a field of a string map interpreted as a bool.
 /// @param m: the map to search.
 /// @param field: the name of the field.
