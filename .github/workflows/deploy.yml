@@ -1,0 +1,109 @@
+name: Deployment
+
+on:
+  # this workflow can only be manually triggered for now.
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Where to deploy the artifacts? Only build (build), deploy to test PyPI (test), or deploy to PyPI (prod).'
+        required: true
+        type: choice
+        default: 'test'
+        options:
+          - build
+          - test
+          - prod
+
+jobs:
+  cibuildwheel:
+    if: github.repository == 'facebookresearch/vrs'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-20.04, macos-latest]
+        cibw_build: ['cp37-*', 'cp38-*', 'cp39-*', 'cp310-*']
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          sudo apt-get update
+          sudo apt-get upgrade
+          sudo apt-get install -o Acquire::Retries=5 \
+            cmake ninja-build ccache libgtest-dev libfmt-dev libcereal-dev \
+            libturbojpeg-dev libpng-dev \
+            liblz4-dev libzstd-dev libxxhash-dev \
+            libboost-system-dev libboost-filesystem-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev \
+            qtbase5-dev portaudio19-dev
+          python -m pip install -U pip
+          python -m pip install pybind11[global]
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+          brew install ninja cmake ccache googletest glog fmt cereal \
+              jpeg-turbo libpng \
+              lz4 zstd xxhash \
+              boost \
+              qt5 portaudio pybind11
+        else
+          echo "$RUNNER_OS not supported"
+          exit 1
+        fi
+    - name: Install python dependencies
+      run: |
+        pip install -U pip
+        pip install numpy typing dataclasses pytest parameterized Pillow
+        pip install --upgrade build setuptools setuptools_scm wheel
+
+    - name: Build wheels
+      uses: pypa/cibuildwheel@v2.4.0
+      env:
+        CIBW_BUILD: ${{ matrix.cibw_build }}
+        CIBW_ARCHS_MACOS: x86_64 universal2 arm64
+        CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
+        CIBW_SKIP: "*-manylinux_i686 *-musllinux_*"
+        MACOSX_DEPLOYMENT_TARGET: "10.13"
+
+
+    - name: Sending wheels to the deployment workflow
+      uses: actions/upload-artifact@v3
+      with:
+        name: python-package-distributions
+        path: wheelhouse/*
+
+
+  publish-to-pypi:
+    runs-on: ubuntu-latest
+    needs:
+      - cibuildwheel
+    steps:
+    - name: Download wheels from previous jobs
+      # by default this will download all artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: python-package-distributions
+        # PyPI publish action uploads everything under dist/* by default
+        path: dist
+
+    - name: Display the list of artifacts
+      run: ls -R dist
+
+    - name: Publish to Test PyPI
+      if: github.event.inputs.deploy == 'test'
+      uses: pypa/gh-action-pypi-publish@v1.4.2
+      with:
+        user: __token__
+        password: ${{ secrets.TEST_PYPI_PASSWORD }}
+        repository_url: https://test.pypi.org/legacy/
+        skip_existing: true
+        verbose: true
+
+    - name: Publish to PyPI
+      if: github.event.inputs.deploy == 'prod' && startsWith(github.ref, 'refs/tags')
+      uses: pypa/gh-action-pypi-publish@v1.4.2
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_PASSWORD }}
+        verbose: true
