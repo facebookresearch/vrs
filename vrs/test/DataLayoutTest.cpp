@@ -16,6 +16,7 @@
 
 #include <iostream>
 #include <limits>
+#include <type_traits>
 
 #include <gtest/gtest.h>
 
@@ -563,8 +564,10 @@ inline void addTemplatePiece(ManualDataLayout& layout, Counters& c, const T& def
   layout.add(unique_ptr<DataPiece>(newValue));
   newValue->setMin(numeric_limits<T>::lowest());
   newValue->setMax(numeric_limits<T>::max());
-  newValue->setMinIncrement(numeric_limits<T>::lowest() / 10);
-  newValue->setMaxIncrement(numeric_limits<T>::max() / 10);
+  if constexpr (std::is_arithmetic_v<T>) {
+    newValue->setMinIncrement(numeric_limits<T>::lowest() / 10);
+    newValue->setMaxIncrement(numeric_limits<T>::max() / 10);
+  }
   newValue->setTag("description", string("this is ") + valuePieceName);
   newValue->setTag("units", "metric");
 
