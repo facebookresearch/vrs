@@ -356,30 +356,39 @@ class DataLayout {
   /// @return Pointer to the DataPiece found, or nullptr.
   /// @internal (meant for testing)
   template <class T>
-  DataPieceValue<T>* findDataPieceValue(const string& label) const;
+  const DataPieceValue<T>* findDataPieceValue(const string& label) const;
+  template <class T>
+  DataPieceValue<T>* findDataPieceValue(const string& label);
   /// Find a field of type DataPieceArray<T> by name.
   /// @param label: Text name of the field (not the variable name).
   /// @return Pointer to the DataPiece found, or nullptr.
   /// @internal (meant for testing)
   template <class T>
-  DataPieceArray<T>* findDataPieceArray(const string& label, size_t arraySize) const;
+  const DataPieceArray<T>* findDataPieceArray(const string& label, size_t arraySize) const;
+  template <class T>
+  DataPieceArray<T>* findDataPieceArray(const string& label, size_t arraySize);
   /// Find a field of type DataPieceVector<T> by name.
   /// @param label: Text name of the field (not the variable name).
   /// @return Pointer to the DataPiece found, or nullptr.
   /// @internal (meant for testing)
   template <class T>
-  DataPieceVector<T>* findDataPieceVector(const string& label) const;
+  const DataPieceVector<T>* findDataPieceVector(const string& label) const;
+  template <class T>
+  DataPieceVector<T>* findDataPieceVector(const string& label);
   /// Find a field of type DataPieceStringMap<T> by name.
   /// @param label: Text name of the field (not the variable name).
   /// @return Pointer to the DataPiece found, or nullptr.
   /// @internal (meant for testing)
   template <class T>
-  DataPieceStringMap<T>* findDataPieceStringMap(const string& label) const;
+  const DataPieceStringMap<T>* findDataPieceStringMap(const string& label) const;
+  template <class T>
+  DataPieceStringMap<T>* findDataPieceStringMap(const string& label);
   /// Find a field of type DataPieceString by name.
   /// @param label: Text name of the field (not the variable name).
   /// @return Pointer to the DataPiece found, or nullptr.
   /// @internal (meant for testing)
-  DataPieceString* findDataPieceString(const string& label) const;
+  const DataPieceString* findDataPieceString(const string& label) const;
+  DataPieceString* findDataPieceString(const string& label);
   /// Iterate over the different data piece elements of a DataLayout.
   /// @param callback: a function to call for each element found.
   /// @param type: filter to select only an element type, of UNDEFINED for no filtering.

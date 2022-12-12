@@ -503,7 +503,7 @@ static DataPieceFactory::Registerer<DataPieceStringMap<string>> Registerer_DataP
 } // namespace internal
 
 template <typename T>
-DataPieceValue<T>* DataLayout::findDataPieceValue(const string& label) const {
+const DataPieceValue<T>* DataLayout::findDataPieceValue(const string& label) const {
   const string& typeName = vrs::getTypeName<T>();
   for (DataPiece* piece : fixedSizePieces_) {
     if (piece->getPieceType() == DataPieceType::Value && piece->getLabel() == label &&
@@ -515,7 +515,14 @@ DataPieceValue<T>* DataLayout::findDataPieceValue(const string& label) const {
 }
 
 template <typename T>
-DataPieceArray<T>* DataLayout::findDataPieceArray(const string& label, size_t arraySize) const {
+DataPieceValue<T>* DataLayout::findDataPieceValue(const string& label) {
+  return const_cast<DataPieceValue<T>*>(
+      const_cast<const DataLayout*>(this)->findDataPieceValue<T>(label));
+}
+
+template <typename T>
+const DataPieceArray<T>* DataLayout::findDataPieceArray(const string& label, size_t arraySize)
+    const {
   const string& typeName = vrs::getTypeName<T>();
   size_t size = arraySize * sizeof(T);
   for (DataPiece* piece : fixedSizePieces_) {
@@ -528,7 +535,13 @@ DataPieceArray<T>* DataLayout::findDataPieceArray(const string& label, size_t ar
 }
 
 template <typename T>
-DataPieceVector<T>* DataLayout::findDataPieceVector(const string& label) const {
+DataPieceArray<T>* DataLayout::findDataPieceArray(const string& label, size_t arraySize) {
+  return const_cast<DataPieceArray<T>*>(
+      const_cast<const DataLayout*>(this)->findDataPieceArray<T>(label, arraySize));
+}
+
+template <typename T>
+const DataPieceVector<T>* DataLayout::findDataPieceVector(const string& label) const {
   const string& typeName = vrs::getTypeName<T>();
   for (DataPiece* piece : varSizePieces_) {
     if (piece->getPieceType() == DataPieceType::Vector && piece->getLabel() == label &&
@@ -539,11 +552,18 @@ DataPieceVector<T>* DataLayout::findDataPieceVector(const string& label) const {
   return nullptr;
 }
 
-template DataPieceVector<string>* DataLayout::findDataPieceVector<string>(
+template <typename T>
+DataPieceVector<T>* DataLayout::findDataPieceVector(const string& label) {
+  return const_cast<DataPieceVector<T>*>(
+      const_cast<const DataLayout*>(this)->findDataPieceVector<T>(label));
+}
+
+template const DataPieceVector<string>* DataLayout::findDataPieceVector<string>(
     const string& label) const;
+template DataPieceVector<string>* DataLayout::findDataPieceVector<string>(const string& label);
 
 template <typename T>
-DataPieceStringMap<T>* DataLayout::findDataPieceStringMap(const string& label) const {
+const DataPieceStringMap<T>* DataLayout::findDataPieceStringMap(const string& label) const {
   const string& typeName = vrs::getTypeName<T>();
   for (DataPiece* piece : varSizePieces_) {
     if (piece->getPieceType() == DataPieceType::StringMap && piece->getLabel() == label &&
@@ -554,16 +574,29 @@ DataPieceStringMap<T>* DataLayout::findDataPieceStringMap(const string& label) c
   return nullptr;
 }
 
-template DataPieceStringMap<string>* DataLayout::findDataPieceStringMap<string>(
-    const string& label) const;
+template <typename T>
+DataPieceStringMap<T>* DataLayout::findDataPieceStringMap(const string& label) {
+  return const_cast<DataPieceStringMap<T>*>(
+      const_cast<const DataLayout*>(this)->findDataPieceStringMap<T>(label));
+}
 
-DataPieceString* DataLayout::findDataPieceString(const string& label) const {
+template const DataPieceStringMap<string>* DataLayout::findDataPieceStringMap<string>(
+    const string& label) const;
+template DataPieceStringMap<string>* DataLayout::findDataPieceStringMap<string>(
+    const string& label);
+
+const DataPieceString* DataLayout::findDataPieceString(const string& label) const {
   for (DataPiece* piece : varSizePieces_) {
     if (piece->getPieceType() == DataPieceType::String && piece->getLabel() == label) {
       return static_cast<DataPieceString*>(piece);
     }
   }
   return nullptr;
+}
+
+DataPieceString* DataLayout::findDataPieceString(const string& label) {
+  return const_cast<DataPieceString*>(
+      const_cast<const DataLayout*>(this)->findDataPieceString(label));
 }
 
 void DataLayout::forEachDataPiece(function<void(const DataPiece*)> callback, DataPieceType type)
@@ -693,12 +726,18 @@ size_t DataLayout::getAvailableVarDataPiecesCount() const {
   return count;
 }
 
-#define DEFINE_FIND_DATA_PIECE(T)                                                           \
-  template DataPieceValue<T>* DataLayout::findDataPieceValue<T>(const string& label) const; \
-  template DataPieceArray<T>* DataLayout::findDataPieceArray(                               \
-      const string& label, size_t arraySize) const;                                         \
-  template DataPieceVector<T>* DataLayout::findDataPieceVector(const string& label) const;  \
-  template DataPieceStringMap<T>* DataLayout::findDataPieceStringMap(const string& label) const;
+#define DEFINE_FIND_DATA_PIECE(T)                                                                 \
+  template const DataPieceValue<T>* DataLayout::findDataPieceValue<T>(const string& label) const; \
+  template DataPieceValue<T>* DataLayout::findDataPieceValue<T>(const string& label);             \
+  template const DataPieceArray<T>* DataLayout::findDataPieceArray(                               \
+      const string& label, size_t arraySize) const;                                               \
+  template DataPieceArray<T>* DataLayout::findDataPieceArray(                                     \
+      const string& label, size_t arraySize);                                                     \
+  template const DataPieceVector<T>* DataLayout::findDataPieceVector(const string& label) const;  \
+  template DataPieceVector<T>* DataLayout::findDataPieceVector(const string& label);              \
+  template const DataPieceStringMap<T>* DataLayout::findDataPieceStringMap(const string& label)   \
+      const;                                                                                      \
+  template DataPieceStringMap<T>* DataLayout::findDataPieceStringMap(const string& label);
 
 #define DEFINE_DATA_PIECE_TYPE(x)          \
   template <>                              \
