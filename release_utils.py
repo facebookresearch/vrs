@@ -16,6 +16,12 @@ import argparse
 from typing import Tuple
 
 
+def get_current_version() -> Tuple[str, str]:
+    current_version = open("version.txt", "r").read().strip()
+    current_tag = "v" + current_version
+    return current_version, current_tag
+
+
 def get_next_version(release_type) -> Tuple[Tuple[int, int, int], str, str]:
     current_version = open("version.txt", "r").read().strip()
     version_list = [int(x) for x in current_version.strip("'").split(".")]
@@ -50,15 +56,21 @@ def update_version(new_version_tuple) -> None:
 
 
 def main(args):
-    if args.release_type in ["major", "minor", "patch"]:
-        new_version_tuple, new_version, new_tag = get_next_version(args.release_type)
-    else:
-        raise ValueError("Incorrect release type specified")
+    if args.release_type:
+        if args.release_type in ["major", "minor", "patch"]:
+            new_version_tuple, new_version, new_tag = get_next_version(
+                args.release_type
+            )
+            print(new_version, new_tag)
+        else:
+            raise ValueError("Incorrect release type specified")
 
     if args.update_version:
         update_version(new_version_tuple)
 
-    print(new_version, new_tag)
+    if args.get_current_version:
+        current_version, current_tag = get_current_version()
+        print(current_version, current_tag)
 
 
 if __name__ == "__main__":
@@ -66,7 +78,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--release-type",
         type=str,
-        required=True,
+        required=False,
         help="type of release = major/minor/patch",
     )
     parser.add_argument(
@@ -74,6 +86,12 @@ if __name__ == "__main__":
         action="store_true",
         required=False,
         help="updates the version in version.txt",
+    )
+    parser.add_argument(
+        "--get-current-version",
+        action="store_true",
+        required=False,
+        help="get the current version in version.txt",
     )
 
     args = parser.parse_args()
