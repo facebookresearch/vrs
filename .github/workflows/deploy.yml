@@ -17,8 +17,6 @@ on:
 jobs:
   build-bin-macos:
     if: github.repository == 'facebookresearch/vrs'
-    needs:
-    - update-version
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -62,8 +60,6 @@ jobs:
   #       Set up an install scripts for libraries instead of using yum that installs older version.
   build-bin-linux:
     if: github.repository == 'facebookresearch/vrs'
-    needs:
-    - update-version
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
