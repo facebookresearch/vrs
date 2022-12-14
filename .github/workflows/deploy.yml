@@ -96,11 +96,13 @@ jobs:
         run: |
           python -m build --sdist --wheel --outdir dist/ pyvrs
           ls -l dist
-      - name: Store the binary wheel
-        uses: actions/upload-artifact@v2
-        with:
-          name: python-package-distributions
-          path: dist
+      # Keep linux build to make sure it's working but not upload it to dist to avoid error on upload to pypi.
+      # pypi doesn't accept wheel that's not built in manylinux...
+      # - name: Store the binary wheel
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: python-package-distributions
+      #     path: dist
 
   publish-to-pypi:
     runs-on: ubuntu-latest
@@ -124,7 +126,7 @@ jobs:
       uses: pypa/gh-action-pypi-publish@v1.4.2
       with:
         user: __token__
-        password: ${{ secrets.TEST_PYPI_PASSWORD }}
+        password: ${{ secrets.TEST_PYPI_TOKEN }}
         repository_url: https://test.pypi.org/legacy/
         skip_existing: true
         verbose: true
@@ -134,5 +136,5 @@ jobs:
       uses: pypa/gh-action-pypi-publish@v1.4.2
       with:
         user: __token__
-        password: ${{ secrets.PYPI_PASSWORD }}
+        password: ${{ secrets.PYPI_TOKEN }}
         verbose: true
