@@ -277,3 +277,21 @@ TEST_F(StringsHelpersTester, replaceAllTest) {
   EXPECT_TRUE(helpers::replaceAll(str, "{", "{{"));
   EXPECT_EQ(str, "{{{{{{}}}}");
 }
+
+TEST_F(StringsHelpersTester, splitTest) {
+  string str =
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+  vector<string> expectedTokens{
+      "Lorem ipsum dolor sit amet",
+      " consectetur adipiscing elit",
+      " sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."};
+  vector<string> actualTokens;
+
+  helpers::split(str, ',', actualTokens);
+  EXPECT_EQ(actualTokens, expectedTokens);
+
+  expectedTokens = {str};
+  actualTokens.clear();
+  helpers::split(str, '_', actualTokens);
+  EXPECT_EQ(actualTokens, expectedTokens);
+}

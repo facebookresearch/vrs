@@ -294,5 +294,14 @@ bool replaceAll(string& inOutString, const string& token, const string& replacem
   return replaced;
 }
 
+void split(const std::string& inputString, char delimiter, std::vector<std::string>& tokens) {
+  std::stringstream ss(inputString);
+  std::string item;
+
+  while (getline(ss, item, delimiter)) {
+    tokens.push_back(item);
+  }
+}
+
 } // namespace helpers
 } // namespace vrs

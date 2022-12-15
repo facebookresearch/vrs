@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <map>
 #include <string>
+#include <vector>
 
 #include <vrs/os/Platform.h>
 
@@ -148,6 +149,12 @@ std::string humanReadableTimestamp(double seconds, uint8_t precision = 3);
 /// This conversion is meant to make string problems visible, rather than be a proper encoding,
 /// for instance, you can't differentiate between "\n" and string that would contain a newline char.
 std::string make_printable(const std::string& str);
+
+/// Helper method to split a string based on the delimiter.
+/// @param inputString: the string that needs to be split.
+/// @param delimiter: the delimiter that will be used to split the input string.
+/// @param tokens: the collection of strings after the split.
+void split(const std::string& inputString, char delimiter, std::vector<std::string>& tokens);
 
 } // namespace helpers
 } // namespace vrs
