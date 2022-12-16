@@ -51,7 +51,7 @@ const string& DiskFile::staticName() {
 DiskFile::DiskFile() : WriteFileHandler(DiskFile::staticName()) {}
 
 DiskFile::~DiskFile() {
-  close();
+  DiskFile::close(); // overrides not available in constructors & destructors
 }
 
 unique_ptr<FileHandler> DiskFile::makeNew() const {
@@ -543,7 +543,7 @@ int DiskFile::parseUri(FileSpec& inOutFileSpec, size_t colonIndex) const {
 }
 
 AtomicDiskFile::~AtomicDiskFile() {
-  close();
+  AtomicDiskFile::close(); // overrides not available in constructors & destructors
 }
 
 int AtomicDiskFile::create(const std::string& newFilePath) {

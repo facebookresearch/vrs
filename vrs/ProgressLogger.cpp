@@ -29,7 +29,7 @@ namespace vrs {
 
 ProgressLogger::ProgressLogger(bool detailedProgress, double updateDelay)
     : detailedProgress_{detailedProgress}, updateDelay_{updateDelay} {
-  updateNextProgessTime();
+  ProgressLogger::updateNextProgessTime(); // overrides not available in constructors & destructors
   stepNumber_ = 0;
   stepCount_ = 1;
 }

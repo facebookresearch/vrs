@@ -64,7 +64,7 @@ inline string checksum(const stringstream& ss) {
 
 string checksum(const map<string, string>& tags) {
   stringstream ss;
-  for (auto tag : tags) {
+  for (const auto& tag : tags) {
     ss << tag.first << '=' << tag.second << '/';
   }
   return checksum(ss);

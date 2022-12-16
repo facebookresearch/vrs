@@ -615,7 +615,7 @@ void RecordFileWriter::addTags(const map<string, string>& newTags) {
   if (isWriting()) {
     XR_LOGE("File tags added after file creation: they won't be written!");
   } else {
-    for (auto tag : newTags) {
+    for (const auto& tag : newTags) {
       fileTags_[tag.first] = tag.second;
     }
   }
@@ -1111,7 +1111,7 @@ int RecordFileWriter::completeAndCloseFile() {
 
 RecordFileWriter::~RecordFileWriter() {
   if (writerThreadData_ != nullptr) {
-    waitForFileClosed();
+    RecordFileWriter::waitForFileClosed(); // overrides not available in constructors & destructors
     delete writerThreadData_;
   }
   if (purgeThreadData_ != nullptr) {

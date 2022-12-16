@@ -108,6 +108,7 @@ class DataPieceValue : public DataPiece {
       outDefault = *defaultValue_.get();
       return true;
     }
+    outDefault = T{};
     return false;
   }
 
@@ -299,7 +300,7 @@ class DataPieceEnum : public DataPieceValue<StorageType> {
   /// @return True if the value was set.
   /// If the value wasn't available, returns false.
   bool get(EnumType& e) const {
-    StorageType v;
+    StorageType v{};
     bool r = DataPieceValue<StorageType>::get(v);
     e = static_cast<EnumType>(v);
     return r;

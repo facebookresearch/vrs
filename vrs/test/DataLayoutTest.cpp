@@ -296,7 +296,7 @@ TEST_F(DataLayoutTester, testDataLayoutMatcher) {
   EXPECT_EQ(newConfig.float_.get(), 0);
   floatt = -1;
   EXPECT_FALSE(newConfig.float_.get(floatt));
-  EXPECT_EQ(floatt, -1);
+  EXPECT_EQ(floatt, 0);
 
   // check missing data, with default
   EXPECT_FALSE(newConfig.double_.isAvailable());

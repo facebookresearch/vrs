@@ -57,16 +57,16 @@ void Recordable::setTag(const string& tagName, const string& tagValue) {
 }
 
 void Recordable::addTags(const map<string, string>& newTags) {
-  for (auto tag : newTags) {
+  for (const auto& tag : newTags) {
     tags_.user[tag.first] = tag.second;
   }
 }
 
 void Recordable::addTags(const StreamTags& tags) {
-  for (auto tag : tags.user) {
+  for (const auto& tag : tags.user) {
     tags_.user[tag.first] = tag.second;
   }
-  for (auto tag : tags.vrs) {
+  for (const auto& tag : tags.vrs) {
     tags_.vrs[tag.first] = tag.second;
   }
 }

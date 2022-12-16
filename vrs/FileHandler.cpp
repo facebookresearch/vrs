@@ -371,7 +371,7 @@ string FileSpec::getXXHash() const {
   for (const auto& chunk : chunks) {
     digester.update(chunk);
   }
-  for (auto extra : extras) {
+  for (const auto& extra : extras) {
     digester.update(extra.first);
     digester.update(extra.second);
   }
