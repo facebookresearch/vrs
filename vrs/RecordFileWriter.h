@@ -283,10 +283,6 @@ class RecordFileWriter {
   /// List of records, sorted by time
   using SortedRecords = deque<SortRecord>;
 
- protected:
-  // data members valid while a file is being worked on
-  unique_ptr<WriteFileHandler> file_;
-
  private:
   /// The implementation of internal methods & members should never be relied upon, and may change.
   uint64_t collectOldRecords(RecordBatch& batch, double maxTimestamp); ///< internal
@@ -310,6 +306,9 @@ class RecordFileWriter {
   set<Recordable*> recordables_;
   mutable std::mutex recordablesMutex_;
 
+ protected:
+  /// data members valid while a file is being worked on
+  unique_ptr<WriteFileHandler> file_;
   uint64_t maxChunkSize_;
   unique_ptr<NewChunkHandler> newChunkHandler_;
   FileFormat::FileHeader fileHeader_;
