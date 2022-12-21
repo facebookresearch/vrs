@@ -245,7 +245,7 @@ struct AriaFileReader {
         }
         if (streamPlayer) {
           reader.setStreamPlayer(id, streamPlayer.get());
-          streamPlayers.emplace_back(move(streamPlayer));
+          streamPlayers.emplace_back(std::move(streamPlayer));
         }
       }
       if (streamPlayers.empty()) {

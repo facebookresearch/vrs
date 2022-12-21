@@ -283,7 +283,8 @@ int threadedCreateRecords(CreateParams& p) {
   if (p.customCreateFileFunction) {
     RETURN_ON_FAILURE(p.customCreateFileFunction(p, fileWriter));
   } else if (p.testOptions & TestOptions::SPLIT_HEADER) {
-    RETURN_ON_FAILURE(fileWriter.createChunkedFile(p.path, p.maxChunkSizeMB, move(p.chunkHandler)));
+    RETURN_ON_FAILURE(
+        fileWriter.createChunkedFile(p.path, p.maxChunkSizeMB, std::move(p.chunkHandler)));
   } else {
     fileWriter.setMaxChunkSizeMB(p.maxChunkSizeMB);
     RETURN_ON_FAILURE(fileWriter.createFileAsync(p.path));
@@ -328,7 +329,7 @@ int singleThreadCreateRecords(CreateParams& p) {
   } else if (p.testOptions & TestOptions::SPLIT_HEADER) {
     size_t kMB = 1024 * 1024;
     RETURN_ON_FAILURE(
-        fileWriter.createChunkedFile(p.path, p.maxChunkSizeMB * kMB, move(p.chunkHandler)));
+        fileWriter.createChunkedFile(p.path, p.maxChunkSizeMB * kMB, std::move(p.chunkHandler)));
   } else {
     // When creating records synchronously, config & state records are not automatically inserted.
     for (auto& camera : cameras) {

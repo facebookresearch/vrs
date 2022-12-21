@@ -114,7 +114,7 @@ struct CreateParams {
     return *this;
   }
   CreateParams& setChunkHandler(unique_ptr<NewChunkHandler>&& handler) {
-    chunkHandler = move(handler);
+    chunkHandler = std::move(handler);
     return *this;
   }
   CreateParams& setCustomCreateFileFunction(CustomCreateFileFunction _customCreateFileFunction) {

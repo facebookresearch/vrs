@@ -95,9 +95,9 @@ bool FramePlayer::onImageRead(
     }
   }
   if (frameValid && job) {
-    job->frame = move(frame);
+    job->frame = std::move(frame);
     imageJobs_.startThreadIfNeeded(&FramePlayer::imageJobsThreadActivity, this);
-    imageJobs_.sendJob(move(job));
+    imageJobs_.sendJob(std::move(job));
     return true;
   }
   if (firstImage_) {
@@ -148,7 +148,7 @@ void FramePlayer::convertFrame(shared_ptr<PixelFrame>& frame) {
     needsConvertedFrame_ = (frame != convertedFrame); // for next time!
     if (needsConvertedFrame_) {
       recycle(frame, true);
-      frame = move(convertedFrame);
+      frame = std::move(convertedFrame);
     }
   }
 }
@@ -164,7 +164,7 @@ shared_ptr<PixelFrame> FramePlayer::getFrame(bool inputNotConvertedFrame) {
   if (frames.empty()) {
     return nullptr;
   }
-  shared_ptr<PixelFrame> frame = move(frames.back());
+  shared_ptr<PixelFrame> frame = std::move(frames.back());
   frames.pop_back();
   return frame;
 }
@@ -176,7 +176,7 @@ void FramePlayer::recycle(shared_ptr<PixelFrame>& frame, bool inputNotConvertedF
       vector<shared_ptr<PixelFrame>>& frames =
           inputNotConvertedFrame ? inputFrames_ : convertedframes_;
       if (frames.size() < 10) {
-        frames.emplace_back(move(frame));
+        frames.emplace_back(std::move(frame));
       }
     }
     frame.reset();
@@ -257,11 +257,11 @@ bool FramePlayer::saveFrame(
 void FramePlayer::imageJobsThreadActivity() {
   unique_ptr<ImageJob> job;
   while (imageJobs_.waitForJob(job)) {
-    shared_ptr<PixelFrame> frame = move(job->frame);
+    shared_ptr<PixelFrame> frame = std::move(job->frame);
     // if we're behind, we just drop images except the last one!
     while (imageJobs_.getJob(job)) {
       recycle(frame, true);
-      frame = move(job->frame);
+      frame = std::move(job->frame);
     }
     bool frameValid = false;
     if (job->imageFormat == vrs::ImageFormat::RAW || job->imageFormat == vrs::ImageFormat::VIDEO) {
