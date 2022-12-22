@@ -171,8 +171,53 @@ static constexpr size_t&#160;</td><td class="memItemRight" valign="bottom"><b>kM
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
 <tr class="memitem:aa42829c98ee8c2f8317a641b5ee09daa"><td class="memItemLeft" align="right" valign="top"><a id="aa42829c98ee8c2f8317a641b5ee09daa"></a>
-unique_ptr&lt; <a class="el" href="classvrs_1_1_write_file_handler.html">WriteFileHandler</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>file_</b></td></tr>
+unique_ptr&lt; <a class="el" href="classvrs_1_1_write_file_handler.html">WriteFileHandler</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#aa42829c98ee8c2f8317a641b5ee09daa">file_</a></td></tr>
+<tr class="memdesc:aa42829c98ee8c2f8317a641b5ee09daa"><td class="mdescLeft">&#160;</td><td class="mdescRight">data members valid while a file is being worked on <br /></td></tr>
 <tr class="separator:aa42829c98ee8c2f8317a641b5ee09daa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a45a490310a4d50f37b5cb7054b12b5ed"><td class="memItemLeft" align="right" valign="top"><a id="a45a490310a4d50f37b5cb7054b12b5ed"></a>
+uint64_t&#160;</td><td class="memItemRight" valign="bottom"><b>maxChunkSize_</b></td></tr>
+<tr class="separator:a45a490310a4d50f37b5cb7054b12b5ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a193b561b250c7d6691b22bb1a10d7993"><td class="memItemLeft" align="right" valign="top"><a id="a193b561b250c7d6691b22bb1a10d7993"></a>
+unique_ptr&lt; <a class="el" href="classvrs_1_1_new_chunk_handler.html">NewChunkHandler</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>newChunkHandler_</b></td></tr>
+<tr class="separator:a193b561b250c7d6691b22bb1a10d7993"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a809bf599a146dd331db0f6bc09fa64"><td class="memItemLeft" align="right" valign="top"><a id="a2a809bf599a146dd331db0f6bc09fa64"></a>
+<a class="el" href="structvrs_1_1_file_format_1_1_file_header.html">FileFormat::FileHeader</a>&#160;</td><td class="memItemRight" valign="bottom"><b>fileHeader_</b></td></tr>
+<tr class="separator:a2a809bf599a146dd331db0f6bc09fa64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8eb551588a0ef6cd94d07505d49d0bab"><td class="memItemLeft" align="right" valign="top"><a id="a8eb551588a0ef6cd94d07505d49d0bab"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>lastRecordSize_</b></td></tr>
+<tr class="separator:a8eb551588a0ef6cd94d07505d49d0bab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a07d63268827836fcf23a440603a7ed6f"><td class="memItemLeft" align="right" valign="top"><a id="a07d63268827836fcf23a440603a7ed6f"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>skipFinalizeIndexRecords_</b> = false</td></tr>
+<tr class="separator:a07d63268827836fcf23a440603a7ed6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a11e3729395f1c8a9703f8328deb3ef"><td class="memItemLeft" align="right" valign="top"><a id="a0a11e3729395f1c8a9703f8328deb3ef"></a>
+unique_ptr&lt; deque&lt; <a class="el" href="structvrs_1_1_index_record_1_1_disk_record_info.html">IndexRecord::DiskRecordInfo</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>preliminaryIndex_</b></td></tr>
+<tr class="separator:a0a11e3729395f1c8a9703f8328deb3ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa861ea7a01c9e11987a38b184725328d"><td class="memItemLeft" align="right" valign="top"><a id="aa861ea7a01c9e11987a38b184725328d"></a>
+<a class="el" href="classvrs_1_1_index_record_1_1_writer.html">IndexRecord::Writer</a>&#160;</td><td class="memItemRight" valign="bottom"><b>indexRecordWriter_</b></td></tr>
+<tr class="separator:aa861ea7a01c9e11987a38b184725328d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3bd3352b265db9d7035d7e4ea8826608"><td class="memItemLeft" align="right" valign="top"><a id="a3bd3352b265db9d7035d7e4ea8826608"></a>
+map&lt; string, string &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>fileTags_</b></td></tr>
+<tr class="separator:a3bd3352b265db9d7035d7e4ea8826608"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a337ad6bb578251560fc6bb7bafd61ce4"><td class="memItemLeft" align="right" valign="top"><a id="a337ad6bb578251560fc6bb7bafd61ce4"></a>
+<a class="el" href="classvrs_1_1_compressor.html">Compressor</a>&#160;</td><td class="memItemRight" valign="bottom"><b>compressor_</b></td></tr>
+<tr class="separator:a337ad6bb578251560fc6bb7bafd61ce4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a03422126411c541e87e54099e3a990e9"><td class="memItemLeft" align="right" valign="top"><a id="a03422126411c541e87e54099e3a990e9"></a>
+size_t&#160;</td><td class="memItemRight" valign="bottom"><b>compressionThreadPoolSize_</b> {}</td></tr>
+<tr class="separator:a03422126411c541e87e54099e3a990e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a804d2cc31fd910476563d445997d5505"><td class="memItemLeft" align="right" valign="top"><a id="a804d2cc31fd910476563d445997d5505"></a>
+<a class="el" href="structvrs_1_1_record_file_writer___1_1_writer_thread_data.html">RecordFileWriter_::WriterThreadData</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#a804d2cc31fd910476563d445997d5505">writerThreadData_</a></td></tr>
+<tr class="memdesc:a804d2cc31fd910476563d445997d5505"><td class="mdescLeft">&#160;</td><td class="mdescRight">when a background thread is active <br /></td></tr>
+<tr class="separator:a804d2cc31fd910476563d445997d5505"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5af634c147db44f9cfbd811d85717c4d"><td class="memItemLeft" align="right" valign="top"><a id="a5af634c147db44f9cfbd811d85717c4d"></a>
+std::unique_ptr&lt; std::atomic&lt; uint64_t &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>queueByteSize_</b></td></tr>
+<tr class="separator:a5af634c147db44f9cfbd811d85717c4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a625e8d8842c54f6c6b95242f3ef705a5"><td class="memItemLeft" align="right" valign="top"><a id="a625e8d8842c54f6c6b95242f3ef705a5"></a>
+<a class="el" href="structvrs_1_1_record_file_writer___1_1_purge_thread_data.html">RecordFileWriter_::PurgeThreadData</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#a625e8d8842c54f6c6b95242f3ef705a5">purgeThreadData_</a></td></tr>
+<tr class="memdesc:a625e8d8842c54f6c6b95242f3ef705a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">when a purge thread is active <br /></td></tr>
+<tr class="separator:a625e8d8842c54f6c6b95242f3ef705a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a020c4839ae3870b3242772bb10105d8d"><td class="memItemLeft" align="right" valign="top"><a id="a020c4839ae3870b3242772bb10105d8d"></a>
+<a class="el" href="namespacevrs.html#a142c4b247fe86fb372c27f77d46e96b4">InitCreatedThreadCallback</a>&#160;</td><td class="memItemRight" valign="bottom"><b>initCreatedThreadCallback_</b></td></tr>
+<tr class="separator:a020c4839ae3870b3242772bb10105d8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
