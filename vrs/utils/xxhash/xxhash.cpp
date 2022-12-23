@@ -15,8 +15,8 @@
  */
 
 #include <vrs/utils/xxhash/xxhash.h>
-#include <iomanip>
-#include <sstream>
+
+#include <cstring>
 
 #define XXH_INLINE_ALL
 #define DEFAULT_LOG_CHANNEL "xxhash"
@@ -47,6 +47,16 @@ XXH64Digester& XXH64Digester::update(const void* data, size_t len) {
   return *this;
 }
 
+XXH64Digester& XXH64Digester::update(const std::map<std::string, std::string>& data) {
+  const char* kSignature = "map<string, string>";
+  update(kSignature, strlen(kSignature));
+  for (const auto& iter : data) {
+    update(iter.first);
+    update(iter.second);
+  }
+  return *this;
+}
+
 uint64_t XXH64Digester::digest() {
   uint64_t xxHash64 = XXH64_digest(xxh_);
   clear();
@@ -54,10 +64,7 @@ uint64_t XXH64Digester::digest() {
 }
 
 string XXH64Digester::digestToString() {
-  stringstream stream;
-  uint64_t xxHash64 = digest();
-  stream << setfill('0') << setw(sizeof(uint64_t) * 2) << hex << xxHash64;
-  return stream.str();
+  return fmt::format("{:016x}", digest());
 }
 
 } // namespace vrs

@@ -20,6 +20,7 @@
 
 #include <xxhash.h>
 #include <array>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -38,6 +39,7 @@ class XXH64Digester {
     }
     return *this;
   }
+  XXH64Digester& update(const std::map<std::string, std::string>& data);
   XXH64Digester& update(const std::string& str) {
     return update(str.c_str(), str.size() + 1);
   }

@@ -53,4 +53,14 @@ TEST_F(XXHTest, sums) {
   XXH64Digester digester6;
   digester6.update(a + b).update(empty);
   EXPECT_EQ(digester6.digestToString(), "d997f8be8ae224f1");
+
+  map<string, string> strMap = {{"a", "b"}, {"c", "d"}};
+  XXH64Digester digester7;
+  digester7.update(strMap);
+  EXPECT_EQ(digester7.digestToString(), "195268c1fb719fe4");
+
+  XXH64Digester digester8;
+  strMap.clear();
+  digester8.update(strMap);
+  EXPECT_EQ(digester8.digestToString(), "97efee010603e0a0");
 }
