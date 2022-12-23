@@ -40,6 +40,11 @@ struct RecordFileWriterTester {
       RecordFileWriter::SortedRecords& inOutSortedRecords) {
     return RecordFileWriter::addRecordBatchesToSortedRecords(batch, inOutSortedRecords);
   }
+  static int64_t getCurrentFileSize(RecordFileWriter& file) {
+    return file.indexRecordWriter_.getSplitHead()
+        ? file.indexRecordWriter_.getSplitHead()->getPos() + file.file_->getPos()
+        : file.file_->getPos();
+  }
 };
 
 // Shared infra to create reference VRS files used in different places
@@ -129,6 +134,11 @@ struct CreateParams {
   size_t fileWriterThreadCount = 0; // 0 is the default value
   unique_ptr<NewChunkHandler> chunkHandler;
   CustomCreateFileFunction customCreateFileFunction;
+
+  // Size of the file after it was created, but before any record was written.
+  // Any file shorter than this is not salvageable, because the description record isn't complete.
+  // This value is set on exit, so we know how much we can truncate the file without breaking.
+  int64_t outMinFileSize = -1;
 };
 
 /// Both functions create the same VRS, except that the former uses multiple threads,

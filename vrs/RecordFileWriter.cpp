@@ -1083,7 +1083,7 @@ int RecordFileWriter::completeAndCloseFile() {
   }
   int error = 0;
   if (!skipFinalizeIndexRecords_) {
-    if (indexRecordWriter_.hasSplitHead()) {
+    if (indexRecordWriter_.getSplitHead()) {
       error = indexRecordWriter_.finalizeSplitIndexRecord(newChunkHandler_);
     } else {
       int64_t endOfRecordsOffset = file_->getPos();

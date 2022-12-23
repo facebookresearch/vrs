@@ -144,8 +144,8 @@ class Writer {
     return *splitHeadFile_;
   }
 
-  bool hasSplitHead() const {
-    return splitHeadFile_ != nullptr;
+  const std::unique_ptr<DiskFile>& getSplitHead() const {
+    return splitHeadFile_;
   }
 
   void addStream(StreamId id) {
