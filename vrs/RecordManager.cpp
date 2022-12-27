@@ -35,8 +35,6 @@ static const double kMaxCycledRecordAge = 1; // to reuse old records more aggres
 RecordManager::RecordManager()
     : compression_{CompressionPreset::Default},
       maxCacheSize_{kDefaultMaxCacheSize},
-      minBytesOverAllocation_{},
-      minPercentOverAllocation_{},
       creationOrder_{0} {}
 
 RecordManager::~RecordManager() {
@@ -181,18 +179,6 @@ void RecordManager::collectOldRecords(double maxAge, list<Record*>& outCollected
     outCollectedRecords.splice(
         outCollectedRecords.begin(), activeRecords_, activeRecords_.begin(), iterator);
   }
-}
-
-size_t RecordManager::getAdjustedRecordBufferSize(size_t requestedSize) const {
-  if (minPercentOverAllocation_ == 0) {
-    return requestedSize + minBytesOverAllocation_; // at most one value set
-  }
-  size_t percentOverAllocation = requestedSize * minPercentOverAllocation_ / 100;
-  if (minBytesOverAllocation_ == 0) {
-    return requestedSize + percentOverAllocation;
-  }
-  // Use min, not max, to prevent massive over-allocation!
-  return requestedSize + min<size_t>(minBytesOverAllocation_, percentOverAllocation);
 }
 
 size_t RecordManager::getAcceptableOverCapacity(size_t capacity) const {

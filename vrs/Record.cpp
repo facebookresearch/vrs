@@ -78,7 +78,6 @@ void Record::set(
       // If we're going to reallocate our buffer, then ask for a bit more right away...
       if (bufferUsedSize_ > buffer_.capacity()) {
         buffer_.resize(0); // make sure we don't copy existing data for no reason!
-        buffer_.reserve(recordManager_.getAdjustedRecordBufferSize(bufferUsedSize_));
       }
       buffer_.resize(bufferUsedSize_);
     }

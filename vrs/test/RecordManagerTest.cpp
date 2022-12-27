@@ -122,18 +122,4 @@ TEST(RecordManager, RecordSize) {
 
   // test default allocation strategy
   testAllocationLimit(manager, 500, 500);
-
-  // test absolute over-allocation
-  manager.setRecordBufferOverAllocationMins(100, 0);
-  testAllocationLimit(manager, 500, 500 + 100);
-
-  // test percentage over-allocation
-  manager.setRecordBufferOverAllocationMins(0, 10);
-  testAllocationLimit(manager, 400, 400 + 40);
-
-  // test absolute + percentage over-allocation
-  manager.setRecordBufferOverAllocationMins(100, 10);
-  testAllocationLimit(manager, 400, 400 + 40);
-  manager.setRecordBufferOverAllocationMins(10, 10);
-  testAllocationLimit(manager, 400, 400 + 10);
 }

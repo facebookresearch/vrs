@@ -91,15 +91,6 @@ class DawnCamera : public Recordable {
         fileConfig_{fileConfig} {
     setCompression(CompressionPreset::Default);
     addRecordFormat(Record::Type::DATA, 1, frameData_.getContentBlock(), {&frameData_});
-    if (index == 0) {
-      getRecordManager().setRecordBufferOverAllocationMins(100, 0);
-    } else if (index == 1) {
-      getRecordManager().setRecordBufferOverAllocationMins(0, 2);
-    } else if (index == 2) {
-      getRecordManager().setRecordBufferOverAllocationMins(100, 2);
-    } else if (index == 3) {
-      getRecordManager().setRecordBufferOverAllocationMins(1000, 10);
-    }
   }
 
   const Record* createStateRecord() override {
