@@ -105,10 +105,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="separator:a2c9520d6b1e83ef3951d429fc99f098a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af48723193df4dbd378ea39193142f7b9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_manager.html#af48723193df4dbd378ea39193142f7b9">setMaxCacheSize</a> (size_t max)</td></tr>
 <tr class="separator:af48723193df4dbd378ea39193142f7b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad7f59dbb896c26c3bd284fa1953a1043"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_manager.html#ad7f59dbb896c26c3bd284fa1953a1043">setRecordBufferOverAllocationMins</a> (size_t minBytes, size_t minPercent)</td></tr>
-<tr class="separator:ad7f59dbb896c26c3bd284fa1953a1043"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5f1ff9aee7aece2d94c9e1a98494aafd"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_manager.html#a5f1ff9aee7aece2d94c9e1a98494aafd">getAdjustedRecordBufferSize</a> (size_t requestedSize) const</td></tr>
-<tr class="separator:a5f1ff9aee7aece2d94c9e1a98494aafd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae2434e3a130f837a70361ab2fa856acb"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_manager.html#ae2434e3a130f837a70361ab2fa856acb">getCurrentCacheSize</a> () const</td></tr>
 <tr class="separator:ae2434e3a130f837a70361ab2fa856acb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -203,31 +199,6 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Record</b></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the record created. </dd></dl>
-
-</div>
-</div>
-<a id="a5f1ff9aee7aece2d94c9e1a98494aafd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5f1ff9aee7aece2d94c9e1a98494aafd">&#9670;&nbsp;</a></span>getAdjustedRecordBufferSize()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">size_t vrs::RecordManager::getAdjustedRecordBufferSize </td>
-          <td>(</td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>requestedSize</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Get how many bytes should actually be allocated when we want to use a specific number of bytes. This number may be greater than the requested size, to improve the ability to reuse an allocated buffer without having to reallocate memory. See <a class="el" href="classvrs_1_1_record_manager.html#ad7f59dbb896c26c3bd284fa1953a1043">setRecordBufferOverAllocationMins()</a>. </p><dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">requestedSize</td><td>number of bytes needed. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Number of bytes that should be allocated. </dd></dl>
 
 </div>
 </div>
@@ -377,49 +348,6 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Record</b></td></tr>
 <p>If you know that you have a lot samples that are small. You can increase the cache size to avoid allocations. The default value is kMaxCacheSize = 10. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">max</td><td>The maximum amount of reusable records to keep around. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="ad7f59dbb896c26c3bd284fa1953a1043"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad7f59dbb896c26c3bd284fa1953a1043">&#9670;&nbsp;</a></span>setRecordBufferOverAllocationMins()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void vrs::RecordManager::setRecordBufferOverAllocationMins </td>
-          <td>(</td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>minBytes</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>minPercent</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>When a record's buffer is allocated, we may want to over-allocate a little bit to improve the chances that when the record is recycled &amp; reused, it we don't need to grow it. This optional configuration allows to allocate more space, by either a min number of bytes, a min percentage of bytes, or both, in which case the <em>min</em> of either setting is used. If one of the values is set to 0, then it is considered not set. By default, both are 0. </p><dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">minBytes</td><td>absolute number of bytes. </td></tr>
-    <tr><td class="paramname">minPercent</td><td>percentage of bytes to allocate on top of the request. </td></tr>
   </table>
   </dd>
 </dl>
