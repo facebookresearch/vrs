@@ -53,13 +53,17 @@ class PlayerWindow : public QMainWindow {
       int maxPerRowCount,
       const QVariantMap& presets,
       const QVariant& currentPreset);
+  void updateTextOverlayMenu();
+
+ private:
+  void addColorAction(const QColor& overlay, const QColor& color, const char* cmdName);
 
  private:
   PlayerUI player_;
   QMenu* fileMenu_;
   QMenu* layoutMenu_;
   QMenu* orientationMenu_;
-  QMenu* colorMenu_;
+  QMenu* textOverlayMenu_;
   std::vector<std::unique_ptr<QAction>> layoutActions_;
 };
 

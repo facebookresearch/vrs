@@ -75,7 +75,13 @@ void FrameWidget::paintEvent(QPaintEvent* evt) {
   const QRect rect = painter.viewport();
   int hOffset = 0;
   int vOffset = 0;
-  painter.setPen(overlayColor_);
+  const QFont& f = painter.font();
+  if (f.pointSize() != fontSize_ || f.hintingPreference() != QFont::PreferFullHinting) {
+    QFont font = painter.font();
+    font.setPointSize(fontSize_);
+    font.setHintingPreference(QFont::PreferFullHinting);
+    painter.setFont(font);
+  }
   bool hasImage = false;
   { // mutex scoope
     unique_lock<mutex> lock;
@@ -113,13 +119,9 @@ void FrameWidget::paintEvent(QPaintEvent* evt) {
             "Could not convert pixel format {} to a Qt equivalent. "
             "Falling back to Grayscale8, but you'll probably see nothing.",
             vrs::toString(image->getPixelFormat()));
-
-        if (painter.font().pointSize() != 16) {
-          QFont font = painter.font();
-          font.setPointSize(16);
-          painter.setFont(font);
-        }
         painter.setPen(Qt::black);
+        painter.setBackground(QBrush(Qt::white));
+        painter.setBackgroundMode(Qt::BGMode::OpaqueMode);
         QString description =
             QString::fromStdString(vrs::toString(image->getPixelFormat()).c_str()) +
             " pixel format not supported...";
@@ -129,10 +131,17 @@ void FrameWidget::paintEvent(QPaintEvent* evt) {
   } // mutex scoope
 
   // draw description overlay
-  if (painter.font().pointSize() != 14) {
-    QFont font = painter.font();
-    font.setPointSize(14);
-    painter.setFont(font);
+  painter.setPen(overlayColor_);
+  if (solidBackground_) {
+    if (overlayColor_ == Qt::white || overlayColor_ == Qt::green || overlayColor_ == Qt::yellow ||
+        overlayColor_ == Qt::cyan) {
+      painter.setBackground(QBrush(Qt::black));
+    } else {
+      painter.setBackground(QBrush(Qt::white));
+    }
+    painter.setBackgroundMode(Qt::BGMode::OpaqueMode);
+  } else {
+    painter.setBackgroundMode(Qt::BGMode::TransparentMode);
   }
   QString description = descriptions_.getDescription(typeToShow_);
   painter.drawText(rect.adjusted(hOffset, vOffset + 4, 2, 2), Qt::AlignLeft, description);

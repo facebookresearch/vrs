@@ -41,6 +41,8 @@ const double kDefaultScreenOccupationRatio = 0.8; // use most of the screen (arb
 const QString kLastFilePathSetting("last_file_path");
 const QString kLastRecordTypeSetting("last_record_type");
 const QString kOverlayColorSetting("overlay_color");
+const QString kOverlayFontSizeSetting("overlay_font_size");
+const QString kOverlaySolidBackgroundSetting("overlay_solid_background");
 
 const QString kDefaultSpeed("1x");
 
@@ -275,6 +277,15 @@ void PlayerUI::openPath(const QString& path) {
   if (overlayColor.isValid()) {
     setOverlayColor(overlayColor.value<QColor>());
   }
+  QVariant fontSize = settings_.value(kOverlayFontSizeSetting);
+  if (fontSize.isValid()) {
+    fontSize_ = fontSize.value<int>();
+    adjustOverlayFontSize(0);
+  }
+  QVariant solidBackground = settings_.value(kOverlaySolidBackgroundSetting);
+  if (solidBackground.isValid()) {
+    setSolidBackground(solidBackground.value<bool>());
+  }
   resizeIfNecessary();
 }
 
@@ -397,8 +408,32 @@ void PlayerUI::reportError(QString errorTitle, QString errorMessage) {
 }
 
 void PlayerUI::setOverlayColor(QColor color) {
-  fileReader_.setOverlayColor(color);
-  settings_.setValue(kOverlayColorSetting, color);
+  overlayColor_ = color;
+  fileReader_.setOverlayColor(overlayColor_);
+  settings_.setValue(kOverlayColorSetting, overlayColor_);
+  overlaySettingChanged();
+}
+
+void PlayerUI::adjustOverlayFontSize(int sizeChange) {
+  const int kDefaultFontSize = 14;
+  const int kMinFontSize = 7;
+  const int kMaxFontSize = 50;
+  fontSize_ += sizeChange;
+  if (fontSize_ == 0) {
+    fontSize_ = kDefaultFontSize;
+  }
+  fontSize_ = max<int>(fontSize_, kMinFontSize);
+  fontSize_ = min<int>(fontSize_, kMaxFontSize);
+  fileReader_.setFontSize(fontSize_);
+  settings_.setValue(kOverlayFontSizeSetting, fontSize_);
+  overlaySettingChanged();
+}
+
+void PlayerUI::setSolidBackground(bool solid) {
+  solidBackground_ = solid;
+  fileReader_.setSolidBackground(solidBackground_);
+  settings_.setValue(kOverlaySolidBackgroundSetting, solidBackground_);
+  overlaySettingChanged();
 }
 
 void PlayerUI::adjustSpeed(int change) {

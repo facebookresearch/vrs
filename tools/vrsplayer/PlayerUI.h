@@ -20,8 +20,10 @@
 #include <vector>
 
 #include <QtCore/qglobal.h>
+#include <qcolor.h>
 #include <qcombobox.h>
 #include <qgraphicsscene.h>
+#include <qnamespace.h>
 #include <qpixmap.h>
 #include <qsettings.h>
 #include <qwidget.h>
@@ -57,6 +59,7 @@ class PlayerUI : public QWidget {
   }
 
  signals:
+  void overlaySettingChanged();
 
  public slots:
   void openFileChooser();
@@ -77,6 +80,14 @@ class PlayerUI : public QWidget {
   void deletePreset(const QString& preset);
   void reportError(QString errorTitle, QString errorMessage);
   void setOverlayColor(QColor color);
+  QColor getOverlayColor() const {
+    return overlayColor_;
+  }
+  void adjustOverlayFontSize(int sizeChange);
+  void setSolidBackground(bool solid);
+  bool isSolidBackground() const {
+    return solidBackground_;
+  }
   void adjustSpeed(int change);
 
  private slots:
@@ -90,6 +101,9 @@ class PlayerUI : public QWidget {
 
  private:
   QSettings settings_;
+  QColor overlayColor_{Qt::yellow};
+  int fontSize_{14};
+  bool solidBackground_{false};
   FileReader fileReader_;
   QVBoxLayout* videoFrames_;
   std::vector<FrameWidget*> frames_;

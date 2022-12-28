@@ -413,6 +413,18 @@ void FileReader::setOverlayColor(QColor color) {
   }
 }
 
+void FileReader::setFontSize(int fontSize) {
+  for (auto& image : imageReaders_) {
+    image.second->getWidget()->setFontSize(fontSize);
+  }
+}
+
+void FileReader::setSolidBackground(bool solid) {
+  for (auto& image : imageReaders_) {
+    image.second->getWidget()->setSolidBackground(solid);
+  }
+}
+
 void FileReader::recordTypeChanged(const QString& type) {
   recordType_ = toEnum<Record::Type>(type.toStdString());
   for (auto& image : imageReaders_) {
