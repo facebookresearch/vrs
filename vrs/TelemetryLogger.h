@@ -20,8 +20,6 @@
 #include <string>
 #include <vector>
 
-#include <vrs/os/Time.h>
-
 namespace vrs {
 
 using std::string;
@@ -112,10 +110,7 @@ struct TrafficEvent {
     uploadNotDownload = false;
     return *this;
   }
-  TrafficEvent& setAttemptStartTime() {
-    transferStartTime = os::getCurrentTimeSecSinceEpoch();
-    return *this;
-  }
+  TrafficEvent& setAttemptStartTime();
   TrafficEvent& setTotalDurationMs(int64_t durationMs) {
     totalDurationMs = durationMs;
     return *this;
@@ -164,8 +159,6 @@ class TelemetryLogger {
  public:
   virtual ~TelemetryLogger();
 
-  static TelemetryLogger& getInstance();
-
   static constexpr const char* kErrorType = "error";
   static constexpr const char* kWarningType = "warning";
   static constexpr const char* kInfoType = "info";
@@ -180,25 +173,29 @@ class TelemetryLogger {
       const OperationContext& operationContext,
       const string& message,
       const string& serverMessage = {}) {
-    static const string sErrorType{kErrorType};
-    getStaticInstance()->logEvent(LogEvent(sErrorType, operationContext, message, serverMessage));
+    getInstance()->logEvent(LogEvent(kErrorType, operationContext, message, serverMessage));
   }
   static inline void warning(
       const OperationContext& operationContext,
       const string& message,
       const string& serverMessage = {}) {
-    static const string sWarningType{kWarningType};
-    getStaticInstance()->logEvent(LogEvent(sWarningType, operationContext, message, serverMessage));
+    getInstance()->logEvent(LogEvent(kWarningType, operationContext, message, serverMessage));
   }
   static inline void info(
       const OperationContext& operationContext,
       const string& message,
       const string& serverMessage = {}) {
-    static const string sInfoType{kInfoType};
-    getStaticInstance()->logEvent(LogEvent(sInfoType, operationContext, message, serverMessage));
+    getInstance()->logEvent(LogEvent(kInfoType, operationContext, message, serverMessage));
+  }
+  static inline void event(
+      const std::string& eventType,
+      const OperationContext& operationContext,
+      const string& message,
+      const string& serverMessage = {}) {
+    getInstance()->logEvent(LogEvent(eventType, operationContext, message, serverMessage));
   }
   static inline void traffic(const OperationContext& operationContext, const TrafficEvent& event) {
-    getStaticInstance()->logTraffic(operationContext, event);
+    getInstance()->logTraffic(operationContext, event);
   }
 
   /// Actual methods that implement the behaviors
@@ -206,7 +203,7 @@ class TelemetryLogger {
   virtual void logTraffic(const OperationContext& operationContext, const TrafficEvent& event);
 
  private:
-  static std::unique_ptr<TelemetryLogger>& getStaticInstance();
+  static std::unique_ptr<TelemetryLogger>& getInstance();
 };
 
 } // namespace vrs

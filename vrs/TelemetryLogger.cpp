@@ -20,19 +20,16 @@
 #include <logging/Log.h>
 
 #include <vrs/helpers/Strings.h>
+#include <vrs/os/Time.h>
 
 using namespace std;
 
 namespace vrs {
 
-TelemetryLogger& TelemetryLogger::getInstance() {
-  return *getStaticInstance().get();
-}
-
 unique_ptr<TelemetryLogger> TelemetryLogger::setLogger(
     unique_ptr<TelemetryLogger>&& telemetryLogger) {
-  unique_ptr<TelemetryLogger> previousLogger;
-  getStaticInstance().swap(telemetryLogger);
+  unique_ptr<TelemetryLogger> previousLogger{std::move(getInstance())};
+  getInstance() = std::move(telemetryLogger);
   return previousLogger;
 }
 
@@ -76,12 +73,17 @@ void TelemetryLogger::logTraffic(
       event.error429Count);
 }
 
-unique_ptr<TelemetryLogger>& TelemetryLogger::getStaticInstance() {
-  static unique_ptr<TelemetryLogger> sInstance = make_unique<TelemetryLogger>();
+unique_ptr<TelemetryLogger>& TelemetryLogger::getInstance() {
+  static unique_ptr<TelemetryLogger> sInstance{make_unique<TelemetryLogger>()};
   return sInstance;
 }
 
 TelemetryLogger::~TelemetryLogger() {}
+
+TrafficEvent& TrafficEvent::setAttemptStartTime() {
+  transferStartTime = os::getCurrentTimeSecSinceEpoch();
+  return *this;
+}
 
 TrafficEvent& TrafficEvent::setUrl(const string& aServerName) {
   // discard prefixes such as http:// and https:// by finding "://"
