@@ -58,7 +58,7 @@ struct PackedHeader {
 inline string checksum(const stringstream& ss) {
   string tagsString = ss.str();
   XXH64Digester digester;
-  digester.update(tagsString.c_str(), tagsString.size());
+  digester.ingest(tagsString.c_str(), tagsString.size());
   return digester.digestToString();
 }
 
@@ -110,11 +110,11 @@ class RecordChecker : public StreamPlayer {
       case CheckType::Checksums:
       case CheckType::HexDump: {
         PackedHeader packedHeader(record, sanitizedId_);
-        headerChecksum_.update(&packedHeader, sizeof(packedHeader));
-        payloadChecksum_.update(buffer_);
+        headerChecksum_.ingest(&packedHeader, sizeof(packedHeader));
+        payloadChecksum_.ingest(buffer_);
         if (checkType_ == CheckType::HexDump) {
           XXH64Digester csDigester_;
-          csDigester_.update(buffer_);
+          csDigester_.ingest(buffer_);
           cout << sanitizedId_.getNumericName() << ": " << fixed << setprecision(3)
                << record.timestamp << " " << toString(record.recordType) << " s=" << buffer_.size()
                << " CS=" << csDigester_.digestToString() << endl;
@@ -240,7 +240,7 @@ string checkRecords(
 
     string fileTagsChecksum = checksum(filteredReader.reader.getTags());
 
-    sum.update(fileTagsChecksum);
+    sum.ingest(fileTagsChecksum);
     if (checkType == CheckType::Checksums) {
       ss << "FileTags: " << fileTagsChecksum << endl;
     }
@@ -250,10 +250,10 @@ string checkRecords(
       const StreamTags& tags = filteredReader.reader.getTags(id);
       switch (checkType) {
         case CheckType::Checksum:
-          sum.update(checksum(tags.vrs))
-              .update(checksum(tags.user))
-              .update(checker->digestHeaderChecksum())
-              .update(checker->digestPayloadChecksum());
+          sum.ingest(checksum(tags.vrs))
+              .ingest(checksum(tags.user))
+              .ingest(checker->digestHeaderChecksum())
+              .ingest(checker->digestPayloadChecksum());
           break;
         case CheckType::Checksums: {
           string vrsTagsChecksum = checksum(tags.vrs);
@@ -264,10 +264,10 @@ string checkRecords(
           ss << id.getNumericName() << " User tags: " << userTagsChecksum << endl;
           ss << id.getNumericName() << " Headers: " << headerChecksum << endl;
           ss << id.getNumericName() << " Payload: " << payloadChecksum << endl;
-          sum.update(vrsTagsChecksum)
-              .update(userTagsChecksum)
-              .update(headerChecksum)
-              .update(payloadChecksum);
+          sum.ingest(vrsTagsChecksum)
+              .ingest(userTagsChecksum)
+              .ingest(headerChecksum)
+              .ingest(payloadChecksum);
         } break;
         case CheckType::ChecksumVerbatim:
         case CheckType::HexDump:
@@ -278,7 +278,7 @@ string checkRecords(
       }
       ids << checker->getSanitizedId().getNumericName() << '/';
     }
-    sum.update(checksum(ids));
+    sum.ingest(checksum(ids));
     ss << sum.digestToString();
     return ss.str();
   }
@@ -325,7 +325,7 @@ string verbatimChecksum(const string& path, bool showProgress) {
     buffer.resize(length);
     int error = file->read(buffer.data(), length);
     if (error == 0) {
-      digester.update(buffer);
+      digester.ingest(buffer);
     } else {
       cerr << kReset << "Read file error: " << errorCodeToMessage(error) << "." << endl;
       return "<read error>";

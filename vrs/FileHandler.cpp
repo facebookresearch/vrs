@@ -365,17 +365,17 @@ string FileSpec::getEasyPath() const {
 
 string FileSpec::getXXHash() const {
   XXH64Digester digester;
-  digester.update(fileHandlerName);
-  digester.update(fileName);
-  digester.update(uri);
+  digester.ingest(fileHandlerName);
+  digester.ingest(fileName);
+  digester.ingest(uri);
   for (const auto& chunk : chunks) {
-    digester.update(chunk);
+    digester.ingest(chunk);
   }
   for (const auto& extra : extras) {
-    digester.update(extra.first);
-    digester.update(extra.second);
+    digester.ingest(extra.first);
+    digester.ingest(extra.second);
   }
-  digester.update(chunkSizes);
+  digester.ingest(chunkSizes);
   return digester.digestToString();
 }
 

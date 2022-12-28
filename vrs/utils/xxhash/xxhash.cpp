@@ -18,6 +18,8 @@
 
 #include <cstring>
 
+#include <fmt/format.h>
+
 #define XXH_INLINE_ALL
 #define DEFAULT_LOG_CHANNEL "xxhash"
 #include <logging/Checks.h>
@@ -42,17 +44,17 @@ void XXH64Digester::clear() {
   }
 }
 
-XXH64Digester& XXH64Digester::update(const void* data, size_t len) {
+XXH64Digester& XXH64Digester::ingest(const void* data, size_t len) {
   XR_CHECK_EQ(XXH64_update(xxh_, static_cast<const uint8_t*>(data), len), 0);
   return *this;
 }
 
-XXH64Digester& XXH64Digester::update(const std::map<std::string, std::string>& data) {
+XXH64Digester& XXH64Digester::ingest(const std::map<std::string, std::string>& data) {
   const char* kSignature = "map<string, string>";
-  update(kSignature, strlen(kSignature));
+  ingest(kSignature, strlen(kSignature));
   for (const auto& iter : data) {
-    update(iter.first);
-    update(iter.second);
+    ingest(iter.first);
+    ingest(iter.second);
   }
   return *this;
 }
