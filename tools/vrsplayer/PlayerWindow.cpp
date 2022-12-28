@@ -36,6 +36,7 @@ PlayerWindow::PlayerWindow(QApplication& app) : QMainWindow(nullptr) {
       &FileReader::updateLayoutMenu,
       this,
       &PlayerWindow::updateLayoutMenu);
+  connect(&player_, &PlayerUI ::overlaySettingChanged, this, &PlayerWindow::updateTextOverlayMenu);
   setWindowFlags(windowFlags() | Qt::CustomizeWindowHint | Qt::WindowMinMaxButtonsHint);
 }
 
@@ -97,31 +98,8 @@ void PlayerWindow::createMenus() {
   fileMenu_->addAction(aboutAction);
 #endif
 
-  colorMenu_ = menuBar()->addMenu("Text Color");
-  QAction* white = new QAction("Use White", this);
-  connect(white, &QAction::triggered, [this]() { player_.setOverlayColor(Qt::white); });
-  colorMenu_->addAction(white);
-  QAction* black = new QAction("Use Black", this);
-  connect(black, &QAction::triggered, [this]() { player_.setOverlayColor(Qt::black); });
-  colorMenu_->addAction(black);
-  QAction* green = new QAction("Use Green", this);
-  connect(green, &QAction::triggered, [this]() { player_.setOverlayColor(Qt::green); });
-  colorMenu_->addAction(green);
-  QAction* red = new QAction("Use Red", this);
-  connect(red, &QAction::triggered, [this]() { player_.setOverlayColor(Qt::red); });
-  colorMenu_->addAction(red);
-  QAction* blue = new QAction("Use Blue", this);
-  connect(blue, &QAction::triggered, [this]() { player_.setOverlayColor(Qt::blue); });
-  colorMenu_->addAction(blue);
-  QAction* yellow = new QAction("Use Yellow", this);
-  connect(yellow, &QAction::triggered, [this]() { player_.setOverlayColor(Qt::yellow); });
-  colorMenu_->addAction(yellow);
-  QAction* cyan = new QAction("Use Cyan", this);
-  connect(cyan, &QAction::triggered, [this]() { player_.setOverlayColor(Qt::cyan); });
-  colorMenu_->addAction(cyan);
-  QAction* magenta = new QAction("Use Magenta", this);
-  connect(magenta, &QAction::triggered, [this]() { player_.setOverlayColor(Qt::magenta); });
-  colorMenu_->addAction(magenta);
+  textOverlayMenu_ = menuBar()->addMenu("Text Overlay");
+  updateTextOverlayMenu();
 
   layoutMenu_ = menuBar()->addMenu("Layout");
 
@@ -204,4 +182,43 @@ void PlayerWindow::updateLayoutMenu(
     layoutMenu_->addAction(layoutAction.get());
     layoutActions_.emplace_back(std::move(layoutAction));
   }
+}
+
+void PlayerWindow::updateTextOverlayMenu() {
+  textOverlayMenu_->clear();
+  QColor color = player_.getOverlayColor();
+  addColorAction(color, Qt::white, "Use White");
+  addColorAction(color, Qt::black, "Use Black");
+  addColorAction(color, Qt::green, "Use Green");
+  addColorAction(color, Qt::red, "Use Red");
+  addColorAction(color, Qt::blue, "Use Blue");
+  addColorAction(color, Qt::yellow, "Use Yellow");
+  addColorAction(color, Qt::cyan, "Use Cyan");
+  addColorAction(color, Qt::magenta, "Use Magenta");
+  textOverlayMenu_->addSeparator();
+  QAction* smallerFont = new QAction("Smaller Font", this);
+  smallerFont->setShortcut(Qt::CTRL | Qt::Key_Minus);
+  connect(smallerFont, &QAction::triggered, [this]() { player_.adjustOverlayFontSize(-1); });
+  textOverlayMenu_->addAction(smallerFont);
+  QAction* largetFont = new QAction("Larger Font", this);
+  largetFont->setShortcut(Qt::CTRL | Qt::Key_Plus);
+  connect(largetFont, &QAction::triggered, [this]() { player_.adjustOverlayFontSize(+1); });
+  textOverlayMenu_->addAction(largetFont);
+  textOverlayMenu_->addSeparator();
+  bool isSolid = player_.isSolidBackground();
+  QAction* solidBackground = new QAction("Solid Background", this);
+  connect(solidBackground, &QAction::triggered, [this, isSolid]() {
+    player_.setSolidBackground(!isSolid);
+  });
+  solidBackground->setCheckable(true);
+  solidBackground->setChecked(isSolid);
+  textOverlayMenu_->addAction(solidBackground);
+}
+
+void PlayerWindow::addColorAction(const QColor& overlay, const QColor& color, const char* cmdName) {
+  QAction* action = new QAction(cmdName, this);
+  connect(action, &QAction::triggered, [this, color]() { player_.setOverlayColor(color); });
+  action->setCheckable(true);
+  action->setChecked(overlay == color);
+  textOverlayMenu_->addAction(action);
 }
