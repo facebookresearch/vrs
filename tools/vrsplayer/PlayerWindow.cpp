@@ -212,6 +212,7 @@ void PlayerWindow::updateTextOverlayMenu() {
   });
   solidBackground->setCheckable(true);
   solidBackground->setChecked(isSolid);
+  solidBackground->setShortcut(Qt::CTRL | Qt::Key_B);
   textOverlayMenu_->addAction(solidBackground);
 }
 
