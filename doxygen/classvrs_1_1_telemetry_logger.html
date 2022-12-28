@@ -94,9 +94,6 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>logTraffic</b
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:aa539e68a389071d46ddda986d384512e"><td class="memItemLeft" align="right" valign="top"><a id="aa539e68a389071d46ddda986d384512e"></a>
-static <a class="el" href="classvrs_1_1_telemetry_logger.html">TelemetryLogger</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getInstance</b> ()</td></tr>
-<tr class="separator:aa539e68a389071d46ddda986d384512e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abd31b687a6cc7f45242328ade4ff31b4"><td class="memItemLeft" align="right" valign="top">static std::unique_ptr&lt; <a class="el" href="classvrs_1_1_telemetry_logger.html">TelemetryLogger</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_telemetry_logger.html#abd31b687a6cc7f45242328ade4ff31b4">setLogger</a> (std::unique_ptr&lt; <a class="el" href="classvrs_1_1_telemetry_logger.html">TelemetryLogger</a> &gt; &amp;&amp;telemetryLogger)</td></tr>
 <tr class="separator:abd31b687a6cc7f45242328ade4ff31b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acf7f0886a08a2a79e2014b4ac1fa0fe5"><td class="memItemLeft" align="right" valign="top"><a id="acf7f0886a08a2a79e2014b4ac1fa0fe5"></a>
@@ -109,6 +106,9 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><b>warning</b> (c
 <tr class="memitem:aa26202591a40826aaa79369d4e656de0"><td class="memItemLeft" align="right" valign="top"><a id="aa26202591a40826aaa79369d4e656de0"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>info</b> (const <a class="el" href="structvrs_1_1_operation_context.html">OperationContext</a> &amp;operationContext, const string &amp;message, const string &amp;serverMessage={})</td></tr>
 <tr class="separator:aa26202591a40826aaa79369d4e656de0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a03146be92b9de29f13e5b866e7643b96"><td class="memItemLeft" align="right" valign="top"><a id="a03146be92b9de29f13e5b866e7643b96"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>event</b> (const std::string &amp;eventType, const <a class="el" href="structvrs_1_1_operation_context.html">OperationContext</a> &amp;operationContext, const string &amp;message, const string &amp;serverMessage={})</td></tr>
+<tr class="separator:a03146be92b9de29f13e5b866e7643b96"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3509a88dd7126591969d4de07b80bb4a"><td class="memItemLeft" align="right" valign="top"><a id="a3509a88dd7126591969d4de07b80bb4a"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>traffic</b> (const <a class="el" href="structvrs_1_1_operation_context.html">OperationContext</a> &amp;operationContext, const <a class="el" href="structvrs_1_1_traffic_event.html">TrafficEvent</a> &amp;event)</td></tr>
 <tr class="separator:a3509a88dd7126591969d4de07b80bb4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
