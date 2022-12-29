@@ -412,7 +412,7 @@ class MultiRecordFileReader {
 
  private:
   using StreamIdToUniqueIdMap = map<StreamId, UniqueStreamId>;
-  using StreamIdReaderPair = std::pair<UniqueStreamId, RecordFileReader*>;
+  using StreamIdReaderPair = std::pair<StreamId, RecordFileReader*>;
 
   /// Are we trying to read only a single file? Useful for special casing / optimizing the single
   /// file use case.
