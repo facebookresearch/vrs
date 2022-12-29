@@ -283,7 +283,7 @@ void pybind_asyncvrsreaders(py::module& m) {
         py::object loop = py::module_::import("asyncio.events").attr("get_event_loop")();
         py::object fut = loop.attr("create_future")();
         unique_ptr<AsyncJob> job = make_unique<AsyncReadJob>(loop, fut, awaitable.getIndex());
-        awaitable.scheduleJob(move(job));
+        awaitable.scheduleJob(std::move(job));
         return fut.attr("__await__")();
       });
 }
