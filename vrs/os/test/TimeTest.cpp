@@ -60,7 +60,7 @@ TEST_F(TimeTest, getCurrentTimeSecSinceEpoch) {
   // merely make sure that the implementation isn't completely busted...
   int64_t now = vrs::os::getCurrentTimeSecSinceEpoch();
   const int64_t lastTestUpdateTime = 1590453570;
-  const int64_t jan1_2030 = 1672560000;
+  const int64_t jan1_2040 = 2209017600;
   EXPECT_GT(now, lastTestUpdateTime);
-  EXPECT_GT(jan1_2030, now);
+  EXPECT_GT(jan1_2040, now);
 }
