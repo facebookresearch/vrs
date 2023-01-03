@@ -10,9 +10,6 @@
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
     
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script src="../../_static/sphinx_highlight.js"></script>
     
@@ -64,7 +61,7 @@
 
 
 <div class="viewcode-block" id="get_recordable_type_id_name"><a class="viewcode-back" href="../../modules/utils.html#pyvrs.utils.get_recordable_type_id_name">[docs]</a><span class="k">def</span> <span class="nf">get_recordable_type_id_name</span><span class="p">(</span><span class="n">stream_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Retrieve a human readable string what the recordable is.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Retrieve a human readable string what the recordable is.</span>
 <span class="sd">    Args:</span>
 <span class="sd">        stream_id: stream_id you are interested in.</span>
 <span class="sd">    Returns:</span>
@@ -76,7 +73,7 @@
 <span class="k">def</span> <span class="nf">_filter_set_on_condition</span><span class="p">(</span>
     <span class="n">s</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">items</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">cond_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">T</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Restrict down a set by a list of items and a comparator. For each element in the set, if for</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Restrict down a set by a list of items and a comparator. For each element in the set, if for</span>
 <span class="sd">    any item in the items the comparator returns True, the element is retained in the filtered set</span>
 <span class="sd">    that is returned. Note that this does not mutate the original set, it returns a filtered copy.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -92,7 +89,7 @@
 <div class="viewcode-block" id="filter_by_stream_ids"><a class="viewcode-back" href="../../modules/utils.html#pyvrs.utils.filter_by_stream_ids">[docs]</a><span class="k">def</span> <span class="nf">filter_by_stream_ids</span><span class="p">(</span>
     <span class="n">available_stream_ids</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">regex_stream_ids</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Filter a set of stream_ids based on the provided regex stream_ids.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter a set of stream_ids based on the provided regex stream_ids.</span>
 <span class="sd">    Args:</span>
 <span class="sd">        available_stream_ids: A set of stream_ids in a file.</span>
 <span class="sd">        regex_stream_ids: regex of the stream ids that you are interested in.</span>
@@ -105,7 +102,7 @@
 <div class="viewcode-block" id="filter_by_record_type"><a class="viewcode-back" href="../../modules/utils.html#pyvrs.utils.filter_by_record_type">[docs]</a><span class="k">def</span> <span class="nf">filter_by_record_type</span><span class="p">(</span>
     <span class="n">available_record_types</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">requested_record_types</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Filter a set record types based on the provided record types. Filter only succeeds on</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter a set record types based on the provided record types. Filter only succeeds on</span>
 <span class="sd">    exact matches.</span>
 <span class="sd">    Args:</span>
 <span class="sd">        available_record_types: A set of record types in a file.</span>
@@ -119,12 +116,12 @@
 
 
 <div class="viewcode-block" id="string_of_set"><a class="viewcode-back" href="../../modules/utils.html#pyvrs.utils.string_of_set">[docs]</a><span class="k">def</span> <span class="nf">string_of_set</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="n">Set</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Return a pretty string representation of a set (with elements ordered).&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a pretty string representation of a set (with elements ordered).&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="s2">&quot;{&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">s</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span></div>
 
 
 <div class="viewcode-block" id="tags_to_justified_table_str"><a class="viewcode-back" href="../../modules/utils.html#pyvrs.utils.tags_to_justified_table_str">[docs]</a><span class="k">def</span> <span class="nf">tags_to_justified_table_str</span><span class="p">(</span><span class="n">tags</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Returns a nice table representation of tags for easy viewing.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a nice table representation of tags for easy viewing.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tags</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;File contains no file tags.&quot;</span>
     <span class="n">tag_width</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">)</span>
@@ -136,7 +133,7 @@
 
 
 <span class="k">def</span> <span class="nf">_unique_string_for_key</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">type_</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dict_</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds a unique key for a name type pair.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds a unique key for a name type pair.&quot;&quot;&quot;</span>
     <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
         <span class="c1"># default to name&lt;type&gt;. If we hit an existing key, keep adding brackets, e.g. name&lt;&lt;type&gt;&gt;.</span>
@@ -149,7 +146,7 @@
 <div class="viewcode-block" id="stringify_metadata_keys"><a class="viewcode-back" href="../../modules/utils.html#pyvrs.utils.stringify_metadata_keys">[docs]</a><span class="k">def</span> <span class="nf">stringify_metadata_keys</span><span class="p">(</span>
     <span class="n">metadata_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">Any</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;remove unambiguous types from metadata dicts. If the type is overloaded, converts to a</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;remove unambiguous types from metadata dicts. If the type is overloaded, converts to a</span>
 <span class="sd">    key&lt;type&gt; string representation.&quot;&quot;&quot;</span>
     <span class="n">filtered</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">ambiguous_names</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -215,7 +212,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Meta Reality Labs Research.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>

@@ -10,9 +10,6 @@
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
     
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script src="../../_static/sphinx_highlight.js"></script>
     
@@ -68,7 +65,7 @@
 
 
 <div class="viewcode-block" id="VRSRecord"><a class="viewcode-back" href="../../modules/record.html#pyvrs.record.VRSRecord">[docs]</a><span class="k">class</span> <span class="nc">VRSRecord</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Represents a single VRS Record.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a single VRS Record.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">:</span> <span class="n">_VRSRecord</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_record</span> <span class="o">=</span> <span class="n">record</span>
@@ -84,59 +81,59 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">format_version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The format version of this VRS record.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The format version of this VRS record.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record</span><span class="o">.</span><span class="n">format_version</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_audio_blocks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The number of audio blocks present in this VRS record.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The number of audio blocks present in this VRS record.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record</span><span class="o">.</span><span class="n">n_audio_blocks</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_custom_blocks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The number of custom blocks present in this VRS record.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The number of custom blocks present in this VRS record.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record</span><span class="o">.</span><span class="n">n_custom_blocks</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_image_blocks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The number of image blocks present in this VRS record.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The number of image blocks present in this VRS record.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record</span><span class="o">.</span><span class="n">n_image_blocks</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_metadata_blocks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The number of metadata blocks present in this VRS record.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The number of metadata blocks present in this VRS record.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record</span><span class="o">.</span><span class="n">n_metadata_blocks</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_blocks_in_total</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The total number of blocks on this record.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The total number of blocks on this record.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record</span><span class="o">.</span><span class="n">n_blocks_in_total</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">record_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The type of this VRS record, e.g. &#39;configuration&#39; or &#39;data&#39;.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The type of this VRS record, e.g. &#39;configuration&#39; or &#39;data&#39;.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record</span><span class="o">.</span><span class="n">record_type</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">record_index</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The absolute index of this VRS record in the VRS file.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The absolute index of this VRS record in the VRS file.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record</span><span class="o">.</span><span class="n">record_index</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">stream_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;A unique identifier for the type of device that recorded this record, along with an</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A unique identifier for the type of device that recorded this record, along with an</span>
 <span class="sd">        enumeration. E.g.: &#39;1001-1&#39;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record</span><span class="o">.</span><span class="n">stream_id</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">timestamp</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The timestamp associated with this record.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The timestamp associated with this record.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record</span><span class="o">.</span><span class="n">timestamp</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">audio_blocks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;VRSBlocks&quot;</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The list of audio blocks associated with this record.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The list of audio blocks associated with this record.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">VRSBlocks</span><span class="p">(</span>
             <span class="n">partial</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">idx</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record</span><span class="o">.</span><span class="n">audio_blocks</span><span class="p">),</span>
             <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_audio_blocks</span><span class="p">),</span>
@@ -144,7 +141,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">audio_specs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;VRSBlocks&quot;</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The list of audio block specs associated with this record.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The list of audio block specs associated with this record.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">VRSBlocks</span><span class="p">(</span>
             <span class="n">partial</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record</span><span class="o">.</span><span class="n">audio_specs</span><span class="p">),</span>
             <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_audio_blocks</span><span class="p">),</span>
@@ -152,7 +149,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">custom_blocks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;VRSBlocks&quot;</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The list of custom blocks associated with this record.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The list of custom blocks associated with this record.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">VRSBlocks</span><span class="p">(</span>
             <span class="n">partial</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">idx</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record</span><span class="o">.</span><span class="n">custom_blocks</span><span class="p">),</span>
             <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_custom_blocks</span><span class="p">),</span>
@@ -160,7 +157,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">custom_block_specs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;VRSBlocks&quot;</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The list of custom block specs associated with this record.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The list of custom block specs associated with this record.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">VRSBlocks</span><span class="p">(</span>
             <span class="n">partial</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record</span><span class="o">.</span><span class="n">custom_block_specs</span><span class="p">),</span>
             <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_custom_blocks</span><span class="p">),</span>
@@ -168,7 +165,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">image_blocks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;VRSBlocks&quot;</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The list of image blocks associated with this record.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The list of image blocks associated with this record.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">VRSBlocks</span><span class="p">(</span>
             <span class="n">partial</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">idx</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record</span><span class="o">.</span><span class="n">image_blocks</span><span class="p">),</span>
             <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_image_blocks</span><span class="p">),</span>
@@ -176,7 +173,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">image_specs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;VRSBlocks&quot;</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The list of image block specs associated with this record.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The list of image block specs associated with this record.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">VRSBlocks</span><span class="p">(</span>
             <span class="n">partial</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record</span><span class="o">.</span><span class="n">image_specs</span><span class="p">),</span>
             <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_image_blocks</span><span class="p">),</span>
@@ -184,7 +181,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">metadata_blocks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;VRSBlocks&quot;</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The list of metadata blocks associated with this record.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The list of metadata blocks associated with this record.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">VRSBlocks</span><span class="p">(</span>
             <span class="n">partial</span><span class="p">(</span>
                 <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="n">stringify_metadata_keys</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">idx</span><span class="p">]),</span>
@@ -195,7 +192,7 @@
 
 
 <div class="viewcode-block" id="VRSBlocks"><a class="viewcode-back" href="../../modules/record.html#pyvrs.record.VRSBlocks">[docs]</a><span class="k">class</span> <span class="nc">VRSBlocks</span><span class="p">(</span><span class="n">Sequence</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A representation of a list of Record blocks (image, metadata, audio or custom).</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A representation of a list of Record blocks (image, metadata, audio or custom).</span>
 <span class="sd">    Accessing elements returns the type directly.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -250,7 +247,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Meta Reality Labs Research.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>

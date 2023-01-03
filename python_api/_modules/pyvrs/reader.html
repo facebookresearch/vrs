@@ -10,9 +10,6 @@
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
     
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script src="../../_static/sphinx_highlight.js"></script>
     
@@ -106,7 +103,7 @@
 
 
 <div class="viewcode-block" id="VRSReader"><a class="viewcode-back" href="../../modules/reader.html#pyvrs.reader.VRSReader">[docs]</a><span class="k">class</span> <span class="nc">VRSReader</span><span class="p">(</span><span class="n">BaseVRSReader</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A Pythonic reader for VRS files. Behaves as a filterable list - has a length</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A Pythonic reader for VRS files. Behaves as a filterable list - has a length</span>
 <span class="sd">    (number of records), can be indexed to retrieve VRSRecords, and can be iterated</span>
 <span class="sd">    over and sliced just like a regular Python list. Significant file reads are</span>
 <span class="sd">    only done when record state is queried, so it remains performant even for larger</span>
@@ -197,7 +194,7 @@
         <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
         <span class="n">multi_path</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            path: a path to the VRS file</span>
 <span class="sd">            auto_read_configuration_records: When this is True, configuration records are automatically read</span>
@@ -239,7 +236,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_open_files</span><span class="p">(</span><span class="n">multi_path</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
 
 <div class="viewcode-block" id="VRSReader.close"><a class="viewcode-back" href="../../modules/reader.html#pyvrs.reader.VRSReader.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;explicitly close the VRS reader without waiting for Python grabage collection.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;explicitly close the VRS reader without waiting for Python grabage collection.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reader</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">slice</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">VRSRecord</span><span class="p">,</span> <span class="n">VRSReaderSlice</span><span class="p">]:</span>
@@ -287,7 +284,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">file_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a dict of all file tags present in this VRS file.</span>
 
 <span class="sd">        Returns:</span>
@@ -297,7 +294,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">stream_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a dict of all per-stream tags present in this VRS file.</span>
 
 <span class="sd">        Returns:</span>
@@ -307,38 +304,38 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_records</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return a number of records in this VRS file.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a number of records in this VRS file.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_records</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">record_types</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Return a set of record types in this VRS file.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a set of record types in this VRS file.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record_types</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">stream_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Return a set of stream ids in this VRS file.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a set of stream ids in this VRS file.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_ids</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">min_timestamp</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return a minimum timestamp of this VRS file.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a minimum timestamp of this VRS file.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_min_timestamp</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">max_timestamp</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return a maximum timestamp of this VRS file.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a maximum timestamp of this VRS file.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_timestamp</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">time_range</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return a timestamp range of this VRS file.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a timestamp range of this VRS file.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_timestamp</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_timestamp</span>
 
 <div class="viewcode-block" id="VRSReader.find_stream"><a class="viewcode-back" href="../../modules/reader.html#pyvrs.reader.VRSReader.find_stream">[docs]</a>    <span class="k">def</span> <span class="nf">find_stream</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">recordable_type_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">tag_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tag_value</span><span class="p">:</span> <span class="nb">str</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find stream matching recordable type and tag, and return its stream id.</span>
 
 <span class="sd">        Args:</span>
@@ -354,7 +351,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="VRSReader.find_streams"><a class="viewcode-back" href="../../modules/reader.html#pyvrs.reader.VRSReader.find_streams">[docs]</a>    <span class="k">def</span> <span class="nf">find_streams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recordable_type_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">flavor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find streams matching recordable type and flavor, and return sets of stream ids.</span>
 
 <span class="sd">        Args:</span>
@@ -370,7 +367,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reader</span><span class="o">.</span><span class="n">get_streams</span><span class="p">(</span><span class="n">RecordableTypeId</span><span class="p">(</span><span class="n">recordable_type_id</span><span class="p">),</span> <span class="n">flavor</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="VRSReader.get_stream_info"><a class="viewcode-back" href="../../modules/reader.html#pyvrs.reader.VRSReader.get_stream_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_stream_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get details about a stream.</span>
 
 <span class="sd">        Args:</span>
@@ -382,7 +379,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reader</span><span class="o">.</span><span class="n">get_stream_info</span><span class="p">(</span><span class="n">stream_id</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="VRSReader.get_records_count"><a class="viewcode-back" href="../../modules/reader.html#pyvrs.reader.VRSReader.get_records_count">[docs]</a>    <span class="k">def</span> <span class="nf">get_records_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">record_type</span><span class="p">:</span> <span class="n">RecordType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the number of records for the stream_id &amp; record_type.</span>
 
 <span class="sd">        Args:</span>
@@ -395,7 +392,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reader</span><span class="o">.</span><span class="n">get_records_count</span><span class="p">(</span><span class="n">stream_id</span><span class="p">,</span> <span class="n">record_type</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="VRSReader.get_timestamp_list"><a class="viewcode-back" href="../../modules/reader.html#pyvrs.reader.VRSReader.get_timestamp_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_timestamp_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the list of timestamps corresponding to the given indices.</span>
 
 <span class="sd">        Args:</span>
@@ -409,7 +406,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reader</span><span class="o">.</span><span class="n">get_timestamp_list_for_indices</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="VRSReader.get_timestamp_for_index"><a class="viewcode-back" href="../../modules/reader.html#pyvrs.reader.VRSReader.get_timestamp_for_index">[docs]</a>    <span class="k">def</span> <span class="nf">get_timestamp_for_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the timestamp corresponding to the given index.</span>
 
 <span class="sd">        Args:</span>
@@ -423,7 +420,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reader</span><span class="o">.</span><span class="n">get_timestamp_for_index</span><span class="p">(</span><span class="n">index</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="VRSReader.set_image_conversion"><a class="viewcode-back" href="../../modules/reader.html#pyvrs.reader.VRSReader.set_image_conversion">[docs]</a>    <span class="k">def</span> <span class="nf">set_image_conversion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conversion</span><span class="p">:</span> <span class="n">ImageConversion</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set default image conversion policy, and clears any stream specific setting.</span>
 
 <span class="sd">        Args:</span>
@@ -434,7 +431,7 @@
 <div class="viewcode-block" id="VRSReader.set_stream_image_conversion"><a class="viewcode-back" href="../../modules/reader.html#pyvrs.reader.VRSReader.set_stream_image_conversion">[docs]</a>    <span class="k">def</span> <span class="nf">set_stream_image_conversion</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">stream_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">conversion</span><span class="p">:</span> <span class="n">ImageConversion</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set image conversion policy for a specific stream.</span>
 
 <span class="sd">        Args:</span>
@@ -446,7 +443,7 @@
 <div class="viewcode-block" id="VRSReader.set_stream_type_image_conversion"><a class="viewcode-back" href="../../modules/reader.html#pyvrs.reader.VRSReader.set_stream_type_image_conversion">[docs]</a>    <span class="k">def</span> <span class="nf">set_stream_type_image_conversion</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">recordable_type_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">conversion</span><span class="p">:</span> <span class="n">ImageConversion</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set image conversion policy for streams of a specific device type.</span>
 
 <span class="sd">        Args:</span>
@@ -462,7 +459,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="VRSReader.might_contain_images"><a class="viewcode-back" href="../../modules/reader.html#pyvrs.reader.VRSReader.might_contain_images">[docs]</a>    <span class="k">def</span> <span class="nf">might_contain_images</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if the given stream_id contains an image data.</span>
 
 <span class="sd">        Args:</span>
@@ -474,7 +471,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reader</span><span class="o">.</span><span class="n">might_contain_images</span><span class="p">(</span><span class="n">stream_id</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="VRSReader.might_contain_audio"><a class="viewcode-back" href="../../modules/reader.html#pyvrs.reader.VRSReader.might_contain_audio">[docs]</a>    <span class="k">def</span> <span class="nf">might_contain_audio</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if the given stream_id contains an audio data.</span>
 
 <span class="sd">        Args:</span>
@@ -486,7 +483,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reader</span><span class="o">.</span><span class="n">might_contain_audio</span><span class="p">(</span><span class="n">stream_id</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="VRSReader.get_estimated_frame_rate"><a class="viewcode-back" href="../../modules/reader.html#pyvrs.reader.VRSReader.get_estimated_frame_rate">[docs]</a>    <span class="k">def</span> <span class="nf">get_estimated_frame_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the estimated frame rate for the given stream_id.</span>
 
 <span class="sd">        Args:</span>
@@ -500,7 +497,7 @@
 <div class="viewcode-block" id="VRSReader.get_record_index_by_time"><a class="viewcode-back" href="../../modules/reader.html#pyvrs.reader.VRSReader.get_record_index_by_time">[docs]</a>    <span class="k">def</span> <span class="nf">get_record_index_by_time</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">stream_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get index in filtered records by timestamp.</span>
 
 <span class="sd">        Args:</span>
@@ -527,7 +524,7 @@
 <div class="viewcode-block" id="VRSReader.read_record_by_time"><a class="viewcode-back" href="../../modules/reader.html#pyvrs.reader.VRSReader.read_record_by_time">[docs]</a>    <span class="k">def</span> <span class="nf">read_record_by_time</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">stream_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VRSRecord</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Read record by timestamp.</span>
 
 <span class="sd">        Args:</span>
@@ -555,7 +552,7 @@
 <div class="viewcode-block" id="VRSReader.read_prev_record"><a class="viewcode-back" href="../../modules/reader.html#pyvrs.reader.VRSReader.read_prev_record">[docs]</a>    <span class="k">def</span> <span class="nf">read_prev_record</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">stream_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">record_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VRSRecord</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Read the last record that matches stream_id and record_type and its index is smaller or equal than given index.</span>
 
 <span class="sd">        Args:</span>
@@ -577,7 +574,7 @@
 <div class="viewcode-block" id="VRSReader.read_next_record"><a class="viewcode-back" href="../../modules/reader.html#pyvrs.reader.VRSReader.read_next_record">[docs]</a>    <span class="k">def</span> <span class="nf">read_next_record</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">stream_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">record_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VRSRecord</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Read the first record that matches stream_id and record_type and its index is greater or equal than given index.</span>
 
 <span class="sd">        Args:</span>
@@ -602,7 +599,7 @@
         <span class="k">return</span> <span class="n">index_or_slice_records</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reader</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_record_count_by_type_from_stream_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Retrieve the number of records from a given stream id sorted by type.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieve the number of records from a given stream id sorted by type.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">stream_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record_counts_by_type</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record_counts_by_type</span><span class="p">[</span><span class="n">stream_id</span><span class="p">]</span>
 
@@ -636,7 +633,7 @@
         <span class="n">min_timestamp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">max_timestamp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;FilteredVRSReader&quot;</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Filter this reader to only read records with given condition.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Filter this reader to only read records with given condition.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            stream_ids: Stream Ids that you are interested in.</span>
@@ -661,7 +658,7 @@
 
 <div class="viewcode-block" id="SyncVRSReader"><a class="viewcode-back" href="../../modules/reader.html#pyvrs.reader.SyncVRSReader">[docs]</a><span class="k">class</span> <span class="nc">SyncVRSReader</span><span class="p">(</span><span class="n">VRSReader</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">_get_reader_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multi_path</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns pybind reader class to construct based on the parameter.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns pybind reader class to construct based on the parameter.</span>
 <span class="sd">        This will return either, vrsbindings.Reader, MultiReader.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">multi_path</span><span class="p">:</span>
@@ -690,7 +687,7 @@
         <span class="n">min_timestamp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">max_timestamp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SyncFilteredVRSReader</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Filter this reader to only read records with given condition.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Filter this reader to only read records with given condition.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            stream_ids: Stream Ids that you are interested in.</span>
@@ -760,7 +757,7 @@
         <span class="n">min_timestamp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">max_timestamp</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncFilteredVRSReader</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Filter this reader to only read records with given condition.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Filter this reader to only read records with given condition.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            stream_ids: Stream Ids that you are interested in.</span>
@@ -858,7 +855,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Meta Reality Labs Research.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.0.0.
     </div>
   </body>
 </html>
