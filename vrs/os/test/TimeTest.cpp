@@ -25,7 +25,6 @@ struct TimeTest : testing::Test {};
 TEST_F(TimeTest, getCurrentTimeSecTest) {
   // naive monotony test. Values should always grow.
   double lastTime = vrs::os::getTimestampSec();
-  size_t zeroGapCount = 0;
   size_t negativeGapCount = 0; // should never ever happen!
   size_t positiveGapCount = 0;
   double minNonZeroGap = 1;
@@ -45,8 +44,6 @@ TEST_F(TimeTest, getCurrentTimeSecTest) {
       if (gap > maxNonZeroGap) {
         maxNonZeroGap = gap;
       }
-    } else {
-      zeroGapCount++; // we'll accept that for Windows... :-(
     }
     lastTime = now;
   }
@@ -59,8 +56,8 @@ TEST_F(TimeTest, getCurrentTimeSecTest) {
 TEST_F(TimeTest, getCurrentTimeSecSinceEpoch) {
   // merely make sure that the implementation isn't completely busted...
   int64_t now = vrs::os::getCurrentTimeSecSinceEpoch();
-  const int64_t lastTestUpdateTime = 1590453570;
+  const int64_t jan1_2023 = 1672560000;
   const int64_t jan1_2040 = 2209017600;
-  EXPECT_GT(now, lastTestUpdateTime);
+  EXPECT_GT(now, jan1_2023);
   EXPECT_GT(jan1_2040, now);
 }
