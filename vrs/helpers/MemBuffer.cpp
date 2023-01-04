@@ -38,7 +38,7 @@ void MemBuffer::addData(const void* data, size_t size) {
 size_t MemBuffer::allocateSpace(uint8_t*& outData, size_t minSize) {
   reserve(minSize);
   auto& back = buffers_.back();
-  outData = &back[back.size()].byte;
+  outData = &back.data()->byte + back.size();
   return back.capacity() - back.size();
 }
 
