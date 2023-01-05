@@ -281,6 +281,9 @@ int threadedCreateRecords(CreateParams& p) {
     RETURN_ON_FAILURE(fileWriter.createFileAsync(p.path));
   }
   p.outMinFileSize = RecordFileWriterTester::getCurrentFileSize(fileWriter);
+  if (p.testOptions & TestOptions::SKIP_FINALIZE_INDEX) {
+    RecordFileWriterTester::skipFinalizeIndexRecord(fileWriter);
+  }
   vector<thread> threads;
   threads.reserve(kCameraCount);
   for (uint32_t threadIndex = 0; threadIndex < kCameraCount; threadIndex++) {
@@ -289,9 +292,6 @@ int threadedCreateRecords(CreateParams& p) {
   for (uint32_t threadIndex = 0; threadIndex < kCameraCount; threadIndex++) {
     XR_LOGD("Joining thread #{}", threadIndex);
     threads[threadIndex].join();
-  }
-  if (p.testOptions & TestOptions::SKIP_FINALIZE_INDEX) {
-    RecordFileWriterTester::skipFinalizeIndexRecord(fileWriter);
   }
   XR_LOGD("Closing file");
   EXPECT_EQ(fileWriter.closeFileAsync(), 0);
