@@ -197,6 +197,16 @@ string asJson(
   return jDocumentToJsonString(document);
 }
 
+string mapAsJson(const map<string, string>& strMap) {
+  using namespace fb_rapidjson;
+  JDocument document;
+  JsonWrapper jw{document};
+  for (const auto& element : strMap) {
+    document.AddMember(jw.jValue(element.first), jw.jValue(element.second), jw.alloc);
+  }
+  return jDocumentToJsonString(document);
+}
+
 } // namespace
 
 namespace vrs::utils {
@@ -234,6 +244,7 @@ string checkRecords(
 
   if (noError && checkType != CheckType::Check) {
     stringstream ss;
+    map<string, string> checksums;
     // calculate xxhash for each componenet, then calculate xxhash for all the hashes.
     XXH64Digester sum;
 
@@ -241,7 +252,11 @@ string checkRecords(
 
     sum.ingest(fileTagsChecksum);
     if (checkType == CheckType::Checksums) {
-      ss << "FileTags: " << fileTagsChecksum << endl;
+      if (copyOptions.jsonOutput) {
+        checksums["filetags"] = fileTagsChecksum;
+      } else {
+        ss << "FileTags: " << fileTagsChecksum << endl;
+      }
     }
     stringstream ids;
     for (auto& checker : checkers) {
@@ -259,10 +274,17 @@ string checkRecords(
           string userTagsChecksum = checksum(tags.user);
           string headerChecksum = checker->digestHeaderChecksum();
           string payloadChecksum = checker->digestPayloadChecksum();
-          ss << id.getNumericName() << " VRS tags: " << vrsTagsChecksum << endl;
-          ss << id.getNumericName() << " User tags: " << userTagsChecksum << endl;
-          ss << id.getNumericName() << " Headers: " << headerChecksum << endl;
-          ss << id.getNumericName() << " Payload: " << payloadChecksum << endl;
+          if (copyOptions.jsonOutput) {
+            checksums[id.getNumericName() + "_vrstags"] = vrsTagsChecksum;
+            checksums[id.getNumericName() + "_usertags"] = userTagsChecksum;
+            checksums[id.getNumericName() + "_headers"] = headerChecksum;
+            checksums[id.getNumericName() + "_payload"] = payloadChecksum;
+          } else {
+            ss << id.getNumericName() << " VRS tags: " << vrsTagsChecksum << endl;
+            ss << id.getNumericName() << " User tags: " << userTagsChecksum << endl;
+            ss << id.getNumericName() << " Headers: " << headerChecksum << endl;
+            ss << id.getNumericName() << " Payload: " << payloadChecksum << endl;
+          }
           sum.ingest(vrsTagsChecksum)
               .ingest(userTagsChecksum)
               .ingest(headerChecksum)
@@ -278,6 +300,10 @@ string checkRecords(
       ids << checker->getSanitizedId().getNumericName() << '/';
     }
     sum.ingest(checksum(ids));
+    if (copyOptions.jsonOutput) {
+      checksums["checksum"] = sum.digestToString();
+      return mapAsJson(checksums);
+    }
     ss << sum.digestToString();
     return ss.str();
   }

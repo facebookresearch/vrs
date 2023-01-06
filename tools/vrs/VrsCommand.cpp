@@ -462,6 +462,7 @@ int VrsCommand::runCommands() {
       cout << checkRecords(filteredReader, copyOptions, CheckType::Checksums) << endl;
       break;
     case Command::Hexdump:
+      copyOptions.showProgress = false;
       cout << checkRecords(filteredReader, copyOptions, CheckType::HexDump) << endl;
       break;
     case Command::ChecksumVerbatim:
