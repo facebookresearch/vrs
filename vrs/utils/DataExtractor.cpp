@@ -195,8 +195,7 @@ bool DataExtractor::DataExtractorStreamPlayer::onUnsupportedBlock(
           ? to_string(contentBlock.getBlockSize()) + " bytes"
           : "unknown size");
   JDocument doc;
-  doc.SetObject();
-  JsonWrapper json{doc, doc.GetAllocator()};
+  JsonWrapper json{doc};
   json.addMember("unsupported_block", contentBlock.asString());
   blocks_.emplace_back(jDocumentToJsonString(doc));
   return true;
@@ -208,8 +207,7 @@ int DataExtractor::DataExtractorStreamPlayer::recordReadComplete(
   using namespace fb_rapidjson;
   {
     JDocument doc;
-    doc.SetObject();
-    JsonWrapper json{doc, doc.GetAllocator()};
+    JsonWrapper json{doc};
     json.addMember("stream", recordInfo.streamId.getNumericName());
     json.addMember("type", Record::typeName(recordInfo.recordType));
     json.addMember("timestamp", recordInfo.timestamp);

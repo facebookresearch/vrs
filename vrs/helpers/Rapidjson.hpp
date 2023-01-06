@@ -47,6 +47,11 @@ using JValue = fb_rapidjson::GenericValue<JUtf8Encoding, JCrtAllocator>;
 /// For use by VRS only.
 /// @internal
 struct JsonWrapper {
+  explicit JsonWrapper(JDocument& doc) : value{doc}, alloc{doc.GetAllocator()} {
+    doc.SetObject();
+  }
+  JsonWrapper(JValue& v, JDocument::AllocatorType& a) : value{v}, alloc{a} {}
+
   JValue& value;
   JDocument::AllocatorType& alloc;
 

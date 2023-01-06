@@ -185,8 +185,7 @@ string asJson(
     double percent) {
   using namespace fb_rapidjson;
   JDocument document;
-  document.SetObject();
-  JsonWrapper wrapper{document, document.GetAllocator()};
+  JsonWrapper wrapper{document};
   wrapper.addMember("good_file", success);
   wrapper.addMember("record_count", recordCount);
   wrapper.addMember("duration", duration);

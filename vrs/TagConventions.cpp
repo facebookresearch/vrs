@@ -42,8 +42,7 @@ static const char* cTagsObjectName = "tags";
 string tag_conventions::makeTagSet(const vector<string>& tags) {
   using namespace fb_rapidjson;
   JDocument doc;
-  doc.SetObject();
-  JsonWrapper wrapper{doc, doc.GetAllocator()};
+  JsonWrapper wrapper{doc};
   serializeVector<string>(tags, wrapper, fb_rapidjson::StringRef(cTagsObjectName));
   return jDocumentToJsonString(doc);
 }

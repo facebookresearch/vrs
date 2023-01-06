@@ -272,8 +272,7 @@ bool FileSpec::fromJson(const string& jsonStr) {
 string FileSpec::toJson() const {
   using namespace fb_rapidjson;
   JDocument document;
-  document.SetObject();
-  JsonWrapper wrapper{document, document.GetAllocator()};
+  JsonWrapper wrapper{document};
   if (!chunks.empty()) {
     serializeVector<string>(chunks, wrapper, StringRef(kChunkField));
   }
