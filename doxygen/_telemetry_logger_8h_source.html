@@ -254,15 +254,19 @@ $(function() {
 <div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;  <span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> traffic(<span class="keyword">const</span> OperationContext&amp; operationContext, <span class="keyword">const</span> TrafficEvent&amp; event) {</div>
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    getInstance()-&gt;logTraffic(operationContext, event);</div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;  }</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160; </div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classvrs_1_1_telemetry_logger.html#a947eb78b85578ad00c2ee5f48ffe9890">logEvent</a>(LogEvent&amp;&amp; event);</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> logTraffic(<span class="keyword">const</span> OperationContext&amp; operationContext, <span class="keyword">const</span> TrafficEvent&amp; event);</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160; </div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160; <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;  <span class="keyword">static</span> std::unique_ptr&lt;TelemetryLogger&gt;&amp; getInstance();</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;};</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;  <span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> flush() {</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    getInstance()-&gt;flushEvents();</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;  }</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160; </div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classvrs_1_1_telemetry_logger.html#a947eb78b85578ad00c2ee5f48ffe9890">logEvent</a>(LogEvent&amp;&amp; event);</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> logTraffic(<span class="keyword">const</span> OperationContext&amp; operationContext, <span class="keyword">const</span> TrafficEvent&amp; event);</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> flushEvents() {}</div>
 <div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160; </div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;} <span class="comment">// namespace vrs</span></div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160; <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  <span class="keyword">static</span> std::unique_ptr&lt;TelemetryLogger&gt;&amp; getInstance();</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;};</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160; </div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;} <span class="comment">// namespace vrs</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="astructvrs_1_1_traffic_event_html"><div class="ttname"><a href="structvrs_1_1_traffic_event.html">vrs::TrafficEvent</a></div><div class="ttdoc">Telemetry event specialized to report cloud traffic.</div><div class="ttdef"><b>Definition:</b> TelemetryLogger.h:86</div></div>
 <div class="ttc" id="aclassvrs_1_1_telemetry_logger_html_a947eb78b85578ad00c2ee5f48ffe9890"><div class="ttname"><a href="classvrs_1_1_telemetry_logger.html#a947eb78b85578ad00c2ee5f48ffe9890">vrs::TelemetryLogger::logEvent</a></div><div class="ttdeci">virtual void logEvent(LogEvent &amp;&amp;event)</div><div class="ttdoc">Actual methods that implement the behaviors.</div><div class="ttdef"><b>Definition:</b> TelemetryLogger.cpp:36</div></div>
