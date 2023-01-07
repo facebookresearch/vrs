@@ -197,10 +197,14 @@ class TelemetryLogger {
   static inline void traffic(const OperationContext& operationContext, const TrafficEvent& event) {
     getInstance()->logTraffic(operationContext, event);
   }
+  static inline void flush() {
+    getInstance()->flushEvents();
+  }
 
   /// Actual methods that implement the behaviors
   virtual void logEvent(LogEvent&& event);
   virtual void logTraffic(const OperationContext& operationContext, const TrafficEvent& event);
+  virtual void flushEvents() {}
 
  private:
   static std::unique_ptr<TelemetryLogger>& getInstance();

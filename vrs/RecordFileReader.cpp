@@ -53,6 +53,7 @@ RecordFileReader::RecordFileReader() {
 
 RecordFileReader::~RecordFileReader() {
   closeFile();
+  TelemetryLogger::flush();
 }
 
 void RecordFileReader::setOpenProgressLogger(ProgressLogger* progressLogger) {
