@@ -303,8 +303,10 @@ TEST_F(MultiRecordFileReaderTest, multiFile) {
   ASSERT_LT(0, reader.getTotalSourceSize());
   assertEmptyStreamTags(reader);
   TestStreamPlayer streamPlayer;
-  for (const auto& stream : reader.getStreams()) {
-    reader.setStreamPlayer(stream, &streamPlayer);
+  for (const auto& streamId : reader.getStreams()) {
+    reader.setStreamPlayer(streamId, &streamPlayer);
+    // validate serial numbers
+    EXPECT_EQ(streamId, reader.getStreamForSerialNumber(reader.getSerialNumber(streamId)));
   }
   // Validate that Data Record timestamps match with expectedTimestamps
   auto timestampIt = expectedTimestamps.cbegin();
@@ -407,6 +409,10 @@ TEST_F(MultiRecordFileReaderTest, singleFile) {
   const auto& streams = reader.getStreams();
   ASSERT_EQ(1, streams.size());
   ASSERT_EQ(numTotalRecords, reader.getRecordCount());
+  // validate serial numbers
+  for (const auto& streamId : streams) {
+    EXPECT_EQ(streamId, reader.getStreamForSerialNumber(reader.getSerialNumber(streamId)));
+  }
   const auto stream = *streams.begin();
   ASSERT_EQ(numTotalRecords, reader.getRecordCount(stream));
   ASSERT_EQ(numConfigRecords, reader.getRecordCount(stream, Record::Type::CONFIGURATION));

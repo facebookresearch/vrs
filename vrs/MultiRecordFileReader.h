@@ -160,10 +160,15 @@ class MultiRecordFileReader {
   /// Streams using << Recordable Class >> ids require a << flavor >>,
   /// which must be provided when the stream was created.
   /// Use this API to get the recordable flavor provided, if any, when the stream was created.
-  /// @param streamId: StreamId of the record stream to consider.
+  /// @param uniqueStreamId: StreamId of the record stream to consider.
   /// @return The flavor for the corresponding RecordableTypeId, or an empty string,
   /// if no flavor was provided when the stream was created.
-  const string& getFlavor(UniqueStreamId streamId) const;
+  const string& getFlavor(UniqueStreamId uniqueStreamId) const;
+
+  /// Get a stream's serial number.
+  /// @param uniqueStreamId: StreamId of the record stream to consider.
+  /// @return The serial number, or an empty string if the stream wasn't found.
+  const string& getSerialNumber(UniqueStreamId uniqueStreamId) const;
 
   /// Get a set of StreamId for a specific type, and an optional flavor.
   /// @param typeId: a recordable type id, maybe a Recordable Class.
@@ -181,11 +186,17 @@ class MultiRecordFileReader {
   /// returned, which means the one with the lowest RecordableTypeId enum value, or if equal, the
   /// one with the lowest UniqueStreamId instanceId.
   /// @return A UniqueStreamId.
-  /// Call isValid() to know if a matching StreamId was actually found.
+  /// Call isValid() to know if a matching stream was actually found.
   UniqueStreamId getStreamForTag(
       const string& tagName,
       const string& tag,
       RecordableTypeId typeId = RecordableTypeId::Undefined) const;
+
+  /// Find the stream with the given serial number.
+  /// @param serialNumber: the serial number to look for.
+  /// @return A UniqueStreamId.
+  /// Call isValid() to know if a matching stream was actually found.
+  UniqueStreamId getStreamForSerialNumber(const string& serialNumber) const;
 
   /// Get a record's index in the global index, which is orderd by timestamp across all open files.
   /// @param record: Pointer of the record.

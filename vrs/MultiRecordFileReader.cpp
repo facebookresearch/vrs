@@ -204,8 +204,12 @@ vector<pair<string, int64_t>> MultiRecordFileReader::getFileChunks() const {
   return fileChunks;
 }
 
-const string& MultiRecordFileReader::getFlavor(UniqueStreamId streamId) const {
-  return getTag(getTags(streamId).vrs, Recordable::getFlavorTagName());
+const string& MultiRecordFileReader::getFlavor(UniqueStreamId uniqueStreamId) const {
+  return getTag(getTags(uniqueStreamId).vrs, Recordable::getFlavorTagName());
+}
+
+const string& MultiRecordFileReader::getSerialNumber(UniqueStreamId uniqueStreamId) const {
+  return getTag(getTags(uniqueStreamId).vrs, Recordable::getSerialNumberTagName());
 }
 
 vector<UniqueStreamId> MultiRecordFileReader::getStreams(
@@ -238,6 +242,22 @@ UniqueStreamId MultiRecordFileReader::getStreamForTag(
     if ((typeId == RecordableTypeId::Undefined || streamId.getTypeId() == typeId) &&
         getTag(streamId, tagName) == tag) {
       return streamId;
+    }
+  }
+  return {};
+}
+
+UniqueStreamId MultiRecordFileReader::getStreamForSerialNumber(
+    const std::string& serialNumber) const {
+  if (!isOpened_) {
+    return {};
+  }
+  if (hasSingleFile()) {
+    return readers_.front()->getStreamForSerialNumber(serialNumber);
+  }
+  for (const auto& uniqueStreamId : uniqueStreamIds_) {
+    if (getSerialNumber(uniqueStreamId) == serialNumber) {
+      return uniqueStreamId;
     }
   }
   return {};
