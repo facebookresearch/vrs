@@ -46,6 +46,18 @@ TEST_F(DeviceSimulator, classicIndex) {
   ASSERT_EQ(reader.openFile(testPath), 0);
   size_t recordCount = reader.getIndex().size();
   EXPECT_EQ(recordCount, kClassicFileConfig.totalRecordCount);
+
+  // validate serial number methods
+  set<string> serialNumbers;
+  for (uint32_t k = 0; k < kCameraCount; ++k) {
+    string tagName = CreateParams::getCameraStreamTag(k);
+    string serialNumber = reader.getTag(tagName);
+    EXPECT_FALSE(serialNumber.empty());
+    serialNumbers.insert(serialNumber);
+    EXPECT_TRUE(reader.getStreamForSerialNumber(serialNumber).isValid());
+  }
+  EXPECT_EQ(serialNumbers.size(), kCameraCount);
+
   reader.closeFile();
 
   // truncate the file to corrupt the index

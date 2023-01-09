@@ -255,7 +255,9 @@ int threadedCreateRecords(CreateParams& p) {
   bool fatalError = false;
   for (uint32_t cameraIndex = 0; cameraIndex < kCameraCount; cameraIndex++) {
     cameras[cameraIndex] = make_unique<DawnCamera>(cameraIndex, kLongFileConfig);
-    fileWriter.addRecordable(cameras[cameraIndex].get());
+    DawnCamera* camera = cameras[cameraIndex].get();
+    fileWriter.addRecordable(camera);
+    fileWriter.setTag(p.getCameraStreamTag(cameraIndex), camera->getSerialNumber());
     counters[cameraIndex] = 0;
     threadParams.push_back(ThreadParam{
         fileWriter,

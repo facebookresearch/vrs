@@ -17,6 +17,8 @@
 #include <functional>
 #include <string>
 
+#include <fmt/format.h>
+
 #include <vrs/DataLayout.h>
 #include <vrs/DataPieces.h>
 #include <vrs/DiskFile.h>
@@ -125,6 +127,9 @@ struct CreateParams {
   CreateParams& setCustomCreateFileFunction(CustomCreateFileFunction _customCreateFileFunction) {
     customCreateFileFunction = _customCreateFileFunction;
     return *this;
+  }
+  static string getCameraStreamTag(uint32_t cameraIndex) {
+    return fmt::format("camera_{}", cameraIndex);
   }
 
   // More params with "neutral" default

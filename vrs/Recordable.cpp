@@ -22,6 +22,8 @@
 #include <logging/Checks.h>
 #include <logging/Log.h>
 
+#include <vrs/os/System.h>
+
 using namespace std;
 
 namespace vrs {
@@ -36,6 +38,7 @@ Recordable::Recordable(RecordableTypeId typeId, const string& flavor)
     tags_.vrs[getFlavorTagName()] = flavor;
   }
   tags_.vrs[getOriginalNameTagName()] = toString(typeId);
+  tags_.vrs[getSerialNumberTagName()] = os::getUniqueSessionId();
 }
 
 Recordable::~Recordable() = default;
@@ -93,6 +96,15 @@ uint16_t Recordable::getNewInstanceId(RecordableTypeId typeId) {
     instanceId = ++(newId->second);
   }
   return instanceId;
+}
+
+const string& Recordable::getTag(const map<string, string>& tags, const string& name) const {
+  auto iter = tags.find(name);
+  if (iter != tags.end()) {
+    return iter->second;
+  }
+  static const string sEmptyString;
+  return sEmptyString;
 }
 
 } // namespace vrs

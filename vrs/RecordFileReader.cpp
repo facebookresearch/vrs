@@ -408,6 +408,7 @@ int RecordFileReader::readFileDetails(
             }),
         recordIndex_.end());
     XR_LOGD("Deleted {} TagsRecords from the index.", sizeBefore - recordIndex_.size());
+    DescriptionRecord::createStreamSerialNumbers(fileTags_, streamTags_);
   }
   // Streams with no record won't be revealed by the index.
   for (auto& tags : streamTags_) {
@@ -534,6 +535,15 @@ StreamId RecordFileReader::getStreamForTag(
   for (const auto& streamId : streamIds_) {
     if ((typeId == RecordableTypeId::Undefined || streamId.getTypeId() == typeId) &&
         getTag(streamId, tagName) == tag) {
+      return streamId;
+    }
+  }
+  return {};
+}
+
+StreamId RecordFileReader::getStreamForSerialNumber(const std::string& streamSerialNumber) const {
+  for (const auto& streamId : streamIds_) {
+    if (getSerialNumber(streamId) == streamSerialNumber) {
       return streamId;
     }
   }
@@ -839,6 +849,10 @@ const string& RecordFileReader::getOriginalRecordableTypeName(StreamId streamId)
 
 const string& RecordFileReader::getFlavor(StreamId streamId) const {
   return getTag(getTags(streamId).vrs, Recordable::getFlavorTagName());
+}
+
+const string& RecordFileReader::getSerialNumber(StreamId streamId) const {
+  return getTag(getTags(streamId).vrs, Recordable::getSerialNumberTagName());
 }
 
 bool RecordFileReader::mightContainImages(StreamId streamId) const {

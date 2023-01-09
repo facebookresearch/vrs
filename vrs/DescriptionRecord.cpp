@@ -27,6 +27,8 @@
 #include <logging/Verify.h>
 
 #include <vrs/helpers/FileMacros.h>
+#include <vrs/utils/xxhash/xxhash.h>
+
 #include "ErrorCode.h"
 #include "FileHandler.h"
 #include "IndexRecord.h"
@@ -331,15 +333,17 @@ int DescriptionRecord::readDescriptionRecord(
         XR_LOGD("Description record bug: {} bytes left.", dataSizeLeft);
       }
       jsonToTags(jsonTags, outFileTags);
+      createStreamSerialNumbers(outFileTags, outStreamTags);
       return 0;
     }
 
     case kDescriptionFormatVersion: {
       IF_ERROR_LOG_AND_RETURN(readMap(file, outStreamTags, dataSizeLeft));
       for (auto& streamTags : outStreamTags) {
-        upgradeStreamTags(streamTags.second);
+        upgradeStreamTags(streamTags.second.vrs);
       }
       IF_ERROR_LOG_AND_RETURN(readMap(file, outFileTags, dataSizeLeft));
+      createStreamSerialNumbers(outFileTags, outStreamTags);
       return 0;
     }
 
@@ -349,11 +353,50 @@ int DescriptionRecord::readDescriptionRecord(
   }
 }
 
-void DescriptionRecord::upgradeStreamTags(StreamTags& streamTags) {
+void DescriptionRecord::upgradeStreamTags(map<string, string>& vrsTags) {
   // strip instance ID of original device names
-  auto iter = streamTags.vrs.find(Recordable::getOriginalNameTagName());
-  if (iter != streamTags.vrs.end()) {
+  auto iter = vrsTags.find(Recordable::getOriginalNameTagName());
+  if (iter != vrsTags.end()) {
     iter->second = stripInstanceId(iter->second);
+  }
+}
+
+static void
+limitedIngest(XXH64Digester& digester, const map<string, string>& data, size_t maxLength) {
+  const char* kSignature = "map<string, string>";
+  digester.ingest(kSignature, strlen(kSignature));
+  for (const auto& iter : data) {
+    digester.ingest(iter.first);
+    // some tags are gigantic (hundreds of KB), we don't need to process them entirely
+    digester.ingest(iter.second.c_str(), min<size_t>(iter.second.size() + 1, maxLength));
+  }
+}
+
+void DescriptionRecord::createStreamSerialNumbers(
+    const map<string, string>& inFileTags,
+    map<StreamId, StreamTags>& inOutStreamTags) {
+  string fileTagsHash;
+  const string& cSerialNumberTagName = Recordable::getSerialNumberTagName();
+  map<RecordableTypeId, uint16_t> streamCounters;
+  for (auto& streamTags : inOutStreamTags) {
+    string& streamSerialNumber = streamTags.second.vrs[cSerialNumberTagName];
+    if (streamSerialNumber.empty()) {
+      // Some user tags are massive (hundreds of KB), let's limit how much data we hash
+      const size_t kMaxLengthUserTags = 2000;
+      if (fileTagsHash.empty()) {
+        XXH64Digester digester;
+        limitedIngest(digester, inFileTags, kMaxLengthUserTags);
+        fileTagsHash = digester.digestToString();
+      }
+      XXH64Digester digester;
+      digester.ingest(fileTagsHash);
+      limitedIngest(digester, streamTags.second.user, kMaxLengthUserTags);
+      // Hash whole VRS internal tags to capture any DataLayout definition difference
+      digester.ingest(streamTags.second.vrs);
+      StreamId id(streamTags.first.getTypeId(), ++streamCounters[streamTags.first.getTypeId()]);
+      digester.ingest(&id, sizeof(id));
+      streamSerialNumber = digester.digestToString();
+    }
   }
 }
 

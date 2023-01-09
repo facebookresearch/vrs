@@ -26,6 +26,9 @@ namespace vrs {
 
 class FileHandler;
 
+using std::map;
+using std::string;
+
 /// \brief Helper functions to read & write description records.
 namespace DescriptionRecord {
 
@@ -44,8 +47,8 @@ enum {
 /// @return 0 if all went well, or some file system error.
 int writeDescriptionRecord(
     WriteFileHandler& file,
-    const std::map<StreamId, const StreamTags*>& streamTags,
-    const std::map<std::string, std::string>& fileTags,
+    const map<StreamId, const StreamTags*>& streamTags,
+    const map<string, string>& fileTags,
     uint32_t& outPreviousRecordSize);
 
 /// Read a description record, including both the record's header and the record's body.
@@ -60,15 +63,26 @@ int readDescriptionRecord(
     FileHandler& file,
     uint32_t recordHeaderSize,
     uint32_t& outDescriptionRecordSize,
-    std::map<StreamId, StreamTags>& outStreamTags,
-    std::map<std::string, std::string>& outFileTags);
+    map<StreamId, StreamTags>& outStreamTags,
+    map<string, string>& outFileTags);
 
 /// Tags may need to be upgraded/cleaned-up.
 /// Currently, this process consists simply of making sure the original stream's name saved
 /// in VRS tags are stripped of a potential instance number, which used to be included.
 /// This clean-up is required for checksums compares to work as expected.
-/// @param streamTags: tags of a stream that has been read from disk, and needs to be upgraded.
-void upgradeStreamTags(StreamTags& streamTags);
+void upgradeStreamTags(map<string, string>& streamTags);
+
+/// Streams did not always have a serial number generated at creation.
+/// To simplify backward compatibility with existing files, when opening a file, we generate a
+/// deterministic serial number for each stream, if there isn't one already.
+/// That serial number is a hash of the file tags, that stream's tags, and the stream's type and
+/// sequence number, so that reprocessed or split files generate the same serial numbers.
+/// @param inFileTags: the file's tags.
+/// @param inOutStreamTags: stream tags with or without serial numbers.
+/// On exit, every stream will have a unique serial number, preserving existing values.
+void createStreamSerialNumbers(
+    const map<string, string>& inFileTags,
+    map<StreamId, StreamTags>& inOutStreamTags);
 
 } // namespace DescriptionRecord
 

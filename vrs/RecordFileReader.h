@@ -219,6 +219,9 @@ class RecordFileReader {
       const string& tag,
       RecordableTypeId typeId = RecordableTypeId::Undefined) const;
 
+  /// Find the stream with the specified stream serial number.
+  StreamId getStreamForSerialNumber(const string& streamSerialNumber) const;
+
   /// Get the index of the VRS file, which is an ordered array of RecordInfo, each describing
   /// the records, sorted by timestamp.
   /// @return The index.
@@ -392,6 +395,7 @@ class RecordFileReader {
   /// @param streamId: StreamId of the record stream to consider.
   /// @return The original text description for the corresponding RecordableTypeId.
   const string& getOriginalRecordableTypeName(StreamId streamId) const;
+
   /// Streams using << Recordable Class >> ids require a << flavor >>,
   /// which must be provided when the stream was created.
   /// Use this API to get the recordable flavor provided, if any, when the stream was created.
@@ -399,6 +403,19 @@ class RecordFileReader {
   /// @return The flavor for the corresponding RecordableTypeId, or an empty string,
   /// if no flavor was provided when the stream was created.
   const string& getFlavor(StreamId streamId) const;
+
+  /// Get a stream's serial number.
+  /// When streams are created, they are assigned a unique serial number by their Recordable object.
+  /// That serial number is universaly unique and it will be preserved during file copies, file
+  /// processing, and other manipulations that preserve stream tags.
+  /// @param streamId: StreamId of the record stream to consider.
+  /// @return The stream's serial number, or the empty string if the stream ID is not
+  /// valid. When opening files created before stream serial numbers were introduced,
+  /// RecordFileReader automatically generates a stable serial number for every stream based on the
+  /// file tags, the stream's tags (both user and VRS internal tags), and the stream type and
+  /// sequence number. This serial number is stable and preserved during copy and filtering
+  /// operations that preserve stream tags.
+  const string& getSerialNumber(StreamId streamId) const;
 
   /// Tell if a stream might contain at least one image (and probably will).
   /// This is a best guess effort, but it is still possible that no images are actually found!

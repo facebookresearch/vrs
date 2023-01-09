@@ -334,7 +334,7 @@ class RecordableTest : public Recordable, StreamPlayer {
     EXPECT_EQ(streamTags.user.size(), 2);
     TAG_EQU(streamTags.user, "streamTag1", "tagValue1");
     TAG_EQU(streamTags.user, "streamTag2", "tagValue2");
-    EXPECT_EQ(streamTags.vrs.size(), 5); // name + 4 record formats
+    EXPECT_EQ(streamTags.vrs.size(), 6); // name + serial number + 4 record formats
     RecordFormat format;
     filePlayer.getRecordFormat(recordable1, Record::Type::CONFIGURATION, 1, format);
     EXPECT_EQ(format, configurationFormat);
@@ -357,7 +357,7 @@ class RecordableTest : public Recordable, StreamPlayer {
     EXPECT_EQ(streamTags2.user.size(), 2);
     TAG_EQU(streamTags2.user, "tag2Tag1", "tag2Value1");
     TAG_EQU(streamTags2.user, "tag2Tag2", "tag2Value2");
-    EXPECT_EQ(streamTags2.vrs.size(), 1); // name + 0 record formats
+    EXPECT_EQ(streamTags2.vrs.size(), 2); // name + serial number + no record formats
     filePlayer.getRecordFormat(recordable2, Record::Type::CONFIGURATION, 1, format);
     EXPECT_EQ(format, ContentType::CUSTOM);
     filePlayer.getRecordFormat(recordable2, Record::Type::STATE, 1, format);
