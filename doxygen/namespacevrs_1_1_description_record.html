@@ -88,12 +88,14 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ade00b665099451fd6de5af8227099ce9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs_1_1_description_record.html#ade00b665099451fd6de5af8227099ce9">writeDescriptionRecord</a> (<a class="el" href="classvrs_1_1_write_file_handler.html">WriteFileHandler</a> &amp;file, const std::map&lt; <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>, const <a class="el" href="structvrs_1_1_stream_tags.html">StreamTags</a> * &gt; &amp;streamTags, const std::map&lt; std::string, std::string &gt; &amp;fileTags, uint32_t &amp;outPreviousRecordSize)</td></tr>
-<tr class="separator:ade00b665099451fd6de5af8227099ce9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a64532c608f82ac45fc0bc4bb24db5d2c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs_1_1_description_record.html#a64532c608f82ac45fc0bc4bb24db5d2c">readDescriptionRecord</a> (<a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &amp;file, uint32_t recordHeaderSize, uint32_t &amp;outDescriptionRecordSize, std::map&lt; <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>, <a class="el" href="structvrs_1_1_stream_tags.html">StreamTags</a> &gt; &amp;outStreamTags, std::map&lt; std::string, std::string &gt; &amp;outFileTags)</td></tr>
-<tr class="separator:a64532c608f82ac45fc0bc4bb24db5d2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8041b1efbda1f2b1c91532d6d4e9aedc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs_1_1_description_record.html#a8041b1efbda1f2b1c91532d6d4e9aedc">upgradeStreamTags</a> (<a class="el" href="structvrs_1_1_stream_tags.html">StreamTags</a> &amp;streamTags)</td></tr>
-<tr class="separator:a8041b1efbda1f2b1c91532d6d4e9aedc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa21812bc9c1b4152a4738b06df8ab116"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs_1_1_description_record.html#aa21812bc9c1b4152a4738b06df8ab116">writeDescriptionRecord</a> (<a class="el" href="classvrs_1_1_write_file_handler.html">WriteFileHandler</a> &amp;file, const map&lt; <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>, const <a class="el" href="structvrs_1_1_stream_tags.html">StreamTags</a> * &gt; &amp;streamTags, const map&lt; string, string &gt; &amp;fileTags, uint32_t &amp;outPreviousRecordSize)</td></tr>
+<tr class="separator:aa21812bc9c1b4152a4738b06df8ab116"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb63ba4ff44efd7ea1fad5f5eef9ecf0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs_1_1_description_record.html#adb63ba4ff44efd7ea1fad5f5eef9ecf0">readDescriptionRecord</a> (<a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &amp;file, uint32_t recordHeaderSize, uint32_t &amp;outDescriptionRecordSize, map&lt; <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>, <a class="el" href="structvrs_1_1_stream_tags.html">StreamTags</a> &gt; &amp;outStreamTags, map&lt; string, string &gt; &amp;outFileTags)</td></tr>
+<tr class="separator:adb63ba4ff44efd7ea1fad5f5eef9ecf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a22cec01f55d5a8732c895478171d4f11"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs_1_1_description_record.html#a22cec01f55d5a8732c895478171d4f11">upgradeStreamTags</a> (map&lt; string, string &gt; &amp;streamTags)</td></tr>
+<tr class="separator:a22cec01f55d5a8732c895478171d4f11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73355ea39ba7aaa1162525ee851e9174"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs_1_1_description_record.html#a73355ea39ba7aaa1162525ee851e9174">createStreamSerialNumbers</a> (const map&lt; string, string &gt; &amp;inFileTags, map&lt; <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>, <a class="el" href="structvrs_1_1_stream_tags.html">StreamTags</a> &gt; &amp;inOutStreamTags)</td></tr>
+<tr class="separator:a73355ea39ba7aaa1162525ee851e9174"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Helper functions to read &amp; write description records. </p>
@@ -121,8 +123,43 @@ Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a64532c608f82ac45fc0bc4bb24db5d2c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a64532c608f82ac45fc0bc4bb24db5d2c">&#9670;&nbsp;</a></span>readDescriptionRecord()</h2>
+<a id="a73355ea39ba7aaa1162525ee851e9174"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a73355ea39ba7aaa1162525ee851e9174">&#9670;&nbsp;</a></span>createStreamSerialNumbers()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void vrs::DescriptionRecord::createStreamSerialNumbers </td>
+          <td>(</td>
+          <td class="paramtype">const map&lt; string, string &gt; &amp;&#160;</td>
+          <td class="paramname"><em>inFileTags</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">map&lt; <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>, <a class="el" href="structvrs_1_1_stream_tags.html">StreamTags</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>inOutStreamTags</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Streams did not always have a serial number generated at creation. To simplify backward compatibility with existing files, when opening a file, we generate a deterministic serial number for each stream, if there isn't one already. That serial number is a hash of the file tags, that stream's tags, and the stream's type and sequence number, so that reprocessed or split files generate the same serial numbers. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">inFileTags</td><td>the file's tags. </td></tr>
+    <tr><td class="paramname">inOutStreamTags</td><td>stream tags with or without serial numbers. On exit, every stream will have a unique serial number, preserving existing values. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="adb63ba4ff44efd7ea1fad5f5eef9ecf0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adb63ba4ff44efd7ea1fad5f5eef9ecf0">&#9670;&nbsp;</a></span>readDescriptionRecord()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -148,13 +185,13 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::map&lt; <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>, <a class="el" href="structvrs_1_1_stream_tags.html">StreamTags</a> &gt; &amp;&#160;</td>
+          <td class="paramtype">map&lt; <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>, <a class="el" href="structvrs_1_1_stream_tags.html">StreamTags</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>outStreamTags</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::map&lt; std::string, std::string &gt; &amp;&#160;</td>
+          <td class="paramtype">map&lt; string, string &gt; &amp;&#160;</td>
           <td class="paramname"><em>outFileTags</em>&#160;</td>
         </tr>
         <tr>
@@ -168,8 +205,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a8041b1efbda1f2b1c91532d6d4e9aedc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8041b1efbda1f2b1c91532d6d4e9aedc">&#9670;&nbsp;</a></span>upgradeStreamTags()</h2>
+<a id="a22cec01f55d5a8732c895478171d4f11"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a22cec01f55d5a8732c895478171d4f11">&#9670;&nbsp;</a></span>upgradeStreamTags()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -177,23 +214,18 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">void vrs::DescriptionRecord::upgradeStreamTags </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structvrs_1_1_stream_tags.html">StreamTags</a> &amp;&#160;</td>
+          <td class="paramtype">map&lt; string, string &gt; &amp;&#160;</td>
           <td class="paramname"><em>streamTags</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Tags may need to be upgraded/cleaned-up. Currently, this process consists simply of making sure the original stream's name saved in VRS tags are stripped of a potential instance number, which used to be included. This clean-up is required for checksums compares to work as expected. </p><dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">streamTags</td><td>tags of a stream that has been read from disk, and needs to be upgraded. </td></tr>
-  </table>
-  </dd>
-</dl>
+<p>Tags may need to be upgraded/cleaned-up. Currently, this process consists simply of making sure the original stream's name saved in VRS tags are stripped of a potential instance number, which used to be included. This clean-up is required for checksums compares to work as expected. </p>
 
 </div>
 </div>
-<a id="ade00b665099451fd6de5af8227099ce9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ade00b665099451fd6de5af8227099ce9">&#9670;&nbsp;</a></span>writeDescriptionRecord()</h2>
+<a id="aa21812bc9c1b4152a4738b06df8ab116"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa21812bc9c1b4152a4738b06df8ab116">&#9670;&nbsp;</a></span>writeDescriptionRecord()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -207,13 +239,13 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::map&lt; <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>, const <a class="el" href="structvrs_1_1_stream_tags.html">StreamTags</a> * &gt; &amp;&#160;</td>
+          <td class="paramtype">const map&lt; <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>, const <a class="el" href="structvrs_1_1_stream_tags.html">StreamTags</a> * &gt; &amp;&#160;</td>
           <td class="paramname"><em>streamTags</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::map&lt; std::string, std::string &gt; &amp;&#160;</td>
+          <td class="paramtype">const map&lt; string, string &gt; &amp;&#160;</td>
           <td class="paramname"><em>fileTags</em>, </td>
         </tr>
         <tr>

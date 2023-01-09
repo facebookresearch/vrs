@@ -131,6 +131,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a31723e14ae3e1498eaaf9624753305c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad5b17a801f4af270df7bf3e5a311d23e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#ad5b17a801f4af270df7bf3e5a311d23e">getStreamForTag</a> (const string &amp;tagName, const string &amp;tag, <a class="el" href="namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5">RecordableTypeId</a> typeId=<a class="el" href="namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5aec0fc0100c4fc1ce4eea230c3dc10360">RecordableTypeId::Undefined</a>) const</td></tr>
 <tr class="separator:ad5b17a801f4af270df7bf3e5a311d23e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab71cbe2b424994eb9fa7d791ee3d0809"><td class="memItemLeft" align="right" valign="top"><a id="ab71cbe2b424994eb9fa7d791ee3d0809"></a>
+<a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#ab71cbe2b424994eb9fa7d791ee3d0809">getStreamForSerialNumber</a> (const string &amp;streamSerialNumber) const</td></tr>
+<tr class="memdesc:ab71cbe2b424994eb9fa7d791ee3d0809"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find the stream with the specified stream serial number. <br /></td></tr>
+<tr class="separator:ab71cbe2b424994eb9fa7d791ee3d0809"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0b1e47d89a735c3246aa1c6c62a2f6b4"><td class="memItemLeft" align="right" valign="top">const vector&lt; <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a0b1e47d89a735c3246aa1c6c62a2f6b4">getIndex</a> () const</td></tr>
 <tr class="separator:a0b1e47d89a735c3246aa1c6c62a2f6b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8915ccc9dad60f6d0db4800b21fef690"><td class="memItemLeft" align="right" valign="top">const vector&lt; const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a8915ccc9dad60f6d0db4800b21fef690">getIndex</a> (<a class="el" href="classvrs_1_1_stream_id.html">StreamId</a> streamId) const</td></tr>
@@ -187,6 +191,8 @@ const map&lt; <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>, <a 
 <tr class="separator:aa9447b11ac25de5ea70cb9b170ddb300"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a24d77aa3800838c0e8da4068316c066c"><td class="memItemLeft" align="right" valign="top">const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a24d77aa3800838c0e8da4068316c066c">getFlavor</a> (<a class="el" href="classvrs_1_1_stream_id.html">StreamId</a> streamId) const</td></tr>
 <tr class="separator:a24d77aa3800838c0e8da4068316c066c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e9a02b8899e92f93c54efd9e98b7615"><td class="memItemLeft" align="right" valign="top">const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a0e9a02b8899e92f93c54efd9e98b7615">getSerialNumber</a> (<a class="el" href="classvrs_1_1_stream_id.html">StreamId</a> streamId) const</td></tr>
+<tr class="separator:a0e9a02b8899e92f93c54efd9e98b7615"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa8ee554269ef5e43590070c735778fe0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#aa8ee554269ef5e43590070c735778fe0">mightContainImages</a> (<a class="el" href="classvrs_1_1_stream_id.html">StreamId</a> streamId) const</td></tr>
 <tr class="separator:aa8ee554269ef5e43590070c735778fe0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6fc3f6e58aba6d53e66dabeff41deb8b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a6fc3f6e58aba6d53e66dabeff41deb8b">mightContainAudio</a> (<a class="el" href="classvrs_1_1_stream_id.html">StreamId</a> streamId) const</td></tr>
@@ -966,6 +972,31 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Index in the record's stream index, or <a class="el" href="classvrs_1_1_record_file_reader.html#afbf4e571bbeb4b4b8405ca3e16cc5ddd">getRecordCount()</a> is record is nullptr. </dd></dl>
+
+</div>
+</div>
+<a id="a0e9a02b8899e92f93c54efd9e98b7615"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0e9a02b8899e92f93c54efd9e98b7615">&#9670;&nbsp;</a></span>getSerialNumber()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string &amp; vrs::RecordFileReader::getSerialNumber </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>&#160;</td>
+          <td class="paramname"><em>streamId</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get a stream's serial number. When streams are created, they are assigned a unique serial number by their <a class="el" href="classvrs_1_1_recordable.html" title="Class to override to implement a record producing device, or virtual device.">Recordable</a> object. That serial number is universaly unique and it will be preserved during file copies, file processing, and other manipulations that preserve stream tags. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">streamId</td><td><a class="el" href="classvrs_1_1_stream_id.html" title="VRS stream identifier class.">StreamId</a> of the record stream to consider. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The stream's serial number, or the empty string if the stream ID is not valid. When opening files created before stream serial numbers were introduced, <a class="el" href="classvrs_1_1_record_file_reader.html" title="The class to read VRS files.">RecordFileReader</a> automatically generates a stable serial number for every stream based on the file tags, the stream's tags (both user and VRS internal tags), and the stream type and sequence number. This serial number is stable and preserved during copy and filtering operations that preserve stream tags. </dd></dl>
 
 </div>
 </div>

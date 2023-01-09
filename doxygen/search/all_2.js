@@ -45,8 +45,9 @@ var searchData=
   ['createrecord_100',['createRecord',['../classvrs_1_1_recordable.html#ac7e5c232cb3bccacdc7d6478471a8fae',1,'vrs::Recordable::createRecord()'],['../classvrs_1_1_record_manager.html#ac9609c8bd45a8ec1f2c98ef032e0a1c4',1,'vrs::RecordManager::createRecord()']]],
   ['createrecorddelegate_101',['CreateRecordDelegate',['../classvrs_1_1_recordable.html#a6fb72295d3b60cc1ed3e571c158dec2a',1,'vrs::Recordable']]],
   ['createstaterecord_102',['createStateRecord',['../classvrs_1_1_recordable.html#a3017dbf8e9f3ce041552ad50697b872e',1,'vrs::Recordable::createStateRecord()'],['../classvrs__sample__code_1_1_recordable_demo.html#adb58d290e062d513cc1a49587a0821c1',1,'vrs_sample_code::RecordableDemo::createStateRecord()'],['../classvrs__sample__code_1_1_my_camera_recordable.html#acd688fab2813d1bff8f69a8dea9ed26c',1,'vrs_sample_code::MyCameraRecordable::createStateRecord()'],['../classvrs__sample__apps_1_1_image_stream.html#ac0237d990a362e83a0092615e30c2026',1,'vrs_sample_apps::ImageStream::createStateRecord()'],['../classvrs__sample__apps_1_1_audio_stream.html#a1743020026c88855fbbdbe0603f56183',1,'vrs_sample_apps::AudioStream::createStateRecord()'],['../classvrs__sample__apps_1_1_motion_stream.html#a070a682055119d32062a2ea26f29201f',1,'vrs_sample_apps::MotionStream::createStateRecord()']]],
-  ['creationid_103',['creationId',['../structvrs_1_1_file_format_1_1_file_header.html#a5100ee283bd335a080219efa2dd3a911',1,'vrs::FileFormat::FileHeader']]],
-  ['currentrecord_104',['CurrentRecord',['../structvrs_1_1_current_record.html',1,'vrs']]],
-  ['custom_105',['CUSTOM',['../namespacevrs.html#ae73984aca85d0aa7b6f3406cd9f2f6eaa72baef04098f035e8a320b03ad197818',1,'vrs']]],
-  ['customblockreader_106',['CustomBlockReader',['../classvrs_1_1_custom_block_reader.html',1,'vrs']]]
+  ['createstreamserialnumbers_103',['createStreamSerialNumbers',['../namespacevrs_1_1_description_record.html#a73355ea39ba7aaa1162525ee851e9174',1,'vrs::DescriptionRecord']]],
+  ['creationid_104',['creationId',['../structvrs_1_1_file_format_1_1_file_header.html#a5100ee283bd335a080219efa2dd3a911',1,'vrs::FileFormat::FileHeader']]],
+  ['currentrecord_105',['CurrentRecord',['../structvrs_1_1_current_record.html',1,'vrs']]],
+  ['custom_106',['CUSTOM',['../namespacevrs.html#ae73984aca85d0aa7b6f3406cd9f2f6eaa72baef04098f035e8a320b03ad197818',1,'vrs']]],
+  ['customblockreader_107',['CustomBlockReader',['../classvrs_1_1_custom_block_reader.html',1,'vrs']]]
 ];
