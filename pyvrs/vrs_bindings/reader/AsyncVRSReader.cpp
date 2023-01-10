@@ -173,6 +173,7 @@ void pybind_asyncvrsreaders(py::module& m) {
               "get_streams",
               py::overload_cast<vrs::RecordableTypeId, const std::string&>(
                   &pyAsyncReader::getStreams))
+          .def("get_stream_for_flavor", &pyAsyncReader::getStreamForFlavor)
           .def("find_stream", &pyAsyncReader::findStream)
           .def("get_stream_info", &pyAsyncReader::getStreamInfo)
           .def("enable_stream", py::overload_cast<const string&>(&pyAsyncReader::enableStream))

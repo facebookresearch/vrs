@@ -386,6 +386,14 @@ vector<string> VRSReader::getStreams(RecordableTypeId recordableTypeId, const st
   return streamIds;
 }
 
+string VRSReader::getStreamForFlavor(
+    RecordableTypeId recordableTypeId,
+    const string& flavor,
+    const uint32_t indexNumber) {
+  auto stream = reader_.getStreamForFlavor(recordableTypeId, flavor, indexNumber);
+  return stream.getNumericName();
+}
+
 string VRSReader::findStream(
     RecordableTypeId recordableTypeId,
     const string& tagName,
@@ -1018,6 +1026,7 @@ void pybind_vrsreader(py::module& m) {
           .def(
               "get_streams",
               py::overload_cast<RecordableTypeId, const string&>(&pyReader::getStreams))
+          .def("get_stream_for_flavor", &pyReader::getStreamForFlavor)
           .def("find_stream", &pyReader::findStream)
           .def("get_stream_info", &pyReader::getStreamInfo)
           .def("enable_stream", py::overload_cast<const string&>(&pyReader::enableStream))

@@ -161,6 +161,17 @@ class VRSReader : public vrs::utils::VideoRecordFormatStreamPlayer {
   /// @return Vector of recordable ids for each VRS stream.
   std::vector<string> getStreams(RecordableTypeId recordableTypeId, const string& flavor);
 
+  /// Get a recordable id for a specific recordable type id (device type), flavor and index number.
+  /// @param recordableTypeId: Device type of the streams to look for.
+  /// Use RecordableTypeId::Undefined to match any recordable type.
+  /// @param flavor: A flavor of device to look for.
+  /// @param indexNumber: The number of the index of the stream. Defaults to 0.
+  /// @return Vector of recordable ids for each VRS stream.
+  string getStreamForFlavor(
+      RecordableTypeId recordableTypeId,
+      const string& flavor,
+      const uint32_t indexNumber = 0);
+
   /// Find a stream of a specific device type, with a specific tag name & tag value.
   /// @param recordableTypeId: Device type of the streams to check.
   /// @param tagName: tag name to check.
