@@ -37,6 +37,6 @@ var searchData=
   ['datasourcechunk_927',['DataSourceChunk',['../classvrs_1_1_data_source_chunk.html',1,'vrs']]],
   ['decompressor_928',['Decompressor',['../classvrs_1_1_decompressor.html',1,'vrs']]],
   ['diskfile_929',['DiskFile',['../classvrs_1_1_disk_file.html',1,'vrs']]],
-  ['diskrecordinfo_930',['DiskRecordInfo',['../structvrs_1_1_file_details_cache_1_1_disk_record_info.html',1,'vrs::FileDetailsCache::DiskRecordInfo'],['../structvrs_1_1_index_record_1_1_disk_record_info.html',1,'vrs::IndexRecord::DiskRecordInfo']]],
+  ['diskrecordinfo_930',['DiskRecordInfo',['../structvrs_1_1_index_record_1_1_disk_record_info.html',1,'vrs::IndexRecord::DiskRecordInfo'],['../structvrs_1_1_file_details_cache_1_1_disk_record_info.html',1,'vrs::FileDetailsCache::DiskRecordInfo']]],
   ['diskstreamid_931',['DiskStreamId',['../structvrs_1_1_file_details_cache_1_1_disk_stream_id.html',1,'vrs::FileDetailsCache::DiskStreamId'],['../structvrs_1_1_index_record_1_1_disk_stream_id.html',1,'vrs::IndexRecord::DiskStreamId']]]
 ];

@@ -519,12 +519,13 @@ Enumerations</h2></td></tr>
 <tr class="memdesc:a2278749cac618182a91e5841f06f66c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Core VRS error domains.  <a href="namespacevrs.html#a2278749cac618182a91e5841f06f66c3">More...</a><br /></td></tr>
 <tr class="separator:a2278749cac618182a91e5841f06f66c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acb1b4358038394407db2b2dc6200afae"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs.html#acb1b4358038394407db2b2dc6200afae">CachingStrategy</a> { <br />
-&#160;&#160;<a class="el" href="namespacevrs.html#acb1b4358038394407db2b2dc6200afaeaf80bc338b6146b566004a046f8137c85">CachingStrategy::Passive</a>, 
+&#160;&#160;<b>UNDEFINED</b> = 0, 
+<a class="el" href="namespacevrs.html#acb1b4358038394407db2b2dc6200afaeaf80bc338b6146b566004a046f8137c85">CachingStrategy::Passive</a>, 
 <a class="el" href="namespacevrs.html#acb1b4358038394407db2b2dc6200afaeaac21d502848247aa2f578d0f718f5d1d">CachingStrategy::Streaming</a>, 
 <a class="el" href="namespacevrs.html#acb1b4358038394407db2b2dc6200afaea02c8e5bdc421c350b1a6a698ae5d4540">CachingStrategy::StreamingBidirectional</a>, 
-<a class="el" href="namespacevrs.html#acb1b4358038394407db2b2dc6200afaea633b1508ec21803c516e3d437d20a0de">CachingStrategy::ReleaseAfterRead</a>, 
 <br />
-&#160;&#160;<b>COUNT</b>
+&#160;&#160;<a class="el" href="namespacevrs.html#acb1b4358038394407db2b2dc6200afaea633b1508ec21803c516e3d437d20a0de">CachingStrategy::ReleaseAfterRead</a>, 
+<b>COUNT</b>
 <br />
  }</td></tr>
 <tr class="memdesc:acb1b4358038394407db2b2dc6200afae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Caching strategy requests.  <a href="namespacevrs.html#acb1b4358038394407db2b2dc6200afae">More...</a><br /></td></tr>
@@ -830,15 +831,18 @@ template&lt;class EC &gt; </td></tr>
 <tr class="memitem:a60363439a31016479813926022eb89fc"><td class="memItemLeft" align="right" valign="top"><a id="a60363439a31016479813926022eb89fc"></a>
 char&#160;</td><td class="memItemRight" valign="bottom"><b>xdigitToChar</b> (char xdigit)</td></tr>
 <tr class="separator:a60363439a31016479813926022eb89fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ca3dc9ac309cdfc607ba15eb0e24b22"><td class="memItemLeft" align="right" valign="top"><a id="a3ca3dc9ac309cdfc607ba15eb0e24b22"></a>
+string&#160;</td><td class="memItemRight" valign="bottom"><b>toString</b> (<a class="el" href="namespacevrs.html#acb1b4358038394407db2b2dc6200afae">CachingStrategy</a> cachingStrategy)</td></tr>
+<tr class="separator:a3ca3dc9ac309cdfc607ba15eb0e24b22"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7accfde5718a6a84e3b968810eaa1240"><td class="memItemLeft" align="right" valign="top"><a id="a7accfde5718a6a84e3b968810eaa1240"></a>
+template&lt;&gt; </td></tr>
+<tr class="memitem:a7accfde5718a6a84e3b968810eaa1240"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespacevrs.html#acb1b4358038394407db2b2dc6200afae">CachingStrategy</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacevrs.html#a7accfde5718a6a84e3b968810eaa1240">toEnum</a> (const string &amp;name)</td></tr>
+<tr class="memdesc:a7accfde5718a6a84e3b968810eaa1240"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a record type name into an enum value. <br /></td></tr>
+<tr class="separator:a7accfde5718a6a84e3b968810eaa1240"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af87f451e56851c8a363092ef43203c94"><td class="memItemLeft" align="right" valign="top"><a id="af87f451e56851c8a363092ef43203c94"></a>
 string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs.html#af87f451e56851c8a363092ef43203c94">toString</a> (<a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> recordType)</td></tr>
 <tr class="memdesc:af87f451e56851c8a363092ef43203c94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a record type as a text string. <br /></td></tr>
 <tr class="separator:af87f451e56851c8a363092ef43203c94"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7accfde5718a6a84e3b968810eaa1240"><td class="memItemLeft" align="right" valign="top"><a id="a7accfde5718a6a84e3b968810eaa1240"></a>
-template&lt;&gt; </td></tr>
-<tr class="memitem:a7accfde5718a6a84e3b968810eaa1240"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacevrs.html#a7accfde5718a6a84e3b968810eaa1240">toEnum</a> (const string &amp;name)</td></tr>
-<tr class="memdesc:a7accfde5718a6a84e3b968810eaa1240"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a record type name into an enum value. <br /></td></tr>
-<tr class="separator:a7accfde5718a6a84e3b968810eaa1240"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:add994ca5b39558f0fb587fd78d7d7537"><td class="memItemLeft" align="right" valign="top"><a id="add994ca5b39558f0fb587fd78d7d7537"></a>
 const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>getNearestRecordByTime</b> (const vector&lt; const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> * &gt; &amp;index, double timestamp, double epsilon)</td></tr>
 <tr class="separator:add994ca5b39558f0fb587fd78d7d7537"><td class="memSeparator" colspan="2">&#160;</td></tr>
