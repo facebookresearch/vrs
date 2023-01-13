@@ -24,6 +24,7 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/helpers/EnumStringConverter.h>
 #include <vrs/helpers/Rapidjson.hpp>
 #include <vrs/helpers/Strings.h>
 #include <vrs/os/Utils.h>
@@ -34,6 +35,24 @@
 #include "FileHandlerFactory.h"
 
 using namespace std;
+
+namespace {
+using vrs::CachingStrategy;
+
+const char* sCachingStrategyNames[] =
+    {"Undefined", "Passive", "Streaming", "StreamingBidirectional", "ReleaseAfterRead"};
+struct CachingStrategyConverter : public EnumStringConverter<
+                                      CachingStrategy,
+                                      sCachingStrategyNames,
+                                      COUNT_OF(sCachingStrategyNames),
+                                      CachingStrategy::UNDEFINED,
+                                      CachingStrategy::UNDEFINED> {
+  static_assert(
+      cNamesCount == static_cast<size_t>(CachingStrategy::COUNT),
+      "Missing CachingStrategy name definitions");
+};
+
+} // namespace
 
 namespace vrs {
 
@@ -478,6 +497,15 @@ int FileSpec::urldecode(const string& in, string& out) {
     out += c;
   }
   return 0;
+}
+
+string toString(CachingStrategy cachingStrategy) {
+  return CachingStrategyConverter::toString(cachingStrategy);
+}
+
+template <>
+CachingStrategy toEnum<>(const string& name) {
+  return CachingStrategyConverter::toEnumNoCase(name.c_str());
 }
 
 } // namespace vrs

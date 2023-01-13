@@ -33,6 +33,8 @@ using std::vector;
 
 /// Caching strategy requests
 enum class CachingStrategy {
+  UNDEFINED = 0,
+
   Passive, ///< (default) Read & cache on-demand (don't prefetch).
   Streaming, ///< Automatically download data "forward", using last read-request as a hint.
   StreamingBidirectional, ///< Automatically download data "forward" and "backward", using last
@@ -41,6 +43,14 @@ enum class CachingStrategy {
 
   COUNT
 };
+
+string toString(CachingStrategy cachingStrategy);
+
+template <class Enum>
+Enum toEnum(const string& name);
+
+template <>
+CachingStrategy toEnum<>(const string& name);
 
 /// \brief Generalized file descriptor class, allowing the efficient representation of complex
 /// file objects, maybe multi-chunks, with additional optional properties.
