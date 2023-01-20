@@ -142,6 +142,13 @@ class DiskFile : public WriteFileHandler {
   /// Read a buffer of an exact size, fails if the size isn't perfectly right.
   static int readFromFile(const string& path, void* data, size_t dataSize);
 
+  /// Read a local file, expected to contain some text
+  /// @param path: local file to read
+  /// @return The content of the file, if found, or the empty string otherwise.
+  /// Will log errors if some unexpected access error happens, but will be silent and
+  /// return an empty string if the file doesn't exist.
+  static string readTextFile(const string& path);
+
   virtual int parseUri(FileSpec& intOutFileSpec, size_t colonIndex) const override;
 
  protected:

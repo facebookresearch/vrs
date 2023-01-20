@@ -73,6 +73,8 @@ TEST_F(FileCacheTest, cacheDomainTest) {
   string location2;
   EXPECT_EQ(fcache->getFile(domain, "123.txt", location2), 0);
   EXPECT_EQ(location, location2);
+  string str = DiskFile::readTextFile(location);
+  EXPECT_EQ(str, location);
   // put a folder in the way of the file...
   os::remove(location);
   os::makeDir(location);

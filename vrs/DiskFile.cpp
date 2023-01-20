@@ -526,6 +526,21 @@ int DiskFile::readFromFile(const string& path, void* data, size_t dataSize) {
   return maxReadSize == 0 ? SUCCESS : FAILURE;
 }
 
+string DiskFile::readTextFile(const std::string& path) {
+  DiskFile file;
+  if (file.open(path) == 0) {
+    int64_t size = file.getTotalSize();
+    const int64_t kMaxReasonableTextFileSize = 50 * 1024 * 1024; // 50 MB is a huge text file...
+    if (size > 0 && XR_VERIFY(size < kMaxReasonableTextFileSize)) {
+      string str(size, 0);
+      if (XR_VERIFY(file.read(str.data(), size) == 0)) {
+        return str;
+      }
+    }
+  }
+  return {};
+}
+
 int DiskFile::parseUri(FileSpec& inOutFileSpec, size_t colonIndex) const {
   string scheme;
   string path;
