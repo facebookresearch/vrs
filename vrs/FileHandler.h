@@ -154,6 +154,11 @@ inline void FileSpec::setExtra(const string& name, const string& value) {
   extras[name] = value;
 }
 
+template <>
+inline void FileSpec::setExtra(const string& name, const bool& value) {
+  extras[name] = value ? "1" : "0";
+}
+
 template <typename T>
 inline void FileSpec::setExtra(const string& name, const T& value) {
   extras[name] = std::to_string(value);
