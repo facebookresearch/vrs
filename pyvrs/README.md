@@ -11,8 +11,13 @@ VRS works. It is complemented by the
 
 ## Install via pip
 ```
-pip install pyvrs
-```
+# Install from pypi
+pip install vrs
 
-## Build from source
-Check [Build from source](https://github.com/facebookresearch/vrs#getting-started) for how to build the package from source.
+# Install from Github
+pip install 'git+https://github.com/facebookresearch/pyvrs.git'
+
+# Install from a local clone
+git clone https://github.com/facebookresearch/pyvrs.git
+pip install -e pyvrs
+```

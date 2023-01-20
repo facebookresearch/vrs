@@ -21,16 +21,7 @@ from pathlib import Path
 from setuptools import Extension, find_packages, setup
 from setuptools.command.build_ext import build_ext
 
-ROOT_DIR = Path(__file__).parent.parent.resolve()
-if os.path.basename(ROOT_DIR) != "vrs":
-    # Check if it is FB repo
-    FB_ROOT_PATH = os.path.abspath(os.path.join(ROOT_DIR, "../libraries/vrs"))
-    if os.path.exists(FB_ROOT_PATH):
-        ROOT_DIR = FB_ROOT_PATH
-    else:
-        PYPI_ROOT_PATH = os.path.abspath(os.path.join(ROOT_DIR, ".."))
-        if os.path.exists(PYPI_ROOT_PATH):
-            ROOT_DIR = PYPI_ROOT_PATH
+ROOT_DIR = Path(__file__).parent.resolve()
 
 
 def _get_sha():
@@ -48,8 +39,6 @@ def _get_sha():
 
 def get_version():
     path = os.path.join(ROOT_DIR, "version.txt")
-    if not os.path.exists(path):
-        path = os.path.join(ROOT_DIR, "oss/version.txt")
     version = open(path, "r").read().strip()
 
     if os.getenv("PYVRS_TEST_BUILD"):
@@ -109,8 +98,7 @@ class CMakeBuild(build_ext):
 
 
 def main():
-    cwd = os.path.dirname(os.path.abspath(__file__))
-    with open(os.path.join(cwd, "README.md"), encoding="utf-8") as f:
+    with open(os.path.join(ROOT_DIR, "README.md"), encoding="utf-8") as f:
         long_description = f.read()
 
     setup(
@@ -119,7 +107,7 @@ def main():
         description="Python API for VRS",
         long_description=long_description,
         long_description_content_type="text/markdown",
-        url="https://github.com/facebookresearch/vrs",
+        url="https://github.com/facebookresearch/pyvrs",
         author="Meta Reality Labs Research",
         license="Apache-2.0",
         install_requires=["numpy", "typing", "dataclasses"],
