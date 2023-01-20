@@ -302,7 +302,7 @@ int RecordFileReader::readFileHeader(
     string fileName =
         "vrs_header_x" + fileSpec.getXXHash() + "_" + to_string(file_->getTotalSize());
     if (fileCache->getFile(fileName, headerCacheFilePath) == 0 &&
-        DiskFile::readFromFile(headerCacheFilePath, &outFileHeader, sizeof(outFileHeader)) == 0 &&
+        DiskFile::readZstdFile(headerCacheFilePath, &outFileHeader, sizeof(outFileHeader)) == 0 &&
         outFileHeader.looksLikeAVRSFile()) {
       openProgressLogger_->logNewStep("Loaded header from cache");
       readHeaderFromCache = true;
@@ -311,7 +311,7 @@ int RecordFileReader::readFileHeader(
   if (!readHeaderFromCache) {
     IF_ERROR_LOG_AND_RETURN(file_->read(outFileHeader));
     if (!headerCacheFilePath.empty()) {
-      DiskFile::writeToFile(headerCacheFilePath, &outFileHeader, sizeof(outFileHeader));
+      DiskFile::writeZstdFile(headerCacheFilePath, &outFileHeader, sizeof(outFileHeader));
     }
   }
   return 0;

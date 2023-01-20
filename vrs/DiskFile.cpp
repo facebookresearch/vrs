@@ -461,7 +461,7 @@ bool DiskFile::isRemoteFileSystem() const {
   return false;
 }
 
-int DiskFile::writeToFile(const string& path, const void* data, size_t dataSize) {
+int DiskFile::writeZstdFile(const string& path, const void* data, size_t dataSize) {
   AtomicDiskFile file;
   IF_ERROR_LOG_AND_RETURN(file.create(path));
   if (dataSize > 0) {
@@ -475,13 +475,13 @@ int DiskFile::writeToFile(const string& path, const void* data, size_t dataSize)
   return SUCCESS;
 }
 
-int DiskFile::writeToFile(const string& path, const string& string) {
-  return writeToFile(path, string.data(), string.size());
+int DiskFile::writeZstdFile(const string& path, const string& string) {
+  return writeZstdFile(path, string.data(), string.size());
 }
 
 namespace {
 template <class T>
-int readFromFileTemplate(const string& path, T& outContent) {
+int readZstdFileTemplate(const string& path, T& outContent) {
   outContent.clear();
   DiskFile file;
   IF_ERROR_LOG_AND_RETURN(file.open(path));
@@ -500,15 +500,15 @@ int readFromFileTemplate(const string& path, T& outContent) {
 }
 } // namespace
 
-int DiskFile::readFromFile(const string& path, vector<char>& outContent) {
-  return readFromFileTemplate(path, outContent);
+int DiskFile::readZstdFile(const string& path, vector<char>& outContent) {
+  return readZstdFileTemplate(path, outContent);
 }
 
-int DiskFile::readFromFile(const string& path, string& outString) {
-  return readFromFileTemplate(path, outString);
+int DiskFile::readZstdFile(const string& path, string& outString) {
+  return readZstdFileTemplate(path, outString);
 }
 
-int DiskFile::readFromFile(const string& path, void* data, size_t dataSize) {
+int DiskFile::readZstdFile(const string& path, void* data, size_t dataSize) {
   DiskFile file;
   IF_ERROR_LOG_AND_RETURN(file.open(path));
   int64_t fileSize = file.getTotalSize();

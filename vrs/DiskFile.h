@@ -122,25 +122,25 @@ class DiskFile : public WriteFileHandler {
 
   /// Helper methods to write a blob of data, or a string, to disk in one shot.
   /// Note that the data is compressed, so that we have high confidence it wasn't edited.
-  static int writeToFile(const string& path, const void* data, size_t dataSize);
-  static int writeToFile(const string& path, const string& string);
+  static int writeZstdFile(const string& path, const void* data, size_t dataSize);
+  static int writeZstdFile(const string& path, const string& string);
   template <typename T, std::enable_if_t<std::is_trivially_copyable<T>::value, int> = 0>
-  int writeToFile(const string& path, const T& object) {
-    return writeToFile(path, &object, sizeof(T));
+  int writeZstdFile(const string& path, const T& object) {
+    return writeZstdFile(path, &object, sizeof(T));
   }
   template <typename T, std::enable_if_t<std::is_trivially_copyable<T>::value, int> = 0>
-  int writeToFile(const string& path, const vector<T>& v) {
-    return writeToFile(path, v.data(), v.size() * sizeof(T));
+  int writeZstdFile(const string& path, const vector<T>& v) {
+    return writeZstdFile(path, v.data(), v.size() * sizeof(T));
   }
-  /// Read a buffer or a string (automatically adjusts the size)
-  static int readFromFile(const string& path, vector<char>& outContent);
-  static int readFromFile(const string& path, string& outString);
+  /// Read a compressed buffer or a string (automatically adjusts the size)
+  static int readZstdFile(const string& path, vector<char>& outContent);
+  static int readZstdFile(const string& path, string& outString);
   template <typename T, std::enable_if_t<std::is_trivially_copyable<T>::value, int> = 0>
-  int readFromFile(const string& path, T& object) {
-    return readFromFile(path, &object, sizeof(T));
+  int readZstdFile(const string& path, T& object) {
+    return readZstdFile(path, &object, sizeof(T));
   }
-  /// Read a buffer of an exact size, fails if the size isn't perfectly right.
-  static int readFromFile(const string& path, void* data, size_t dataSize);
+  /// Read a compressed buffer of an exact size, fails if the size isn't perfectly right.
+  static int readZstdFile(const string& path, void* data, size_t dataSize);
 
   /// Read a local file, expected to contain some text
   /// @param path: local file to read
