@@ -27,9 +27,6 @@ if ("${VRS_SOURCE_DIR}" STREQUAL "")
   # open source layout
   set(VRS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
   set(OSS_DIR "${VRS_SOURCE_DIR}")
-  set(PYVRS_DIR "${VRS_SOURCE_DIR}/pyvrs")
-else()
-  set(PYVRS_DIR "${VRS_SOURCE_DIR}/../../python/pyvrs2")
 endif()
 
 set(CMAKE_MODULE_PATH "${OSS_DIR}/cmake")
@@ -73,9 +70,6 @@ if (BUILD_TOOLS)
 
   # Add the vrsplayer tool
   add_subdirectory(${OSS_DIR}/tools/vrsplayer)
-
-  # Add python binding
-  add_subdirectory(${PYVRS_DIR} pyvrs)
 endif()
 
 if (BUILD_SAMPLES)
