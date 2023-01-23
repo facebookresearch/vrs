@@ -843,11 +843,11 @@ template&lt;&gt; </td></tr>
 string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs.html#af87f451e56851c8a363092ef43203c94">toString</a> (<a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> recordType)</td></tr>
 <tr class="memdesc:af87f451e56851c8a363092ef43203c94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a record type as a text string. <br /></td></tr>
 <tr class="separator:af87f451e56851c8a363092ef43203c94"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:add994ca5b39558f0fb587fd78d7d7537"><td class="memItemLeft" align="right" valign="top"><a id="add994ca5b39558f0fb587fd78d7d7537"></a>
-const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>getNearestRecordByTime</b> (const vector&lt; const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> * &gt; &amp;index, double timestamp, double epsilon)</td></tr>
-<tr class="separator:add994ca5b39558f0fb587fd78d7d7537"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab5bdcf33fcf1525c8e6693db1d07fa45"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs.html#ab5bdcf33fcf1525c8e6693db1d07fa45">getNearestRecordByTime</a> (const std::vector&lt; const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> * &gt; &amp;index, double timestamp, double epsilon)</td></tr>
-<tr class="separator:ab5bdcf33fcf1525c8e6693db1d07fa45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a02b04c867c1dc718c4a6dcc10bfb4cba"><td class="memItemLeft" align="right" valign="top"><a id="a02b04c867c1dc718c4a6dcc10bfb4cba"></a>
+const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>getNearestRecordByTime</b> (const vector&lt; const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> * &gt; &amp;index, double timestamp, double epsilon, <a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> recordType)</td></tr>
+<tr class="separator:a02b04c867c1dc718c4a6dcc10bfb4cba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac001af76fe95d199da74f41548c333b0"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs.html#ac001af76fe95d199da74f41548c333b0">getNearestRecordByTime</a> (const std::vector&lt; const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> * &gt; &amp;index, double timestamp, double epsilon, <a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> recordType=<a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2cea0db45d2a4141101bdfe48e3314cfbca3">Record::Type::UNDEFINED</a>)</td></tr>
+<tr class="separator:ac001af76fe95d199da74f41548c333b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac6c551d97a145be0b888182f3773e240"><td class="memItemLeft" align="right" valign="top"><a id="ac6c551d97a145be0b888182f3773e240"></a>
 string&#160;</td><td class="memItemRight" valign="bottom"><b>toString</b> (<a class="el" href="namespacevrs.html#ae73984aca85d0aa7b6f3406cd9f2f6ea">ContentType</a> contentType)</td></tr>
 <tr class="separator:ac6c551d97a145be0b888182f3773e240"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1717,8 +1717,8 @@ template&lt;class EC &gt; </div>
 
 </div>
 </div>
-<a id="ab5bdcf33fcf1525c8e6693db1d07fa45"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab5bdcf33fcf1525c8e6693db1d07fa45">&#9670;&nbsp;</a></span>getNearestRecordByTime()</h2>
+<a id="ac001af76fe95d199da74f41548c333b0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac001af76fe95d199da74f41548c333b0">&#9670;&nbsp;</a></span>getNearestRecordByTime()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1739,7 +1739,13 @@ template&lt;class EC &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>epsilon</em>&#160;</td>
+          <td class="paramname"><em>epsilon</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a>&#160;</td>
+          <td class="paramname"><em>recordType</em> = <code><a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2cea0db45d2a4141101bdfe48e3314cfbca3">Record::Type::UNDEFINED</a></code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1752,6 +1758,7 @@ template&lt;class EC &gt; </div>
   <table class="params">
     <tr><td class="paramname">timestamp</td><td>timestamp to seek. </td></tr>
     <tr><td class="paramname">epsilon</td><td>the threshold we search for the index. </td></tr>
+    <tr><td class="paramname">recordType</td><td>record type to find, or <a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2cea0db45d2a4141101bdfe48e3314cfbca3" title="don&#39;t use.">Record::Type::UNDEFINED</a> for any record type. </td></tr>
   </table>
   </dd>
 </dl>

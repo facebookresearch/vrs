@@ -172,8 +172,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a15e52455f81858bd3f09655112ad513c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0a4ce7e2786f5fe7d98dd9ef0fccb19b"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#a0a4ce7e2786f5fe7d98dd9ef0fccb19b">getRecordByTime</a> (<a class="el" href="classvrs_1_1_multi_record_file_reader.html#a95c324393b94d95ab8558c25d4c6a999">UniqueStreamId</a> streamId, double timestamp) const</td></tr>
 <tr class="separator:a0a4ce7e2786f5fe7d98dd9ef0fccb19b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4157570a441ba4cb24cacfc6cbb23784"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#a4157570a441ba4cb24cacfc6cbb23784">getNearestRecordByTime</a> (double timestamp, double epsilon, <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a> streamId={}) const</td></tr>
-<tr class="separator:a4157570a441ba4cb24cacfc6cbb23784"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5cd496fba11f07e4919cf48a704d3097"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#a5cd496fba11f07e4919cf48a704d3097">getRecordByTime</a> (<a class="el" href="classvrs_1_1_stream_id.html">StreamId</a> streamId, <a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> recordType, double timestamp) const</td></tr>
+<tr class="separator:a5cd496fba11f07e4919cf48a704d3097"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d8cede54de2802bfb082a0b421f616b"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#a1d8cede54de2802bfb082a0b421f616b">getNearestRecordByTime</a> (double timestamp, double epsilon, <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a> streamId={}, <a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> recordType=<a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2cea0db45d2a4141101bdfe48e3314cfbca3">Record::Type::UNDEFINED</a>) const</td></tr>
+<tr class="separator:a1d8cede54de2802bfb082a0b421f616b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4b16e8bcfce6f5de6178736bb38bb105"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#a4b16e8bcfce6f5de6178736bb38bb105">getFileHandler</a> () const</td></tr>
 <tr class="separator:a4b16e8bcfce6f5de6178736bb38bb105"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2a066c279ebbcba58fa7679bde5e983e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#a95c324393b94d95ab8558c25d4c6a999">UniqueStreamId</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#a2a066c279ebbcba58fa7679bde5e983e">getUniqueStreamId</a> (const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> *record) const</td></tr>
@@ -423,8 +425,8 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a4157570a441ba4cb24cacfc6cbb23784"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4157570a441ba4cb24cacfc6cbb23784">&#9670;&nbsp;</a></span>getNearestRecordByTime()</h2>
+<a id="a1d8cede54de2802bfb082a0b421f616b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d8cede54de2802bfb082a0b421f616b">&#9670;&nbsp;</a></span>getNearestRecordByTime()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -445,7 +447,13 @@ Static Public Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>&#160;</td>
-          <td class="paramname"><em>streamId</em> = <code>{}</code>&#160;</td>
+          <td class="paramname"><em>streamId</em> = <code>{}</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a>&#160;</td>
+          <td class="paramname"><em>recordType</em> = <code><a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2cea0db45d2a4141101bdfe48e3314cfbca3">Record::Type::UNDEFINED</a></code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -459,6 +467,7 @@ Static Public Attributes</h2></td></tr>
     <tr><td class="paramname">timestamp</td><td>timestamp to seek. </td></tr>
     <tr><td class="paramname">epsilon</td><td>the threshold we search for the index. </td></tr>
     <tr><td class="paramname">streamId</td><td><a class="el" href="classvrs_1_1_stream_id.html" title="VRS stream identifier class.">StreamId</a> of the stream to consider. Leave undefined to search all streams </td></tr>
+    <tr><td class="paramname">recordType</td><td>record type to find, or <a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2cea0db45d2a4141101bdfe48e3314cfbca3" title="don&#39;t use.">Record::Type::UNDEFINED</a> for any record type. </td></tr>
   </table>
   </dd>
 </dl>
@@ -604,7 +613,7 @@ Static Public Attributes</h2></td></tr>
 </div>
 </div>
 <a id="a15e52455f81858bd3f09655112ad513c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a15e52455f81858bd3f09655112ad513c">&#9670;&nbsp;</a></span>getRecordByTime() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a15e52455f81858bd3f09655112ad513c">&#9670;&nbsp;</a></span>getRecordByTime() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -628,8 +637,51 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a5cd496fba11f07e4919cf48a704d3097"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5cd496fba11f07e4919cf48a704d3097">&#9670;&nbsp;</a></span>getRecordByTime() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> * vrs::MultiRecordFileReader::getRecordByTime </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>&#160;</td>
+          <td class="paramname"><em>streamId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a>&#160;</td>
+          <td class="paramname"><em>recordType</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>timestamp</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Find the first record of a specific stream of a specific type at or after a timestamp. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">streamId</td><td><a class="el" href="classvrs_1_1_stream_id.html" title="VRS stream identifier class.">StreamId</a> of the stream to consider. </td></tr>
+    <tr><td class="paramname">recordType</td><td>record type to find. </td></tr>
+    <tr><td class="paramname">timestamp</td><td>timestamp to seek. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Pointer to the record info, or nullptr (timestamp is too big?). </dd></dl>
+
+</div>
+</div>
 <a id="a0a4ce7e2786f5fe7d98dd9ef0fccb19b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0a4ce7e2786f5fe7d98dd9ef0fccb19b">&#9670;&nbsp;</a></span>getRecordByTime() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a0a4ce7e2786f5fe7d98dd9ef0fccb19b">&#9670;&nbsp;</a></span>getRecordByTime() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
