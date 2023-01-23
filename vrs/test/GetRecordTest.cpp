@@ -274,4 +274,12 @@ TEST_F(GetRecordTester, GetRecordTest) {
   for (uint32_t i = 0; i < index.size(); i++) {
     checkIndex(file, i);
   }
+
+  rec = file.getRecordByTime(Record::Type::CONFIGURATION, nextafter(startTime, startTime + 1));
+  auto r = file.getNearestRecordByTime(rec->timestamp, 1e-6, {}, Record::Type::CONFIGURATION);
+  EXPECT_NE(r, nullptr);
+  r = file.getNearestRecordByTime(rec->timestamp, 1e-6, {}, Record::Type::DATA);
+  EXPECT_EQ(r, nullptr);
+  r = file.getNearestRecordByTime(rec->timestamp, 1, {}, Record::Type::DATA);
+  EXPECT_EQ(r, nullptr);
 }

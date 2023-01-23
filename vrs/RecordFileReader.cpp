@@ -666,11 +666,12 @@ const IndexRecord::RecordInfo* RecordFileReader::getRecordByTime(
 const IndexRecord::RecordInfo* RecordFileReader::getNearestRecordByTime(
     double timestamp,
     double epsilon,
-    StreamId streamId) const {
+    StreamId streamId,
+    Record::Type recordType) const {
   // If stream id is undefined, we search for all the streams.
   if (streamId.isValid()) {
     const vector<const IndexRecord::RecordInfo*>& index = getIndex(streamId);
-    return vrs::getNearestRecordByTime(index, timestamp, epsilon);
+    return vrs::getNearestRecordByTime(index, timestamp, epsilon, recordType);
   }
 
   const IndexRecord::RecordInfo* nearest = nullptr;
@@ -680,8 +681,10 @@ const IndexRecord::RecordInfo* RecordFileReader::getNearestRecordByTime(
   auto start = (lowerBound == recordIndex_.begin()) ? lowerBound : lowerBound - 1;
   auto end = (lowerBound == recordIndex_.end()) ? lowerBound : lowerBound + 1;
   for (auto iter = start; iter != end; iter++) {
-    double diff = abs((*iter).timestamp - timestamp);
-    if (diff <= epsilon && (nearest == nullptr || diff < abs(nearest->timestamp - timestamp))) {
+    double diff = std::abs((*iter).timestamp - timestamp);
+    if (diff <= epsilon &&
+        (nearest == nullptr || diff < std::abs(nearest->timestamp - timestamp)) &&
+        (recordType == Record::Type::UNDEFINED || iter->recordType == recordType)) {
       nearest = &(*iter);
     }
   }
@@ -1078,7 +1081,8 @@ int RecordFileReader::readRecord(
 const IndexRecord::RecordInfo* getNearestRecordByTime(
     const vector<const IndexRecord::RecordInfo*>& index,
     double timestamp,
-    double epsilon) {
+    double epsilon,
+    Record::Type recordType) {
   const IndexRecord::RecordInfo* nearest = nullptr;
   const IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type());
   auto lowerBound = lower_bound(index.begin(), index.end(), &firstTime, ptrTimeCompare);
@@ -1086,8 +1090,10 @@ const IndexRecord::RecordInfo* getNearestRecordByTime(
   auto start = (lowerBound == index.begin()) ? lowerBound : lowerBound - 1;
   auto end = (lowerBound == index.end()) ? lowerBound : lowerBound + 1;
   for (auto iter = start; iter != end; iter++) {
-    double diff = abs((*iter)->timestamp - timestamp);
-    if (diff <= epsilon && (nearest == nullptr || diff < abs(nearest->timestamp - timestamp))) {
+    double diff = std::abs((*iter)->timestamp - timestamp);
+    if (diff <= epsilon &&
+        (nearest == nullptr || diff < std::abs(nearest->timestamp - timestamp)) &&
+        (recordType == Record::Type::UNDEFINED || (*iter)->recordType == recordType)) {
       nearest = *iter;
     }
   }

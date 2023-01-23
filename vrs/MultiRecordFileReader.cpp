@@ -510,15 +510,34 @@ const IndexRecord::RecordInfo* MultiRecordFileReader::getRecordByTime(
   return reader->getRecordByTime(streamIdReaderPair->first, timestamp);
 }
 
-const IndexRecord::RecordInfo* MultiRecordFileReader::getNearestRecordByTime(
-    double timestamp,
-    double epsilon,
-    StreamId streamId) const {
+const IndexRecord::RecordInfo* MultiRecordFileReader::getRecordByTime(
+    StreamId streamId,
+    Record::Type recordType,
+    double timestamp) const {
   if (!isOpened_) {
     return nullptr;
   }
   if (hasSingleFile()) {
-    return readers_.front()->getNearestRecordByTime(timestamp, epsilon, streamId);
+    return readers_.front()->getRecordByTime(streamId, recordType, timestamp);
+  }
+  const StreamIdReaderPair* streamIdReaderPair = getStreamIdReaderPair(streamId);
+  if (streamIdReaderPair == nullptr) {
+    return nullptr;
+  }
+  const RecordFileReader* reader = streamIdReaderPair->second;
+  return reader->getRecordByTime(streamIdReaderPair->first, recordType, timestamp);
+}
+
+const IndexRecord::RecordInfo* MultiRecordFileReader::getNearestRecordByTime(
+    double timestamp,
+    double epsilon,
+    StreamId streamId,
+    Record::Type recordType) const {
+  if (!isOpened_) {
+    return nullptr;
+  }
+  if (hasSingleFile()) {
+    return readers_.front()->getNearestRecordByTime(timestamp, epsilon, streamId, recordType);
   }
   if (streamId.isValid()) {
     const StreamIdReaderPair* streamIdReaderPair = getStreamIdReaderPair(streamId);
@@ -526,10 +545,11 @@ const IndexRecord::RecordInfo* MultiRecordFileReader::getNearestRecordByTime(
       return nullptr;
     }
     const RecordFileReader* reader = streamIdReaderPair->second;
-    return reader->getNearestRecordByTime(timestamp, epsilon, streamIdReaderPair->first);
+    return reader->getNearestRecordByTime(
+        timestamp, epsilon, streamIdReaderPair->first, recordType);
   }
 
-  return vrs::getNearestRecordByTime(*recordIndex_, timestamp, epsilon);
+  return vrs::getNearestRecordByTime(*recordIndex_, timestamp, epsilon, recordType);
 }
 
 unique_ptr<FileHandler> MultiRecordFileReader::getFileHandler() const {

@@ -309,9 +309,13 @@ class RecordFileReader {
   /// @param timestamp: timestamp to seek.
   /// @param epsilon: the threshold we search for the index.
   /// @param streamId: StreamId of the stream to consider. Leave undefined to search all streams
+  /// @param recordType: record type to find, or Record::Type::UNDEFINED for any record type.
   /// @return Pointer to the record info, or nullptr (timestamp is too big?).
-  const IndexRecord::RecordInfo*
-  getNearestRecordByTime(double timestamp, double epsilon, StreamId streamId = {}) const;
+  const IndexRecord::RecordInfo* getNearestRecordByTime(
+      double timestamp,
+      double epsilon,
+      StreamId streamId = {},
+      Record::Type recordType = Record::Type::UNDEFINED) const;
 
   /// Get a record's index in the global index.
   /// @param record: pointer of the record.
@@ -541,10 +545,12 @@ class RecordFileReader {
 /// the range of (timestamp - epsilon) - (timestamp + epsilon).
 /// @param timestamp: timestamp to seek.
 /// @param epsilon: the threshold we search for the index.
+/// @param recordType: record type to find, or Record::Type::UNDEFINED for any record type.
 /// @return Pointer to the record info, or nullptr (timestamp is too big?).
 const IndexRecord::RecordInfo* getNearestRecordByTime(
     const std::vector<const IndexRecord::RecordInfo*>& index,
     double timestamp,
-    double epsilon);
+    double epsilon,
+    Record::Type recordType = Record::Type::UNDEFINED);
 
 } // namespace vrs

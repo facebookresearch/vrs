@@ -338,14 +338,26 @@ class MultiRecordFileReader {
   /// @return Pointer to the record info, or nullptr (timestamp is too big?).
   const IndexRecord::RecordInfo* getRecordByTime(UniqueStreamId streamId, double timestamp) const;
 
+  /// Find the first record of a specific stream of a specific type at or after a timestamp.
+  /// @param streamId: StreamId of the stream to consider.
+  /// @param recordType: record type to find.
+  /// @param timestamp: timestamp to seek.
+  /// @return Pointer to the record info, or nullptr (timestamp is too big?).
+  const IndexRecord::RecordInfo*
+  getRecordByTime(StreamId streamId, Record::Type recordType, double timestamp) const;
+
   /// Find the nearest record of a specific stream within
   /// the range of (timestamp - epsilon) - (timestamp + epsilon).
   /// @param timestamp: timestamp to seek.
   /// @param epsilon: the threshold we search for the index.
   /// @param streamId: StreamId of the stream to consider. Leave undefined to search all streams
+  /// @param recordType: record type to find, or Record::Type::UNDEFINED for any record type.
   /// @return Pointer to the record info, or nullptr (timestamp is too big?).
-  const IndexRecord::RecordInfo*
-  getNearestRecordByTime(double timestamp, double epsilon, StreamId streamId = {}) const;
+  const IndexRecord::RecordInfo* getNearestRecordByTime(
+      double timestamp,
+      double epsilon,
+      StreamId streamId = {},
+      Record::Type recordType = Record::Type::UNDEFINED) const;
 
   /// Get a clone of the current file handler, for use elsewhere.
   /// @return A copy of the current file handler.
