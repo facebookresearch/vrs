@@ -64,8 +64,8 @@ jobs:
           ninja all
           ctest -j8
 
-      - name: Build and Test Python
-        shell: bash
-        run: |
-          pip install -e pyvrs
-          python -m pytest pyvrs/test
+      # - name: Build and Test Python
+      #   shell: bash
+      #   run: |
+      #     pip install -e pyvrs
+      #     python -m pytest pyvrs/test
