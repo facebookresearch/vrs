@@ -39,8 +39,13 @@ using namespace std;
 namespace {
 using vrs::CachingStrategy;
 
-const char* sCachingStrategyNames[] =
-    {"Undefined", "Passive", "Streaming", "StreamingBidirectional", "ReleaseAfterRead"};
+const char* sCachingStrategyNames[] = {
+    "Undefined",
+    "Passive",
+    "Streaming",
+    "StreamingBidirectional",
+    "StreamingBackward",
+    "ReleaseAfterRead"};
 struct CachingStrategyConverter : public EnumStringConverter<
                                       CachingStrategy,
                                       sCachingStrategyNames,

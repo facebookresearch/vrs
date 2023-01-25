@@ -39,6 +39,7 @@ enum class CachingStrategy {
   Streaming, ///< Automatically download data "forward", using last read-request as a hint.
   StreamingBidirectional, ///< Automatically download data "forward" and "backward", using last
                           ///< read-request as a hint.
+  StreamingBackward, ///< Automatically download data "backward", using last read-request as a hint.
   ReleaseAfterRead, ///< Same as "Passive" but release used cache blocks immediately after read.
 
   COUNT
