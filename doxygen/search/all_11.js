@@ -72,11 +72,12 @@ var searchData=
   ['stereoaudiorecordableclass_763',['StereoAudioRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a705e8d05e43ae1c71dc6cb56c7e7616a',1,'vrs']]],
   ['streamid_764',['StreamId',['../classvrs_1_1_stream_id.html',1,'vrs::StreamId'],['../structvrs_1_1_index_record_1_1_record_info.html#a7ed65599d1b99b934f8df461b4b898a6',1,'vrs::IndexRecord::RecordInfo::streamId()']]],
   ['streaming_765',['Streaming',['../namespacevrs.html#acb1b4358038394407db2b2dc6200afaeaac21d502848247aa2f578d0f718f5d1d',1,'vrs']]],
-  ['streamingbidirectional_766',['StreamingBidirectional',['../namespacevrs.html#acb1b4358038394407db2b2dc6200afaea02c8e5bdc421c350b1a6a698ae5d4540',1,'vrs']]],
-  ['streamplayer_767',['StreamPlayer',['../classvrs_1_1_stream_player.html',1,'vrs']]],
-  ['streamplayerdemo_768',['StreamPlayerDemo',['../classvrs__sample__code_1_1_stream_player_demo.html',1,'vrs_sample_code']]],
-  ['streamtags_769',['StreamTags',['../structvrs_1_1_stream_tags.html',1,'vrs']]],
-  ['string_770',['String',['../namespacevrs.html#afb0b040e753b40173e69f247afa430a2a27118326006d3829667a400ad23d5d98',1,'vrs']]],
-  ['stringmap_771',['StringMap',['../namespacevrs.html#afb0b040e753b40173e69f247afa430a2aa217c0217d4330b7b43ec310cba690f1',1,'vrs']]],
-  ['syncrecordableclass_772',['SyncRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a9c5afd3ac39708896bb42a674d0c7b32',1,'vrs']]]
+  ['streamingbackward_766',['StreamingBackward',['../namespacevrs.html#acb1b4358038394407db2b2dc6200afaeae3cb7042f6a2a56c14df0f764735000b',1,'vrs']]],
+  ['streamingbidirectional_767',['StreamingBidirectional',['../namespacevrs.html#acb1b4358038394407db2b2dc6200afaea02c8e5bdc421c350b1a6a698ae5d4540',1,'vrs']]],
+  ['streamplayer_768',['StreamPlayer',['../classvrs_1_1_stream_player.html',1,'vrs']]],
+  ['streamplayerdemo_769',['StreamPlayerDemo',['../classvrs__sample__code_1_1_stream_player_demo.html',1,'vrs_sample_code']]],
+  ['streamtags_770',['StreamTags',['../structvrs_1_1_stream_tags.html',1,'vrs']]],
+  ['string_771',['String',['../namespacevrs.html#afb0b040e753b40173e69f247afa430a2a27118326006d3829667a400ad23d5d98',1,'vrs']]],
+  ['stringmap_772',['StringMap',['../namespacevrs.html#afb0b040e753b40173e69f247afa430a2aa217c0217d4330b7b43ec310cba690f1',1,'vrs']]],
+  ['syncrecordableclass_773',['SyncRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a9c5afd3ac39708896bb42a674d0c7b32',1,'vrs']]]
 ];
