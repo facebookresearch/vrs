@@ -69,7 +69,7 @@ using ImageSpecType = uint32_t;
 /// though it is guarantied to be the last one of that format.
 ///
 /// Note that the values used are *not* static, so that if the configuration changes,
-/// the lastest value is used, without having to search each time we have a new image block.
+/// the latest value is used, without having to search each time we have a new image block.
 class ImageSpec : public AutoDataLayout {
  public:
   DataPieceValue<ImageSpecType> width{kImageWidth};
@@ -136,7 +136,7 @@ constexpr const char* kAudioSampleCount = "audio_sample_count";
 /// the next time around, the same *location* will be used again.
 ///
 /// Note that the values used are *not* static, so that if the configuration changes,
-/// the lastest value is used, without having to search each time we have a new image block.
+/// the latest value is used, without having to search each time we have a new image block.
 class AudioSpec : public AutoDataLayout {
  public:
   DataPieceEnum<AudioSampleFormat, uint8_t> sampleType{kAudioSampleFormat};

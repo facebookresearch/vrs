@@ -272,7 +272,7 @@ class FileHandler {
   /// read, until enough data can be read.
   /// @param buffer: a buffer to the bytes to write.
   /// @param length: the number of bytes to write.
-  /// @return A status code, 0 meaning success and length bytes were successfuly read.
+  /// @return A status code, 0 meaning success and length bytes were successfully read.
   virtual int read(void* buffer, size_t length) = 0;
   /// Helper to read trivially copyable objects, in a chunk aware way.
   template <typename T, std::enable_if_t<std::is_trivially_copyable<T>::value, int> = 0>
@@ -312,7 +312,7 @@ class FileHandler {
   virtual int getChunkRange(int64_t& outChunkOffset, int64_t& outChunkSize) const = 0;
 
   /// Set caching strategy.
-  /// @param CachingStragy: Caching strategy desired.
+  /// @param CachingStrategy: Caching strategy desired.
   /// @return True if the caching strategy was set.
   /// False if the file handler doesn't support the requested strategy, or any particular strategy.
   virtual bool setCachingStrategy(CachingStrategy /*cachingStrategy*/) {

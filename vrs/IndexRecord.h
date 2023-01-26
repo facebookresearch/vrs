@@ -227,7 +227,7 @@ class Reader {
   ProgressLogger* progressLogger_;
   set<StreamId>& streamIds_;
   vector<RecordInfo>& index_;
-  unique_ptr<deque<IndexRecord::DiskRecordInfo>> diskIndex_; // only when rewritting the index
+  unique_ptr<deque<IndexRecord::DiskRecordInfo>> diskIndex_; // only when rewriting the index
   bool indexComplete_;
   bool hasSplitHeadChunk_;
   int32_t sortErrorCount_;

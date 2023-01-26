@@ -245,7 +245,7 @@ class RecordFileReader {
   /// @return The number of records of the specified stream.
   uint32_t getRecordCount(StreamId streamId) const;
 
-  /// Get the number of records for a specific stream and specifc record type.
+  /// Get the number of records for a specific stream and specific record type.
   /// Attention: this computation has a linear complexity, so cache the result!
   /// @param streamId: StreamId of the record stream to consider.
   /// @param recordType: Type of records to count.
@@ -410,7 +410,7 @@ class RecordFileReader {
 
   /// Get a stream's serial number.
   /// When streams are created, they are assigned a unique serial number by their Recordable object.
-  /// That serial number is universaly unique and it will be preserved during file copies, file
+  /// That serial number is universally unique and it will be preserved during file copies, file
   /// processing, and other manipulations that preserve stream tags.
   /// @param streamId: StreamId of the record stream to consider.
   /// @return The stream's serial number, or the empty string if the stream ID is not

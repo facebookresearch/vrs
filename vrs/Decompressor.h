@@ -41,7 +41,7 @@ class Decompressor {
 
   /// Decompress a maximum of destinationSize bytes of data, at the pointed to destination,
   /// and return the number of bytes read in outReadSize.
-  /// @return 0 if no error occured, a file system error code otherwise.
+  /// @return 0 if no error occurred, a file system error code otherwise.
   int decompress(void* destination, uint32_t destinationSize, uint32_t& outReadSize);
 
   /// Get a buffer of a specific size where to write the data to be decoded.
@@ -76,7 +76,7 @@ class Decompressor {
   /// a compressed frame. Note that the file might be read past the end of the compressed frame, but
   /// not beyond the incoming value of inOutMaxReadSize. So when reading successive frames, do not
   /// reset the compression object between frames. Instead, just call initFrame again, after
-  /// successfuly reading a frame.
+  /// successfully reading a frame.
   int initFrame(FileHandler& file, size_t& outFrameSize, size_t& inOutMaxReadSize);
   /// Read a compressed frame, all at once.
   /// @param file: A file open for reading, at the position of the frame.

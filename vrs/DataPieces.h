@@ -38,7 +38,7 @@ struct JsonWrapper;
 
 /// \brief Abstract class representing a piece of information part of a DataLayout.
 ///
-/// DataPiece objets have a type (DataPieceType) and label (a text name),
+/// DataPiece objects have a type (DataPieceType) and label (a text name),
 /// which together are enough to identify uniquely a DataPiece of a particular DataLayout.
 /// See DataLayout for more details.
 class DataPiece {

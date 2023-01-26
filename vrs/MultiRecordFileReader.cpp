@@ -452,7 +452,7 @@ bool MultiRecordFileReader::prefetchRecordSequence(
   if (!isOpened_) {
     return false;
   }
-  // Split the input prefetch sequence into sequences correponding to each underlying Reader
+  // Split the input prefetch sequence into sequences corresponding to each underlying Reader
   map<RecordFileReader*, vector<const IndexRecord::RecordInfo*>> readerPrefetchSequenceMap;
   for (const auto* prefetchRecord : records) {
     RecordFileReader* reader = getReader(prefetchRecord);

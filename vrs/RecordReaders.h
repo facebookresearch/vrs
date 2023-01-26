@@ -73,7 +73,7 @@ class RecordReader {
   /// Discard any unread data.
   virtual void finish() {}
 
-  /// Tell how many bytes of record data haven't been read/consummed yet.
+  /// Tell how many bytes of record data haven't been read/consumed yet.
   /// @return Number of unread bytes (uncompressed).
   uint32_t getUnreadBytes() const {
     return remainingUncompressedSize_;

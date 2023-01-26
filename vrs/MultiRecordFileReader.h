@@ -120,7 +120,7 @@ class MultiRecordFileReader {
   /// @return The number of records of the specified stream.
   uint32_t getRecordCount(UniqueStreamId uniqueStreamId) const;
 
-  /// Get the number of records for a specific stream and specifc record type.
+  /// Get the number of records for a specific stream and specific record type.
   /// Attention: this computation has a linear complexity, so cache the result!
   /// @param uniqueStreamId: StreamId of the record stream to consider.
   /// @param recordType: Type of records to count.
@@ -198,13 +198,13 @@ class MultiRecordFileReader {
   /// Call isValid() to know if a matching stream was actually found.
   UniqueStreamId getStreamForSerialNumber(const string& serialNumber) const;
 
-  /// Get a record's index in the global index, which is orderd by timestamp across all open files.
+  /// Get a record's index in the global index, which is ordered by timestamp across all open files.
   /// @param record: Pointer of the record.
   /// @return Index in the global index, or getRecordCount() is record is nullptr or an invalid
   /// pointer.
   uint32_t getRecordIndex(const IndexRecord::RecordInfo* record) const;
 
-  /// Get the record correponding to the given index position in the global index.
+  /// Get the record corresponding to the given index position in the global index.
   /// @param globalIndex: Position in the global index to look up.
   /// @return Corresponding record if present or nullptr if the given index is invalid.
   const IndexRecord::RecordInfo* getRecord(uint32_t globalIndex) const;
@@ -251,7 +251,7 @@ class MultiRecordFileReader {
   /// Hook a stream player to a specific stream after opening a file and before reading records.
   /// The file player does *not* take ownership of the StreamPlayer.
   /// Using the same StreamPlayer instance for multiple streams is supported.
-  /// So the caller is responsible for deleting the StreamPlayer objets after the file is read.
+  /// So the caller is responsible for deleting the StreamPlayer objects after the file is read.
   /// Disconnect the StreamPlayer by passing a nullptr for the stream id.
   /// @param streamId: UniqueStreamId to hook the stream player to.
   /// @param streamPlayer: StreamPlayer to attach.
@@ -273,7 +273,7 @@ class MultiRecordFileReader {
 
   /// Set Caching strategy for all the underlying file handlers.
   /// This should be called *after* opening the files, as open might replace the file handler.
-  /// @param cachingStragy: Caching strategy desired.
+  /// @param cachingStrategy: Caching strategy desired.
   /// @return True if the caching strategy was set.
   /// False if any of the underlying file handlers doesn't support the requested strategy, or any
   /// particular strategy.

@@ -143,7 +143,7 @@ struct JsonFormatProfileSpec {
 /// Note: You can not use DataLayout template types with your own POD types, because:
 ///  1. DataLayout needs a factory able to instantiate them, even when your code isn't around,
 ///  2. it would defeat the purpose of handling format changes, as any change made to your
-///  POD type would have to be versionned & managed by hand.
+///  POD type would have to be versioned & managed by hand.
 ///
 /// Variable-size DataPiece objects use a number of bytes that depends on their actual value:
 /// - DataPieceVector<T>: a vector of any of the supported POD types, or std::string.

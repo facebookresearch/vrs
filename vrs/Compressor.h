@@ -94,7 +94,7 @@ class Compressor {
 
   /// Frame compression APIs, with streaming to a file.
   /// Write to a file a block of data (a "frame") to be compressed. That data will be logically self
-  /// contained, and its size will be retrivable when decoding the first byte. The frame can be
+  /// contained, and its size will be retrievable when decoding the first byte. The frame can be
   /// added in multiple calls, making it easy to write a lot of data without needing large
   /// intermediate buffers.
   ///
@@ -106,7 +106,7 @@ class Compressor {
   int startFrame(size_t frameSize, CompressionPreset zstdPreset, uint32_t& outSize);
   /// Add data to a frame started before.
   /// The total amount of data may not exceed the declared size of the frame when it was started.
-  /// @param file: A file open for writting.
+  /// @param file: A file open for writing.
   /// @param data: A pointer to the data to add to the frame.
   /// @param dataSize: Number of bytes to add to the frame.
   /// @param inOutCompressedSize: Updated number of bytes written out to the file.
@@ -123,7 +123,7 @@ class Compressor {
       size_t maxCompressedSize = 0);
   /// Write out all the data left in internal compression buffers to disk, and complete the frame.
   /// After this call has been made, a new frame maybe started.
-  /// @param file: A file open for writting.
+  /// @param file: A file open for writing.
   /// @param inOutCompressedSize: Updated number of bytes written out to the file.
   /// @param maxCompressedSize: Max number of bytes the compressed record may get. Fail if the
   /// compressed data is larger, while guarantying that fewer bytes have been written to disk.
