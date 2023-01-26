@@ -125,7 +125,7 @@ static_assert(
     static_cast<int>(PixelFormat::YUV_I420_SPLIT) == 5,
     "PixelFormat enum values CHANGED!");
 static_assert(static_cast<int>(PixelFormat::RGBA8) == 6, "PixelFormat enum values CHANGED!");
-static_assert(static_cast<int>(PixelFormat::GREY10) == 9, "PixelFormatt enum values CHANGED!");
+static_assert(static_cast<int>(PixelFormat::GREY10) == 9, "PixelFormat enum values CHANGED!");
 static_assert(static_cast<int>(PixelFormat::RGB32F) == 12, "PixelFormat enum values CHANGED!");
 static_assert(static_cast<int>(PixelFormat::YUY2) == 14, "PixelFormat enum values CHANGED!");
 static_assert(static_cast<int>(PixelFormat::RGBA32F) == 16, "PixelFormat enum values CHANGED!");
@@ -419,7 +419,7 @@ uint8_t ImageContentBlockSpec::getChannelCountPerPixel(PixelFormat pixel) {
     case PixelFormat::RAW10_BAYER_RGGB:
     case PixelFormat::RAW10_BAYER_BGGR:
     case PixelFormat::RAW10:
-      return 1; // greyscale, or "depth", or any form of single numeric value per pixel
+      return 1; // grayscale, or "depth", or any form of single numeric value per pixel
     case PixelFormat::BGR8:
     case PixelFormat::RGB8:
     case PixelFormat::RGB10:
@@ -490,7 +490,7 @@ uint32_t ImageContentBlockSpec::getPlaneCount(PixelFormat pixelFormat) {
 uint32_t ImageContentBlockSpec::getPlaneStride(uint32_t planeIndex) const {
   if (pixelFormat_ == PixelFormat::YUV_I420_SPLIT) {
     if (planeIndex == 0) {
-      // The first block uses 1 byte-per-pixel, and a width which might be overidden by stride_
+      // The first block uses 1 byte-per-pixel, and a width which might be overridden by stride_
       return (stride_ > 0 ? stride_ : getWidth());
     } else if (planeIndex < 3) {
       // second and third planes use one byte per 2-2 squares: half the width, half the height
