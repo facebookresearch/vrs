@@ -165,7 +165,7 @@ static const size_t&#160;</td><td class="memItemRight" valign="bottom"><b>kMinBy
 </div><div class="memdoc">
 <p>Add data to a frame started before. The total amount of data may not exceed the declared size of the frame when it was started. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">file</td><td>A file open for writting. </td></tr>
+    <tr><td class="paramname">file</td><td>A file open for writing. </td></tr>
     <tr><td class="paramname">data</td><td>A pointer to the data to add to the frame. </td></tr>
     <tr><td class="paramname">dataSize</td><td>Number of bytes to add to the frame. </td></tr>
     <tr><td class="paramname">inOutCompressedSize</td><td>Updated number of bytes written out to the file. </td></tr>
@@ -253,7 +253,7 @@ static const size_t&#160;</td><td class="memItemRight" valign="bottom"><b>kMinBy
 </div><div class="memdoc">
 <p>Write out all the data left in internal compression buffers to disk, and complete the frame. After this call has been made, a new frame maybe started. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">file</td><td>A file open for writting. </td></tr>
+    <tr><td class="paramname">file</td><td>A file open for writing. </td></tr>
     <tr><td class="paramname">inOutCompressedSize</td><td>Updated number of bytes written out to the file. </td></tr>
     <tr><td class="paramname">maxCompressedSize</td><td>Max number of bytes the compressed record may get. Fail if the compressed data is larger, while guarantying that fewer bytes have been written to disk. </td></tr>
   </table>
@@ -320,7 +320,7 @@ static const size_t&#160;</td><td class="memItemRight" valign="bottom"><b>kMinBy
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Frame compression APIs, with streaming to a file. Write to a file a block of data (a "frame") to be compressed. That data will be logically self contained, and its size will be retrivable when decoding the first byte. The frame can be added in multiple calls, making it easy to write a lot of data without needing large intermediate buffers.</p>
+<p>Frame compression APIs, with streaming to a file. Write to a file a block of data (a "frame") to be compressed. That data will be logically self contained, and its size will be retrievable when decoding the first byte. The frame can be added in multiple calls, making it easy to write a lot of data without needing large intermediate buffers.</p>
 <p>Start a new frame, declaring its full size upfront. This size must be respected. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">frameSize</td><td>exact number of bytes that will be added to the frame in total. </td></tr>

@@ -523,7 +523,7 @@ Static Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get the record correponding to the given index position in the global index. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Get the record corresponding to the given index position in the global index. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">globalIndex</td><td>Position in the global index to look up. </td></tr>
   </table>
@@ -784,7 +784,7 @@ Static Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get the number of records for a specific stream and specifc record type. Attention: this computation has a linear complexity, so cache the result! </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Get the number of records for a specific stream and specific record type. Attention: this computation has a linear complexity, so cache the result! </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">uniqueStreamId</td><td><a class="el" href="classvrs_1_1_stream_id.html" title="VRS stream identifier class.">StreamId</a> of the record stream to consider. </td></tr>
     <tr><td class="paramname">recordType</td><td>Type of records to count. </td></tr>
@@ -846,7 +846,7 @@ Static Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get a record's index in the global index, which is orderd by timestamp across all open files. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Get a record's index in the global index, which is ordered by timestamp across all open files. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">record</td><td>Pointer of the record. </td></tr>
   </table>
@@ -1523,7 +1523,7 @@ Static Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Set Caching strategy for all the underlying file handlers. This should be called <em>after</em> opening the files, as open might replace the file handler. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">cachingStragy</td><td>Caching strategy desired. </td></tr>
+    <tr><td class="paramname">cachingStrategy</td><td>Caching strategy desired. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1556,7 +1556,7 @@ Static Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Hook a stream player to a specific stream after opening a file and before reading records. The file player does <em>not</em> take ownership of the <a class="el" href="classvrs_1_1_stream_player.html" title="Class designed to receive record data when reading a VRS file.">StreamPlayer</a>. Using the same <a class="el" href="classvrs_1_1_stream_player.html" title="Class designed to receive record data when reading a VRS file.">StreamPlayer</a> instance for multiple streams is supported. So the caller is responsible for deleting the <a class="el" href="classvrs_1_1_stream_player.html" title="Class designed to receive record data when reading a VRS file.">StreamPlayer</a> objets after the file is read. Disconnect the <a class="el" href="classvrs_1_1_stream_player.html" title="Class designed to receive record data when reading a VRS file.">StreamPlayer</a> by passing a nullptr for the stream id. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Hook a stream player to a specific stream after opening a file and before reading records. The file player does <em>not</em> take ownership of the <a class="el" href="classvrs_1_1_stream_player.html" title="Class designed to receive record data when reading a VRS file.">StreamPlayer</a>. Using the same <a class="el" href="classvrs_1_1_stream_player.html" title="Class designed to receive record data when reading a VRS file.">StreamPlayer</a> instance for multiple streams is supported. So the caller is responsible for deleting the <a class="el" href="classvrs_1_1_stream_player.html" title="Class designed to receive record data when reading a VRS file.">StreamPlayer</a> objects after the file is read. Disconnect the <a class="el" href="classvrs_1_1_stream_player.html" title="Class designed to receive record data when reading a VRS file.">StreamPlayer</a> by passing a nullptr for the stream id. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">streamId</td><td>UniqueStreamId to hook the stream player to. </td></tr>
     <tr><td class="paramname">streamPlayer</td><td><a class="el" href="classvrs_1_1_stream_player.html" title="Class designed to receive record data when reading a VRS file.">StreamPlayer</a> to attach. </td></tr>

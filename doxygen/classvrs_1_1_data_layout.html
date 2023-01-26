@@ -337,7 +337,7 @@ Anatomy of a DataLayout</h1>
 <p>DataPieceValue&lt;T&gt; and DataPieceArray&lt;T&gt; are the two fixed size <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> template classes.</p>
 <p>Note: You can not use <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> template types with your own POD types, because:</p><ol type="1">
 <li><a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> needs a factory able to instantiate them, even when your code isn't around,</li>
-<li>it would defeat the purpose of handling format changes, as any change made to your POD type would have to be versionned &amp; managed by hand.</li>
+<li>it would defeat the purpose of handling format changes, as any change made to your POD type would have to be versioned &amp; managed by hand.</li>
 </ol>
 <p>Variable-size <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> objects use a number of bytes that depends on their actual value:</p><ul>
 <li>DataPieceVector&lt;T&gt;: a vector of any of the supported POD types, or std::string.</li>
