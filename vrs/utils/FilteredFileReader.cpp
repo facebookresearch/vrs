@@ -552,7 +552,7 @@ void FilteredFileReader::preRollConfigAndState(RecordReaderFunc recordReaderFunc
   vector<size_t> indexes;
   const auto& records = reader.getIndex();
   // to compare: only the timestamps matters!
-  IndexRecord::RecordInfo firstTime(filter.minTime, 0, StreamId(), Record::Type());
+  IndexRecord::RecordInfo firstTime(filter.minTime, 0, StreamId(), Record::Type::UNDEFINED);
   auto lowerBound = lower_bound(records.begin(), records.end(), firstTime);
   if (lowerBound != records.end()) {
     size_t index = static_cast<size_t>(lowerBound - records.begin()); // guaranteed positive
@@ -641,7 +641,7 @@ void FilteredFileReader::iterateAdvanced(
   }
 
   const auto& records = reader.getIndex();
-  IndexRecord::RecordInfo firstTime(filter.minTime, 0, StreamId(), Record::Type());
+  IndexRecord::RecordInfo firstTime(filter.minTime, 0, StreamId(), Record::Type::UNDEFINED);
   auto lowerBound = lower_bound(records.begin(), records.end(), firstTime);
   if (lowerBound != records.end()) {
     size_t first = static_cast<size_t>(lowerBound - records.begin());

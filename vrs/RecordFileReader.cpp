@@ -605,7 +605,7 @@ static bool timeCompare(const IndexRecord::RecordInfo& lhs, const IndexRecord::R
 }
 
 const IndexRecord::RecordInfo* RecordFileReader::getRecordByTime(double timestamp) const {
-  IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type());
+  IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type::UNDEFINED);
   auto lowerBound = lower_bound(recordIndex_.begin(), recordIndex_.end(), firstTime, timeCompare);
   if (lowerBound != recordIndex_.end()) {
     return &*lowerBound;
@@ -616,7 +616,7 @@ const IndexRecord::RecordInfo* RecordFileReader::getRecordByTime(double timestam
 const IndexRecord::RecordInfo* RecordFileReader::getRecordByTime(
     Record::Type recordType,
     double timestamp) const {
-  IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type());
+  IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type::UNDEFINED);
   auto lowerBound = lower_bound(recordIndex_.begin(), recordIndex_.end(), firstTime, timeCompare);
   while (lowerBound != recordIndex_.end() && lowerBound->recordType != recordType) {
     ++lowerBound;
@@ -635,7 +635,7 @@ const IndexRecord::RecordInfo* RecordFileReader::getRecordByTime(
     StreamId streamId,
     double timestamp) const {
   const vector<const IndexRecord::RecordInfo*>& index = getIndex(streamId);
-  const IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type());
+  const IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type::UNDEFINED);
 
   auto lowerBound = lower_bound(index.begin(), index.end(), &firstTime, ptrTimeCompare);
   // The stream index is a vector of pointers in the recordIndex_ vector!
@@ -650,7 +650,7 @@ const IndexRecord::RecordInfo* RecordFileReader::getRecordByTime(
     Record::Type recordType,
     double timestamp) const {
   const vector<const IndexRecord::RecordInfo*>& index = getIndex(streamId);
-  const IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type());
+  const IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type::UNDEFINED);
 
   auto lowerBound = lower_bound(index.begin(), index.end(), &firstTime, ptrTimeCompare);
   while (lowerBound != index.end() && (*lowerBound)->recordType != recordType) {
@@ -675,7 +675,7 @@ const IndexRecord::RecordInfo* RecordFileReader::getNearestRecordByTime(
   }
 
   const IndexRecord::RecordInfo* nearest = nullptr;
-  const IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type());
+  const IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type::UNDEFINED);
   auto lowerBound = lower_bound(recordIndex_.begin(), recordIndex_.end(), firstTime, timeCompare);
 
   auto start = (lowerBound == recordIndex_.begin()) ? lowerBound : lowerBound - 1;
@@ -1084,7 +1084,7 @@ const IndexRecord::RecordInfo* getNearestRecordByTime(
     double epsilon,
     Record::Type recordType) {
   const IndexRecord::RecordInfo* nearest = nullptr;
-  const IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type());
+  const IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type::UNDEFINED);
   auto lowerBound = lower_bound(index.begin(), index.end(), &firstTime, ptrTimeCompare);
 
   auto start = (lowerBound == index.begin()) ? lowerBound : lowerBound - 1;
