@@ -424,7 +424,7 @@ Enumerations</h2></td></tr>
 <b>ZstdTight</b>, 
 <br />
 &#160;&#160;<b>ZstdMax</b>, 
-<b>PresetCount</b>, 
+<b>COUNT</b>, 
 <b>FirstLz4Preset</b> = Lz4Fast, 
 <b>LastLz4Preset</b> = Lz4Tight, 
 <br />
@@ -446,7 +446,7 @@ Enumerations</h2></td></tr>
 <br />
 &#160;&#160;<a class="el" href="namespacevrs.html#afb0b040e753b40173e69f247afa430a2a27118326006d3829667a400ad23d5d98">DataPieceType::String</a> = 4, 
 <a class="el" href="namespacevrs.html#afb0b040e753b40173e69f247afa430a2aa217c0217d4330b7b43ec310cba690f1">DataPieceType::StringMap</a> = 5, 
-<a class="el" href="namespacevrs.html#afb0b040e753b40173e69f247afa430a2ae93f994f01c537c4e2f7d8528c3eb5e9">DataPieceType::Count</a>
+<a class="el" href="namespacevrs.html#afb0b040e753b40173e69f247afa430a2a4905ac9d6a22bdfc1ae096094ce6248d">DataPieceType::COUNT</a>
 <br />
  }</td></tr>
 <tr class="memdesc:afb0b040e753b40173e69f247afa430a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Specifier for a type of DataPiece.  <a href="namespacevrs.html#afb0b040e753b40173e69f247afa430a2">More...</a><br /></td></tr>
@@ -519,7 +519,7 @@ Enumerations</h2></td></tr>
 <tr class="memdesc:a2278749cac618182a91e5841f06f66c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Core VRS error domains.  <a href="namespacevrs.html#a2278749cac618182a91e5841f06f66c3">More...</a><br /></td></tr>
 <tr class="separator:a2278749cac618182a91e5841f06f66c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acb1b4358038394407db2b2dc6200afae"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs.html#acb1b4358038394407db2b2dc6200afae">CachingStrategy</a> { <br />
-&#160;&#160;<b>UNDEFINED</b> = 0, 
+&#160;&#160;<b>Undefined</b> = 0, 
 <a class="el" href="namespacevrs.html#acb1b4358038394407db2b2dc6200afaeaf80bc338b6146b566004a046f8137c85">CachingStrategy::Passive</a>, 
 <a class="el" href="namespacevrs.html#acb1b4358038394407db2b2dc6200afaeaac21d502848247aa2f578d0f718f5d1d">CachingStrategy::Streaming</a>, 
 <a class="el" href="namespacevrs.html#acb1b4358038394407db2b2dc6200afaea02c8e5bdc421c350b1a6a698ae5d4540">CachingStrategy::StreamingBidirectional</a>, 
@@ -765,10 +765,6 @@ template&lt;&gt; </td></tr>
 <tr class="memitem:a9a0d3174baf3fd60bae0d0291b3e7e63"><td class="memItemLeft" align="right" valign="top"><a id="a9a0d3174baf3fd60bae0d0291b3e7e63"></a>
 string&#160;</td><td class="memItemRight" valign="bottom"><b>toPrettyName</b> (<a class="el" href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7b">CompressionPreset</a> preset)</td></tr>
 <tr class="separator:a9a0d3174baf3fd60bae0d0291b3e7e63"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad62d8a3adc42f0d42c712f51d17e0c33"><td class="memTemplParams" colspan="2"><a id="ad62d8a3adc42f0d42c712f51d17e0c33"></a>
-template&lt;class Enum &gt; </td></tr>
-<tr class="memitem:ad62d8a3adc42f0d42c712f51d17e0c33"><td class="memTemplItemLeft" align="right" valign="top">Enum&#160;</td><td class="memTemplItemRight" valign="bottom"><b>toEnum</b> (const std::string &amp;name)</td></tr>
-<tr class="separator:ad62d8a3adc42f0d42c712f51d17e0c33"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a012e216ff7f3bb1f1445a34fe5d464ba"><td class="memItemLeft" align="right" valign="top"><a id="a012e216ff7f3bb1f1445a34fe5d464ba"></a>
 template&lt;&gt; </td></tr>
 <tr class="memitem:a012e216ff7f3bb1f1445a34fe5d464ba"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7b">CompressionPreset</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><b>toEnum&lt; CompressionPreset &gt;</b> (const std::string &amp;presetName)</td></tr>
@@ -1186,7 +1182,7 @@ const int&#160;</td><td class="memItemRight" valign="bottom"><b>kDomainErrorsSta
 </td></tr>
 <tr><td class="fieldname"><a id="afb0b040e753b40173e69f247afa430a2aa217c0217d4330b7b43ec310cba690f1"></a>StringMap&#160;</td><td class="fielddoc"><p>Map with string keys, and T values. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="afb0b040e753b40173e69f247afa430a2ae93f994f01c537c4e2f7d8528c3eb5e9"></a>Count&#160;</td><td class="fielddoc"><p>Count of enum values. </p>
+<tr><td class="fieldname"><a id="afb0b040e753b40173e69f247afa430a2a4905ac9d6a22bdfc1ae096094ce6248d"></a>COUNT&#160;</td><td class="fielddoc"><p>Count of enum values. </p>
 </td></tr>
 </table>
 
