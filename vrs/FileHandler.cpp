@@ -50,10 +50,10 @@ struct CachingStrategyConverter : public EnumStringConverter<
                                       CachingStrategy,
                                       sCachingStrategyNames,
                                       COUNT_OF(sCachingStrategyNames),
-                                      CachingStrategy::UNDEFINED,
-                                      CachingStrategy::UNDEFINED> {
+                                      CachingStrategy::Undefined,
+                                      CachingStrategy::Undefined> {
   static_assert(
-      cNamesCount == static_cast<size_t>(CachingStrategy::COUNT),
+      cNamesCount == vrs::enumCount<CachingStrategy>(),
       "Missing CachingStrategy name definitions");
 };
 

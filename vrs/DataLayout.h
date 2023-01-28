@@ -57,7 +57,8 @@ enum class DataPieceType : uint8_t {
   Vector = 3, ///< Variable size array of T.
   String = 4, ///< Variable size array of char, null terminated.
   StringMap = 5, ///< Map with string keys, and T values.
-  Count ///< Count of enum values
+
+  COUNT ///< Count of enum values
 };
 
 /// Enum for a DataLayout printout json formatting profile

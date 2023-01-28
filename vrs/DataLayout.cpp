@@ -428,7 +428,7 @@ struct DataPieceTypeStringConverter : public EnumStringConverter<
                                           DataPieceType::Undefined,
                                           DataPieceType::Undefined> {
   static_assert(
-      cNamesCount == static_cast<size_t>(DataPieceType::Count),
+      cNamesCount == enumCount<DataPieceType>(),
       "Missing DataPieceType name definitions");
 };
 

@@ -28,6 +28,7 @@
 
 #include <vrs/FileHandlerFactory.h>
 #include <vrs/helpers/Rapidjson.hpp>
+#include <vrs/utils/FilterCopy.h>
 #include <vrs/utils/xxhash/xxhash.h>
 
 using namespace std;
@@ -123,8 +124,8 @@ class RecordChecker : public StreamPlayer {
       } break;
       case CheckType::ChecksumVerbatim: // not handled here
       case CheckType::None:
-      case CheckType::Count:
       case CheckType::Check:
+      case CheckType::COUNT:
           /* do nothing */;
         break;
     }
@@ -293,8 +294,8 @@ string checkRecords(
         case CheckType::ChecksumVerbatim:
         case CheckType::HexDump:
         case CheckType::None:
-        case CheckType::Count:
         case CheckType::Check:
+        case CheckType::COUNT:
             /* do nothing */;
       }
       ids << checker->getSanitizedId().getNumericName() << '/';

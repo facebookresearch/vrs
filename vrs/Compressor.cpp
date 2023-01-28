@@ -73,7 +73,7 @@ struct CompressionPresetConverter : public EnumStringConverter<
                                         CompressionPreset::Undefined,
                                         true> {
   static_assert(
-      COUNT_OF(sCompressionPresetNames) == static_cast<size_t>(CompressionPreset::PresetCount),
+      COUNT_OF(sCompressionPresetNames) == enumCount<CompressionPreset>(),
       "Missing CheckType name definitions");
 };
 

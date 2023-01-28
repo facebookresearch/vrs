@@ -86,9 +86,7 @@ struct CommandConverter : public EnumStringConverter<
                               COUNT_OF(sCommands),
                               Command::None,
                               Command::None> {
-  static_assert(
-      COUNT_OF(sCommands) == static_cast<size_t>(Command::Count),
-      "Missing GaiaOp name definitions");
+  static_assert(COUNT_OF(sCommands) == enumCount<Command>(), "Missing GaiaOp name definitions");
 };
 
 static const RecordFileInfo::Details kCopyOpsDetails = Details::MainCounters;
@@ -129,7 +127,7 @@ const CommandSpec& getCommandSpec(Command cmd) {
       {Command::FixIndex, 1000, Details::Basics},
       {Command::CompressionBenchmark, 1},
   };
-  if (!XR_VERIFY(cmd > Command::None && cmd < Command::Count)) {
+  if (!XR_VERIFY(cmd > Command::None && cmd < Command::COUNT)) {
     return sCommandSpecs[static_cast<size_t>(Command::None)];
   }
   return sCommandSpecs[static_cast<size_t>(cmd)];
@@ -536,7 +534,7 @@ int VrsCommand::runCommands() {
       statusCode = compressionBenchmark(filteredReader, copyOptions);
       break;
     case Command::None:
-    case Command::Count:
+    case Command::COUNT:
       break;
   }
 

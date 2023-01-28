@@ -53,7 +53,8 @@ enum class Command {
   JsonDescription,
   FixIndex,
   CompressionBenchmark,
-  Count
+
+  COUNT
 };
 
 struct VrsCommand {

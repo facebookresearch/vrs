@@ -21,12 +21,11 @@
 
 #include <vrs/Compressor.h>
 
-#include "FilterCopy.h"
 #include "FilteredFileReader.h"
 
 namespace vrs::utils {
 
-enum class CheckType { None, Check, Checksum, ChecksumVerbatim, Checksums, HexDump, Count };
+enum class CheckType { None, Check, Checksum, ChecksumVerbatim, Checksums, HexDump, COUNT };
 
 /// Check a VRS file by reading all its records & counting errors.
 /// The file should be open & filters applied already.
@@ -42,7 +41,7 @@ std::string checkRecords(
 std::string recordsChecksum(const std::string& path, bool showProgress);
 std::string verbatimChecksum(const std::string& path, bool showProgress);
 
-enum class CompareType { None, Compare, CompareVerbatim, Count };
+enum class CompareType { None, Compare, CompareVerbatim, COUNT };
 
 /// Compare VRS files from a data standpoint, comparing stream & file tags, the count of streams,
 /// and records one by one, while respecting filters, so that you can compare parts of files.

@@ -49,7 +49,7 @@ enum class CompressionPreset {
   ZstdTight,
   ZstdMax,
 
-  PresetCount,
+  COUNT,
 
   FirstLz4Preset = Lz4Fast,
   LastLz4Preset = Lz4Tight,
@@ -66,8 +66,7 @@ enum class CompressionPreset {
 
 std::string toPrettyName(CompressionPreset preset);
 std::string toString(CompressionPreset preset);
-template <class Enum>
-Enum toEnum(const std::string& name);
+
 template <>
 CompressionPreset toEnum<CompressionPreset>(const std::string& presetName);
 

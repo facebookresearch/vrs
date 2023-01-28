@@ -25,6 +25,8 @@
 #include <utility>
 #include <vector>
 
+#include <vrs/helpers/EnumTemplates.hpp>
+
 namespace vrs {
 
 using std::map;
@@ -33,7 +35,7 @@ using std::vector;
 
 /// Caching strategy requests
 enum class CachingStrategy {
-  UNDEFINED = 0,
+  Undefined = 0,
 
   Passive, ///< (default) Read & cache on-demand (don't prefetch).
   Streaming, ///< Automatically download data "forward", using last read-request as a hint.
@@ -46,9 +48,6 @@ enum class CachingStrategy {
 };
 
 string toString(CachingStrategy cachingStrategy);
-
-template <class Enum>
-Enum toEnum(const string& name);
 
 template <>
 CachingStrategy toEnum<>(const string& name);

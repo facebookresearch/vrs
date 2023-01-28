@@ -41,7 +41,7 @@ class QPixmap;
 class QVBoxLayout;
 QT_END_NAMESPACE
 
-enum class FileReaderState { Undefined, NoMedia, Paused, Playing, Error, Count };
+enum class FileReaderState { Undefined, NoMedia, Paused, Playing, Error, COUNT };
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 Q_DECLARE_METATYPE(FileReaderState)
 #endif

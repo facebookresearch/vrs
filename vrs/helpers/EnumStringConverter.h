@@ -20,6 +20,7 @@
 
 #include <string>
 
+#include <vrs/helpers/EnumTemplates.hpp>
 #include <vrs/helpers/Strings.h>
 
 /*

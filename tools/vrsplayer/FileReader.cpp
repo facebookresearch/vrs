@@ -62,7 +62,7 @@ struct FileReaderStateConverter : public EnumStringConverter<
                                       FileReaderState::Undefined,
                                       FileReaderState::Undefined> {
   static_assert(
-      cNamesCount == static_cast<size_t>(FileReaderState::Count),
+      cNamesCount == vrs::enumCount<FileReaderState>(),
       "Missing FileReaderState name definitions");
 };
 

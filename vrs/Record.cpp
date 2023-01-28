@@ -40,9 +40,7 @@ struct RecordTypeConverter : public EnumStringConverter<
                                  COUNT_OF(sRecordTypes),
                                  Record::Type::UNDEFINED,
                                  Record::Type::UNDEFINED> {
-  static_assert(
-      cNamesCount == static_cast<size_t>(Record::Type::COUNT),
-      "Missing Record::Type name definitions");
+  static_assert(cNamesCount == enumCount<Record::Type>(), "Missing Record::Type name definitions");
 };
 
 } // namespace

@@ -74,9 +74,7 @@ struct ContentTypeFormatConverter : public EnumStringConverter<
                                         COUNT_OF(sContentTypeNames),
                                         ContentType::CUSTOM,
                                         ContentType::CUSTOM> {
-  static_assert(
-      cNamesCount == static_cast<size_t>(ContentType::COUNT),
-      "Missing ContentType name definitions");
+  static_assert(cNamesCount == enumCount<ContentType>(), "Missing ContentType name definitions");
 };
 
 // These text names may NEVER BE CHANGED, as they are used in data layout definitions!!
@@ -87,9 +85,7 @@ struct ImageFormatConverter : public EnumStringConverter<
                                   COUNT_OF(sImageFormatNames),
                                   ImageFormat::UNDEFINED,
                                   ImageFormat::UNDEFINED> {
-  static_assert(
-      cNamesCount == static_cast<size_t>(ImageFormat::COUNT),
-      "Missing ImageFormat name definitions");
+  static_assert(cNamesCount == enumCount<ImageFormat>(), "Missing ImageFormat name definitions");
 };
 
 // Enum values may NEVER BE CHANGED, as they are used in data layout definitions!!
@@ -113,9 +109,7 @@ struct PixelFormatConverter : public EnumStringConverter<
                                   COUNT_OF(sPixelFormatNames),
                                   PixelFormat::UNDEFINED,
                                   PixelFormat::UNDEFINED> {
-  static_assert(
-      cNamesCount == static_cast<size_t>(PixelFormat::COUNT),
-      "Missing PixelFormat name definitions");
+  static_assert(cNamesCount == enumCount<PixelFormat>(), "Missing PixelFormat name definitions");
 };
 
 // Enum values may NEVER BE CHANGED, as they are used in data layout definitions!!
@@ -143,9 +137,7 @@ struct AudioFormatConverter : public EnumStringConverter<
                                   COUNT_OF(sAudioFormatNames),
                                   AudioFormat::UNDEFINED,
                                   AudioFormat::UNDEFINED> {
-  static_assert(
-      cNamesCount == static_cast<size_t>(AudioFormat::COUNT),
-      "Missing AudioFormat name definitions");
+  static_assert(cNamesCount == enumCount<AudioFormat>(), "Missing AudioFormat name definitions");
 };
 
 // Enum values may NEVER BE CHANGED, as they are used in data layout definitions!!
@@ -163,7 +155,7 @@ struct AudioSampleFormatConverter : public EnumStringConverter<
                                         AudioSampleFormat::UNDEFINED,
                                         AudioSampleFormat::UNDEFINED> {
   static_assert(
-      cNamesCount == static_cast<size_t>(AudioSampleFormat::COUNT),
+      cNamesCount == enumCount<AudioSampleFormat>(),
       "Missing AudioSampleFormat name definitions");
 };
 
