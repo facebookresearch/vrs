@@ -618,11 +618,11 @@ const IndexRecord::RecordInfo* RecordFileReader::getRecordByTime(
     double timestamp) const {
   IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type::UNDEFINED);
   auto lowerBound = lower_bound(recordIndex_.begin(), recordIndex_.end(), firstTime, timeCompare);
-  while (lowerBound != recordIndex_.end() && lowerBound->recordType != recordType) {
+  while (lowerBound != recordIndex_.end()) {
+    if (lowerBound->recordType == recordType) {
+      return &(*lowerBound);
+    }
     ++lowerBound;
-  }
-  if (lowerBound != recordIndex_.end()) {
-    return &*lowerBound;
   }
   return nullptr;
 }
@@ -634,13 +634,14 @@ static bool ptrTimeCompare(const IndexRecord::RecordInfo* lhs, const IndexRecord
 const IndexRecord::RecordInfo* RecordFileReader::getRecordByTime(
     StreamId streamId,
     double timestamp) const {
-  const vector<const IndexRecord::RecordInfo*>& index = getIndex(streamId);
   const IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type::UNDEFINED);
-
-  auto lowerBound = lower_bound(index.begin(), index.end(), &firstTime, ptrTimeCompare);
+  auto lowerBound = lower_bound(recordIndex_.begin(), recordIndex_.end(), firstTime, timeCompare);
   // The stream index is a vector of pointers in the recordIndex_ vector!
-  if (lowerBound != index.end()) {
-    return *lowerBound;
+  while (lowerBound != recordIndex_.end()) {
+    if (lowerBound->streamId == streamId) {
+      return &(*lowerBound);
+    }
+    ++lowerBound;
   }
   return nullptr;
 }
@@ -649,16 +650,14 @@ const IndexRecord::RecordInfo* RecordFileReader::getRecordByTime(
     StreamId streamId,
     Record::Type recordType,
     double timestamp) const {
-  const vector<const IndexRecord::RecordInfo*>& index = getIndex(streamId);
   const IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type::UNDEFINED);
-
-  auto lowerBound = lower_bound(index.begin(), index.end(), &firstTime, ptrTimeCompare);
-  while (lowerBound != index.end() && (*lowerBound)->recordType != recordType) {
-    ++lowerBound;
-  }
+  auto lowerBound = lower_bound(recordIndex_.begin(), recordIndex_.end(), firstTime, timeCompare);
   // The stream index is a vector of pointers in the recordIndex_ vector!
-  if (lowerBound != index.end()) {
-    return *lowerBound;
+  while (lowerBound != recordIndex_.end()) {
+    if (lowerBound->streamId == streamId && lowerBound->recordType == recordType) {
+      return &(*lowerBound);
+    }
+    ++lowerBound;
   }
   return nullptr;
 }
