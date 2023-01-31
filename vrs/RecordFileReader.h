@@ -526,6 +526,9 @@ class RecordFileReader {
       const FileSpec& fileSpec,
       bool autoWriteFixedIndex,
       FileFormat::FileHeader& fileHeader);
+  bool readConfigRecords(
+      const set<const IndexRecord::RecordInfo*>& configRecords,
+      StreamPlayer* streamPlayer);
 
   const string& getTag(const map<string, string>& tags, const string& name) const; ///< private
   bool mightContainContentTypeInDataRecord(StreamId streamId, ContentType type) const; ///< private

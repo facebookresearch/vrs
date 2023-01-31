@@ -754,39 +754,49 @@ double RecordFileReader::getFirstDataRecordTime() const {
   return 0; // no data record...
 }
 
-bool RecordFileReader::readFirstConfigurationRecord(StreamId streamId, StreamPlayer* streamPlayer) {
-  const IndexRecord::RecordInfo* config = getRecord(streamId, Record::Type::CONFIGURATION, 0);
-  if (config == nullptr) {
-    return false;
-  } else if (streamPlayer == nullptr) {
-    return readRecord(*config) == 0;
+bool RecordFileReader::readConfigRecords(
+    const set<const IndexRecord::RecordInfo*>& configRecords,
+    StreamPlayer* streamPlayer) {
+  bool foundAtLeastOneStream = false;
+  bool allGood = true;
+  for (auto configRecord : configRecords) {
+    if (configRecord != nullptr) {
+      foundAtLeastOneStream = true;
+      int status;
+      if (streamPlayer == nullptr) {
+        status = readRecord(*configRecord);
+      } else {
+        streamPlayer->onAttachedToFileReader(*this, configRecord->streamId);
+        status = readRecord(*configRecord, streamPlayer);
+      }
+      allGood = (status == 0) && allGood;
+    }
   }
-  streamPlayer->onAttachedToFileReader(*this, streamId);
-  return readRecord(*config, streamPlayer) == 0;
+  return foundAtLeastOneStream && allGood;
+}
+
+bool RecordFileReader::readFirstConfigurationRecord(StreamId streamId, StreamPlayer* streamPlayer) {
+  return readConfigRecords({getRecord(streamId, Record::Type::CONFIGURATION, 0)}, streamPlayer);
 }
 
 bool RecordFileReader::readFirstConfigurationRecords(StreamPlayer* streamPlayer) {
-  bool foundAtLeastOneStream = false;
-  bool allGood = true;
+  set<const IndexRecord::RecordInfo*> configRecords;
   for (auto streamId : streamIds_) {
-    foundAtLeastOneStream = true;
-    allGood = readFirstConfigurationRecord(streamId, streamPlayer) && allGood;
+    configRecords.insert(getRecord(streamId, Record::Type::CONFIGURATION, 0));
   }
-  return foundAtLeastOneStream && allGood;
+  return readConfigRecords(configRecords, streamPlayer);
 }
 
 bool RecordFileReader::readFirstConfigurationRecordsForType(
     RecordableTypeId typeId,
     StreamPlayer* streamPlayer) {
-  bool foundAtLeastOneStream = false;
-  bool allGood = true;
+  set<const IndexRecord::RecordInfo*> configRecords;
   for (auto streamId : streamIds_) {
     if (streamId.getTypeId() == typeId) {
-      foundAtLeastOneStream = true;
-      allGood = readFirstConfigurationRecord(streamId, streamPlayer) && allGood;
+      configRecords.insert(getRecord(streamId, Record::Type::CONFIGURATION, 0));
     }
   }
-  return foundAtLeastOneStream && allGood;
+  return readConfigRecords(configRecords, streamPlayer);
 }
 
 bool RecordFileReader::getRecordFormat(
