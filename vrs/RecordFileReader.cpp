@@ -503,7 +503,7 @@ bool RecordFileReader::hasIndex() const {
 
 vector<StreamId> RecordFileReader::getStreams(RecordableTypeId typeId, const string& flavor) const {
   vector<StreamId> streamIds;
-  for (const auto& streamId : streamIds_) {
+  for (auto streamId : streamIds_) {
     if ((typeId == RecordableTypeId::Undefined || streamId.getTypeId() == typeId) &&
         (flavor.empty() || getFlavor(streamId) == flavor)) {
       streamIds.emplace_back(streamId);
@@ -514,7 +514,7 @@ vector<StreamId> RecordFileReader::getStreams(RecordableTypeId typeId, const str
 
 StreamId RecordFileReader::getStreamForType(RecordableTypeId typeId, uint32_t indexNumber) const {
   uint32_t hitCount = 0;
-  for (const auto& streamId : streamIds_) {
+  for (auto streamId : streamIds_) {
     if (streamId.getTypeId() == typeId && hitCount++ == indexNumber) {
       return streamId;
     }
@@ -527,7 +527,7 @@ StreamId RecordFileReader::getStreamForFlavor(
     const string& flavor,
     uint32_t indexNumber) const {
   uint32_t hitCount = 0;
-  for (const auto& streamId : streamIds_) {
+  for (auto streamId : streamIds_) {
     if (streamId.getTypeId() == typeId && getFlavor(streamId) == flavor &&
         hitCount++ == indexNumber) {
       return streamId;
@@ -540,7 +540,7 @@ StreamId RecordFileReader::getStreamForTag(
     const string& tagName,
     const string& tag,
     RecordableTypeId typeId) const {
-  for (const auto& streamId : streamIds_) {
+  for (auto streamId : streamIds_) {
     if ((typeId == RecordableTypeId::Undefined || streamId.getTypeId() == typeId) &&
         getTag(streamId, tagName) == tag) {
       return streamId;
@@ -550,7 +550,7 @@ StreamId RecordFileReader::getStreamForTag(
 }
 
 StreamId RecordFileReader::getStreamForSerialNumber(const std::string& streamSerialNumber) const {
-  for (const auto& streamId : streamIds_) {
+  for (auto streamId : streamIds_) {
     if (getSerialNumber(streamId) == streamSerialNumber) {
       return streamId;
     }
@@ -768,7 +768,7 @@ bool RecordFileReader::readFirstConfigurationRecord(StreamId streamId, StreamPla
 bool RecordFileReader::readFirstConfigurationRecords(StreamPlayer* streamPlayer) {
   bool foundAtLeastOneStream = false;
   bool allGood = true;
-  for (const auto& streamId : streamIds_) {
+  for (auto streamId : streamIds_) {
     foundAtLeastOneStream = true;
     allGood = readFirstConfigurationRecord(streamId, streamPlayer) && allGood;
   }
@@ -780,7 +780,7 @@ bool RecordFileReader::readFirstConfigurationRecordsForType(
     StreamPlayer* streamPlayer) {
   bool foundAtLeastOneStream = false;
   bool allGood = true;
-  for (const auto& streamId : streamIds_) {
+  for (auto streamId : streamIds_) {
     if (streamId.getTypeId() == typeId) {
       foundAtLeastOneStream = true;
       allGood = readFirstConfigurationRecord(streamId, streamPlayer) && allGood;

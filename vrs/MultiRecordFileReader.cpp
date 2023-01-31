@@ -741,7 +741,7 @@ void MultiRecordFileReader::initializeUniqueStreamIds() {
     return;
   }
   for (const auto& readerPtr : readers_) {
-    for (const auto& streamId : readerPtr->getStreams()) {
+    for (auto streamId : readerPtr->getStreams()) {
       UniqueStreamId uniqueStreamId;
       if (uniqueStreamIds_.find(streamId) == uniqueStreamIds_.end()) {
         // Newly seen StreamId - UniqueStreamId can be same as StreamId
