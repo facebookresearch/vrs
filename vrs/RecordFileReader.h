@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <array>
 #include <functional>
 #include <map>
 #include <memory>
@@ -502,6 +503,22 @@ class RecordFileReader {
   /// @return A status code, 0 meaning success.
   static int vrsFilePathToFileSpec(const string& filePath, FileSpec& outFileSpec);
 
+  class RecordTypeCounter : public std::array<uint32_t, enumCount<Record::Type>()> {
+    using ParentType = std::array<uint32_t, enumCount<Record::Type>()>;
+
+   public:
+    RecordTypeCounter() {
+      fill(0);
+    }
+    inline uint32_t operator[](Record::Type recordType) const {
+      return ParentType::operator[](static_cast<uint32_t>(recordType));
+    }
+    inline uint32_t& operator[](Record::Type recordType) {
+      return ParentType::operator[](static_cast<uint32_t>(recordType));
+    }
+    uint32_t totalCount() const;
+  };
+
  private:
   int doOpenFile(const FileSpec& fileSpec, bool autoWriteFixedIndex, bool checkSignatureOnly);
   int readFileHeader(const FileSpec& fileSpec, FileFormat::FileHeader& outFileHeader);
@@ -523,6 +540,7 @@ class RecordFileReader {
   map<StreamId, StreamTags> streamTags_;
   map<string, string> fileTags_;
   vector<IndexRecord::RecordInfo> recordIndex_;
+  mutable map<StreamId, RecordTypeCounter> streamRecordCounts_;
 
   // Pointers to stream players to notify when reading records. These are NOT owned by the class.
   map<StreamId, StreamPlayer*> streamPlayers_;

@@ -28,6 +28,7 @@ using namespace vrs;
 namespace {
 struct GetRecordTester : testing::Test {
   string kTestFile = string(coretech::getTestDataDir()) + "/VRS_Files/sample_file.vrs";
+  string kTestFile2 = string(coretech::getTestDataDir()) + "/VRS_Files/simulated.vrs";
 };
 } // namespace
 
@@ -282,4 +283,61 @@ TEST_F(GetRecordTester, GetRecordTest) {
   EXPECT_EQ(r, nullptr);
   r = file.getNearestRecordByTime(rec->timestamp, 1, {}, Record::Type::DATA);
   EXPECT_EQ(r, nullptr);
+}
+
+TEST_F(GetRecordTester, GetRecordForwardBackwardTest) {
+  vrs::RecordFileReader file;
+  EXPECT_EQ(file.openFile(kTestFile2), 0);
+  EXPECT_EQ(file.getRecordCount(), 15377);
+  EXPECT_EQ(file.getStreams().size(), 3);
+  auto iter = file.getStreams().begin();
+  StreamId id1 = *iter++;
+  EXPECT_EQ(file.getRecordCount(id1), 76);
+  EXPECT_EQ(file.getRecordCount(id1, Record::Type::CONFIGURATION), 1);
+  EXPECT_EQ(file.getRecordCount(id1, Record::Type::STATE), 1);
+  EXPECT_EQ(file.getRecordCount(id1, Record::Type::DATA), 74);
+  StreamId id2 = *iter++;
+  EXPECT_EQ(file.getRecordCount(id2), 228);
+  EXPECT_EQ(file.getRecordCount(id2, Record::Type::CONFIGURATION), 1);
+  EXPECT_EQ(file.getRecordCount(id2, Record::Type::STATE), 1);
+  EXPECT_EQ(file.getRecordCount(id2, Record::Type::DATA), 226);
+  StreamId id3 = *iter++;
+  EXPECT_EQ(file.getRecordCount(id3), 15073);
+  EXPECT_EQ(file.getRecordCount(id3, Record::Type::CONFIGURATION), 1);
+  EXPECT_EQ(file.getRecordCount(id3, Record::Type::STATE), 1);
+  EXPECT_EQ(file.getRecordCount(id3, Record::Type::DATA), 15071);
+  const auto& index = file.getIndex();
+  // validate forward iteration
+  RecordFileReader::RecordTypeCounter counters;
+  for (const auto& record : index) {
+    if (record.streamId == id2) {
+      uint32_t streamTypeIndex = counters[record.recordType];
+      if (streamTypeIndex % 7 != 3) {
+        EXPECT_EQ(&record, file.getRecord(id2, record.recordType, streamTypeIndex));
+      }
+      uint32_t totalCount = counters.totalCount();
+      if (totalCount % 7 != 3) {
+        EXPECT_EQ(&record, file.getRecord(id2, totalCount));
+      }
+      counters[record.recordType]++;
+    }
+  }
+  uint32_t id2Counter = file.getRecordCount(id2);
+  // validate backward iteration
+  RecordFileReader::RecordTypeCounter reverseCounters;
+  for (auto riter = index.rbegin(); riter != index.rend(); ++riter) {
+    const IndexRecord::RecordInfo& record = *riter;
+    if (record.streamId == id2) {
+      uint32_t streamTypeIndex =
+          counters[record.recordType] - reverseCounters[record.recordType] - 1;
+      if (streamTypeIndex % 7 != 3) {
+        EXPECT_EQ(&record, file.getRecord(id2, record.recordType, streamTypeIndex));
+      }
+      reverseCounters[record.recordType]++;
+      uint32_t streamIndex = id2Counter - reverseCounters.totalCount();
+      if (streamIndex % 7 != 3) {
+        EXPECT_EQ(&record, file.getRecord(id2, streamIndex));
+      }
+    }
+  }
 }

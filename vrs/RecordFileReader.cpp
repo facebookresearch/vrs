@@ -289,6 +289,13 @@ int RecordFileReader::doOpenFile(
   }
   openProgressLogger_->logDuration("File open", os::getTimestampSec() - beforeTime);
   endOfUserRecordsOffset_ = fileHeader.getEndOfUserRecordsOffset(file_->getTotalSize());
+  if (error == 0) {
+    // count the records of each stream & type
+    streamRecordCounts_.clear();
+    for (const auto& record : recordIndex_) {
+      streamRecordCounts_[record.streamId][record.recordType]++;
+    }
+  }
   return error;
 }
 
@@ -429,6 +436,7 @@ int RecordFileReader::closeFile() {
   recordIndex_.clear();
   openProgressLogger_ = &defaultProgressLogger_;
   streamIndex_.clear();
+  streamRecordCounts_.clear();
   lastRequest_.clear();
   fileHasAnIndex_ = false;
   return result;
@@ -715,17 +723,11 @@ uint32_t RecordFileReader::getRecordStreamIndex(const IndexRecord::RecordInfo* r
 }
 
 const vector<const IndexRecord::RecordInfo*>& RecordFileReader::getIndex(StreamId streamId) const {
-  // recordableIndex_ is only initialized when we need it the first time. When we do,
-  // we create an index for all the typess.
+  // streamIndex_ is only initialized the first time we need it, for all streams at once.
   if (streamIndex_.empty() && (!streamIds_.empty() && !recordIndex_.empty())) {
-    // We need to create the indexes. First, calculate their size
-    map<StreamId, uint32_t> recordCounter;
-    for (const auto& recordIndex : recordIndex_) {
-      recordCounter[recordIndex.streamId]++;
-    }
     // Reserve space in the vectors, so that emplace_back never needs to re-allocate memory
-    for (auto iter : recordCounter) {
-      streamIndex_[iter.first].reserve(iter.second);
+    for (StreamId id : streamIds_) {
+      streamIndex_[id].reserve(getRecordCount(id));
     }
     // We can now create the indexes, trusting that the emplace_back operations will be trivial
     for (const auto& recordIndex : recordIndex_) {
@@ -736,18 +738,11 @@ const vector<const IndexRecord::RecordInfo*>& RecordFileReader::getIndex(StreamI
 }
 
 uint32_t RecordFileReader::getRecordCount(StreamId streamId) const {
-  return static_cast<uint32_t>(getIndex(streamId).size());
+  return streamRecordCounts_[streamId].totalCount();
 }
 
 uint32_t RecordFileReader::getRecordCount(StreamId streamId, Record::Type recordType) const {
-  const auto& recordIndex = getIndex(streamId);
-  uint32_t count = 0;
-  for (const auto& recordInfo : recordIndex) {
-    if (recordInfo->recordType == recordType) {
-      count++;
-    }
-  }
-  return count;
+  return streamRecordCounts_[streamId][recordType];
 }
 
 double RecordFileReader::getFirstDataRecordTime() const {
@@ -1097,6 +1092,12 @@ const IndexRecord::RecordInfo* getNearestRecordByTime(
     }
   }
   return nearest;
+}
+
+uint32_t RecordFileReader::RecordTypeCounter::totalCount() const {
+  return ParentType::operator[](static_cast<uint32_t>(Record::Type::CONFIGURATION)) +
+      ParentType::operator[](static_cast<uint32_t>(Record::Type::STATE)) +
+      ParentType::operator[](static_cast<uint32_t>(Record::Type::DATA));
 }
 
 } // namespace vrs
