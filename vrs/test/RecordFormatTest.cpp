@@ -125,6 +125,15 @@ TEST_F(RecordFormatTest, testBlockFormat) {
   EXPECT_EQ(yuvSplit.image().getBytesPerPixel(), ContentBlock::kSizeUnknown);
   EXPECT_EQ(yuvSplit.image().getChannelCountPerPixel(), 3);
   EXPECT_EQ(yuvSplit.image().getBlockSize(), 460800);
+  EXPECT_EQ(yuvSplit.image().getPlaneCount(), 3);
+  EXPECT_EQ(yuvSplit.image().getPlaneStride(0), 640);
+  EXPECT_EQ(yuvSplit.image().getPlaneStride(1), 320);
+  EXPECT_EQ(yuvSplit.image().getPlaneStride(2), 320);
+  EXPECT_EQ(yuvSplit.image().getPlaneStride(3), 0);
+  EXPECT_EQ(yuvSplit.image().getPlaneHeight(0), 480);
+  EXPECT_EQ(yuvSplit.image().getPlaneHeight(1), 240);
+  EXPECT_EQ(yuvSplit.image().getPlaneHeight(2), 240);
+  EXPECT_EQ(yuvSplit.image().getPlaneHeight(3), 0);
 
   // A single stride doesn't make much sense for this format, but we'll accept it anyway.
   ContentBlock yuvSplit2("image/raw/640x480/pixel=yuv_i420_split/stride=640");

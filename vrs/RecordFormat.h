@@ -68,6 +68,7 @@ enum class PixelFormat : uint8_t {
   DEPTH32F, ///< 1 32 bit float value, representing a depth.
   RGB8, ///< 3 uint8_t values, red + green + blue.
   YUV_I420_SPLIT, ///< 3 uint8_t values, 4:2:0. The 3 planes are stored separately.
+  YUV_I420_PLANAR = YUV_I420_SPLIT, ///< same as YUV_I420_SPLIT, but more conventional name.
   RGBA8, ///< 4 uint8_t values, red + blue + green + alpha.
   RGB10, ///< uses 16 bit little-endian values. 6 most significant bits are unused and set to 0.
   RGB12, ///< uses 16 bit little-endian values. 4 most significant bits are unused and set to 0.

@@ -498,7 +498,7 @@ uint32_t ImageContentBlockSpec::getPlaneHeight(uint32_t planeIndex) const {
   if (planeIndex == 0) {
     return getHeight();
   }
-  if (planeIndex > getPlaneCount()) {
+  if (planeIndex >= getPlaneCount()) {
     return 0;
   }
   if (pixelFormat_ == PixelFormat::YUV_I420_SPLIT) {
