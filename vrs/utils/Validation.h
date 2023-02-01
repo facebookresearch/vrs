@@ -25,13 +25,13 @@
 
 namespace vrs::utils {
 
-enum class CheckType { None, Check, Checksum, ChecksumVerbatim, Checksums, HexDump, COUNT };
+enum class CheckType { None, Check, Checksum, ChecksumVerbatim, Checksums, HexDump, Decode, COUNT };
 
 /// Check a VRS file by reading all its records & counting errors.
 /// The file should be open & filters applied already.
 /// @param filteredReader: source file with record filtering
 /// @param copyOptions: to disable progress logging. Other parameters are not applicable.
-/// @param checkType: which type of check is expected.
+/// @param checkType: which type of check is expected, except ChecksumVerbatim (see API below).
 std::string checkRecords(
     FilteredFileReader& filteredReader,
     const CopyOptions& copyOptions,

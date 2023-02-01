@@ -37,6 +37,7 @@ enum class Command {
   Checksums,
   ChecksumVerbatim,
   Hexdump,
+  Decode,
   Compare,
   CompareVerbatim,
   Debug,

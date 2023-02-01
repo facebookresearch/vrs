@@ -63,6 +63,7 @@ const char* sCommands[] = {
     "checksums",
     "checksum-verbatim",
     "hexdump",
+    "decode",
     "compare",
     "compare-verbatim",
     "debug",
@@ -110,6 +111,7 @@ const CommandSpec& getCommandSpec(Command cmd) {
       {Command::Checksums, 1},
       {Command::ChecksumVerbatim, 1, Details::None, false},
       {Command::Hexdump, 1},
+      {Command::Decode, 1, Details::MainCounters},
       {Command::Compare, 1000, Details::MainCounters},
       {Command::CompareVerbatim, 1000, Details::None, false},
       {Command::Debug, 1, Details::None, false},
@@ -183,6 +185,8 @@ void printHelp(const string& appName) {
       << endl
       << CMD("Check that a file can be read (checks integrity)",
              "check <file.vrs> [filter-options]")
+      << CMD("Check that a file can be decoded (record-format integrity and image decompression)",
+             "decode <file.vrs> [filter-options]")
       << CMD("Calculate a checksum for the whole file, at the VRS data level",
              "checksum <file.vrs> [filter-options]")
       << CMD("Calculate checksums for each part of the VRS file",
@@ -452,6 +456,9 @@ int VrsCommand::runCommands() {
       break;
     case Command::Check:
       cout << checkRecords(filteredReader, copyOptions, CheckType::Check) << endl;
+      break;
+    case Command::Decode:
+      cout << checkRecords(filteredReader, copyOptions, CheckType::Decode) << endl;
       break;
     case Command::Checksum:
       cout << checkRecords(filteredReader, copyOptions, CheckType::Checksum) << endl;
