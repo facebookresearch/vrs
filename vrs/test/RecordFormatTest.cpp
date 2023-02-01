@@ -167,6 +167,44 @@ TEST_F(RecordFormatTest, testBlockFormat) {
   EXPECT_EQ(yuvSplit4.image().getRawStride(), 0);
   EXPECT_EQ(yuvSplit4.image().getBlockSize(), 462240);
 
+  ContentBlock yuvNv21("image/raw/640x480/pixel=yuv_420_nv21");
+  EXPECT_EQ(yuvNv21.getContentType(), ContentType::IMAGE);
+  EXPECT_EQ(yuvNv21.image().getImageFormat(), ImageFormat::RAW);
+  EXPECT_EQ(yuvNv21.image().getPixelFormat(), PixelFormat::YUV_420_NV21);
+  EXPECT_EQ(yuvNv21.image().getWidth(), 640);
+  EXPECT_EQ(yuvNv21.image().getHeight(), 480);
+  EXPECT_EQ(yuvNv21.image().getStride(), 640);
+  EXPECT_EQ(yuvNv21.image().getRawStride(), 0);
+  EXPECT_EQ(yuvNv21.image().getBytesPerPixel(), ContentBlock::kSizeUnknown);
+  EXPECT_EQ(yuvNv21.image().getChannelCountPerPixel(), 3);
+  EXPECT_EQ(yuvNv21.image().getBlockSize(), 460800);
+  EXPECT_EQ(yuvNv21.image().getPlaneCount(), 2);
+  EXPECT_EQ(yuvNv21.image().getPlaneStride(0), 640);
+  EXPECT_EQ(yuvNv21.image().getPlaneStride(1), 640);
+  EXPECT_EQ(yuvNv21.image().getPlaneStride(2), 0);
+  EXPECT_EQ(yuvNv21.image().getPlaneHeight(0), 480);
+  EXPECT_EQ(yuvNv21.image().getPlaneHeight(1), 240);
+  EXPECT_EQ(yuvNv21.image().getPlaneHeight(2), 0);
+
+  ContentBlock yuvNv12("image/raw/640x480/pixel=yuv_420_nv12");
+  EXPECT_EQ(yuvNv12.getContentType(), ContentType::IMAGE);
+  EXPECT_EQ(yuvNv12.image().getImageFormat(), ImageFormat::RAW);
+  EXPECT_EQ(yuvNv12.image().getPixelFormat(), PixelFormat::YUV_420_NV12);
+  EXPECT_EQ(yuvNv12.image().getWidth(), 640);
+  EXPECT_EQ(yuvNv12.image().getHeight(), 480);
+  EXPECT_EQ(yuvNv12.image().getStride(), 640);
+  EXPECT_EQ(yuvNv12.image().getRawStride(), 0);
+  EXPECT_EQ(yuvNv12.image().getBytesPerPixel(), ContentBlock::kSizeUnknown);
+  EXPECT_EQ(yuvNv12.image().getChannelCountPerPixel(), 3);
+  EXPECT_EQ(yuvNv12.image().getBlockSize(), 460800);
+  EXPECT_EQ(yuvNv12.image().getPlaneCount(), 2);
+  EXPECT_EQ(yuvNv12.image().getPlaneStride(0), 640);
+  EXPECT_EQ(yuvNv12.image().getPlaneStride(1), 640);
+  EXPECT_EQ(yuvNv12.image().getPlaneStride(2), 0);
+  EXPECT_EQ(yuvNv12.image().getPlaneHeight(0), 480);
+  EXPECT_EQ(yuvNv12.image().getPlaneHeight(1), 240);
+  EXPECT_EQ(yuvNv12.image().getPlaneHeight(2), 0);
+
   ContentBlock yuy2a("image/raw/642x480/pixel=yuy2");
   EXPECT_EQ(yuy2a.getContentType(), ContentType::IMAGE);
   EXPECT_EQ(yuy2a.image().getImageFormat(), ImageFormat::RAW);

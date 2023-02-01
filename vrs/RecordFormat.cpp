@@ -97,11 +97,11 @@ static_assert(static_cast<int>(ImageFormat::JXL) == 5, "ImageFormat enum values 
 
 // These text names may NEVER BE CHANGED, as they are used in data layout definitions!!
 const char* sPixelFormatNames[] = {
-    "undefined",       "grey8",   "bgr8",        "depth32f",  "rgb8",
-    "yuv_i420_split",  "rgba8",   "rgb10",       "rgb12",     "grey10",
-    "grey12",          "grey16",  "rgb32F",      "scalar64F", "yuy2",
-    "rgb_ir_4x4",      "rgba32F", "bayer8_rggb", "raw10",     "raw10_bayer_rggb",
-    "raw10_bayer_bggr"};
+    "undefined",        "grey8",        "bgr8",        "depth32f",  "rgb8",
+    "yuv_i420_split",   "rgba8",        "rgb10",       "rgb12",     "grey10",
+    "grey12",           "grey16",       "rgb32F",      "scalar64F", "yuy2",
+    "rgb_ir_4x4",       "rgba32F",      "bayer8_rggb", "raw10",     "raw10_bayer_rggb",
+    "raw10_bayer_bggr", "yuv_420_nv21", "yuv_420_nv12"};
 
 struct PixelFormatConverter : public EnumStringConverter<
                                   PixelFormat,
@@ -129,6 +129,12 @@ static_assert(
     "PixelFormat enum values CHANGED!");
 static_assert(
     static_cast<int>(PixelFormat::RAW10_BAYER_BGGR) == 20,
+    "PixelFormat enum values CHANGED!");
+static_assert(
+    static_cast<int>(PixelFormat::YUV_420_NV21) == 21,
+    "PixelFormat enum values CHANGED!");
+static_assert(
+    static_cast<int>(PixelFormat::YUV_420_NV12) == 22,
     "PixelFormat enum values CHANGED!");
 const char* sAudioFormatNames[] = {"undefined", "pcm"};
 struct AudioFormatConverter : public EnumStringConverter<
@@ -420,6 +426,8 @@ uint8_t ImageContentBlockSpec::getChannelCountPerPixel(PixelFormat pixel) {
     case PixelFormat::RGB_IR_RAW_4X4:
     case PixelFormat::YUV_I420_SPLIT:
     case PixelFormat::YUY2:
+    case PixelFormat::YUV_420_NV21:
+    case PixelFormat::YUV_420_NV12:
       return 3; // Typically Red/Green/Blue, or YUV of some kind
     case PixelFormat::RGBA8:
     case PixelFormat::RGBA32F:
@@ -468,6 +476,8 @@ size_t ImageContentBlockSpec::getBytesPerPixel(PixelFormat pixel) {
     case PixelFormat::RAW10:
     case PixelFormat::RAW10_BAYER_RGGB:
     case PixelFormat::RAW10_BAYER_BGGR:
+    case PixelFormat::YUV_420_NV21:
+    case PixelFormat::YUV_420_NV12:
     case PixelFormat::UNDEFINED:
     case PixelFormat::COUNT:
       return ContentBlock::kSizeUnknown;
@@ -476,20 +486,42 @@ size_t ImageContentBlockSpec::getBytesPerPixel(PixelFormat pixel) {
 }
 
 uint32_t ImageContentBlockSpec::getPlaneCount(PixelFormat pixelFormat) {
-  return (pixelFormat == PixelFormat::YUV_I420_SPLIT) ? 3 : 1;
+  switch (pixelFormat) {
+    case PixelFormat::YUV_I420_SPLIT:
+      return 3;
+    case PixelFormat::YUV_420_NV21:
+    case PixelFormat::YUV_420_NV12:
+      return 2;
+    default:
+      return 1;
+  }
+  return 1;
 }
 
 uint32_t ImageContentBlockSpec::getPlaneStride(uint32_t planeIndex) const {
-  if (pixelFormat_ == PixelFormat::YUV_I420_SPLIT) {
-    if (planeIndex == 0) {
-      // The first block uses 1 byte-per-pixel, and a width which might be overridden by stride_
-      return (stride_ > 0 ? stride_ : getWidth());
-    } else if (planeIndex < 3) {
-      // second and third planes use one byte per 2-2 squares: half the width, half the height
-      return (getWidth() + 1) / 2;
-    }
-  } else if (planeIndex == 0) {
-    return getStride();
+  switch (pixelFormat_) {
+    case PixelFormat::YUV_I420_SPLIT:
+      if (planeIndex == 0) {
+        // The first block uses 1 byte-per-pixel, and a width which might be overridden by stride_
+        return (stride_ > 0 ? stride_ : getWidth());
+      } else if (planeIndex < 3) {
+        // second and third planes use one byte per 2-2 squares: half the width, half the height
+        return (getWidth() + 1) / 2;
+      }
+      break;
+    case PixelFormat::YUV_420_NV21:
+    case PixelFormat::YUV_420_NV12:
+      if (planeIndex == 0) {
+        // The first block uses 1 byte-per-pixel, and a width which might be overridden by stride_
+        return (stride_ > 0 ? stride_ : getWidth());
+      } else if (planeIndex < 2) {
+        return getWidth();
+      }
+      break;
+    default:
+      if (planeIndex == 0) {
+        return getStride();
+      }
   }
   return 0;
 }
@@ -501,9 +533,15 @@ uint32_t ImageContentBlockSpec::getPlaneHeight(uint32_t planeIndex) const {
   if (planeIndex >= getPlaneCount()) {
     return 0;
   }
-  if (pixelFormat_ == PixelFormat::YUV_I420_SPLIT) {
-    // second and third planes use one byte per 2-2 squares: half the width, half the height
-    return (getHeight() + 1) / 2;
+  switch (pixelFormat_) {
+    case PixelFormat::YUV_I420_SPLIT:
+      // second and third planes use one byte per 2-2 squares: half the width, half the height
+      return (getHeight() + 1) / 2;
+    case PixelFormat::YUV_420_NV21:
+    case PixelFormat::YUV_420_NV12:
+      return (getHeight() + 1) / 2;
+    default:
+      return 0;
   }
   return 0;
 }
@@ -546,6 +584,8 @@ uint32_t ImageContentBlockSpec::getStride() const {
   }
   switch (pixelFormat_) {
     case PixelFormat::YUV_I420_SPLIT:
+    case PixelFormat::YUV_420_NV21:
+    case PixelFormat::YUV_420_NV12:
       return getWidth();
     case PixelFormat::RAW10:
     case PixelFormat::RAW10_BAYER_RGGB:

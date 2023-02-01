@@ -85,6 +85,8 @@ enum class PixelFormat : uint8_t {
   RAW10, ///< https://developer.android.com/reference/android/graphics/ImageFormat#RAW10
   RAW10_BAYER_RGGB, ///< 10 bit per pixel, RGGB bayer pattern.
   RAW10_BAYER_BGGR, ///< 10 bit per pixel, BGGR bayer pattern.
+  YUV_420_NV21, ///< Y plane + half width/half height chroma plane with weaved V and U values.
+  YUV_420_NV12, ///< Y plane + half width/half height chroma plane with weaved U and V values.
 
   COUNT, ///< Count of values in this enum type. @internal
 };

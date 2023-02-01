@@ -333,7 +333,9 @@ bool PixelFrame::normalizeFrame(shared_ptr<PixelFrame>& normalizedFrame, bool gr
   }
   PixelFormat format = srcFormat;
   switch (srcFormat) {
-    case PixelFormat::YUV_I420_SPLIT: {
+    case PixelFormat::YUV_I420_SPLIT:
+    case PixelFormat::YUV_420_NV21:
+    case PixelFormat::YUV_420_NV12: {
       // buffer truncation to grayscale when ocean isn't available
       const uint32_t width = imageSpec_.getWidth();
       const uint32_t height = imageSpec_.getHeight();
