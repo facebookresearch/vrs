@@ -43,6 +43,8 @@ using namespace std;
 
 namespace vrs {
 
+constexpr int kMaxFilesOpenCount = 2;
+
 const string& DiskFile::staticName() {
   static const string sDiskFileHandlerName = "diskfile";
   return sDiskFileHandlerName;

@@ -163,12 +163,11 @@ class DiskFile : public WriteFileHandler {
 
   vector<Chunk> chunks_; // all the chunks, when a VRS file is opened.
   Chunk* currentChunk_{}; // if a file is opened, **always** points to a valid chunk within chunks_.
-  static const int kMaxFilesOpenCount = 2;
   int filesOpenCount_{};
 
-  size_t lastRWSize_;
-  int lastError_;
-  bool readOnly_;
+  size_t lastRWSize_{};
+  int lastError_{};
+  bool readOnly_{true};
 };
 
 /// Helper class to create a new file with better chances that the content won't be clobbered by
