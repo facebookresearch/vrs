@@ -16,11 +16,14 @@
 
 #pragma once
 
-#include <fstream>
-
+#include <vrs/DiskFile.h>
 #include <vrs/RecordFormatStreamPlayer.h>
 
 namespace vrs::utils {
+
+/// Audio track extraction code, with few diagnostics, and auto-file name generation.
+/// If the audio format changes mid-track, will create a new file.
+/// Designed to extract all the audio parts possible of a file, in a fairly crude way.
 
 class AudioExtractor : public RecordFormatStreamPlayer {
  public:
@@ -30,6 +33,16 @@ class AudioExtractor : public RecordFormatStreamPlayer {
 
   bool onAudioRead(const CurrentRecord& record, size_t, const ContentBlock& audioBlock) override;
   bool onUnsupportedBlock(const CurrentRecord& record, size_t, const ContentBlock& cb) override;
+
+  static int createWavFile(
+      const string& wavFilePath,
+      const AudioContentBlockSpec& audioBlock,
+      DiskFile& outFile);
+  static int writeWavAudioData(
+      DiskFile& inFile,
+      const AudioContentBlockSpec& audioBlock,
+      const vector<uint8_t>& audio);
+  static int closeWavFile(DiskFile& inFile);
 
  protected:
   // folder to save wav files to
@@ -44,11 +57,8 @@ class AudioExtractor : public RecordFormatStreamPlayer {
   // used to track compatibility of successive audio blocks within a stream;
   // if format changes, we close the wav file and start a new one
   AudioContentBlockSpec currentAudioContentBlockSpec_;
-  // used to track total size of wav data written to file, so the .wav header
-  // can be properly updated before being finalized on disk
-  uint32_t totalAudioDataSize_ = 0;
   // output stream of wav file currently being written
-  std::ofstream currentWavFile_;
+  DiskFile currentWavFile_;
   // temp audio buffer to hold segment of audio to be written to file
   vector<uint8_t> audio_;
   // For validation: start timestamp of the audio segment
