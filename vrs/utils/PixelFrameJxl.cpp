@@ -15,6 +15,8 @@
  */
 
 #include "PixelFrame.h"
+#include "jxl/decode.h"
+#include "jxl/encode.h"
 
 #include <algorithm>
 #include <map>
@@ -167,8 +169,11 @@ bool PixelFrame::readJxlFrame(const vector<uint8_t>& jxlBuf, bool decodePixels) 
             colorEncoding.color_space == JXL_COLOR_SPACE_GRAY) {
           colorEncoding.gamma = 0.5;
           colorEncoding.transfer_function = JXL_TRANSFER_FUNCTION_GAMMA;
-          JxlDecoderSetPreferredColorProfile(dec, &colorEncoding);
+        } else {
+          DEC_CHECK(JxlDecoderGetColorAsEncodedProfile(
+              dec, &format, JXL_COLOR_PROFILE_TARGET_ORIGINAL, &colorEncoding));
         }
+        DEC_CHECK(JxlDecoderSetPreferredColorProfile(dec, &colorEncoding));
       } break;
 
       case JXL_DEC_BASIC_INFO: {
@@ -189,12 +194,28 @@ bool PixelFrame::readJxlFrame(const vector<uint8_t>& jxlBuf, bool decodePixels) 
         format.num_channels = info.num_color_channels + info.num_extra_channels;
         switch (format.num_channels) {
           case 1:
-            init(PixelFormat::GREY8, info.xsize, info.ysize);
+            if (info.bits_per_sample != 8 && info.bits_per_sample != 16) {
+              XR_LOGE("Unsupported bit per sample: {}", info.bits_per_sample);
+              return false;
+            }
+            init(
+                info.bits_per_sample == 8 ? PixelFormat::GREY8 : PixelFormat::GREY16,
+                info.xsize,
+                info.ysize);
+            format.data_type = info.bits_per_sample == 8 ? JXL_TYPE_UINT8 : JXL_TYPE_UINT16;
             break;
           case 3:
+            if (info.bits_per_sample != 8) {
+              XR_LOGE("Unsupported bit per sample: {}", info.bits_per_sample);
+              return false;
+            }
             init(PixelFormat::RGB8, info.xsize, info.ysize);
             break;
           case 4:
+            if (info.bits_per_sample != 8) {
+              XR_LOGE("Unsupported bit per sample: {}", info.bits_per_sample);
+              return false;
+            }
             init(PixelFormat::RGBA8, info.xsize, info.ysize);
             break;
           default:
@@ -203,10 +224,6 @@ bool PixelFrame::readJxlFrame(const vector<uint8_t>& jxlBuf, bool decodePixels) 
                 info.num_color_channels,
                 info.num_extra_channels);
             return false;
-        }
-        if (info.bits_per_sample != 8) {
-          XR_LOGE("Unsupported bit per sample: {}", info.bits_per_sample);
-          return false;
         }
         if (!decodePixels) {
           JxlDecoderReset(dec);
@@ -290,7 +307,10 @@ bool PixelFrame::jxlCompress(
       basic_info.alpha_bits = (extraChannels > 0) ? 8 : 0;
       pixel_format.data_type = JXL_TYPE_UINT8;
       break;
-
+    case PixelFormat::GREY16:
+      basic_info.bits_per_sample = 16;
+      pixel_format.data_type = JXL_TYPE_UINT16;
+      break;
     default:
       return false;
   }
@@ -299,9 +319,15 @@ bool PixelFrame::jxlCompress(
   ENC_CHECK(JxlEncoderSetBasicInfo(enc, &basic_info));
 
   JxlColorEncoding color_encoding = {};
-  JxlColorEncodingSetToSRGB(
-      &color_encoding,
-      /*is_gray=*/pixel_format.num_channels < 3);
+  if (basic_info.num_color_channels > 1) {
+    JxlColorEncodingSetToLinearSRGB(
+        &color_encoding,
+        /*is_gray=*/pixel_format.num_channels < 3);
+  } else {
+    JxlColorEncodingSetToSRGB(
+        &color_encoding,
+        /*is_gray=*/pixel_format.num_channels < 3);
+  }
   ENC_CHECK(JxlEncoderSetColorEncoding(enc, &color_encoding));
 
   auto settings = JxlEncoderFrameSettingsCreate(enc, nullptr);
@@ -341,7 +367,8 @@ bool PixelFrame::jxlCompress(
     size_t remainingSize = allocatedSize;
     encoderStatus = JxlEncoderProcessOutput(enc, &outData, &remainingSize);
     if (JXL_ENC_SUCCESS != encoderStatus && JXL_ENC_NEED_MORE_OUTPUT != encoderStatus) {
-      throw runtime_error("JxlEncoderProcessOutput failed");
+      XR_LOGE("JxlEncoderProcessOutput failed");
+      return false;
     }
     memBuffer.addAllocatedSpace(allocatedSize - remainingSize);
   } while (encoderStatus == JXL_ENC_NEED_MORE_OUTPUT);
