@@ -190,38 +190,46 @@ bool PixelFrame::readJxlFrame(const vector<uint8_t>& jxlBuf, bool decodePixels) 
           return false;
         }
         format.num_channels = info.num_color_channels + info.num_extra_channels;
-        switch (format.num_channels) {
-          case 1:
-            if (info.bits_per_sample != 8 && info.bits_per_sample != 16) {
-              XR_LOGE("Unsupported bit per sample: {}", info.bits_per_sample);
-              return false;
+        bool supportedFormat = true;
+        switch (info.bits_per_sample) {
+          case 8: {
+            format.data_type = JXL_TYPE_UINT8;
+            switch (format.num_channels) {
+              case 1:
+                init(PixelFormat::GREY8, info.xsize, info.ysize);
+                break;
+              case 3:
+                init(PixelFormat::RGB8, info.xsize, info.ysize);
+                break;
+              case 4:
+                init(PixelFormat::RGBA8, info.xsize, info.ysize);
+                break;
+              default:
+                supportedFormat = false;
             }
-            init(
-                info.bits_per_sample == 8 ? PixelFormat::GREY8 : PixelFormat::GREY16,
-                info.xsize,
-                info.ysize);
-            format.data_type = info.bits_per_sample == 8 ? JXL_TYPE_UINT8 : JXL_TYPE_UINT16;
-            break;
-          case 3:
-            if (info.bits_per_sample != 8) {
-              XR_LOGE("Unsupported bit per sample: {}", info.bits_per_sample);
-              return false;
+          } break;
+          case 16: {
+            format.data_type = JXL_TYPE_UINT16;
+            switch (format.num_channels) {
+              case 1:
+                init(PixelFormat::GREY16, info.xsize, info.ysize);
+                break;
+              case 3:
+              case 4:
+              default:
+                supportedFormat = false;
             }
-            init(PixelFormat::RGB8, info.xsize, info.ysize);
-            break;
-          case 4:
-            if (info.bits_per_sample != 8) {
-              XR_LOGE("Unsupported bit per sample: {}", info.bits_per_sample);
-              return false;
-            }
-            init(PixelFormat::RGBA8, info.xsize, info.ysize);
-            break;
+          } break;
           default:
-            XR_LOGE(
-                "Unexpected combo of color channels and extra channels: {}+{}",
-                info.num_color_channels,
-                info.num_extra_channels);
-            return false;
+            supportedFormat = false;
+        }
+        if (!supportedFormat) {
+          XR_LOGE(
+              "Unexpected combo of color/extra channels {}+{} channels @ {} bits per sample",
+              info.num_color_channels,
+              info.num_extra_channels,
+              info.bits_per_sample);
+          return false;
         }
         if (!decodePixels) {
           JxlDecoderReset(dec);
