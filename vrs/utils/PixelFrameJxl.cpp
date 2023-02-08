@@ -15,8 +15,6 @@
  */
 
 #include "PixelFrame.h"
-#include "jxl/decode.h"
-#include "jxl/encode.h"
 
 #include <algorithm>
 #include <map>
