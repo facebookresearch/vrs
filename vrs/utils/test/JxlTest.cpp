@@ -197,6 +197,7 @@ struct JxlVerificationTest : testing::Test, public ::testing::WithParamInterface
   JxlVerificationTest() {}
 };
 
+#ifdef JXL_IS_AVAILABLE
 //#define WRITE_TEST_PATTERN
 TEST_P(JxlVerificationTest, checkRoundTrip) {
   PixelFormat format = GetParam();
@@ -233,3 +234,4 @@ INSTANTIATE_TEST_SUITE_P(
     JxlPixelFormatTest,
     JxlVerificationTest,
     ::testing::Values<PixelFormat>(PixelFormat::RGB8, PixelFormat::GREY8, PixelFormat::GREY16));
+#endif
