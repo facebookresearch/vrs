@@ -682,18 +682,43 @@ const IndexRecord::RecordInfo* RecordFileReader::getNearestRecordByTime(
   }
 
   const IndexRecord::RecordInfo* nearest = nullptr;
-  const IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type::UNDEFINED);
-  auto lowerBound = lower_bound(recordIndex_.begin(), recordIndex_.end(), firstTime, timeCompare);
+  if (recordIndex_.empty()) {
+    return nullptr;
+  }
+  vector<IndexRecord::RecordInfo>::const_iterator lowerBound;
+  if (recordIndex_.back().timestamp < timestamp) {
+    lowerBound = recordIndex_.end() - 1;
+  } else {
+    IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type::UNDEFINED);
+    lowerBound = lower_bound(recordIndex_.begin(), recordIndex_.end(), firstTime, timeCompare);
+  }
 
-  auto start = (lowerBound == recordIndex_.begin()) ? lowerBound : lowerBound - 1;
-  auto end = (lowerBound == recordIndex_.end()) ? lowerBound : lowerBound + 1;
-  for (auto iter = start; iter != end; iter++) {
-    double diff = std::abs((*iter).timestamp - timestamp);
+  auto left = (lowerBound == recordIndex_.begin()) ? lowerBound : lowerBound - 1;
+  double diff = 0;
+  while (diff <= epsilon) {
+    diff = std::abs((*left).timestamp - timestamp);
     if (diff <= epsilon &&
-        (nearest == nullptr || diff < std::abs(nearest->timestamp - timestamp)) &&
-        (recordType == Record::Type::UNDEFINED || iter->recordType == recordType)) {
-      nearest = &(*iter);
+        (recordType == Record::Type::UNDEFINED || left->recordType == recordType)) {
+      nearest = &(*left);
+      break;
     }
+    if (left == recordIndex_.begin()) {
+      break;
+    }
+    left--;
+  }
+  auto right = lowerBound;
+  diff = 0;
+  while (right != recordIndex_.end() && diff <= epsilon) {
+    diff = std::abs((*right).timestamp - timestamp);
+    if (diff <= epsilon &&
+        (recordType == Record::Type::UNDEFINED || right->recordType == recordType)) {
+      if (nearest == nullptr || diff < std::abs(nearest->timestamp - timestamp)) {
+        nearest = &(*right);
+        break;
+      }
+    }
+    right++;
   }
 
   return nearest;
@@ -1088,19 +1113,45 @@ const IndexRecord::RecordInfo* getNearestRecordByTime(
     double epsilon,
     Record::Type recordType) {
   const IndexRecord::RecordInfo* nearest = nullptr;
-  const IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type::UNDEFINED);
-  auto lowerBound = lower_bound(index.begin(), index.end(), &firstTime, ptrTimeCompare);
-
-  auto start = (lowerBound == index.begin()) ? lowerBound : lowerBound - 1;
-  auto end = (lowerBound == index.end()) ? lowerBound : lowerBound + 1;
-  for (auto iter = start; iter != end; iter++) {
-    double diff = std::abs((*iter)->timestamp - timestamp);
-    if (diff <= epsilon &&
-        (nearest == nullptr || diff < std::abs(nearest->timestamp - timestamp)) &&
-        (recordType == Record::Type::UNDEFINED || (*iter)->recordType == recordType)) {
-      nearest = *iter;
-    }
+  if (index.empty()) {
+    return nullptr;
   }
+  vector<const IndexRecord::RecordInfo*>::const_iterator lowerBound;
+  if (index.back()->timestamp < timestamp) {
+    lowerBound = index.end() - 1;
+  } else {
+    IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type::UNDEFINED);
+    lowerBound = lower_bound(index.begin(), index.end(), &firstTime, ptrTimeCompare);
+  }
+
+  auto left = (lowerBound == index.begin()) ? lowerBound : lowerBound - 1;
+  double diff = 0;
+  while (diff <= epsilon) {
+    diff = std::abs((*left)->timestamp - timestamp);
+    if (diff <= epsilon &&
+        (recordType == Record::Type::UNDEFINED || (*left)->recordType == recordType)) {
+      nearest = *left;
+      break;
+    }
+    if (left == index.begin()) {
+      break;
+    }
+    left--;
+  }
+  auto right = lowerBound;
+  diff = 0;
+  while (right != index.end() && diff <= epsilon) {
+    diff = std::abs((*right)->timestamp - timestamp);
+    if (diff <= epsilon &&
+        (recordType == Record::Type::UNDEFINED || (*right)->recordType == recordType)) {
+      if (nearest == nullptr || diff < std::abs(nearest->timestamp - timestamp)) {
+        nearest = *right;
+        break;
+      }
+    }
+    right++;
+  }
+
   return nearest;
 }
 

@@ -16,10 +16,12 @@
 
 #include <cmath>
 #include <random>
+#include "vrs/StreamId.h"
 
 #include <gtest/gtest.h>
 
 #include <TestDataDir/TestDataDir.h>
+#include <vrs/IndexRecord.h>
 #include <vrs/RecordFileReader.h>
 
 using namespace std;
@@ -66,6 +68,52 @@ static bool isCloserThan(
     double timestamp,
     const IndexRecord::RecordInfo& farther) {
   return abs(closer.timestamp - timestamp) < abs(farther.timestamp - timestamp);
+}
+
+const IndexRecord::RecordInfo* getNearestRecordByTime(
+    const vector<IndexRecord::RecordInfo>& index,
+    double timestamp,
+    double epsilon,
+    StreamId streamId = {},
+    Record::Type recordType = Record::Type::UNDEFINED) {
+  const IndexRecord::RecordInfo* closest = nullptr;
+  for (const auto& record : index) {
+    if ((!streamId.isValid() || streamId == record.streamId) &&
+        (recordType == Record::Type::UNDEFINED || recordType == record.recordType) &&
+        (closest == nullptr || isCloserThan(record, timestamp, *closest) ||
+         (record.timestamp == closest->timestamp && timestamp > record.timestamp))) {
+      closest = &record;
+    }
+  }
+  if (closest != nullptr && (abs(closest->timestamp - timestamp) > epsilon)) {
+    closest = nullptr;
+  }
+  EXPECT_TRUE(!streamId.isValid() || closest == nullptr || streamId == closest->streamId);
+  EXPECT_TRUE(
+      recordType == Record::Type::UNDEFINED || closest == nullptr ||
+      recordType == closest->recordType);
+  return closest;
+}
+
+void checkNearestRecord(vrs::RecordFileReader& file, const IndexRecord::RecordInfo& record) {
+  const auto& index = file.getIndex();
+  auto streamIds = file.getStreams();
+  // Add invalid stream for test
+  streamIds.insert({});
+  for (double timestampDiff : {1., -1., 1e-7, -1e-7, 1e-6, -1e-6, 0.}) {
+    double target = record.timestamp + timestampDiff;
+    // Test epsilon to be different kinds
+    for (double epsilon : {1.1, 1., 9e-1, 2e-7, 1e-7, 9e-8, 0.}) {
+      for (StreamId streamId : streamIds) {
+        for (Record::Type type :
+             {Record::Type::CONFIGURATION, Record::Type::STATE, Record::Type::DATA}) {
+          auto r = file.getNearestRecordByTime(target, epsilon, streamId, type);
+          auto ref = getNearestRecordByTime(index, target, epsilon, streamId, type);
+          EXPECT_EQ(r, ref);
+        }
+      }
+    }
+  }
 }
 
 void checkIndex(vrs::RecordFileReader& file, uint32_t recordIndex) {
@@ -167,32 +215,7 @@ void checkIndex(vrs::RecordFileReader& file, uint32_t recordIndex) {
       index[i - 1].timestamp == record.timestamp);
 
   // search nearest record with slightly different timestamps
-  double target = record.timestamp + 1e-7;
-  r = file.getNearestRecordByTime(target, 1e-6, record.streamId);
-  EXPECT_NE(r, nullptr);
-  i = file.getRecordIndex(r);
-  EXPECT_FALSE(
-      i > 0 && index[i - 1].streamId == record.streamId &&
-      isCloserThan(index[i - 1], target, record));
-  EXPECT_FALSE(
-      i + 1 < index.size() && index[i + 1].streamId == record.streamId &&
-      isCloserThan(index[i + 1], target, record));
-
-  target = record.timestamp - 1e-7;
-  r = file.getNearestRecordByTime(target, 1e-6, record.streamId);
-  EXPECT_NE(r, nullptr);
-  i = file.getRecordIndex(r);
-  EXPECT_FALSE(
-      i > 0 && index[i - 1].streamId == record.streamId &&
-      isCloserThan(index[i - 1], target, record));
-  EXPECT_FALSE(
-      i + 1 < index.size() && index[i + 1].streamId == record.streamId &&
-      isCloserThan(index[i + 1], target, record));
-
-  r = file.getNearestRecordByTime(record.timestamp + 1e-6, 1e-7, record.streamId);
-  EXPECT_EQ(r, nullptr);
-  r = file.getNearestRecordByTime(record.timestamp - 1e-6, 1e-7, record.streamId);
-  EXPECT_EQ(r, nullptr);
+  checkNearestRecord(file, record);
 
   r = file.getNearestRecordByTime(record.timestamp, 1e-6);
   EXPECT_NE(r, nullptr);
@@ -275,14 +298,6 @@ TEST_F(GetRecordTester, GetRecordTest) {
   for (uint32_t i = 0; i < index.size(); i++) {
     checkIndex(file, i);
   }
-
-  rec = file.getRecordByTime(Record::Type::CONFIGURATION, nextafter(startTime, startTime + 1));
-  auto r = file.getNearestRecordByTime(rec->timestamp, 1e-6, {}, Record::Type::CONFIGURATION);
-  EXPECT_NE(r, nullptr);
-  r = file.getNearestRecordByTime(rec->timestamp, 1e-6, {}, Record::Type::DATA);
-  EXPECT_EQ(r, nullptr);
-  r = file.getNearestRecordByTime(rec->timestamp, 1, {}, Record::Type::DATA);
-  EXPECT_EQ(r, nullptr);
 }
 
 TEST_F(GetRecordTester, GetRecordForwardBackwardTest) {
