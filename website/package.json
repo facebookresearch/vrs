@@ -7,7 +7,6 @@
     "start": "docusaurus start",
     "build": "yarn doxydoc && docusaurus build",
     "doxydoc": "/bin/bash -c 'cd .. && mkdir -p \"website/build/doxygen\" && doxygen vrs/Doxyfile'",
-    "pythondoc": "/bin/bash -c 'cd .. && bash website/build_python_docs.sh'",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",

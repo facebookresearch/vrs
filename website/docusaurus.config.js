@@ -88,11 +88,6 @@ const repoUrl = 'https://github.com/facebookresearch/vrs';
             label: 'C++ API Documentation',
           },
           {
-            href: 'pathname:///python_api/index.html',
-            position: 'left',
-            label: 'Python API Documentation',
-          },
-          {
             href: 'https://github.com/facebookresearch/vrs#getting-started',
             position: 'left',
             label: 'Build Instructions',
