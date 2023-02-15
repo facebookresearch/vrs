@@ -43,4 +43,4 @@
                      fmt::format(__VA_ARGS__)), \
                  0))
 
-#define XR_VERIFY(cond, ...) XR_VERIFY_C(DEFAULT_LOG_CHANNEL, cond, ##__VA_ARGS__, "")
+#define XR_VERIFY(cond, ...) XR_VERIFY_C(DEFAULT_LOG_CHANNEL, cond, "", ##__VA_ARGS__)

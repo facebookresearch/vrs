@@ -39,7 +39,7 @@ void logAndAbort(const std::string& condition, const std::string& message = {});
 #define XR_CHECK_FORMAT(condition, ...) \
   (condition ? 0 : ((vrs::logging::logAndAbort(#condition, fmt::format(__VA_ARGS__))), 0))
 
-#define XR_CHECK(condition, ...) XR_CHECK_FORMAT(condition, ##__VA_ARGS__, "")
+#define XR_CHECK(condition, ...) XR_CHECK_FORMAT(condition, "", ##__VA_ARGS__)
 
 #define XR_CHECK_EQ(val1, val2, ...) XR_CHECK((val1) == (val2), ##__VA_ARGS__)
 
@@ -57,7 +57,8 @@ void logAndAbort(const std::string& condition, const std::string& message = {});
 #define XR_CHECK_TRUE(val, ...) XR_CHECK_EQ(true, static_cast<bool>(val), ##__VA_ARGS__)
 #define XR_CHECK_FALSE(val, ...) XR_CHECK_EQ(false, static_cast<bool>(val), ##__VA_ARGS__)
 
-#define XR_FATAL_ERROR(...) __builtin_unreachable()
+//#define XR_FATAL_ERROR(...) __builtin_unreachable()
+#define XR_FATAL_ERROR(...) __assume(0)
 
 #define XR_DEV_CHECK(condition, ...) XR_CHECK(condition, ##__VA_ARGS__)
 #define XR_DEV_CHECK_EQ(val1, val2, ...) XR_CHECK_EQ(val1, val2, ##__VA_ARGS__)
