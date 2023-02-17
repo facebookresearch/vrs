@@ -132,7 +132,7 @@ ContentBlockChunk::ContentBlockChunk(const ContentBlock& contentBlock, const Cur
 }
 
 ContentBlockChunk::ContentBlockChunk(const ContentBlock& contentBlock, vector<uint8_t>&& buffer)
-    : ContentChunk(move(buffer)), contentBlock_{contentBlock} {}
+    : ContentChunk(std::move(buffer)), contentBlock_{contentBlock} {}
 
 void FilteredChunksSource::copyTo(uint8_t* buffer) const {
   for (auto& chunk : chunks_) {
@@ -218,7 +218,7 @@ bool RecordFilterCopier::onImageRead(const CurrentRecord& rec, size_t idx, const
   }
   unique_ptr<ContentBlockChunk> imageChunk = make_unique<ContentBlockChunk>(cb, rec);
   filterImage(rec, idx, cb, imageChunk->getBuffer());
-  chunks_.emplace_back(move(imageChunk));
+  chunks_.emplace_back(std::move(imageChunk));
   return true;
 }
 
@@ -229,7 +229,7 @@ bool RecordFilterCopier::onAudioRead(const CurrentRecord& rec, size_t idx, const
   }
   unique_ptr<ContentBlockChunk> audioChunk = make_unique<ContentBlockChunk>(cd, rec);
   filterAudio(rec, idx, cd, audioChunk->getBuffer());
-  chunks_.emplace_back(move(audioChunk));
+  chunks_.emplace_back(std::move(audioChunk));
   return true;
 }
 
@@ -249,7 +249,7 @@ bool RecordFilterCopier::onUnsupportedBlock(
   if (status != 0) {
     XR_LOGW("Failed to read {} block: {}", cb.asString(), errorCodeToMessage(status));
   }
-  chunks_.emplace_back(move(bufferSourceChunk));
+  chunks_.emplace_back(std::move(bufferSourceChunk));
   return readNext;
 }
 

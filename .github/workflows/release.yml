@@ -1,0 +1,50 @@
+name: VRS Release
+
+on: [push]
+
+jobs:
+  get-current-version:
+    if: github.repository == 'facebookresearch/vrs'
+    runs-on: ubuntu-20.04
+    steps:
+      - name: checkout-repo-content
+        uses: actions/checkout@v2
+
+      - name: setup-python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: get current version and tag
+        id: get-current-version-and-tag
+        run: |
+          output=$(python3 release_utils.py --get-current-version)
+          echo $output
+          current_version=$(echo $output | awk '{print $1}')
+          current_tag=$(echo $output | awk '{print $2}')
+          echo "current version is $current_version"
+          echo "current tag is $current_tag"
+          echo ::set-output name=version::$current_version
+          echo ::set-output name=tag::$current_tag
+    outputs:
+      current_version: ${{ steps.get-current-version-and-tag.outputs.version }}
+      current_tag: ${{ steps.get-current-version-and-tag.outputs.tag }}
+
+  create-release-if-not-exist:
+    if: github.repository == 'facebookresearch/vrs'
+    runs-on: ubuntu-20.04
+    needs:
+      - get-current-version
+    steps:
+      - id: get-latest-tag
+        uses: pozetroninc/github-action-get-latest-release@master
+        with:
+          repository: ${{ github.repository }}
+      - name: checkout-repo-content
+        uses: actions/checkout@v2
+
+      - name: Create release
+        if: needs.get-current-version.outputs.current_tag != steps.get-latest-tag.outputs.release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: '${{ needs.get-current-version.outputs.current_tag }}'

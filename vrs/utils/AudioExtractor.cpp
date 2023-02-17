@@ -25,6 +25,7 @@
 
 #include <vrs/RecordReaders.h>
 #include <vrs/helpers/Endian.h>
+#include <vrs/helpers/FileMacros.h>
 #include <vrs/os/Utils.h>
 
 using namespace std;
@@ -33,30 +34,22 @@ using namespace vrs;
 namespace {
 
 template <class T>
-void writeHeader(void* p, const T t) {
+inline void writeHeader(void* p, const T t) {
   memcpy(p, &t, sizeof(T));
 }
+} // namespace
 
-void startNewWavFile(
-    ofstream& outFile,
+constexpr uint32_t kWavHeaderSize = 44;
+
+namespace vrs::utils {
+
+int AudioExtractor::createWavFile(
+    const std::string& wavFilePath,
     const AudioContentBlockSpec& audioBlock,
-    const string& folderPath,
-    StreamId id,
-    uint32_t audioCounter,
-    double timestamp) {
-  XR_VERIFY(os::makeDirectories(folderPath) == 0);
-  string path = fmt::format(
-      "{}/{}-{:04}-{:.3f}.wav", folderPath, id.getNumericName(), audioCounter, timestamp);
-  cout << "Writing " << path << endl;
-  cout << "WAV file details: " << static_cast<int>(audioBlock.getChannelCount()) << " channel"
-       << (audioBlock.getChannelCount() != 1 ? "s, " : ", ") << audioBlock.getSampleRate() << " "
-       << audioBlock.getSampleFormatAsString() << " samples/s, "
-       << static_cast<int>(audioBlock.getBitsPerSample()) << " bits per sample, "
-       << static_cast<int>(audioBlock.getSampleBlockStride()) << " bytes sample block stride."
-       << endl;
+    DiskFile& outFile) {
+  IF_ERROR_RETURN(outFile.create(wavFilePath));
 
-  outFile.open(path, ofstream::out | ofstream::binary);
-  array<uint8_t, 44> fileHeader{};
+  array<uint8_t, kWavHeaderSize> fileHeader{};
   writeHeader(fileHeader.data() + 0, htobe32(0x52494646)); // 'RIFF' in big endian
   writeHeader(fileHeader.data() + 4, htole32(0)); // will come back and compute this later (36 +
                                                   // total PCM data size), write in little endian
@@ -103,28 +96,13 @@ void startNewWavFile(
   writeHeader(fileHeader.data() + 40, htole32(0)); // will come back and fill this in later (total
                                                    // PCM data size), write in little endian
 
-  outFile.write((char*)fileHeader.data(), fileHeader.size());
+  return outFile.write((char*)fileHeader.data(), fileHeader.size());
 }
 
-void closeExistingWavFile(ofstream& outFile, uint32_t totalAudioDataSize) {
-  // close existing file if there is one
-  if (outFile.is_open()) {
-    // seek to beginning, update chunk & file sizes in header before closing
-    outFile.seekp(4);
-    uint32_t fileSize = htole32(36 + totalAudioDataSize);
-    outFile.write((char*)&fileSize, sizeof(fileSize));
-    outFile.seekp(40);
-    uint32_t dataSize = htole32(totalAudioDataSize);
-    outFile.write((char*)&dataSize, sizeof(dataSize));
-    outFile.close();
-  }
-}
-
-uint32_t writeAudioBlock(
-    ofstream& outFile,
+int AudioExtractor::writeWavAudioData(
+    DiskFile& inFile,
     const AudioContentBlockSpec& audioBlock,
-    const vector<uint8_t>& audio) {
-  uint32_t bytesWritten = 0;
+    const std::vector<uint8_t>& audio) {
   uint32_t srcOffset = 0;
   uint32_t bytesPerSampleBlock =
       (audioBlock.getBitsPerSample() + 7) / 8 * audioBlock.getChannelCount();
@@ -137,16 +115,26 @@ uint32_t writeAudioBlock(
     }
 
     // round up # of bits per sample to nearest byte
-    outFile.write((char*)audio.data() + srcOffset, bytesPerSampleBlock);
-    bytesWritten += bytesPerSampleBlock;
+    IF_ERROR_RETURN(inFile.write((char*)audio.data() + srcOffset, bytesPerSampleBlock));
     srcOffset += srcStride;
   }
-  return bytesWritten;
+  return 0;
 }
 
-} // namespace
-
-namespace vrs::utils {
+int AudioExtractor::closeWavFile(DiskFile& inFile) {
+  if (!inFile.isOpened()) {
+    return 0;
+  }
+  uint32_t totalAudioDataSize = inFile.getPos() - kWavHeaderSize;
+  // seek to beginning, update chunk & file sizes in header before closing
+  IF_ERROR_RETURN(inFile.setPos(4));
+  uint32_t fileSize = htole32(36 + totalAudioDataSize);
+  IF_ERROR_RETURN(inFile.write((char*)&fileSize, sizeof(fileSize)));
+  IF_ERROR_RETURN(inFile.setPos(40));
+  uint32_t dataSize = htole32(totalAudioDataSize);
+  IF_ERROR_RETURN(inFile.write((char*)&dataSize, sizeof(dataSize)));
+  return inFile.close();
+}
 
 AudioExtractor::AudioExtractor(const string& folderPath, StreamId id, uint32_t& counter)
     : folderPath_{folderPath},
@@ -156,7 +144,7 @@ AudioExtractor::AudioExtractor(const string& folderPath, StreamId id, uint32_t& 
 
 AudioExtractor::~AudioExtractor() {
   // Need to write header size before closing file
-  closeExistingWavFile(currentWavFile_, totalAudioDataSize_);
+  closeWavFile(currentWavFile_);
 }
 
 bool AudioExtractor::onAudioRead(
@@ -182,15 +170,24 @@ bool AudioExtractor::onAudioRead(
   }
 
   if (!currentAudioContentBlockSpec_.isCompatibleWith(audioBlockSpec)) {
-    closeExistingWavFile(currentWavFile_, totalAudioDataSize_);
-    totalAudioDataSize_ = 0;
-    startNewWavFile(
-        currentWavFile_,
-        audioBlockSpec,
+    closeWavFile(currentWavFile_);
+
+    XR_VERIFY(os::makeDirectories(folderPath_) == 0);
+    string path = fmt::format(
+        "{}/{}-{:04}-{:.3f}.wav",
         folderPath_,
-        id_,
+        id_.getNumericName(),
         streamOutputAudioFileCount_,
         record.timestamp);
+    cout << "Writing " << path << endl;
+    cout << "WAV file details: " << static_cast<int>(audioBlockSpec.getChannelCount()) << " channel"
+         << (audioBlockSpec.getChannelCount() != 1 ? "s, " : ", ") << audioBlockSpec.getSampleRate()
+         << " " << audioBlockSpec.getSampleFormatAsString() << " samples/s, "
+         << static_cast<int>(audioBlockSpec.getBitsPerSample()) << " bits per sample, "
+         << static_cast<int>(audioBlockSpec.getSampleBlockStride()) << " bytes sample block stride."
+         << endl;
+    XR_VERIFY(createWavFile(path, audioBlockSpec, currentWavFile_) == 0);
+
     currentAudioContentBlockSpec_ = audioBlockSpec;
     cumulativeOutputAudioFileCount_++;
     streamOutputAudioFileCount_++;
@@ -198,7 +195,7 @@ bool AudioExtractor::onAudioRead(
     segmentSamplesCount_ = 0;
   }
 
-  totalAudioDataSize_ += writeAudioBlock(currentWavFile_, audioBlockSpec, audio_);
+  XR_VERIFY(writeWavAudioData(currentWavFile_, audioBlockSpec, audio_) == 0);
 
   // Time/sample counting validation
   if (segmentSamplesCount_ > 0) {

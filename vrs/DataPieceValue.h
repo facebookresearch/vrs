@@ -108,6 +108,7 @@ class DataPieceValue : public DataPiece {
       outDefault = *defaultValue_.get();
       return true;
     }
+    outDefault = T{};
     return false;
   }
 
@@ -153,13 +154,13 @@ class DataPieceValue : public DataPiece {
     return getProperty(kMaxValue, outMax);
   }
   /// Get minimum increment for this value, between two successive records.
-  /// @param outMinIncrement: Reference to set to the minimum incremenet value.
+  /// @param outMinIncrement: Reference to set to the minimum increment value.
   /// @return True if there is minimum increment value & outMinIncrement was set.
   bool getMinIncrement(T& outMinIncrement) const {
     return getProperty(kMinIncrement, outMinIncrement);
   }
   /// Get maximum increment for this value, between two successive records.
-  /// @param outMaxIncrement: Reference to set to the maximum incremenet value.
+  /// @param outMaxIncrement: Reference to set to the maximum increment value.
   /// @return True if there is maximum increment value & outMaxIncrement was set.
   bool getMaxIncrement(T& outMaxIncrement) const {
     return getProperty(kMaxIncrement, outMaxIncrement);
@@ -299,7 +300,7 @@ class DataPieceEnum : public DataPieceValue<StorageType> {
   /// @return True if the value was set.
   /// If the value wasn't available, returns false.
   bool get(EnumType& e) const {
-    StorageType v;
+    StorageType v{};
     bool r = DataPieceValue<StorageType>::get(v);
     e = static_cast<EnumType>(v);
     return r;

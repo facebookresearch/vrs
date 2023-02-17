@@ -38,7 +38,7 @@ struct JsonWrapper;
 
 /// \brief Abstract class representing a piece of information part of a DataLayout.
 ///
-/// DataPiece objets have a type (DataPieceType) and label (a text name),
+/// DataPiece objects have a type (DataPieceType) and label (a text name),
 /// which together are enough to identify uniquely a DataPiece of a particular DataLayout.
 /// See DataLayout for more details.
 class DataPiece {
@@ -133,16 +133,16 @@ class DataPiece {
     tags_[kUnit] = unit;
   }
 
-  /// Get the decription of a DataPiece.
+  /// Get the description of a DataPiece.
   /// @param outDescription: Reference to a string to set.
   /// @return True, if the unit tag was found, and outDescription was set. False, otherwise.
   bool getDescription(string& outDescription) const {
     return getTag(kDescription, outDescription);
   }
-  /// Set the decription of a DataPiece.
-  /// @param decription: Human readable description of the DataPiece.
-  void setDescription(const string& decription) {
-    tags_[kDescription] = decription;
+  /// Set the description of a DataPiece.
+  /// @param description: Human readable description of the DataPiece.
+  void setDescription(const string& description) {
+    tags_[kDescription] = description;
   }
 
   /// Specify if the DataPiece is required when mapping to another DataLayout.

@@ -188,7 +188,7 @@ void assertEmptyStreamTags(const MultiRecordFileReader& reader, UniqueStreamId s
 }
 
 void assertEmptyStreamTags(const MultiRecordFileReader& reader) {
-  for (const auto& stream : reader.getStreams()) {
+  for (auto stream : reader.getStreams()) {
     assertEmptyStreamTags(reader, stream);
   }
 }
@@ -303,8 +303,10 @@ TEST_F(MultiRecordFileReaderTest, multiFile) {
   ASSERT_LT(0, reader.getTotalSourceSize());
   assertEmptyStreamTags(reader);
   TestStreamPlayer streamPlayer;
-  for (const auto& stream : reader.getStreams()) {
+  for (auto stream : reader.getStreams()) {
     reader.setStreamPlayer(stream, &streamPlayer);
+    // validate serial numbers
+    EXPECT_EQ(stream, reader.getStreamForSerialNumber(reader.getSerialNumber(stream)));
   }
   // Validate that Data Record timestamps match with expectedTimestamps
   auto timestampIt = expectedTimestamps.cbegin();
@@ -341,7 +343,7 @@ TEST_F(MultiRecordFileReaderTest, multiFile) {
   const double lastTimestamp = reader.getRecord(reader.getRecordCount() - 1)->timestamp;
   ASSERT_EQ(nullptr, reader.getRecordByTime(lastTimestamp + 10));
   // Validate getRecordByTime(stream, timestamp)
-  for (const auto& stream : reader.getStreams()) {
+  for (auto stream : reader.getStreams()) {
     const auto& streamIndex = reader.getIndex(stream);
     const size_t position = streamIndex.size() / 2;
     const IndexRecord::RecordInfo* record = streamIndex[position];
@@ -365,7 +367,7 @@ TEST_F(MultiRecordFileReaderTest, multiFile) {
   stream0Player.validateLastRecord(firstConfigRecord);
   // Validate readFirstConfigurationRecords()
   TestStreamPlayer allStreamsPlayer1, allStreamsPlayer2;
-  for (const auto& stream : reader.getStreams()) {
+  for (auto stream : reader.getStreams()) {
     reader.setStreamPlayer(stream, &allStreamsPlayer1);
     reader.setStreamPlayer(stream, &allStreamsPlayer2);
   }
@@ -407,6 +409,10 @@ TEST_F(MultiRecordFileReaderTest, singleFile) {
   const auto& streams = reader.getStreams();
   ASSERT_EQ(1, streams.size());
   ASSERT_EQ(numTotalRecords, reader.getRecordCount());
+  // validate serial numbers
+  for (const auto& streamId : streams) {
+    EXPECT_EQ(streamId, reader.getStreamForSerialNumber(reader.getSerialNumber(streamId)));
+  }
   const auto stream = *streams.begin();
   ASSERT_EQ(numTotalRecords, reader.getRecordCount(stream));
   ASSERT_EQ(numConfigRecords, reader.getRecordCount(stream, Record::Type::CONFIGURATION));
@@ -511,7 +517,7 @@ TEST_F(MultiRecordFileReaderTest, getFirstAndLastRecord) {
   ASSERT_LT(0, reader.getTotalSourceSize());
   assertEmptyStreamTags(reader);
   TestStreamPlayer streamPlayer;
-  for (const auto& stream : reader.getStreams()) {
+  for (auto stream : reader.getStreams()) {
     reader.setStreamPlayer(stream, &streamPlayer);
   }
 

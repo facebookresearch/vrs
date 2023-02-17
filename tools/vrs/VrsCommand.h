@@ -37,6 +37,7 @@ enum class Command {
   Checksums,
   ChecksumVerbatim,
   Hexdump,
+  Decode,
   Compare,
   CompareVerbatim,
   Debug,
@@ -53,7 +54,8 @@ enum class Command {
   JsonDescription,
   FixIndex,
   CompressionBenchmark,
-  Count
+
+  COUNT
 };
 
 struct VrsCommand {

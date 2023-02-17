@@ -137,7 +137,7 @@ class RecordFileWriter {
   /// @param filePath: Path relative or absolute of the VRS file to create.
   /// Note: the file's & recordables' tags will be written to disk before the call returns. Make
   /// sure to call this method only after you've added all your recordables and set all the tags.
-  int createFileAsync(const string& filePath);
+  virtual int createFileAsync(const string& filePath);
 
   /// Create a VRS file to write to in a background thread, with a separate head file that will
   /// contain the file's header, and the description and index records only. All the user records
@@ -224,7 +224,7 @@ class RecordFileWriter {
 
   /// Start writing all the pending records, and wait for the file to be written & closed.
   /// @return A status code: 0 if no error occurred, a file system error code otherwise.
-  int waitForFileClosed();
+  virtual int waitForFileClosed();
 
   /// Set a tag value.
   /// Note: tags are written when the file is created! Changes made later will not be saved!
@@ -306,7 +306,8 @@ class RecordFileWriter {
   set<Recordable*> recordables_;
   mutable std::mutex recordablesMutex_;
 
-  // data members valid while a file is being worked on
+ protected:
+  /// data members valid while a file is being worked on
   unique_ptr<WriteFileHandler> file_;
   uint64_t maxChunkSize_;
   unique_ptr<NewChunkHandler> newChunkHandler_;

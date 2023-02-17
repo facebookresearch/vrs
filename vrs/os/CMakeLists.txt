@@ -14,7 +14,7 @@
 
 file(GLOB VRS_OS_SRCS *.cpp *.h *.hpp)
 # Remove fb-only source files (if there is still any lying around)
-file(GLOB VRS_OS_FB_SRCS *_fb\.cpp *_fb\.h)
+file(GLOB VRS_OS_FB_SRCS *_fb.cpp *_fb.h)
 if (VRS_OS_FB_SRCS)
   list(REMOVE_ITEM VRS_OS_SRCS ${VRS_OS_FB_SRCS})
 endif()

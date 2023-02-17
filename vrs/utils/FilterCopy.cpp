@@ -92,7 +92,7 @@ int filterCopy(
   }
   int copyResult = throttledFileDelegate->createFile(pathToCopy);
   if (copyResult == 0) {
-    // Init tracker propgress early, to be sure we track the background thread queue size
+    // Init tracker progress early, to be sure we track the background thread queue size
     filteredReader.preRollConfigAndState(); // make sure to copy most recent config & state records
     throttledWriter.initTimeRange(startTimestamp, endTimestamp);
     filteredReader.iterateAdvanced(&throttledWriter);
@@ -276,7 +276,7 @@ int filterMerge(
           r.record->recordType);
       offset = r.record->fileOffset;
     }
-    recordFileWriter.preallocateIndex(move(preliminaryIndex));
+    recordFileWriter.preallocateIndex(std::move(preliminaryIndex));
   }
 
   int mergeResult = throttledFileDelegate->createFile(pathToCopy);

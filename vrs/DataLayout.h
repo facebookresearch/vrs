@@ -57,7 +57,8 @@ enum class DataPieceType : uint8_t {
   Vector = 3, ///< Variable size array of T.
   String = 4, ///< Variable size array of char, null terminated.
   StringMap = 5, ///< Map with string keys, and T values.
-  Count ///< Count of enum values
+
+  COUNT ///< Count of enum values
 };
 
 /// Enum for a DataLayout printout json formatting profile
@@ -143,7 +144,7 @@ struct JsonFormatProfileSpec {
 /// Note: You can not use DataLayout template types with your own POD types, because:
 ///  1. DataLayout needs a factory able to instantiate them, even when your code isn't around,
 ///  2. it would defeat the purpose of handling format changes, as any change made to your
-///  POD type would have to be versionned & managed by hand.
+///  POD type would have to be versioned & managed by hand.
 ///
 /// Variable-size DataPiece objects use a number of bytes that depends on their actual value:
 /// - DataPieceVector<T>: a vector of any of the supported POD types, or std::string.
@@ -182,7 +183,7 @@ struct JsonFormatProfileSpec {
 /// data, unlike with json, which guaranties the bit accuracy of your data.
 /// That can be critically important when using float & double numbers.
 ///
-/// Of course, all of this is the reponsibility of VRS itself.
+/// Of course, all of this is the responsibility of VRS itself.
 class DataLayout {
  protected:
   DataLayout() = default;
@@ -252,7 +253,7 @@ class DataLayout {
   /// @internal
   size_t getVarDataSizeFromIndex() const;
 
-  /// @return Size to fit the variable-size data writen to its variable-size DataPieces fields.
+  /// @return Size to fit the variable-size data written to its variable-size DataPieces fields.
   /// Won't match varData_'s size, unless collectVariableDataAndUpdateIndex() was called.
   /// @internal
   size_t getVarDataSizeNeeded() const;
@@ -356,30 +357,39 @@ class DataLayout {
   /// @return Pointer to the DataPiece found, or nullptr.
   /// @internal (meant for testing)
   template <class T>
-  DataPieceValue<T>* findDataPieceValue(const string& label) const;
+  const DataPieceValue<T>* findDataPieceValue(const string& label) const;
+  template <class T>
+  DataPieceValue<T>* findDataPieceValue(const string& label);
   /// Find a field of type DataPieceArray<T> by name.
   /// @param label: Text name of the field (not the variable name).
   /// @return Pointer to the DataPiece found, or nullptr.
   /// @internal (meant for testing)
   template <class T>
-  DataPieceArray<T>* findDataPieceArray(const string& label, size_t arraySize) const;
+  const DataPieceArray<T>* findDataPieceArray(const string& label, size_t arraySize) const;
+  template <class T>
+  DataPieceArray<T>* findDataPieceArray(const string& label, size_t arraySize);
   /// Find a field of type DataPieceVector<T> by name.
   /// @param label: Text name of the field (not the variable name).
   /// @return Pointer to the DataPiece found, or nullptr.
   /// @internal (meant for testing)
   template <class T>
-  DataPieceVector<T>* findDataPieceVector(const string& label) const;
+  const DataPieceVector<T>* findDataPieceVector(const string& label) const;
+  template <class T>
+  DataPieceVector<T>* findDataPieceVector(const string& label);
   /// Find a field of type DataPieceStringMap<T> by name.
   /// @param label: Text name of the field (not the variable name).
   /// @return Pointer to the DataPiece found, or nullptr.
   /// @internal (meant for testing)
   template <class T>
-  DataPieceStringMap<T>* findDataPieceStringMap(const string& label) const;
+  const DataPieceStringMap<T>* findDataPieceStringMap(const string& label) const;
+  template <class T>
+  DataPieceStringMap<T>* findDataPieceStringMap(const string& label);
   /// Find a field of type DataPieceString by name.
   /// @param label: Text name of the field (not the variable name).
   /// @return Pointer to the DataPiece found, or nullptr.
   /// @internal (meant for testing)
-  DataPieceString* findDataPieceString(const string& label) const;
+  const DataPieceString* findDataPieceString(const string& label) const;
+  DataPieceString* findDataPieceString(const string& label);
   /// Iterate over the different data piece elements of a DataLayout.
   /// @param callback: a function to call for each element found.
   /// @param type: filter to select only an element type, of UNDEFINED for no filtering.
@@ -515,7 +525,7 @@ class EmptyDataLayout : public DataLayout {
 /// All the DataPiece objects will be automatically registered in the DataLayout,
 /// allowing the DataLayout to references all its DataPiece objects.
 ///
-/// Exemple:
+/// Example:
 ///
 ///   class MyConfig : public AutoDataLayout {
 ///     DataPieceValue<uint32_t> exposureMode{"exposure_mode"};
@@ -536,10 +546,10 @@ class AutoDataLayoutEnd {
   AutoDataLayoutEnd();
 };
 
-/// \brief Specialiazed DataLayout for programmatic DataLayout generation.
+/// \brief Specialized DataLayout for programmatic DataLayout generation.
 ///
 /// Helper class to build a DataLayout manually, piece-by-piece.
-/// Make sure to call endLayout as soon as you're no longer adding pieces, to release a blobal lock.
+/// Make sure to call endLayout as soon as you're no longer adding pieces, to release a global lock.
 class ManualDataLayout : public DataLayout {
  public:
   /// Build a DataLayout from a json definition.

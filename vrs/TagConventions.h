@@ -71,7 +71,7 @@ namespace tag_conventions {
 
   /// Add tags describing a device.
   /// @param writer: the file writer, or a recordable to describe.
-  /// @param type: a device type descrption.
+  /// @param type: a device type description.
   /// @param serialNumber: the device's serial number.
   /// @param version: the device's version number.
   template <class T> inline // vrs::RecordFileWriter or vrs::Recordable

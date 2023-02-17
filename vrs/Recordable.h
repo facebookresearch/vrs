@@ -189,6 +189,16 @@ class Recordable {
     return tags_;
   }
 
+  /// Get the stream's unique serial number generated on stream creation.
+  /// That serial number is universaly unique and it will be preserved during file copies, file
+  /// processing, and other manipulations that preserve stream tags, whereas the stream's streamID
+  /// may change.
+  /// Note that VRS internal tags might be overwritten, in particular during file copy operations,
+  /// so this serial number might be intentionally replaced (by design).
+  const string& getSerialNumber() const {
+    return getTag(tags_.vrs, getSerialNumberTagName());
+  }
+
   /// Get the name of the VRS tag used to store the original name of the recordable.
   /// @internal
   static const string& getOriginalNameTagName() {
@@ -207,6 +217,12 @@ class Recordable {
   /// @internal
   RecordManager& getRecordManager() {
     return recordManager_;
+  }
+
+  /// Get the name of the VRS tag used to store the stream's serial number.
+  static const string& getSerialNumberTagName() {
+    static const string sSerialNumberTagName("VRS_Serial_Number");
+    return sSerialNumberTagName;
   }
 
   /// Recordable instance ids are automatically assigned when Recordable objects are created.
@@ -278,6 +294,8 @@ class Recordable {
   /// Each type is counted separately. The default value is used to reset Ids during tests.
   /// @internal
   static uint16_t getNewInstanceId(RecordableTypeId typeId = static_cast<RecordableTypeId>(0));
+
+  const string& getTag(const map<string, string>& tags, const string& name) const;
 };
 
 } // namespace vrs

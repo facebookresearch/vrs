@@ -62,7 +62,7 @@ struct FileReaderStateConverter : public EnumStringConverter<
                                       FileReaderState::Undefined,
                                       FileReaderState::Undefined> {
   static_assert(
-      cNamesCount == static_cast<size_t>(FileReaderState::Count),
+      cNamesCount == vrs::enumCount<FileReaderState>(),
       "Missing FileReaderState name definitions");
 };
 
@@ -410,6 +410,18 @@ vector<FrameWidget*> FileReader::openFile(QVBoxLayout* videoFrames, QWidget* wid
 void FileReader::setOverlayColor(QColor color) {
   for (auto& image : imageReaders_) {
     image.second->getWidget()->setOverlayColor(color);
+  }
+}
+
+void FileReader::setFontSize(int fontSize) {
+  for (auto& image : imageReaders_) {
+    image.second->getWidget()->setFontSize(fontSize);
+  }
+}
+
+void FileReader::setSolidBackground(bool solid) {
+  for (auto& image : imageReaders_) {
+    image.second->getWidget()->setSolidBackground(solid);
   }
 }
 

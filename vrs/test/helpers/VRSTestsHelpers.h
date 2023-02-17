@@ -17,6 +17,8 @@
 #include <functional>
 #include <string>
 
+#include <fmt/format.h>
+
 #include <vrs/DataLayout.h>
 #include <vrs/DataPieces.h>
 #include <vrs/DiskFile.h>
@@ -39,6 +41,11 @@ struct RecordFileWriterTester {
       const RecordFileWriter::RecordBatches& batch,
       RecordFileWriter::SortedRecords& inOutSortedRecords) {
     return RecordFileWriter::addRecordBatchesToSortedRecords(batch, inOutSortedRecords);
+  }
+  static int64_t getCurrentFileSize(RecordFileWriter& file) {
+    return file.indexRecordWriter_.getSplitHead()
+        ? file.indexRecordWriter_.getSplitHead()->getPos() + file.file_->getPos()
+        : file.file_->getPos();
   }
 };
 
@@ -114,12 +121,15 @@ struct CreateParams {
     return *this;
   }
   CreateParams& setChunkHandler(unique_ptr<NewChunkHandler>&& handler) {
-    chunkHandler = move(handler);
+    chunkHandler = std::move(handler);
     return *this;
   }
   CreateParams& setCustomCreateFileFunction(CustomCreateFileFunction _customCreateFileFunction) {
     customCreateFileFunction = _customCreateFileFunction;
     return *this;
+  }
+  static string getCameraStreamTag(uint32_t cameraIndex) {
+    return fmt::format("camera_{}", cameraIndex);
   }
 
   // More params with "neutral" default
@@ -129,6 +139,11 @@ struct CreateParams {
   size_t fileWriterThreadCount = 0; // 0 is the default value
   unique_ptr<NewChunkHandler> chunkHandler;
   CustomCreateFileFunction customCreateFileFunction;
+
+  // Size of the file after it was created, but before any record was written.
+  // Any file shorter than this is not salvageable, because the description record isn't complete.
+  // This value is set on exit, so we know how much we can truncate the file without breaking.
+  int64_t outMinFileSize = -1;
 };
 
 /// Both functions create the same VRS, except that the former uses multiple threads,

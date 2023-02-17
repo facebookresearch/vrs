@@ -302,7 +302,7 @@ void FilteredFileReader::applyRecordableFilters(const vector<string>& filters) {
       stringToIds(*(++iter), reader, argIds);
       if (!newSet) {
         // first command is add? start from empty set
-        newSet = make_unique<set<StreamId>>(move(argIds));
+        newSet = make_unique<set<StreamId>>(std::move(argIds));
       } else {
         newSet->insert(argIds.begin(), argIds.end());
       }
@@ -333,7 +333,7 @@ void FilteredFileReader::applyRecordableFilters(const vector<string>& filters) {
 
 void FilteredFileReader::applyTypeFilters(const vector<string>& filters) {
   set<Record::Type> types = {Record::Type::CONFIGURATION, Record::Type::DATA, Record::Type::STATE};
-  set<Record::Type>* newSet = nullptr;
+  std::unique_ptr<set<Record::Type>> newSet = nullptr;
   for (auto iter = filters.begin(); iter != filters.end(); ++iter) {
     const bool isPlus = *iter == "+";
     Record::Type readType = stringToType(*(++iter));
@@ -341,22 +341,22 @@ void FilteredFileReader::applyTypeFilters(const vector<string>& filters) {
       if (isPlus) {
         if (newSet == nullptr) {
           // first command is add? start from empty set
-          newSet = new set<Record::Type>();
+          newSet = std::make_unique<set<Record::Type>>();
         }
         newSet->insert(readType);
       } else { // if it's not a '+', then it was a '-'
         if (newSet == nullptr) {
           // first command is remove? start with set of all known streams
-          newSet = new set<Record::Type>(types);
+          newSet = std::make_unique<set<Record::Type>>(types);
         }
         newSet->erase(readType);
       }
     }
   }
   if (newSet != nullptr) {
-    this->filter.types = move(*newSet);
+    this->filter.types = std::move(*newSet);
   } else {
-    this->filter.types = move(types);
+    this->filter.types = std::move(types);
   }
 }
 
@@ -552,7 +552,7 @@ void FilteredFileReader::preRollConfigAndState(RecordReaderFunc recordReaderFunc
   vector<size_t> indexes;
   const auto& records = reader.getIndex();
   // to compare: only the timestamps matters!
-  IndexRecord::RecordInfo firstTime(filter.minTime, 0, StreamId(), Record::Type());
+  IndexRecord::RecordInfo firstTime(filter.minTime, 0, StreamId(), Record::Type::UNDEFINED);
   auto lowerBound = lower_bound(records.begin(), records.end(), firstTime);
   if (lowerBound != records.end()) {
     size_t index = static_cast<size_t>(lowerBound - records.begin()); // guaranteed positive
@@ -641,7 +641,7 @@ void FilteredFileReader::iterateAdvanced(
   }
 
   const auto& records = reader.getIndex();
-  IndexRecord::RecordInfo firstTime(filter.minTime, 0, StreamId(), Record::Type());
+  IndexRecord::RecordInfo firstTime(filter.minTime, 0, StreamId(), Record::Type::UNDEFINED);
   auto lowerBound = lower_bound(records.begin(), records.end(), firstTime);
   if (lowerBound != records.end()) {
     size_t first = static_cast<size_t>(lowerBound - records.begin());

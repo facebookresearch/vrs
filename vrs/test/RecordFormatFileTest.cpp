@@ -664,7 +664,7 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
     EXPECT_EQ(id.getTypeId(), RecordableTypeId::UnitTest1);
     EXPECT_TRUE(id.isValid());
     filePlayer.setStreamPlayer(id, this);
-    EXPECT_EQ(filePlayer.getTags(id).vrs.size(), 9);
+    EXPECT_EQ(filePlayer.getTags(id).vrs.size(), 10);
     EXPECT_EQ(filePlayer.getTags(id).user.size(), 2);
     EXPECT_EQ(filePlayer.getTag(id, "some_tag_name"), "some_tag_value");
     EXPECT_EQ(

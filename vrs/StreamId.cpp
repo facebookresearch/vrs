@@ -94,6 +94,7 @@ const map<RecordableTypeId, const char*>& getRecordableTypeIdRegistry() {
     {RecordableTypeId::UsbRecordableClass, "USB Data Class"},
     {RecordableTypeId::TimeRecordableClass, "Time Domain Mapping Class"},
     {RecordableTypeId::AttentionRecordableClass, "Attention Data Class"},
+    {RecordableTypeId::GMSRecordableClass, "GMS Data Class"},
 
     /// << User Input >>
     {RecordableTypeId::InputRecordableClass, "Input Data Class"},

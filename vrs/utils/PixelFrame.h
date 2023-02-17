@@ -33,8 +33,6 @@
 
 namespace vrs::utils {
 
-using PixelFrameDecoder = std::function<bool(PixelFrame& out, const vector<uint8_t>&, bool decode)>;
-
 /// Helper class to read & convert images read using RecordFormat into simpler, but maybe degraded,
 /// pixel buffer, that can easily be displayed, or saved to disk as jpg or png.
 ///
@@ -140,6 +138,27 @@ class PixelFrame {
   static bool
   readJpegFrame(std::shared_ptr<PixelFrame>& frame, RecordReader* reader, const uint32_t sizeBytes);
 
+  /// Compress pixel frame to jpg. Supports ImageFormat::RAW and PixelFormat::RGB8 or GREY8 only.
+  /// @param outBuffer: on exit, the jpg payload which can be saved as a .jpg file
+  /// @param quality: jpg quality setting, from 1 to 100
+  /// @return True if the image and pixel formats are supported, the compression succeeded, and
+  /// outBuffer was set. If returning False, do not use outBuffer.
+  bool jpgCompress(std::vector<uint8_t>& outBuffer, uint32_t quality);
+
+  /// Compress pixel frame to jpg. See other variant of jpgCompress for specs.
+  /// @param pixelSpec: specs of the pixel buffer.
+  /// @param pixels: the raw pixel buffer.
+  /// @param outBuffer: on exit, the jpg payload which can be saved as a .jpg file.
+  /// outBuffer may be the same as pixels.
+  /// @param quality: jpg quality setting, from 1 to 100
+  /// @return True if the image and pixel formats are supported, the compression succeeded, and
+  /// outBuffer was set. If returning False, do not use outBuffer.
+  static bool jpgCompress(
+      const ImageContentBlockSpec& pixelSpec,
+      const std::vector<uint8_t>& pixels,
+      std::vector<uint8_t>& outBuffer,
+      uint32_t quality);
+
   /// Read a JPEG-XL encoded frame into the internal buffer.
   /// @return True if the frame type is supported & the frame was read.
   /// Returns false, if no decoder was installed, or the data couldn't be decoded correctly.
@@ -151,9 +170,47 @@ class PixelFrame {
   /// Returns false, if no decoder was installed, or the data couldn't be decoded correctly.
   bool readJxlFrame(const std::vector<uint8_t>& buffer, bool decodePixels = true);
 
-  /// Temporary: to avoid linkage issues, jepg-xl is optional for now and support is explicit.
-  /// At best, provide a decoder when the app is initialized, before using jpeg-xl images.
-  static void setJxlDecoder(const PixelFrameDecoder& decoder);
+  /// Compress pixel frame to jxl. Supports ImageFormat::RAW and PixelFormat::RGB8 or GREY8 only.
+  /// @param outBuffer: on exit, the jxl payload which can be saved as a .jxl file
+  /// @param quality: jxl quality setting, from 20 to 100 for percentage, or 0 to 15 for distance.
+  /// @param percentNotDistance: if true quality is a percentage (default), 100% being lossless.
+  /// If false, quality is a Butteraugli distance (Google "Butteraugli" for details), where
+  /// Butteraugli distance 0 is lossless, and 15 is the worst Butteraugli distance supported.
+  /// 99.99% ~ Butteraugli 0.1, 99% ~ Butteraugli 0.2, 95.5% ~ Butteraugli 0.5, 90% ~ Butteraugli 1
+  /// @param effort: Sets encoder effort/speed level without affecting decoding speed.
+  /// Valid values are, from faster to slower speed: 1:lightning 2:thunder 3:falcon
+  /// 4:cheetah 5:hare 6:wombat 7:squirrel 8:kitten 9:tortoise.
+  /// 99.99% ~ Butteraugli 0.1, 99% ~ Butteraugli 0.2, 95.5% ~ Butteraugli 0.5, 90% ~ Butteraugli 1
+  /// @return True if the image and pixel formats are supported, the compression succeeded, and
+  /// outBuffer was set. If returning False, do not use outBuffer.
+  bool jxlCompress(
+      std::vector<uint8_t>& outBuffer,
+      float quality,
+      bool percentNotDistance = true,
+      int effort = 3);
+
+  /// Compress pixel frame to jxl. Supports ImageFormat::RAW and PixelFormat::RGB8 or GREY8 only.
+  /// @param pixelSpec: specs of the pixel buffer.
+  /// @param pixels: the raw pixel buffer.
+  /// @param outBuffer: on exit, the jxl payload which can be saved as a .jxl file.
+  /// outBuffer may be the same as pixels.
+  /// @param quality: jxl quality setting, from 20 to 100 for percentage, or 0 to 15 for distance.
+  /// @param percentNotDistance: if true quality is a percentage (default), 100% being lossless.
+  /// If false, quality is a Butteraugli distance (Google "Butteraugli" for details), where
+  /// Butteraugli distance 0 is lossless, and 15 is the worst Butteraugli distance supported.
+  /// @param effort: Sets encoder effort/speed level without affecting decoding speed.
+  /// Valid values are, from faster to slower speed: 1:lightning 2:thunder 3:falcon
+  /// 4:cheetah 5:hare 6:wombat 7:squirrel 8:kitten 9:tortoise.
+  /// 99.99% ~ Butteraugli 0.1, 99% ~ Butteraugli 0.2, 95.5% ~ Butteraugli 0.5, 90% ~ Butteraugli 1
+  /// @return True if the image and pixel formats are supported, the compression succeeded, and
+  /// outBuffer was set. If returning False, do not use outBuffer.
+  static bool jxlCompress(
+      const ImageContentBlockSpec& pixelSpec,
+      const std::vector<uint8_t>& pixels,
+      std::vector<uint8_t>& outBuffer,
+      float quality,
+      bool percentNotDistance = true,
+      int effort = 3);
 
   /// Read a PNG encoded frame into the internal buffer.
   /// @param reader: The record reader to read data from.
@@ -173,7 +230,7 @@ class PixelFrame {
   /// @param path: path of the file to write, if no outBuffer is provided
   /// @param outBuffer: if provided, a vector where to write the data, instead of writing to disk
   /// @return A status code, 0 meaning success.
-  int writeAsPng(const string& path, std::vector<uint8_t>* const outBuffer = nullptr);
+  int writeAsPng(const string& path, std::vector<uint8_t>* const outBuffer = nullptr) const;
 
   /// Normalize an input frame if possible and as necessary,
   /// which means it has one of the following pixel formats:

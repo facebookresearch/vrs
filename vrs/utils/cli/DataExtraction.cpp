@@ -45,6 +45,7 @@ void extractImages(const string& path, FilteredFileReader& filteredReader, bool 
     }
   }
   filteredReader.iterateSafe();
+  extractors.clear();
   cout << "Found " << imageCounter << " image(s)." << endl;
 }
 
@@ -67,7 +68,7 @@ int extractAudio(const string& path, FilteredFileReader& filteredReader) {
   deque<unique_ptr<StreamPlayer>> extractors;
   for (auto id : filteredReader.filter.streams) {
     if (filteredReader.reader.mightContainAudio(id)) {
-      extractors.emplace_back(move(new AudioExtractor(path, id, audioFileCount)));
+      extractors.emplace_back(std::move(new AudioExtractor(path, id, audioFileCount)));
       filteredReader.reader.setStreamPlayer(id, extractors.back().get());
       ++streamCount;
     }

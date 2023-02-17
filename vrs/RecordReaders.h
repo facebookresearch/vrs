@@ -73,7 +73,7 @@ class RecordReader {
   /// Discard any unread data.
   virtual void finish() {}
 
-  /// Tell how many bytes of record data haven't been read/consummed yet.
+  /// Tell how many bytes of record data haven't been read/consumed yet.
   /// @return Number of unread bytes (uncompressed).
   uint32_t getUnreadBytes() const {
     return remainingUncompressedSize_;
@@ -101,7 +101,7 @@ class CompressedRecordReader : public RecordReader {
   void finish() override;
 
  private:
-  int read(void* dest, uint32_t destSize, uint32_t overalSize, uint32_t& outReadSize);
+  int read(void* dest, uint32_t destSize, uint32_t overallSize, uint32_t& outReadSize);
 
   Decompressor decompressor_;
 };

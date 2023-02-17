@@ -39,8 +39,8 @@ class VideoFrameHandler {
   /// @param outBuffer: a preallocated buffer which size must be that of the raw image.
   /// @param reader: data source to read the encoded data frame from.
   /// @param contentBlock: image content block describing the encoded frame, including the codec.
-  /// @return 0 if the frame was successfuly decoded, which can happen only if:
-  /// - the codec specified in contentBlock is available and was intantiated successfuly.
+  /// @return 0 if the frame was successfully decoded, which can happen only if:
+  /// - the codec specified in contentBlock is available and was instantiated successfully.
   /// - the frame is either an i-frame, or the next p-frame after the last decoded frame.
   /// - no error unexpected error happened on the way...
   /// When 0 is returned, the frame is ready to be used, and the next content block can be read.

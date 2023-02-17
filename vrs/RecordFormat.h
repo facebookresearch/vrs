@@ -37,7 +37,7 @@ using std::vector;
 /// Type of a record's block.
 enum class ContentType : uint8_t {
   CUSTOM = 0, ///< Custom format, or unknown/unspecified data format
-  EMPTY, ///< No data (interna).
+  EMPTY, ///< No data (internal).
   DATA_LAYOUT, ///< DataLayout block.
   IMAGE, ///< Image block.
   AUDIO, ///< Audio block.
@@ -68,6 +68,7 @@ enum class PixelFormat : uint8_t {
   DEPTH32F, ///< 1 32 bit float value, representing a depth.
   RGB8, ///< 3 uint8_t values, red + green + blue.
   YUV_I420_SPLIT, ///< 3 uint8_t values, 4:2:0. The 3 planes are stored separately.
+  YUV_I420_PLANAR = YUV_I420_SPLIT, ///< same as YUV_I420_SPLIT, but more conventional name.
   RGBA8, ///< 4 uint8_t values, red + blue + green + alpha.
   RGB10, ///< uses 16 bit little-endian values. 6 most significant bits are unused and set to 0.
   RGB12, ///< uses 16 bit little-endian values. 4 most significant bits are unused and set to 0.
@@ -78,12 +79,14 @@ enum class PixelFormat : uint8_t {
   SCALAR64F, ///< 1 64 bit float value, representing high precision image data.
   YUY2, ///< 4 uint8_t values, 4:2:2, single plane.
   RGB_IR_RAW_4X4, ///< As seen on the OV2312, a 4x4 pattern of BGRG GIrGIr RGBG GIrGIr
-                  ///< where Ir means infrafred.
+                  ///< where Ir means infrared.
   RGBA32F, ///< 1 32 bit float value.
   BAYER8_RGGB, ///< 8 bit per pixel, RGGB bayer pattern.
   RAW10, ///< https://developer.android.com/reference/android/graphics/ImageFormat#RAW10
   RAW10_BAYER_RGGB, ///< 10 bit per pixel, RGGB bayer pattern.
   RAW10_BAYER_BGGR, ///< 10 bit per pixel, BGGR bayer pattern.
+  YUV_420_NV21, ///< Y plane + half width/half height chroma plane with weaved V and U values.
+  YUV_420_NV12, ///< Y plane + half width/half height chroma plane with weaved U and V values.
 
   COUNT, ///< Count of values in this enum type. @internal
 };
@@ -249,7 +252,7 @@ class ImageContentBlockSpec {
   /// Get the number of channels of this format. Every pixel format has a channel count, but
   /// it does not tell how the pixel data is arranged in the image buffer (might not be contiguous).
   /// In other words, this should not be used to make assumptions on memory layout in any way.
-  /// A value of 1 means the image is greyscale, or some form of 1 dimensional value, such as depth.
+  /// A value of 1 means the image is grayscale, or some form of 1 dimensional value, such as depth.
   uint8_t getChannelCountPerPixel() const {
     return getChannelCountPerPixel(pixelFormat_);
   }
@@ -266,7 +269,7 @@ class ImageContentBlockSpec {
   const string& getCodecName() const {
     return codecName_;
   }
-  /// Get codec quality seeting used to encode the image, if any.
+  /// Get codec quality setting used to encode the image, if any.
   /// 0 means codec-default, 100 means lossless
   /// Only used for ImageFormat::VIDEO
   uint8_t getCodecQuality() const {
@@ -482,7 +485,7 @@ class ContentBlock {
       double keyFrameTimestamp,
       uint32_t keyFrameIndex);
 
-  /// Very generatic audio block description.
+  /// Very generic audio block description.
   ContentBlock(AudioFormat audioFormat, uint8_t channelCount = 0);
 
   /// PCM audio block description.
@@ -726,7 +729,7 @@ class RecordFormat {
   /// @return The size of all the content blocks at and past the index, or
   /// ContentBlock::kSizeUnknown if any of the blocks doesn't have a known size.
   size_t getRemainingBlocksSize(size_t firstBlock) const;
-  /// Get the size of a particular block, knowing the remaning record size including this block, or
+  /// Get the size of a particular block, knowing the remaining record size including this block, or
   /// ContentBlock::kSizeUnknown.
   /// @param firstBlock: Size of the first content block to count the size of.
   /// @param remainingSize: Number of bytes left in the record for the remaining blocks.

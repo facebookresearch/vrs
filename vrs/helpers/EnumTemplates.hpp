@@ -14,16 +14,23 @@
  * limitations under the License.
  */
 
-#include "VrsBindings.h"
+#pragma once
 
-#include <vrs/os/Platform.h>
+#include <string>
 
-namespace pyvrs {
+namespace vrs {
 
-#if IS_VRS_OSS_CODE()
-void initVrsBindings(const char* clientName) {}
+/// Helper template to convert a string to an enum
+/// Expect the enum to have a symetric definition (no template needed):
+/// string toString(Enum enumValue);
+template <class Enum>
+Enum toEnum(const std::string& name);
 
-void uninitVrsBindings() {}
-#endif
+/// Helper template to get the number of values in an enum, which assumes there is an enum value
+/// named "COUNT" (capitalization matters) that gives the value.
+template <class Enum>
+constexpr uint32_t enumCount() {
+  return static_cast<uint32_t>(Enum::COUNT);
+}
 
-} // namespace pyvrs
+} // namespace vrs

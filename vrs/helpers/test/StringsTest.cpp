@@ -249,3 +249,49 @@ TEST_F(StringsHelpersTester, readUnsignedInt32) {
   const char* strWord = "vrs";
   EXPECT_EQ(readUInt32(strWord, outInt), false);
 }
+
+TEST_F(StringsHelpersTester, replaceAllTest) {
+  string str = "hello world";
+  EXPECT_TRUE(helpers::replaceAll(str, " ", "_"));
+  EXPECT_EQ(str, "hello_world");
+
+  EXPECT_TRUE(helpers::replaceAll(str, "world", "worlds"));
+  EXPECT_EQ(str, "hello_worlds");
+
+  str = "hello\\nworld\\nI'm\\ncoming\\n";
+  EXPECT_TRUE(helpers::replaceAll(str, "\\n", "\n"));
+  EXPECT_EQ(str, "hello\nworld\nI'm\ncoming\n");
+  EXPECT_FALSE(helpers::replaceAll(str, "a", "b"));
+  EXPECT_EQ(str, "hello\nworld\nI'm\ncoming\n");
+
+  str = "hello";
+  EXPECT_TRUE(helpers::replaceAll(str, str, "bye"));
+  EXPECT_EQ(str, "bye");
+
+  str = "[[[]]]";
+  EXPECT_TRUE(helpers::replaceAll(str, "[", "{"));
+  EXPECT_TRUE(helpers::replaceAll(str, "]]]", "}"));
+  EXPECT_EQ(str, "{{{}");
+  EXPECT_TRUE(helpers::replaceAll(str, "}", "}}}}"));
+  EXPECT_EQ(str, "{{{}}}}");
+  EXPECT_TRUE(helpers::replaceAll(str, "{", "{{"));
+  EXPECT_EQ(str, "{{{{{{}}}}");
+}
+
+TEST_F(StringsHelpersTester, splitTest) {
+  string str =
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+  vector<string> expectedTokens{
+      "Lorem ipsum dolor sit amet",
+      " consectetur adipiscing elit",
+      " sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."};
+  vector<string> actualTokens;
+
+  helpers::split(str, ',', actualTokens);
+  EXPECT_EQ(actualTokens, expectedTokens);
+
+  expectedTokens = {str};
+  actualTokens.clear();
+  helpers::split(str, '_', actualTokens);
+  EXPECT_EQ(actualTokens, expectedTokens);
+}

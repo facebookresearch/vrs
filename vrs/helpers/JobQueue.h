@@ -114,10 +114,14 @@ class JobQueue {
     std::unique_lock<std::mutex> locker(mutex_);
     queue_.clear();
   }
+  size_t getQueueSize() const {
+    std::unique_lock<std::mutex> locker(mutex_);
+    return queue_.size();
+  }
 
  private:
   std::deque<T> queue_;
-  std::mutex mutex_;
+  mutable std::mutex mutex_;
   std::condition_variable condition_;
   std::atomic<bool> hasEnded_{false};
 };

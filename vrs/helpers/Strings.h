@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <map>
 #include <string>
+#include <vector>
 
 #include <vrs/os/Platform.h>
 
@@ -68,6 +69,14 @@ bool startsWith(const std::string& text, const std::string& prefix);
 /// @param prefix: the suffix to test
 /// @return True if text ends with suffix. Case insensitive.
 bool endsWith(const std::string& text, const std::string& suffix);
+
+/// Replace all occurences of a string within another string
+/// @param inOutString: the string to modify with the replacement(s)
+/// @param token: text to replace
+/// @param replacement: text to replace token with
+/// The function can't fail. Only full instances of token in the original string will be replaced.
+/// @return true if at least once instance of token was found and replaced.
+bool replaceAll(std::string& inOutString, const std::string& token, const std::string& replacement);
 
 /// Helper to get a field of a string map interpreted as a bool.
 /// @param m: the map to search.
@@ -140,6 +149,12 @@ std::string humanReadableTimestamp(double seconds, uint8_t precision = 3);
 /// This conversion is meant to make string problems visible, rather than be a proper encoding,
 /// for instance, you can't differentiate between "\n" and string that would contain a newline char.
 std::string make_printable(const std::string& str);
+
+/// Helper method to split a string based on the delimiter.
+/// @param inputString: the string that needs to be split.
+/// @param delimiter: the delimiter that will be used to split the input string.
+/// @param tokens: the collection of strings after the split.
+void split(const std::string& inputString, char delimiter, std::vector<std::string>& tokens);
 
 } // namespace helpers
 } // namespace vrs

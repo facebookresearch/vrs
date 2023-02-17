@@ -16,6 +16,7 @@
 
 #include <iostream>
 #include <limits>
+#include <type_traits>
 
 #include <gtest/gtest.h>
 
@@ -295,7 +296,7 @@ TEST_F(DataLayoutTester, testDataLayoutMatcher) {
   EXPECT_EQ(newConfig.float_.get(), 0);
   floatt = -1;
   EXPECT_FALSE(newConfig.float_.get(floatt));
-  EXPECT_EQ(floatt, -1);
+  EXPECT_EQ(floatt, 0);
 
   // check missing data, with default
   EXPECT_FALSE(newConfig.double_.isAvailable());
@@ -563,8 +564,10 @@ inline void addTemplatePiece(ManualDataLayout& layout, Counters& c, const T& def
   layout.add(unique_ptr<DataPiece>(newValue));
   newValue->setMin(numeric_limits<T>::lowest());
   newValue->setMax(numeric_limits<T>::max());
-  newValue->setMinIncrement(numeric_limits<T>::lowest() / 10);
-  newValue->setMaxIncrement(numeric_limits<T>::max() / 10);
+  if constexpr (std::is_arithmetic_v<T>) {
+    newValue->setMinIncrement(numeric_limits<T>::lowest() / 10);
+    newValue->setMaxIncrement(numeric_limits<T>::max() / 10);
+  }
   newValue->setTag("description", string("this is ") + valuePieceName);
   newValue->setTag("units", "metric");
 
@@ -786,18 +789,23 @@ struct MetadataTest : public AutoDataLayout {
   }
   DataPieceValue<int32_t> intValue{"int"};
   DataPieceValue<float> floatValue{"float"};
+  DataPieceArray<float> floatArrayValue{"float_array", 2};
+  DataPieceVector<float> floatVectorValue{"float_vector"};
+  DataPieceStringMap<uint8_t> uintStringMapValue{"uint_string_map"};
+  DataPieceString stringValue{"string"};
 
   AutoDataLayoutEnd end;
 };
 } // namespace
 
 TEST_F(DataLayoutTester, testMetaData) {
-  MetadataTest data;
-  string js = data.asJson(JsonFormatProfile::VrsFormat);
+  const MetadataTest data;
+  const string js = data.asJson(JsonFormatProfile::VrsFormat);
   unique_ptr<DataLayout> dl = DataLayout::makeFromJson(js);
   ASSERT_NE(dl, nullptr);
   EXPECT_TRUE(data.isSame(*dl));
-  DataPieceValue<int32_t>* intValue = dl->findDataPieceValue<int32_t>("int");
+
+  const DataPieceValue<int32_t>* intValue = dl->findDataPieceValue<int32_t>("int");
   ASSERT_NE(intValue, nullptr);
   int32_t v;
   EXPECT_TRUE(intValue->getMin(v));
@@ -813,13 +821,27 @@ TEST_F(DataLayoutTester, testMetaData) {
   EXPECT_STREQ(s.c_str(), "meter");
   EXPECT_TRUE(intValue->getDescription(s));
   EXPECT_STREQ(s.c_str(), "some int");
-  DataPieceValue<float>* floatValue = dl->findDataPieceValue<float>("float");
+
+  const DataPieceValue<float>* floatValue = dl->findDataPieceValue<float>("float");
   ASSERT_NE(floatValue, nullptr);
   float f;
   EXPECT_TRUE(floatValue->getMin(f));
   EXPECT_NEAR(f, -10.f, 0.0001f);
   EXPECT_TRUE(floatValue->getMax(f));
   EXPECT_NEAR(f, 100.f, 0.0001f);
+
+  const DataPieceArray<float>* floatArrayValue = dl->findDataPieceArray<float>("float_array", 2);
+  ASSERT_NE(floatArrayValue, nullptr);
+
+  const DataPieceVector<float>* floatVectorValue = dl->findDataPieceVector<float>("float_vector");
+  ASSERT_NE(floatVectorValue, nullptr);
+
+  const DataPieceStringMap<uint8_t>* stringMapValue =
+      dl->findDataPieceStringMap<uint8_t>("uint_string_map");
+  ASSERT_NE(stringMapValue, nullptr);
+
+  const DataPieceString* stringValue = dl->findDataPieceString("string");
+  ASSERT_NE(stringValue, nullptr);
 }
 
 TEST_F(DataLayoutTester, testStaging) {

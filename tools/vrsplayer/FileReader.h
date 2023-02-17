@@ -41,7 +41,7 @@ class QPixmap;
 class QVBoxLayout;
 QT_END_NAMESPACE
 
-enum class FileReaderState { Undefined, NoMedia, Paused, Playing, Error, Count };
+enum class FileReaderState { Undefined, NoMedia, Paused, Playing, Error, COUNT };
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 Q_DECLARE_METATYPE(FileReaderState)
 #endif
@@ -122,6 +122,8 @@ class FileReader : public QObject {
  public slots:
   std::vector<FrameWidget*> openFile(const QString& url, QVBoxLayout* videoFrame, QWidget* parent);
   void setOverlayColor(QColor color);
+  void setFontSize(int fontSize);
+  void setSolidBackground(bool solid);
   void recordTypeChanged(const QString& type);
   void setPosition(int position);
   void sliderPressed();

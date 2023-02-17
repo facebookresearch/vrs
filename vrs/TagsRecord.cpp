@@ -59,7 +59,7 @@ bool TagsRecordPlayer::onDataLayoutRead(const CurrentRecord& record, size_t, Dat
         thisRecordableTags.vrs.size(),
         thisRecordableTags.user.size(),
         record.streamId.getName());
-    DescriptionRecord::upgradeStreamTags(thisRecordableTags);
+    DescriptionRecord::upgradeStreamTags(thisRecordableTags.vrs);
   }
   return true;
 }

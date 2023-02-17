@@ -117,6 +117,7 @@ enum class RecordableTypeId : uint16_t {
   UsbRecordableClass = 284, ///< For USB data streams.
   TimeRecordableClass = 285, ///< For time data streams.
   AttentionRecordableClass = 286, ///< For attention data streams.
+  GMSRecordableClass = 287, ///< For GMS location data stream.
 
   // << User Input >>
   InputRecordableClass = 300, ///< For user input data streams.
@@ -136,7 +137,7 @@ enum class RecordableTypeId : uint16_t {
   // << Ground Truth >>
   GroundTruthRecordableClass = 340, ///< For ground truth data streams.
   GroundTruthImuRecordableClass = 341, ///< For ground truth IMU data streams.
-  GroundTruthAlignmentRecordableClass = 342, ///< For ground truth aligment data streams.
+  GroundTruthAlignmentRecordableClass = 342, ///< For ground truth alignment data streams.
   GroundTruthPositionRecordableClass = 343, ///< For ground truth position data streams.
   GroundTruthOrientationRecordableClass = 344, ///< For ground truth orientation data streams.
   GroundTruthDepthRecordableClass = 345, ///< For ground truth depth data streams.
@@ -180,7 +181,7 @@ enum class RecordableTypeId : uint16_t {
   UnitTest2, ///< For unit tests.
   SampleDevice, ///< For sample code.
 
-  Undefined = 65535 ///< Value used for default intializations and marking undefined situations.
+  Undefined = 65535 ///< Value used for default initializations and marking undefined situations.
 };
 
 /// Get an English readable recordable type name for the enum value.
@@ -233,6 +234,7 @@ class StreamId {
   }
 
   StreamId& operator=(const StreamId& rhs) = default;
+  StreamId& operator=(StreamId&& rhs) = default;
   bool operator==(const StreamId& rhs) const {
     return typeId_ == rhs.typeId_ && instanceId_ == rhs.instanceId_;
   }

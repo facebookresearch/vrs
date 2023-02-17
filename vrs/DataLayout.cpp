@@ -67,6 +67,7 @@ void DataLayout::collectVariableDataAndUpdateIndex() {
 
 void DataLayout::collectVariableDataAndUpdateIndex(void* destination) {
   int8_t* data = reinterpret_cast<int8_t*>(destination);
+  DataLayout::IndexEntry* varSizeIndex = getVarSizeIndex();
   size_t offset = 0;
   for (size_t index = 0; index < varSizePieces_.size(); ++index) {
     DataPiece* piece = varSizePieces_[index];
@@ -74,14 +75,14 @@ void DataLayout::collectVariableDataAndUpdateIndex(void* destination) {
     size_t writtenSize = piece->collectVariableData(data, size);
     if (size != writtenSize) {
       XR_FATAL_ERROR(
-          "Failed to collect DataLayout field {}/{}, {} bytes writen, {} expected",
+          "Failed to collect DataLayout field {}/{}, {} bytes written, {} expected",
           piece->getLabel(),
           piece->getElementTypeName(),
           writtenSize,
           size);
     }
     data += size;
-    IndexEntry& indexEntry = getVarSizeIndex()[index];
+    IndexEntry& indexEntry = varSizeIndex[index];
     indexEntry.setOffset(offset);
     indexEntry.setLength(size);
     offset += size;
@@ -427,7 +428,7 @@ struct DataPieceTypeStringConverter : public EnumStringConverter<
                                           DataPieceType::Undefined,
                                           DataPieceType::Undefined> {
   static_assert(
-      cNamesCount == static_cast<size_t>(DataPieceType::Count),
+      cNamesCount == enumCount<DataPieceType>(),
       "Missing DataPieceType name definitions");
 };
 
@@ -502,7 +503,7 @@ static DataPieceFactory::Registerer<DataPieceStringMap<string>> Registerer_DataP
 } // namespace internal
 
 template <typename T>
-DataPieceValue<T>* DataLayout::findDataPieceValue(const string& label) const {
+const DataPieceValue<T>* DataLayout::findDataPieceValue(const string& label) const {
   const string& typeName = vrs::getTypeName<T>();
   for (DataPiece* piece : fixedSizePieces_) {
     if (piece->getPieceType() == DataPieceType::Value && piece->getLabel() == label &&
@@ -514,7 +515,14 @@ DataPieceValue<T>* DataLayout::findDataPieceValue(const string& label) const {
 }
 
 template <typename T>
-DataPieceArray<T>* DataLayout::findDataPieceArray(const string& label, size_t arraySize) const {
+DataPieceValue<T>* DataLayout::findDataPieceValue(const string& label) {
+  return const_cast<DataPieceValue<T>*>(
+      const_cast<const DataLayout*>(this)->findDataPieceValue<T>(label));
+}
+
+template <typename T>
+const DataPieceArray<T>* DataLayout::findDataPieceArray(const string& label, size_t arraySize)
+    const {
   const string& typeName = vrs::getTypeName<T>();
   size_t size = arraySize * sizeof(T);
   for (DataPiece* piece : fixedSizePieces_) {
@@ -527,7 +535,13 @@ DataPieceArray<T>* DataLayout::findDataPieceArray(const string& label, size_t ar
 }
 
 template <typename T>
-DataPieceVector<T>* DataLayout::findDataPieceVector(const string& label) const {
+DataPieceArray<T>* DataLayout::findDataPieceArray(const string& label, size_t arraySize) {
+  return const_cast<DataPieceArray<T>*>(
+      const_cast<const DataLayout*>(this)->findDataPieceArray<T>(label, arraySize));
+}
+
+template <typename T>
+const DataPieceVector<T>* DataLayout::findDataPieceVector(const string& label) const {
   const string& typeName = vrs::getTypeName<T>();
   for (DataPiece* piece : varSizePieces_) {
     if (piece->getPieceType() == DataPieceType::Vector && piece->getLabel() == label &&
@@ -538,11 +552,18 @@ DataPieceVector<T>* DataLayout::findDataPieceVector(const string& label) const {
   return nullptr;
 }
 
-template DataPieceVector<string>* DataLayout::findDataPieceVector<string>(
+template <typename T>
+DataPieceVector<T>* DataLayout::findDataPieceVector(const string& label) {
+  return const_cast<DataPieceVector<T>*>(
+      const_cast<const DataLayout*>(this)->findDataPieceVector<T>(label));
+}
+
+template const DataPieceVector<string>* DataLayout::findDataPieceVector<string>(
     const string& label) const;
+template DataPieceVector<string>* DataLayout::findDataPieceVector<string>(const string& label);
 
 template <typename T>
-DataPieceStringMap<T>* DataLayout::findDataPieceStringMap(const string& label) const {
+const DataPieceStringMap<T>* DataLayout::findDataPieceStringMap(const string& label) const {
   const string& typeName = vrs::getTypeName<T>();
   for (DataPiece* piece : varSizePieces_) {
     if (piece->getPieceType() == DataPieceType::StringMap && piece->getLabel() == label &&
@@ -553,16 +574,29 @@ DataPieceStringMap<T>* DataLayout::findDataPieceStringMap(const string& label) c
   return nullptr;
 }
 
-template DataPieceStringMap<string>* DataLayout::findDataPieceStringMap<string>(
-    const string& label) const;
+template <typename T>
+DataPieceStringMap<T>* DataLayout::findDataPieceStringMap(const string& label) {
+  return const_cast<DataPieceStringMap<T>*>(
+      const_cast<const DataLayout*>(this)->findDataPieceStringMap<T>(label));
+}
 
-DataPieceString* DataLayout::findDataPieceString(const string& label) const {
+template const DataPieceStringMap<string>* DataLayout::findDataPieceStringMap<string>(
+    const string& label) const;
+template DataPieceStringMap<string>* DataLayout::findDataPieceStringMap<string>(
+    const string& label);
+
+const DataPieceString* DataLayout::findDataPieceString(const string& label) const {
   for (DataPiece* piece : varSizePieces_) {
     if (piece->getPieceType() == DataPieceType::String && piece->getLabel() == label) {
       return static_cast<DataPieceString*>(piece);
     }
   }
   return nullptr;
+}
+
+DataPieceString* DataLayout::findDataPieceString(const string& label) {
+  return const_cast<DataPieceString*>(
+      const_cast<const DataLayout*>(this)->findDataPieceString(label));
 }
 
 void DataLayout::forEachDataPiece(function<void(const DataPiece*)> callback, DataPieceType type)
@@ -692,12 +726,18 @@ size_t DataLayout::getAvailableVarDataPiecesCount() const {
   return count;
 }
 
-#define DEFINE_FIND_DATA_PIECE(T)                                                           \
-  template DataPieceValue<T>* DataLayout::findDataPieceValue<T>(const string& label) const; \
-  template DataPieceArray<T>* DataLayout::findDataPieceArray(                               \
-      const string& label, size_t arraySize) const;                                         \
-  template DataPieceVector<T>* DataLayout::findDataPieceVector(const string& label) const;  \
-  template DataPieceStringMap<T>* DataLayout::findDataPieceStringMap(const string& label) const;
+#define DEFINE_FIND_DATA_PIECE(T)                                                                 \
+  template const DataPieceValue<T>* DataLayout::findDataPieceValue<T>(const string& label) const; \
+  template DataPieceValue<T>* DataLayout::findDataPieceValue<T>(const string& label);             \
+  template const DataPieceArray<T>* DataLayout::findDataPieceArray(                               \
+      const string& label, size_t arraySize) const;                                               \
+  template DataPieceArray<T>* DataLayout::findDataPieceArray(                                     \
+      const string& label, size_t arraySize);                                                     \
+  template const DataPieceVector<T>* DataLayout::findDataPieceVector(const string& label) const;  \
+  template DataPieceVector<T>* DataLayout::findDataPieceVector(const string& label);              \
+  template const DataPieceStringMap<T>* DataLayout::findDataPieceStringMap(const string& label)   \
+      const;                                                                                      \
+  template DataPieceStringMap<T>* DataLayout::findDataPieceStringMap(const string& label);
 
 #define DEFINE_DATA_PIECE_TYPE(x)          \
   template <>                              \
@@ -855,7 +895,7 @@ size_t elementSize<string>(const string& s) {
 /// @param writtenSize: number of bytes of the buffer already used. Will be updated if the data was
 /// copied in the buffer. Writing will happen at the address dest + writtenSize.
 /// @param maxSize: size of the buffer. Will never write past dest + maxSize.
-/// @return True if the copy was done & writenSize updated. False, if the buffer was too small.
+/// @return True if the copy was done & writtenSize updated. False, if the buffer was too small.
 template <class T>
 bool storeElement(int8_t* dest, const T& sourceValue, size_t& writtenSize, size_t maxSize) {
   if (writtenSize + sizeof(T) > maxSize) {
@@ -1460,7 +1500,7 @@ bool DataPieceStringMap<T>::get(map<string, T>& outValues) const {
         outValues[key] = value;
       } else {
         outValues = defaultValues_;
-        return false; // some reading error occured: stop reading & use default value.
+        return false; // some reading error occurred: stop reading & use default value.
       }
     }
     return true;
@@ -1562,11 +1602,11 @@ const string& DataPieceString::getElementTypeName() const {
 }
 
 size_t DataPieceString::collectVariableData(int8_t* data, size_t bufferSize) const {
-  const size_t writenSize = min(bufferSize, getVariableSize());
-  if (writenSize > 0) {
-    memcpy(data, stagedString_.data(), writenSize);
+  const size_t writtenSize = min(bufferSize, getVariableSize());
+  if (writtenSize > 0) {
+    memcpy(data, stagedString_.data(), writtenSize);
   }
-  return writenSize;
+  return writtenSize;
 }
 
 string DataPieceString::get() const {
@@ -1709,7 +1749,7 @@ ManualDataLayout::ManualDataLayout(const string& json) : ManualDataLayout() {
 DataPiece* ManualDataLayout::add(unique_ptr<DataPiece> piece) {
   DataPiece* dataPiece = piece.get();
   if (dataPiece != nullptr) {
-    manualPieces.emplace_back(move(piece));
+    manualPieces.emplace_back(std::move(piece));
   }
   return dataPiece;
 }

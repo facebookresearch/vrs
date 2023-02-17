@@ -54,7 +54,7 @@ struct RecordFormatReader {
 ///
 /// For each of the record's content blocks a specific callback will be called depending on the type
 /// of content block. The content blocks are decoded in order, until they are all read, some
-/// decoding error occured, or a callback returns false.
+/// decoding error occurred, or a callback returns false.
 /// The block's index is passed in case you need to disambiguate successive blocks of the same type,
 /// or need to know when a new block is started.
 class RecordFormatStreamPlayer : public StreamPlayer {
@@ -74,7 +74,7 @@ class RecordFormatStreamPlayer : public StreamPlayer {
   /// Callback for image content blocks.
   /// The ContentBlock object 'cb' describes the image content block, but the content block's data
   /// has not been read yet. Query the ContentBlock object to know the details about the image and
-  /// the content block's size. Then you can allocate or resuse a buffer, and call
+  /// the content block's size. Then you can allocate or reuse a buffer, and call
   /// record.reader->read() to read the content block's data in that buffer.
   /// Depending on cb.image().getImageFormat(), the content block's data will be:
   /// ImageFormat::RAW: raw pixel buffer data, in the format specified by cb.image.getPixelFormat().
@@ -93,7 +93,7 @@ class RecordFormatStreamPlayer : public StreamPlayer {
   /// Callback for audio content blocks.
   /// The ContentBlock object 'cb' describes the audio content block, but the content block's data
   /// has not been read yet. Query the ContentBlock object to know the details about the audio data
-  /// and the content block's size. Then you can allocate or resuse a buffer, and call
+  /// and the content block's size. Then you can allocate or reuse a buffer, and call
   /// record.reader->read() to read the content block's data in that buffer.
   /// @param record: Metadata associated with the record being read.
   /// @param blockIndex: Index of the content block being read.
@@ -106,7 +106,7 @@ class RecordFormatStreamPlayer : public StreamPlayer {
   /// Callback for custom content blocks.
   /// The ContentBlock object 'cb' describes the custom content block, but the content block's data
   /// has not been read yet. Query the ContentBlock object to know the details about the custom data
-  /// and the content block's size. Then you can allocate or resuse a buffer, and call
+  /// and the content block's size. Then you can allocate or reuse a buffer, and call
   /// record.reader->read() to read the content block's data in that buffer.
   /// @param rec: Metadata associated with the record being read.
   /// @param blkIdx: Index of the content block being read.
@@ -183,7 +183,7 @@ class RecordFormatStreamPlayer : public StreamPlayer {
   RecordFileReader* recordFileReader_{};
 
   // Keep the readers all separate,
-  // in case the same RecordFormatStreamPlayer is handling mulitple streams.
+  // in case the same RecordFormatStreamPlayer is handling multiple streams.
   map<tuple<StreamId, Record::Type, uint32_t>, RecordFormatReader> readers_;
   map<pair<StreamId, Record::Type>, RecordFormatReader*> lastReader_;
   RecordFormatReader* currentReader_{};

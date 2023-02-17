@@ -65,11 +65,11 @@ void convertVectorized(
     bool hasLeftover = (heightInPixels * widthInPixels) % 8 ? true : false;
     for (int op = 0; op < numFullOperations; ++op) {
       const uint8x16_t encoded = vld1q_u8(src);
-      const uint8x16_t r = vqtbl1q_s8(encoded, rshuf);
-      const uint8x16_t mIn = vqtbl1q_s8(encoded, pshuf);
-      const auto pixels = vshlq_n_u16(mIn, 2);
-      const auto fracts = vshlq_u16(vandq_u16(r, mask), rsh);
-      vst1q_s16((short*)dst, vorrq_u16(pixels, fracts));
+      const uint8x16_t r = vqtbl1q_u8(encoded, rshuf);
+      const uint8x16_t mIn = vqtbl1q_u8(encoded, pshuf);
+      const uint16x8_t pixels = vshlq_n_u16(vreinterpretq_u16_u8(mIn), 2);
+      const uint16x8_t fracts = vshlq_u16(vandq_u16(vreinterpretq_u16_u8(r), mask), rsh);
+      vst1q_s16((short*)dst, vreinterpretq_s16_u16(vorrq_u16(pixels, fracts)));
 
       src += kSrcIncrement;
       dst += kDstIncrement;
@@ -83,11 +83,11 @@ void convertVectorized(
       const uint8_t* RESTRICT srcPtr = src;
       for (int op = 0; op < numOperationsPerRow; ++op) {
         const uint8x16_t encoded = vld1q_u8(srcPtr);
-        const uint8x16_t r = vqtbl1q_s8(encoded, rshuf);
-        const uint8x16_t mIn = vqtbl1q_s8(encoded, pshuf);
-        const auto pixels = vshlq_n_u16(mIn, 2);
-        const auto fracts = vshlq_u16(vandq_u16(r, mask), rsh);
-        vst1q_s16((short*)dst, vorrq_u16(pixels, fracts));
+        const uint8x16_t r = vqtbl1q_u8(encoded, rshuf);
+        const uint8x16_t mIn = vqtbl1q_u8(encoded, pshuf);
+        const uint16x8_t pixels = vshlq_n_u16(vreinterpretq_u16_u8(mIn), 2);
+        const uint16x8_t fracts = vshlq_u16(vandq_u16(vreinterpretq_u16_u8(r), mask), rsh);
+        vst1q_s16((short*)dst, vreinterpretq_s16_u16(vorrq_u16(pixels, fracts)));
 
         srcPtr += kSrcIncrement;
         dst += kDstIncrement;

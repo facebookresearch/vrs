@@ -63,6 +63,7 @@ const char* sCommands[] = {
     "checksums",
     "checksum-verbatim",
     "hexdump",
+    "decode",
     "compare",
     "compare-verbatim",
     "debug",
@@ -86,9 +87,7 @@ struct CommandConverter : public EnumStringConverter<
                               COUNT_OF(sCommands),
                               Command::None,
                               Command::None> {
-  static_assert(
-      COUNT_OF(sCommands) == static_cast<size_t>(Command::Count),
-      "Missing GaiaOp name definitions");
+  static_assert(COUNT_OF(sCommands) == enumCount<Command>(), "Missing GaiaOp name definitions");
 };
 
 static const RecordFileInfo::Details kCopyOpsDetails = Details::MainCounters;
@@ -112,6 +111,7 @@ const CommandSpec& getCommandSpec(Command cmd) {
       {Command::Checksums, 1},
       {Command::ChecksumVerbatim, 1, Details::None, false},
       {Command::Hexdump, 1},
+      {Command::Decode, 1, Details::MainCounters},
       {Command::Compare, 1000, Details::MainCounters},
       {Command::CompareVerbatim, 1000, Details::None, false},
       {Command::Debug, 1, Details::None, false},
@@ -129,7 +129,7 @@ const CommandSpec& getCommandSpec(Command cmd) {
       {Command::FixIndex, 1000, Details::Basics},
       {Command::CompressionBenchmark, 1},
   };
-  if (!XR_VERIFY(cmd > Command::None && cmd < Command::Count)) {
+  if (!XR_VERIFY(cmd > Command::None && cmd < Command::COUNT)) {
     return sCommandSpecs[static_cast<size_t>(Command::None)];
   }
   return sCommandSpecs[static_cast<size_t>(cmd)];
@@ -185,6 +185,8 @@ void printHelp(const string& appName) {
       << endl
       << CMD("Check that a file can be read (checks integrity)",
              "check <file.vrs> [filter-options]")
+      << CMD("Check that a file can be decoded (record-format integrity and image decompression)",
+             "decode <file.vrs> [filter-options]")
       << CMD("Calculate a checksum for the whole file, at the VRS data level",
              "checksum <file.vrs> [filter-options]")
       << CMD("Calculate checksums for each part of the VRS file",
@@ -455,6 +457,9 @@ int VrsCommand::runCommands() {
     case Command::Check:
       cout << checkRecords(filteredReader, copyOptions, CheckType::Check) << endl;
       break;
+    case Command::Decode:
+      cout << checkRecords(filteredReader, copyOptions, CheckType::Decode) << endl;
+      break;
     case Command::Checksum:
       cout << checkRecords(filteredReader, copyOptions, CheckType::Checksum) << endl;
       break;
@@ -462,6 +467,7 @@ int VrsCommand::runCommands() {
       cout << checkRecords(filteredReader, copyOptions, CheckType::Checksums) << endl;
       break;
     case Command::Hexdump:
+      copyOptions.showProgress = false;
       cout << checkRecords(filteredReader, copyOptions, CheckType::HexDump) << endl;
       break;
     case Command::ChecksumVerbatim:
@@ -535,7 +541,7 @@ int VrsCommand::runCommands() {
       statusCode = compressionBenchmark(filteredReader, copyOptions);
       break;
     case Command::None:
-    case Command::Count:
+    case Command::COUNT:
       break;
   }
 

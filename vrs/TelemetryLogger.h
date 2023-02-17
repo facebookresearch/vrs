@@ -20,8 +20,6 @@
 #include <string>
 #include <vector>
 
-#include <vrs/os/Time.h>
-
 namespace vrs {
 
 using std::string;
@@ -37,15 +35,15 @@ struct OperationContext {
   OperationContext(const OperationContext& rhs)
       : operation{rhs.operation}, sourceLocation{rhs.sourceLocation} {}
   OperationContext(OperationContext&& rhs)
-      : operation{move(rhs.operation)}, sourceLocation{move(rhs.sourceLocation)} {}
+      : operation{std::move(rhs.operation)}, sourceLocation{std::move(rhs.sourceLocation)} {}
 
   bool operator<(const OperationContext& rhs) const {
     return operation < rhs.operation ||
         (operation == rhs.operation && sourceLocation < rhs.sourceLocation);
   }
   OperationContext& operator=(OperationContext&& rhs) {
-    operation = move(rhs.operation);
-    sourceLocation = move(rhs.sourceLocation);
+    operation = std::move(rhs.operation);
+    sourceLocation = std::move(rhs.sourceLocation);
     return *this;
   }
 };
@@ -60,16 +58,16 @@ struct LogEvent {
       const string& serverReply)
       : type{type}, operationContext{opContext}, message{message}, serverReply{serverReply} {}
   LogEvent(LogEvent&& rhs)
-      : type{move(rhs.type)},
+      : type{std::move(rhs.type)},
         operationContext{std::move(rhs.operationContext)},
-        message{move(rhs.message)},
-        serverReply{move(rhs.serverReply)} {}
+        message{std::move(rhs.message)},
+        serverReply{std::move(rhs.serverReply)} {}
 
   LogEvent& operator=(LogEvent&& rhs) {
-    type = move(rhs.type);
+    type = std::move(rhs.type);
     operationContext = std::move(rhs.operationContext);
-    message = move(rhs.message);
-    serverReply = move(rhs.serverReply);
+    message = std::move(rhs.message);
+    serverReply = std::move(rhs.serverReply);
     return *this;
   }
 
@@ -81,7 +79,7 @@ struct LogEvent {
 
 /// \brief Telemetry event specialized to report cloud traffic
 ///
-/// A key goal of telemetry is to monitor traffic to cloud storage solutions, so we can mesure
+/// A key goal of telemetry is to monitor traffic to cloud storage solutions, so we can measure
 /// resource usage and detect excessive traffic. This requires logging every network transaction,
 /// as opposed to sparse events, giving leverage to custom implementation optimizations not possible
 /// with a generic event.
@@ -112,10 +110,7 @@ struct TrafficEvent {
     uploadNotDownload = false;
     return *this;
   }
-  TrafficEvent& setAttemptStartTime() {
-    transferStartTime = os::getCurrentTimeSecSinceEpoch();
-    return *this;
-  }
+  TrafficEvent& setAttemptStartTime();
   TrafficEvent& setTotalDurationMs(int64_t durationMs) {
     totalDurationMs = durationMs;
     return *this;
@@ -164,8 +159,6 @@ class TelemetryLogger {
  public:
   virtual ~TelemetryLogger();
 
-  static TelemetryLogger& getInstance();
-
   static constexpr const char* kErrorType = "error";
   static constexpr const char* kWarningType = "warning";
   static constexpr const char* kInfoType = "info";
@@ -180,33 +173,41 @@ class TelemetryLogger {
       const OperationContext& operationContext,
       const string& message,
       const string& serverMessage = {}) {
-    static const string sErrorType{kErrorType};
-    getStaticInstance()->logEvent(LogEvent(sErrorType, operationContext, message, serverMessage));
+    getInstance()->logEvent(LogEvent(kErrorType, operationContext, message, serverMessage));
   }
   static inline void warning(
       const OperationContext& operationContext,
       const string& message,
       const string& serverMessage = {}) {
-    static const string sWarningType{kWarningType};
-    getStaticInstance()->logEvent(LogEvent(sWarningType, operationContext, message, serverMessage));
+    getInstance()->logEvent(LogEvent(kWarningType, operationContext, message, serverMessage));
   }
   static inline void info(
       const OperationContext& operationContext,
       const string& message,
       const string& serverMessage = {}) {
-    static const string sInfoType{kInfoType};
-    getStaticInstance()->logEvent(LogEvent(sInfoType, operationContext, message, serverMessage));
+    getInstance()->logEvent(LogEvent(kInfoType, operationContext, message, serverMessage));
+  }
+  static inline void event(
+      const std::string& eventType,
+      const OperationContext& operationContext,
+      const string& message,
+      const string& serverMessage = {}) {
+    getInstance()->logEvent(LogEvent(eventType, operationContext, message, serverMessage));
   }
   static inline void traffic(const OperationContext& operationContext, const TrafficEvent& event) {
-    getStaticInstance()->logTraffic(operationContext, event);
+    getInstance()->logTraffic(operationContext, event);
+  }
+  static inline void flush() {
+    getInstance()->flushEvents();
   }
 
-  /// Actuall methods that implement the behaviors
+  /// Actual methods that implement the behaviors
   virtual void logEvent(LogEvent&& event);
   virtual void logTraffic(const OperationContext& operationContext, const TrafficEvent& event);
+  virtual void flushEvents() {}
 
  private:
-  static std::unique_ptr<TelemetryLogger>& getStaticInstance();
+  static std::unique_ptr<TelemetryLogger>& getInstance();
 };
 
 } // namespace vrs

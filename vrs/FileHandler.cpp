@@ -24,6 +24,7 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/helpers/EnumStringConverter.h>
 #include <vrs/helpers/Rapidjson.hpp>
 #include <vrs/helpers/Strings.h>
 #include <vrs/os/Utils.h>
@@ -34,6 +35,29 @@
 #include "FileHandlerFactory.h"
 
 using namespace std;
+
+namespace {
+using vrs::CachingStrategy;
+
+const char* sCachingStrategyNames[] = {
+    "Undefined",
+    "Passive",
+    "Streaming",
+    "StreamingBidirectional",
+    "StreamingBackward",
+    "ReleaseAfterRead"};
+struct CachingStrategyConverter : public EnumStringConverter<
+                                      CachingStrategy,
+                                      sCachingStrategyNames,
+                                      COUNT_OF(sCachingStrategyNames),
+                                      CachingStrategy::Undefined,
+                                      CachingStrategy::Undefined> {
+  static_assert(
+      cNamesCount == vrs::enumCount<CachingStrategy>(),
+      "Missing CachingStrategy name definitions");
+};
+
+} // namespace
 
 namespace vrs {
 
@@ -272,8 +296,7 @@ bool FileSpec::fromJson(const string& jsonStr) {
 string FileSpec::toJson() const {
   using namespace fb_rapidjson;
   JDocument document;
-  document.SetObject();
-  JsonWrapper wrapper{document, document.GetAllocator()};
+  JsonWrapper wrapper{document};
   if (!chunks.empty()) {
     serializeVector<string>(chunks, wrapper, StringRef(kChunkField));
   }
@@ -365,17 +388,17 @@ string FileSpec::getEasyPath() const {
 
 string FileSpec::getXXHash() const {
   XXH64Digester digester;
-  digester.update(fileHandlerName);
-  digester.update(fileName);
-  digester.update(uri);
+  digester.ingest(fileHandlerName);
+  digester.ingest(fileName);
+  digester.ingest(uri);
   for (const auto& chunk : chunks) {
-    digester.update(chunk);
+    digester.ingest(chunk);
   }
-  for (auto extra : extras) {
-    digester.update(extra.first);
-    digester.update(extra.second);
+  for (const auto& extra : extras) {
+    digester.ingest(extra.first);
+    digester.ingest(extra.second);
   }
-  digester.update(chunkSizes);
+  digester.ingest(chunkSizes);
   return digester.digestToString();
 }
 
@@ -479,6 +502,15 @@ int FileSpec::urldecode(const string& in, string& out) {
     out += c;
   }
   return 0;
+}
+
+string toString(CachingStrategy cachingStrategy) {
+  return CachingStrategyConverter::toString(cachingStrategy);
+}
+
+template <>
+CachingStrategy toEnum<>(const string& name) {
+  return CachingStrategyConverter::toEnumNoCase(name.c_str());
 }
 
 } // namespace vrs

@@ -31,7 +31,7 @@ class DataLayout;
 
 /// \brief VRS internal class to manage the records of a specific Recordable after their creation.
 ///
-/// Each Recordable has its own RecordManager to minize (ideally avoid) inter-thread locking.
+/// Each Recordable has its own RecordManager to minimize (ideally avoid) inter-thread locking.
 /// All timestamps are in seconds since some arbitrary point in time, and must be using the same
 /// time domain for the entire VRS file.
 /// @internal
@@ -40,6 +40,8 @@ class RecordManager {
 
  public:
   RecordManager();
+  RecordManager(const RecordManager&) = delete;
+  void operator=(const RecordManager&) = delete;
   ~RecordManager();
 
   /// Create & hold a record using the given parameters. RecordManager is responsible for deleting
@@ -87,26 +89,6 @@ class RecordManager {
     maxCacheSize_ = max;
   }
 
-  /// When a record's buffer is allocated, we may want to over-allocate a little bit to improve
-  /// the chances that when the record is recycled & reused, it we don't need to grow it.
-  /// This optional configuration allows to allocate more space, by either a min number of bytes,
-  /// a min percentage of bytes, or both, in which case the *min* of either setting is used.
-  /// If one of the values is set to 0, then it is considered not set. By default, both are 0.
-  /// @param minBytes: absolute number of bytes.
-  /// @param minPercent: percentage of bytes to allocate on top of the request.
-  void setRecordBufferOverAllocationMins(size_t minBytes, size_t minPercent) {
-    minBytesOverAllocation_ = minBytes;
-    minPercentOverAllocation_ = minPercent;
-  }
-
-  /// Get how many bytes should actually be allocated when we want to use a specific number of
-  /// bytes. This number may be greater than the requested size, to improve the ability to reuse an
-  /// allocated buffer without having to reallocate memory. See setRecordBufferOverAllocationMins().
-  /// @param requestedSise: number of bytes needed.
-  /// @return Number of bytes that should be allocated.
-  /// @internal only VRS itself should need to use this API.
-  size_t getAdjustedRecordBufferSize(size_t requestedSize) const;
-
   /// Get the count of recycled records are currently waiting to be reused.
   /// @return Number of recycled records available.
   /// @internal For use by unit tests.
@@ -124,8 +106,6 @@ class RecordManager {
 
   CompressionPreset compression_;
   size_t maxCacheSize_;
-  size_t minBytesOverAllocation_;
-  size_t minPercentOverAllocation_;
   uint64_t creationOrder_;
 };
 

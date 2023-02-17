@@ -204,8 +204,12 @@ vector<pair<string, int64_t>> MultiRecordFileReader::getFileChunks() const {
   return fileChunks;
 }
 
-const string& MultiRecordFileReader::getFlavor(UniqueStreamId streamId) const {
-  return getTag(getTags(streamId).vrs, Recordable::getFlavorTagName());
+const string& MultiRecordFileReader::getFlavor(UniqueStreamId uniqueStreamId) const {
+  return getTag(getTags(uniqueStreamId).vrs, Recordable::getFlavorTagName());
+}
+
+const string& MultiRecordFileReader::getSerialNumber(UniqueStreamId uniqueStreamId) const {
+  return getTag(getTags(uniqueStreamId).vrs, Recordable::getSerialNumberTagName());
 }
 
 vector<UniqueStreamId> MultiRecordFileReader::getStreams(
@@ -238,6 +242,22 @@ UniqueStreamId MultiRecordFileReader::getStreamForTag(
     if ((typeId == RecordableTypeId::Undefined || streamId.getTypeId() == typeId) &&
         getTag(streamId, tagName) == tag) {
       return streamId;
+    }
+  }
+  return {};
+}
+
+UniqueStreamId MultiRecordFileReader::getStreamForSerialNumber(
+    const std::string& serialNumber) const {
+  if (!isOpened_) {
+    return {};
+  }
+  if (hasSingleFile()) {
+    return readers_.front()->getStreamForSerialNumber(serialNumber);
+  }
+  for (const auto& uniqueStreamId : uniqueStreamIds_) {
+    if (getSerialNumber(uniqueStreamId) == serialNumber) {
+      return uniqueStreamId;
     }
   }
   return {};
@@ -432,7 +452,7 @@ bool MultiRecordFileReader::prefetchRecordSequence(
   if (!isOpened_) {
     return false;
   }
-  // Split the input prefetch sequence into sequences correponding to each underlying Reader
+  // Split the input prefetch sequence into sequences corresponding to each underlying Reader
   map<RecordFileReader*, vector<const IndexRecord::RecordInfo*>> readerPrefetchSequenceMap;
   for (const auto* prefetchRecord : records) {
     RecordFileReader* reader = getReader(prefetchRecord);
@@ -490,15 +510,34 @@ const IndexRecord::RecordInfo* MultiRecordFileReader::getRecordByTime(
   return reader->getRecordByTime(streamIdReaderPair->first, timestamp);
 }
 
-const IndexRecord::RecordInfo* MultiRecordFileReader::getNearestRecordByTime(
-    double timestamp,
-    double epsilon,
-    StreamId streamId) const {
+const IndexRecord::RecordInfo* MultiRecordFileReader::getRecordByTime(
+    StreamId streamId,
+    Record::Type recordType,
+    double timestamp) const {
   if (!isOpened_) {
     return nullptr;
   }
   if (hasSingleFile()) {
-    return readers_.front()->getNearestRecordByTime(timestamp, epsilon, streamId);
+    return readers_.front()->getRecordByTime(streamId, recordType, timestamp);
+  }
+  const StreamIdReaderPair* streamIdReaderPair = getStreamIdReaderPair(streamId);
+  if (streamIdReaderPair == nullptr) {
+    return nullptr;
+  }
+  const RecordFileReader* reader = streamIdReaderPair->second;
+  return reader->getRecordByTime(streamIdReaderPair->first, recordType, timestamp);
+}
+
+const IndexRecord::RecordInfo* MultiRecordFileReader::getNearestRecordByTime(
+    double timestamp,
+    double epsilon,
+    StreamId streamId,
+    Record::Type recordType) const {
+  if (!isOpened_) {
+    return nullptr;
+  }
+  if (hasSingleFile()) {
+    return readers_.front()->getNearestRecordByTime(timestamp, epsilon, streamId, recordType);
   }
   if (streamId.isValid()) {
     const StreamIdReaderPair* streamIdReaderPair = getStreamIdReaderPair(streamId);
@@ -506,10 +545,11 @@ const IndexRecord::RecordInfo* MultiRecordFileReader::getNearestRecordByTime(
       return nullptr;
     }
     const RecordFileReader* reader = streamIdReaderPair->second;
-    return reader->getNearestRecordByTime(timestamp, epsilon, streamIdReaderPair->first);
+    return reader->getNearestRecordByTime(
+        timestamp, epsilon, streamIdReaderPair->first, recordType);
   }
 
-  return vrs::getNearestRecordByTime(*recordIndex_, timestamp, epsilon);
+  return vrs::getNearestRecordByTime(*recordIndex_, timestamp, epsilon, recordType);
 }
 
 unique_ptr<FileHandler> MultiRecordFileReader::getFileHandler() const {
@@ -701,7 +741,7 @@ void MultiRecordFileReader::initializeUniqueStreamIds() {
     return;
   }
   for (const auto& readerPtr : readers_) {
-    for (const auto& streamId : readerPtr->getStreams()) {
+    for (auto streamId : readerPtr->getStreams()) {
       UniqueStreamId uniqueStreamId;
       if (uniqueStreamIds_.find(streamId) == uniqueStreamIds_.end()) {
         // Newly seen StreamId - UniqueStreamId can be same as StreamId

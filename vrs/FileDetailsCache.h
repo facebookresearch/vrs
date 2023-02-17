@@ -54,7 +54,7 @@ int write(
 /// @param outStreamIds: stream Ids read.
 /// @param outFileTags: file tags read.
 /// @param outStreamTags: stream tags read.
-/// @param outRecodIndex: VRS file index read.
+/// @param outRecordIndex: VRS file index read.
 /// @param outFileHasIndex: does the original VRS file have a proper index.
 /// @return A status code, 0 for success.
 int read(

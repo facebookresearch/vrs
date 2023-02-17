@@ -31,7 +31,7 @@ using std::string;
 /// @param argn: current argument index number, updated if more arguments were consumed.
 /// @param argc: Max argument count.
 /// @param argv: All the command line arguments available.
-/// @param outStatusCode: Set if arg was recognied but an error occurred, untouched otherwise.
+/// @param outStatusCode: Set if arg was recognized but an error occurred, untouched otherwise.
 /// @param copyOptions: where to store the arguments parsed.
 /// @return False if arg was not recognized (argn & outStatusCode were not changed).
 /// Returns true if the argument was recognized, which doesn't mean there was no error.
@@ -58,7 +58,7 @@ void printCopyOptionsHelp();
 /// @param argn: current argument index number, updated if more arguments were consumed.
 /// @param argc: Max argument count.
 /// @param argv: All the command line arguments available.
-/// @param outStatusCode: Set if arg was recognied but an error occurred, untouched otherwise.
+/// @param outStatusCode: Set if arg was recognized but an error occurred, untouched otherwise.
 /// @param copyOptions: where to store the arguments parsed.
 /// @return False if arg was not recognized (argn & outStatusCode were not changed).
 /// Returns true if the argument was recognized, which doesn't mean there was no error.
@@ -87,7 +87,7 @@ void printTagOverrideOptionsHelp();
 /// @param argn: current argument index number, updated if more arguments were consumed.
 /// @param argc: Max argument count.
 /// @param argv: All the command line arguments available.
-/// @param outStatusCode: Set if arg was recognied but an error occurred, untouched otherwise.
+/// @param outStatusCode: Set if arg was recognized but an error occurred, untouched otherwise.
 /// @param copyOptions: where to store the arguments parsed.
 /// @return False if arg was not recognized (argn & outStatusCode were not changed).
 /// Returns true if the argument was recognized, which doesn't mean there was no error.
@@ -115,7 +115,7 @@ void printTimeAndStreamFiltersHelp();
 /// @param argn: current argument index number, updated if more arguments were consumed.
 /// @param argc: Max argument count.
 /// @param argv: All the command line arguments available.
-/// @param outStatusCode: Set if arg was recognied but an error occurred, untouched otherwise.
+/// @param outStatusCode: Set if arg was recognized but an error occurred, untouched otherwise.
 /// @param copyOptions: where to store the arguments parsed.
 /// @return False if arg was not recognized (argn & outStatusCode were not changed).
 /// Returns true if the argument was recognized, which doesn't mean there was no error.

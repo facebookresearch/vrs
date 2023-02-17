@@ -27,9 +27,6 @@ if ("${VRS_SOURCE_DIR}" STREQUAL "")
   # open source layout
   set(VRS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
   set(OSS_DIR "${VRS_SOURCE_DIR}")
-  set(PYVRS_DIR "${VRS_SOURCE_DIR}/pyvrs")
-else()
-  set(PYVRS_DIR "${VRS_SOURCE_DIR}/../../python/pyvrs2")
 endif()
 
 set(CMAKE_MODULE_PATH "${OSS_DIR}/cmake")
@@ -38,9 +35,17 @@ include(${CMAKE_MODULE_PATH}/Platform.cmake)
 include(${CMAKE_MODULE_PATH}/Compiler.cmake)
 include(${CMAKE_MODULE_PATH}/Options.cmake)
 
+# --- Version numbers for generated libraries ---
+file(READ "${OSS_DIR}/version.txt" VRS_DEFAULT_VERSION)
+# Strip trailing newline
+string(REGEX REPLACE "\n$" "" VRS_DEFAULT_VERSION "${VRS_DEFAULT_VERSION}")
+if ("${VRS_DEFAULT_VERSION}x" STREQUAL "x")
+  message(FATAL_ERROR "Could not get version number from file 'version.txt'")
+endif()
+
 # Declare the project, make cmake chose/test the compiler, etc
 project(vrs
-  VERSION 1.0
+  VERSION ${VRS_DEFAULT_VERSION}
   DESCRIPTION "Meta VRS File Format Project"
   LANGUAGES CXX
 )
@@ -56,15 +61,19 @@ include(${CMAKE_MODULE_PATH}/LibrariesSetup.cmake)
 # Include the libraries
 add_subdirectory(vrs)
 
-# Add the vrs command line utility
-add_subdirectory(${OSS_DIR}/tools/vrs)
+OPTION(BUILD_TOOLS "Build all of the tools" ON)
+OPTION(BUILD_SAMPLES "Build sample code and sample apps" ON)
 
-# Add the vrsplayer tool
-add_subdirectory(${OSS_DIR}/tools/vrsplayer)
+if (BUILD_TOOLS)
+  # Add the vrs command line utility
+  add_subdirectory(${OSS_DIR}/tools/vrs)
 
-# Add python binding
-add_subdirectory(${PYVRS_DIR} pyvrs)
+  # Add the vrsplayer tool
+  add_subdirectory(${OSS_DIR}/tools/vrsplayer)
+endif()
 
-# Add the sample apps/code
-add_subdirectory(sample_apps)
-add_subdirectory(sample_code)
+if (BUILD_SAMPLES)
+  # Add the sample apps/code
+  add_subdirectory(sample_apps)
+  add_subdirectory(sample_code)
+endif()

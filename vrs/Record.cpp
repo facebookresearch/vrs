@@ -40,9 +40,7 @@ struct RecordTypeConverter : public EnumStringConverter<
                                  COUNT_OF(sRecordTypes),
                                  Record::Type::UNDEFINED,
                                  Record::Type::UNDEFINED> {
-  static_assert(
-      cNamesCount == static_cast<size_t>(Record::Type::COUNT),
-      "Missing Record::Type name definitions");
+  static_assert(cNamesCount == enumCount<Record::Type>(), "Missing Record::Type name definitions");
 };
 
 } // namespace
@@ -78,7 +76,6 @@ void Record::set(
       // If we're going to reallocate our buffer, then ask for a bit more right away...
       if (bufferUsedSize_ > buffer_.capacity()) {
         buffer_.resize(0); // make sure we don't copy existing data for no reason!
-        buffer_.reserve(recordManager_.getAdjustedRecordBufferSize(bufferUsedSize_));
       }
       buffer_.resize(bufferUsedSize_);
     }

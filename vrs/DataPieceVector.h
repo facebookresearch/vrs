@@ -58,11 +58,11 @@ class DataPieceVector : public DataPiece {
   /// @param bufferSize: Max number of bytes to write.
   /// @return Number of bytes written.
   size_t collectVariableData(int8_t* data, size_t bufferSize) const override {
-    const size_t writenSize = min(bufferSize, getVariableSize());
-    if (writenSize > 0) {
-      memcpy(data, stagedValues_.data(), writenSize);
+    const size_t writtenSize = min(bufferSize, getVariableSize());
+    if (writtenSize > 0) {
+      memcpy(data, stagedValues_.data(), writtenSize);
     }
-    return writenSize;
+    return writtenSize;
   }
 
   /// Read-only access to the vector of values you wish to write to disk.

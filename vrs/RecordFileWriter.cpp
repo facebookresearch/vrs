@@ -16,6 +16,7 @@
 
 #include "RecordFileWriter.h"
 
+#include <algorithm>
 #include <functional>
 #include <mutex>
 #include <queue>
@@ -302,10 +303,7 @@ vector<Recordable*> RecordFileWriter::getRecordables() const {
 }
 
 void RecordFileWriter::setCompressionThreadPoolSize(size_t size) {
-  if (size == kMaxThreadPoolSizeForHW) {
-    size = thread::hardware_concurrency();
-  }
-  compressionThreadPoolSize_ = size;
+  compressionThreadPoolSize_ = min<size_t>(size, thread::hardware_concurrency());
 }
 
 void RecordFileWriter::setInitCreatedThreadCallback(
@@ -374,7 +372,7 @@ void RecordFileWriter::backgroundWriterThreadActivity() {
             nextAutoCollectTime = os::getTimestampSec() + autoCollectDelay;
             unique_ptr<RecordBatch> newBatch = make_unique<RecordBatch>();
             if (collectOldRecords(*newBatch, writerThreadData_->maxTimestampProvider()) > 0) {
-              writerThreadData_->recordsReadyToWrite.emplace_back(move(newBatch));
+              writerThreadData_->recordsReadyToWrite.emplace_back(std::move(newBatch));
               writerThreadData_->hasRecordsReadyToWrite.store(true, memory_order_relaxed);
               somethingToWrite = true;
             }
@@ -480,7 +478,7 @@ int RecordFileWriter::createChunkedFile(
     size_t maxChunkSizeMB,
     unique_ptr<NewChunkHandler>&& chunkHandler) {
   setMaxChunkSizeMB(maxChunkSizeMB);
-  newChunkHandler_ = move(chunkHandler);
+  newChunkHandler_ = std::move(chunkHandler);
   return createFileAsync(filePath, true);
 }
 
@@ -499,7 +497,7 @@ int RecordFileWriter::preallocateIndex(
   if (isWriting()) {
     return FILE_ALREADY_OPEN; // too late!
   }
-  preliminaryIndex_ = move(preliminaryIndex);
+  preliminaryIndex_ = std::move(preliminaryIndex);
   return 0;
 }
 
@@ -512,7 +510,7 @@ int RecordFileWriter::writeRecordsAsync(double maxTimestamp) {
   if (collectOldRecords(*recordBatch, maxTimestamp) > 0) {
     { // mutex guard
       unique_lock<recursive_mutex> guard{writerThreadData_->mutex};
-      writerThreadData_->recordsReadyToWrite.emplace_back(move(recordBatch));
+      writerThreadData_->recordsReadyToWrite.emplace_back(std::move(recordBatch));
       writerThreadData_->hasRecordsReadyToWrite.store(true, memory_order_relaxed);
     } // mutex guard
     writerThreadData_->writeEventChannel.dispatchEvent();
@@ -617,7 +615,7 @@ void RecordFileWriter::addTags(const map<string, string>& newTags) {
   if (isWriting()) {
     XR_LOGE("File tags added after file creation: they won't be written!");
   } else {
-    for (auto tag : newTags) {
+    for (const auto& tag : newTags) {
       fileTags_[tag.first] = tag.second;
     }
   }
@@ -627,7 +625,7 @@ int RecordFileWriter::setWriteFileHandler(unique_ptr<WriteFileHandler> writeFile
   if (isWriting()) {
     return FILE_ALREADY_OPEN;
   }
-  file_ = move(writeFileHandler);
+  file_ = std::move(writeFileHandler);
   return SUCCESS;
 }
 
@@ -788,7 +786,7 @@ int RecordFileWriter::createFile(const string& filePath, bool splitHead) {
       // need be uploaded and prepended to the uploaded data, after the file is closed.
       splitHead = true;
     }
-    file_ = move(writeFile);
+    file_ = std::move(writeFile);
   } else if (spec.chunks.size() != 1) {
     XR_LOGE("File creation using {} requires a single file chunk.", spec.fileHandlerName);
     return INVALID_FILE_SPEC;
@@ -797,7 +795,17 @@ int RecordFileWriter::createFile(const string& filePath, bool splitHead) {
   WriteFileHandler& head = splitHead ? indexRecordWriter_.initSplitHead() : *file_;
   error = head.create(spec.chunks.front());
   if (error != 0) {
-    XR_LOGW("createFile '{}' failed: {}, {}", filePath, error, errorCodeToMessage(error));
+    if (!splitHead && filePath == spec.chunks.front()) {
+      XR_LOGE("Failed to create '{}': {}, {}", filePath, error, errorCodeToMessage(error));
+    } else {
+      XR_LOGE(
+          "Failed to create {}'{}' at '{}': {}, {}",
+          splitHead ? "the split head for " : "",
+          filePath,
+          spec.chunks.front(),
+          error,
+          errorCodeToMessage(error));
+    }
     return error;
   }
   fileHeader_.init();
@@ -822,7 +830,7 @@ int RecordFileWriter::createFile(const string& filePath, bool splitHead) {
     }
   } else if (preliminaryIndex_ && !preliminaryIndex_->empty()) {
     // only use this preliminary index once
-    unique_ptr<deque<IndexRecord::DiskRecordInfo>> index = move(preliminaryIndex_);
+    unique_ptr<deque<IndexRecord::DiskRecordInfo>> index = std::move(preliminaryIndex_);
     IF_ERROR_LOG_CLOSE_AND_RETURN(
         indexRecordWriter_.preallocateClassicIndexRecord(head, *index, lastRecordSize_))
   } else {
@@ -884,8 +892,10 @@ int RecordFileWriter::writeRecordsSingleThread(SortedRecords& records, int lastE
         XR_LOGE("Write failed: {}, {}", error, errorCodeToMessage(error));
       } else {
         writtenRecords++;
-        indexRecordWriter_.addRecord(
-            record->getTimestamp(), lastRecordSize_, r.streamId, record->getRecordType());
+        if (!skipFinalizeIndexRecords_) {
+          indexRecordWriter_.addRecord(
+              record->getTimestamp(), lastRecordSize_, r.streamId, record->getRecordType());
+        }
         currentChunkSize += lastRecordSize_;
       }
     }
@@ -1000,8 +1010,10 @@ int RecordFileWriter::writeRecordsMultiThread(
         if (error != 0) {
           XR_LOGE("Write failed: {}, {}", error, errorCodeToMessage(error));
         } else {
-          indexRecordWriter_.addRecord(
-              record->getTimestamp(), lastRecordSize_, id, record->getRecordType());
+          if (!skipFinalizeIndexRecords_) {
+            indexRecordWriter_.addRecord(
+                record->getTimestamp(), lastRecordSize_, id, record->getRecordType());
+          }
           writtenRecords++;
           currentChunkSize += lastRecordSize_;
         }
@@ -1071,7 +1083,7 @@ int RecordFileWriter::completeAndCloseFile() {
   }
   int error = 0;
   if (!skipFinalizeIndexRecords_) {
-    if (indexRecordWriter_.hasSplitHead()) {
+    if (indexRecordWriter_.getSplitHead()) {
       error = indexRecordWriter_.finalizeSplitIndexRecord(newChunkHandler_);
     } else {
       int64_t endOfRecordsOffset = file_->getPos();
@@ -1099,7 +1111,7 @@ int RecordFileWriter::completeAndCloseFile() {
 
 RecordFileWriter::~RecordFileWriter() {
   if (writerThreadData_ != nullptr) {
-    waitForFileClosed();
+    RecordFileWriter::waitForFileClosed(); // overrides not available in constructors & destructors
     delete writerThreadData_;
   }
   if (purgeThreadData_ != nullptr) {

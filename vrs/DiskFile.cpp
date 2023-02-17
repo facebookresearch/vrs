@@ -43,6 +43,8 @@ using namespace std;
 
 namespace vrs {
 
+constexpr int kMaxFilesOpenCount = 2;
+
 const string& DiskFile::staticName() {
   static const string sDiskFileHandlerName = "diskfile";
   return sDiskFileHandlerName;
@@ -51,7 +53,7 @@ const string& DiskFile::staticName() {
 DiskFile::DiskFile() : WriteFileHandler(DiskFile::staticName()) {}
 
 DiskFile::~DiskFile() {
-  close();
+  DiskFile::close(); // overrides not available in constructors & destructors
 }
 
 unique_ptr<FileHandler> DiskFile::makeNew() const {
@@ -276,10 +278,10 @@ int DiskFile::overwrite(const void* buffer, size_t length) {
       int64_t maxRequest = max<int64_t>(currentChunk_->size - os::fileTell(currentChunk_->file), 0);
       requestSize = min<size_t>(requestSize, static_cast<size_t>(maxRequest));
     }
-    size_t writenSize = ::fwrite(
+    size_t writtenSize = ::fwrite(
         static_cast<const char*>(buffer) + lastRWSize_, 1, requestSize, currentChunk_->file);
-    lastRWSize_ += writenSize;
-    if (writenSize != requestSize) {
+    lastRWSize_ += writtenSize;
+    if (writtenSize != requestSize) {
       if (ferror(currentChunk_->file) != 0) {
         lastError_ = errno;
       } else {
@@ -461,7 +463,7 @@ bool DiskFile::isRemoteFileSystem() const {
   return false;
 }
 
-int DiskFile::writeToFile(const string& path, const void* data, size_t dataSize) {
+int DiskFile::writeZstdFile(const string& path, const void* data, size_t dataSize) {
   AtomicDiskFile file;
   IF_ERROR_LOG_AND_RETURN(file.create(path));
   if (dataSize > 0) {
@@ -475,13 +477,13 @@ int DiskFile::writeToFile(const string& path, const void* data, size_t dataSize)
   return SUCCESS;
 }
 
-int DiskFile::writeToFile(const string& path, const string& string) {
-  return writeToFile(path, string.data(), string.size());
+int DiskFile::writeZstdFile(const string& path, const string& string) {
+  return writeZstdFile(path, string.data(), string.size());
 }
 
 namespace {
 template <class T>
-int readFromFileTemplate(const string& path, T& outContent) {
+int readZstdFileTemplate(const string& path, T& outContent) {
   outContent.clear();
   DiskFile file;
   IF_ERROR_LOG_AND_RETURN(file.open(path));
@@ -500,15 +502,15 @@ int readFromFileTemplate(const string& path, T& outContent) {
 }
 } // namespace
 
-int DiskFile::readFromFile(const string& path, vector<char>& outContent) {
-  return readFromFileTemplate(path, outContent);
+int DiskFile::readZstdFile(const string& path, vector<char>& outContent) {
+  return readZstdFileTemplate(path, outContent);
 }
 
-int DiskFile::readFromFile(const string& path, string& outString) {
-  return readFromFileTemplate(path, outString);
+int DiskFile::readZstdFile(const string& path, string& outString) {
+  return readZstdFileTemplate(path, outString);
 }
 
-int DiskFile::readFromFile(const string& path, void* data, size_t dataSize) {
+int DiskFile::readZstdFile(const string& path, void* data, size_t dataSize) {
   DiskFile file;
   IF_ERROR_LOG_AND_RETURN(file.open(path));
   int64_t fileSize = file.getTotalSize();
@@ -524,6 +526,21 @@ int DiskFile::readFromFile(const string& path, void* data, size_t dataSize) {
   }
   IF_ERROR_LOG_AND_RETURN(decompressor.readFrame(file, data, frameSize, maxReadSize));
   return maxReadSize == 0 ? SUCCESS : FAILURE;
+}
+
+string DiskFile::readTextFile(const std::string& path) {
+  DiskFile file;
+  if (file.open(path) == 0) {
+    int64_t size = file.getTotalSize();
+    const int64_t kMaxReasonableTextFileSize = 50 * 1024 * 1024; // 50 MB is a huge text file...
+    if (size > 0 && XR_VERIFY(size < kMaxReasonableTextFileSize)) {
+      string str(size, 0);
+      if (XR_VERIFY(file.read(str.data(), size) == 0)) {
+        return str;
+      }
+    }
+  }
+  return {};
 }
 
 int DiskFile::parseUri(FileSpec& inOutFileSpec, size_t colonIndex) const {
@@ -543,7 +560,7 @@ int DiskFile::parseUri(FileSpec& inOutFileSpec, size_t colonIndex) const {
 }
 
 AtomicDiskFile::~AtomicDiskFile() {
-  close();
+  AtomicDiskFile::close(); // overrides not available in constructors & destructors
 }
 
 int AtomicDiskFile::create(const std::string& newFilePath) {

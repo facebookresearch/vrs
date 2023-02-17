@@ -37,22 +37,22 @@ struct FilteredFileReaderTest : testing::Test {
   void SetUp() override {
     filteredReader.setSource(kTestFilePath);
     ASSERT_EQ(filteredReader.openFile({}), 0);
-    ASSERT_EQ(filteredReader.reader.getStreams().size(), 19);
+    ASSERT_EQ(filteredReader.reader.getStreams().size(), 22);
   }
 };
 
 TEST_F(FilteredFileReaderTest, excludeStreams) {
   utils::RecordFilterParams filters;
   filteredReader.applyFilters(filters);
-  EXPECT_EQ(filteredReader.filter.streams.size(), 19);
+  EXPECT_EQ(filteredReader.filter.streams.size(), 22);
 
   filters.excludeStream("100-test/synthetic/grey8");
   filteredReader.applyFilters(filters);
-  EXPECT_EQ(filteredReader.filter.streams.size(), 18);
+  EXPECT_EQ(filteredReader.filter.streams.size(), 21);
 
   filters.excludeStream("100-4");
   filteredReader.applyFilters(filters);
-  EXPECT_EQ(filteredReader.filter.streams.size(), 17);
+  EXPECT_EQ(filteredReader.filter.streams.size(), 20);
 }
 
 TEST_F(FilteredFileReaderTest, includeStreams) {
@@ -116,6 +116,6 @@ TEST_F(FilteredFileReaderTest, includeExcludeStreams) {
     filters.includeStream("214");
     filters.excludeStream("100-test/synthetic/raw10");
     filteredReader.applyFilters(filters);
-    EXPECT_EQ(filteredReader.filter.streams.size(), 15);
+    EXPECT_EQ(filteredReader.filter.streams.size(), 18);
   }
 }

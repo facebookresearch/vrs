@@ -47,6 +47,11 @@ using JValue = fb_rapidjson::GenericValue<JUtf8Encoding, JCrtAllocator>;
 /// For use by VRS only.
 /// @internal
 struct JsonWrapper {
+  explicit JsonWrapper(JDocument& doc) : value{doc}, alloc{doc.GetAllocator()} {
+    doc.SetObject();
+  }
+  JsonWrapper(JValue& v, JDocument::AllocatorType& a) : value{v}, alloc{a} {}
+
   JValue& value;
   JDocument::AllocatorType& alloc;
 
@@ -264,7 +269,7 @@ inline bool getFromRapidjsonValue(const JValue& value, MatrixND<T, N>& outMatrix
 }
 
 template <typename T>
-inline void
+inline bool
 getMap(map<string, T>& outMap, const JValue& piece, fb_rapidjson::GenericStringRef<char> name) {
   using namespace fb_rapidjson;
   outMap.clear();
@@ -278,11 +283,13 @@ getMap(map<string, T>& outMap, const JValue& piece, fb_rapidjson::GenericStringR
         outMap[itr->name.GetString()] = value;
       }
     }
+    return true;
   }
+  return false;
 }
 
 template <typename T>
-inline void
+inline bool
 getVector(vector<T>& outVector, const JValue& piece, fb_rapidjson::GenericStringRef<char> name) {
   using namespace fb_rapidjson;
   outVector.clear();
@@ -296,7 +303,9 @@ getVector(vector<T>& outVector, const JValue& piece, fb_rapidjson::GenericString
         outVector.push_back(value);
       }
     }
+    return true;
   }
+  return false;
 }
 
 inline bool getString(string& outString, const JValue& piece, const char* name) {
@@ -307,6 +316,28 @@ inline bool getString(string& outString, const JValue& piece, const char* name) 
     return true;
   }
   outString.clear();
+  return false;
+}
+
+inline bool getInt64(int64_t& outInt64, const JValue& piece, const char* name) {
+  using namespace fb_rapidjson;
+  const JValue::ConstMemberIterator member = piece.FindMember(name);
+  if (member != piece.MemberEnd() && member->value.IsInt64()) {
+    outInt64 = member->value.GetInt64();
+    return true;
+  }
+  outInt64 = 0;
+  return false;
+}
+
+inline bool getInt(int& outInt, const JValue& piece, const char* name) {
+  using namespace fb_rapidjson;
+  const JValue::ConstMemberIterator member = piece.FindMember(name);
+  if (member != piece.MemberEnd() && member->value.IsInt()) {
+    outInt = member->value.GetInt();
+    return true;
+  }
+  outInt = 0;
   return false;
 }
 

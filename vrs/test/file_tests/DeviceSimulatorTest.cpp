@@ -46,6 +46,18 @@ TEST_F(DeviceSimulator, classicIndex) {
   ASSERT_EQ(reader.openFile(testPath), 0);
   size_t recordCount = reader.getIndex().size();
   EXPECT_EQ(recordCount, kClassicFileConfig.totalRecordCount);
+
+  // validate serial number methods
+  set<string> serialNumbers;
+  for (uint32_t k = 0; k < kCameraCount; ++k) {
+    string tagName = CreateParams::getCameraStreamTag(k);
+    string serialNumber = reader.getTag(tagName);
+    EXPECT_FALSE(serialNumber.empty());
+    serialNumbers.insert(serialNumber);
+    EXPECT_TRUE(reader.getStreamForSerialNumber(serialNumber).isValid());
+  }
+  EXPECT_EQ(serialNumbers.size(), kCameraCount);
+
   reader.closeFile();
 
   // truncate the file to corrupt the index
@@ -161,12 +173,11 @@ TEST_F(DeviceSimulator, splitIndex) {
   const string testPath = os::getTempFolder() + "SplitIndex.vrs";
 
   map<size_t, string> chunks;
-  EXPECT_EQ(
-      threadedCreateRecords(CreateParams(testPath, kLongFileConfig)
-                                .setTestOptions(TestOptions::SPLIT_HEADER)
-                                .setMaxChunkSizeMB(1)
-                                .setChunkHandler(make_unique<ChunkCollector>(chunks))),
-      0);
+  CreateParams creationParams(testPath, kLongFileConfig);
+  creationParams.setTestOptions(TestOptions::SPLIT_HEADER)
+      .setMaxChunkSizeMB(1)
+      .setChunkHandler(make_unique<ChunkCollector>(chunks));
+  EXPECT_EQ(threadedCreateRecords(creationParams), 0);
   checkRecordCountAndIndex(CheckParams(testPath, kLongFileConfig)); // baseline: all ok
   checkChunks(chunks, testPath, 3);
 
@@ -178,7 +189,7 @@ TEST_F(DeviceSimulator, splitIndex) {
       CheckParams(testPath, kLongFileConfig).setHasIndex(false).setJumpbackCount(2));
   deleteChunkedFile(testPath);
 
-  const int64_t indexRecordHeaderEnd = 1752; // exact known location
+  const int64_t indexRecordHeaderEnd = creationParams.outMinFileSize;
 
   // cut out all the index
   EXPECT_EQ(

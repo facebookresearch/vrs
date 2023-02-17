@@ -18,10 +18,12 @@
 
 #include <cstring>
 
-#include <xxhash.h>
 #include <array>
+#include <map>
 #include <string>
 #include <vector>
+
+#include <xxhash.h>
 
 namespace vrs {
 
@@ -30,16 +32,17 @@ class XXH64Digester {
   XXH64Digester();
   ~XXH64Digester();
   void clear();
-  XXH64Digester& update(const void* data, size_t len);
+  XXH64Digester& ingest(const void* data, size_t len);
   template <class T>
-  XXH64Digester& update(const std::vector<T>& data) {
+  XXH64Digester& ingest(const std::vector<T>& data) {
     if (!data.empty()) {
-      update(data.data(), data.size() * sizeof(T));
+      ingest(data.data(), data.size() * sizeof(T));
     }
     return *this;
   }
-  XXH64Digester& update(const std::string& str) {
-    return update(str.c_str(), str.size() + 1);
+  XXH64Digester& ingest(const std::map<std::string, std::string>& data);
+  XXH64Digester& ingest(const std::string& str) {
+    return ingest(str.c_str(), str.size() + 1);
   }
   uint64_t digest();
   std::string digestToString();

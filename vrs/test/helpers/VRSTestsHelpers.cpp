@@ -91,15 +91,6 @@ class DawnCamera : public Recordable {
         fileConfig_{fileConfig} {
     setCompression(CompressionPreset::Default);
     addRecordFormat(Record::Type::DATA, 1, frameData_.getContentBlock(), {&frameData_});
-    if (index == 0) {
-      getRecordManager().setRecordBufferOverAllocationMins(100, 0);
-    } else if (index == 1) {
-      getRecordManager().setRecordBufferOverAllocationMins(0, 2);
-    } else if (index == 2) {
-      getRecordManager().setRecordBufferOverAllocationMins(100, 2);
-    } else if (index == 3) {
-      getRecordManager().setRecordBufferOverAllocationMins(1000, 10);
-    }
   }
 
   const Record* createStateRecord() override {
@@ -264,7 +255,9 @@ int threadedCreateRecords(CreateParams& p) {
   bool fatalError = false;
   for (uint32_t cameraIndex = 0; cameraIndex < kCameraCount; cameraIndex++) {
     cameras[cameraIndex] = make_unique<DawnCamera>(cameraIndex, kLongFileConfig);
-    fileWriter.addRecordable(cameras[cameraIndex].get());
+    DawnCamera* camera = cameras[cameraIndex].get();
+    fileWriter.addRecordable(camera);
+    fileWriter.setTag(p.getCameraStreamTag(cameraIndex), camera->getSerialNumber());
     counters[cameraIndex] = 0;
     threadParams.push_back(ThreadParam{
         fileWriter,
@@ -283,10 +276,15 @@ int threadedCreateRecords(CreateParams& p) {
   if (p.customCreateFileFunction) {
     RETURN_ON_FAILURE(p.customCreateFileFunction(p, fileWriter));
   } else if (p.testOptions & TestOptions::SPLIT_HEADER) {
-    RETURN_ON_FAILURE(fileWriter.createChunkedFile(p.path, p.maxChunkSizeMB, move(p.chunkHandler)));
+    RETURN_ON_FAILURE(
+        fileWriter.createChunkedFile(p.path, p.maxChunkSizeMB, std::move(p.chunkHandler)));
   } else {
     fileWriter.setMaxChunkSizeMB(p.maxChunkSizeMB);
     RETURN_ON_FAILURE(fileWriter.createFileAsync(p.path));
+  }
+  p.outMinFileSize = RecordFileWriterTester::getCurrentFileSize(fileWriter);
+  if (p.testOptions & TestOptions::SKIP_FINALIZE_INDEX) {
+    RecordFileWriterTester::skipFinalizeIndexRecord(fileWriter);
   }
   vector<thread> threads;
   threads.reserve(kCameraCount);
@@ -296,9 +294,6 @@ int threadedCreateRecords(CreateParams& p) {
   for (uint32_t threadIndex = 0; threadIndex < kCameraCount; threadIndex++) {
     XR_LOGD("Joining thread #{}", threadIndex);
     threads[threadIndex].join();
-  }
-  if (p.testOptions & TestOptions::SKIP_FINALIZE_INDEX) {
-    RecordFileWriterTester::skipFinalizeIndexRecord(fileWriter);
   }
   XR_LOGD("Closing file");
   EXPECT_EQ(fileWriter.closeFileAsync(), 0);
@@ -325,10 +320,12 @@ int singleThreadCreateRecords(CreateParams& p) {
   }
   if (p.customCreateFileFunction) {
     RETURN_ON_FAILURE(p.customCreateFileFunction(p, fileWriter));
+    p.outMinFileSize = RecordFileWriterTester::getCurrentFileSize(fileWriter);
   } else if (p.testOptions & TestOptions::SPLIT_HEADER) {
     size_t kMB = 1024 * 1024;
     RETURN_ON_FAILURE(
-        fileWriter.createChunkedFile(p.path, p.maxChunkSizeMB * kMB, move(p.chunkHandler)));
+        fileWriter.createChunkedFile(p.path, p.maxChunkSizeMB * kMB, std::move(p.chunkHandler)));
+    p.outMinFileSize = RecordFileWriterTester::getCurrentFileSize(fileWriter);
   } else {
     // When creating records synchronously, config & state records are not automatically inserted.
     for (auto& camera : cameras) {

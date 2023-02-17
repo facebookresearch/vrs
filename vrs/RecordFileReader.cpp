@@ -53,6 +53,7 @@ RecordFileReader::RecordFileReader() {
 
 RecordFileReader::~RecordFileReader() {
   closeFile();
+  TelemetryLogger::flush();
 }
 
 void RecordFileReader::setOpenProgressLogger(ProgressLogger* progressLogger) {
@@ -67,7 +68,7 @@ void RecordFileReader::setOpenProgressLogger(ProgressLogger* progressLogger) {
 
 void RecordFileReader::setFileHandler(unique_ptr<FileHandler> fileHandler) {
   if (fileHandler) {
-    file_ = move(fileHandler);
+    file_ = std::move(fileHandler);
   }
 }
 
@@ -288,6 +289,13 @@ int RecordFileReader::doOpenFile(
   }
   openProgressLogger_->logDuration("File open", os::getTimestampSec() - beforeTime);
   endOfUserRecordsOffset_ = fileHeader.getEndOfUserRecordsOffset(file_->getTotalSize());
+  if (error == 0) {
+    // count the records of each stream & type
+    streamRecordCounts_.clear();
+    for (const auto& record : recordIndex_) {
+      streamRecordCounts_[record.streamId][record.recordType]++;
+    }
+  }
   return error;
 }
 
@@ -301,7 +309,7 @@ int RecordFileReader::readFileHeader(
     string fileName =
         "vrs_header_x" + fileSpec.getXXHash() + "_" + to_string(file_->getTotalSize());
     if (fileCache->getFile(fileName, headerCacheFilePath) == 0 &&
-        DiskFile::readFromFile(headerCacheFilePath, &outFileHeader, sizeof(outFileHeader)) == 0 &&
+        DiskFile::readZstdFile(headerCacheFilePath, &outFileHeader, sizeof(outFileHeader)) == 0 &&
         outFileHeader.looksLikeAVRSFile()) {
       openProgressLogger_->logNewStep("Loaded header from cache");
       readHeaderFromCache = true;
@@ -310,7 +318,7 @@ int RecordFileReader::readFileHeader(
   if (!readHeaderFromCache) {
     IF_ERROR_LOG_AND_RETURN(file_->read(outFileHeader));
     if (!headerCacheFilePath.empty()) {
-      DiskFile::writeToFile(headerCacheFilePath, &outFileHeader, sizeof(outFileHeader));
+      DiskFile::writeZstdFile(headerCacheFilePath, &outFileHeader, sizeof(outFileHeader));
     }
   }
   return 0;
@@ -407,6 +415,7 @@ int RecordFileReader::readFileDetails(
             }),
         recordIndex_.end());
     XR_LOGD("Deleted {} TagsRecords from the index.", sizeBefore - recordIndex_.size());
+    DescriptionRecord::createStreamSerialNumbers(fileTags_, streamTags_);
   }
   // Streams with no record won't be revealed by the index.
   for (auto& tags : streamTags_) {
@@ -427,6 +436,7 @@ int RecordFileReader::closeFile() {
   recordIndex_.clear();
   openProgressLogger_ = &defaultProgressLogger_;
   streamIndex_.clear();
+  streamRecordCounts_.clear();
   lastRequest_.clear();
   fileHasAnIndex_ = false;
   return result;
@@ -493,7 +503,7 @@ bool RecordFileReader::hasIndex() const {
 
 vector<StreamId> RecordFileReader::getStreams(RecordableTypeId typeId, const string& flavor) const {
   vector<StreamId> streamIds;
-  for (const auto& streamId : streamIds_) {
+  for (auto streamId : streamIds_) {
     if ((typeId == RecordableTypeId::Undefined || streamId.getTypeId() == typeId) &&
         (flavor.empty() || getFlavor(streamId) == flavor)) {
       streamIds.emplace_back(streamId);
@@ -504,7 +514,7 @@ vector<StreamId> RecordFileReader::getStreams(RecordableTypeId typeId, const str
 
 StreamId RecordFileReader::getStreamForType(RecordableTypeId typeId, uint32_t indexNumber) const {
   uint32_t hitCount = 0;
-  for (const auto& streamId : streamIds_) {
+  for (auto streamId : streamIds_) {
     if (streamId.getTypeId() == typeId && hitCount++ == indexNumber) {
       return streamId;
     }
@@ -517,7 +527,7 @@ StreamId RecordFileReader::getStreamForFlavor(
     const string& flavor,
     uint32_t indexNumber) const {
   uint32_t hitCount = 0;
-  for (const auto& streamId : streamIds_) {
+  for (auto streamId : streamIds_) {
     if (streamId.getTypeId() == typeId && getFlavor(streamId) == flavor &&
         hitCount++ == indexNumber) {
       return streamId;
@@ -530,9 +540,18 @@ StreamId RecordFileReader::getStreamForTag(
     const string& tagName,
     const string& tag,
     RecordableTypeId typeId) const {
-  for (const auto& streamId : streamIds_) {
+  for (auto streamId : streamIds_) {
     if ((typeId == RecordableTypeId::Undefined || streamId.getTypeId() == typeId) &&
         getTag(streamId, tagName) == tag) {
+      return streamId;
+    }
+  }
+  return {};
+}
+
+StreamId RecordFileReader::getStreamForSerialNumber(const std::string& streamSerialNumber) const {
+  for (auto streamId : streamIds_) {
+    if (getSerialNumber(streamId) == streamSerialNumber) {
       return streamId;
     }
   }
@@ -594,7 +613,7 @@ static bool timeCompare(const IndexRecord::RecordInfo& lhs, const IndexRecord::R
 }
 
 const IndexRecord::RecordInfo* RecordFileReader::getRecordByTime(double timestamp) const {
-  IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type());
+  IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type::UNDEFINED);
   auto lowerBound = lower_bound(recordIndex_.begin(), recordIndex_.end(), firstTime, timeCompare);
   if (lowerBound != recordIndex_.end()) {
     return &*lowerBound;
@@ -605,13 +624,13 @@ const IndexRecord::RecordInfo* RecordFileReader::getRecordByTime(double timestam
 const IndexRecord::RecordInfo* RecordFileReader::getRecordByTime(
     Record::Type recordType,
     double timestamp) const {
-  IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type());
+  IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type::UNDEFINED);
   auto lowerBound = lower_bound(recordIndex_.begin(), recordIndex_.end(), firstTime, timeCompare);
-  while (lowerBound != recordIndex_.end() && lowerBound->recordType != recordType) {
+  while (lowerBound != recordIndex_.end()) {
+    if (lowerBound->recordType == recordType) {
+      return &(*lowerBound);
+    }
     ++lowerBound;
-  }
-  if (lowerBound != recordIndex_.end()) {
-    return &*lowerBound;
   }
   return nullptr;
 }
@@ -623,13 +642,14 @@ static bool ptrTimeCompare(const IndexRecord::RecordInfo* lhs, const IndexRecord
 const IndexRecord::RecordInfo* RecordFileReader::getRecordByTime(
     StreamId streamId,
     double timestamp) const {
-  const vector<const IndexRecord::RecordInfo*>& index = getIndex(streamId);
-  const IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type());
-
-  auto lowerBound = lower_bound(index.begin(), index.end(), &firstTime, ptrTimeCompare);
+  const IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type::UNDEFINED);
+  auto lowerBound = lower_bound(recordIndex_.begin(), recordIndex_.end(), firstTime, timeCompare);
   // The stream index is a vector of pointers in the recordIndex_ vector!
-  if (lowerBound != index.end()) {
-    return *lowerBound;
+  while (lowerBound != recordIndex_.end()) {
+    if (lowerBound->streamId == streamId) {
+      return &(*lowerBound);
+    }
+    ++lowerBound;
   }
   return nullptr;
 }
@@ -638,16 +658,14 @@ const IndexRecord::RecordInfo* RecordFileReader::getRecordByTime(
     StreamId streamId,
     Record::Type recordType,
     double timestamp) const {
-  const vector<const IndexRecord::RecordInfo*>& index = getIndex(streamId);
-  const IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type());
-
-  auto lowerBound = lower_bound(index.begin(), index.end(), &firstTime, ptrTimeCompare);
-  while (lowerBound != index.end() && (*lowerBound)->recordType != recordType) {
-    ++lowerBound;
-  }
+  const IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type::UNDEFINED);
+  auto lowerBound = lower_bound(recordIndex_.begin(), recordIndex_.end(), firstTime, timeCompare);
   // The stream index is a vector of pointers in the recordIndex_ vector!
-  if (lowerBound != index.end()) {
-    return *lowerBound;
+  while (lowerBound != recordIndex_.end()) {
+    if (lowerBound->streamId == streamId && lowerBound->recordType == recordType) {
+      return &(*lowerBound);
+    }
+    ++lowerBound;
   }
   return nullptr;
 }
@@ -655,24 +673,52 @@ const IndexRecord::RecordInfo* RecordFileReader::getRecordByTime(
 const IndexRecord::RecordInfo* RecordFileReader::getNearestRecordByTime(
     double timestamp,
     double epsilon,
-    StreamId streamId) const {
+    StreamId streamId,
+    Record::Type recordType) const {
   // If stream id is undefined, we search for all the streams.
   if (streamId.isValid()) {
     const vector<const IndexRecord::RecordInfo*>& index = getIndex(streamId);
-    return vrs::getNearestRecordByTime(index, timestamp, epsilon);
+    return vrs::getNearestRecordByTime(index, timestamp, epsilon, recordType);
   }
 
   const IndexRecord::RecordInfo* nearest = nullptr;
-  const IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type());
-  auto lowerBound = lower_bound(recordIndex_.begin(), recordIndex_.end(), firstTime, timeCompare);
+  if (recordIndex_.empty()) {
+    return nullptr;
+  }
+  vector<IndexRecord::RecordInfo>::const_iterator lowerBound;
+  if (recordIndex_.back().timestamp < timestamp) {
+    lowerBound = recordIndex_.end() - 1;
+  } else {
+    IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type::UNDEFINED);
+    lowerBound = lower_bound(recordIndex_.begin(), recordIndex_.end(), firstTime, timeCompare);
+  }
 
-  auto start = (lowerBound == recordIndex_.begin()) ? lowerBound : lowerBound - 1;
-  auto end = (lowerBound == recordIndex_.end()) ? lowerBound : lowerBound + 1;
-  for (auto iter = start; iter != end; iter++) {
-    double diff = abs((*iter).timestamp - timestamp);
-    if (diff <= epsilon && (nearest == nullptr || diff < abs(nearest->timestamp - timestamp))) {
-      nearest = &(*iter);
+  auto left = (lowerBound == recordIndex_.begin()) ? lowerBound : lowerBound - 1;
+  double diff = 0;
+  while (diff <= epsilon) {
+    diff = std::abs((*left).timestamp - timestamp);
+    if (diff <= epsilon &&
+        (recordType == Record::Type::UNDEFINED || left->recordType == recordType)) {
+      nearest = &(*left);
+      break;
     }
+    if (left == recordIndex_.begin()) {
+      break;
+    }
+    left--;
+  }
+  auto right = lowerBound;
+  diff = 0;
+  while (right != recordIndex_.end() && diff <= epsilon) {
+    diff = std::abs((*right).timestamp - timestamp);
+    if (diff <= epsilon &&
+        (recordType == Record::Type::UNDEFINED || right->recordType == recordType)) {
+      if (nearest == nullptr || diff < std::abs(nearest->timestamp - timestamp)) {
+        nearest = &(*right);
+        break;
+      }
+    }
+    right++;
   }
 
   return nearest;
@@ -702,17 +748,11 @@ uint32_t RecordFileReader::getRecordStreamIndex(const IndexRecord::RecordInfo* r
 }
 
 const vector<const IndexRecord::RecordInfo*>& RecordFileReader::getIndex(StreamId streamId) const {
-  // recordableIndex_ is only initialized when we need it the first time. When we do,
-  // we create an index for all the typess.
+  // streamIndex_ is only initialized the first time we need it, for all streams at once.
   if (streamIndex_.empty() && (!streamIds_.empty() && !recordIndex_.empty())) {
-    // We need to create the indexes. First, calculate their size
-    map<StreamId, uint32_t> recordCounter;
-    for (const auto& recordIndex : recordIndex_) {
-      recordCounter[recordIndex.streamId]++;
-    }
     // Reserve space in the vectors, so that emplace_back never needs to re-allocate memory
-    for (auto iter : recordCounter) {
-      streamIndex_[iter.first].reserve(iter.second);
+    for (StreamId id : streamIds_) {
+      streamIndex_[id].reserve(getRecordCount(id));
     }
     // We can now create the indexes, trusting that the emplace_back operations will be trivial
     for (const auto& recordIndex : recordIndex_) {
@@ -723,18 +763,11 @@ const vector<const IndexRecord::RecordInfo*>& RecordFileReader::getIndex(StreamI
 }
 
 uint32_t RecordFileReader::getRecordCount(StreamId streamId) const {
-  return static_cast<uint32_t>(getIndex(streamId).size());
+  return streamRecordCounts_[streamId].totalCount();
 }
 
 uint32_t RecordFileReader::getRecordCount(StreamId streamId, Record::Type recordType) const {
-  const auto& recordIndex = getIndex(streamId);
-  uint32_t count = 0;
-  for (const auto& recordInfo : recordIndex) {
-    if (recordInfo->recordType == recordType) {
-      count++;
-    }
-  }
-  return count;
+  return streamRecordCounts_[streamId][recordType];
 }
 
 double RecordFileReader::getFirstDataRecordTime() const {
@@ -746,39 +779,49 @@ double RecordFileReader::getFirstDataRecordTime() const {
   return 0; // no data record...
 }
 
-bool RecordFileReader::readFirstConfigurationRecord(StreamId streamId, StreamPlayer* streamPlayer) {
-  const IndexRecord::RecordInfo* config = getRecord(streamId, Record::Type::CONFIGURATION, 0);
-  if (config == nullptr) {
-    return false;
-  } else if (streamPlayer == nullptr) {
-    return readRecord(*config) == 0;
+bool RecordFileReader::readConfigRecords(
+    const set<const IndexRecord::RecordInfo*>& configRecords,
+    StreamPlayer* streamPlayer) {
+  bool foundAtLeastOneStream = false;
+  bool allGood = true;
+  for (auto configRecord : configRecords) {
+    if (configRecord != nullptr) {
+      foundAtLeastOneStream = true;
+      int status;
+      if (streamPlayer == nullptr) {
+        status = readRecord(*configRecord);
+      } else {
+        streamPlayer->onAttachedToFileReader(*this, configRecord->streamId);
+        status = readRecord(*configRecord, streamPlayer);
+      }
+      allGood = (status == 0) && allGood;
+    }
   }
-  streamPlayer->onAttachedToFileReader(*this, streamId);
-  return readRecord(*config, streamPlayer) == 0;
+  return foundAtLeastOneStream && allGood;
+}
+
+bool RecordFileReader::readFirstConfigurationRecord(StreamId streamId, StreamPlayer* streamPlayer) {
+  return readConfigRecords({getRecord(streamId, Record::Type::CONFIGURATION, 0)}, streamPlayer);
 }
 
 bool RecordFileReader::readFirstConfigurationRecords(StreamPlayer* streamPlayer) {
-  bool foundAtLeastOneStream = false;
-  bool allGood = true;
-  for (const auto& streamId : streamIds_) {
-    foundAtLeastOneStream = true;
-    allGood = readFirstConfigurationRecord(streamId, streamPlayer) && allGood;
+  set<const IndexRecord::RecordInfo*> configRecords;
+  for (auto streamId : streamIds_) {
+    configRecords.insert(getRecord(streamId, Record::Type::CONFIGURATION, 0));
   }
-  return foundAtLeastOneStream && allGood;
+  return readConfigRecords(configRecords, streamPlayer);
 }
 
 bool RecordFileReader::readFirstConfigurationRecordsForType(
     RecordableTypeId typeId,
     StreamPlayer* streamPlayer) {
-  bool foundAtLeastOneStream = false;
-  bool allGood = true;
-  for (const auto& streamId : streamIds_) {
+  set<const IndexRecord::RecordInfo*> configRecords;
+  for (auto streamId : streamIds_) {
     if (streamId.getTypeId() == typeId) {
-      foundAtLeastOneStream = true;
-      allGood = readFirstConfigurationRecord(streamId, streamPlayer) && allGood;
+      configRecords.insert(getRecord(streamId, Record::Type::CONFIGURATION, 0));
     }
   }
-  return foundAtLeastOneStream && allGood;
+  return readConfigRecords(configRecords, streamPlayer);
 }
 
 bool RecordFileReader::getRecordFormat(
@@ -838,6 +881,10 @@ const string& RecordFileReader::getOriginalRecordableTypeName(StreamId streamId)
 
 const string& RecordFileReader::getFlavor(StreamId streamId) const {
   return getTag(getTags(streamId).vrs, Recordable::getFlavorTagName());
+}
+
+const string& RecordFileReader::getSerialNumber(StreamId streamId) const {
+  return getTag(getTags(streamId).vrs, Recordable::getSerialNumberTagName());
 }
 
 bool RecordFileReader::mightContainImages(StreamId streamId) const {
@@ -1063,20 +1110,55 @@ int RecordFileReader::readRecord(
 const IndexRecord::RecordInfo* getNearestRecordByTime(
     const vector<const IndexRecord::RecordInfo*>& index,
     double timestamp,
-    double epsilon) {
+    double epsilon,
+    Record::Type recordType) {
   const IndexRecord::RecordInfo* nearest = nullptr;
-  const IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type());
-  auto lowerBound = lower_bound(index.begin(), index.end(), &firstTime, ptrTimeCompare);
-
-  auto start = (lowerBound == index.begin()) ? lowerBound : lowerBound - 1;
-  auto end = (lowerBound == index.end()) ? lowerBound : lowerBound + 1;
-  for (auto iter = start; iter != end; iter++) {
-    double diff = abs((*iter)->timestamp - timestamp);
-    if (diff <= epsilon && (nearest == nullptr || diff < abs(nearest->timestamp - timestamp))) {
-      nearest = *iter;
-    }
+  if (index.empty()) {
+    return nullptr;
   }
+  vector<const IndexRecord::RecordInfo*>::const_iterator lowerBound;
+  if (index.back()->timestamp < timestamp) {
+    lowerBound = index.end() - 1;
+  } else {
+    IndexRecord::RecordInfo firstTime(timestamp, 0, StreamId(), Record::Type::UNDEFINED);
+    lowerBound = lower_bound(index.begin(), index.end(), &firstTime, ptrTimeCompare);
+  }
+
+  auto left = (lowerBound == index.begin()) ? lowerBound : lowerBound - 1;
+  double diff = 0;
+  while (diff <= epsilon) {
+    diff = std::abs((*left)->timestamp - timestamp);
+    if (diff <= epsilon &&
+        (recordType == Record::Type::UNDEFINED || (*left)->recordType == recordType)) {
+      nearest = *left;
+      break;
+    }
+    if (left == index.begin()) {
+      break;
+    }
+    left--;
+  }
+  auto right = lowerBound;
+  diff = 0;
+  while (right != index.end() && diff <= epsilon) {
+    diff = std::abs((*right)->timestamp - timestamp);
+    if (diff <= epsilon &&
+        (recordType == Record::Type::UNDEFINED || (*right)->recordType == recordType)) {
+      if (nearest == nullptr || diff < std::abs(nearest->timestamp - timestamp)) {
+        nearest = *right;
+        break;
+      }
+    }
+    right++;
+  }
+
   return nearest;
+}
+
+uint32_t RecordFileReader::RecordTypeCounter::totalCount() const {
+  return ParentType::operator[](static_cast<uint32_t>(Record::Type::CONFIGURATION)) +
+      ParentType::operator[](static_cast<uint32_t>(Record::Type::STATE)) +
+      ParentType::operator[](static_cast<uint32_t>(Record::Type::DATA));
 }
 
 } // namespace vrs

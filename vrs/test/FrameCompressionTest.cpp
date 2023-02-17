@@ -523,27 +523,27 @@ TEST_F(FrameCompressionTest, stringReadWrite) {
   string writtenString;
   string readString;
 
-  ASSERT_EQ(DiskFile::writeToFile(testPath, writtenString), 0);
+  ASSERT_EQ(DiskFile::writeZstdFile(testPath, writtenString), 0);
   readString = "hello";
-  EXPECT_EQ(DiskFile::readFromFile(testPath, readString), 0);
+  EXPECT_EQ(DiskFile::readZstdFile(testPath, readString), 0);
   EXPECT_EQ(writtenString, readString);
 
   writtenString = "some short string";
-  ASSERT_EQ(DiskFile::writeToFile(testPath, writtenString), 0);
+  ASSERT_EQ(DiskFile::writeZstdFile(testPath, writtenString), 0);
   readString = "hello";
-  EXPECT_EQ(DiskFile::readFromFile(testPath, readString), 0);
+  EXPECT_EQ(DiskFile::readZstdFile(testPath, readString), 0);
   EXPECT_EQ(writtenString, readString);
 
   writtenString = kBigJson;
-  ASSERT_EQ(DiskFile::writeToFile(testPath, writtenString), 0);
+  ASSERT_EQ(DiskFile::writeZstdFile(testPath, writtenString), 0);
   readString = "hello";
-  EXPECT_EQ(DiskFile::readFromFile(testPath, readString), 0);
+  EXPECT_EQ(DiskFile::readZstdFile(testPath, readString), 0);
   EXPECT_EQ(writtenString, readString);
 
   size_t l = writtenString.length() / 2;
-  ASSERT_EQ(DiskFile::writeToFile(testPath, kBigJson, l), 0);
+  ASSERT_EQ(DiskFile::writeZstdFile(testPath, kBigJson, l), 0);
   vector<char> readBuffer(l);
-  EXPECT_EQ(DiskFile::readFromFile(testPath, &readBuffer.front(), l), 0);
+  EXPECT_EQ(DiskFile::readZstdFile(testPath, &readBuffer.front(), l), 0);
   EXPECT_EQ(readBuffer.size(), l);
   EXPECT_EQ(memcmp(readBuffer.data(), kBigJson, l), 0);
 

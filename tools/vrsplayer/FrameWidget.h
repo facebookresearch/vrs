@@ -127,6 +127,14 @@ class FrameWidget : public QWidget {
     overlayColor_ = color;
     setNeedsUpdate();
   }
+  void setFontSize(int fontSize) {
+    fontSize_ = fontSize;
+    setNeedsUpdate();
+  }
+  void setSolidBackground(bool solid) {
+    solidBackground_ = solid;
+    setNeedsUpdate();
+  }
   void blank();
   void updateMinMaxSize();
 
@@ -153,6 +161,8 @@ class FrameWidget : public QWidget {
   Fps imageFps_;
   Fps drawFps_;
   QColor overlayColor_{Qt::yellow};
+  int fontSize_{14};
+  bool solidBackground_{false};
   int rotation_{0};
   bool flipped_{false};
   bool hasFrame_{false};

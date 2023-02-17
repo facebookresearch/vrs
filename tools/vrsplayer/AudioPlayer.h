@@ -43,12 +43,12 @@ class AudioPlayer : public QObject, public RecordFormatStreamPlayer {
   struct AudioJob {
     AudioJob() = default;
     AudioJob(std::vector<uint8_t>&& samples, uint32_t frameCount, uint32_t frameSize)
-        : samples{move(samples)}, frameCount{frameCount}, frameSize{frameSize} {}
+        : samples{std::move(samples)}, frameCount{frameCount}, frameSize{frameSize} {}
     AudioJob(AudioJob&& job)
-        : samples{move(job.samples)}, frameCount{job.frameCount}, frameSize{job.frameSize} {}
+        : samples{std::move(job.samples)}, frameCount{job.frameCount}, frameSize{job.frameSize} {}
 
     AudioJob& operator=(AudioJob&& job) {
-      samples = move(job.samples);
+      samples = std::move(job.samples);
       frameCount = job.frameCount;
       frameSize = job.frameSize;
       return *this;

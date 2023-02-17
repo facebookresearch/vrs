@@ -32,7 +32,7 @@ using std::vector;
 /// VRS' DiskFile offers the most comprehensive implementation, because it is designed to fit all
 /// the needs of advanced VRS file creations, with chunking, but it should be perfectly usable
 /// on its own. On the other hand, network WriteFileHandler implementations might have very specific
-/// behaviors designed to accomodate the specifities of the network storage they implement.
+/// behaviors designed to accommodate the specificities of the network storage they implement.
 /// In particular, they might have specific behaviors to handle VRS file creation in the cloud,
 /// which requires the first part of the file to be edited last (and probably uploaded last too).
 /// Therefore, network WriteFileHandler implementations might not be usable for anything else than

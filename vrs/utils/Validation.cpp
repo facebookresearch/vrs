@@ -28,6 +28,11 @@
 
 #include <vrs/FileHandlerFactory.h>
 #include <vrs/helpers/Rapidjson.hpp>
+#include <vrs/helpers/Strings.h>
+#include <vrs/os/Time.h>
+#include <vrs/utils/FilterCopy.h>
+#include <vrs/utils/PixelFrame.h>
+#include <vrs/utils/VideoRecordFormatStreamPlayer.h>
 #include <vrs/utils/xxhash/xxhash.h>
 
 using namespace std;
@@ -58,13 +63,13 @@ struct PackedHeader {
 inline string checksum(const stringstream& ss) {
   string tagsString = ss.str();
   XXH64Digester digester;
-  digester.update(tagsString.c_str(), tagsString.size());
+  digester.ingest(tagsString.c_str(), tagsString.size());
   return digester.digestToString();
 }
 
 string checksum(const map<string, string>& tags) {
   stringstream ss;
-  for (auto tag : tags) {
+  for (const auto& tag : tags) {
     ss << tag.first << '=' << tag.second << '/';
   }
   return checksum(ss);
@@ -110,11 +115,11 @@ class RecordChecker : public StreamPlayer {
       case CheckType::Checksums:
       case CheckType::HexDump: {
         PackedHeader packedHeader(record, sanitizedId_);
-        headerChecksum_.update(&packedHeader, sizeof(packedHeader));
-        payloadChecksum_.update(buffer_);
+        headerChecksum_.ingest(&packedHeader, sizeof(packedHeader));
+        payloadChecksum_.ingest(buffer_);
         if (checkType_ == CheckType::HexDump) {
           XXH64Digester csDigester_;
-          csDigester_.update(buffer_);
+          csDigester_.ingest(buffer_);
           cout << sanitizedId_.getNumericName() << ": " << fixed << setprecision(3)
                << record.timestamp << " " << toString(record.recordType) << " s=" << buffer_.size()
                << " CS=" << csDigester_.digestToString() << endl;
@@ -122,9 +127,10 @@ class RecordChecker : public StreamPlayer {
         }
       } break;
       case CheckType::ChecksumVerbatim: // not handled here
+      case CheckType::Decode: // not handled here
       case CheckType::None:
-      case CheckType::Count:
       case CheckType::Check:
+      case CheckType::COUNT:
           /* do nothing */;
         break;
     }
@@ -155,13 +161,16 @@ bool iterateChecker(
     FilteredFileReader& reader,
     size_t& outDecodedRecords,
     bool& outNoError,
-    ThrottledWriter* throttledWriter) {
+    ThrottledWriter* throttledWriter,
+    double& outDuration) {
   outDecodedRecords = 0;
   outNoError = true;
   if (!reader.timeRangeValid()) {
     cerr << "Time Range invalid: " << reader.getTimeConstraintDescription() << endl;
+    outDuration = 0;
     return false;
   }
+  double beforeTime = os::getTimestampSec();
   reader.iterateAdvanced(
       [&outDecodedRecords, &outNoError](
           RecordFileReader& recordFileReader, const IndexRecord::RecordInfo& record) {
@@ -173,6 +182,7 @@ bool iterateChecker(
   for (auto id : reader.filter.streams) {
     reader.reader.setStreamPlayer(id, nullptr);
   }
+  outDuration = os::getTimestampSec() - beforeTime;
   return true;
 }
 
@@ -185,8 +195,7 @@ string asJson(
     double percent) {
   using namespace fb_rapidjson;
   JDocument document;
-  document.SetObject();
-  JsonWrapper wrapper{document, document.GetAllocator()};
+  JsonWrapper wrapper{document};
   wrapper.addMember("good_file", success);
   wrapper.addMember("record_count", recordCount);
   wrapper.addMember("duration", duration);
@@ -198,6 +207,144 @@ string asJson(
   return jDocumentToJsonString(document);
 }
 
+string mapAsJson(const map<string, string>& strMap) {
+  using namespace fb_rapidjson;
+  JDocument document;
+  JsonWrapper jw{document};
+  for (const auto& element : strMap) {
+    document.AddMember(jw.jValue(element.first), jw.jValue(element.second), jw.alloc);
+  }
+  return jDocumentToJsonString(document);
+}
+
+class DecodeChecker : public VideoRecordFormatStreamPlayer {
+ public:
+  DecodeChecker(uint32_t& errorCount, uint32_t& imageCount)
+      : errorCount_{errorCount}, imageCount_{imageCount} {}
+  bool processRecordHeader(const CurrentRecord& record, DataReference& outDataReference) override {
+    if (VideoRecordFormatStreamPlayer::processRecordHeader(record, outDataReference)) {
+      return true;
+    }
+    if (record.recordSize > 0) {
+      errorCount_++;
+    }
+    return false;
+  }
+  void processRecord(const CurrentRecord& record, uint32_t readSize) override {
+    processSuccess = true;
+    RecordFormatStreamPlayer::processRecord(record, readSize);
+    size_t unreadBytes = record.reader->getUnreadBytes();
+    if (unreadBytes > 0) {
+      processSuccess = false;
+      XR_LOGW(
+          "{} - {}: {} bytes unread out of {} bytes.",
+          record.streamId.getNumericName(),
+          Record::typeName(record.recordType),
+          unreadBytes,
+          record.recordSize);
+    } else if (!processSuccess) {
+      XR_LOGW(
+          "{} - {}: could not be decoded.",
+          record.streamId.getNumericName(),
+          Record::typeName(record.recordType));
+    }
+    if (!processSuccess) {
+      errorCount_++;
+    }
+  }
+  bool onDataLayoutRead(const CurrentRecord& r, size_t /* blockIndex */, DataLayout& dl) override {
+    return true;
+  }
+  bool onImageRead(const CurrentRecord& record, size_t blockIndex, const ContentBlock& cb)
+      override {
+    if (cb.image().getImageFormat() == ImageFormat::VIDEO) {
+      PixelFrame frame;
+      return isSuccess(tryToDecodeFrame(frame, record, cb) == 0, cb.getContentType());
+    } else {
+      shared_ptr<PixelFrame> frame;
+      return isSuccess(PixelFrame::readFrame(frame, record.reader, cb), cb.getContentType());
+    }
+    return onUnsupportedBlock(record, blockIndex, cb);
+  }
+  bool onAudioRead(const CurrentRecord& record, size_t blockIndex, const ContentBlock& cb)
+      override {
+    return onUnsupportedBlock(record, blockIndex, cb);
+  }
+  bool onCustomBlockRead(const CurrentRecord& rec, size_t blkIdx, const ContentBlock& cb) override {
+    return onUnsupportedBlock(rec, blkIdx, cb);
+  }
+  bool onUnsupportedBlock(const CurrentRecord& rec, size_t blkIdx, const ContentBlock& cb)
+      override {
+    size_t blockSize = cb.getBlockSize();
+    if (blockSize == ContentBlock::kSizeUnknown) {
+      XR_LOGW("Block size for {} unknown.", cb.asString());
+      return isSuccess(false);
+    }
+    vector<char> data(blockSize);
+    return isSuccess(rec.reader->read(data) == 0);
+  }
+  bool isSuccess(bool success, ContentType contentType = ContentType::EMPTY) {
+    if (!success) {
+      processSuccess = false;
+    } else if (contentType == ContentType::IMAGE) {
+      imageCount_++;
+    }
+    return success;
+  }
+
+ private:
+  uint32_t& errorCount_;
+  uint32_t& imageCount_;
+  bool processSuccess{false};
+};
+
+string decodeValidation(FilteredFileReader& filteredReader, const CopyOptions& copyOptions) {
+  uint32_t decodeErrorCount{0};
+  uint32_t imageCount{0};
+  vector<unique_ptr<DecodeChecker>> checkers;
+  for (auto id : filteredReader.filter.streams) {
+    checkers.emplace_back(make_unique<DecodeChecker>(decodeErrorCount, imageCount));
+    filteredReader.reader.setStreamPlayer(id, checkers.back().get());
+  }
+
+  double startTimestamp, endTimestamp;
+  filteredReader.getConstrainedTimeRange(startTimestamp, endTimestamp);
+  filteredReader.preRollConfigAndState(); // make sure to copy most recent config & state records
+
+  ThrottledWriter throttledWriter(copyOptions);
+  throttledWriter.initTimeRange(startTimestamp, endTimestamp);
+
+  size_t readRecordCount;
+  bool noError;
+  double timeSpent = 0;
+  if (!iterateChecker(filteredReader, readRecordCount, noError, &throttledWriter, timeSpent)) {
+    return "<invalid timerange>";
+  }
+  throttledWriter.closeFile();
+
+  size_t decodedCount =
+      readRecordCount >= decodeErrorCount ? readRecordCount - decodeErrorCount : 0;
+  double successRate = decodedCount * 100. / readRecordCount;
+  if (copyOptions.jsonOutput) {
+    double duration = endTimestamp - startTimestamp;
+    double mbPerSec =
+        duration > 0 ? filteredReader.reader.getTotalSourceSize() / (duration * 1024 * 1024) : -1;
+    return asJson(noError, readRecordCount, duration, mbPerSec, decodedCount, successRate);
+  }
+  if (noError && decodeErrorCount == 0) {
+    return fmt::format(
+        "Decoded {} records, {} images, in {}, no errors.",
+        decodedCount,
+        imageCount,
+        helpers::humanReadableDuration(timeSpent));
+  }
+  return fmt::format(
+      "Failure! Decoded {} records out of {}, {:.2f}% good.",
+      decodedCount,
+      readRecordCount,
+      successRate);
+}
+
 } // namespace
 
 namespace vrs::utils {
@@ -207,7 +354,10 @@ string checkRecords(
     const CopyOptions& copyOptions,
     CheckType checkType) {
   if (!filteredReader.reader.isOpened()) {
-    return "";
+    return {};
+  }
+  if (checkType == CheckType::Decode) {
+    return decodeValidation(filteredReader, copyOptions);
   }
   vector<unique_ptr<RecordChecker>> checkers;
   // Instance ids are assigned by VRS and can not be relied upon, though ordering is
@@ -228,21 +378,27 @@ string checkRecords(
 
   size_t decodedCount;
   bool noError;
-  if (!iterateChecker(filteredReader, decodedCount, noError, &throttledWriter)) {
+  double timeSpent = 0;
+  if (!iterateChecker(filteredReader, decodedCount, noError, &throttledWriter, timeSpent)) {
     return "<invalid timerange>";
   }
   throttledWriter.closeFile();
 
   if (noError && checkType != CheckType::Check) {
     stringstream ss;
+    map<string, string> checksums;
     // calculate xxhash for each componenet, then calculate xxhash for all the hashes.
     XXH64Digester sum;
 
     string fileTagsChecksum = checksum(filteredReader.reader.getTags());
 
-    sum.update(fileTagsChecksum);
+    sum.ingest(fileTagsChecksum);
     if (checkType == CheckType::Checksums) {
-      ss << "FileTags: " << fileTagsChecksum << endl;
+      if (copyOptions.jsonOutput) {
+        checksums["filetags"] = fileTagsChecksum;
+      } else {
+        ss << "FileTags: " << fileTagsChecksum << endl;
+      }
     }
     stringstream ids;
     for (auto& checker : checkers) {
@@ -250,35 +406,47 @@ string checkRecords(
       const StreamTags& tags = filteredReader.reader.getTags(id);
       switch (checkType) {
         case CheckType::Checksum:
-          sum.update(checksum(tags.vrs))
-              .update(checksum(tags.user))
-              .update(checker->digestHeaderChecksum())
-              .update(checker->digestPayloadChecksum());
+          sum.ingest(checksum(tags.vrs))
+              .ingest(checksum(tags.user))
+              .ingest(checker->digestHeaderChecksum())
+              .ingest(checker->digestPayloadChecksum());
           break;
         case CheckType::Checksums: {
           string vrsTagsChecksum = checksum(tags.vrs);
           string userTagsChecksum = checksum(tags.user);
           string headerChecksum = checker->digestHeaderChecksum();
           string payloadChecksum = checker->digestPayloadChecksum();
-          ss << id.getNumericName() << " VRS tags: " << vrsTagsChecksum << endl;
-          ss << id.getNumericName() << " User tags: " << userTagsChecksum << endl;
-          ss << id.getNumericName() << " Headers: " << headerChecksum << endl;
-          ss << id.getNumericName() << " Payload: " << payloadChecksum << endl;
-          sum.update(vrsTagsChecksum)
-              .update(userTagsChecksum)
-              .update(headerChecksum)
-              .update(payloadChecksum);
+          if (copyOptions.jsonOutput) {
+            checksums[id.getNumericName() + "_vrstags"] = vrsTagsChecksum;
+            checksums[id.getNumericName() + "_usertags"] = userTagsChecksum;
+            checksums[id.getNumericName() + "_headers"] = headerChecksum;
+            checksums[id.getNumericName() + "_payload"] = payloadChecksum;
+          } else {
+            ss << id.getNumericName() << " VRS tags: " << vrsTagsChecksum << endl;
+            ss << id.getNumericName() << " User tags: " << userTagsChecksum << endl;
+            ss << id.getNumericName() << " Headers: " << headerChecksum << endl;
+            ss << id.getNumericName() << " Payload: " << payloadChecksum << endl;
+          }
+          sum.ingest(vrsTagsChecksum)
+              .ingest(userTagsChecksum)
+              .ingest(headerChecksum)
+              .ingest(payloadChecksum);
         } break;
         case CheckType::ChecksumVerbatim:
         case CheckType::HexDump:
+        case CheckType::Decode:
         case CheckType::None:
-        case CheckType::Count:
         case CheckType::Check:
+        case CheckType::COUNT:
             /* do nothing */;
       }
       ids << checker->getSanitizedId().getNumericName() << '/';
     }
-    sum.update(checksum(ids));
+    sum.ingest(checksum(ids));
+    if (copyOptions.jsonOutput) {
+      checksums["checksum"] = sum.digestToString();
+      return mapAsJson(checksums);
+    }
     ss << sum.digestToString();
     return ss.str();
   }
@@ -290,14 +458,17 @@ string checkRecords(
         duration > 0 ? filteredReader.reader.getTotalSourceSize() / (duration * 1024 * 1024) : -1;
     return asJson(noError, recordCount, duration, mbPerSec, decodedCount, successRate);
   }
-  stringstream ss;
   if (noError) {
-    ss << "Decoded " << decodedCount << " records, no errors.";
-  } else {
-    ss << "Failure! Decoded " << decodedCount << " records out of " << recordCount << ", " << fixed
-       << setprecision(2) << successRate << "% good.";
+    return fmt::format(
+        "Checked {} records in {}, no errors.",
+        decodedCount,
+        helpers::humanReadableDuration(timeSpent));
   }
-  return ss.str();
+  return fmt::format(
+      "Failure! Checked {} records out of {}, {:.2f}% good.",
+      decodedCount,
+      recordCount,
+      successRate);
 }
 
 string recordsChecksum(const string& path, bool showProgress) {
@@ -325,7 +496,7 @@ string verbatimChecksum(const string& path, bool showProgress) {
     buffer.resize(length);
     int error = file->read(buffer.data(), length);
     if (error == 0) {
-      digester.update(buffer);
+      digester.ingest(buffer);
     } else {
       cerr << kReset << "Read file error: " << errorCodeToMessage(error) << "." << endl;
       return "<read error>";
@@ -617,7 +788,8 @@ bool compareVRSfiles(
     first.reader.setStreamPlayer(iter.first, checkers.back().get());
   }
   size_t decodedCount;
-  if (!iterateChecker(first, decodedCount, noError, &throttledWriter)) {
+  double timeSpent = 0;
+  if (!iterateChecker(first, decodedCount, noError, &throttledWriter, timeSpent)) {
     return false;
   }
   if (!noError) {

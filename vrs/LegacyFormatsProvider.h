@@ -58,10 +58,10 @@ class RecordFormatRegistrar {
   unique_ptr<DataLayout> getLegacyDataLayout(const ContentBlockId& blockId);
 
   /// Get the newest legacy DataLayout definition for a recordable type id & record type.
-  /// "Latest" makes the assumption, generally true but not garanteed, that record versions are
+  /// "Latest" makes the assumption, generally true but not guaranteed, that record versions are
   /// numeric values increasing over time.
   /// Also, if the "most recent" RecordFormat definition includes multiple DataLayout blocks,
-  /// the last one is returned, which is also arbitrary, but generaly what's needed.
+  /// the last one is returned, which is also arbitrary, but generally what's needed.
   /// These approximations are OK, because this API is meant to dig out legacy DataLayout
   /// definitions that include metadata definitions, such as unit & description, mix & max values,
   /// to be used for UI purposes when the DataLayout definition found in a file doesn't provide

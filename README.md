@@ -79,23 +79,29 @@ avoid installing any library on your system.
   [Brew’s web site](https://brew.sh/).
 - install tools & libraries:
   ```
-  brew install cmake ninja ccache boost fmt cereal libpng jpeg lz4 zstd xxhash googletest
-  brew install qt5 portaudio # for vrsplayer
+  brew install cmake ninja ccache boost fmt cereal libpng jpeg-turbo lz4 zstd xxhash glog googletest
+  brew install qt5 portaudio pybind11
   brew install node doxygen
+  python -m pip install -U pip
+  python -m pip install numpy typing dataclasses pytest parameterized Pillow
   ```
 
 ### Install build tools & libraries (Ubuntu)
 
 _These instructions are validated using Ubuntu 20.04, whereas Ubuntu 18.04
-doesn't install recent enough versions of cmake, fmt, lz4, and zstd._
+doesn't install recent enough versions of cmake, fmt, lz4, and zstd, and is
+therefore not supported._
 
 - install tools & libraries:
   ```
-  sudo apt-get install cmake ninja-build ccache libgtest-dev libfmt-dev libcereal-dev libjpeg-dev libpng-dev
+  sudo apt-get install cmake ninja-build ccache libgtest-dev libfmt-dev libcereal-dev libturbojpeg-dev libpng-dev
   sudo apt-get install liblz4-dev libzstd-dev libxxhash-dev
   sudo apt-get install libboost-system-dev libboost-filesystem-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev
-  sudo apt-get install qtbase5-dev portaudio19-dev # for vrsplayer
+  sudo apt-get install qtbase5-dev portaudio19-dev
   sudo apt-get install npm doxygen
+  python -m pip install -U pip
+  python -m pip install pybind11[global]
+  python -m pip install numpy typing dataclasses pytest parameterized Pillow
   ```
 
 ## Build & run (macOS & Linux)

@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <array>
 #include <functional>
 #include <map>
 #include <memory>
@@ -219,6 +220,9 @@ class RecordFileReader {
       const string& tag,
       RecordableTypeId typeId = RecordableTypeId::Undefined) const;
 
+  /// Find the stream with the specified stream serial number.
+  StreamId getStreamForSerialNumber(const string& streamSerialNumber) const;
+
   /// Get the index of the VRS file, which is an ordered array of RecordInfo, each describing
   /// the records, sorted by timestamp.
   /// @return The index.
@@ -242,7 +246,7 @@ class RecordFileReader {
   /// @return The number of records of the specified stream.
   uint32_t getRecordCount(StreamId streamId) const;
 
-  /// Get the number of records for a specific stream and specifc record type.
+  /// Get the number of records for a specific stream and specific record type.
   /// Attention: this computation has a linear complexity, so cache the result!
   /// @param streamId: StreamId of the record stream to consider.
   /// @param recordType: Type of records to count.
@@ -306,9 +310,13 @@ class RecordFileReader {
   /// @param timestamp: timestamp to seek.
   /// @param epsilon: the threshold we search for the index.
   /// @param streamId: StreamId of the stream to consider. Leave undefined to search all streams
+  /// @param recordType: record type to find, or Record::Type::UNDEFINED for any record type.
   /// @return Pointer to the record info, or nullptr (timestamp is too big?).
-  const IndexRecord::RecordInfo*
-  getNearestRecordByTime(double timestamp, double epsilon, StreamId streamId = {}) const;
+  const IndexRecord::RecordInfo* getNearestRecordByTime(
+      double timestamp,
+      double epsilon,
+      StreamId streamId = {},
+      Record::Type recordType = Record::Type::UNDEFINED) const;
 
   /// Get a record's index in the global index.
   /// @param record: pointer of the record.
@@ -392,6 +400,7 @@ class RecordFileReader {
   /// @param streamId: StreamId of the record stream to consider.
   /// @return The original text description for the corresponding RecordableTypeId.
   const string& getOriginalRecordableTypeName(StreamId streamId) const;
+
   /// Streams using << Recordable Class >> ids require a << flavor >>,
   /// which must be provided when the stream was created.
   /// Use this API to get the recordable flavor provided, if any, when the stream was created.
@@ -399,6 +408,19 @@ class RecordFileReader {
   /// @return The flavor for the corresponding RecordableTypeId, or an empty string,
   /// if no flavor was provided when the stream was created.
   const string& getFlavor(StreamId streamId) const;
+
+  /// Get a stream's serial number.
+  /// When streams are created, they are assigned a unique serial number by their Recordable object.
+  /// That serial number is universally unique and it will be preserved during file copies, file
+  /// processing, and other manipulations that preserve stream tags.
+  /// @param streamId: StreamId of the record stream to consider.
+  /// @return The stream's serial number, or the empty string if the stream ID is not
+  /// valid. When opening files created before stream serial numbers were introduced,
+  /// RecordFileReader automatically generates a stable serial number for every stream based on the
+  /// file tags, the stream's tags (both user and VRS internal tags), and the stream type and
+  /// sequence number. This serial number is stable and preserved during copy and filtering
+  /// operations that preserve stream tags.
+  const string& getSerialNumber(StreamId streamId) const;
 
   /// Tell if a stream might contain at least one image (and probably will).
   /// This is a best guess effort, but it is still possible that no images are actually found!
@@ -481,6 +503,22 @@ class RecordFileReader {
   /// @return A status code, 0 meaning success.
   static int vrsFilePathToFileSpec(const string& filePath, FileSpec& outFileSpec);
 
+  class RecordTypeCounter : public std::array<uint32_t, enumCount<Record::Type>()> {
+    using ParentType = std::array<uint32_t, enumCount<Record::Type>()>;
+
+   public:
+    RecordTypeCounter() {
+      fill(0);
+    }
+    inline uint32_t operator[](Record::Type recordType) const {
+      return ParentType::operator[](static_cast<uint32_t>(recordType));
+    }
+    inline uint32_t& operator[](Record::Type recordType) {
+      return ParentType::operator[](static_cast<uint32_t>(recordType));
+    }
+    uint32_t totalCount() const;
+  };
+
  private:
   int doOpenFile(const FileSpec& fileSpec, bool autoWriteFixedIndex, bool checkSignatureOnly);
   int readFileHeader(const FileSpec& fileSpec, FileFormat::FileHeader& outFileHeader);
@@ -488,6 +526,9 @@ class RecordFileReader {
       const FileSpec& fileSpec,
       bool autoWriteFixedIndex,
       FileFormat::FileHeader& fileHeader);
+  bool readConfigRecords(
+      const set<const IndexRecord::RecordInfo*>& configRecords,
+      StreamPlayer* streamPlayer);
 
   const string& getTag(const map<string, string>& tags, const string& name) const; ///< private
   bool mightContainContentTypeInDataRecord(StreamId streamId, ContentType type) const; ///< private
@@ -502,6 +543,7 @@ class RecordFileReader {
   map<StreamId, StreamTags> streamTags_;
   map<string, string> fileTags_;
   vector<IndexRecord::RecordInfo> recordIndex_;
+  mutable map<StreamId, RecordTypeCounter> streamRecordCounts_;
 
   // Pointers to stream players to notify when reading records. These are NOT owned by the class.
   map<StreamId, StreamPlayer*> streamPlayers_;
@@ -524,10 +566,12 @@ class RecordFileReader {
 /// the range of (timestamp - epsilon) - (timestamp + epsilon).
 /// @param timestamp: timestamp to seek.
 /// @param epsilon: the threshold we search for the index.
+/// @param recordType: record type to find, or Record::Type::UNDEFINED for any record type.
 /// @return Pointer to the record info, or nullptr (timestamp is too big?).
 const IndexRecord::RecordInfo* getNearestRecordByTime(
     const std::vector<const IndexRecord::RecordInfo*>& index,
     double timestamp,
-    double epsilon);
+    double epsilon,
+    Record::Type recordType = Record::Type::UNDEFINED);
 
 } // namespace vrs

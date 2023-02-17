@@ -88,8 +88,9 @@ class ThrottledWriter {
 class ThrottledFileDelegate {
  public:
   ThrottledFileDelegate() = default;
-  ThrottledFileDelegate(ThrottledWriter& throttledWriter) {
-    init(throttledWriter);
+  explicit ThrottledFileDelegate(ThrottledWriter& throttledWriter) {
+    // overrides not available in constructors & destructors
+    ThrottledFileDelegate::init(throttledWriter);
   }
   virtual ~ThrottledFileDelegate() = default;
   virtual void init(ThrottledWriter& throttledWriter) {

@@ -108,7 +108,7 @@ double frameRateEstimationFps(const vector<IndexRecord::RecordInfo>& index, vrs:
     previousTimestamp = record.timestamp;
   }
   if (gapCount < 1) {
-    // No gap: abitrary default response
+    // No gap: arbitrary default response
     return 30;
   }
   Bucket sum;

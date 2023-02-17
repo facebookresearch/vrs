@@ -25,6 +25,8 @@
 #include <utility>
 #include <vector>
 
+#include <vrs/helpers/EnumTemplates.hpp>
+
 namespace vrs {
 
 using std::map;
@@ -33,14 +35,22 @@ using std::vector;
 
 /// Caching strategy requests
 enum class CachingStrategy {
+  Undefined = 0,
+
   Passive, ///< (default) Read & cache on-demand (don't prefetch).
   Streaming, ///< Automatically download data "forward", using last read-request as a hint.
   StreamingBidirectional, ///< Automatically download data "forward" and "backward", using last
                           ///< read-request as a hint.
+  StreamingBackward, ///< Automatically download data "backward", using last read-request as a hint.
   ReleaseAfterRead, ///< Same as "Passive" but release used cache blocks immediately after read.
 
   COUNT
 };
+
+string toString(CachingStrategy cachingStrategy);
+
+template <>
+CachingStrategy toEnum<>(const string& name);
 
 /// \brief Generalized file descriptor class, allowing the efficient representation of complex
 /// file objects, maybe multi-chunks, with additional optional properties.
@@ -142,6 +152,11 @@ struct FileSpec {
 template <>
 inline void FileSpec::setExtra(const string& name, const string& value) {
   extras[name] = value;
+}
+
+template <>
+inline void FileSpec::setExtra(const string& name, const bool& value) {
+  extras[name] = value ? "1" : "0";
 }
 
 template <typename T>
@@ -256,7 +271,7 @@ class FileHandler {
   /// read, until enough data can be read.
   /// @param buffer: a buffer to the bytes to write.
   /// @param length: the number of bytes to write.
-  /// @return A status code, 0 meaning success and length bytes were successfuly read.
+  /// @return A status code, 0 meaning success and length bytes were successfully read.
   virtual int read(void* buffer, size_t length) = 0;
   /// Helper to read trivially copyable objects, in a chunk aware way.
   template <typename T, std::enable_if_t<std::is_trivially_copyable<T>::value, int> = 0>
@@ -296,7 +311,7 @@ class FileHandler {
   virtual int getChunkRange(int64_t& outChunkOffset, int64_t& outChunkSize) const = 0;
 
   /// Set caching strategy.
-  /// @param CachingStragy: Caching strategy desired.
+  /// @param CachingStrategy: Caching strategy desired.
   /// @return True if the caching strategy was set.
   /// False if the file handler doesn't support the requested strategy, or any particular strategy.
   virtual bool setCachingStrategy(CachingStrategy /*cachingStrategy*/) {

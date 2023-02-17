@@ -85,7 +85,7 @@ const repoUrl = 'https://github.com/facebookresearch/vrs';
           {
             href: 'pathname:///doxygen/index.html',
             position: 'left',
-            label: 'API Documentation',
+            label: 'C++ API Documentation',
           },
           {
             href: 'https://github.com/facebookresearch/vrs#getting-started',

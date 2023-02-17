@@ -124,7 +124,7 @@ struct FileHeader {
   /// the file version number by calling this method.
   void enableFrontIndexRecordSupport();
   /// Get a best guess as to where user records end. If the file has no index, this value may be
-  /// innacurate, but a sensible estimation will be returned (probably the end of the file).
+  /// inaccurate, but a sensible estimation will be returned (probably the end of the file).
   /// Only call this methods for file headers read from an actual VRS file.
   /// @param fileSize: the size of the VRS file, value returned if no better estimate can be made,
   /// or when the file's index is at the start of the file (in which case it is the right answer).

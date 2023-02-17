@@ -18,6 +18,8 @@
 
 #include <vector>
 
+#include <vrs/helpers/EnumTemplates.hpp>
+
 #include "ForwardDefinitions.h"
 #include "StreamId.h"
 
@@ -175,9 +177,6 @@ class Record final {
 
 /// Get a record type as a text string.
 string toString(Record::Type recordType);
-
-template <class Enum>
-Enum toEnum(const string& name);
 
 /// Convert a record type name into an enum value.
 template <>

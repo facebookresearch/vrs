@@ -74,7 +74,7 @@ bool AudioPlayer::onAudioRead(const CurrentRecord& record, size_t blkIdx, const 
         uint32_t srcChannelCount = audio.getChannelCount();
         uint8_t bytesPerSample = audio.getBytesPerSample();
         if (channelCount_ == srcChannelCount) {
-          playbackQueue_.sendJob(AudioJob(move(buffer), sampleCount, bytesPerSample));
+          playbackQueue_.sendJob(AudioJob(std::move(buffer), sampleCount, bytesPerSample));
         } else {
           const uint8_t* src = reinterpret_cast<const uint8_t*>(buffer.data());
           uint8_t* dst = reinterpret_cast<uint8_t*>(buffer.data());
@@ -83,7 +83,7 @@ bool AudioPlayer::onAudioRead(const CurrentRecord& record, size_t blkIdx, const 
             src += srcChannelCount * bytesPerSample;
             dst += channelCount_ * bytesPerSample;
           }
-          playbackQueue_.sendJob(AudioJob(move(buffer), sampleCount, bytesPerSample));
+          playbackQueue_.sendJob(AudioJob(std::move(buffer), sampleCount, bytesPerSample));
         }
       }
     }

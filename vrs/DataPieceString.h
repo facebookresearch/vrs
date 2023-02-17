@@ -57,13 +57,13 @@ class DataPieceString : public DataPiece {
   size_t collectVariableData(int8_t* data, size_t bufferSize) const override;
 
   /// Stage a string value.
-  /// Note: does not motify the value returned by get().
+  /// Note: does not modify the value returned by get().
   /// @param string: Value to stage.
   void stage(const string& string) {
     stagedString_ = string;
   }
   /// Stage a string value.
-  /// Note: does not motify the value returned by get().
+  /// Note: does not modify the value returned by get().
   /// @param string: Value to stage.
   void stage(string&& string) {
     stagedString_ = std::move(string);

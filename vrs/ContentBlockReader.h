@@ -148,7 +148,7 @@ class DataLayoutBlockReader : public ContentBlockReader {
       const RecordFormat& recordFormat,
       size_t blockIndex,
       unique_ptr<DataLayout>&& blockLayout)
-      : ContentBlockReader(recordFormat, blockIndex), blockLayout_{move(blockLayout)} {}
+      : ContentBlockReader(recordFormat, blockIndex), blockLayout_{std::move(blockLayout)} {}
 
   bool readBlock(const CurrentRecord&, RecordFormatStreamPlayer&) override;
 

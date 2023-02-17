@@ -19,6 +19,7 @@
 #include <png.h>
 #include <cerrno>
 
+#include <atomic>
 #include <deque>
 #include <vector>
 
@@ -26,6 +27,7 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/helpers/MemBuffer.h>
 #include <vrs/os/Utils.h>
 
 namespace {
@@ -88,12 +90,12 @@ bool PixelFrame::readPngFrame(const vector<uint8_t>& pngBuffer, bool decodePixel
   }
   png_bytep* rowPtrs = nullptr;
   if (setjmp(png_jmpbuf(pngPtr))) {
-    // An error occured, so clean up what we have allocated so far.
+    // An error occurred, so clean up what we have allocated so far.
     png_destroy_read_struct(&pngPtr, &infoPtr, (png_infopp)0);
     if (rowPtrs != nullptr) {
       delete[] rowPtrs;
     }
-    XR_LOGE("An error occured while reading the PNG file.");
+    XR_LOGE("An error occurred while reading the PNG file.");
     // libPNG will jump to here if something goes wrong.
     return false;
   }
@@ -185,31 +187,18 @@ bool PixelFrame::readPngFrame(
 
 namespace {
 
-atomic<uint32_t> sAllocSize = 128 * 1024;
-
-struct uninitialized_byte final {
-  uninitialized_byte() {} // do not use '= default' as it will initialize byte!
-  uint8_t byte;
-};
-using MemBuffers = deque<vector<uninitialized_byte>>;
+atomic<uint32_t> sAllocSize{128 * 1024};
 
 void mem_png_write_data(png_structp png_ptr, png_bytep data, png_size_t length) {
-  MemBuffers* buffers = reinterpret_cast<MemBuffers*>(png_get_io_ptr(png_ptr));
-  if (buffers->empty() || buffers->back().capacity() - buffers->back().size() < length) {
-    buffers->emplace_back(0);
-    buffers->back().reserve(max<size_t>(length + 16, sAllocSize.load(memory_order_relaxed)));
-  }
-  vector<uninitialized_byte>& back = buffers->back();
-  size_t previousSize = back.size();
-  back.resize(previousSize + length);
-  memcpy(back.data() + previousSize, data, length);
+  helpers::MemBuffer* buffer = reinterpret_cast<helpers::MemBuffer*>(png_get_io_ptr(png_ptr));
+  buffer->addData(data, length);
 }
 
 void mem_png_flush(png_structp png_ptr) {}
 
 } // namespace
 
-int PixelFrame::writeAsPng(const string& filename, std::vector<uint8_t>* const outBuffer) {
+int PixelFrame::writeAsPng(const string& filename, std::vector<uint8_t>* const outBuffer) const {
   PixelFormat pixelFormat = this->getPixelFormat();
   if (!XR_VERIFY(
           pixelFormat == PixelFormat::GREY8 || pixelFormat == PixelFormat::GREY16 ||
@@ -236,7 +225,7 @@ int PixelFrame::writeAsPng(const string& filename, std::vector<uint8_t>* const o
   }
 
   FILE* file = nullptr;
-  MemBuffers memBuffers;
+  helpers::MemBuffer memBuffer;
   if (outBuffer == nullptr) {
     file = os::fileOpen(filename, "wb");
     if (file == nullptr) {
@@ -245,7 +234,7 @@ int PixelFrame::writeAsPng(const string& filename, std::vector<uint8_t>* const o
     }
     png_init_io(pngStruct, file);
   } else {
-    png_set_write_fn(pngStruct, &memBuffers, mem_png_write_data, mem_png_flush);
+    png_set_write_fn(pngStruct, &memBuffer, mem_png_write_data, mem_png_flush);
   }
 
   // determine the pixel type for PNG
@@ -310,22 +299,10 @@ int PixelFrame::writeAsPng(const string& filename, std::vector<uint8_t>* const o
   if (outBuffer == nullptr) {
     os::fileClose(file);
   } else {
-    if (memBuffers.size() == 1) {
-      outBuffer->swap(reinterpret_cast<vector<uint8_t>&>(memBuffers.front()));
-    } else {
-      size_t totalSize = 0;
-      for (const auto& buffer : memBuffers) {
-        totalSize += buffer.size();
-      }
-      outBuffer->resize(totalSize);
-      uint8_t* outData = outBuffer->data();
-      for (const auto& buffer : memBuffers) {
-        memcpy(outData, buffer.data(), buffer.size());
-        outData += buffer.size();
-      }
-      if (totalSize > sAllocSize) {
-        sAllocSize = totalSize + totalSize / 100;
-      }
+    memBuffer.getData(*outBuffer);
+    size_t totalSize = outBuffer->size();
+    if (totalSize > sAllocSize) {
+      sAllocSize.store(totalSize + totalSize / 100, memory_order_relaxed);
     }
   }
 
