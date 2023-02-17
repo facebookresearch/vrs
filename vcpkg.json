@@ -1,0 +1,24 @@
+{
+    "name": "vrs",
+    "version-string": "0.1.0",
+    "dependencies": [
+      "boost-filesystem",
+      "boost-chrono",
+      "boost-date-time",
+      "boost-thread",
+      "boost-uuid",
+      "boost-process",
+      "boost-interprocess",
+      "fmt",
+      "cereal",
+      "libpng",
+      "libjpeg-turbo",
+      "lz4",
+      "xxhash",
+      "glog",
+      "zstd",
+      "gtest",
+      "portaudio",
+      "qt5-base"
+    ]
+  }

@@ -24,6 +24,16 @@ target_include_directories(vrslib
     $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
     $<INSTALL_INTERFACE:include>
 )
+
+if(MSVC)
+  target_link_libraries(vrslib
+    PRIVATE
+      bcrypt
+  )
+endif(MSVC)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
+
 target_link_libraries(vrslib
   PUBLIC
     vrs_helpers
