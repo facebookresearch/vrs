@@ -171,12 +171,13 @@ int main() {
 
 ```
 
-## Windows Support
+## Windows Installation
+Windows support add the extra dependecy of [vcpkg](https://vcpkg.io/en/index.html) to manage all dependencies. It uses a manifest file (vcpkg.json) located in the root directory of the source directory. Currently, the manifest file includes by default qt5-base library, which is required by the VRS player tool.
+Installation was performed on Windows11 machine using both VS2019 and VS2022.
 
-We don’t have equivalent instructions for Windows.
-[vcpkg](https://vcpkg.io/en/index.html) looks like a promising package manager
-for Windows, but the cmake build system needs more massaging to work.\
-Contributions welcome! :-)
+- Install [vcpkg](https://vcpkg.io/en/index.html) package manager to a directory of your choice on your local machine, following the instructions of the [site](https://vcpkg.io/en/getting-started.html).
+- Use CMake to build the project
+  - GUI case: Choose appropriate compiler and choose _Specify toolchain file for cross-compiling_ option, press next that will require a path to the toolchain file, which is located at **\<VCPKG_INSTALLATION_PATH\>*/scripts/buildsystems/vcpkg.cmake
 
 ## Container build & Usage
 
