@@ -176,8 +176,10 @@ Windows support add the extra dependecy of [vcpkg](https://vcpkg.io/en/index.htm
 Installation was performed on Windows11 machine using both VS2019 and VS2022.
 
 - Install [vcpkg](https://vcpkg.io/en/index.html) package manager to a directory of your choice on your local machine, following the instructions of the [site](https://vcpkg.io/en/getting-started.html).
-- Use CMake to build the project
-  - GUI case: Choose appropriate compiler and choose _Specify toolchain file for cross-compiling_ option, press next that will require a path to the toolchain file, which is located at **\<VCPKG_INSTALLATION_PATH\>*/scripts/buildsystems/vcpkg.cmake
+- Use CMake to build the project (GUI or command line)
+  - GUI case: Choose appropriate compiler and choose _Specify toolchain file for cross-compiling_ option, press next that will require a path to the toolchain file, which is located at **\<VCPKG_INSTALLATION_PATH\>/scripts/buildsystems/vcpkg.cmake**. Then hit configure and generate and your project should be built. Configure will download and install all required libraries and will take some time.
+  - Command Line: Search for "Native Tools Command Prompt" in Start menu and choose the appropriate compiler (VS2019 or VS2022). Navigate to the VRS directory `cd <PATH_TO_VRS>` and run `cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=<VCPKG_INSTALLATION_PATH>/scripts/buildsystems/vcpkg.cmake` which will create a directory named **build** that containts the buiid files. This will download and install all required libraries and will take a while.
+- Compile the project
 
 ## Container build & Usage
 
