@@ -39,7 +39,11 @@ void logAndAbort(const std::string& condition, const std::string& message = {});
 #define XR_CHECK_FORMAT(condition, ...) \
   (condition ? 0 : ((vrs::logging::logAndAbort(#condition, fmt::format(__VA_ARGS__))), 0))
 
+#ifdef IS_WINDOWS_PLATFORM
 #define XR_CHECK(condition, ...) XR_CHECK_FORMAT(condition, "", ##__VA_ARGS__)
+#else
+#define XR_CHECK(condition, ...) XR_CHECK_FORMAT(condition, ##__VA_ARGS__, "")
+#endif
 
 #define XR_CHECK_EQ(val1, val2, ...) XR_CHECK((val1) == (val2), ##__VA_ARGS__)
 

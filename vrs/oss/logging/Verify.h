@@ -43,4 +43,8 @@
                      fmt::format(__VA_ARGS__)), \
                  0))
 
+#ifdef IS_WINDOWS_PLATFORM
 #define XR_VERIFY(cond, ...) XR_VERIFY_C(DEFAULT_LOG_CHANNEL, cond, "", ##__VA_ARGS__)
+#else
+#define XR_VERIFY(cond, ...) XR_VERIFY_C(DEFAULT_LOG_CHANNEL, cond, ##__VA_ARGS__, "")
+#endif
