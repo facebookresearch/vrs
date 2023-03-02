@@ -17,7 +17,7 @@ var searchData=
   ['unittest2_807',['UnitTest2',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a9fcebce7c0416116fc553c5914da7d7c',1,'vrs']]],
   ['unittestrecordableclass_808',['UnitTestRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5ad07e5ad74acdea9a8a863780f9a35732',1,'vrs']]],
   ['unsupportedblockreader_809',['UnsupportedBlockReader',['../classvrs_1_1_unsupported_block_reader.html',1,'vrs']]],
-  ['updatenextprogesstime_810',['updateNextProgessTime',['../classvrs_1_1_progress_logger.html#ab048c598f9e316014aee6f7f16d9fe1d',1,'vrs::ProgressLogger']]],
+  ['updatenextprogresstime_810',['updateNextProgressTime',['../classvrs_1_1_progress_logger.html#a98f9ef96c839cda15fec7ea2d2b422a2',1,'vrs::ProgressLogger']]],
   ['updatestep_811',['updateStep',['../classvrs_1_1_progress_logger.html#ac37490c6358267f5976a411cba44bd8e',1,'vrs::ProgressLogger']]],
   ['upgradestreamtags_812',['upgradeStreamTags',['../namespacevrs_1_1_description_record.html#a22cec01f55d5a8732c895478171d4f11',1,'vrs::DescriptionRecord']]],
   ['upwardcamerarecordableclass_813',['UpwardCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5aa9cf522251916598aa9f21e404e65ae9',1,'vrs']]],

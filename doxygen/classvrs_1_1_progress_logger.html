@@ -88,7 +88,7 @@ Inheritance diagram for vrs::ProgressLogger:</div>
  <div class="center">
   <img src="classvrs_1_1_progress_logger.png" usemap="#vrs::ProgressLogger_map" alt=""/>
   <map id="vrs::ProgressLogger_map" name="vrs::ProgressLogger_map">
-<area href="classvrs_1_1_silent_logger.html" title="Progess logger to ignore all progress notifications." alt="vrs::SilentLogger" shape="rect" coords="0,56,127,80"/>
+<area href="classvrs_1_1_silent_logger.html" title="Progress logger to ignore all progress notifications." alt="vrs::SilentLogger" shape="rect" coords="0,56,127,80"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -129,10 +129,10 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:ac1fd1026616bc5e38917c14ff3829258"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac37490c6358267f5976a411cba44bd8e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_progress_logger.html#ac37490c6358267f5976a411cba44bd8e">updateStep</a> (size_t progress=0, size_t maxProgress=100)</td></tr>
 <tr class="separator:ac37490c6358267f5976a411cba44bd8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab048c598f9e316014aee6f7f16d9fe1d"><td class="memItemLeft" align="right" valign="top"><a id="ab048c598f9e316014aee6f7f16d9fe1d"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_progress_logger.html#ab048c598f9e316014aee6f7f16d9fe1d">updateNextProgessTime</a> ()</td></tr>
-<tr class="memdesc:ab048c598f9e316014aee6f7f16d9fe1d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Callback to schedule the time of the next text update. <br /></td></tr>
-<tr class="separator:ab048c598f9e316014aee6f7f16d9fe1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98f9ef96c839cda15fec7ea2d2b422a2"><td class="memItemLeft" align="right" valign="top"><a id="a98f9ef96c839cda15fec7ea2d2b422a2"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_progress_logger.html#a98f9ef96c839cda15fec7ea2d2b422a2">updateNextProgressTime</a> ()</td></tr>
+<tr class="memdesc:a98f9ef96c839cda15fec7ea2d2b422a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Callback to schedule the time of the next text update. <br /></td></tr>
+<tr class="separator:a98f9ef96c839cda15fec7ea2d2b422a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a16d1a3516f637a07d53f0501f7b43abd"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_progress_logger.html#a16d1a3516f637a07d53f0501f7b43abd">shouldKeepGoing</a> ()</td></tr>
 <tr class="separator:a16d1a3516f637a07d53f0501f7b43abd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -183,7 +183,7 @@ double&#160;</td><td class="memItemRight" valign="bottom"><b>nextProgressTime_</
         </tr>
       </table>
 </div><div class="memdoc">
-<p>By default, only logs every 2 seconds, and after 2 seconds, so opening from a file will be silent, unless a slow reindexing operation is required. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>By default, only logs every 2 seconds, and after 2 seconds, so opening from a file will be silent, unless a slow re-indexing operation is required. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">detailedProgress</td><td>pass true to log every new step, regardless of timing. </td></tr>
     <tr><td class="paramname">updateDelay</td><td>time in seconds between updates. </td></tr>
