@@ -156,7 +156,7 @@ void printHelp(const string& appName) {
              "merge [ vrsfiles.vrs ]+ --to <target.vrs> [copy-options] [tag-options] [filter-options]")
       << CMD("Copy all the data from a file into a new one, but with blanked/zeroed image and audio data,\n"
              "so the copy is much smaller because of lossless compression",
-             "zero <file.vrs> --to <output.vrs>")
+             "copy --zero <file.vrs> --to <output.vrs>")
 
       << endl
       << CMD("List records, with their timestamp, stream name and identifier, and record type.",
@@ -244,7 +244,7 @@ void printSamples(const string& appName) {
        << SP("print-json src.vrs + 1001 - data")
 
        << "Copy & clean-up a recording with default compression and rebuilding the index:\n"
-       << SP("copysrc.vrs --to cleanedRecording.vrs")
+       << SP("copy src.vrs --to cleanedRecording.vrs")
 
        << "Recompress a recording with a tighter compression than default:\n"
        << SP("copy src.vrs --to tight.vrs --compression=ztight")
