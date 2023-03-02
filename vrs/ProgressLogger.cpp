@@ -29,7 +29,7 @@ namespace vrs {
 
 ProgressLogger::ProgressLogger(bool detailedProgress, double updateDelay)
     : detailedProgress_{detailedProgress}, updateDelay_{updateDelay} {
-  ProgressLogger::updateNextProgessTime(); // overrides not available in constructors & destructors
+  ProgressLogger::updateNextProgressTime(); // overrides not available in constructors & destructors
   stepNumber_ = 0;
   stepCount_ = 1;
 }
@@ -71,7 +71,7 @@ bool ProgressLogger::logProgress(
     } else {
       logMessage(stepName + "...");
     }
-    updateNextProgessTime();
+    updateNextProgressTime();
   }
   return shouldKeepGoing();
 }
@@ -83,7 +83,7 @@ bool ProgressLogger::logStatus(const string& stepName, int status) {
     } else {
       logError(stepName + " failed!");
     }
-    updateNextProgessTime();
+    updateNextProgressTime();
   }
   return shouldKeepGoing();
 }
@@ -93,12 +93,12 @@ bool ProgressLogger::logDuration(const string& operationName, double duration, i
     stringstream ss;
     ss << operationName << " in " << fixed << setprecision(precision) << duration << "s.";
     logMessage(ss.str());
-    updateNextProgessTime();
+    updateNextProgressTime();
   }
   return shouldKeepGoing();
 }
 
-void ProgressLogger::updateNextProgessTime() {
+void ProgressLogger::updateNextProgressTime() {
   nextProgressTime_ = os::getTimestampSec() + updateDelay_;
 }
 

@@ -127,7 +127,7 @@ void mergeTags(
           cerr << "Warning! The tag '" << newTag.first << "' was already set, ignoring value '"
                << newTag.second << "' from " << source << endl;
         } else {
-          // store value using a new name, to perserve (some) context
+          // store value using a new name, to preserve (some) context
           cerr << "Warning! The tag '" << newTag.first
                << "' was already set. Dup found in: " << source << endl;
           string newName = newTag.first + "_merged";

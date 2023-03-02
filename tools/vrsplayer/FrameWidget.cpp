@@ -128,7 +128,7 @@ void FrameWidget::paintEvent(QPaintEvent* evt) {
         painter.drawText(QPointF(rect.left() + 4, rect.bottom() - 4), description);
       }
     }
-  } // mutex scoope
+  } // mutex scope
 
   // draw description overlay
   painter.setPen(overlayColor_);

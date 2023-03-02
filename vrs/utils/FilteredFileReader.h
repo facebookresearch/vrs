@@ -50,7 +50,7 @@ struct RecordFilterParams {
   vector<string> typeFilters;
   unique_ptr<DecimationParams> decimationParams;
 
-  // Add contraints, typically from command line options
+  // Add constraints, typically from command line options
   bool includeStream(const string& numericName);
   bool excludeStream(const string& numericName);
   bool includeType(const string& type);
@@ -192,11 +192,11 @@ struct FilteredFileReader {
   // Make an index of the filtered records. Useful to pre-allocate the index during copy operations.
   unique_ptr<deque<IndexRecord::DiskRecordInfo>> buildIndex();
 
-  // Make sure the lastest config & state records are read before reading.
+  // Make sure the latest config & state records are read before reading.
   // Needed when we don't read from the start
   // This version reads the records
   void preRollConfigAndState();
-  // Make sure the lastest config & state records are read before reading.
+  // Make sure the latest config & state records are read before reading.
   // Needed when we don't read from the start
   // This version hands the records to the function provided
   void preRollConfigAndState(RecordReaderFunc recordReaderFunc);

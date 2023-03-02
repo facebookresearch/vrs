@@ -32,7 +32,7 @@ class ProgressLogger {
  public:
   static constexpr double kDefaultUpdateDelay = 2;
   /// By default, only logs every 2 seconds, and after 2 seconds, so opening from a file will be
-  /// silent, unless a slow reindexing operation is required.
+  /// silent, unless a slow re-indexing operation is required.
   /// @param detailedProgress: pass true to log every new step, regardless of timing.
   /// @param updateDelay: time in seconds between updates.
   ProgressLogger(bool detailedProgress = false, double updateDelay = kDefaultUpdateDelay);
@@ -108,7 +108,7 @@ class ProgressLogger {
   /// @param maxProgress: the max value of the progress counter in the step.
   virtual void updateStep(size_t progress = 0, size_t maxProgress = 100);
   /// Callback to schedule the time of the next text update.
-  virtual void updateNextProgessTime();
+  virtual void updateNextProgressTime();
   /// Callback to tell if the operation should stop or keep going.
   /// Override this method to check if the operation should be cancelled, and probably cache
   /// the result.
@@ -123,7 +123,7 @@ class ProgressLogger {
   double nextProgressTime_;
 };
 
-/// \brief Progess logger to ignore all progress notifications.
+/// \brief Progress logger to ignore all progress notifications.
 class SilentLogger : public ProgressLogger {
  public:
   ~SilentLogger();

@@ -31,7 +31,7 @@ void printProgress(const char* status, size_t currentSize, size_t totalSize, boo
 ///  - copying the stream's tags,
 ///  - hooking up itself up to the reader,
 ///  - creating & hooking-up a Recordable for the writer, so it can create records to write out,
-///  - seting up the output stream's compression
+///  - setting up the output stream's compression
 ///  - when it receives a record from its StreamPlayer interface, creating a corresponding record in
 ///  the
 ///    output file.
@@ -77,7 +77,7 @@ int filterCopy(
 
 /// Merge records from multiple files into a new file, using multiple filtered readers.
 /// @param filteredReader: first source file with record filtering.
-/// @param moreRecordFilters: more source files with filterering
+/// @param moreRecordFilters: more source files with filtering
 /// @param pathToCopy: path of the destination location
 /// @param copyOptions: copy parameters, such as compression preset, chunking behavior, etc.
 /// @param throttledFileDelegate: delegate to create & close the target file.

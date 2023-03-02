@@ -216,7 +216,7 @@ class RecordFilterCopier : public RecordFormatStreamPlayer {
   // Called after all the content chunks have been received. By default, write-out new record.
   virtual void finishRecordProcessing(const CurrentRecord& record);
 
-  // For advanced operateions, like altering RecordFormat definitions
+  // For advanced operations, like altering RecordFormat definitions
   Writer& getWriter() {
     return writer_;
   }

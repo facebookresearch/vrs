@@ -120,7 +120,7 @@ struct VrsCommand {
   /// Source file and its filters
   vrs::utils::FilteredFileReader filteredReader;
   vrs::utils::RecordFilterParams filters;
-  /// Helper to use when setting up decimation, to make sure it's created & intialized before use
+  /// Helper to use when setting up decimation, to make sure it's created & initialized before use
   vrs::utils::DecimationParams& getDecimatorParams();
 
   /// Force showing the tool's help documentation
@@ -130,7 +130,7 @@ struct VrsCommand {
   vrs::utils::CopyOptions copyOptions;
   vrs::utils::MakeStreamFilterFunction copyMakeStreamFilterFunction = vrs::utils::makeCopier;
 
-  /// Taget location for copy, merge, extract operations specified with the '--to' option
+  /// Target location for copy, merge, extract operations specified with the '--to' option
   std::string targetPath;
 
   /// Additional input files for merge operations

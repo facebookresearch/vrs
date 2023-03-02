@@ -240,7 +240,7 @@ bool RecordFilterCopier::onUnsupportedBlock(
   bool readNext = true;
   size_t blockSize = cb.getBlockSize();
   if (blockSize == ContentBlock::kSizeUnknown) {
-    // just read everything left, without trying to analyse content
+    // just read everything left, without trying to analyze content
     blockSize = record.reader->getUnreadBytes();
     readNext = false;
   }

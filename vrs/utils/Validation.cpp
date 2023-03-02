@@ -387,7 +387,7 @@ string checkRecords(
   if (noError && checkType != CheckType::Check) {
     stringstream ss;
     map<string, string> checksums;
-    // calculate xxhash for each componenet, then calculate xxhash for all the hashes.
+    // calculate xxhash for each component, then calculate xxhash for all the hashes.
     XXH64Digester sum;
 
     string fileTagsChecksum = checksum(filteredReader.reader.getTags());

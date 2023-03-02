@@ -66,7 +66,7 @@ enum class CompressionType : uint8_t {
 /// requested by VRS, by calling a Recordable's createStateRecord method.
 ///
 /// Data records are used to capture the actual sensor data. Devices are expected to create Data
-/// records whenever data is received from some kind of device driver, or abritrarily in the
+/// records whenever data is received from some kind of device driver, or arbitrarily in the
 /// case of synthetic data.
 ///
 /// See Recordable::createRecord() to see how to create records.
@@ -78,7 +78,7 @@ class Record final {
   /// Record type definitions.
   /// Only Configuration, State and Data records are used by the client users of the APIs.
   /// Tags records are internal to VRS, and will not be exposed in the RecordFileReader's index even
-  /// when they are used internaly.
+  /// when they are used internally.
   enum class Type : uint8_t {
     UNDEFINED = 0, ///< don't use.
     STATE = 1, ///< device or algorithm state information.

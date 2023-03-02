@@ -76,7 +76,7 @@ bool parseCopyOptions(
       try {
         copyOptions.maxChunkSizeMB = stoull(param) * factor;
       } catch (logic_error&) {
-        cerr << appName << ": error. Invalid '--chunk-size' numberic value." << endl;
+        cerr << appName << ": error. Invalid '--chunk-size' numeric value." << endl;
         outStatusCode = EXIT_FAILURE;
       }
     } else {

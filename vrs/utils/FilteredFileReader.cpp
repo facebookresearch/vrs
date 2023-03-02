@@ -574,7 +574,7 @@ void FilteredFileReader::preRollConfigAndState(RecordReaderFunc recordReaderFunc
       }
     }
   }
-  // we found the records in reserse chronological order: read records sequentially now
+  // we found the records in reverse chronological order: read records sequentially now
   for (size_t k = indexes.size(); k-- > 0; /* size_t is unsigned: loop carefully! */) {
     recordReaderFunc(reader, records[indexes[k]]);
   }

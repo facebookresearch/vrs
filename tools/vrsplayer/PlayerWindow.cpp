@@ -200,10 +200,10 @@ void PlayerWindow::updateTextOverlayMenu() {
   smallerFont->setShortcut(Qt::CTRL | Qt::Key_Minus);
   connect(smallerFont, &QAction::triggered, [this]() { player_.adjustOverlayFontSize(-1); });
   textOverlayMenu_->addAction(smallerFont);
-  QAction* largetFont = new QAction("Larger Font", this);
-  largetFont->setShortcut(Qt::CTRL | Qt::Key_Plus);
-  connect(largetFont, &QAction::triggered, [this]() { player_.adjustOverlayFontSize(+1); });
-  textOverlayMenu_->addAction(largetFont);
+  QAction* largestFont = new QAction("Larger Font", this);
+  largestFont->setShortcut(Qt::CTRL | Qt::Key_Plus);
+  connect(largestFont, &QAction::triggered, [this]() { player_.adjustOverlayFontSize(+1); });
+  textOverlayMenu_->addAction(largestFont);
   textOverlayMenu_->addSeparator();
   bool isSolid = player_.isSolidBackground();
   QAction* solidBackground = new QAction("Solid Background", this);
