@@ -16,10 +16,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.7"
 
       - name: Install dependencies
         run: |
@@ -32,22 +28,18 @@ jobs:
               liblz4-dev libzstd-dev libxxhash-dev \
               libboost-system-dev libboost-filesystem-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev \
               qtbase5-dev portaudio19-dev
-            python -m pip install -U pip
-            python -m pip install pybind11[global]
 
           elif [ "$RUNNER_OS" == "macOS" ]; then
               brew install ninja cmake ccache googletest glog fmt cereal \
                   jpeg-turbo libpng \
                   lz4 zstd xxhash \
                   boost \
-                  qt5 portaudio pybind11
+                  qt5 portaudio
 
           else
               echo "$RUNNER_OS not supported"
               exit 1
           fi
-          python -m pip install -U pip
-          python -m pip install numpy typing dataclasses pytest parameterized Pillow
 
       - name: Configure
         shell: bash
@@ -63,9 +55,3 @@ jobs:
           cd build
           ninja all
           ctest -j8
-
-      # - name: Build and Test Python
-      #   shell: bash
-      #   run: |
-      #     pip install -e pyvrs
-      #     python -m pytest pyvrs/test

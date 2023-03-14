@@ -82,8 +82,6 @@ avoid installing any library on your system.
   brew install cmake ninja ccache boost fmt cereal libpng jpeg-turbo lz4 zstd xxhash glog googletest
   brew install qt5 portaudio pybind11
   brew install node doxygen
-  python -m pip install -U pip
-  python -m pip install numpy typing dataclasses pytest parameterized Pillow
   ```
 
 ### Install build tools & libraries (Ubuntu)
@@ -99,9 +97,6 @@ therefore not supported._
   sudo apt-get install libboost-system-dev libboost-filesystem-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev
   sudo apt-get install qtbase5-dev portaudio19-dev
   sudo apt-get install npm doxygen
-  python -m pip install -U pip
-  python -m pip install pybind11[global]
-  python -m pip install numpy typing dataclasses pytest parameterized Pillow
   ```
 
 ## Build & run (macOS & Linux)
@@ -221,6 +216,15 @@ has many options,
 and audio files. It also provides ways to visualize record's metadata as they
 are played. For more information, see the
 [`vrsplayer` documentation](https://facebookresearch.github.io/vrs/docs/vrsplayer).
+
+# Python interface
+
+[`pyvrs`](https://github.com/facebookresearch/pyvrs) is a python interface for
+VRS library. You can install it via pip
+
+```
+pip install vrs
+```
 
 # Contributing
 
