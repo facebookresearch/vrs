@@ -381,6 +381,9 @@ int RecordFileReader::readFileDetails(
       TelemetryLogger::warning(
           {"RecordFileReader::open", fileSpec.getSourceLocation()}, "Index is incomplete.");
     }
+    if (fileSpec.getExtraAsBool(kFailFastOnIncompleteIndex)) {
+      return INDEX_RECORD_ERROR;
+    }
     XR_LOGW("Index incomplete. Rebuilding index of '{}'...", fileSpec.getEasyPath());
     indexReader.rebuildIndex(autoWriteFixedIndex);
     if (!file_->isReadOnly()) {

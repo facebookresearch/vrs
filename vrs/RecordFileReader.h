@@ -45,6 +45,12 @@ using std::vector;
 class DataLayout;
 class StreamPlayer;
 
+/// This is a special boolean extra field in FileSpec to make RecordFileReader fail fast
+/// on open if the file's index is incomplete or missing, and prevent VRS from rebuilding the index.
+/// This is useful when accessing large files in cloud, when we'd rather fail than rebuild the
+/// index.
+constexpr const char* kFailFastOnIncompleteIndex = "fail_fast_on_incomplete_index";
+
 /// \brief The class to read VRS files.
 ///
 /// Recipe:
