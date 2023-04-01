@@ -12,13 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-add_executable(aria_file_reader "AriaFileReader.cpp")
-target_link_libraries(aria_file_reader
-  PUBLIC
-    vrslib
-    fmt::fmt
-)
-
 add_executable(sample_playback_app "SamplePlaybackApp.cpp")
 target_link_libraries(sample_playback_app
   PUBLIC
