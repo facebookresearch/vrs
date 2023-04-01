@@ -3,7 +3,6 @@
 The modules in `vrs/oss` are replacements for libraries that exist at Meta but
 we aren't open sourcing at this point.
 
-- `vrs/oss/aria` provides `DataLayout` definitions used by the Aria device.
 - `vrs/oss/logging` provides a logging facility, that merely prints to `stdout`.
   When integrating VRS in your own code, you will probably want to redirect that
   logging output to your own logging infrastructure.
