@@ -50,7 +50,7 @@ template <
     size_t NAMES_COUNT, // size of the static array of names (use COUNT_OF)
     E DEFAULT_ENUM, // enum to use when name to enum fails
     E DEFAULT_NAME, // enum to use when enum to name fails
-    bool USE_INDEX_ZERO = false> // By default, the first value is reserved for unitialized state
+    bool USE_INDEX_ZERO = false> // By default, the first value is reserved for uninitialized state
 struct EnumStringConverter {
   static const char* toString(E value) {
     size_t index = static_cast<size_t>(value);

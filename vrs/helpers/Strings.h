@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include <algorithm>
 #include <map>
 #include <string>
@@ -55,7 +57,7 @@ inline int strncasecmp(const char* first, const char* second, size_t size) {
 /// at the beginning or at the end of the string have been removed.
 /// @param text: some utf8 text string to trim
 /// @param whiteChars: a series of 1-byte chars to remove
-/// @return the trimed string
+/// @return the trimmed string
 std::string trim(const std::string& text, const char* whiteChars = " \t");
 
 /// Tell if a text string starts with the provided prefix.
@@ -70,7 +72,7 @@ bool startsWith(const std::string& text, const std::string& prefix);
 /// @return True if text ends with suffix. Case insensitive.
 bool endsWith(const std::string& text, const std::string& suffix);
 
-/// Replace all occurences of a string within another string
+/// Replace all occurrences of a string within another string
 /// @param inOutString: the string to modify with the replacement(s)
 /// @param token: text to replace
 /// @param replacement: text to replace token with

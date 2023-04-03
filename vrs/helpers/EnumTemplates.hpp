@@ -16,12 +16,14 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include <string>
 
 namespace vrs {
 
 /// Helper template to convert a string to an enum
-/// Expect the enum to have a symetric definition (no template needed):
+/// Expect the enum to have a symmetric definition (no template needed):
 /// string toString(Enum enumValue);
 template <class Enum>
 Enum toEnum(const std::string& name);

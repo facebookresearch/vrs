@@ -23,9 +23,9 @@
 namespace vrs {
 namespace helpers {
 
-/// Helper class to collect data "writen" to it in various sizes.
+/// Helper class to collect data "written" to it in various sizes.
 /// If the allocation size provided is large enough to hold the whole data,
-/// memory copy is minized, and the data vector returned is swapped out (no copy),
+/// memory copy is minimized, and the data vector returned is swapped out (no copy),
 /// otherwise, one extra copy is required to put all the pieces together in a single
 /// contiguous buffer.
 /// However, the class guarantees no extra copies, and no initialization overhead.
