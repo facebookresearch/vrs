@@ -230,8 +230,8 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a53cadbb21601d58ae45e5e8e3ab2e162"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a53cadbb21601d58ae45e5e8e3ab2e162">vrsFilePathToFileSpec</a> (const string &amp;filePath, <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;outFileSpec)</td></tr>
-<tr class="separator:a53cadbb21601d58ae45e5e8e3ab2e162"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39729fdb368d109746548f815bfc0184"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a39729fdb368d109746548f815bfc0184">vrsFilePathToFileSpec</a> (const string &amp;filePath, <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;outFileSpec, bool checkLocalFile=false)</td></tr>
+<tr class="separator:a39729fdb368d109746548f815bfc0184"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The class to read VRS files. </p>
@@ -1933,8 +1933,8 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a53cadbb21601d58ae45e5e8e3ab2e162"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a53cadbb21601d58ae45e5e8e3ab2e162">&#9670;&nbsp;</a></span>vrsFilePathToFileSpec()</h2>
+<a id="a39729fdb368d109746548f815bfc0184"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a39729fdb368d109746548f815bfc0184">&#9670;&nbsp;</a></span>vrsFilePathToFileSpec()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1952,7 +1952,13 @@ Static Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;&#160;</td>
-          <td class="paramname"><em>outFileSpec</em>&#160;</td>
+          <td class="paramname"><em>outFileSpec</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>checkLocalFile</em> = <code>false</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1970,6 +1976,7 @@ Static Public Member Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">filePath</td><td>a local file path, a URI, or a file spec in json format. </td></tr>
     <tr><td class="paramname">outFileSpec</td><td>on exit and on success, set to the resulting file spec. </td></tr>
+    <tr><td class="paramname">checkLocalFile</td><td>only resolve links and look for additional chunks after validating that the local file is a VRS file, by reading the file's header and checking VRS signatures. </td></tr>
   </table>
   </dd>
 </dl>
