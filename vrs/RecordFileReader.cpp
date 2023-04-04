@@ -93,7 +93,10 @@ int RecordFileReader::openFile(const string& filePath, bool autoWriteFixedIndex)
   return doOpenFile(fileSpec, autoWriteFixedIndex, /* checkSignatureOnly */ false);
 }
 
-int RecordFileReader::vrsFilePathToFileSpec(const string& filePath, FileSpec& outFileSpec) {
+int RecordFileReader::vrsFilePathToFileSpec(
+    const string& filePath,
+    FileSpec& outFileSpec,
+    bool checkLocalFile) {
   IF_ERROR_RETURN(outFileSpec.fromPathJsonUri(filePath));
   if (!outFileSpec.isDiskFile()) {
     return SUCCESS;
@@ -112,9 +115,23 @@ int RecordFileReader::vrsFilePathToFileSpec(const string& filePath, FileSpec& ou
     }
     return SUCCESS;
   }
+  string& firstChunk = outFileSpec.chunks.front();
+
+  // if requested, check that the local file's data looks like a VRS file
+  if (checkLocalFile) {
+    DiskFile file;
+    FileFormat::FileHeader fileHeader;
+    if (os::getFileSize(firstChunk) >= sizeof(FileFormat::FileHeader) &&
+        file.openSpec(outFileSpec) == 0 &&
+        file.read(&fileHeader, sizeof(FileFormat::FileHeader)) == 0) {
+      if (!fileHeader.looksLikeAVRSFile()) {
+        return SUCCESS; // if not a VRS file, that's ok, we just skip link and chunk resolution
+      }
+    }
+  }
+
   // if we have only one chunk, resolve the link (if it's a link), and look for further chunks
   // next to the target of the link, not next to the link itself...
-  string& firstChunk = outFileSpec.chunks.front();
   string targetFile; // path to the file, or the linked file, if filePath was a link
   os::getLinkedTarget(firstChunk, targetFile);
   if (!os::isFile(targetFile)) {

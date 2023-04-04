@@ -506,8 +506,11 @@ class RecordFileReader {
   /// Convert a path to a FileSpec, including resolution of local chunked files
   /// @param filePath: a local file path, a URI, or a file spec in json format.
   /// @param outFileSpec: on exit and on success, set to the resulting file spec.
+  /// @param checkLocalFile: only resolve links and look for additional chunks after validating that
+  /// the local file is a VRS file, by reading the file's header and checking VRS signatures.
   /// @return A status code, 0 meaning success.
-  static int vrsFilePathToFileSpec(const string& filePath, FileSpec& outFileSpec);
+  static int
+  vrsFilePathToFileSpec(const string& filePath, FileSpec& outFileSpec, bool checkLocalFile = false);
 
   class RecordTypeCounter : public std::array<uint32_t, enumCount<Record::Type>()> {
     using ParentType = std::array<uint32_t, enumCount<Record::Type>()>;

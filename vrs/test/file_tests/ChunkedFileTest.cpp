@@ -99,22 +99,24 @@ TEST_F(ChunkedFileTester, LinkedFileTest) {
   EXPECT_EQ(file.getRecordCount(), 306);
   EXPECT_EQ(file.getFileChunks().size(), 3);
 
-  FileSpec foundSpec;
-  ASSERT_EQ(RecordFileReader::vrsFilePathToFileSpec(linkedFile, foundSpec), 0);
-  ASSERT_EQ(foundSpec.chunks.size(), 3);
-  EXPECT_EQ(foundSpec.fileHandlerName, DiskFile::staticName());
+  for (bool checkSignature : {false, true}) {
+    FileSpec foundSpec;
+    ASSERT_EQ(RecordFileReader::vrsFilePathToFileSpec(linkedFile, foundSpec, checkSignature), 0);
+    ASSERT_EQ(foundSpec.chunks.size(), 3);
+    EXPECT_EQ(foundSpec.fileHandlerName, DiskFile::staticName());
 
-  EXPECT_EQ(os::getFilename(foundSpec.chunks[0]), os::getFilename(kChunkedFile));
-  EXPECT_EQ(os::getFilename(foundSpec.chunks[1]), os::getFilename(kChunkedFile2));
-  EXPECT_EQ(os::getFilename(foundSpec.chunks[2]), os::getFilename(kChunkedFile3));
-  EXPECT_EQ(os::getFileSize(foundSpec.chunks[0]), os::getFileSize(kChunkedFile));
-  EXPECT_EQ(os::getFileSize(foundSpec.chunks[1]), os::getFileSize(kChunkedFile2));
-  EXPECT_EQ(os::getFileSize(foundSpec.chunks[2]), os::getFileSize(kChunkedFile3));
+    EXPECT_EQ(os::getFilename(foundSpec.chunks[0]), os::getFilename(kChunkedFile));
+    EXPECT_EQ(os::getFilename(foundSpec.chunks[1]), os::getFilename(kChunkedFile2));
+    EXPECT_EQ(os::getFilename(foundSpec.chunks[2]), os::getFilename(kChunkedFile3));
+    EXPECT_EQ(os::getFileSize(foundSpec.chunks[0]), os::getFileSize(kChunkedFile));
+    EXPECT_EQ(os::getFileSize(foundSpec.chunks[1]), os::getFileSize(kChunkedFile2));
+    EXPECT_EQ(os::getFileSize(foundSpec.chunks[2]), os::getFileSize(kChunkedFile3));
+  }
 
   EXPECT_EQ(::unlink(linkedFile.c_str()), 0); // delete that link
 
-  EXPECT_EQ(
-      RecordFileReader::vrsFilePathToFileSpec(linkedFile, foundSpec), DISKFILE_FILE_NOT_FOUND);
+  FileSpec spec;
+  EXPECT_EQ(RecordFileReader::vrsFilePathToFileSpec(linkedFile, spec), DISKFILE_FILE_NOT_FOUND);
 }
 #endif // !IS_WINDOWS_PLATFORM
 
