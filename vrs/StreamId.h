@@ -100,6 +100,7 @@ enum class RecordableTypeId : uint16_t {
   BarometerRecordableClass = 247, ///< For barometer data streams.
   PhotoplethysmogramRecordableClass = 248, ///< For photoplethysmography data streams.
   EMGRecordableClass = 249, ///< For electromyography data streams
+  CapacitiveTouchRecordableClass = 250, ///< For capacitive touch data streams.
 
   // << Calibration, Setup, Diagnostic, etc >>
   CalibrationRecordableClass = 260, ///< For calibration data streams.

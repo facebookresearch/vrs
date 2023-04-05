@@ -74,6 +74,7 @@ const map<RecordableTypeId, const char*>& getRecordableTypeIdRegistry() {
     {RecordableTypeId::BarometerRecordableClass, "Barometer Data Class"},
     {RecordableTypeId::PhotoplethysmogramRecordableClass, "Photoplethysmogram (PPG) Data Class"},
     {RecordableTypeId::EMGRecordableClass, "Electromyography (EMG) Data Class"},
+    {RecordableTypeId::CapacitiveTouchRecordableClass, "Capacitive Touch Data Class"},
 
     {RecordableTypeId::SlamImuData, "IMU Data (SLAM)"},
     {RecordableTypeId::SlamMagnetometerData, "Magnetometer Data (SLAM)"},
