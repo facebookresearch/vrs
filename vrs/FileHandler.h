@@ -141,6 +141,9 @@ struct FileSpec {
   template <typename T>
   void setExtra(const string& name, const T& value);
 
+  /// Unset an extra parameter
+  void unsetExtra(const string& name);
+
   string fileHandlerName;
   string fileName;
   string uri;

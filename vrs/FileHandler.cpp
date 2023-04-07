@@ -441,6 +441,10 @@ bool FileSpec::getExtraAsBool(const string& name, bool defaultValue) const {
   return helpers::getBool(extras, name, result) ? result : defaultValue;
 }
 
+void FileSpec::unsetExtra(const string& name) {
+  extras.erase(name);
+}
+
 int FileSpec::decodeQuery(const string& query, string& outKey, string& outValue) {
   auto equal = query.find('=');
   if (equal == query.npos) {

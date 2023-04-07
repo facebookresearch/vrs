@@ -210,4 +210,7 @@ TEST_F(FileHandlerJsonTest, SetAndGetExtras) {
   EXPECT_FALSE(spec.getExtraAsBool("zero"));
   EXPECT_FALSE(spec.getExtraAsBool("false"));
   EXPECT_TRUE(spec.getExtraAsBool("str"));
+
+  spec.unsetExtra("str");
+  EXPECT_FALSE(spec.hasExtra("str"));
 }
