@@ -40,13 +40,7 @@ bool PixelFrame::readJpegFrame(RecordReader* reader, const uint32_t sizeBytes) {
   return readJpegFrame(jpegBuf);
 }
 
-bool PixelFrame::readJpegFrame(const vector<uint8_t>& jpegBuf, bool decodePixels) {
-  // setup libjpeg
-  struct jpeg_decompress_struct cinfo;
-  struct jpeg_error_mgr jerr;
-  cinfo.err = jpeg_std_error(&jerr);
-  jpeg_create_decompress(&cinfo);
-  jpeg_mem_src(&cinfo, jpegBuf.data(), jpegBuf.size());
+bool PixelFrame::readJpegFrameHelper(struct jpeg_decompress_struct cinfo, bool decodePixels) {
   jpeg_read_header(&cinfo, TRUE);
   jpeg_start_decompress(&cinfo);
   if (cinfo.num_components == 1) {
@@ -67,6 +61,31 @@ bool PixelFrame::readJpegFrame(const vector<uint8_t>& jpegBuf, bool decodePixels
   jpeg_finish_decompress(&cinfo);
   jpeg_destroy_decompress(&cinfo);
   return true;
+}
+
+bool PixelFrame::readJpegFrame(const vector<uint8_t>& jpegBuf, bool decodePixels) {
+  // setup libjpeg
+  struct jpeg_decompress_struct cinfo;
+  struct jpeg_error_mgr jerr;
+  cinfo.err = jpeg_std_error(&jerr);
+  jpeg_create_decompress(&cinfo);
+  jpeg_mem_src(&cinfo, jpegBuf.data(), jpegBuf.size());
+  return readJpegFrameHelper(cinfo, decodePixels);
+}
+
+bool PixelFrame::readJpegFrameFromFile(std::string path, bool decodePixels) {
+  FILE* infile = fopen(path.c_str(), "rb");
+  if (infile == NULL) {
+    return false;
+  }
+
+  // setup libjpeg
+  struct jpeg_decompress_struct cinfo;
+  struct jpeg_error_mgr jerr;
+  cinfo.err = jpeg_std_error(&jerr);
+  jpeg_create_decompress(&cinfo);
+  jpeg_stdio_src(&cinfo, infile);
+  return readJpegFrameHelper(cinfo, decodePixels);
 }
 
 bool PixelFrame::readJpegFrame(
