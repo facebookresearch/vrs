@@ -89,7 +89,7 @@ void printTags(ostream& out, const map<string, string>& tags) {
     if (iter.first == tag_conventions::kCaptureTimeEpoch) {
       time_t creationTimeSec = static_cast<time_t>(stoul(iter.second));
       if (creationTimeSec > 1000000) {
-        cout << put_time(localtime(&creationTimeSec), " -- %c %Z");
+        out << put_time(localtime(&creationTimeSec), " -- %c %Z");
       }
     }
     out << endl;
