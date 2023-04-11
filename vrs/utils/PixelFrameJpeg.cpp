@@ -75,7 +75,7 @@ bool PixelFrame::readJpegFrame(const vector<uint8_t>& jpegBuf, bool decodePixels
 
 bool PixelFrame::readJpegFrameFromFile(std::string path, bool decodePixels) {
   FILE* infile = fopen(path.c_str(), "rb");
-  if (infile == NULL) {
+  if (!infile) {
     return false;
   }
 
