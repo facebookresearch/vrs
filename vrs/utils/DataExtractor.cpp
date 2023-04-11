@@ -87,12 +87,13 @@ bool DataExtractor::DataExtractorStreamPlayer::writeImage(
       filenamePostfix,
       extension);
 
-  ofstream file(os::pathJoin(outputFolder_, filename), ios::binary);
+  string path = os::pathJoin(outputFolder_, filename);
+  ofstream file(path, ios::binary);
   if (!file.is_open()) {
     XR_LOGE("Cannot open file {} for writing", filename);
     return false;
   }
-  cout << "Writing " << filename << endl;
+  fmt::print("Writing {}\n", path);
   if (!file.write(reinterpret_cast<const char*>(imageData.data()), imageData.size())) {
     XR_LOGE("Failed to write file {}", filename);
     return false;
@@ -235,8 +236,9 @@ void DataExtractor::DataExtractorStreamPlayer::writePngImage(const CurrentRecord
   }
   string filename = fmt::format(
       "{}-{:05}-{:.3f}.png", record.streamId.getNumericName(), imageCounter_, record.timestamp);
-  cout << "Writing " << filename << endl;
-  processedFrame_->writeAsPng(os::pathJoin(outputFolder_, filename));
+  string path = os::pathJoin(outputFolder_, filename);
+  fmt::print("Writing {}\n", path);
+  processedFrame_->writeAsPng(path);
   wroteImage(filename);
 }
 

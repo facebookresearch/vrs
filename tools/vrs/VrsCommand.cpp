@@ -175,12 +175,12 @@ void printHelp(const string& appName) {
       << endl
       << CMD("Extract images in a folder. jpg and png are extracted as is.\n"
              "RAW images are saved as GREY8, GREY16, RGB8 or RGBA8 png files,\n"
-             "or as .raw image files without any conversion with the --raw-images options.",
-             "extract-images file.vrs --to <folder_path> [filter-options] [--raw-images]")
+             "or as .raw image files without any conversion with the --raw-images option.",
+             "extract-images file.vrs [ --to <folder_path> ] [ --raw-images ] [filter-options]                        ")
       << CMD("Extract audio data as WAVE file(s) in a folder",
-             "extract-audio file.vrs --to <folder_path> [filter-options]")
+             "extract-audio file.vrs [ --to <folder_path> ] [filter-options]")
       << CMD("Extract images, audio, and meta data in a folder",
-             "extract-all file.vrs --to <folder_path> [filter-options]")
+             "extract-all file.vrs [ --to <folder_path> ] [filter-options]")
 
       << endl
       << CMD("Check that a file can be read (checks integrity)",
