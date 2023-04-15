@@ -751,41 +751,9 @@ size_t DataLayout::getAvailableVarDataPiecesCount() const {
   REGISTER_TEMPLATE(DataPieceStringMap, x) \
   DEFINE_FIND_DATA_PIECE(x)
 
-// Define & generate the code for the types you need.
-// Note: do NOT define size_t, because its size is not guaranteed!
-// Plus, size_t collides with some type below on some platforms... :-(
-DEFINE_DATA_PIECE_TYPE(Bool)
-DEFINE_DATA_PIECE_TYPE(char)
-DEFINE_DATA_PIECE_TYPE(double)
-DEFINE_DATA_PIECE_TYPE(float)
-DEFINE_DATA_PIECE_TYPE(int64_t)
-DEFINE_DATA_PIECE_TYPE(uint64_t)
-DEFINE_DATA_PIECE_TYPE(int32_t)
-DEFINE_DATA_PIECE_TYPE(uint32_t)
-DEFINE_DATA_PIECE_TYPE(int16_t)
-DEFINE_DATA_PIECE_TYPE(uint16_t)
-DEFINE_DATA_PIECE_TYPE(int8_t)
-DEFINE_DATA_PIECE_TYPE(uint8_t)
-
-DEFINE_DATA_PIECE_TYPE(Point2Dd)
-DEFINE_DATA_PIECE_TYPE(Point2Df)
-DEFINE_DATA_PIECE_TYPE(Point2Di)
-DEFINE_DATA_PIECE_TYPE(Point3Dd)
-DEFINE_DATA_PIECE_TYPE(Point3Df)
-DEFINE_DATA_PIECE_TYPE(Point3Di)
-DEFINE_DATA_PIECE_TYPE(Point4Dd)
-DEFINE_DATA_PIECE_TYPE(Point4Df)
-DEFINE_DATA_PIECE_TYPE(Point4Di)
-
-DEFINE_DATA_PIECE_TYPE(Matrix2Dd)
-DEFINE_DATA_PIECE_TYPE(Matrix2Df)
-DEFINE_DATA_PIECE_TYPE(Matrix2Di)
-DEFINE_DATA_PIECE_TYPE(Matrix3Dd)
-DEFINE_DATA_PIECE_TYPE(Matrix3Df)
-DEFINE_DATA_PIECE_TYPE(Matrix3Di)
-DEFINE_DATA_PIECE_TYPE(Matrix4Dd)
-DEFINE_DATA_PIECE_TYPE(Matrix4Df)
-DEFINE_DATA_PIECE_TYPE(Matrix4Di)
+// Define & generate the code for each POD type supported.
+#define POD_MACRO DEFINE_DATA_PIECE_TYPE
+#include <vrs/helpers/PODMacro.inc>
 
 bool DataPiece::isSame(const DataPiece* rhs) const {
   return isMatch(*rhs) && isRequired() == rhs->isRequired() && vrs::isSame(tags_, rhs->tags_);
