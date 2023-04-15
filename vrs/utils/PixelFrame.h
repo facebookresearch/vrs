@@ -30,7 +30,6 @@
 #include <vrs/RecordReaders.h>
 #include <vrs/utils/DecoderFactory.h>
 #include <vrs/utils/VideoFrameHandler.h>
-#include <jpeglib.h>
 
 namespace vrs::utils {
 
@@ -139,7 +138,7 @@ class PixelFrame {
   /// @param path: path to jpg file
   /// @param decodePixels: if true, decode the image in the buffer, otherwise, only read the format.
   /// @return True if the frame type is supported & the frame was read.
-  bool readJpegFrameFromFile(std::string path, bool decodePixels = true);
+  bool readJpegFrameFromFile(const std::string& path, bool decodePixels = true);
 
   static bool
   readJpegFrame(std::shared_ptr<PixelFrame>& frame, RecordReader* reader, const uint32_t sizeBytes);
@@ -282,8 +281,6 @@ class PixelFrame {
       const;
 
  private:
-  /// Helper that abstracts common logic when reading jpgs from files or from memory
-  bool readJpegFrameHelper(struct jpeg_decompress_struct cinfo, bool decodePixels = true);
   ImageContentBlockSpec imageSpec_;
   std::vector<uint8_t> frameBytes_;
 };
