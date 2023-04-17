@@ -199,6 +199,8 @@ const map&lt; <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>, <a 
 <tr class="separator:a24d77aa3800838c0e8da4068316c066c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0e9a02b8899e92f93c54efd9e98b7615"><td class="memItemLeft" align="right" valign="top">const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a0e9a02b8899e92f93c54efd9e98b7615">getSerialNumber</a> (<a class="el" href="classvrs_1_1_stream_id.html">StreamId</a> streamId) const</td></tr>
 <tr class="separator:a0e9a02b8899e92f93c54efd9e98b7615"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae0d050e7c1002a47bbdf755ae1ee8263"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#ae0d050e7c1002a47bbdf755ae1ee8263">getStreamsSignature</a> () const</td></tr>
+<tr class="separator:ae0d050e7c1002a47bbdf755ae1ee8263"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa8ee554269ef5e43590070c735778fe0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#aa8ee554269ef5e43590070c735778fe0">mightContainImages</a> (<a class="el" href="classvrs_1_1_stream_id.html">StreamId</a> streamId) const</td></tr>
 <tr class="separator:aa8ee554269ef5e43590070c735778fe0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6fc3f6e58aba6d53e66dabeff41deb8b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a6fc3f6e58aba6d53e66dabeff41deb8b">mightContainAudio</a> (<a class="el" href="classvrs_1_1_stream_id.html">StreamId</a> streamId) const</td></tr>
@@ -1194,6 +1196,24 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A vector of stream ids of the given type, and of the provided flavor (if any). </dd></dl>
+
+</div>
+</div>
+<a id="ae0d050e7c1002a47bbdf755ae1ee8263"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae0d050e7c1002a47bbdf755ae1ee8263">&#9670;&nbsp;</a></span>getStreamsSignature()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">string vrs::RecordFileReader::getStreamsSignature </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get a string describing the stream configuration, with stream type, serial number, and record counts, so it can be used to verify that the file looks a specific way without doing a full checksum. The stream Instance ID are NOT used, as they might be modified during copies. </p>
 
 </div>
 </div>
