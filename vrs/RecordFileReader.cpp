@@ -907,6 +907,21 @@ const string& RecordFileReader::getSerialNumber(StreamId streamId) const {
   return getTag(getTags(streamId).vrs, Recordable::getSerialNumberTagName());
 }
 
+string RecordFileReader::getStreamsSignature() const {
+  vector<string> signatures;
+  signatures.reserve(streamIds_.size());
+  for (StreamId id : streamIds_) {
+    signatures.emplace_back(fmt::format(
+        "{}-{}-{}-{}-{}",
+        id.getTypeId(),
+        getSerialNumber(id),
+        getRecordCount(id, Record::Type::CONFIGURATION),
+        getRecordCount(id, Record::Type::STATE),
+        getRecordCount(id, Record::Type::DATA)));
+  }
+  return fmt::to_string(fmt::join(signatures, ","));
+}
+
 bool RecordFileReader::mightContainImages(StreamId streamId) const {
   return mightContainContentTypeInDataRecord(streamId, ContentType::IMAGE);
 }

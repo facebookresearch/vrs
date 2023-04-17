@@ -60,6 +60,9 @@ struct ChunkedFileTester : testing::Test {
   string kMissingFile = getTestDataDir() + "/VRS_Files/does_not_exist.vrs";
 };
 
+static const char* kChunkedFileStreamSignature =
+    "101-462fa095330f6ac4-1-1-100,200-51b98ee8be872906-1-1-100,372-1b24bc705850ccad-1-1-100";
+
 TEST_F(ChunkedFileTester, ChunkedFileTest) {
   vrs::RecordFileReader file;
   EXPECT_EQ(file.openFile(kChunkedFile), 0);
@@ -71,6 +74,7 @@ TEST_F(ChunkedFileTester, ChunkedFileTest) {
   EXPECT_FALSE(file.mightContainAudio(StreamId(RecordableTypeId::ForwardCameraRecordableClass, 1)));
   EXPECT_TRUE(file.mightContainAudio(StreamId(RecordableTypeId::AudioStream, 1)));
   EXPECT_FALSE(file.mightContainAudio(StreamId(RecordableTypeId::MotionRecordableClass, 1)));
+  EXPECT_EQ(file.getStreamsSignature(), kChunkedFileStreamSignature);
 }
 
 TEST_F(ChunkedFileTester, OpenChunkedFileTest) {
@@ -79,6 +83,7 @@ TEST_F(ChunkedFileTester, OpenChunkedFileTest) {
   EXPECT_EQ(file.openFile(jsonPath), 0);
   EXPECT_EQ(file.getRecordCount(), 306); // number of records if all chunks are found
   EXPECT_EQ(file.getFileChunks().size(), 3);
+  EXPECT_EQ(file.getStreamsSignature(), kChunkedFileStreamSignature);
 }
 
 TEST_F(ChunkedFileTester, MissingChunkChunkedFileTest) {
@@ -98,6 +103,7 @@ TEST_F(ChunkedFileTester, LinkedFileTest) {
   EXPECT_EQ(file.openFile(linkedFile), 0);
   EXPECT_EQ(file.getRecordCount(), 306);
   EXPECT_EQ(file.getFileChunks().size(), 3);
+  EXPECT_EQ(file.getStreamsSignature(), kChunkedFileStreamSignature);
 
   for (bool checkSignature : {false, true}) {
     FileSpec foundSpec;

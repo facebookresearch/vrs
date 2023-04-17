@@ -428,6 +428,11 @@ class RecordFileReader {
   /// operations that preserve stream tags.
   const string& getSerialNumber(StreamId streamId) const;
 
+  /// Get a string describing the stream configuration, with stream type, serial number, and record
+  /// counts, so it can be used to verify that the file looks a specific way without doing a full
+  /// checksum. The stream Instance ID are NOT used, as they might be modified during copies.
+  string getStreamsSignature() const;
+
   /// Tell if a stream might contain at least one image (and probably will).
   /// This is a best guess effort, but it is still possible that no images are actually found!
   /// @param streamId: StreamId of the record stream to check.
