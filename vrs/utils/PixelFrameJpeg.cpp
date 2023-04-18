@@ -85,7 +85,9 @@ bool PixelFrame::readJpegFrameFromFile(const std::string& path, bool decodePixel
   cinfo.err = jpeg_std_error(&jerr);
   jpeg_create_decompress(&cinfo);
   jpeg_stdio_src(&cinfo, infile);
-  return readJpegFrameHelper(*this, cinfo, decodePixels);
+  const bool success = readJpegFrameHelper(*this, cinfo, decodePixels);
+  fclose(infile);
+  return success;
 }
 
 bool PixelFrame::readJpegFrame(
