@@ -113,17 +113,6 @@ class FileHandler {
   /// or cleared if the current FileHandler should be used to continue accessing the file.
   /// @return A status code, 0 meaning success.
   /// Use errorCodeToString() to get an error description.
-  virtual int delegateOpen(const string& path, std::unique_ptr<FileHandler>& outNewDelegate);
-  /// Open a file, while giving the opportunity to the FileHandler to delegate the file operations
-  /// to another FileHandler. With this method, a FileHandler can be capable of deciding which other
-  /// FileHandler is the right one to open a file, after inspection, parsing of the path, or lookup.
-  /// @param path: file specification.
-  /// @param outNewDelegate: If provided, might be a fallback FileHandler to use.
-  /// On exit, may be set to a different FileHandler than the current object, if the current
-  /// FileHandler was not ultimately the right one to handle the provided path,
-  /// or cleared if the current FileHandler should be used to continue accessing the file.
-  /// @return A status code, 0 meaning success.
-  /// Use errorCodeToString() to get an error description.
   virtual int delegateOpenSpec(
       const FileSpec& fileSpec,
       std::unique_ptr<FileHandler>& outNewDelegate);

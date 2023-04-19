@@ -74,17 +74,6 @@ int FileHandler::open(const string& filePath) {
   return openSpec(fileSpec);
 }
 
-int FileHandler::delegateOpen(const string& path, unique_ptr<FileHandler>& outNewDelegate) {
-  FileSpec fileSpec;
-  int status = parseFilePath(path, fileSpec);
-  if (status != 0) {
-    close();
-    outNewDelegate.reset();
-    return status;
-  }
-  return delegateOpenSpec(fileSpec, outNewDelegate);
-}
-
 int FileHandler::delegateOpenSpec(
     const FileSpec& fileSpec,
     unique_ptr<FileHandler>& outNewDelegate) {
