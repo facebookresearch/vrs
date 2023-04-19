@@ -33,6 +33,9 @@
 
 namespace vrs::utils {
 
+using std::shared_ptr;
+using std::vector;
+
 /// Helper class to read & convert images read using RecordFormat into simpler, but maybe degraded,
 /// pixel buffer, that can easily be displayed, or saved to disk as jpg or png.
 ///
@@ -55,9 +58,9 @@ class PixelFrame {
     init(ImageContentBlockSpec(pf, w, h, stride));
   }
 
-  static void init(std::shared_ptr<PixelFrame>& inOutFrame, const ImageContentBlockSpec& spec);
+  static void init(shared_ptr<PixelFrame>& inOutFrame, const ImageContentBlockSpec& spec);
   static inline void init(
-      std::shared_ptr<PixelFrame>& inOutFrame,
+      shared_ptr<PixelFrame>& inOutFrame,
       PixelFormat pf,
       uint32_t w,
       uint32_t h,
@@ -89,7 +92,7 @@ class PixelFrame {
     return imageSpec_.getStride();
   }
 
-  std::vector<uint8_t>& getBuffer() {
+  vector<uint8_t>& getBuffer() {
     return frameBytes_;
   }
   const uint8_t* rdata() const {
@@ -112,7 +115,7 @@ class PixelFrame {
   /// Read a RAW, PNG, or JPEG encoded frame into the internal buffer.
   /// @return True if the frame type is supported & the frame was read.
   static bool
-  readFrame(std::shared_ptr<PixelFrame>& frame, RecordReader* reader, const ContentBlock& cb);
+  readFrame(shared_ptr<PixelFrame>& frame, RecordReader* reader, const ContentBlock& cb);
 
   /// Read a RAW frame into the internal buffer.
   /// @return True if the frame type is supported & the frame was read.
@@ -122,7 +125,7 @@ class PixelFrame {
   bool readCompressedFrame(const vector<uint8_t>& pixels, ImageFormat imageFormat);
 
   static bool readRawFrame(
-      std::shared_ptr<PixelFrame>& frame,
+      shared_ptr<PixelFrame>& frame,
       RecordReader* reader,
       const ImageContentBlockSpec& inputImageSpec);
 
@@ -133,22 +136,22 @@ class PixelFrame {
   /// @param buffer: jpg data, possibly read from a valid jpg file (the whole file).
   /// @param decodePixels: if true, decode the image in the buffer, otherwise, only read the format.
   /// @return True if the frame type is supported & the frame was read.
-  bool readJpegFrame(const std::vector<uint8_t>& buffer, bool decodePixels = true);
+  bool readJpegFrame(const vector<uint8_t>& buffer, bool decodePixels = true);
   /// Decode a JPEG encoded frame into the internal buffer.
   /// @param path: path to jpg file
   /// @param decodePixels: if true, decode the image in the buffer, otherwise, only read the format.
   /// @return True if the frame type is supported & the frame was read.
-  bool readJpegFrameFromFile(const std::string& path, bool decodePixels = true);
+  bool readJpegFrameFromFile(const string& path, bool decodePixels = true);
 
   static bool
-  readJpegFrame(std::shared_ptr<PixelFrame>& frame, RecordReader* reader, const uint32_t sizeBytes);
+  readJpegFrame(shared_ptr<PixelFrame>& frame, RecordReader* reader, const uint32_t sizeBytes);
 
   /// Compress pixel frame to jpg. Supports ImageFormat::RAW and PixelFormat::RGB8 or GREY8 only.
   /// @param outBuffer: on exit, the jpg payload which can be saved as a .jpg file
   /// @param quality: jpg quality setting, from 1 to 100
   /// @return True if the image and pixel formats are supported, the compression succeeded, and
   /// outBuffer was set. If returning False, do not use outBuffer.
-  bool jpgCompress(std::vector<uint8_t>& outBuffer, uint32_t quality);
+  bool jpgCompress(vector<uint8_t>& outBuffer, uint32_t quality);
 
   /// Compress pixel frame to jpg. See other variant of jpgCompress for specs.
   /// @param pixelSpec: specs of the pixel buffer.
@@ -160,8 +163,8 @@ class PixelFrame {
   /// outBuffer was set. If returning False, do not use outBuffer.
   static bool jpgCompress(
       const ImageContentBlockSpec& pixelSpec,
-      const std::vector<uint8_t>& pixels,
-      std::vector<uint8_t>& outBuffer,
+      const vector<uint8_t>& pixels,
+      vector<uint8_t>& outBuffer,
       uint32_t quality);
 
   /// Read a JPEG-XL encoded frame into the internal buffer.
@@ -173,7 +176,7 @@ class PixelFrame {
   /// @param decodePixels: if true, decode the image in the buffer, otherwise, only read the format.
   /// @return True if the frame type is supported & the frame was read.
   /// Returns false, if no decoder was installed, or the data couldn't be decoded correctly.
-  bool readJxlFrame(const std::vector<uint8_t>& buffer, bool decodePixels = true);
+  bool readJxlFrame(const vector<uint8_t>& buffer, bool decodePixels = true);
 
   /// Compress pixel frame to jxl. Supports ImageFormat::RAW and PixelFormat::RGB8 or GREY8 only.
   /// @param outBuffer: on exit, the jxl payload which can be saved as a .jxl file
@@ -189,7 +192,7 @@ class PixelFrame {
   /// @return True if the image and pixel formats are supported, the compression succeeded, and
   /// outBuffer was set. If returning False, do not use outBuffer.
   bool jxlCompress(
-      std::vector<uint8_t>& outBuffer,
+      vector<uint8_t>& outBuffer,
       float quality,
       bool percentNotDistance = true,
       int effort = 3);
@@ -211,8 +214,8 @@ class PixelFrame {
   /// outBuffer was set. If returning False, do not use outBuffer.
   static bool jxlCompress(
       const ImageContentBlockSpec& pixelSpec,
-      const std::vector<uint8_t>& pixels,
-      std::vector<uint8_t>& outBuffer,
+      const vector<uint8_t>& pixels,
+      vector<uint8_t>& outBuffer,
       float quality,
       bool percentNotDistance = true,
       int effort = 3);
@@ -226,16 +229,16 @@ class PixelFrame {
   /// @param pngBuffer: png data, possibly read from a valid png file (the whole file).
   /// @param decodePixels: if true, decode the image in the buffer, otherwise, only read the format.
   /// @return True if the frame type is supported & the frame was read.
-  bool readPngFrame(const std::vector<uint8_t>& pngBuffer, bool decodePixels = true);
+  bool readPngFrame(const vector<uint8_t>& pngBuffer, bool decodePixels = true);
 
   static bool
-  readPngFrame(std::shared_ptr<PixelFrame>& frame, RecordReader* reader, const uint32_t sizeBytes);
+  readPngFrame(shared_ptr<PixelFrame>& frame, RecordReader* reader, const uint32_t sizeBytes);
 
   /// Save image as PNG
   /// @param path: path of the file to write, if no outBuffer is provided
   /// @param outBuffer: if provided, a vector where to write the data, instead of writing to disk
   /// @return A status code, 0 meaning success.
-  int writeAsPng(const string& path, std::vector<uint8_t>* const outBuffer = nullptr) const;
+  int writeAsPng(const string& path, vector<uint8_t>* const outBuffer = nullptr) const;
 
   /// Normalize an input frame if possible and as necessary,
   /// which means it has one of the following pixel formats:
@@ -252,13 +255,13 @@ class PixelFrame {
   /// - sourceFrame if no conversion was possible
   /// - some new frame, if the frame was converted into a normalized format.
   static void normalizeFrame(
-      const std::shared_ptr<PixelFrame>& sourceFrame,
-      std::shared_ptr<PixelFrame>& outFrame,
+      const shared_ptr<PixelFrame>& sourceFrame,
+      shared_ptr<PixelFrame>& outFrame,
       bool grey16supported);
 
   /// Convert the internal frame to a simpler format, if necessary.
   /// Returns false if the frame could not be converted, or the format doesn't need conversion.
-  bool normalizeFrame(std::shared_ptr<PixelFrame>& normalizedFrame, bool grey16supported) const;
+  bool normalizeFrame(shared_ptr<PixelFrame>& normalizedFrame, bool grey16supported) const;
 
   static PixelFormat getNormalizedPixelFormat(PixelFormat sourcePixelFormat, bool grey16supported);
 
@@ -269,7 +272,7 @@ class PixelFrame {
   /// Convert current RGBA frame to RGB, with allocation of a PixelFrame, if necessary.
   /// @param outRgbFrame: a shared pointer to a PixelFrame. Does not need to be allocated yet.
   /// @return True if the conversion was performed, false if source wasn't an RGBA frame.
-  bool convertRgbaToRgb(std::shared_ptr<PixelFrame>& outRgbFrame) const;
+  bool convertRgbaToRgb(shared_ptr<PixelFrame>& outRgbFrame) const;
 
  private:
   /// Conversion from an external buffer
@@ -277,12 +280,12 @@ class PixelFrame {
   /// @param targetPixelFormat: pixel format to target. Expect GREY8, GREY16 and RGB8 to work.
   /// @return True if the conversion happened, otherwise, the buffer is left in an undefined state.
   /// Note that the actual conversion format is set in imageSpec_, and it could be different...
-  bool normalizeToPixelFormat(std::shared_ptr<PixelFrame>& outFrame, PixelFormat targetPixelFormat)
+  bool normalizeToPixelFormat(shared_ptr<PixelFrame>& outFrame, PixelFormat targetPixelFormat)
       const;
 
  private:
   ImageContentBlockSpec imageSpec_;
-  std::vector<uint8_t> frameBytes_;
+  vector<uint8_t> frameBytes_;
 };
 
 } // namespace vrs::utils
