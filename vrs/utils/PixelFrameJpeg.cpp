@@ -40,6 +40,30 @@ bool PixelFrame::readJpegFrame(RecordReader* reader, const uint32_t sizeBytes) {
   return readJpegFrame(jpegBuf);
 }
 
+static bool
+readJpegFrameHelper(PixelFrame& frame, struct jpeg_decompress_struct& cinfo, bool decodePixels) {
+  jpeg_read_header(&cinfo, TRUE);
+  jpeg_start_decompress(&cinfo);
+  if (cinfo.num_components == 1) {
+    cinfo.out_color_space = JCS_GRAYSCALE;
+    frame.init(PixelFormat::GREY8, cinfo.image_width, cinfo.image_height);
+  } else {
+    cinfo.out_color_space = JCS_RGB;
+    frame.init(PixelFormat::RGB8, cinfo.image_width, cinfo.image_height);
+  }
+  if (decodePixels) {
+    // decompress row by row
+    uint8_t* rowPtr = frame.getBuffer().data();
+    while (cinfo.output_scanline < cinfo.output_height) {
+      jpeg_read_scanlines(&cinfo, &rowPtr, 1);
+      rowPtr += frame.getSpec().getStride();
+    }
+  }
+  jpeg_finish_decompress(&cinfo);
+  jpeg_destroy_decompress(&cinfo);
+  return true;
+}
+
 bool PixelFrame::readJpegFrame(const vector<uint8_t>& jpegBuf, bool decodePixels) {
   // setup libjpeg
   struct jpeg_decompress_struct cinfo;
@@ -47,26 +71,24 @@ bool PixelFrame::readJpegFrame(const vector<uint8_t>& jpegBuf, bool decodePixels
   cinfo.err = jpeg_std_error(&jerr);
   jpeg_create_decompress(&cinfo);
   jpeg_mem_src(&cinfo, jpegBuf.data(), jpegBuf.size());
-  jpeg_read_header(&cinfo, TRUE);
-  jpeg_start_decompress(&cinfo);
-  if (cinfo.num_components == 1) {
-    cinfo.out_color_space = JCS_GRAYSCALE;
-    init(PixelFormat::GREY8, cinfo.image_width, cinfo.image_height);
-  } else {
-    cinfo.out_color_space = JCS_RGB;
-    init(PixelFormat::RGB8, cinfo.image_width, cinfo.image_height);
+  return readJpegFrameHelper(*this, cinfo, decodePixels);
+}
+
+bool PixelFrame::readJpegFrameFromFile(const std::string& path, bool decodePixels) {
+  FILE* infile = fopen(path.c_str(), "rb");
+  if (infile == nullptr) {
+    return false;
   }
-  if (decodePixels) {
-    // decompress row by row
-    uint8_t* rowPtr = frameBytes_.data();
-    while (cinfo.output_scanline < cinfo.output_height) {
-      jpeg_read_scanlines(&cinfo, &rowPtr, 1);
-      rowPtr += imageSpec_.getStride();
-    }
-  }
-  jpeg_finish_decompress(&cinfo);
-  jpeg_destroy_decompress(&cinfo);
-  return true;
+
+  // setup libjpeg
+  struct jpeg_decompress_struct cinfo;
+  struct jpeg_error_mgr jerr;
+  cinfo.err = jpeg_std_error(&jerr);
+  jpeg_create_decompress(&cinfo);
+  jpeg_stdio_src(&cinfo, infile);
+  const bool success = readJpegFrameHelper(*this, cinfo, decodePixels);
+  fclose(infile);
+  return success;
 }
 
 bool PixelFrame::readJpegFrame(

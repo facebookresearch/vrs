@@ -134,6 +134,11 @@ class PixelFrame {
   /// @param decodePixels: if true, decode the image in the buffer, otherwise, only read the format.
   /// @return True if the frame type is supported & the frame was read.
   bool readJpegFrame(const std::vector<uint8_t>& buffer, bool decodePixels = true);
+  /// Decode a JPEG encoded frame into the internal buffer.
+  /// @param path: path to jpg file
+  /// @param decodePixels: if true, decode the image in the buffer, otherwise, only read the format.
+  /// @return True if the frame type is supported & the frame was read.
+  bool readJpegFrameFromFile(const std::string& path, bool decodePixels = true);
 
   static bool
   readJpegFrame(std::shared_ptr<PixelFrame>& frame, RecordReader* reader, const uint32_t sizeBytes);
