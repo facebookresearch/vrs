@@ -47,7 +47,7 @@ var searchData=
   ['decompressor_144',['Decompressor',['../classvrs_1_1_decompressor.html',1,'vrs']]],
   ['default_145',['Default',['../namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7ba7a1920d61156abc05a60135aefe8bc67',1,'vrs']]],
   ['defaults_146',['defaults',['../structvrs_1_1_json_format_profile_spec.html#a4db0fdba0400d80675b41d8b566de007',1,'vrs::JsonFormatProfileSpec']]],
-  ['delegateopen_147',['delegateOpen',['../classvrs_1_1_file_handler.html#a968559d2e8d7e8c6feff3ec5a4b79649',1,'vrs::FileHandler::delegateOpen()'],['../classvrs_1_1_file_handler_factory.html#afedf7700a357ac0490bbc9b09822be87',1,'vrs::FileHandlerFactory::delegateOpen()']]],
+  ['delegateopen_147',['delegateOpen',['../classvrs_1_1_file_handler_factory.html#afedf7700a357ac0490bbc9b09822be87',1,'vrs::FileHandlerFactory']]],
   ['delegateopenspec_148',['delegateOpenSpec',['../classvrs_1_1_file_handler.html#a3a10e956278b3a40e4b9260387239637',1,'vrs::FileHandler']]],
   ['depth32f_149',['DEPTH32F',['../namespacevrs.html#a0fbbb88591f21313dd46736fba5a7aa5a19f22a1cbc2e2733484acbf9fc1bb4cd',1,'vrs']]],
   ['depthcamerarecordableclass_150',['DepthCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a519f9fba435216fcd1f0bd8abbd03b48',1,'vrs']]],
