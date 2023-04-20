@@ -908,18 +908,23 @@ const string& RecordFileReader::getSerialNumber(StreamId streamId) const {
 }
 
 string RecordFileReader::getStreamsSignature() const {
-  vector<string> signatures;
-  signatures.reserve(streamIds_.size());
+  string signature;
   for (StreamId id : streamIds_) {
-    signatures.emplace_back(fmt::format(
+    string s = fmt::format(
         "{}-{}-{}-{}-{}",
-        id.getTypeId(),
+        static_cast<uint16_t>(id.getTypeId()),
         getSerialNumber(id),
         getRecordCount(id, Record::Type::CONFIGURATION),
         getRecordCount(id, Record::Type::STATE),
-        getRecordCount(id, Record::Type::DATA)));
+        getRecordCount(id, Record::Type::DATA));
+    if (signature.empty()) {
+      signature.reserve((s.size() + 10) * streamIds_.size()); // pre-allocation approximation
+      signature.append(s);
+    } else {
+      signature.append(",").append(s);
+    }
   }
-  return fmt::to_string(fmt::join(signatures, ","));
+  return signature;
 }
 
 bool RecordFileReader::mightContainImages(StreamId streamId) const {
