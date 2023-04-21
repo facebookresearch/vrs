@@ -52,6 +52,7 @@ namespace RecordFileWriter_ {
 struct WriterThreadData;
 struct PurgeThreadData;
 struct CompressionThreadsData;
+struct RecordWriterData;
 } // namespace RecordFileWriter_
 
 /// Thread types that are created with the RecordFileWriter interface
@@ -297,6 +298,12 @@ class RecordFileWriter {
       RecordFileWriter_::CompressionThreadsData& compressionThreadsData,
       SortedRecords& records,
       int lastError); ///< internal
+  void writeOneRecord(
+      RecordFileWriter_::RecordWriterData& rwd,
+      Record* record,
+      const StreamId id,
+      Compressor& compressor,
+      uint32_t compressedSize);
   int completeAndCloseFile(); ///< internal
 
   void backgroundWriteCollectedRecord(); ///< internal
@@ -317,7 +324,6 @@ class RecordFileWriter {
   unique_ptr<deque<IndexRecord::DiskRecordInfo>> preliminaryIndex_;
   IndexRecord::Writer indexRecordWriter_;
   map<string, string> fileTags_;
-  Compressor compressor_;
   size_t compressionThreadPoolSize_{};
 
   /// when a background thread is active

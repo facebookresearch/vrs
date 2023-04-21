@@ -101,16 +101,6 @@ class Record final {
       const DataSource& data,
       uint64_t creationOrder);
 
-  /// Compress (if desirable & possible) & write the record to a file (header + data).
-  /// @internal
-  int compressAndWriteRecord(
-      WriteFileHandler& file,
-      StreamId streamId,
-      uint32_t& inOutRecordSize,
-      Compressor& compressor) {
-    return writeRecord(file, streamId, inOutRecordSize, compressor, compressRecord(compressor));
-  }
-
   /// Tell if an attempt should be made to compress the record.
   /// If compression can't reduce the size of the record, then the record is written uncompressed.
   /// @internal

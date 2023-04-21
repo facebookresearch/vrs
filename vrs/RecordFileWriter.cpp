@@ -851,205 +851,66 @@ int RecordFileWriter::writeRecords(SortedRecords& records, int lastError) {
   return writeRecordsMultiThread(compressionThreadsData, records, lastError);
 }
 
-int RecordFileWriter::writeRecordsSingleThread(SortedRecords& records, int lastError) {
-  if (LOG_FILE_OPERATIONS) {
-    XR_LOGD("Starting to write {} records", records.size());
-  }
-  int error = lastError;
-  uint64_t currentChunkSize = static_cast<uint64_t>(file_->getChunkPos());
-  double oldest = numeric_limits<double>::max();
-  double newest = numeric_limits<double>::lowest();
-  uint32_t writtenRecords = 0;
-  uint32_t skippedRecords = 0;
-  for (auto& r : records) {
-    Record* record = r.record;
-    if (error != 0) {
-      skippedRecords++;
-    } else {
-      double timestamp = record->getTimestamp();
-      if (timestamp < oldest) {
-        oldest = timestamp;
-      }
-      if (timestamp > newest) {
-        newest = timestamp;
-      }
-      if (currentChunkSize > 0 && currentChunkSize + record->getSize() >= maxChunkSize_) {
-        NewChunkNotifier newChunkNotifier(*file_, newChunkHandler_);
-        // AddChunk() preserves the current chunk on error.
-        XR_VERIFY(
-            file_->addChunk() == 0,
-            "Add chunk failed: {}, {}",
-            file_->getLastError(),
-            errorCodeToMessage(file_->getLastError()));
-        currentChunkSize = 0; // reset, even if addChunk() failed to reduce retrying.
-        newChunkNotifier.notify(1); // offset chunk index by 1
-      }
-      if (queueByteSize_) {
-        queueByteSize_->fetch_sub(record->getSize(), memory_order_relaxed);
-      }
-      error = record->compressAndWriteRecord(*file_, r.streamId, lastRecordSize_, compressor_);
-      if (error != 0) {
-        XR_LOGE("Write failed: {}, {}", error, errorCodeToMessage(error));
-      } else {
-        writtenRecords++;
-        if (!skipFinalizeIndexRecords_) {
-          indexRecordWriter_.addRecord(
-              record->getTimestamp(), lastRecordSize_, r.streamId, record->getRecordType());
-        }
-        currentChunkSize += lastRecordSize_;
-      }
-    }
-    record->recycle();
-  }
-  if (LOG_FILE_OPERATIONS) {
-    // If an error occurred, it was already logged. Log success & (otherwise) silent skipping of
-    // write operations...
-    if (writtenRecords > 0) {
-      if (writtenRecords == records.size()) {
-        XR_LOGD("Wrote all {} records, from {} to {}", writtenRecords, oldest, newest);
-      } else {
-        XR_LOGW(
-            "Wrote {} out of {} records, from {} to {}",
-            writtenRecords,
-            records.size(),
-            oldest,
-            newest);
-      }
-    }
-    if (skippedRecords > 0) {
-      if (skippedRecords == records.size()) {
-        XR_LOGW("Skipped all {} records, from {} to {}", skippedRecords, oldest, newest);
-      } else {
-        XR_LOGW(
-            "Skipped {} out of {} records, from {} to {}",
-            skippedRecords,
-            records.size(),
-            oldest,
-            newest);
-      }
-    }
-  }
-  records.clear();
-  return error;
-}
-
-int RecordFileWriter::writeRecordsMultiThread(
-    CompressionThreadsData& compressionThreadsData,
-    SortedRecords& recordsToCompress,
-    int lastError) {
-  uint64_t recordsToWriteCount = recordsToCompress.size();
-  CompressionJob noCompressionJob;
-  vector<CompressionJob> jobs(compressionThreadPoolSize_ * 3);
-  vector<CompressionJob*> availableJobs;
-  availableJobs.reserve(jobs.size());
-  for (auto& job : jobs) {
-    availableJobs.push_back(&job);
-  }
-  deque<SortRecord> writeQueue; // we need to preserve the order when writing data out!
-  map<SortRecord, CompressionJob*> compressionResults;
-  uint64_t currentChunkSize = static_cast<uint64_t>(file_->getChunkPos());
-  int error = lastError;
+struct RecordFileWriter_::RecordWriterData {
+  uint64_t currentChunkSize;
+  int error;
   double oldest = numeric_limits<double>::max();
   double newest = numeric_limits<double>::lowest();
   uint64_t writtenRecords = 0;
   uint64_t skippedRecords = 0;
   uint64_t compressedRecords = 0;
-  while (!recordsToCompress.empty() || !writeQueue.empty() || !compressionResults.empty()) {
-    double waitTime = 10;
-    // See if we can find a new compressor for that job
-    while (!recordsToCompress.empty() && !availableJobs.empty()) {
-      SortRecord nextRecord = *recordsToCompress.begin();
-      recordsToCompress.erase(recordsToCompress.begin());
-      writeQueue.push_back(nextRecord);
-      if (error == 0 && nextRecord.record->shouldTryToCompress()) {
-        compressionThreadsData.addThreadUntil(
-            compressionThreadPoolSize_, initCreatedThreadCallback_);
-        // an idle worker might not have any job available (they haven't been written yet)
-        CompressionJob* job = availableJobs.back();
-        availableJobs.pop_back();
-        job->setSortRecord(nextRecord);
-        compressionThreadsData.jobsQueue.sendJob(job);
-        compressedRecords++;
-      } else {
-        compressionResults.emplace(nextRecord, &noCompressionJob);
-      }
-      waitTime = 0;
-    }
-    map<SortRecord, CompressionJob*>::iterator resultsIter;
-    // process completed compression job
-    if (!writeQueue.empty() &&
-        (resultsIter = compressionResults.find(writeQueue.front())) != compressionResults.end()) {
-      Record* record = resultsIter->first.record;
-      const StreamId id = resultsIter->first.streamId;
-      CompressionJob* job = resultsIter->second;
-      if (error != 0) {
-        skippedRecords++;
-      } else {
-        double timestamp = record->getTimestamp();
-        if (timestamp < oldest) {
-          oldest = timestamp;
-        }
-        if (timestamp > newest) {
-          newest = timestamp;
-        }
-        if (currentChunkSize > 0 && currentChunkSize + record->getSize() >= maxChunkSize_) {
-          NewChunkNotifier newChunkNotifier(*file_, newChunkHandler_);
-          // AddChunk() preserves the current chunk on error.
-          XR_VERIFY(
-              file_->addChunk() == 0,
-              "Add chunk failed: {}, {}",
-              file_->getLastError(),
-              errorCodeToMessage(file_->getLastError()));
-          currentChunkSize = 0; // reset, even if addChunk() failed to reduce retrying.
-          newChunkNotifier.notify(1); // offset chunk index by 1
-        }
-        if (queueByteSize_) {
-          queueByteSize_->fetch_sub(record->getSize(), memory_order_relaxed);
-        }
-        error = record->writeRecord(
-            *file_, id, lastRecordSize_, job->getCompressor(), job->getCompressedSize());
-        if (error != 0) {
-          XR_LOGE("Write failed: {}, {}", error, errorCodeToMessage(error));
-        } else {
-          if (!skipFinalizeIndexRecords_) {
-            indexRecordWriter_.addRecord(
-                record->getTimestamp(), lastRecordSize_, id, record->getRecordType());
-          }
-          writtenRecords++;
-          currentChunkSize += lastRecordSize_;
-        }
-      }
-      record->recycle();
-      if (job != &noCompressionJob) {
-        availableJobs.push_back(job);
-      }
-      compressionResults.erase(resultsIter);
-      writeQueue.pop_front();
-      waitTime = 0;
-    }
-    // Check if we have a results to process
-    CompressionJob* job;
-    while (compressionThreadsData.resultsQueue.waitForJob(job, waitTime)) {
-      compressionResults.emplace(job->getSortRecord(), job);
-      waitTime = 0;
-    }
-    // Grab any new record ready to write, to feed our background threads ASAP
-    size_t previousCount = recordsToCompress.size();
-    if (addRecordsReadyToWrite(recordsToCompress)) {
-      recordsToWriteCount += recordsToCompress.size() - previousCount;
-    }
-  }
 
-  if (LOG_FILE_OPERATIONS) {
+  RecordWriterData(WriteFileHandler& fileHandler, int lastError)
+      : currentChunkSize{static_cast<uint64_t>(fileHandler.getChunkPos())}, error{lastError} {}
+
+  int getError() const {
+    return error;
+  }
+  void log(uint64_t recordsToWriteCount, size_t compressionThreadCount) {
     // If an error occurred, it was already logged. Log success & (otherwise) silent skipping of
     // write operations...
     if (writtenRecords > 0) {
       if (writtenRecords == recordsToWriteCount) {
         XR_LOGD(
-            "Wrote all {} records, compressed {}, using {} threads, from {} to {}",
+            "Wrote all {} records, compressed {} using {} threads, from {} to {}",
             writtenRecords,
             compressedRecords,
-            compressionThreadsData.compressionThreadsPool_.size(),
+            compressionThreadCount,
+            oldest,
+            newest);
+      } else {
+        XR_LOGW(
+            "Wrote {} out of {} records, compressed {} using {} threads, from {} to {}",
+            writtenRecords,
+            recordsToWriteCount,
+            compressedRecords,
+            compressionThreadCount,
+            oldest,
+            newest);
+      }
+    }
+    if (skippedRecords > 0) {
+      if (skippedRecords == recordsToWriteCount) {
+        XR_LOGW("Skipped all {} records, from {} to {}", skippedRecords, oldest, newest);
+      } else {
+        XR_LOGW(
+            "Skipped {} out of {} records, from {} to {}",
+            skippedRecords,
+            recordsToWriteCount,
+            oldest,
+            newest);
+      }
+    }
+  }
+  void log(uint64_t recordsToWriteCount) {
+    // If an error occurred, it was already logged. Log success & (otherwise) silent skipping of
+    // write operations...
+    if (writtenRecords > 0) {
+      if (writtenRecords == recordsToWriteCount) {
+        XR_LOGD(
+            "Wrote all {} records, compressed {}, from {} to {}",
+            writtenRecords,
+            compressedRecords,
             oldest,
             newest);
       } else {
@@ -1075,7 +936,152 @@ int RecordFileWriter::writeRecordsMultiThread(
       }
     }
   }
-  return error;
+};
+
+void RecordFileWriter::writeOneRecord(
+    RecordFileWriter_::RecordWriterData& rwd,
+    Record* record,
+    const StreamId streamId,
+    Compressor& compressor,
+    uint32_t compressedSize) {
+  double timestamp = record->getTimestamp();
+  if (timestamp < rwd.oldest) {
+    rwd.oldest = timestamp;
+  }
+  if (timestamp > rwd.newest) {
+    rwd.newest = timestamp;
+  }
+  if (rwd.currentChunkSize > 0 && rwd.currentChunkSize + record->getSize() >= maxChunkSize_) {
+    NewChunkNotifier newChunkNotifier(*file_, newChunkHandler_);
+    // AddChunk() preserves the current chunk on error.
+    XR_VERIFY(
+        file_->addChunk() == 0,
+        "Add chunk failed: {}, {}",
+        file_->getLastError(),
+        errorCodeToMessage(file_->getLastError()));
+    rwd.currentChunkSize = 0; // reset, even if addChunk() failed to reduce retrying.
+    newChunkNotifier.notify(1); // offset chunk index by 1
+  }
+  if (queueByteSize_) {
+    queueByteSize_->fetch_sub(record->getSize(), memory_order_relaxed);
+  }
+  int error = record->writeRecord(*file_, streamId, lastRecordSize_, compressor, compressedSize);
+  if (error != 0) {
+    XR_LOGE("Write failed: {}, {}", error, errorCodeToMessage(error));
+    rwd.error = error;
+  } else {
+    if (!skipFinalizeIndexRecords_) {
+      indexRecordWriter_.addRecord(
+          record->getTimestamp(), lastRecordSize_, streamId, record->getRecordType());
+    }
+    rwd.writtenRecords++;
+    rwd.currentChunkSize += lastRecordSize_;
+  }
+  record->recycle();
+}
+
+int RecordFileWriter::writeRecordsSingleThread(SortedRecords& records, int lastError) {
+  if (LOG_FILE_OPERATIONS) {
+    XR_LOGD("Starting to write {} records", records.size());
+  }
+  RecordWriterData rwd(*file_, lastError);
+  Compressor compressor;
+
+  for (auto& r : records) {
+    Record* record = r.record;
+    if (rwd.getError() != 0) {
+      rwd.skippedRecords++;
+      record->recycle();
+    } else {
+      uint32_t compressedSize = record->compressRecord(compressor);
+      if (compressedSize > 0) {
+        rwd.compressedRecords++;
+      }
+      writeOneRecord(rwd, record, r.streamId, compressor, compressedSize);
+    }
+  }
+  if (LOG_FILE_OPERATIONS) {
+    rwd.log(records.size());
+  }
+  records.clear();
+  return rwd.error;
+}
+
+int RecordFileWriter::writeRecordsMultiThread(
+    CompressionThreadsData& compressionThreadsData,
+    SortedRecords& recordsToCompress,
+    int lastError) {
+  uint64_t recordsToWriteCount = recordsToCompress.size();
+  CompressionJob noCompressionJob;
+  vector<CompressionJob> jobs(compressionThreadPoolSize_ * 3);
+  vector<CompressionJob*> availableJobs;
+  availableJobs.reserve(jobs.size());
+  for (auto& job : jobs) {
+    availableJobs.push_back(&job);
+  }
+  deque<SortRecord> writeQueue; // we need to preserve the order when writing data out!
+  map<SortRecord, CompressionJob*> compressionResults;
+  RecordWriterData rwd(*file_, lastError);
+
+  while (!recordsToCompress.empty() || !writeQueue.empty() || !compressionResults.empty()) {
+    double waitTime = 10;
+    // See if we can find a new compressor for that job
+    while (!recordsToCompress.empty() && !availableJobs.empty()) {
+      SortRecord nextRecord = *recordsToCompress.begin();
+      recordsToCompress.erase(recordsToCompress.begin());
+      writeQueue.push_back(nextRecord);
+      if (rwd.getError() == 0 && nextRecord.record->shouldTryToCompress()) {
+        compressionThreadsData.addThreadUntil(
+            compressionThreadPoolSize_, initCreatedThreadCallback_);
+        // an idle worker might not have any job available (they haven't been written yet)
+        CompressionJob* job = availableJobs.back();
+        availableJobs.pop_back();
+        job->setSortRecord(nextRecord);
+        compressionThreadsData.jobsQueue.sendJob(job);
+        rwd.compressedRecords++;
+      } else {
+        compressionResults.emplace(nextRecord, &noCompressionJob);
+      }
+      waitTime = 0;
+    }
+    map<SortRecord, CompressionJob*>::iterator resultsIter;
+    // process completed compression job
+    if (!writeQueue.empty() &&
+        (resultsIter = compressionResults.find(writeQueue.front())) != compressionResults.end()) {
+      Record* record = resultsIter->first.record;
+      CompressionJob* job = resultsIter->second;
+      if (rwd.getError() != 0) {
+        rwd.skippedRecords++;
+        record->recycle();
+      } else {
+        const StreamId streamId = resultsIter->first.streamId;
+        writeOneRecord(rwd, record, streamId, job->getCompressor(), job->getCompressedSize());
+      }
+      if (job != &noCompressionJob) {
+        availableJobs.push_back(job);
+      }
+      compressionResults.erase(resultsIter);
+      writeQueue.pop_front();
+      waitTime = 0;
+    }
+    // Check if we have a results to process
+    CompressionJob* job;
+    while (compressionThreadsData.resultsQueue.waitForJob(job, waitTime)) {
+      compressionResults.emplace(job->getSortRecord(), job);
+      waitTime = 0;
+    }
+    // Grab any new record ready to write, to feed our background threads ASAP
+    size_t previousCount = recordsToCompress.size();
+    if (addRecordsReadyToWrite(recordsToCompress)) {
+      recordsToWriteCount += recordsToCompress.size() - previousCount;
+    }
+  }
+
+  if (LOG_FILE_OPERATIONS) {
+    size_t compressionThreadCount = compressionThreadsData.compressionThreadsPool_.size();
+    rwd.log(recordsToWriteCount, compressionThreadCount);
+  }
+  return rwd.error;
 }
 
 int RecordFileWriter::completeAndCloseFile() {
