@@ -940,7 +940,8 @@ int RecordFileWriter::writeRecordsMultiThread(
   uint64_t recordsToWriteCount = recordsToCompress.size();
   CompressionJob noCompressionJob;
   vector<CompressionJob> jobs(compressionThreadPoolSize_ * 3);
-  list<CompressionJob*> availableJobs;
+  vector<CompressionJob*> availableJobs;
+  availableJobs.reserve(jobs.size());
   for (auto& job : jobs) {
     availableJobs.push_back(&job);
   }
@@ -964,8 +965,8 @@ int RecordFileWriter::writeRecordsMultiThread(
         compressionThreadsData.addThreadUntil(
             compressionThreadPoolSize_, initCreatedThreadCallback_);
         // an idle worker might not have any job available (they haven't been written yet)
-        CompressionJob* job = availableJobs.front();
-        availableJobs.pop_front();
+        CompressionJob* job = availableJobs.back();
+        availableJobs.pop_back();
         job->setSortRecord(nextRecord);
         compressionThreadsData.jobsQueue.sendJob(job);
         compressedRecords++;
