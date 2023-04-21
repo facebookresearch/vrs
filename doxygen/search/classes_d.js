@@ -18,5 +18,6 @@ var searchData=
   ['recordsample_989',['RecordSample',['../classvrs__sample__code_1_1_record_sample.html',1,'vrs_sample_code']]],
   ['recordsignature_990',['RecordSignature',['../structvrs_1_1_index_record_1_1_record_signature.html',1,'vrs::IndexRecord']]],
   ['recordtypecounter_991',['RecordTypeCounter',['../classvrs_1_1_record_file_reader_1_1_record_type_counter.html',1,'vrs::RecordFileReader']]],
-  ['registerer_992',['Registerer',['../structvrs_1_1internal_1_1_data_piece_factory_1_1_registerer.html',1,'vrs::internal::DataPieceFactory']]]
+  ['recordwriterdata_992',['RecordWriterData',['../structvrs_1_1_record_file_writer___1_1_record_writer_data.html',1,'vrs::RecordFileWriter_']]],
+  ['registerer_993',['Registerer',['../structvrs_1_1internal_1_1_data_piece_factory_1_1_registerer.html',1,'vrs::internal::DataPieceFactory']]]
 ];

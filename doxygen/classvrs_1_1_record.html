@@ -111,8 +111,6 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad931529be1bfa0c3844d51678d68da44"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aadeca5302d25b08f4797433ea8b73985"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record.html#aadeca5302d25b08f4797433ea8b73985">set</a> (double timestamp, <a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Type</a> type, uint32_t formatVersion, const <a class="el" href="classvrs_1_1_data_source.html">DataSource</a> &amp;data, uint64_t creationOrder)</td></tr>
 <tr class="separator:aadeca5302d25b08f4797433ea8b73985"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a08515a51c0afa98738bf4dff673a31de"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record.html#a08515a51c0afa98738bf4dff673a31de">compressAndWriteRecord</a> (<a class="el" href="classvrs_1_1_write_file_handler.html">WriteFileHandler</a> &amp;file, <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a> streamId, uint32_t &amp;inOutRecordSize, <a class="el" href="classvrs_1_1_compressor.html">Compressor</a> &amp;compressor)</td></tr>
-<tr class="separator:a08515a51c0afa98738bf4dff673a31de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa80b976bc6c773473c1b3aa1e3e60457"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record.html#aa80b976bc6c773473c1b3aa1e3e60457">shouldTryToCompress</a> () const</td></tr>
 <tr class="separator:aa80b976bc6c773473c1b3aa1e3e60457"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4aebd1c3abd00472d28c6d3455962a64"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record.html#a4aebd1c3abd00472d28c6d3455962a64">compressRecord</a> (<a class="el" href="classvrs_1_1_compressor.html">Compressor</a> &amp;compressor)</td></tr>
@@ -203,55 +201,6 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>RecordManager</b></t
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a08515a51c0afa98738bf4dff673a31de"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a08515a51c0afa98738bf4dff673a31de">&#9670;&nbsp;</a></span>compressAndWriteRecord()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">int vrs::Record::compressAndWriteRecord </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classvrs_1_1_write_file_handler.html">WriteFileHandler</a> &amp;&#160;</td>
-          <td class="paramname"><em>file</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>&#160;</td>
-          <td class="paramname"><em>streamId</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t &amp;&#160;</td>
-          <td class="paramname"><em>inOutRecordSize</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classvrs_1_1_compressor.html">Compressor</a> &amp;&#160;</td>
-          <td class="paramname"><em>compressor</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Compress (if desirable &amp; possible) &amp; write the record to a file (header + data). </p>
-
-</div>
-</div>
 <a id="a4aebd1c3abd00472d28c6d3455962a64"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4aebd1c3abd00472d28c6d3455962a64">&#9670;&nbsp;</a></span>compressRecord()</h2>
 
