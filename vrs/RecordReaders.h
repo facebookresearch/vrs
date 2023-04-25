@@ -79,6 +79,14 @@ class RecordReader {
     return remainingUncompressedSize_;
   }
 
+  /// Tell if the record was compressed. It's named "looksCompressed" rather than "isCompressed",
+  /// because this method must be called early enough when a record is played back to be accurate.
+  /// Call this method from StreamPlayer::processRecordHeader() to tell for sure.
+  /// @return True if the record looks like it was compressed.
+  bool looksCompressed() const {
+    return remainingDiskBytes_ != remainingUncompressedSize_;
+  }
+
  protected:
   FileHandler* file_;
   uint32_t remainingDiskBytes_;

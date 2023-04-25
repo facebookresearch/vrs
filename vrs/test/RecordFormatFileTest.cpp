@@ -296,9 +296,18 @@ class OtherStreamPlayer : public RecordFormatStreamPlayer {
     }
     return true;
   }
+  bool processRecordHeader(const CurrentRecord& record, DataReference& outDataReference) override {
+    if (record.recordType == Record::Type::DATA) {
+      if (record.reader->looksCompressed()) {
+        usesCompression = true;
+      }
+    }
+    return RecordFormatStreamPlayer::processRecordHeader(record, outDataReference);
+  }
 
   uint32_t cameraId{};
   uint64_t frameCounter{};
+  bool usesCompression{false};
 };
 
 class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
@@ -564,6 +573,15 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
     return true;
   }
 
+  bool processRecordHeader(const CurrentRecord& record, DataReference& outDataReference) override {
+    if (record.recordType == Record::Type::DATA) {
+      if (record.reader->looksCompressed()) {
+        usesCompression = true;
+      }
+    }
+    return RecordFormatStreamPlayer::processRecordHeader(record, outDataReference);
+  }
+
   int createVrsFile() {
     RecordFileWriter fileWriter;
     tag_conventions::addOsFingerprint(fileWriter);
@@ -695,6 +713,9 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
       EXPECT_EQ(fixedImageCount_, 0);
       EXPECT_EQ(variableImageCount_, 0);
       EXPECT_EQ(configurationCount_, 0);
+      EXPECT_TRUE(usesCompression);
+
+      usesCompression = false;
 
       EXPECT_TRUE(filePlayer.readFirstConfigurationRecord(id));
       EXPECT_EQ(configurationCount_, 1);
@@ -703,28 +724,35 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
       EXPECT_EQ(unsupportedBlockCount_, 1); // no increase
       EXPECT_EQ(fixedImageCount_, 1);
       EXPECT_EQ(variableImageCount_, 0);
+      EXPECT_TRUE(usesCompression);
+
       fixedImageCount_ = 0;
       configurationCount_ = 0;
       unsupportedBlockCount_ = 0;
+      usesCompression = false;
 
       EXPECT_TRUE(filePlayer.readFirstConfigurationRecordsForType(RecordableTypeId::UnitTest1));
       EXPECT_EQ(configurationCount_, 1);
+
       fixedImageCount_ = 0;
       configurationCount_ = 0;
       unsupportedBlockCount_ = 0;
+      usesCompression = false;
     }
 
     EXPECT_EQ(filePlayer.readAllRecords(), 0);
     EXPECT_EQ(unsupportedBlockCount_, 0);
     EXPECT_EQ(kFrameCount, fixedImageCount_);
     EXPECT_EQ(kFrameCount, variableImageCount_);
+    EXPECT_TRUE(usesCompression);
 
     // Prove that the "other" stream players were properly decoded too, both config & data
     EXPECT_EQ(streamPlayerOther1.cameraId, 1);
     EXPECT_EQ(streamPlayerOther1.frameCounter, 3);
     EXPECT_EQ(streamPlayerOther2.cameraId, 2);
     EXPECT_EQ(streamPlayerOther2.frameCounter, 1);
-
+    EXPECT_FALSE(streamPlayerOther1.usesCompression); // records too small
+    EXPECT_FALSE(streamPlayerOther2.usesCompression); // records too small
     return filePlayer.closeFile();
   }
 
@@ -735,6 +763,7 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
   uint32_t fixedImageCount_;
   uint32_t variableImageCount_;
   VariableImageSpec imageSpec_;
+  bool usesCompression{false};
 };
 
 struct DataLayoutFileTester : testing::Test {
