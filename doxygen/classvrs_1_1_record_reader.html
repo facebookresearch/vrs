@@ -108,6 +108,8 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="separator:a77bfc50a32119498e9bf4050dec9e177"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a91e155656e805d40136350369472637b"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_reader.html#a91e155656e805d40136350369472637b">getUnreadBytes</a> () const</td></tr>
 <tr class="separator:a91e155656e805d40136350369472637b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72133a4788c6af16f4d1268a6eee5b3f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_reader.html#a72133a4788c6af16f4d1268a6eee5b3f">looksCompressed</a> () const</td></tr>
+<tr class="separator:a72133a4788c6af16f4d1268a6eee5b3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -190,6 +192,32 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>remainingUncompre
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Pointer to the reader. </dd></dl>
+
+</div>
+</div>
+<a id="a72133a4788c6af16f4d1268a6eee5b3f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a72133a4788c6af16f4d1268a6eee5b3f">&#9670;&nbsp;</a></span>looksCompressed()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool vrs::RecordReader::looksCompressed </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Tell if the record was compressed. It's named "looksCompressed" rather than "isCompressed", because this method must be called early enough when a record is played back to be accurate. Call this method from <a class="el" href="classvrs_1_1_stream_player.html#a1ba098935311a3764ba1087d77341ad0">StreamPlayer::processRecordHeader()</a> to tell for sure. </p><dl class="section return"><dt>Returns</dt><dd>True if the record looks like it was compressed. </dd></dl>
 
 </div>
 </div>

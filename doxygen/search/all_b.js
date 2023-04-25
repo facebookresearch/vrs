@@ -18,11 +18,12 @@ var searchData=
   ['lognewstep_492',['logNewStep',['../classvrs_1_1_progress_logger.html#aa97f13ca414ea11ab9fbad188742dc17',1,'vrs::ProgressLogger']]],
   ['logprogress_493',['logProgress',['../classvrs_1_1_progress_logger.html#a5c1267f5c9afb150cc694dbf17710f29',1,'vrs::ProgressLogger::logProgress(const string &amp;stepName, size_t progress=0, size_t maxProgress=100)'],['../classvrs_1_1_progress_logger.html#a8534fb432dbdbbfde7c78a7cfb112da4',1,'vrs::ProgressLogger::logProgress(const string &amp;stepName, int64_t progress, int64_t maxProgress)'],['../classvrs_1_1_progress_logger.html#a7009dfdb5108f69dc2226fbef15f3b56',1,'vrs::ProgressLogger::logProgress(const string &amp;stepName, size_t progress, size_t maxProgress, bool newStep)'],['../classvrs_1_1_silent_logger.html#a125d4de1eecb1fd526b75ff1dfaf2e7e',1,'vrs::SilentLogger::logProgress()']]],
   ['logstatus_494',['logStatus',['../classvrs_1_1_progress_logger.html#a91219dd3ed1f6ea54430733b1fc221b3',1,'vrs::ProgressLogger::logStatus()'],['../classvrs_1_1_silent_logger.html#a090f5bb54d5aea7787e9cc752170fbe8',1,'vrs::SilentLogger::logStatus()']]],
-  ['lookslikeavrsfile_495',['looksLikeAVRSFile',['../structvrs_1_1_file_format_1_1_file_header.html#a00e1c0428fe510118a493f954c84fd53',1,'vrs::FileFormat::FileHeader']]],
-  ['lookslikeourfiles_496',['looksLikeOurFiles',['../structvrs_1_1_file_format_1_1_file_header.html#aba0134ec8f47196ade5c79315606d184',1,'vrs::FileFormat::FileHeader']]],
-  ['lowest_497',['lowest',['../classvrs_1_1_stream_id.html#ad85821cc3baf7d6a75105e31a37b084e',1,'vrs::StreamId']]],
-  ['lz4_498',['Lz4',['../namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2fa56c8337568e62301ca0fb81adc631f1b',1,'vrs']]],
-  ['lz4decompressor_499',['Lz4Decompressor',['../classvrs_1_1_decompressor_1_1_lz4_decompressor.html',1,'vrs::Decompressor']]],
-  ['lz4fast_500',['Lz4Fast',['../namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7ba981e12fe6dbad219590b0546f411adc1',1,'vrs']]],
-  ['lz4tight_501',['Lz4Tight',['../namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7ba094c8cb4ef8c5578d075bd7dc031ac33',1,'vrs']]]
+  ['lookscompressed_495',['looksCompressed',['../classvrs_1_1_record_reader.html#a72133a4788c6af16f4d1268a6eee5b3f',1,'vrs::RecordReader']]],
+  ['lookslikeavrsfile_496',['looksLikeAVRSFile',['../structvrs_1_1_file_format_1_1_file_header.html#a00e1c0428fe510118a493f954c84fd53',1,'vrs::FileFormat::FileHeader']]],
+  ['lookslikeourfiles_497',['looksLikeOurFiles',['../structvrs_1_1_file_format_1_1_file_header.html#aba0134ec8f47196ade5c79315606d184',1,'vrs::FileFormat::FileHeader']]],
+  ['lowest_498',['lowest',['../classvrs_1_1_stream_id.html#ad85821cc3baf7d6a75105e31a37b084e',1,'vrs::StreamId']]],
+  ['lz4_499',['Lz4',['../namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2fa56c8337568e62301ca0fb81adc631f1b',1,'vrs']]],
+  ['lz4decompressor_500',['Lz4Decompressor',['../classvrs_1_1_decompressor_1_1_lz4_decompressor.html',1,'vrs::Decompressor']]],
+  ['lz4fast_501',['Lz4Fast',['../namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7ba981e12fe6dbad219590b0546f411adc1',1,'vrs']]],
+  ['lz4tight_502',['Lz4Tight',['../namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7ba094c8cb4ef8c5578d075bd7dc031ac33',1,'vrs']]]
 ];
