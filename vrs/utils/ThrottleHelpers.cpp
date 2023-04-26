@@ -24,11 +24,11 @@
 namespace {
 
 #if IS_LINUX_PLATFORM() || IS_MAC_PLATFORM() || IS_WINDOWS_PLATFORM()
-// No need to be stingy on memory usage on desktop platforms
-const size_t kMaxQueueByteSize = 2 * 1024 * 1024 * 1024ULL; // 2 GB
+// Be more generous on memory usage with desktop platforms
+const size_t kMaxQueueByteSize = 600 * 1024 * 1024ULL; // 600 MB
 #else
-// Mobile environments are constrained, and might kill a greedy app...
-const size_t kMaxQueueByteSize = 600 * 1024 * 1024; // 600 MB
+// Mobile environments are memory constrained, and might kill a memory greedy app
+const size_t kMaxQueueByteSize = 400 * 1024 * 1024; // 400 MB
 #endif
 const size_t kReadAgainQueueByteSize = kMaxQueueByteSize * 9 / 10; // 90%
 const size_t kLowQueueByteSize = 40 * 1024 * 1024ULL;
@@ -45,8 +45,7 @@ using namespace vrs;
 const size_t kDownloadChunkSize = 1024 * 1024 * 4;
 
 #if IS_WINDOWS_PLATFORM()
-// "\r" works, but escape sequences don't by default: overwrite with
-// white spaces... :-(
+// "\r" works, but escape sequences don't by default: overwrite with white spaces... :-(
 const char* const kResetCurrentLine = "\r                                            \r";
 #else
 const char* const kResetCurrentLine = "\r\33[2K\r";

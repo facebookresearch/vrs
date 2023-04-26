@@ -138,6 +138,12 @@ class Compressor {
   }
   CompressionType getCompressionType() const;
 
+  /// Really deallocate the buffer's memory (clear() doesn't do that)
+  void clear() {
+    std::vector<uint8_t> blank;
+    buffer_.swap(blank);
+  }
+
   static bool shouldTryToCompress(CompressionPreset preset, size_t size);
 
  private:

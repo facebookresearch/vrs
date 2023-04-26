@@ -1045,7 +1045,12 @@ int RecordFileWriter::writeRecordsMultiThread(
     int lastError) {
   uint64_t recordsToWriteCount = recordsToCompress.size();
   CompressionJob noCompressionJob;
-  vector<CompressionJob> jobs(compressionThreadPoolSize_ * 3);
+#if IS_ANDROID_PLATFORM() || IS_IOS_PLATFORM()
+  // Mobile platform have much tighter memory restrictions
+  vector<CompressionJob> jobs(compressionThreadPoolSize_ * 4);
+#else
+  vector<CompressionJob> jobs(compressionThreadPoolSize_ * 20);
+#endif
   vector<CompressionJob*> availableJobs;
   availableJobs.reserve(jobs.size());
   for (auto& job : jobs) {
@@ -1090,6 +1095,7 @@ int RecordFileWriter::writeRecordsMultiThread(
         writeOneRecord(rwd, record, streamId, job->getCompressor(), job->getCompressedSize());
       }
       if (job != &noCompressionJob) {
+        job->getCompressor().clear();
         availableJobs.push_back(job);
       }
       compressionResults.erase(resultsIter);
