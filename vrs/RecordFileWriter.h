@@ -287,6 +287,7 @@ class RecordFileWriter {
  private:
   /// The implementation of internal methods & members should never be relied upon, and may change.
   uint64_t collectOldRecords(RecordBatch& batch, double maxTimestamp); ///< internal
+  bool autoCollectRecords(bool checkTime); ///< internal
   static uint64_t addRecordBatchesToSortedRecords(
       const RecordBatches& batch,
       SortedRecords& inOutSortedRecords); ///< internal

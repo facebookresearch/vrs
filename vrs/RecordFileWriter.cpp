@@ -44,7 +44,7 @@ using namespace std;
 
 namespace vrs {
 
-#define LOG_FILE_OPERATIONS true
+#define LOG_FILE_OPERATIONS false
 
 static double kMaxAutoCollectDelay = 10;
 static double kDefaultAutoCollectDelay = 1;
@@ -155,7 +155,8 @@ struct WriterThreadData {
             os::EventChannel::NotificationMode::UNICAST},
         hasRecordsReadyToWrite{false},
         maxTimestampProvider{nullptr},
-        autoCollectDelay{0} {
+        autoCollectDelay{0},
+        nextAutoCollectTime{0} {
     // Do *not* start the thread here, as this will create race conditions.
     // The thread may start before the constructor even finished and returned, which means the
     // main thread may not even have a reference to this object.
@@ -176,6 +177,7 @@ struct WriterThreadData {
   atomic<bool> hasRecordsReadyToWrite;
   function<double()> maxTimestampProvider; // for auto-writing records
   atomic<double> autoCollectDelay; // for auto-writing records
+  double nextAutoCollectTime; // for auto-writing records
 
   CompressionThreadsData compressionThreadsData_;
 
@@ -190,7 +192,7 @@ struct WriterThreadData {
     }
   }
 
-  double getBackgroundThreadWaitTime(const double& nextAutoCollectTime);
+  double getBackgroundThreadWaitTime();
 };
 
 struct PurgeThreadData {
@@ -221,7 +223,7 @@ struct PurgeThreadData {
   thread purgeThread; // background thread to purge records
 };
 
-double WriterThreadData::getBackgroundThreadWaitTime(const double& nextAutoCollectTime) {
+double WriterThreadData::getBackgroundThreadWaitTime() {
   double waitDelay = autoCollectDelay.load(memory_order_relaxed);
   if (waitDelay != 0.) {
     if (nextAutoCollectTime != 0.) {
@@ -230,7 +232,7 @@ double WriterThreadData::getBackgroundThreadWaitTime(const double& nextAutoColle
     if (waitDelay < 0) {
       if (waitDelay < -1) {
         XR_LOGW_EVERY_N_SEC(
-            1,
+            5,
             "Compressing and saving the recording is {:.3f} seconds behind capturing the data, "
             "consider changing recording scope, destination, or compression settings.",
             -waitDelay);
@@ -245,6 +247,16 @@ double WriterThreadData::getBackgroundThreadWaitTime(const double& nextAutoColle
   return waitDelay;
 }
 
+static void logBatch(RecordFileWriter::RecordBatch& batch, const char* functionName) {
+  size_t streamCount = 0;
+  size_t recordCount = 0;
+  for (const auto& r : batch) {
+    streamCount++;
+    recordCount += r.second.size();
+  }
+  XR_LOGD("{} {} records from {} streams.", functionName, recordCount, streamCount);
+}
+
 } // namespace RecordFileWriter_
 
 using namespace vrs::RecordFileWriter_;
@@ -256,6 +268,9 @@ RecordFileWriter::RecordFileWriter()
       purgeThreadData_{nullptr} {
   setMaxChunkSizeMB(0);
   initCreatedThreadCallback_ = [](thread&, ThreadRole, int) {};
+  if (LOG_FILE_OPERATIONS) {
+    arvr::logging::getChannel(DEFAULT_LOG_CHANNEL).setLevel(arvr::logging::Level::Debug);
+  }
 }
 
 void RecordFileWriter::addRecordable(Recordable* recordable) {
@@ -279,7 +294,7 @@ void RecordFileWriter::addRecordable(Recordable* recordable) {
         Record::Type::TAGS,
         TagsRecord::kTagsVersion,
         DataSource(tagsRecord));
-    XR_LOGD(
+    XR_LOGI(
         "Recordable {} is added after the file creation, so we're creating a TagsRecord "
         "for {} VRS tags and {} user tags.",
         recordable->getStreamId().getName(),
@@ -352,9 +367,8 @@ void RecordFileWriter::purgeOldRecords(double maxTimestamp, bool recycleBuffers)
 void RecordFileWriter::backgroundWriterThreadActivity() {
   initCreatedThreadCallback_(writerThreadData_->saveThread, ThreadRole::Writer, 0);
 
-  double nextAutoCollectTime = 0;
   while (!writerThreadData_->shouldEndThread) {
-    double waitDelay = writerThreadData_->getBackgroundThreadWaitTime(nextAutoCollectTime);
+    double waitDelay = writerThreadData_->getBackgroundThreadWaitTime();
     os::EventChannel::Event event;
     os::EventChannel::Status status =
         writerThreadData_->writeEventChannel.waitForEvent(event, waitDelay);
@@ -363,24 +377,8 @@ void RecordFileWriter::backgroundWriterThreadActivity() {
         backgroundWriteCollectedRecord();
       }
     } else if (status == os::EventChannel::Status::TIMEOUT) {
-      if (writerThreadData_->autoCollectDelay.load(memory_order_relaxed) != 0.) {
-        bool somethingToWrite = false;
-        { // mutex guard
-          unique_lock<recursive_mutex> guard{writerThreadData_->mutex};
-          double autoCollectDelay = writerThreadData_->autoCollectDelay.load(memory_order_relaxed);
-          if (autoCollectDelay != 0. && writerThreadData_->maxTimestampProvider != nullptr) {
-            nextAutoCollectTime = os::getTimestampSec() + autoCollectDelay;
-            unique_ptr<RecordBatch> newBatch = make_unique<RecordBatch>();
-            if (collectOldRecords(*newBatch, writerThreadData_->maxTimestampProvider()) > 0) {
-              writerThreadData_->recordsReadyToWrite.emplace_back(std::move(newBatch));
-              writerThreadData_->hasRecordsReadyToWrite.store(true, memory_order_relaxed);
-              somethingToWrite = true;
-            }
-          }
-        } // mutex guard
-        if (somethingToWrite) {
-          backgroundWriteCollectedRecord();
-        }
+      if (autoCollectRecords(false)) {
+        backgroundWriteCollectedRecord();
       }
     } else {
       XR_LOGE("Background thread quit on error");
@@ -406,6 +404,37 @@ void RecordFileWriter::backgroundWriterThreadActivity() {
   if (LOG_FILE_OPERATIONS) {
     XR_LOGD("Background thread ended.");
   }
+}
+
+bool RecordFileWriter::autoCollectRecords(bool checkTime) {
+  bool somethingToWrite = false;
+
+  const double now = os::getTimestampSec();
+  if (checkTime && now < writerThreadData_->nextAutoCollectTime) {
+    return false;
+  }
+
+  if (!writerThreadData_->shouldEndThread &&
+      writerThreadData_->autoCollectDelay.load(memory_order_relaxed) != 0.) {
+    { // mutex guard
+      unique_lock<recursive_mutex> guard{writerThreadData_->mutex};
+      double autoCollectDelay = writerThreadData_->autoCollectDelay.load(memory_order_relaxed);
+      if (autoCollectDelay != 0. && writerThreadData_->maxTimestampProvider != nullptr) {
+        writerThreadData_->nextAutoCollectTime = now + autoCollectDelay;
+        unique_ptr<RecordBatch> newBatch = make_unique<RecordBatch>();
+        if (collectOldRecords(*newBatch, writerThreadData_->maxTimestampProvider()) > 0) {
+          if (LOG_FILE_OPERATIONS) {
+            logBatch(*newBatch, "autoCollectRecords");
+          }
+          writerThreadData_->recordsReadyToWrite.emplace_back(std::move(newBatch));
+          writerThreadData_->hasRecordsReadyToWrite.store(true, memory_order_relaxed);
+          somethingToWrite = true;
+        }
+      }
+    } // mutex guard
+  }
+
+  return somethingToWrite;
 }
 
 void RecordFileWriter::backgroundPurgeThreadActivity() {
@@ -508,6 +537,9 @@ int RecordFileWriter::writeRecordsAsync(double maxTimestamp) {
 
   unique_ptr<RecordBatch> recordBatch = make_unique<RecordBatch>();
   if (collectOldRecords(*recordBatch, maxTimestamp) > 0) {
+    if (LOG_FILE_OPERATIONS) {
+      logBatch(*recordBatch, "writeRecordsAsync");
+    }
     { // mutex guard
       unique_lock<recursive_mutex> guard{writerThreadData_->mutex};
       writerThreadData_->recordsReadyToWrite.emplace_back(std::move(recordBatch));
@@ -1071,6 +1103,7 @@ int RecordFileWriter::writeRecordsMultiThread(
       waitTime = 0;
     }
     // Grab any new record ready to write, to feed our background threads ASAP
+    autoCollectRecords(true);
     size_t previousCount = recordsToCompress.size();
     if (addRecordsReadyToWrite(recordsToCompress)) {
       recordsToWriteCount += recordsToCompress.size() - previousCount;
