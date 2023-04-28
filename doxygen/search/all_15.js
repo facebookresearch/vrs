@@ -13,7 +13,8 @@ var searchData=
   ['writerecordsasync_845',['writeRecordsAsync',['../classvrs_1_1_record_file_writer.html#abd37c181ccb84adaba5e67f0868b717c',1,'vrs::RecordFileWriter']]],
   ['writerthreaddata_846',['WriterThreadData',['../structvrs_1_1_record_file_writer___1_1_writer_thread_data.html',1,'vrs::RecordFileWriter_']]],
   ['writerthreaddata_5f_847',['writerThreadData_',['../classvrs_1_1_record_file_writer.html#a804d2cc31fd910476563d445997d5505',1,'vrs::RecordFileWriter']]],
-  ['writetofile_848',['writeToFile',['../classvrs_1_1_record_file_writer.html#ad3a1faddddafd31345419dd1845533c1',1,'vrs::RecordFileWriter']]],
-  ['writeunaligned_849',['writeUnaligned',['../namespacevrs.html#a0ff4cc79bae39464050a6ce835c3fbc8',1,'vrs']]],
-  ['writezstdfile_850',['writeZstdFile',['../classvrs_1_1_disk_file.html#ae575c0d6cc98ae205e9be939f8d5ff16',1,'vrs::DiskFile']]]
+  ['writetextfile_848',['writeTextFile',['../classvrs_1_1_disk_file.html#acc4ca40fa427a4ba1d4c2342234d3931',1,'vrs::DiskFile']]],
+  ['writetofile_849',['writeToFile',['../classvrs_1_1_record_file_writer.html#ad3a1faddddafd31345419dd1845533c1',1,'vrs::RecordFileWriter']]],
+  ['writeunaligned_850',['writeUnaligned',['../namespacevrs.html#a0ff4cc79bae39464050a6ce835c3fbc8',1,'vrs']]],
+  ['writezstdfile_851',['writeZstdFile',['../classvrs_1_1_disk_file.html#ae575c0d6cc98ae205e9be939f8d5ff16',1,'vrs::DiskFile']]]
 ];

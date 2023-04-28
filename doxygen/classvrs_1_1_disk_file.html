@@ -307,6 +307,8 @@ static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href
 <tr class="separator:aef466a771e68a3a94fa4b5bcf2a92be3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac5d0ecfd886cfba01f075d588c0f10df"><td class="memItemLeft" align="right" valign="top">static string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_disk_file.html#ac5d0ecfd886cfba01f075d588c0f10df">readTextFile</a> (const string &amp;path)</td></tr>
 <tr class="separator:ac5d0ecfd886cfba01f075d588c0f10df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acc4ca40fa427a4ba1d4c2342234d3931"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_disk_file.html#acc4ca40fa427a4ba1d4c2342234d3931">writeTextFile</a> (const string &amp;path, const string &amp;text)</td></tr>
+<tr class="separator:acc4ca40fa427a4ba1d4c2342234d3931"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -511,6 +513,50 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>CacheStatsCallbackFu
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The content of the file, if found, or the empty string otherwise. Will log errors if some unexpected access error happens, but will be silent and return an empty string if the file doesn't exist. </dd></dl>
+
+</div>
+</div>
+<a id="acc4ca40fa427a4ba1d4c2342234d3931"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acc4ca40fa427a4ba1d4c2342234d3931">&#9670;&nbsp;</a></span>writeTextFile()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int vrs::DiskFile::writeTextFile </td>
+          <td>(</td>
+          <td class="paramtype">const string &amp;&#160;</td>
+          <td class="paramname"><em>path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const string &amp;&#160;</td>
+          <td class="paramname"><em>text</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Write string to a local file </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>local file path </td></tr>
+    <tr><td class="paramname">text</td><td>text to write </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A status code, 0 for success. </dd></dl>
 
 </div>
 </div>
