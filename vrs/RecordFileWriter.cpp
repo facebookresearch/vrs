@@ -269,7 +269,8 @@ RecordFileWriter::RecordFileWriter()
   setMaxChunkSizeMB(0);
   initCreatedThreadCallback_ = [](thread&, ThreadRole, int) {};
   if (LOG_FILE_OPERATIONS) {
-    arvr::logging::getChannel(DEFAULT_LOG_CHANNEL).setLevel(arvr::logging::Level::Debug);
+    // @oss-disable: arvr::logging::getChannel(DEFAULT_LOG_CHANNEL)
+        // @oss-disable: .setLevel(arvr::logging::Level::Debug);
   }
 }
 
@@ -898,7 +899,7 @@ struct RecordFileWriter_::RecordWriterData {
   int getError() const {
     return error;
   }
-  void log(uint64_t recordsToWriteCount, size_t compressionThreadCount) {
+  void logStat(uint64_t recordsToWriteCount, size_t compressionThreadCount) {
     // If an error occurred, it was already logged. Log success & (otherwise) silent skipping of
     // write operations...
     if (writtenRecords > 0) {
@@ -934,7 +935,7 @@ struct RecordFileWriter_::RecordWriterData {
       }
     }
   }
-  void log(uint64_t recordsToWriteCount) {
+  void logStat(uint64_t recordsToWriteCount) {
     // If an error occurred, it was already logged. Log success & (otherwise) silent skipping of
     // write operations...
     if (writtenRecords > 0) {
@@ -1033,7 +1034,7 @@ int RecordFileWriter::writeRecordsSingleThread(SortedRecords& records, int lastE
     }
   }
   if (LOG_FILE_OPERATIONS) {
-    rwd.log(records.size());
+    rwd.logStat(records.size());
   }
   records.clear();
   return rwd.error;
@@ -1118,7 +1119,7 @@ int RecordFileWriter::writeRecordsMultiThread(
 
   if (LOG_FILE_OPERATIONS) {
     size_t compressionThreadCount = compressionThreadsData.compressionThreadsPool_.size();
-    rwd.log(recordsToWriteCount, compressionThreadCount);
+    rwd.logStat(recordsToWriteCount, compressionThreadCount);
   }
   return rwd.error;
 }
