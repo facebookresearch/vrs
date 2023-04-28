@@ -543,6 +543,13 @@ string DiskFile::readTextFile(const std::string& path) {
   return {};
 }
 
+int DiskFile::writeTextFile(const std::string& path, const std::string& text) {
+  DiskFile file;
+  IF_ERROR_LOG_AND_RETURN(file.create(path));
+  IF_ERROR_LOG_AND_RETURN(file.write(text.data(), text.size()));
+  return file.close();
+}
+
 int DiskFile::parseUri(FileSpec& inOutFileSpec, size_t colonIndex) const {
   string scheme;
   string path;

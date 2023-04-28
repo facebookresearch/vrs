@@ -148,6 +148,11 @@ class DiskFile : public WriteFileHandler {
   /// Will log errors if some unexpected access error happens, but will be silent and
   /// return an empty string if the file doesn't exist.
   static string readTextFile(const string& path);
+  /// Write string to a local file
+  /// @param path: local file path
+  /// @param text: text to write
+  /// @return A status code, 0 for success.
+  static int writeTextFile(const string& path, const string& text);
 
   virtual int parseUri(FileSpec& intOutFileSpec, size_t colonIndex) const override;
 
