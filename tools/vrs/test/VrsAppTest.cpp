@@ -49,7 +49,7 @@ string checkVRSFile(VrsCommand& command, CheckType checkType = CheckType::Checks
 
 string checkVRSFile(const string& path, CheckType checkType = CheckType::Checksums) {
   VrsCommand command;
-  command.filteredReader.path = path;
+  command.filteredReader.setSource(path);
   return checkVRSFile(command, checkType);
 }
 

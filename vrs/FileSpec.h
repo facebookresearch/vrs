@@ -67,6 +67,9 @@ struct FileSpec {
   /// a file might not exists, the requested filehandler may not be available, etc.
   int fromPathJsonUri(const string& pathJsonUri);
 
+  /// Reverse operation as fromPathJsonUri, as possible
+  string toPathJsonUri() const;
+
   // Parse json and extract file specs, with optional extra parameters.
   // @param jsonStr: ex. {"storage": "mystorage", "chunks":["chunk1", "chunk2"],
   // "filename":"file.vrs"}.
@@ -86,6 +89,8 @@ struct FileSpec {
   string getSourceLocation() const;
   /// Logical reverse operation from fromPathJsonUri, but kept minimal for logging
   string getEasyPath() const;
+  /// Get filename, if possible
+  string getFileName() const;
 
   /// Get signature of the path
   string getXXHash() const;

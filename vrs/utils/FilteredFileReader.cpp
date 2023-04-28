@@ -160,40 +160,40 @@ bool RecordFilterParams::excludeType(const string& type) {
   return true;
 }
 
-bool FilteredFileReader::fileExists() const {
-  if (!path.empty() && path[0] == '{') {
-    return true; // Assume json paths exist, to avoid breaking sanity checks
+void FilteredFileReader::setSource(
+    const string& filePath,
+    const unique_ptr<FileHandler>& fileHandler) {
+  if (helpers::endsWith(filePath, ".vrs")) {
+    RecordFileReader::vrsFilePathToFileSpec(filePath, spec);
+  } else {
+    spec.fromPathJsonUri(filePath);
   }
-  return os::pathExists(path);
+  if (fileHandler) {
+    reader.setFileHandler(fileHandler->makeNew());
+  }
+}
+
+bool FilteredFileReader::fileExists() const {
+  if (spec.isDiskFile()) {
+    return !spec.chunks.empty() && os::pathExists(spec.chunks.front());
+  }
+  return !spec.fileHandlerName.empty();
 }
 
 string FilteredFileReader::getPathOrUri() const {
-  return path;
+  return spec.toPathJsonUri();
 }
 
 string FilteredFileReader::getFileName() {
-  if (path.empty()) {
-    return {};
-  }
-  if (path.front() != '{') {
-    return os::getFilename(path);
-  }
-  // if json filepath is used, we want to use either filename or first chunk.
-  FileSpec spec;
-  if (spec.fromJson(path)) {
-    if (spec.fileName.empty() && !spec.chunks.empty()) {
-      spec.fileName = os::getFilename(spec.chunks[0]);
-    }
-  }
-  return spec.fileName;
+  return spec.getFileName();
 }
 
 int64_t FilteredFileReader::getFileSize() const {
-  return os::getFileSize(path);
+  return spec.getFileSize();
 }
 
 int FilteredFileReader::openFile(const RecordFilterParams& filters) {
-  int status = path.empty() ? ErrorCode::INVALID_REQUEST : reader.openFile(path);
+  int status = spec.empty() ? ErrorCode::INVALID_REQUEST : reader.openFile(spec);
   if (status != 0) {
     return status;
   }
@@ -203,7 +203,7 @@ int FilteredFileReader::openFile(const RecordFilterParams& filters) {
 
 int FilteredFileReader::openFile(unique_ptr<FileHandler>& file) const {
   file = make_unique<DiskFile>();
-  int status = file->open(path);
+  int status = file->openSpec(spec);
   if (status != 0) {
     cerr << "Can't open '" << getPathOrUri() << "': " << errorCodeToMessage(status) << endl;
   }

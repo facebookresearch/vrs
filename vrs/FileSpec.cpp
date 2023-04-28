@@ -162,6 +162,19 @@ int FileSpec::fromPathJsonUri(const string& pathJsonUri) {
   return parseUri(uri, fileHandlerName, chunks[0], extras);
 }
 
+string FileSpec::toPathJsonUri() const {
+  if (isDiskFile()) {
+    if (chunks.size() == 1 && extras.empty()) {
+      return chunks.front();
+    }
+    return empty() ? "" : toJson();
+  }
+  if (!uri.empty()) {
+    return uri;
+  }
+  return empty() ? "" : toJson();
+}
+
 bool FileSpec::fromJson(const string& jsonStr) {
   using namespace fb_rapidjson;
   JDocument document;
@@ -217,12 +230,24 @@ bool FileSpec::hasChunkSizes() const {
 }
 
 int64_t FileSpec::getFileSize() const {
-  if (!hasChunkSizes()) {
-    return -1;
-  }
   int64_t fileSize = 0;
-  for (int64_t chunksSize : chunkSizes) {
-    fileSize += chunksSize;
+  if (hasChunkSizes()) {
+    for (int64_t chunksSize : chunkSizes) {
+      fileSize += chunksSize;
+    }
+  } else {
+    if (isDiskFile() && !chunks.empty()) {
+      for (const auto& chunk : chunks) {
+        int64_t size = os::getFileSize(chunk);
+        if (size < 0) {
+          fileSize = -1;
+          break;
+        }
+        fileSize += size;
+      }
+    } else {
+      fileSize = -1;
+    }
   }
   return fileSize;
 }
@@ -278,6 +303,16 @@ string FileSpec::getEasyPath() const {
     }
   }
   return simpleSpec.toJson();
+}
+
+string FileSpec::getFileName() const {
+  if (!fileName.empty()) {
+    return fileName;
+  }
+  if (!chunks.empty()) {
+    return os::getFilename(chunks.front());
+  }
+  return {};
 }
 
 string FileSpec::getXXHash() const {

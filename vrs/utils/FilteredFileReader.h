@@ -123,7 +123,7 @@ class Decimator {
 
 /// Encapsulation of a VRS file to read, along with filters to only reads some records/streams.
 struct FilteredFileReader {
-  string path;
+  FileSpec spec;
   RecordFileReader reader;
   RecordFilter filter;
   // custom filter: return true to skip record
@@ -134,16 +134,11 @@ struct FilteredFileReader {
 
   FilteredFileReader() = default;
   FilteredFileReader(const string& filePath, const unique_ptr<FileHandler>& vrsFileProvider = {}) {
-    setSource(filePath, vrsFileProvider);
+    FilteredFileReader::setSource(filePath, vrsFileProvider);
   }
   virtual ~FilteredFileReader() = default;
 
-  void setSource(const string& filePath, const unique_ptr<FileHandler>& vrsFileProvider = {}) {
-    path = filePath;
-    if (vrsFileProvider) {
-      reader.setFileHandler(vrsFileProvider->makeNew());
-    }
-  }
+  virtual void setSource(const string& filePath, const unique_ptr<FileHandler>& fileHandler = {});
 
   virtual bool fileExists() const;
   virtual string getPathOrUri() const;

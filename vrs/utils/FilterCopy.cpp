@@ -210,7 +210,12 @@ int filterMerge(
     recordFilter->expandTimeRange(startTimestamp, endTimestamp);
     // add the global tags
     map<string, string> tags;
-    mergeTags(recordFileWriter.getTags(), reader.getTags(), tags, recordFilter->path, false);
+    mergeTags(
+        recordFileWriter.getTags(),
+        reader.getTags(),
+        tags,
+        recordFilter->spec.getEasyPath(),
+        false);
     recordFileWriter.addTags(tags);
 
     // track how many stream of each type we've seen in the current reader
@@ -228,7 +233,7 @@ int filterMerge(
           const StreamTags& writtenTags = writer.getStreamTags();
           const StreamTags& newTags = reader.getTags(id);
           StreamTags streamTags;
-          string tagSource = id.getName() + " of " + recordFilter->path;
+          string tagSource = id.getName() + " of " + recordFilter->spec.getEasyPath();
           mergeTags(writtenTags.user, newTags.user, streamTags.user, tagSource, false);
           mergeTags(writtenTags.vrs, newTags.vrs, streamTags.vrs, tagSource, true);
           writer.addTags(streamTags);

@@ -361,9 +361,9 @@ bool VrsCommand::processUnrecognizedArgument(const string& appName, const string
     return false;
   }
   size_t maxFileCount = (cmd == Command::None) ? 1 : getCommandSpec(cmd).maxFiles;
-  size_t fileCount = filteredReader.path.empty() ? 0 : (1 + otherFilteredReaders.size());
+  size_t fileCount = filteredReader.spec.empty() ? 0 : (1 + otherFilteredReaders.size());
   if (fileCount < maxFileCount) {
-    if (filteredReader.path.empty()) {
+    if (filteredReader.spec.empty()) {
       filteredReader.setSource(arg);
     } else {
       otherFilteredReaders.emplace_back(arg);
@@ -380,12 +380,12 @@ bool VrsCommand::openVrsFile() {
   if (cmdSpec.maxFiles < 1) {
     return true;
   }
-  if (filteredReader.path.empty()) {
+  if (filteredReader.spec.empty()) {
     cerr << "Missing VRS file arguments." << endl;
     return false;
   }
   if (getCommandSpec(cmd).mainFileIsVRS) {
-    return filteredReader.reader.openFile(filteredReader.path, cmd == Command::FixIndex) == 0;
+    return filteredReader.reader.openFile(filteredReader.spec, cmd == Command::FixIndex) == 0;
   }
   return true;
 }
@@ -395,8 +395,8 @@ bool VrsCommand::openOtherVrsFile(
     RecordFileInfo::Details details) {
   if (!otherReader.reader.isOpened()) {
     // Open the reader, apply the filters and print their overview
-    if (otherReader.reader.openFile(otherReader.path, cmd == Command::FixIndex) != 0) {
-      cerr << "Error: could not open " << otherReader.path << endl;
+    if (otherReader.reader.openFile(otherReader.spec, cmd == Command::FixIndex) != 0) {
+      cerr << "Error: could not open " << otherReader.spec.getEasyPath() << endl;
       return false;
     }
     otherReader.filter = filteredReader.filter;

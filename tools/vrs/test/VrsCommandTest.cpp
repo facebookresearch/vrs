@@ -69,7 +69,8 @@ TEST_F(VrsCommandTest, miscCommands) {
     EXPECT_EQ(argn, 3);
     EXPECT_EQ(statusCode, EXIT_SUCCESS);
     EXPECT_EQ(command.cmd, Command::Check);
-    EXPECT_EQ(command.filteredReader.path, inputFile);
+    EXPECT_EQ(command.filteredReader.spec.chunks.size(), 3);
+    EXPECT_EQ(command.filteredReader.getFileSize(), 21337114);
   }
 
   {
@@ -79,7 +80,8 @@ TEST_F(VrsCommandTest, miscCommands) {
     EXPECT_EQ(argn, 3);
     EXPECT_EQ(statusCode, EXIT_SUCCESS);
     EXPECT_EQ(command.cmd, Command::Checksum);
-    EXPECT_EQ(command.filteredReader.path, inputFile);
+    EXPECT_EQ(command.filteredReader.spec.chunks.size(), 3);
+    EXPECT_EQ(command.filteredReader.getFileSize(), 21337114);
   }
 
   {
@@ -89,7 +91,8 @@ TEST_F(VrsCommandTest, miscCommands) {
     EXPECT_EQ(argn, 3);
     EXPECT_EQ(statusCode, EXIT_SUCCESS);
     EXPECT_EQ(command.cmd, Command::Compare);
-    EXPECT_EQ(command.filteredReader.path, inputFile);
+    EXPECT_EQ(command.filteredReader.spec.chunks.size(), 3);
+    EXPECT_EQ(command.filteredReader.getFileSize(), 21337114);
   }
 
   {
@@ -99,7 +102,8 @@ TEST_F(VrsCommandTest, miscCommands) {
     EXPECT_EQ(argn, 3);
     EXPECT_EQ(statusCode, EXIT_SUCCESS);
     EXPECT_EQ(command.cmd, Command::CompareVerbatim);
-    EXPECT_EQ(command.filteredReader.path, inputFile);
+    EXPECT_EQ(command.filteredReader.spec.chunks.size(), 3);
+    EXPECT_EQ(command.filteredReader.getFileSize(), 21337114);
   }
 
   {
@@ -109,7 +113,8 @@ TEST_F(VrsCommandTest, miscCommands) {
     EXPECT_EQ(argn, 5);
     EXPECT_EQ(statusCode, EXIT_SUCCESS);
     EXPECT_EQ(command.cmd, Command::Copy);
-    EXPECT_EQ(command.filteredReader.path, inputFile);
+    EXPECT_EQ(command.filteredReader.spec.chunks.size(), 3);
+    EXPECT_EQ(command.filteredReader.getFileSize(), 21337114);
     EXPECT_EQ(command.targetPath, outputFile);
   }
 
@@ -120,8 +125,9 @@ TEST_F(VrsCommandTest, miscCommands) {
     EXPECT_EQ(argn, 6);
     EXPECT_EQ(statusCode, EXIT_SUCCESS);
     EXPECT_EQ(command.cmd, Command::Copy);
-    EXPECT_EQ(command.filteredReader.path, inputFile);
-    EXPECT_EQ(command.otherFilteredReaders.back().path, inputFile2);
+    EXPECT_EQ(command.filteredReader.spec.chunks.size(), 3);
+    EXPECT_EQ(command.filteredReader.getFileSize(), 21337114);
+    EXPECT_EQ(command.otherFilteredReaders.back().getPathOrUri(), inputFile2);
     EXPECT_EQ(command.otherFilteredReaders.size(), 1);
     EXPECT_EQ(command.targetPath, outputFile);
   }
@@ -133,8 +139,9 @@ TEST_F(VrsCommandTest, miscCommands) {
     EXPECT_EQ(argn, 6);
     EXPECT_EQ(statusCode, EXIT_SUCCESS);
     EXPECT_EQ(command.cmd, Command::Copy);
-    EXPECT_EQ(command.filteredReader.path, inputFile);
-    EXPECT_EQ(command.otherFilteredReaders.back().path, inputFile2);
+    EXPECT_EQ(command.filteredReader.spec.chunks.size(), 3);
+    EXPECT_EQ(command.filteredReader.getFileSize(), 21337114);
+    EXPECT_EQ(command.otherFilteredReaders.back().getPathOrUri(), inputFile2);
     EXPECT_EQ(command.otherFilteredReaders.size(), 1);
     EXPECT_EQ(command.targetPath, outputFile);
   }
@@ -146,8 +153,9 @@ TEST_F(VrsCommandTest, miscCommands) {
     EXPECT_EQ(argn, 6);
     EXPECT_EQ(statusCode, EXIT_SUCCESS);
     EXPECT_EQ(command.cmd, Command::Merge);
-    EXPECT_EQ(command.filteredReader.path, inputFile);
-    EXPECT_EQ(command.otherFilteredReaders.back().path, inputFile2);
+    EXPECT_EQ(command.filteredReader.spec.chunks.size(), 3);
+    EXPECT_EQ(command.filteredReader.getFileSize(), 21337114);
+    EXPECT_EQ(command.otherFilteredReaders.back().getPathOrUri(), inputFile2);
     EXPECT_EQ(command.otherFilteredReaders.size(), 1);
     EXPECT_EQ(command.targetPath, outputFile);
   }
@@ -159,7 +167,8 @@ TEST_F(VrsCommandTest, miscCommands) {
     EXPECT_EQ(argn, 3);
     EXPECT_EQ(statusCode, EXIT_SUCCESS);
     EXPECT_EQ(command.cmd, Command::Debug);
-    EXPECT_EQ(command.filteredReader.path, inputFile);
+    EXPECT_EQ(command.filteredReader.spec.chunks.size(), 3);
+    EXPECT_EQ(command.filteredReader.getFileSize(), 21337114);
   }
 
   {
@@ -169,7 +178,8 @@ TEST_F(VrsCommandTest, miscCommands) {
     EXPECT_EQ(argn, 3);
     EXPECT_EQ(statusCode, EXIT_SUCCESS);
     EXPECT_EQ(command.cmd, Command::PrintRecordFormats);
-    EXPECT_EQ(command.filteredReader.path, inputFile);
+    EXPECT_EQ(command.filteredReader.spec.chunks.size(), 3);
+    EXPECT_EQ(command.filteredReader.getFileSize(), 21337114);
   }
 
   {
@@ -179,7 +189,8 @@ TEST_F(VrsCommandTest, miscCommands) {
     EXPECT_EQ(argn, 3);
     EXPECT_EQ(statusCode, EXIT_SUCCESS);
     EXPECT_EQ(command.cmd, Command::ListRecords);
-    EXPECT_EQ(command.filteredReader.path, inputFile);
+    EXPECT_EQ(command.filteredReader.spec.chunks.size(), 3);
+    EXPECT_EQ(command.filteredReader.getFileSize(), 21337114);
   }
 }
 

@@ -31,25 +31,30 @@ using namespace vrs::utils;
 namespace vrs::utils {
 
 int compressionBenchmark(FilteredFileReader& source, const CopyOptions& inOptions) {
-  // first, do a copy, with no compression at all, to get a baseline size
-  FilteredFileReader master;
-  master.path = source.path;
-  // remove ".vrs" suffix
-  if (helpers::endsWith(master.path, ".vrs")) {
-    master.path.resize(master.path.size() - 4);
+  if (!source.spec.isDiskFile()) {
+    cerr << "Benchmarks only available for local files." << endl;
+    return FAILURE;
   }
-  master.path += "-uncompressed.vrs";
+  const string sourcePath = source.getPathOrUri();
+  string sourceBasename = sourcePath;
+  // remove ".vrs" suffix
+  if (helpers::endsWith(sourceBasename, ".vrs")) {
+    sourceBasename.resize(sourceBasename.size() - 4);
+  }
+  string masterPath = sourceBasename + "-uncompressed.vrs";
+  // first, do a copy, with no compression at all, to get a baseline size
+  FilteredFileReader master(masterPath);
   CopyOptions options{inOptions};
   options.setCompressionPreset(CompressionPreset::None);
-  filterCopy(source, master.path, options);
-  int error = master.reader.openFile(master.path);
+  filterCopy(source, masterPath, options);
+  int error = master.reader.openFile(masterPath);
   if (error == 0) {
     master.applyRecordableFilters({});
     master.applyTypeFilters({});
     int64_t sourceSize = master.reader.getTotalSourceSize();
-    cout << os::getFilename(master.path) << "\t" << helpers::humanReadableFileSize(sourceSize)
+    cout << os::getFilename(masterPath) << "\t" << helpers::humanReadableFileSize(sourceSize)
          << endl;
-    string copyPath = source.path + "-comp.vrs";
+    string copyPath = sourceBasename + "-comp.vrs";
     double firstCompressionDuration = 0;
     for (int preset = static_cast<int>(CompressionPreset::CompressedFirst);
          preset <= static_cast<int>(CompressionPreset::CompressedLast);
@@ -87,15 +92,15 @@ int compressionBenchmark(FilteredFileReader& source, const CopyOptions& inOption
         }
         cout << endl;
       } else {
-        cerr << "Error compressing '" << source.path << "'. Error #" << copyError << ": "
+        cerr << "Error compressing '" << copyPath << "'. Error #" << copyError << ": "
              << errorCodeToMessage(copyError) << endl;
       }
     }
   } else {
-    cerr << "Could not copy '" << master.path << "' for compression experiment. Error #" << error
+    cerr << "Could not copy '" << masterPath << "' for compression experiment. Error #" << error
          << ": " << errorCodeToMessage(error) << endl;
   }
-  remove(master.path.c_str());
+  remove(masterPath.c_str());
   return error;
 }
 
