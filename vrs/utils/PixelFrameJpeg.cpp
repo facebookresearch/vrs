@@ -53,7 +53,7 @@ readJpegFrameHelper(PixelFrame& frame, struct jpeg_decompress_struct& cinfo, boo
   }
   if (decodePixels) {
     // decompress row by row
-    uint8_t* rowPtr = frame.getBuffer().data();
+    uint8_t* rowPtr = frame.wdata();
     while (cinfo.output_scanline < cinfo.output_height) {
       jpeg_read_scanlines(&cinfo, &rowPtr, 1);
       rowPtr += frame.getSpec().getStride();
