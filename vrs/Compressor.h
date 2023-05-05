@@ -46,6 +46,8 @@ enum class CompressionPreset {
   ZstdFast,
   ZstdLight,
   ZstdMedium,
+  ZstdHeavy,
+  ZstdHigh,
   ZstdTight,
   ZstdMax,
 

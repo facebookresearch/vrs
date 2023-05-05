@@ -42,14 +42,16 @@ using namespace vrs;
 map<CompressionPreset, int> sZstdPresets = {
     {CompressionPreset::ZstdFast, 1},
     {CompressionPreset::ZstdLight, 3},
-    {CompressionPreset::ZstdMedium, 5},
+    {CompressionPreset::ZstdMedium, 7},
+    {CompressionPreset::ZstdHeavy, 12},
+    {CompressionPreset::ZstdHigh, 15},
     {CompressionPreset::ZstdTight, 18},
     {CompressionPreset::ZstdMax, 20}};
 
 static_assert(
     static_cast<uint32_t>(CompressionPreset::LastZstdPreset) -
             static_cast<uint32_t>(CompressionPreset::FirstZstdPreset) + 1 ==
-        5, // Number of zstd presets defined in sZstdPreset
+        7, // Number of zstd presets defined in sZstdPreset
     "Missing sZstdPreset constant definition");
 
 const map<CompressionPreset, const char*> sPresetNames = {
@@ -60,11 +62,13 @@ const map<CompressionPreset, const char*> sPresetNames = {
     {CompressionPreset::ZstdFast, "zstd-fast"},
     {CompressionPreset::ZstdLight, "zstd-light"},
     {CompressionPreset::ZstdMedium, "zstd-medium"},
+    {CompressionPreset::ZstdHeavy, "zstd-heavy"},
+    {CompressionPreset::ZstdHigh, "zstd-high"},
     {CompressionPreset::ZstdTight, "zstd-tight"},
     {CompressionPreset::ZstdMax, "zstd-max"}};
 
 const char* sCompressionPresetNames[] =
-    {"none", "fast", "tight", "zfast", "zlight", "zmedium", "ztight", "zmax"};
+    {"none", "fast", "tight", "zfast", "zlight", "zmedium", "zheavy", "zhigh", "ztight", "zmax"};
 struct CompressionPresetConverter : public EnumStringConverter<
                                         CompressionPreset,
                                         sCompressionPresetNames,
@@ -74,7 +78,7 @@ struct CompressionPresetConverter : public EnumStringConverter<
                                         true> {
   static_assert(
       COUNT_OF(sCompressionPresetNames) == enumCount<CompressionPreset>(),
-      "Missing CheckType name definitions");
+      "Missing CompressionPreset name definitions");
 };
 
 } // namespace

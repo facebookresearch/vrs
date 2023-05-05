@@ -22,6 +22,7 @@
 #include <vrs/Compressor.h>
 #include <vrs/RecordFormatStreamPlayer.h>
 #include <vrs/Recordable.h>
+#include <vrs/os/Platform.h>
 
 namespace vrs::utils {
 
@@ -77,7 +78,11 @@ struct CopyOptions {
 
  private:
   CompressionPreset userCompressionPreset = CompressionPreset::Undefined;
+#if IS_MAC_PLATFORM() && defined(__aarch64__)
+  CompressionPreset defaultCompressionPreset = CompressionPreset::ZstdMedium;
+#else
   CompressionPreset defaultCompressionPreset = CompressionPreset::ZstdLight;
+#endif
 };
 
 // Helper to write records, as given by the Copier class below.
