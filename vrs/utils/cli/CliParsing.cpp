@@ -104,11 +104,11 @@ bool parseCopyOptions(
 void printCopyOptionsHelp() {
   cout << "  [ --no-progress ]:"
           " don't show any progress information (useful for offline usage with basic terminals).\n"
-          "  [ --compression={none|default|fast|tight|zfast|zlight|zmedium|ztight|zmax} ]:"
-          " set compression setting.\n"
           "  [ --mt <thread-count> ]: use <thread-count> threads for compression while copying.\n"
           "  [ --chunk-size <nb>[M|G] ]: chunk output file every <nb> number of MB or GB.\n"
-          "    Use 'M' for MB (default), or 'G' for GB.\n";
+          "    Use 'M' for MB (default), or 'G' for GB.\n"
+          "  [ --compression={none|default|fast|tight|zfast|zlight|zmedium|ztight|zmax} ]:"
+          " set compression setting.\n";
 }
 
 bool parseTagOverrideOptions(

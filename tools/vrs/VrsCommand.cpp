@@ -156,7 +156,7 @@ void printHelp(const string& appName) {
              "merge [ vrsfiles.vrs ]+ --to <target.vrs> [copy-options] [tag-options] [filter-options]")
       << CMD("Copy all the data from a file into a new one, but with blanked/zeroed image and audio data,\n"
              "so the copy is much smaller because of lossless compression",
-             "copy --zero <file.vrs> --to <output.vrs>")
+             "copy --zero-vrs <file.vrs> --to <output.vrs>")
 
       << endl
       << CMD("List records, with their timestamp, stream name and identifier, and record type.",
@@ -322,7 +322,7 @@ bool VrsCommand::parseArgument(
     }
   } else if (arg == "--raw-images") {
     extractImagesRaw = true;
-  } else if (arg == "--zero") {
+  } else if (arg == "--zero-vrs") {
     copyMakeStreamFilterFunction = makeZeroFilterCopier;
   } else {
     return parseCopyOptions(appName, arg, argn, argc, argv, outStatusCode, copyOptions) ||
