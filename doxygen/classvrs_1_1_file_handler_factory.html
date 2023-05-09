@@ -83,20 +83,41 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a4e257428e17b943a107a248af7feae60"><td class="memItemLeft" align="right" valign="top"><a id="a4e257428e17b943a107a248af7feae60"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>registerFileHandler</b> (std::unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt; &amp;&amp;fileHandler)</td></tr>
-<tr class="separator:a4e257428e17b943a107a248af7feae60"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac5589d0c51872a8369d13abb7bd635de"><td class="memItemLeft" align="right" valign="top"><a id="ac5589d0c51872a8369d13abb7bd635de"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>unregisterFileHandler</b> (const std::string &amp;fileHandlerName)</td></tr>
-<tr class="separator:ac5589d0c51872a8369d13abb7bd635de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3fcbad3b7e32d1953709f99f9ccf209e"><td class="memItemLeft" align="right" valign="top"><a id="a3fcbad3b7e32d1953709f99f9ccf209e"></a>
-std::unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getFileHandler</b> (const std::string &amp;name)</td></tr>
-<tr class="separator:a3fcbad3b7e32d1953709f99f9ccf209e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afedf7700a357ac0490bbc9b09822be87"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler_factory.html#afedf7700a357ac0490bbc9b09822be87">delegateOpen</a> (const std::string &amp;path, std::unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt; &amp;outNewDelegate)</td></tr>
-<tr class="separator:afedf7700a357ac0490bbc9b09822be87"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d893f55322992a835e665447f0ee934"><td class="memItemLeft" align="right" valign="top"><a id="a2d893f55322992a835e665447f0ee934"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>delegateOpen</b> (const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;fileSpec, std::unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt; &amp;outNewDelegate)</td></tr>
-<tr class="separator:a2d893f55322992a835e665447f0ee934"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a931ca2ef22a9b02499aaf6fbcd089472"><td class="memItemLeft" align="right" valign="top"><a id="a931ca2ef22a9b02499aaf6fbcd089472"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler_factory.html#a931ca2ef22a9b02499aaf6fbcd089472">registerFileDelegator</a> (const string &amp;name, unique_ptr&lt; <a class="el" href="classvrs_1_1_file_delegator.html">FileDelegator</a> &gt; &amp;&amp;delegator)</td></tr>
+<tr class="memdesc:a931ca2ef22a9b02499aaf6fbcd089472"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delegators operating on FileSpec.fileHandlerName. <br /></td></tr>
+<tr class="separator:a931ca2ef22a9b02499aaf6fbcd089472"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afd89174227293c06c4ece417e9d630bf"><td class="memItemLeft" align="right" valign="top"><a id="afd89174227293c06c4ece417e9d630bf"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>unregisterFileDelegator</b> (const string &amp;name)</td></tr>
+<tr class="separator:afd89174227293c06c4ece417e9d630bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36ed219a67f4029044079724fe0fd969"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler_factory.html#a36ed219a67f4029044079724fe0fd969">registerExtraDelegator</a> (const string &amp;extraName, const string &amp;extraValue, unique_ptr&lt; <a class="el" href="classvrs_1_1_file_delegator.html">FileDelegator</a> &gt; &amp;&amp;delegator)</td></tr>
+<tr class="separator:a36ed219a67f4029044079724fe0fd969"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca1eb73e71b40dca04e5badb7c5e9706"><td class="memItemLeft" align="right" valign="top"><a id="aca1eb73e71b40dca04e5badb7c5e9706"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>unregisterExtraDelegator</b> (const string &amp;extraName, const string &amp;extraValue)</td></tr>
+<tr class="separator:aca1eb73e71b40dca04e5badb7c5e9706"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55b3a507c6695e3fdf3d1d2c92553a60"><td class="memItemLeft" align="right" valign="top"><a id="a55b3a507c6695e3fdf3d1d2c92553a60"></a>
+<a class="el" href="classvrs_1_1_file_delegator.html">FileDelegator</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>getExtraDelegator</b> (const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;fileSpec)</td></tr>
+<tr class="separator:a55b3a507c6695e3fdf3d1d2c92553a60"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb7871f04a4f6919d06c0dca8c2bd734"><td class="memItemLeft" align="right" valign="top"><a id="adb7871f04a4f6919d06c0dca8c2bd734"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler_factory.html#adb7871f04a4f6919d06c0dca8c2bd734">registerFileHandler</a> (unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt; &amp;&amp;fileHandler)</td></tr>
+<tr class="memdesc:adb7871f04a4f6919d06c0dca8c2bd734"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delegators operating on FileSpec.fileHandlerName. <br /></td></tr>
+<tr class="separator:adb7871f04a4f6919d06c0dca8c2bd734"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4bb0b156965119809e47b73f45efb891"><td class="memItemLeft" align="right" valign="top"><a id="a4bb0b156965119809e47b73f45efb891"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>unregisterFileHandler</b> (const string &amp;fileHandlerName)</td></tr>
+<tr class="separator:a4bb0b156965119809e47b73f45efb891"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb5ca291324b29c928e652f652fe8cbd"><td class="memItemLeft" align="right" valign="top"><a id="abb5ca291324b29c928e652f652fe8cbd"></a>
+unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getFileHandler</b> (const string &amp;name)</td></tr>
+<tr class="separator:abb5ca291324b29c928e652f652fe8cbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec4f31545dbac48de5db02a005a8f80a"><td class="memItemLeft" align="right" valign="top"><a id="aec4f31545dbac48de5db02a005a8f80a"></a>
+<a class="el" href="classvrs_1_1_file_delegator.html">FileDelegator</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>getFileDelegator</b> (const string &amp;name)</td></tr>
+<tr class="separator:aec4f31545dbac48de5db02a005a8f80a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8cc1b86d81f9a65dd1fc6a9caeaaa1e7"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler_factory.html#a8cc1b86d81f9a65dd1fc6a9caeaaa1e7">delegateOpen</a> (const string &amp;path, unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt; &amp;outNewDelegate)</td></tr>
+<tr class="separator:a8cc1b86d81f9a65dd1fc6a9caeaaa1e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa3b46180111af7bf15f279721b172f44"><td class="memItemLeft" align="right" valign="top"><a id="aa3b46180111af7bf15f279721b172f44"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>delegateOpen</b> (const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;fileSpec, unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt; &amp;outNewDelegate)</td></tr>
+<tr class="separator:aa3b46180111af7bf15f279721b172f44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade33e86c2608e83643c1e049b2e6f86d"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler_factory.html#ade33e86c2608e83643c1e049b2e6f86d">parseUri</a> (<a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;inOutFileSpec, size_t colonIndex)</td></tr>
+<tr class="separator:ade33e86c2608e83643c1e049b2e6f86d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -107,8 +128,8 @@ static <a class="el" href="classvrs_1_1_file_handler_factory.html">FileHandlerFa
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A factory system for FileHandlers, allowing the runtime registration &amp; usage of custom <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> implementations. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="afedf7700a357ac0490bbc9b09822be87"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afedf7700a357ac0490bbc9b09822be87">&#9670;&nbsp;</a></span>delegateOpen()</h2>
+<a id="a8cc1b86d81f9a65dd1fc6a9caeaaa1e7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8cc1b86d81f9a65dd1fc6a9caeaaa1e7">&#9670;&nbsp;</a></span>delegateOpen()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -117,15 +138,15 @@ static <a class="el" href="classvrs_1_1_file_handler_factory.html">FileHandlerFa
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual int vrs::FileHandlerFactory::delegateOpen </td>
+          <td class="memname">int vrs::FileHandlerFactory::delegateOpen </td>
           <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramtype">const string &amp;&#160;</td>
           <td class="paramname"><em>path</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt; &amp;&#160;</td>
+          <td class="paramtype">unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>outNewDelegate</em>&#160;</td>
         </tr>
         <tr>
@@ -152,6 +173,78 @@ static <a class="el" href="classvrs_1_1_file_handler_factory.html">FileHandlerFa
 <div class="line"><span class="stringliteral">&quot;chunks&quot;</span>: [ <span class="stringliteral">&quot;chunk_path_1&quot;</span>, <span class="stringliteral">&quot;chunk2_path_2&quot;</span>, ... ],</div>
 </div><!-- fragment --><p>JSON paths are converted into <a class="el" href="structvrs_1_1_file_spec.html" title="Generalized file descriptor class, allowing the efficient representation of complex file objects,...">FileSpec</a> objects by FileSpec::fromJson() 4) If all the above methods fail, fall back to opening path as file path.</p>
 <p>Method is virtual to enable mock FileHandlerFactories to be created for unit testing. </p>
+
+</div>
+</div>
+<a id="ade33e86c2608e83643c1e049b2e6f86d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ade33e86c2608e83643c1e049b2e6f86d">&#9670;&nbsp;</a></span>parseUri()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int vrs::FileHandlerFactory::parseUri </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;&#160;</td>
+          <td class="paramname"><em>inOutFileSpec</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>colonIndex</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Parsing URIs can be customized by <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> and FileDelegators. Note that extra delegators only get the <a class="el" href="classvrs_1_1_file_handler_factory.html#ade33e86c2608e83643c1e049b2e6f86d">parseUri()</a> callback after parsing is complete, but they can still completely change the <a class="el" href="structvrs_1_1_file_spec.html" title="Generalized file descriptor class, allowing the efficient representation of complex file objects,...">FileSpec</a>. </p>
+
+</div>
+</div>
+<a id="a36ed219a67f4029044079724fe0fd969"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36ed219a67f4029044079724fe0fd969">&#9670;&nbsp;</a></span>registerExtraDelegator()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void vrs::FileHandlerFactory::registerExtraDelegator </td>
+          <td>(</td>
+          <td class="paramtype">const string &amp;&#160;</td>
+          <td class="paramname"><em>extraName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const string &amp;&#160;</td>
+          <td class="paramname"><em>extraValue</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unique_ptr&lt; <a class="el" href="classvrs_1_1_file_delegator.html">FileDelegator</a> &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"><em>delegator</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Delegators operating on particular key-value pairs of FileSpec.extras so this type of URI can be customized: a_scheme:/my/path?my_unique_name=my_unique_value </p>
 
 </div>
 </div>

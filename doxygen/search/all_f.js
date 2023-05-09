@@ -2,7 +2,7 @@ var searchData=
 [
   ['parserecordformattagname_574',['parseRecordFormatTagName',['../classvrs_1_1_record_format.html#a1d5f442664f607cdc28cb51f008ebed8',1,'vrs::RecordFormat']]],
   ['parsetagset_575',['parseTagSet',['../namespacevrs_1_1tag__conventions.html#a85949c7993b4f9e3c474b12d6e804e36',1,'vrs::tag_conventions']]],
-  ['parseuri_576',['parseUri',['../classvrs_1_1_disk_file.html#af07c3877155f6ba23af97b9990659f3f',1,'vrs::DiskFile::parseUri()'],['../classvrs_1_1_file_handler.html#a90aceae94395bdc08cebbdb1ee768806',1,'vrs::FileHandler::parseUri()']]],
+  ['parseuri_576',['parseUri',['../classvrs_1_1_disk_file.html#af07c3877155f6ba23af97b9990659f3f',1,'vrs::DiskFile::parseUri()'],['../classvrs_1_1_file_delegator.html#ada2b37e7ae16cc030db9fd8dab4061ae',1,'vrs::FileDelegator::parseUri()'],['../classvrs_1_1_file_handler_factory.html#ade33e86c2608e83643c1e049b2e6f86d',1,'vrs::FileHandlerFactory::parseUri()'],['../structvrs_1_1_file_spec.html#a3e10771e4c48bff5a5bec3f971fd95b4',1,'vrs::FileSpec::parseUri()']]],
   ['passive_577',['Passive',['../namespacevrs.html#acb1b4358038394407db2b2dc6200afaeaf80bc338b6146b566004a046f8137c85',1,'vrs']]],
   ['pcm_578',['PCM',['../namespacevrs.html#add2bb21a732f1a1a425cb65c9cb69a03a1088fbc901dc88b6c18085220cc33de9',1,'vrs']]],
   ['performancerecordableclass_579',['PerformanceRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a96ee1c7890dccff35b0a4e65c9cf4b94',1,'vrs']]],
@@ -23,7 +23,7 @@ var searchData=
   ['pointnd_594',['PointND',['../structvrs_1_1_point_n_d.html',1,'vrs::PointND&lt; T, N &gt;'],['../structvrs_1_1_point_n_d.html#aa22683a7b494d6d75ae251ee9370af1a',1,'vrs::PointND::PointND(T x, T y)'],['../structvrs_1_1_point_n_d.html#a2d6fbbe37c43279f824e2b9de09da8f7',1,'vrs::PointND::PointND(T x, T y, T z)'],['../structvrs_1_1_point_n_d.html#aa247a1d6d96e308c43ea2e53d98aab00',1,'vrs::PointND::PointND(T x, T y, T z, T w)']]],
   ['poserecordableclass_595',['PoseRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5ae627dd9f9cd4cf34613b8dd84eb23717',1,'vrs']]],
   ['preallocateindex_596',['preallocateIndex',['../classvrs_1_1_record_file_writer.html#a71d708366d44df51c9c500a2852279ae',1,'vrs::RecordFileWriter']]],
-  ['prefetchreadsequence_597',['prefetchReadSequence',['../classvrs_1_1_file_handler.html#a590f1ea564f4a24a86d84bc9de64eb0f',1,'vrs::FileHandler']]],
+  ['prefetchreadsequence_597',['prefetchReadSequence',['../classvrs_1_1_file_handler.html#ad61094a22f1e1fb624ae8ecf9818679d',1,'vrs::FileHandler']]],
   ['prefetchrecordsequence_598',['prefetchRecordSequence',['../classvrs_1_1_multi_record_file_reader.html#a64a7f1918e2a599e9b2cdc3d4349451c',1,'vrs::MultiRecordFileReader::prefetchRecordSequence()'],['../classvrs_1_1_record_file_reader.html#a106707a35c6b20f348b004b9359a5db7',1,'vrs::RecordFileReader::prefetchRecordSequence()']]],
   ['prettyjson_599',['prettyJson',['../structvrs_1_1_json_format_profile_spec.html#ac956c4dc8cd47f0dd7d9cc091cd3ea65',1,'vrs::JsonFormatProfileSpec']]],
   ['previousrecordsize_600',['previousRecordSize',['../structvrs_1_1_file_format_1_1_record_header.html#a1f286c194800be0006fa8c4904026d53',1,'vrs::FileFormat::RecordHeader']]],

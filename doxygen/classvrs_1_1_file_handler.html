@@ -71,7 +71,6 @@ $(function() {
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classvrs_1_1_file_handler-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -89,9 +88,10 @@ Inheritance diagram for vrs::FileHandler:</div>
  <div class="center">
   <img src="classvrs_1_1_file_handler.png" usemap="#vrs::FileHandler_map" alt=""/>
   <map id="vrs::FileHandler_map" name="vrs::FileHandler_map">
-<area href="classvrs_1_1_write_file_handler.html" title="The WriteFileHandler interface adds write operations to the FileHandler interface." alt="vrs::WriteFileHandler" shape="rect" coords="0,56,131,80"/>
-<area href="classvrs_1_1_disk_file.html" title="FileHandler implementation for disk files, with chunked file support." alt="vrs::DiskFile" shape="rect" coords="0,112,131,136"/>
-<area href="classvrs_1_1_atomic_disk_file.html" alt="vrs::AtomicDiskFile" shape="rect" coords="0,168,131,192"/>
+<area href="classvrs_1_1_file_delegator.html" title="Class to abstract the delegate file open operation for VRS file." alt="vrs::FileDelegator" shape="rect" coords="0,0,131,24"/>
+<area href="classvrs_1_1_write_file_handler.html" title="The WriteFileHandler interface adds write operations to the FileHandler interface." alt="vrs::WriteFileHandler" shape="rect" coords="0,112,131,136"/>
+<area href="classvrs_1_1_disk_file.html" title="FileHandler implementation for disk files, with chunked file support." alt="vrs::DiskFile" shape="rect" coords="0,168,131,192"/>
+<area href="classvrs_1_1_atomic_disk_file.html" alt="vrs::AtomicDiskFile" shape="rect" coords="0,224,131,248"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -112,16 +112,14 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a87333a3da593726fcb634990712b6da3"><td class="memItemLeft" align="right" valign="top"><a id="a87333a3da593726fcb634990712b6da3"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>FileHandler</b> (const string &amp;fileHandlerName)</td></tr>
 <tr class="separator:a87333a3da593726fcb634990712b6da3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac76ac6616355de9f1c6262baa5cf189b"><td class="memItemLeft" align="right" valign="top">virtual std::unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#ac76ac6616355de9f1c6262baa5cf189b">makeNew</a> () const =0</td></tr>
-<tr class="separator:ac76ac6616355de9f1c6262baa5cf189b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9b111970fbffa26628718cee1886d66a"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#a9b111970fbffa26628718cee1886d66a">~FileHandler</a> ()=default</td></tr>
-<tr class="separator:a9b111970fbffa26628718cee1886d66a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9e142b78b30f3e03cc6bfd4ac4aad5e"><td class="memItemLeft" align="right" valign="top">virtual unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#ac9e142b78b30f3e03cc6bfd4ac4aad5e">makeNew</a> () const =0</td></tr>
+<tr class="separator:ac9e142b78b30f3e03cc6bfd4ac4aad5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc8cce8cea6320affac819d063705d9b"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#acc8cce8cea6320affac819d063705d9b">open</a> (const string &amp;filePath)</td></tr>
 <tr class="separator:acc8cce8cea6320affac819d063705d9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaaafaf72028776e1868b6d69a1210902"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#aaaafaf72028776e1868b6d69a1210902">openSpec</a> (const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;fileSpec)=0</td></tr>
 <tr class="separator:aaaafaf72028776e1868b6d69a1210902"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3a10e956278b3a40e4b9260387239637"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#a3a10e956278b3a40e4b9260387239637">delegateOpenSpec</a> (const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;fileSpec, std::unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt; &amp;outNewDelegate)</td></tr>
-<tr class="separator:a3a10e956278b3a40e4b9260387239637"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29c9ecdcaec465eded60d96890b23670"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#a29c9ecdcaec465eded60d96890b23670">delegateOpen</a> (const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;fileSpec, unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt; &amp;outNewDelegate) override</td></tr>
+<tr class="separator:a29c9ecdcaec465eded60d96890b23670"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a506f20a4a8612d710fe5c57fee2e4e"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#a9a506f20a4a8612d710fe5c57fee2e4e">isOpened</a> () const =0</td></tr>
 <tr class="separator:a9a506f20a4a8612d710fe5c57fee2e4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2145daea7adfb70f991cf4d7cf1262e3"><td class="memItemLeft" align="right" valign="top">virtual int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#a2145daea7adfb70f991cf4d7cf1262e3">getTotalSize</a> () const =0</td></tr>
@@ -165,8 +163,8 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="separator:ae8ad8cb958456d4ff23b7103dcc100af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9df905d36e9a89b467e542a8ae8d6fb4"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacevrs.html#acb1b4358038394407db2b2dc6200afae">CachingStrategy</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#a9df905d36e9a89b467e542a8ae8d6fb4">getCachingStrategy</a> () const</td></tr>
 <tr class="separator:a9df905d36e9a89b467e542a8ae8d6fb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a590f1ea564f4a24a86d84bc9de64eb0f"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#a590f1ea564f4a24a86d84bc9de64eb0f">prefetchReadSequence</a> (const std::vector&lt; std::pair&lt; size_t, size_t &gt;&gt; &amp;sequence, bool clearSequence=true)</td></tr>
-<tr class="separator:a590f1ea564f4a24a86d84bc9de64eb0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad61094a22f1e1fb624ae8ecf9818679d"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#ad61094a22f1e1fb624ae8ecf9818679d">prefetchReadSequence</a> (const vector&lt; std::pair&lt; size_t, size_t &gt;&gt; &amp;sequence, bool clearSequence=true)</td></tr>
+<tr class="separator:ad61094a22f1e1fb624ae8ecf9818679d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a85dd822081969a71159b7206a4371177"><td class="memItemLeft" align="right" valign="top"><a id="a85dd822081969a71159b7206a4371177"></a>
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>setStatsCallback</b> (CacheStatsCallbackFunction)</td></tr>
 <tr class="separator:a85dd822081969a71159b7206a4371177"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -178,20 +176,15 @@ string&#160;</td><td class="memItemRight" valign="bottom"><b>getFileHandlerName<
 <tr class="memitem:a8d1a9e18368a77be359b1d23360c8ced"><td class="memItemLeft" align="right" valign="top"><a id="a8d1a9e18368a77be359b1d23360c8ced"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>isFileHandlerMatch</b> (const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;fileSpec) const</td></tr>
 <tr class="separator:a8d1a9e18368a77be359b1d23360c8ced"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90aceae94395bdc08cebbdb1ee768806"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#a90aceae94395bdc08cebbdb1ee768806">parseUri</a> (<a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;inOutFileSpec, size_t colonIndex) const</td></tr>
-<tr class="separator:a90aceae94395bdc08cebbdb1ee768806"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aace0d5e85bc07729d92b88b8897ef4fd"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#aace0d5e85bc07729d92b88b8897ef4fd">isRemoteFileSystem</a> () const</td></tr>
 <tr class="separator:aace0d5e85bc07729d92b88b8897ef4fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9648c85d534485a206c519b931723ffd"><td class="memItemLeft" align="right" valign="top"><a id="a9648c85d534485a206c519b931723ffd"></a>
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#a9648c85d534485a206c519b931723ffd">showProgress</a> () const</td></tr>
 <tr class="memdesc:a9648c85d534485a206c519b931723ffd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tell if the file handler is probably slow, and extra progress information might be useful. <br /></td></tr>
 <tr class="separator:a9648c85d534485a206c519b931723ffd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
-Protected Member Functions</h2></td></tr>
-<tr class="memitem:a8d792a983a4560150941e21a9ba7e582"><td class="memItemLeft" align="right" valign="top"><a id="a8d792a983a4560150941e21a9ba7e582"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>parseFilePath</b> (const string &amp;filePath, <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;outFileSpec) const</td></tr>
-<tr class="separator:a8d792a983a4560150941e21a9ba7e582"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classvrs_1_1_file_delegator"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classvrs_1_1_file_delegator')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classvrs_1_1_file_delegator.html">vrs::FileDelegator</a></td></tr>
+<tr class="memitem:ada2b37e7ae16cc030db9fd8dab4061ae inherit pub_methods_classvrs_1_1_file_delegator"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_delegator.html#ada2b37e7ae16cc030db9fd8dab4061ae">parseUri</a> (<a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;inOutFileSpec, size_t colonIndex) const</td></tr>
+<tr class="separator:ada2b37e7ae16cc030db9fd8dab4061ae inherit pub_methods_classvrs_1_1_file_delegator"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -202,36 +195,9 @@ string&#160;</td><td class="memItemRight" valign="bottom"><b>fileHandlerName_</b
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class to abstract VRS file system operations, to enable support for alternate storage methods, in particular network/cloud storage implementations. </p>
 <p>For simplicity, in this documentation, we will references "files", but they might be one or more data blobs on a network storage.</p>
-<p>VRS file users probably only need to use <a class="el" href="classvrs_1_1_record_file_reader.html" title="The class to read VRS files.">RecordFileReader</a> &amp; <a class="el" href="classvrs_1_1_record_file_writer.html" title="The class to create VRS files.">RecordFileWriter</a>, but they have the option to use <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> directly to access files stored on remote file systems, same as VRS. Use <a class="el" href="classvrs_1_1_file_handler_factory.html#afedf7700a357ac0490bbc9b09822be87">FileHandlerFactory::delegateOpen()</a> to find the proper <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> implementation and open a file. <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> only exposes read operations, because it's the most implementation, while <a class="el" href="classvrs_1_1_write_file_handler.html" title="The WriteFileHandler interface adds write operations to the FileHandler interface.">WriteFileHandler</a> extends <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> for write operations. Both are abstract classes.</p>
+<p>VRS file users probably only need to use <a class="el" href="classvrs_1_1_record_file_reader.html" title="The class to read VRS files.">RecordFileReader</a> &amp; <a class="el" href="classvrs_1_1_record_file_writer.html" title="The class to create VRS files.">RecordFileWriter</a>, but they have the option to use <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> directly to access files stored on remote file systems, same as VRS. Use <a class="el" href="classvrs_1_1_file_handler_factory.html#a8cc1b86d81f9a65dd1fc6a9caeaaa1e7">FileHandlerFactory::delegateOpen()</a> to find the proper <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> implementation and open a file. <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> only exposes read operations, because it's the most implementation, while <a class="el" href="classvrs_1_1_write_file_handler.html" title="The WriteFileHandler interface adds write operations to the FileHandler interface.">WriteFileHandler</a> extends <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> for write operations. Both are abstract classes.</p>
 <p>'int' return values are status codes: 0 means success, while other values are error codes, which can always be converted to a human readable string using vrs::errorCodeToMessage(code). File sizes and offset are specified using int64_t, which is equivalent to the POSIX behavior. Byte counts use size_t. </p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a9b111970fbffa26628718cee1886d66a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9b111970fbffa26628718cee1886d66a">&#9670;&nbsp;</a></span>~FileHandler()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual vrs::FileHandler::~FileHandler </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span><span class="mlabel">default</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Delete the object. Derived classes should make sure to close their file(s)/handle(s), probably simply by calling <a class="el" href="classvrs_1_1_file_handler.html#ae110dcfe731d9a1e1c6b2a8069271554">close()</a>. </p>
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
+</div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="ae110dcfe731d9a1e1c6b2a8069271554"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae110dcfe731d9a1e1c6b2a8069271554">&#9670;&nbsp;</a></span>close()</h2>
 
@@ -260,8 +226,8 @@ string&#160;</td><td class="memItemRight" valign="bottom"><b>fileHandlerName_</b
 
 </div>
 </div>
-<a id="a3a10e956278b3a40e4b9260387239637"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3a10e956278b3a40e4b9260387239637">&#9670;&nbsp;</a></span>delegateOpenSpec()</h2>
+<a id="a29c9ecdcaec465eded60d96890b23670"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a29c9ecdcaec465eded60d96890b23670">&#9670;&nbsp;</a></span>delegateOpen()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -270,7 +236,7 @@ string&#160;</td><td class="memItemRight" valign="bottom"><b>fileHandlerName_</b
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">int vrs::FileHandler::delegateOpenSpec </td>
+          <td class="memname">int vrs::FileHandler::delegateOpen </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;&#160;</td>
           <td class="paramname"><em>fileSpec</em>, </td>
@@ -278,7 +244,7 @@ string&#160;</td><td class="memItemRight" valign="bottom"><b>fileHandlerName_</b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt; &amp;&#160;</td>
+          <td class="paramtype">unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>outNewDelegate</em>&#160;</td>
         </tr>
         <tr>
@@ -289,18 +255,20 @@ string&#160;</td><td class="memItemRight" valign="bottom"><b>fileHandlerName_</b
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Open a file, while giving the opportunity to the <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> to delegate the file operations to another <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a>. With this method, a <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> can be capable of deciding which other <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> is the right one to open a file, after inspection, parsing of the path, or lookup. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Open a file, while giving the opportunity to the <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> to delegate the file operations to another <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a>. With this method, a <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> might decide that another <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> is the right one to open a file, after inspecting the spec, parsing of the path, or lookup. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">path</td><td>file specification. </td></tr>
+    <tr><td class="paramname">fileSpec</td><td>file specification. </td></tr>
     <tr><td class="paramname">outNewDelegate</td><td>If provided, might be a fallback <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> to use. On exit, may be set to a different <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> than the current object, if the current <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> was not ultimately the right one to handle the provided path, or cleared if the current <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> should be used to continue accessing the file. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A status code, 0 meaning success. Use errorCodeToString() to get an error description. </dd></dl>
+
+<p>Implements <a class="el" href="classvrs_1_1_file_delegator.html#a20ed43d0540c28802acdec6c33001cc6">vrs::FileDelegator</a>.</p>
 
 </div>
 </div>
@@ -689,8 +657,8 @@ string&#160;</td><td class="memItemRight" valign="bottom"><b>fileHandlerName_</b
 
 </div>
 </div>
-<a id="ac76ac6616355de9f1c6262baa5cf189b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac76ac6616355de9f1c6262baa5cf189b">&#9670;&nbsp;</a></span>makeNew()</h2>
+<a id="ac9e142b78b30f3e03cc6bfd4ac4aad5e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac9e142b78b30f3e03cc6bfd4ac4aad5e">&#9670;&nbsp;</a></span>makeNew()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -699,7 +667,7 @@ string&#160;</td><td class="memItemRight" valign="bottom"><b>fileHandlerName_</b
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual std::unique_ptr&lt;<a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a>&gt; vrs::FileHandler::makeNew </td>
+          <td class="memname">virtual unique_ptr&lt;<a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a>&gt; vrs::FileHandler::makeNew </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -785,54 +753,8 @@ string&#160;</td><td class="memItemRight" valign="bottom"><b>fileHandlerName_</b
 
 </div>
 </div>
-<a id="a90aceae94395bdc08cebbdb1ee768806"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a90aceae94395bdc08cebbdb1ee768806">&#9670;&nbsp;</a></span>parseUri()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">int vrs::FileHandler::parseUri </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;&#160;</td>
-          <td class="paramname"><em>inOutFileSpec</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>colonIndex</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>When converting a URI "path" to a <a class="el" href="structvrs_1_1_file_spec.html" title="Generalized file descriptor class, allowing the efficient representation of complex file objects,...">FileSpec</a>, some custom parsing maybe required, or maybe the <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> want to delegate to another <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> for when the file needs to be opened. </p><dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">inOutFileSpec</td><td>on input, both the fileHandlerName &amp; uri fields are set. All the other fields of the <a class="el" href="structvrs_1_1_file_spec.html" title="Generalized file descriptor class, allowing the efficient representation of complex file objects,...">FileSpec</a> object are cleared, and uri holds the full original uri. </td></tr>
-    <tr><td class="paramname">colonIndex</td><td>index of the ':' character of the uri. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>A status code, 0 on success, which doesn't necessarily mean that the file/object exists or can be opened, merely, that parsing did not fail. On success, any of the fields may have been set or changed, including fileHandlerName and uri. </dd></dl>
-
-<p>Reimplemented in <a class="el" href="classvrs_1_1_disk_file.html#af07c3877155f6ba23af97b9990659f3f">vrs::DiskFile</a>.</p>
-
-</div>
-</div>
-<a id="a590f1ea564f4a24a86d84bc9de64eb0f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a590f1ea564f4a24a86d84bc9de64eb0f">&#9670;&nbsp;</a></span>prefetchReadSequence()</h2>
+<a id="ad61094a22f1e1fb624ae8ecf9818679d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad61094a22f1e1fb624ae8ecf9818679d">&#9670;&nbsp;</a></span>prefetchReadSequence()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -843,7 +765,7 @@ string&#160;</td><td class="memItemRight" valign="bottom"><b>fileHandlerName_</b
         <tr>
           <td class="memname">virtual bool vrs::FileHandler::prefetchReadSequence </td>
           <td>(</td>
-          <td class="paramtype">const std::vector&lt; std::pair&lt; size_t, size_t &gt;&gt; &amp;&#160;</td>
+          <td class="paramtype">const vector&lt; std::pair&lt; size_t, size_t &gt;&gt; &amp;&#160;</td>
           <td class="paramname"><em>sequence</em>, </td>
         </tr>
         <tr>

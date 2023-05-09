@@ -82,9 +82,10 @@ Inheritance diagram for vrs::AtomicDiskFile:</div>
  <div class="center">
   <img src="classvrs_1_1_atomic_disk_file.png" usemap="#vrs::AtomicDiskFile_map" alt=""/>
   <map id="vrs::AtomicDiskFile_map" name="vrs::AtomicDiskFile_map">
-<area href="classvrs_1_1_disk_file.html" title="FileHandler implementation for disk files, with chunked file support." alt="vrs::DiskFile" shape="rect" coords="0,112,131,136"/>
-<area href="classvrs_1_1_write_file_handler.html" title="The WriteFileHandler interface adds write operations to the FileHandler interface." alt="vrs::WriteFileHandler" shape="rect" coords="0,56,131,80"/>
-<area href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,..." alt="vrs::FileHandler" shape="rect" coords="0,0,131,24"/>
+<area href="classvrs_1_1_disk_file.html" title="FileHandler implementation for disk files, with chunked file support." alt="vrs::DiskFile" shape="rect" coords="0,168,131,192"/>
+<area href="classvrs_1_1_write_file_handler.html" title="The WriteFileHandler interface adds write operations to the FileHandler interface." alt="vrs::WriteFileHandler" shape="rect" coords="0,112,131,136"/>
+<area href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,..." alt="vrs::FileHandler" shape="rect" coords="0,56,131,80"/>
+<area href="classvrs_1_1_file_delegator.html" title="Class to abstract the delegate file open operation for VRS file." alt="vrs::FileDelegator" shape="rect" coords="0,0,131,24"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -241,12 +242,10 @@ template&lt;typename T , std::enable_if_t&lt; std::is_trivially_copyable&lt; T &
 <tr class="memitem:a87333a3da593726fcb634990712b6da3 inherit pub_methods_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top"><a id="a87333a3da593726fcb634990712b6da3"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>FileHandler</b> (const string &amp;fileHandlerName)</td></tr>
 <tr class="separator:a87333a3da593726fcb634990712b6da3 inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9b111970fbffa26628718cee1886d66a inherit pub_methods_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#a9b111970fbffa26628718cee1886d66a">~FileHandler</a> ()=default</td></tr>
-<tr class="separator:a9b111970fbffa26628718cee1886d66a inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc8cce8cea6320affac819d063705d9b inherit pub_methods_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#acc8cce8cea6320affac819d063705d9b">open</a> (const string &amp;filePath)</td></tr>
 <tr class="separator:acc8cce8cea6320affac819d063705d9b inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3a10e956278b3a40e4b9260387239637 inherit pub_methods_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#a3a10e956278b3a40e4b9260387239637">delegateOpenSpec</a> (const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;fileSpec, std::unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt; &amp;outNewDelegate)</td></tr>
-<tr class="separator:a3a10e956278b3a40e4b9260387239637 inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29c9ecdcaec465eded60d96890b23670 inherit pub_methods_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#a29c9ecdcaec465eded60d96890b23670">delegateOpen</a> (const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;fileSpec, unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt; &amp;outNewDelegate) override</td></tr>
+<tr class="separator:a29c9ecdcaec465eded60d96890b23670 inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab4971d8f9405714e9556b18d37bcf2e5 inherit pub_methods_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#ab4971d8f9405714e9556b18d37bcf2e5">isAvailableOrPrefetch</a> (size_t length)</td></tr>
 <tr class="separator:ab4971d8f9405714e9556b18d37bcf2e5 inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a862ed4edd6b651c810c71593e4d2f6c1 inherit pub_methods_classvrs_1_1_file_handler"><td class="memTemplParams" colspan="2"><a id="a862ed4edd6b651c810c71593e4d2f6c1"></a>
@@ -258,8 +257,8 @@ template&lt;typename T , std::enable_if_t&lt; std::is_trivially_copyable&lt; T &
 <tr class="separator:ae8ad8cb958456d4ff23b7103dcc100af inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9df905d36e9a89b467e542a8ae8d6fb4 inherit pub_methods_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacevrs.html#acb1b4358038394407db2b2dc6200afae">CachingStrategy</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#a9df905d36e9a89b467e542a8ae8d6fb4">getCachingStrategy</a> () const</td></tr>
 <tr class="separator:a9df905d36e9a89b467e542a8ae8d6fb4 inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a590f1ea564f4a24a86d84bc9de64eb0f inherit pub_methods_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#a590f1ea564f4a24a86d84bc9de64eb0f">prefetchReadSequence</a> (const std::vector&lt; std::pair&lt; size_t, size_t &gt;&gt; &amp;sequence, bool clearSequence=true)</td></tr>
-<tr class="separator:a590f1ea564f4a24a86d84bc9de64eb0f inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad61094a22f1e1fb624ae8ecf9818679d inherit pub_methods_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#ad61094a22f1e1fb624ae8ecf9818679d">prefetchReadSequence</a> (const vector&lt; std::pair&lt; size_t, size_t &gt;&gt; &amp;sequence, bool clearSequence=true)</td></tr>
+<tr class="separator:ad61094a22f1e1fb624ae8ecf9818679d inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a85dd822081969a71159b7206a4371177 inherit pub_methods_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top"><a id="a85dd822081969a71159b7206a4371177"></a>
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>setStatsCallback</b> (CacheStatsCallbackFunction)</td></tr>
 <tr class="separator:a85dd822081969a71159b7206a4371177 inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -325,10 +324,6 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>isLastChunk</b> () co
 <tr class="memitem:ab62d9111db6edd0988e8ebac51471854 inherit pro_methods_classvrs_1_1_disk_file"><td class="memItemLeft" align="right" valign="top"><a id="ab62d9111db6edd0988e8ebac51471854"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>trySetPosInCurrentChunk</b> (int64_t offset)</td></tr>
 <tr class="separator:ab62d9111db6edd0988e8ebac51471854 inherit pro_methods_classvrs_1_1_disk_file"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pro_methods_classvrs_1_1_file_handler"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classvrs_1_1_file_handler')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classvrs_1_1_file_handler.html">vrs::FileHandler</a></td></tr>
-<tr class="memitem:a8d792a983a4560150941e21a9ba7e582 inherit pro_methods_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top"><a id="a8d792a983a4560150941e21a9ba7e582"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>parseFilePath</b> (const string &amp;filePath, <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;outFileSpec) const</td></tr>
-<tr class="separator:a8d792a983a4560150941e21a9ba7e582 inherit pro_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_attribs_classvrs_1_1_disk_file"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classvrs_1_1_disk_file')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classvrs_1_1_disk_file.html">vrs::DiskFile</a></td></tr>
 <tr class="memitem:a382ab61be3f1c4736020f3ba87835af4 inherit pro_attribs_classvrs_1_1_disk_file"><td class="memItemLeft" align="right" valign="top"><a id="a382ab61be3f1c4736020f3ba87835af4"></a>
 vector&lt; <a class="el" href="structvrs_1_1_disk_file_1_1_chunk.html">Chunk</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>chunks_</b></td></tr>

@@ -106,8 +106,8 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>empty</b> () const</t
 <tr class="memitem:aac8c93f275e683bd4ff194af86b47c20"><td class="memItemLeft" align="right" valign="top"><a id="aac8c93f275e683bd4ff194af86b47c20"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>isDiskFile</b> () const</td></tr>
 <tr class="separator:aac8c93f275e683bd4ff194af86b47c20"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3a6358967d13a3f32564392bf0dfe09b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvrs_1_1_file_spec.html#a3a6358967d13a3f32564392bf0dfe09b">fromPathJsonUri</a> (const string &amp;pathJsonUri)</td></tr>
-<tr class="separator:a3a6358967d13a3f32564392bf0dfe09b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5732993a13eaa89580fb81017c66c322"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvrs_1_1_file_spec.html#a5732993a13eaa89580fb81017c66c322">fromPathJsonUri</a> (const string &amp;pathJsonUri, const string &amp;defaultFileHandlerName={})</td></tr>
+<tr class="separator:a5732993a13eaa89580fb81017c66c322"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c882064ae2b246ad3aee56b0cffe8a2"><td class="memItemLeft" align="right" valign="top"><a id="a0c882064ae2b246ad3aee56b0cffe8a2"></a>
 string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvrs_1_1_file_spec.html#a0c882064ae2b246ad3aee56b0cffe8a2">toPathJsonUri</a> () const</td></tr>
 <tr class="memdesc:a0c882064ae2b246ad3aee56b0cffe8a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reverse operation as fromPathJsonUri, as possible. <br /></td></tr>
@@ -118,6 +118,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>fromJson</b> (const s
 <tr class="memitem:ab4154a8bccfec6085af3585e4f9d511c"><td class="memItemLeft" align="right" valign="top"><a id="ab4154a8bccfec6085af3585e4f9d511c"></a>
 string&#160;</td><td class="memItemRight" valign="bottom"><b>toJson</b> () const</td></tr>
 <tr class="separator:ab4154a8bccfec6085af3585e4f9d511c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e10771e4c48bff5a5bec3f971fd95b4"><td class="memItemLeft" align="right" valign="top"><a id="a3e10771e4c48bff5a5bec3f971fd95b4"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvrs_1_1_file_spec.html#a3e10771e4c48bff5a5bec3f971fd95b4">parseUri</a> ()</td></tr>
+<tr class="memdesc:a3e10771e4c48bff5a5bec3f971fd95b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse the uri field already set, overwritting other fields on success. <br /></td></tr>
+<tr class="separator:a3e10771e4c48bff5a5bec3f971fd95b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a17b5807f5f3def17aeac1a05984f3f67"><td class="memItemLeft" align="right" valign="top"><a id="a17b5807f5f3def17aeac1a05984f3f67"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvrs_1_1_file_spec.html#a17b5807f5f3def17aeac1a05984f3f67">hasChunkSizes</a> () const</td></tr>
 <tr class="memdesc:a17b5807f5f3def17aeac1a05984f3f67"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tell if we have chunks and all of them has a file size. <br /></td></tr>
@@ -218,8 +222,8 @@ map&lt; string, string &gt;&#160;</td><td class="memItemRight" valign="bottom"><
 <div class="textblock"><p>Generalized file descriptor class, allowing the efficient representation of complex file objects, maybe multi-chunks, with additional optional properties. </p>
 <p>File specification struct, to describe a file object in more details than just a single path, possibly with multiple chunks, with a special file handler, an explicit file name (useful when the chunks are urls), and possibly a source uri. If no file handler name is specified, the object is assumed to a set of local files. Additional properties may be specified in the extras field, which has helper methods. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a3a6358967d13a3f32564392bf0dfe09b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3a6358967d13a3f32564392bf0dfe09b">&#9670;&nbsp;</a></span>fromPathJsonUri()</h2>
+<a id="a5732993a13eaa89580fb81017c66c322"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5732993a13eaa89580fb81017c66c322">&#9670;&nbsp;</a></span>fromPathJsonUri()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -228,14 +232,25 @@ map&lt; string, string &gt;&#160;</td><td class="memItemRight" valign="bottom"><
           <td class="memname">int vrs::FileSpec::fromPathJsonUri </td>
           <td>(</td>
           <td class="paramtype">const string &amp;&#160;</td>
-          <td class="paramname"><em>pathJsonUri</em></td><td>)</td>
+          <td class="paramname"><em>pathJsonUri</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const string &amp;&#160;</td>
+          <td class="paramname"><em>defaultFileHandlerName</em> = <code>{}</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 <p>Smart setter that will parse the string given, determining if the string passed is a local file path, a uri, or a json path. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pathJsonUri</td><td>a path, a json spec, or a URI </td></tr>
+    <tr><td class="paramname">defaultFileHandlerName</td><td>provide a default <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> name. <a class="el" href="classvrs_1_1_disk_file.html" title="FileHandler implementation for disk files, with chunked file support.">DiskFile</a> by default. </td></tr>
   </table>
   </dd>
 </dl>
