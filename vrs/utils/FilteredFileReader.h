@@ -138,7 +138,7 @@ struct FilteredFileReader {
   }
   virtual ~FilteredFileReader() = default;
 
-  virtual void setSource(const string& filePath, const unique_ptr<FileHandler>& fileHandler = {});
+  virtual int setSource(const string& filePath, const unique_ptr<FileHandler>& fileHandler = {});
 
   virtual bool fileExists() const;
   virtual string getPathOrUri() const;

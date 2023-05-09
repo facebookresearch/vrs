@@ -160,17 +160,16 @@ bool RecordFilterParams::excludeType(const string& type) {
   return true;
 }
 
-void FilteredFileReader::setSource(
+int FilteredFileReader::setSource(
     const string& filePath,
     const unique_ptr<FileHandler>& fileHandler) {
-  if (helpers::endsWith(filePath, ".vrs")) {
-    RecordFileReader::vrsFilePathToFileSpec(filePath, spec);
-  } else {
-    spec.fromPathJsonUri(filePath);
-  }
   if (fileHandler) {
     reader.setFileHandler(fileHandler->makeNew());
   }
+  if (helpers::endsWith(filePath, ".vrs")) {
+    return RecordFileReader::vrsFilePathToFileSpec(filePath, spec);
+  }
+  return spec.fromPathJsonUri(filePath);
 }
 
 bool FilteredFileReader::fileExists() const {
