@@ -63,12 +63,17 @@ namespace vrs {
 
 int FileHandler::open(const string& filePath) {
   FileSpec fileSpec;
-  int status = parseFilePath(filePath, fileSpec);
+  int status = fileSpec.fromPathJsonUri(filePath, getFileHandlerName());
   if (status != 0) {
     close();
     return status;
   }
   if (!isFileHandlerMatch(fileSpec)) {
+    XR_LOGE(
+        "FileHandler mismatch. This FileHandler is '{}', but this path requires "
+        "a FileHandler for '{}'.",
+        getFileHandlerName(),
+        fileSpec.fileHandlerName);
     return FILE_HANDLER_MISMATCH;
   }
   return openSpec(fileSpec);
@@ -97,32 +102,6 @@ bool FileHandler::isReadOnly() const {
 
 bool FileHandler::isRemoteFileSystem() const {
   return true; // everything but disk file is pretty much a remote file system...
-}
-
-int FileHandler::parseFilePath(const string& filePath, FileSpec& outFileSpec) const {
-  if (filePath.empty()) {
-    outFileSpec.clear();
-    return INVALID_PARAMETER;
-  } else if (filePath.front() != '{') {
-    outFileSpec.clear();
-    outFileSpec.chunks = {filePath};
-    // In this flow, we presume the FileHandler ("this") is the correct FileHandler
-    outFileSpec.fileHandlerName = getFileHandlerName();
-  } else {
-    if (!outFileSpec.fromJson(filePath)) {
-      outFileSpec.clear();
-      return FILEPATH_PARSE_ERROR;
-    }
-    if (!isFileHandlerMatch(outFileSpec)) {
-      XR_LOGE(
-          "FileHandler mismatch. This FileHandler is '{}', but this path requires "
-          "a FileHandler for '{}'.",
-          getFileHandlerName(),
-          outFileSpec.fileHandlerName);
-      return FILE_HANDLER_MISMATCH;
-    }
-  }
-  return SUCCESS;
 }
 
 bool FileHandler::isFileHandlerMatch(const FileSpec& fileSpec) const {

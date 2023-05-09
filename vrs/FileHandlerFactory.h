@@ -59,6 +59,8 @@ class FileHandlerFactory {
   virtual int delegateOpen(const std::string& path, std::unique_ptr<FileHandler>& outNewDelegate);
   virtual int delegateOpen(const FileSpec& fileSpec, std::unique_ptr<FileHandler>& outNewDelegate);
 
+  virtual int parseUri(FileSpec& inOutFileSpec, size_t colonIndex);
+
  protected:
   FileHandlerFactory();
   virtual ~FileHandlerFactory() = default;

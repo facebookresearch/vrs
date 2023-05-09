@@ -239,8 +239,6 @@ class FileHandler : public FileDelegator {
   }
 
  protected:
-  int parseFilePath(const string& filePath, FileSpec& outFileSpec) const;
-
   string fileHandlerName_;
 };
 

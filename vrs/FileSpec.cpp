@@ -134,9 +134,11 @@ int FileSpec::parseUri(
   return SUCCESS;
 }
 
-int FileSpec::fromPathJsonUri(const string& pathJsonUri) {
+int FileSpec::fromPathJsonUri(const string& pathJsonUri, const string& defaultFileHandlerName) {
   clear();
-  if (pathJsonUri.front() == '{') {
+  if (pathJsonUri.empty()) {
+    return INVALID_PARAMETER;
+  } else if (pathJsonUri.front() == '{') {
     return fromJson(pathJsonUri) ? SUCCESS : FILEPATH_PARSE_ERROR;
   }
   auto colon = pathJsonUri.find(':');
@@ -148,18 +150,15 @@ int FileSpec::fromPathJsonUri(const string& pathJsonUri) {
   }
   if (!isUri) {
     chunks = {pathJsonUri};
-    fileHandlerName = DiskFile::staticName();
+    fileHandlerName =
+        defaultFileHandlerName.empty() ? DiskFile::staticName() : defaultFileHandlerName;
     return SUCCESS;
   }
   fileHandlerName = pathJsonUri.substr(0, colon);
   uri = pathJsonUri;
+
   // give a chance to a file handler named after the uri scheme, if any, to parse the uri.
-  auto fileHandler = FileHandlerFactory::getInstance().getFileHandler(fileHandlerName);
-  if (fileHandler) {
-    return fileHandler->parseUri(*this, colon);
-  }
-  chunks.resize(1);
-  return parseUri(uri, fileHandlerName, chunks[0], extras);
+  return FileHandlerFactory::getInstance().parseUri(*this, colon);
 }
 
 string FileSpec::toPathJsonUri() const {
@@ -223,6 +222,14 @@ string FileSpec::toJson() const {
     wrapper.addMember(extra.first, extra.second);
   }
   return jDocumentToJsonString(document);
+}
+
+int FileSpec::parseUri() {
+  fileName.clear();
+  chunks.resize(1);
+  chunks[0].clear();
+  chunkSizes.clear();
+  return parseUri(uri, fileHandlerName, chunks[0], extras);
 }
 
 bool FileSpec::hasChunkSizes() const {

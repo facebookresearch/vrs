@@ -70,6 +70,15 @@ int FileHandlerFactory::delegateOpen(
   return status;
 }
 
+int FileHandlerFactory::parseUri(FileSpec& inOutFileSpec, size_t colonIndex) {
+  unique_ptr<FileHandler> fileHandler = getFileHandler(inOutFileSpec.fileHandlerName);
+  if (fileHandler) {
+    return fileHandler->parseUri(inOutFileSpec, colonIndex);
+  }
+
+  return inOutFileSpec.parseUri();
+}
+
 void FileHandlerFactory::registerFileHandler(unique_ptr<FileHandler>&& fileHandler) {
   unique_lock<mutex> lock(mutex_);
   const auto fileHandlerName = fileHandler->getFileHandlerName();

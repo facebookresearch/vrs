@@ -63,9 +63,10 @@ struct FileSpec {
   /// Smart setter that will parse the string given, determining if the string passed is a local
   /// file path, a uri, or a json path.
   /// @param pathJsonUri: a path, a json spec, or a URI
+  /// @param defaultFileHandlerName: provide a default FileHandler name. DiskFile by default.
   /// @return A status code, 0 meaning apparent success. Note that the validation is superficial,
   /// a file might not exists, the requested filehandler may not be available, etc.
-  int fromPathJsonUri(const string& pathJsonUri);
+  int fromPathJsonUri(const string& pathJsonUri, const string& defaultFileHandlerName = {});
 
   /// Reverse operation as fromPathJsonUri, as possible
   string toPathJsonUri() const;
@@ -80,6 +81,9 @@ struct FileSpec {
   // @return jsonStr: ex. {"storage": "mystorage", "chunks":["chunk1", "chunk2"],
   // "filename":"file.vrs"}.
   string toJson() const;
+
+  /// Parse the uri field already set, overwritting other fields on success.
+  int parseUri();
 
   /// Tell if we have chunks and all of them has a file size.
   bool hasChunkSizes() const;
