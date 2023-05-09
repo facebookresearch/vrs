@@ -47,13 +47,13 @@ int FileHandlerFactory::delegateOpen(
     unique_ptr<FileHandler>& outNewDelegate) {
   FileDelegator* delegator = getExtraDelegator(fileSpec);
   if (delegator != nullptr) {
-    return delegator->delegateOpenSpec(fileSpec, outNewDelegate);
+    return delegator->delegateOpen(fileSpec, outNewDelegate);
   }
   if (!fileSpec.fileHandlerName.empty() &&
       (!outNewDelegate || outNewDelegate->getFileHandlerName() != fileSpec.fileHandlerName)) {
     delegator = getFileDelegator(fileSpec.fileHandlerName);
     if (delegator != nullptr) {
-      return delegator->delegateOpenSpec(fileSpec, outNewDelegate);
+      return delegator->delegateOpen(fileSpec, outNewDelegate);
     }
 
     unique_ptr<FileHandler> newHandler = getFileHandler(fileSpec.fileHandlerName);
@@ -73,7 +73,7 @@ int FileHandlerFactory::delegateOpen(
   }
   // Now delegate opening the file to the file handler, which might delegate further...
   unique_ptr<FileHandler> newDelegate;
-  int status = outNewDelegate->delegateOpenSpec(fileSpec, newDelegate);
+  int status = outNewDelegate->delegateOpen(fileSpec, newDelegate);
   if (newDelegate) {
     outNewDelegate.swap(newDelegate);
   }

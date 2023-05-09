@@ -79,9 +79,7 @@ int FileHandler::open(const string& filePath) {
   return openSpec(fileSpec);
 }
 
-int FileHandler::delegateOpenSpec(
-    const FileSpec& fileSpec,
-    unique_ptr<FileHandler>& outNewDelegate) {
+int FileHandler::delegateOpen(const FileSpec& fileSpec, unique_ptr<FileHandler>& outNewDelegate) {
   // if provided with a delegate, then ask the delegate first...
   if (outNewDelegate) {
     if (outNewDelegate->openSpec(fileSpec) == SUCCESS) {

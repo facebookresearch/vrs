@@ -51,7 +51,7 @@ class FakeHandler : public DiskFile {
   int openSpec(const FileSpec& fileSpec) override {
     return 0;
   }
-  virtual int delegateOpenSpec(const FileSpec& fileSpec, unique_ptr<FileHandler>& outNewDelegate)
+  virtual int delegateOpen(const FileSpec& fileSpec, unique_ptr<FileHandler>& outNewDelegate)
       override {
     outNewDelegate.reset();
     return 0;

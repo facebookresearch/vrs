@@ -110,7 +110,7 @@ class FileHandler : public FileDelegator {
   /// or cleared if the current FileHandler should be used to continue accessing the file.
   /// @return A status code, 0 meaning success.
   /// Use errorCodeToString() to get an error description.
-  int delegateOpenSpec(const FileSpec& fileSpec, unique_ptr<FileHandler>& outNewDelegate) override;
+  int delegateOpen(const FileSpec& fileSpec, unique_ptr<FileHandler>& outNewDelegate) override;
 
   /// Tell if a file is actually open.
   /// @return True if a file is currently open.

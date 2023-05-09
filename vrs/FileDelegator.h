@@ -48,9 +48,7 @@ class FileDelegator {
   /// FileHandler was not set or not the correct one to handle the provided file specification,
   /// or cleared if no appropriate FileHandler could be found.
   /// @return A status code, 0 meaning success.
-  virtual int delegateOpenSpec(
-      const FileSpec& fileSpec,
-      unique_ptr<FileHandler>& outNewDelegate) = 0;
+  virtual int delegateOpen(const FileSpec& fileSpec, unique_ptr<FileHandler>& outNewDelegate) = 0;
 
   /// When converting a URI to a FileSpec, some custom parsing maybe required.
   /// @param inOutFileSpec: on input, both the fileHandlerName & URI fields are set.
