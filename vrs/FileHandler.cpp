@@ -129,10 +129,6 @@ bool FileHandler::isFileHandlerMatch(const FileSpec& fileSpec) const {
   return fileSpec.fileHandlerName.empty() || getFileHandlerName() == fileSpec.fileHandlerName;
 }
 
-int FileHandler::parseUri(FileSpec& /*inOutFileSpec*/, size_t /*colonIndex*/) const {
-  return SUCCESS;
-}
-
 string toString(CachingStrategy cachingStrategy) {
   return CachingStrategyConverter::toString(cachingStrategy);
 }

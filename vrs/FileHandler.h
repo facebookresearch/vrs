@@ -25,6 +25,7 @@
 #include <utility>
 #include <vector>
 
+#include <vrs/FileDelegator.h>
 #include <vrs/FileSpec.h>
 #include <vrs/helpers/EnumTemplates.hpp>
 
@@ -69,7 +70,7 @@ CachingStrategy toEnum<>(const string& name);
 /// which can always be converted to a human readable string using vrs::errorCodeToMessage(code).
 /// File sizes and offset are specified using int64_t, which is equivalent to the POSIX behavior.
 /// Byte counts use size_t.
-class FileHandler {
+class FileHandler : public FileDelegator {
  public:
   /// Stats for cache.
   struct CacheStats {
@@ -88,11 +89,7 @@ class FileHandler {
   /// Make a new instance of the concrete class implementing this interface in its default state,
   /// no matter what this object's state is, so that we can access more files using the same method.
   /// @return A new object of the concrete type, ready to be used to open a new file.
-  virtual std::unique_ptr<FileHandler> makeNew() const = 0;
-
-  /// Delete the object. Derived classes should make sure to close their file(s)/handle(s),
-  /// probably simply by calling close().
-  virtual ~FileHandler() = default;
+  virtual unique_ptr<FileHandler> makeNew() const = 0;
 
   /// Open a file in read-only mode.
   /// @param filePath: a disk path, or anything that the particular module recognizes.
@@ -104,18 +101,16 @@ class FileHandler {
   virtual int openSpec(const FileSpec& fileSpec) = 0;
 
   /// Open a file, while giving the opportunity to the FileHandler to delegate the file operations
-  /// to another FileHandler. With this method, a FileHandler can be capable of deciding which other
-  /// FileHandler is the right one to open a file, after inspection, parsing of the path, or lookup.
-  /// @param path: file specification.
+  /// to another FileHandler. With this method, a FileHandler might decide that another FileHandler
+  /// is the right one to open a file, after inspecting the spec, parsing of the path, or lookup.
+  /// @param fileSpec: file specification.
   /// @param outNewDelegate: If provided, might be a fallback FileHandler to use.
   /// On exit, may be set to a different FileHandler than the current object, if the current
   /// FileHandler was not ultimately the right one to handle the provided path,
   /// or cleared if the current FileHandler should be used to continue accessing the file.
   /// @return A status code, 0 meaning success.
   /// Use errorCodeToString() to get an error description.
-  virtual int delegateOpenSpec(
-      const FileSpec& fileSpec,
-      std::unique_ptr<FileHandler>& outNewDelegate);
+  int delegateOpenSpec(const FileSpec& fileSpec, unique_ptr<FileHandler>& outNewDelegate) override;
 
   /// Tell if a file is actually open.
   /// @return True if a file is currently open.
@@ -213,7 +208,7 @@ class FileHandler {
   /// caching starts.
   /// @return True if the file handler support custom read sequences.
   virtual bool prefetchReadSequence(
-      const std::vector<std::pair<size_t, size_t>>& sequence,
+      const vector<std::pair<size_t, size_t>>& sequence,
       bool clearSequence = true) {
     return false;
   }
@@ -234,16 +229,6 @@ class FileHandler {
   }
 
   bool isFileHandlerMatch(const FileSpec& fileSpec) const;
-
-  /// When converting a URI "path" to a FileSpec, some custom parsing maybe required, or maybe
-  /// the FileHandler want to delegate to another FileHandler for when the file needs to be opened.
-  /// @param inOutFileSpec: on input, both the fileHandlerName & uri fields are set.
-  /// All the other fields of the FileSpec object are cleared, and uri holds the full original uri.
-  /// @param colonIndex: index of the ':' character of the uri.
-  /// @return A status code, 0 on success, which doesn't necessarily mean that the file/object
-  /// exists or can be opened, merely, that parsing did not fail.
-  /// On success, any of the fields may have been set or changed, including fileHandlerName and uri.
-  virtual int parseUri(FileSpec& inOutFileSpec, size_t colonIndex) const;
 
   /// Tell if the file handler is handling remote data, that might need caching for instance.
   /// Because most custom file systems implementation are not local FS, defaults to true!
