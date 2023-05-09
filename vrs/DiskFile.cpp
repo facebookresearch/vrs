@@ -562,6 +562,7 @@ int DiskFile::parseUri(FileSpec& inOutFileSpec, size_t colonIndex) const {
 
   inOutFileSpec.fileHandlerName = getFileHandlerName();
   inOutFileSpec.chunks = {path};
+  inOutFileSpec.extras = std::move(queryParams);
 
   return SUCCESS;
 }

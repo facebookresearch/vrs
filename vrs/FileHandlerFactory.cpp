@@ -21,6 +21,7 @@
 #include <vrs/DiskFile.h>
 #include <vrs/ErrorCode.h>
 #include <vrs/FileHandlerFactory.h>
+#include <vrs/helpers/FileMacros.h>
 
 using namespace std;
 
@@ -44,9 +45,13 @@ int FileHandlerFactory::delegateOpen(const string& path, unique_ptr<FileHandler>
 int FileHandlerFactory::delegateOpen(
     const FileSpec& fileSpec,
     unique_ptr<FileHandler>& outNewDelegate) {
+  FileDelegator* delegator = getExtraDelegator(fileSpec);
+  if (delegator != nullptr) {
+    return delegator->delegateOpenSpec(fileSpec, outNewDelegate);
+  }
   if (!fileSpec.fileHandlerName.empty() &&
       (!outNewDelegate || outNewDelegate->getFileHandlerName() != fileSpec.fileHandlerName)) {
-    FileDelegator* delegator = getFileDelegator(fileSpec.fileHandlerName);
+    delegator = getFileDelegator(fileSpec.fileHandlerName);
     if (delegator != nullptr) {
       return delegator->delegateOpenSpec(fileSpec, outNewDelegate);
     }
@@ -78,15 +83,20 @@ int FileHandlerFactory::delegateOpen(
 int FileHandlerFactory::parseUri(FileSpec& inOutFileSpec, size_t colonIndex) {
   FileDelegator* delegator = getFileDelegator(inOutFileSpec.fileHandlerName);
   if (delegator != nullptr) {
-    return delegator->parseUri(inOutFileSpec, colonIndex);
+    IF_ERROR_RETURN(delegator->parseUri(inOutFileSpec, colonIndex));
+  } else {
+    unique_ptr<FileHandler> fileHandler = getFileHandler(inOutFileSpec.fileHandlerName);
+    if (fileHandler) {
+      IF_ERROR_RETURN(fileHandler->parseUri(inOutFileSpec, colonIndex));
+    } else {
+      IF_ERROR_RETURN(inOutFileSpec.parseUri());
+    }
   }
 
-  unique_ptr<FileHandler> fileHandler = getFileHandler(inOutFileSpec.fileHandlerName);
-  if (fileHandler) {
-    return fileHandler->parseUri(inOutFileSpec, colonIndex);
+  if (!inOutFileSpec.extras.empty() && (delegator = getExtraDelegator(inOutFileSpec)) != nullptr) {
+    delegator->parseUri(inOutFileSpec, colonIndex);
   }
-
-  return inOutFileSpec.parseUri();
+  return SUCCESS;
 }
 
 void FileHandlerFactory::registerFileHandler(unique_ptr<FileHandler>&& fileHandler) {
@@ -121,6 +131,42 @@ void FileHandlerFactory::registerFileDelegator(
 void FileHandlerFactory::unregisterFileDelegator(const string& name) {
   unique_lock<mutex> lock(mutex_);
   fileDelegatorMap_.erase(name);
+}
+
+void FileHandlerFactory::registerExtraDelegator(
+    const string& extraName,
+    const string& extraValue,
+    unique_ptr<FileDelegator>&& delegator) {
+  XR_DEV_CHECK_FALSE(extraName.empty());
+  XR_DEV_CHECK_FALSE(extraValue.empty());
+  unique_lock<mutex> lock(mutex_);
+  extraDelegatorMap_[extraName][extraValue] = std::move(delegator);
+}
+
+void FileHandlerFactory::unregisterExtraDelegator(
+    const std::string& extraName,
+    const std::string& extraValue) {
+  XR_DEV_CHECK_FALSE(extraName.empty());
+  XR_DEV_CHECK_FALSE(extraValue.empty());
+  unique_lock<mutex> lock(mutex_);
+  auto& extra = extraDelegatorMap_[extraName];
+  extra.erase(extraValue);
+  if (extra.empty()) {
+    extraDelegatorMap_.erase(extraName);
+  }
+}
+
+FileDelegator* FileHandlerFactory::getExtraDelegator(const FileSpec& fileSpec) {
+  unique_lock<mutex> lock(mutex_);
+  for (const auto& iter : extraDelegatorMap_) {
+    const string& extraName = iter.first;
+    const string& extraValue = fileSpec.getExtra(extraName);
+    const auto& delegateIter = iter.second.find(extraValue);
+    if (delegateIter != iter.second.end()) {
+      return delegateIter->second.get();
+    }
+  }
+  return nullptr;
 }
 
 FileDelegator* FileHandlerFactory::getFileDelegator(const std::string& name) {
