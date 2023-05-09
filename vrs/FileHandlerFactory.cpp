@@ -46,6 +46,11 @@ int FileHandlerFactory::delegateOpen(
     unique_ptr<FileHandler>& outNewDelegate) {
   if (!fileSpec.fileHandlerName.empty() &&
       (!outNewDelegate || outNewDelegate->getFileHandlerName() != fileSpec.fileHandlerName)) {
+    FileDelegator* delegator = getFileDelegator(fileSpec.fileHandlerName);
+    if (delegator != nullptr) {
+      return delegator->delegateOpenSpec(fileSpec, outNewDelegate);
+    }
+
     unique_ptr<FileHandler> newHandler = getFileHandler(fileSpec.fileHandlerName);
     if (!newHandler) {
       XR_LOGW(
@@ -71,6 +76,11 @@ int FileHandlerFactory::delegateOpen(
 }
 
 int FileHandlerFactory::parseUri(FileSpec& inOutFileSpec, size_t colonIndex) {
+  FileDelegator* delegator = getFileDelegator(inOutFileSpec.fileHandlerName);
+  if (delegator != nullptr) {
+    return delegator->parseUri(inOutFileSpec, colonIndex);
+  }
+
   unique_ptr<FileHandler> fileHandler = getFileHandler(inOutFileSpec.fileHandlerName);
   if (fileHandler) {
     return fileHandler->parseUri(inOutFileSpec, colonIndex);
@@ -99,6 +109,24 @@ unique_ptr<FileHandler> FileHandlerFactory::getFileHandler(const string& name) {
     return handler->second->makeNew();
   }
   return {};
+}
+
+void FileHandlerFactory::registerFileDelegator(
+    const string& name,
+    unique_ptr<FileDelegator>&& delegator) {
+  unique_lock<mutex> lock(mutex_);
+  fileDelegatorMap_[name] = std::move(delegator);
+}
+
+void FileHandlerFactory::unregisterFileDelegator(const string& name) {
+  unique_lock<mutex> lock(mutex_);
+  fileDelegatorMap_.erase(name);
+}
+
+FileDelegator* FileHandlerFactory::getFileDelegator(const std::string& name) {
+  unique_lock<mutex> lock(mutex_);
+  auto delegator = fileDelegatorMap_.find(name);
+  return (delegator == fileDelegatorMap_.end()) ? nullptr : delegator->second.get();
 }
 
 } // namespace vrs

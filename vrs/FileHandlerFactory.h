@@ -31,9 +31,13 @@ class FileHandlerFactory {
  public:
   static FileHandlerFactory& getInstance();
 
+  void registerFileDelegator(const std::string& name, std::unique_ptr<FileDelegator>&& delegator);
+  void unregisterFileDelegator(const std::string& name);
+
   void registerFileHandler(std::unique_ptr<FileHandler>&& fileHandler);
   void unregisterFileHandler(const std::string& fileHandlerName);
   std::unique_ptr<FileHandler> getFileHandler(const std::string& name);
+  FileDelegator* getFileDelegator(const std::string& name);
 
   /// Use different strategies to determine which FileHandler should be used to open the file path.
   /// @param path: a path or other form of identification for a file.
@@ -67,7 +71,8 @@ class FileHandlerFactory {
 
  private:
   std::mutex mutex_;
-  std::map<std::string, std::unique_ptr<FileHandler>> fileHandlerMap_ = {};
+  std::map<std::string, std::unique_ptr<FileDelegator>> fileDelegatorMap_;
+  std::map<std::string, std::unique_ptr<FileHandler>> fileHandlerMap_;
 };
 
 } // namespace vrs

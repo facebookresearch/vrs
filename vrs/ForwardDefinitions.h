@@ -49,6 +49,7 @@ enum class AudioFormat : uint8_t;
 enum class AudioSampleFormat : uint8_t;
 
 struct FileSpec;
+class FileDelegator;
 class FileHandler;
 class WriteFileHandler;
 class DiskFile;
