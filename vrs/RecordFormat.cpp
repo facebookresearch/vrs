@@ -16,14 +16,15 @@
 
 #include "RecordFormat.h"
 
-#include <array>
 #include <cassert>
 #include <cerrno>
 #include <climits>
 
+#include <array>
 #include <iomanip>
 #include <limits>
 #include <sstream>
+#include <tuple>
 
 #define DEFAULT_LOG_CHANNEL "RecordFormat"
 #include <logging/Log.h>
@@ -260,12 +261,14 @@ ImageContentBlockSpec::ImageContentBlockSpec(
     PixelFormat pixelFormat,
     uint32_t width,
     uint32_t height,
-    uint32_t stride)
+    uint32_t stride,
+    uint32_t stride2)
     : imageFormat_{ImageFormat::RAW},
       pixelFormat_{pixelFormat},
       width_{width},
       height_{height},
-      stride_{stride} {}
+      stride_{stride},
+      stride2_{stride2} {}
 
 ImageContentBlockSpec::ImageContentBlockSpec(
     ImageFormat imageFormat,
@@ -273,6 +276,7 @@ ImageContentBlockSpec::ImageContentBlockSpec(
     uint32_t width,
     uint32_t height,
     uint32_t stride,
+    uint32_t stride2,
     const string& codecName,
     uint8_t codecQuality,
     double keyFrameTimestamp,
@@ -282,6 +286,7 @@ ImageContentBlockSpec::ImageContentBlockSpec(
       width_{width},
       height_{height},
       stride_{stride},
+      stride2_{stride2},
       codecName_{codecName},
       keyFrameTimestamp_{keyFrameTimestamp},
       keyFrameIndex_{keyFrameIndex},
@@ -293,12 +298,14 @@ ImageContentBlockSpec::ImageContentBlockSpec(
     PixelFormat pixelFormat,
     uint32_t width,
     uint32_t height,
-    uint32_t stride)
+    uint32_t stride,
+    uint32_t stride2)
     : imageFormat_{ImageFormat::VIDEO},
       pixelFormat_{pixelFormat},
       width_{width},
       height_{height},
       stride_{stride},
+      stride2_{stride2},
       codecName_{codecName},
       codecQuality_{codecQuality} {}
 
@@ -313,15 +320,26 @@ void ImageContentBlockSpec::clear() {
   width_ = 0;
   height_ = 0;
   stride_ = 0;
+  stride2_ = 0;
   codecName_.clear();
   codecQuality_ = kQualityUndefined;
 }
 
 bool ImageContentBlockSpec::operator==(const ImageContentBlockSpec& rhs) const {
-  return imageFormat_ == rhs.imageFormat_ && pixelFormat_ == rhs.pixelFormat_ &&
-      width_ == rhs.width_ && height_ == rhs.height_ && stride_ == rhs.stride_ &&
-      codecName_ == rhs.codecName_ && codecQuality_ == rhs.codecQuality_ &&
-      keyFrameTimestamp_ == rhs.keyFrameTimestamp_ && keyFrameIndex_ == rhs.keyFrameIndex_;
+  auto tieImageSpec = [](const ImageContentBlockSpec& v) {
+    return tie(
+        v.imageFormat_,
+        v.pixelFormat_,
+        v.width_,
+        v.height_,
+        v.stride_,
+        v.stride2_,
+        v.codecName_,
+        v.codecQuality_,
+        v.keyFrameTimestamp_,
+        v.keyFrameIndex_);
+  };
+  return tieImageSpec(*this) == tieImageSpec(rhs);
 }
 
 bool ImageContentBlockSpec::operator!=(const ImageContentBlockSpec& rhs) const {
@@ -352,6 +370,8 @@ void ImageContentBlockSpec::set(ContentParser& parser) {
         pixelFormat_ = PixelFormatConverter::toEnum(text.data());
       } else if (firstChar == 's' && stride_ == 0 && sscanf(cstr, "stride=%u", &stride) == 1) {
         stride_ = stride;
+      } else if (firstChar == 's' && stride2_ == 0 && sscanf(cstr, "stride_2=%u", &stride) == 1) {
+        stride2_ = stride;
       } else if (
           firstChar == 'c' && codecName_.empty() && parser.str.size() < text.size() &&
           sscanf(cstr, "codec=%s", text.data()) == 1) {
@@ -384,6 +404,9 @@ string ImageContentBlockSpec::asString() const {
       }
       if (stride_ > 0) {
         ss << "/stride=" << stride_;
+      }
+      if (stride2_ > 0) {
+        ss << "/stride_2=" << stride2_;
       }
       if (imageFormat_ == ImageFormat::VIDEO) {
         if (!codecName_.empty()) {
@@ -503,10 +526,10 @@ uint32_t ImageContentBlockSpec::getPlaneStride(uint32_t planeIndex) const {
     case PixelFormat::YUV_I420_SPLIT:
       if (planeIndex == 0) {
         // The first block uses 1 byte-per-pixel, and a width which might be overridden by stride_
-        return (stride_ > 0 ? stride_ : getWidth());
+        return stride_ > 0 ? stride_ : getWidth();
       } else if (planeIndex < 3) {
         // second and third planes use one byte per 2-2 squares: half the width, half the height
-        return (getWidth() + 1) / 2;
+        return stride2_ > 0 ? stride2_ : ((getWidth() + 1) / 2);
       }
       break;
     case PixelFormat::YUV_420_NV21:
@@ -515,7 +538,7 @@ uint32_t ImageContentBlockSpec::getPlaneStride(uint32_t planeIndex) const {
         // The first block uses 1 byte-per-pixel, and a width which might be overridden by stride_
         return (stride_ > 0 ? stride_ : getWidth());
       } else if (planeIndex < 2) {
-        return getWidth();
+        return stride2_ > 0 ? stride2_ : getWidth();
       }
       break;
     default:
@@ -598,6 +621,9 @@ uint32_t ImageContentBlockSpec::getStride() const {
       // groups of 2 pixels store their data in 4 bytes
       uint32_t twoPixelsGroupCount = (getWidth() + 1) / 2;
       return twoPixelsGroupCount * 4;
+    }
+    case PixelFormat::UNDEFINED: {
+      return 0;
     }
     default:;
   }
@@ -822,16 +848,18 @@ ContentBlock::ContentBlock(
     PixelFormat pixelFormat,
     uint32_t width,
     uint32_t height,
-    uint32_t stride)
+    uint32_t stride,
+    uint32_t stride2)
     : contentType_(ContentType::IMAGE),
-      imageSpec_(codecName, codecQuality, pixelFormat, width, height, stride) {}
+      imageSpec_(codecName, codecQuality, pixelFormat, width, height, stride, stride2) {}
 
 ContentBlock::ContentBlock(
     PixelFormat pixelFormat,
     uint32_t width,
     uint32_t height,
-    uint32_t stride)
-    : contentType_(ContentType::IMAGE), imageSpec_(pixelFormat, width, height, stride) {}
+    uint32_t stride,
+    uint32_t stride2)
+    : contentType_(ContentType::IMAGE), imageSpec_(pixelFormat, width, height, stride, stride2) {}
 
 ContentBlock::ContentBlock(const ImageContentBlockSpec& imageSpec, size_t size)
     : contentType_(ContentType::IMAGE), size_{size}, imageSpec_{imageSpec} {}

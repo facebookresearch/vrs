@@ -103,19 +103,19 @@ TEST_F(ContentBlockReaderTest, videoImageSpecTest) {
       {ImageFormat::VIDEO, PixelFormat::GREY8, 100, 100}, spec, ImageFormat::VIDEO, 123));
   spec.codecName.stage("H.264");
   EXPECT_TRUE(isImageSpec(
-      {ImageFormat::VIDEO, PixelFormat::GREY8, 100, 100, 0, "H.264"},
+      {ImageFormat::VIDEO, PixelFormat::GREY8, 100, 100, 0, 0, "H.264"},
       spec,
       ImageFormat::VIDEO,
       123));
   spec.codecQuality.set(23);
   EXPECT_TRUE(isImageSpec(
-      {ImageFormat::VIDEO, PixelFormat::GREY8, 100, 100, 0, "H.264", 23},
+      {ImageFormat::VIDEO, PixelFormat::GREY8, 100, 100, 0, 0, "H.264", 23},
       spec,
       ImageFormat::VIDEO,
       123));
   spec.codecQuality.set(0);
   EXPECT_TRUE(isImageSpec(
-      {ImageFormat::VIDEO, PixelFormat::GREY8, 100, 100, 0, "H.264", 0},
+      {ImageFormat::VIDEO, PixelFormat::GREY8, 100, 100, 0, 0, "H.264", 0},
       spec,
       ImageFormat::VIDEO,
       123));
@@ -126,6 +126,7 @@ TEST_F(ContentBlockReaderTest, videoImageSpecTest) {
        100,
        100,
        0,
+       0,
        "H.264",
        ImageContentBlockSpec::kQualityUndefined},
       spec,
@@ -134,7 +135,10 @@ TEST_F(ContentBlockReaderTest, videoImageSpecTest) {
   spec.codecName.stage({});
   spec.codecQuality.set(5);
   EXPECT_TRUE(isImageSpec(
-      {ImageFormat::VIDEO, PixelFormat::GREY8, 100, 100, 0, {}, 5}, spec, ImageFormat::VIDEO, 123));
+      {ImageFormat::VIDEO, PixelFormat::GREY8, 100, 100, 0, 0, {}, 5},
+      spec,
+      ImageFormat::VIDEO,
+      123));
 }
 
 TEST_F(ContentBlockReaderTest, legacySpecTest) {

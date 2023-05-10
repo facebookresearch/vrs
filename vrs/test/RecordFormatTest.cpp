@@ -16,6 +16,9 @@
 
 #include <gtest/gtest.h>
 
+#define DEFAULT_LOG_CHANNEL "RecordFormatTest"
+#include <logging/Verify.h>
+
 #include <vrs/DataPieces.h>
 #include <vrs/Record.h>
 #include <vrs/RecordFormat.h>
@@ -64,6 +67,51 @@ class TestRecordable : public Recordable {
 #define FORMAT_EQUAL(_block_format, _cstring) \
   EXPECT_STREQ(_block_format.asString().c_str(), _cstring)
 
+bool checkImageDimensions(
+    const ContentBlock& cb,
+    uint32_t width,
+    uint32_t height,
+    uint32_t rawStride,
+    uint32_t planeStrideO,
+    uint32_t rawStride2 = 0,
+    uint32_t planeStride1 = 0,
+    uint32_t planeStride2 = 0,
+    uint32_t planeStride3 = 0) {
+  const ImageContentBlockSpec& spec = cb.image();
+  uint32_t planeCount = 0;
+  for (uint32_t plane = 0; plane <= 4; ++plane) {
+    if (spec.getPlaneHeight(plane) != 0 || spec.getPlaneStride(plane) != 0) {
+      planeCount++;
+    }
+    EXPECT_EQ(spec.getPlaneHeight(plane) != 0, spec.getPlaneStride(plane) != 0);
+  }
+  // if dimensions aren't set, bypass the test below
+  if (spec.getWidth() == 0 && spec.getHeight() == 0) {
+    planeCount = spec.getPlaneCount();
+  }
+  return XR_VERIFY(spec.getWidth() == width) && XR_VERIFY(spec.getHeight() == height) &&
+      XR_VERIFY(spec.getRawStride() == rawStride) && XR_VERIFY(spec.getStride() == planeStrideO) &&
+      XR_VERIFY(spec.getPlaneStride(0) == planeStrideO) &&
+      XR_VERIFY(spec.getRawStride2() == rawStride2) &&
+      XR_VERIFY(spec.getPlaneStride(1) == planeStride1) &&
+      XR_VERIFY(spec.getPlaneStride(2) == planeStride2) &&
+      XR_VERIFY(spec.getPlaneStride(3) == planeStride3) && XR_VERIFY(spec.getPlaneStride(4) == 0) &&
+      XR_VERIFY(spec.getPlaneCount() == planeCount);
+}
+
+bool checkImageHeights(
+    const ContentBlock& cb,
+    uint32_t height0,
+    uint32_t height1 = 0,
+    uint32_t height2 = 0,
+    uint32_t height3 = 0) {
+  const ImageContentBlockSpec& spec = cb.image();
+  return XR_VERIFY(spec.getPlaneHeight(0) == height0) &&
+      XR_VERIFY(spec.getPlaneHeight(1) == height1) &&
+      XR_VERIFY(spec.getPlaneHeight(2) == height2) &&
+      XR_VERIFY(spec.getPlaneHeight(3) == height3) && XR_VERIFY(spec.getPlaneHeight(4) == 0);
+}
+
 TEST_F(RecordFormatTest, testBlockFormat) {
   ContentBlock emptyString("");
   EXPECT_EQ(emptyString.getContentType(), ContentType::CUSTOM);
@@ -96,15 +144,15 @@ TEST_F(RecordFormatTest, testBlockFormat) {
   EXPECT_EQ(classic.getContentType(), ContentType::IMAGE);
   EXPECT_EQ(classic.image().getImageFormat(), ImageFormat::RAW);
   EXPECT_EQ(classic.image().getPixelFormat(), PixelFormat::GREY8);
-  EXPECT_EQ(classic.image().getWidth(), 640);
-  EXPECT_EQ(classic.image().getHeight(), 480);
-  EXPECT_EQ(classic.image().getStride(), 648);
-  EXPECT_EQ(classic.image().getRawStride(), 648);
+  EXPECT_TRUE(checkImageDimensions(classic, 640, 480, 648, 648));
+  EXPECT_TRUE(checkImageHeights(classic, 480));
   EXPECT_EQ(classic.image().getBytesPerPixel(), 1);
   EXPECT_EQ(classic.image().getChannelCountPerPixel(), 1);
 
   ContentBlock classicManual(PixelFormat::GREY8, 640, 480, 648);
   EXPECT_EQ(classic, classicManual);
+  EXPECT_TRUE(checkImageDimensions(classicManual, 640, 480, 648, 648));
+  EXPECT_TRUE(checkImageHeights(classicManual, 480));
 
   EXPECT_EQ(ContentBlock("image/raw/10x20/pixel=grey8"), ContentBlock(PixelFormat::GREY8, 10, 20));
   EXPECT_EQ(
@@ -118,18 +166,12 @@ TEST_F(RecordFormatTest, testBlockFormat) {
   EXPECT_EQ(yuvSplit.getContentType(), ContentType::IMAGE);
   EXPECT_EQ(yuvSplit.image().getImageFormat(), ImageFormat::RAW);
   EXPECT_EQ(yuvSplit.image().getPixelFormat(), PixelFormat::YUV_I420_SPLIT);
-  EXPECT_EQ(yuvSplit.image().getWidth(), 640);
-  EXPECT_EQ(yuvSplit.image().getHeight(), 480);
-  EXPECT_EQ(yuvSplit.image().getStride(), 640);
-  EXPECT_EQ(yuvSplit.image().getRawStride(), 0);
+  EXPECT_TRUE(checkImageDimensions(yuvSplit, 640, 480, 0, 640, 0, 320, 320));
+  EXPECT_TRUE(checkImageHeights(yuvSplit, 480, 240, 240));
   EXPECT_EQ(yuvSplit.image().getBytesPerPixel(), ContentBlock::kSizeUnknown);
   EXPECT_EQ(yuvSplit.image().getChannelCountPerPixel(), 3);
-  EXPECT_EQ(yuvSplit.image().getBlockSize(), 460800);
+  EXPECT_EQ(yuvSplit.image().getBlockSize(), 640 * 480 + 2 * 320 * 240);
   EXPECT_EQ(yuvSplit.image().getPlaneCount(), 3);
-  EXPECT_EQ(yuvSplit.image().getPlaneStride(0), 640);
-  EXPECT_EQ(yuvSplit.image().getPlaneStride(1), 320);
-  EXPECT_EQ(yuvSplit.image().getPlaneStride(2), 320);
-  EXPECT_EQ(yuvSplit.image().getPlaneStride(3), 0);
   EXPECT_EQ(yuvSplit.image().getPlaneHeight(0), 480);
   EXPECT_EQ(yuvSplit.image().getPlaneHeight(1), 240);
   EXPECT_EQ(yuvSplit.image().getPlaneHeight(2), 240);
@@ -140,79 +182,95 @@ TEST_F(RecordFormatTest, testBlockFormat) {
   EXPECT_EQ(yuvSplit2.getContentType(), ContentType::IMAGE);
   EXPECT_EQ(yuvSplit2.image().getImageFormat(), ImageFormat::RAW);
   EXPECT_EQ(yuvSplit2.image().getPixelFormat(), PixelFormat::YUV_I420_SPLIT);
-  EXPECT_EQ(yuvSplit2.image().getWidth(), 640);
-  EXPECT_EQ(yuvSplit2.image().getHeight(), 480);
-  EXPECT_EQ(yuvSplit2.image().getStride(), 640);
-  EXPECT_EQ(yuvSplit2.image().getRawStride(), 640);
-  EXPECT_EQ(yuvSplit2.image().getBlockSize(), 460800);
+  EXPECT_TRUE(checkImageDimensions(yuvSplit2, 640, 480, 640, 640, 0, 320, 320));
+  EXPECT_TRUE(checkImageHeights(yuvSplit2, 480, 240, 240));
+  EXPECT_EQ(yuvSplit2.image().getBlockSize(), 640 * 480 + 2 * 320 * 240);
 
   // A single stride doesn't make much sense for this format, but we'll accept it anyway.
   ContentBlock yuvSplit3("image/raw/640x480/pixel=yuv_i420_split/stride=650");
   EXPECT_EQ(yuvSplit3.getContentType(), ContentType::IMAGE);
   EXPECT_EQ(yuvSplit3.image().getImageFormat(), ImageFormat::RAW);
   EXPECT_EQ(yuvSplit3.image().getPixelFormat(), PixelFormat::YUV_I420_SPLIT);
-  EXPECT_EQ(yuvSplit3.image().getWidth(), 640);
-  EXPECT_EQ(yuvSplit3.image().getHeight(), 480);
-  EXPECT_EQ(yuvSplit3.image().getStride(), 650);
-  EXPECT_EQ(yuvSplit3.image().getRawStride(), 650);
-  EXPECT_EQ(yuvSplit3.image().getBlockSize(), 465600);
+  EXPECT_TRUE(checkImageDimensions(yuvSplit3, 640, 480, 650, 650, 0, 320, 320));
+  EXPECT_TRUE(checkImageHeights(yuvSplit3, 480, 240, 240));
+  EXPECT_EQ(yuvSplit3.image().getBlockSize(), 650 * 480 + 2 * 320 * 240);
 
   ContentBlock yuvSplit4("image/raw/642x480/pixel=yuv_i420_split");
   EXPECT_EQ(yuvSplit4.getContentType(), ContentType::IMAGE);
   EXPECT_EQ(yuvSplit4.image().getImageFormat(), ImageFormat::RAW);
   EXPECT_EQ(yuvSplit4.image().getPixelFormat(), PixelFormat::YUV_I420_SPLIT);
-  EXPECT_EQ(yuvSplit4.image().getWidth(), 642);
-  EXPECT_EQ(yuvSplit4.image().getHeight(), 480);
-  EXPECT_EQ(yuvSplit4.image().getStride(), 642);
-  EXPECT_EQ(yuvSplit4.image().getRawStride(), 0);
-  EXPECT_EQ(yuvSplit4.image().getBlockSize(), 462240);
+  EXPECT_TRUE(checkImageDimensions(yuvSplit4, 642, 480, 0, 642, 0, 321, 321));
+  EXPECT_TRUE(checkImageHeights(yuvSplit4, 480, 240, 240));
+  EXPECT_EQ(yuvSplit4.image().getBlockSize(), 642 * 480 + 2 * 321 * 240);
+
+  ContentBlock yuvSplit4b("image/raw/642x480/pixel=yuv_i420_split/stride_2=340");
+  EXPECT_EQ(yuvSplit4b.getContentType(), ContentType::IMAGE);
+  EXPECT_EQ(yuvSplit4b.image().getImageFormat(), ImageFormat::RAW);
+  EXPECT_EQ(yuvSplit4b.image().getPixelFormat(), PixelFormat::YUV_I420_SPLIT);
+  EXPECT_TRUE(checkImageDimensions(yuvSplit4b, 642, 480, 0, 642, 340, 340, 340));
+  EXPECT_TRUE(checkImageHeights(yuvSplit4b, 480, 240, 240));
+  EXPECT_EQ(yuvSplit4b.image().getBlockSize(), 642 * 480 + 2 * 340 * 240);
+
+  ContentBlock yuvSplit4c("image/raw/642x480/pixel=yuv_i420_split/stride=660/stride_2=340");
+  EXPECT_EQ(yuvSplit4c.getContentType(), ContentType::IMAGE);
+  EXPECT_EQ(yuvSplit4c.image().getImageFormat(), ImageFormat::RAW);
+  EXPECT_EQ(yuvSplit4c.image().getPixelFormat(), PixelFormat::YUV_I420_SPLIT);
+  EXPECT_TRUE(checkImageDimensions(yuvSplit4c, 642, 480, 660, 660, 340, 340, 340));
+  EXPECT_TRUE(checkImageHeights(yuvSplit4c, 480, 240, 240));
+  EXPECT_EQ(yuvSplit4c.image().getBlockSize(), 660 * 480 + 2 * 340 * 240);
 
   ContentBlock yuvNv21("image/raw/640x480/pixel=yuv_420_nv21");
   EXPECT_EQ(yuvNv21.getContentType(), ContentType::IMAGE);
   EXPECT_EQ(yuvNv21.image().getImageFormat(), ImageFormat::RAW);
   EXPECT_EQ(yuvNv21.image().getPixelFormat(), PixelFormat::YUV_420_NV21);
-  EXPECT_EQ(yuvNv21.image().getWidth(), 640);
-  EXPECT_EQ(yuvNv21.image().getHeight(), 480);
-  EXPECT_EQ(yuvNv21.image().getStride(), 640);
-  EXPECT_EQ(yuvNv21.image().getRawStride(), 0);
+  EXPECT_TRUE(checkImageDimensions(yuvNv21, 640, 480, 0, 640, 0, 640));
+  EXPECT_TRUE(checkImageHeights(yuvNv21, 480, 240));
+  EXPECT_EQ(yuvNv21.image().getBlockSize(), 640 * 480 + 640 * 240);
   EXPECT_EQ(yuvNv21.image().getBytesPerPixel(), ContentBlock::kSizeUnknown);
   EXPECT_EQ(yuvNv21.image().getChannelCountPerPixel(), 3);
-  EXPECT_EQ(yuvNv21.image().getBlockSize(), 460800);
   EXPECT_EQ(yuvNv21.image().getPlaneCount(), 2);
-  EXPECT_EQ(yuvNv21.image().getPlaneStride(0), 640);
-  EXPECT_EQ(yuvNv21.image().getPlaneStride(1), 640);
-  EXPECT_EQ(yuvNv21.image().getPlaneStride(2), 0);
-  EXPECT_EQ(yuvNv21.image().getPlaneHeight(0), 480);
-  EXPECT_EQ(yuvNv21.image().getPlaneHeight(1), 240);
-  EXPECT_EQ(yuvNv21.image().getPlaneHeight(2), 0);
 
   ContentBlock yuvNv12("image/raw/640x480/pixel=yuv_420_nv12");
   EXPECT_EQ(yuvNv12.getContentType(), ContentType::IMAGE);
   EXPECT_EQ(yuvNv12.image().getImageFormat(), ImageFormat::RAW);
   EXPECT_EQ(yuvNv12.image().getPixelFormat(), PixelFormat::YUV_420_NV12);
-  EXPECT_EQ(yuvNv12.image().getWidth(), 640);
-  EXPECT_EQ(yuvNv12.image().getHeight(), 480);
-  EXPECT_EQ(yuvNv12.image().getStride(), 640);
-  EXPECT_EQ(yuvNv12.image().getRawStride(), 0);
+  EXPECT_TRUE(checkImageDimensions(yuvNv12, 640, 480, 0, 640, 0, 640));
+  EXPECT_TRUE(checkImageHeights(yuvNv12, 480, 240));
+  EXPECT_EQ(yuvNv12.image().getBlockSize(), 640 * 480 + 640 * 240);
   EXPECT_EQ(yuvNv12.image().getBytesPerPixel(), ContentBlock::kSizeUnknown);
   EXPECT_EQ(yuvNv12.image().getChannelCountPerPixel(), 3);
-  EXPECT_EQ(yuvNv12.image().getBlockSize(), 460800);
+  EXPECT_EQ(yuvNv12.image().getBlockSize(), 640 * 480 + 640 * 240);
   EXPECT_EQ(yuvNv12.image().getPlaneCount(), 2);
-  EXPECT_EQ(yuvNv12.image().getPlaneStride(0), 640);
-  EXPECT_EQ(yuvNv12.image().getPlaneStride(1), 640);
-  EXPECT_EQ(yuvNv12.image().getPlaneStride(2), 0);
-  EXPECT_EQ(yuvNv12.image().getPlaneHeight(0), 480);
-  EXPECT_EQ(yuvNv12.image().getPlaneHeight(1), 240);
-  EXPECT_EQ(yuvNv12.image().getPlaneHeight(2), 0);
+
+  ContentBlock yuvNv12b("image/raw/640x480/pixel=yuv_420_nv12/stride_2=680");
+  EXPECT_EQ(yuvNv12b.getContentType(), ContentType::IMAGE);
+  EXPECT_EQ(yuvNv12b.image().getImageFormat(), ImageFormat::RAW);
+  EXPECT_EQ(yuvNv12b.image().getPixelFormat(), PixelFormat::YUV_420_NV12);
+  EXPECT_TRUE(checkImageDimensions(yuvNv12b, 640, 480, 0, 640, 680, 680));
+  EXPECT_TRUE(checkImageHeights(yuvNv12b, 480, 240));
+  EXPECT_EQ(yuvNv12b.image().getBlockSize(), 640 * 480 + 680 * 240);
+  EXPECT_EQ(yuvNv12b.image().getBytesPerPixel(), ContentBlock::kSizeUnknown);
+  EXPECT_EQ(yuvNv12b.image().getChannelCountPerPixel(), 3);
+  EXPECT_EQ(yuvNv12b.image().getPlaneCount(), 2);
+
+  ContentBlock yuvNv12c("image/raw/640x480/pixel=yuv_420_nv12/stride=660/stride_2=680");
+  EXPECT_EQ(yuvNv12c.getContentType(), ContentType::IMAGE);
+  EXPECT_EQ(yuvNv12c.image().getImageFormat(), ImageFormat::RAW);
+  EXPECT_EQ(yuvNv12c.image().getPixelFormat(), PixelFormat::YUV_420_NV12);
+  EXPECT_TRUE(checkImageDimensions(yuvNv12c, 640, 480, 660, 660, 680, 680));
+  EXPECT_TRUE(checkImageHeights(yuvNv12c, 480, 240));
+  EXPECT_EQ(yuvNv12c.image().getBlockSize(), 660 * 480 + 680 * 240);
+  EXPECT_EQ(yuvNv12c.image().getBytesPerPixel(), ContentBlock::kSizeUnknown);
+  EXPECT_EQ(yuvNv12c.image().getChannelCountPerPixel(), 3);
+  EXPECT_EQ(yuvNv12c.image().getPlaneCount(), 2);
 
   ContentBlock yuy2a("image/raw/642x480/pixel=yuy2");
   EXPECT_EQ(yuy2a.getContentType(), ContentType::IMAGE);
   EXPECT_EQ(yuy2a.image().getImageFormat(), ImageFormat::RAW);
   EXPECT_EQ(yuy2a.image().getPixelFormat(), PixelFormat::YUY2);
-  EXPECT_EQ(yuy2a.image().getWidth(), 642);
-  EXPECT_EQ(yuy2a.image().getHeight(), 480);
-  EXPECT_EQ(yuy2a.image().getStride(), 1284);
-  EXPECT_EQ(yuy2a.image().getRawStride(), 0);
+  EXPECT_TRUE(checkImageDimensions(yuy2a, 642, 480, 0, 642 * 2));
+  EXPECT_TRUE(checkImageHeights(yuy2a, 480));
+  EXPECT_EQ(yuy2a.image().getBlockSize(), 642 * 2 * 480);
   EXPECT_EQ(yuy2a.image().getBytesPerPixel(), ContentBlock::kSizeUnknown);
   EXPECT_EQ(yuy2a.image().getChannelCountPerPixel(), 3);
 
@@ -220,19 +278,17 @@ TEST_F(RecordFormatTest, testBlockFormat) {
   EXPECT_EQ(yuy2b.getContentType(), ContentType::IMAGE);
   EXPECT_EQ(yuy2b.image().getImageFormat(), ImageFormat::RAW);
   EXPECT_EQ(yuy2b.image().getPixelFormat(), PixelFormat::YUY2);
-  EXPECT_EQ(yuy2b.image().getWidth(), 643);
-  EXPECT_EQ(yuy2b.image().getHeight(), 480);
-  EXPECT_EQ(yuy2b.image().getStride(), 1288);
-  EXPECT_EQ(yuy2b.image().getRawStride(), 0);
+  EXPECT_TRUE(checkImageDimensions(yuy2b, 643, 480, 0, 644 * 2));
+  EXPECT_TRUE(checkImageHeights(yuy2b, 480));
+  EXPECT_EQ(yuy2b.image().getBlockSize(), 644 * 2 * 480);
 
   ContentBlock raw10a("image/raw/640x480/pixel=raw10");
   EXPECT_EQ(raw10a.getContentType(), ContentType::IMAGE);
   EXPECT_EQ(raw10a.image().getImageFormat(), ImageFormat::RAW);
   EXPECT_EQ(raw10a.image().getPixelFormat(), PixelFormat::RAW10);
-  EXPECT_EQ(raw10a.image().getWidth(), 640);
-  EXPECT_EQ(raw10a.image().getHeight(), 480);
-  EXPECT_EQ(raw10a.image().getStride(), 800);
-  EXPECT_EQ(raw10a.image().getRawStride(), 0);
+  EXPECT_TRUE(checkImageDimensions(raw10a, 640, 480, 0, 800));
+  EXPECT_TRUE(checkImageHeights(raw10a, 480));
+  EXPECT_EQ(raw10a.image().getBlockSize(), 800 * 480);
   EXPECT_EQ(raw10a.image().getBytesPerPixel(), ContentBlock::kSizeUnknown);
   EXPECT_EQ(raw10a.image().getChannelCountPerPixel(), 1);
 
@@ -240,10 +296,9 @@ TEST_F(RecordFormatTest, testBlockFormat) {
   EXPECT_EQ(raw10b.getContentType(), ContentType::IMAGE);
   EXPECT_EQ(raw10b.image().getImageFormat(), ImageFormat::RAW);
   EXPECT_EQ(raw10b.image().getPixelFormat(), PixelFormat::RAW10);
-  EXPECT_EQ(raw10b.image().getWidth(), 641);
-  EXPECT_EQ(raw10b.image().getHeight(), 480);
-  EXPECT_EQ(raw10b.image().getStride(), 805);
-  EXPECT_EQ(raw10b.image().getRawStride(), 0);
+  EXPECT_TRUE(checkImageDimensions(raw10b, 641, 480, 0, 805));
+  EXPECT_TRUE(checkImageHeights(raw10b, 480));
+  EXPECT_EQ(raw10b.image().getBlockSize(), 805 * 480);
   EXPECT_EQ(raw10b.image().getBytesPerPixel(), ContentBlock::kSizeUnknown);
   EXPECT_EQ(raw10b.image().getChannelCountPerPixel(), 1);
   EXPECT_EQ(raw10b.image().getCodecQuality(), ImageContentBlockSpec::kQualityUndefined);
@@ -252,10 +307,8 @@ TEST_F(RecordFormatTest, testBlockFormat) {
   EXPECT_EQ(video.getContentType(), ContentType::IMAGE);
   EXPECT_EQ(video.image().getImageFormat(), ImageFormat::VIDEO);
   EXPECT_EQ(video.image().getPixelFormat(), PixelFormat::UNDEFINED);
-  EXPECT_EQ(video.image().getWidth(), 0);
-  EXPECT_EQ(video.image().getHeight(), 0);
-  EXPECT_EQ(video.image().getStride(), 0);
-  EXPECT_EQ(video.image().getRawStride(), 0);
+  EXPECT_TRUE(checkImageDimensions(video, 0, 0, 0, 0));
+  EXPECT_TRUE(checkImageHeights(video, 0));
   EXPECT_EQ(video.image().getBytesPerPixel(), ContentBlock::kSizeUnknown);
   EXPECT_EQ(video.image().getChannelCountPerPixel(), 0);
   EXPECT_EQ(video.image().getCodecName(), "");
@@ -265,10 +318,8 @@ TEST_F(RecordFormatTest, testBlockFormat) {
   EXPECT_EQ(videoCodec.getContentType(), ContentType::IMAGE);
   EXPECT_EQ(videoCodec.image().getImageFormat(), ImageFormat::VIDEO);
   EXPECT_EQ(videoCodec.image().getPixelFormat(), PixelFormat::UNDEFINED);
-  EXPECT_EQ(videoCodec.image().getWidth(), 0);
-  EXPECT_EQ(videoCodec.image().getHeight(), 0);
-  EXPECT_EQ(videoCodec.image().getStride(), 0);
-  EXPECT_EQ(videoCodec.image().getRawStride(), 0);
+  EXPECT_TRUE(checkImageDimensions(videoCodec, 0, 0, 0, 0));
+  EXPECT_TRUE(checkImageHeights(videoCodec, 0));
   EXPECT_EQ(videoCodec.image().getBytesPerPixel(), ContentBlock::kSizeUnknown);
   EXPECT_EQ(videoCodec.image().getChannelCountPerPixel(), 0);
   EXPECT_EQ(videoCodec.image().getCodecName(), "H.264");
@@ -278,10 +329,8 @@ TEST_F(RecordFormatTest, testBlockFormat) {
   EXPECT_EQ(videoCodecQuality.getContentType(), ContentType::IMAGE);
   EXPECT_EQ(videoCodecQuality.image().getImageFormat(), ImageFormat::VIDEO);
   EXPECT_EQ(videoCodecQuality.image().getPixelFormat(), PixelFormat::UNDEFINED);
-  EXPECT_EQ(videoCodecQuality.image().getWidth(), 0);
-  EXPECT_EQ(videoCodecQuality.image().getHeight(), 0);
-  EXPECT_EQ(videoCodecQuality.image().getStride(), 0);
-  EXPECT_EQ(videoCodecQuality.image().getRawStride(), 0);
+  EXPECT_TRUE(checkImageDimensions(videoCodecQuality, 0, 0, 0, 0));
+  EXPECT_TRUE(checkImageHeights(videoCodecQuality, 0));
   EXPECT_EQ(videoCodecQuality.image().getBytesPerPixel(), ContentBlock::kSizeUnknown);
   EXPECT_EQ(videoCodecQuality.image().getChannelCountPerPixel(), 0);
   EXPECT_EQ(videoCodecQuality.image().getCodecName(), "VP9");
@@ -296,10 +345,9 @@ TEST_F(RecordFormatTest, testBlockFormat) {
   EXPECT_EQ(videoCodecEscaped.getContentType(), ContentType::IMAGE);
   EXPECT_EQ(videoCodecEscaped.image().getImageFormat(), ImageFormat::VIDEO);
   EXPECT_EQ(videoCodecEscaped.image().getPixelFormat(), PixelFormat::GREY12);
-  EXPECT_EQ(videoCodecEscaped.image().getWidth(), 640);
-  EXPECT_EQ(videoCodecEscaped.image().getHeight(), 480);
-  EXPECT_EQ(videoCodecEscaped.image().getStride(), 650);
-  EXPECT_EQ(videoCodecEscaped.image().getRawStride(), 650);
+  EXPECT_TRUE(checkImageDimensions(videoCodecEscaped, 640, 480, 650, 650));
+  EXPECT_TRUE(checkImageHeights(videoCodecEscaped, 480));
+  EXPECT_EQ(videoCodecEscaped.image().getBlockSize(), ContentBlock::kSizeUnknown);
   EXPECT_EQ(videoCodecEscaped.image().getBytesPerPixel(), 2);
   EXPECT_EQ(videoCodecEscaped.image().getChannelCountPerPixel(), 1);
   EXPECT_EQ(videoCodecEscaped.image().getCodecName(), "+confusing/codec/bad+name");
@@ -476,6 +524,11 @@ TEST_F(RecordFormatTest, testFormat) {
       "image/raw/100x200/pixel=bgr8",
       "image/raw/10x20/pixel=grey8",
       "image/raw/102x200/pixel=depth32f",
+      "image/raw/102x200/pixel=yuv_i420_split",
+      "image/raw/102x200/pixel=yuy2",
+      "image/raw/102x200/pixel=yuy2/stride=204",
+      "image/raw/102x200/pixel=yuv_420_nv12/stride=120/stride_2=104",
+      "image/raw/102x200/pixel=yuv_420_nv12/stride_2=104",
       "image/video/1024x800/pixel=raw10/codec=H.264",
       "image/video/1024x800/pixel=raw10/codec=VP9/codec_quality=53",
       "image/video/640x480/pixel=grey8/codec_quality=0",
@@ -699,12 +752,12 @@ TEST_F(RecordFormatTest, testCompare) {
   EXPECT_EQ(
       def,
       ImageContentBlockSpec(
-          ImageFormat::UNDEFINED, PixelFormat::UNDEFINED, 0, 0, 0, {}, kQUndefined));
+          ImageFormat::UNDEFINED, PixelFormat::UNDEFINED, 0, 0, 0, 0, {}, kQUndefined));
 
   ImageContentBlockSpec copy{def};
   EXPECT_EQ(def, copy);
 
-  ImageContentBlockSpec exp(ImageFormat::VIDEO, PixelFormat::GREY10, 10, 20, 25, "test", 12);
+  ImageContentBlockSpec exp(ImageFormat::VIDEO, PixelFormat::GREY10, 10, 20, 25, 0, "test", 12);
   EXPECT_NE(def, exp);
   EXPECT_EQ(exp.getImageFormat(), ImageFormat::VIDEO);
   EXPECT_EQ(exp.getPixelFormat(), PixelFormat::GREY10);
@@ -712,11 +765,12 @@ TEST_F(RecordFormatTest, testCompare) {
   EXPECT_EQ(exp.getHeight(), 20);
   EXPECT_EQ(exp.getStride(), 25);
   EXPECT_EQ(exp.getRawImageSize(), 500);
+  EXPECT_EQ(exp.getRawStride2(), 0);
   EXPECT_EQ(exp.getCodecName(), "test");
   EXPECT_EQ(exp.getCodecQuality(), 12);
 
   ImageContentBlockSpec exp2(
-      ImageFormat::VIDEO, PixelFormat::GREY12, 10, 20, 25, "test", 12, 1.2, 5);
+      ImageFormat::VIDEO, PixelFormat::GREY12, 10, 20, 25, 0, "test", 12, 1.2, 5);
   EXPECT_NE(def, exp2);
   EXPECT_EQ(exp2.getImageFormat(), ImageFormat::VIDEO);
   EXPECT_EQ(exp2.getPixelFormat(), PixelFormat::GREY12);
@@ -724,6 +778,7 @@ TEST_F(RecordFormatTest, testCompare) {
   EXPECT_EQ(exp2.getHeight(), 20);
   EXPECT_EQ(exp2.getStride(), 25);
   EXPECT_EQ(exp2.getRawImageSize(), 500);
+  EXPECT_EQ(exp.getRawStride2(), 0);
   EXPECT_EQ(exp2.getCodecName(), "test");
   EXPECT_EQ(exp2.getCodecQuality(), 12);
   EXPECT_NEAR(exp2.getKeyFrameTimestamp(), 1.2, 1e-9);
@@ -731,22 +786,23 @@ TEST_F(RecordFormatTest, testCompare) {
 
   ImageContentBlockSpec raw(PixelFormat::GREY8, 1, 2, 3);
   EXPECT_EQ(
-      raw, ImageContentBlockSpec(ImageFormat::RAW, PixelFormat::GREY8, 1, 2, 3, {}, kQUndefined));
+      raw,
+      ImageContentBlockSpec(ImageFormat::RAW, PixelFormat::GREY8, 1, 2, 3, 0, {}, kQUndefined));
 
   ImageContentBlockSpec video("H.264", 0, PixelFormat::GREY8, 2, 3, 4);
   EXPECT_EQ(
-      video, ImageContentBlockSpec(ImageFormat::VIDEO, PixelFormat::GREY8, 2, 3, 4, "H.264", 0));
+      video, ImageContentBlockSpec(ImageFormat::VIDEO, PixelFormat::GREY8, 2, 3, 4, 0, "H.264", 0));
 
   ImageContentBlockSpec video2(video, 1.250, 34);
   EXPECT_EQ(
       video2,
       ImageContentBlockSpec(
-          ImageFormat::VIDEO, PixelFormat::GREY8, 2, 3, 4, "H.264", 0, 1.250, 34));
+          ImageFormat::VIDEO, PixelFormat::GREY8, 2, 3, 4, 0, "H.264", 0, 1.250, 34));
 
   ImageContentBlockSpec jpg(ImageFormat::JPG, 5, 6);
   EXPECT_EQ(
       jpg,
-      ImageContentBlockSpec(ImageFormat::JPG, PixelFormat::UNDEFINED, 5, 6, 0, {}, kQUndefined));
+      ImageContentBlockSpec(ImageFormat::JPG, PixelFormat::UNDEFINED, 5, 6, 0, 0, {}, kQUndefined));
 }
 
 TEST_F(RecordFormatTest, testPixelFormat) {
