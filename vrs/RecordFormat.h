@@ -156,6 +156,7 @@ class ImageContentBlockSpec {
       uint32_t width = 0,
       uint32_t height = 0,
       uint32_t stride = 0,
+      uint32_t stride2 = 0,
       const string& codecName = {},
       uint8_t codecQuality = kQualityUndefined,
       double keyFrameTimestamp = kInvalidTimestamp,
@@ -169,7 +170,9 @@ class ImageContentBlockSpec {
       PixelFormat pixelFormat,
       uint32_t width,
       uint32_t height,
-      uint32_t stride = 0); // number of bytes between lines, if not width * sizeof(pixelFormat)
+      uint32_t stride = 0, ///< number of bytes between lines, if not width * sizeof(pixelFormat)
+      uint32_t stride2 = 0 ///< stride for planes after the first plane
+  );
 
   /// Video image with codec.
   ImageContentBlockSpec(
@@ -178,7 +181,8 @@ class ImageContentBlockSpec {
       PixelFormat pixelFormat,
       uint32_t width,
       uint32_t height,
-      uint32_t stride = 0);
+      uint32_t stride = 0,
+      uint32_t stride2 = 0);
 
   /// Constructor used for factory construction. @internal
   explicit ImageContentBlockSpec(const string& formatStr);
@@ -202,7 +206,7 @@ class ImageContentBlockSpec {
   /// Default copy assignment
   ImageContentBlockSpec& operator=(const ImageContentBlockSpec&) = default;
 
-  /// Compare two image block spec.
+  /// Compare two image block spec strictly, field by field.
   bool operator==(const ImageContentBlockSpec& rhs) const;
   bool operator!=(const ImageContentBlockSpec& rhs) const;
 
@@ -234,6 +238,9 @@ class ImageContentBlockSpec {
   /// Return 0 if no stride value was explicitly provided.
   uint32_t getRawStride() const {
     return stride_;
+  }
+  uint32_t getRawStride2() const {
+    return stride2_;
   }
 
   /// Get the number of planes for this pixel format.
@@ -310,7 +317,8 @@ class ImageContentBlockSpec {
   PixelFormat pixelFormat_{PixelFormat::UNDEFINED};
   uint32_t width_{0};
   uint32_t height_{0};
-  uint32_t stride_{0};
+  uint32_t stride_{0}; // Stride (bytes between lines) for the first pixel plane
+  uint32_t stride2_{0}; // Stride for the other planes (same for all)
   // for ImageFormat::VIDEO
   string codecName_;
   double keyFrameTimestamp_{kInvalidTimestamp};
@@ -474,10 +482,16 @@ class ContentBlock {
       PixelFormat pixelFormat = PixelFormat::UNDEFINED,
       uint32_t width = 0,
       uint32_t height = 0,
-      uint32_t stride = 0);
+      uint32_t stride = 0,
+      uint32_t stride2 = 0);
 
   /// Raw image formats: a PixelFormat and maybe resolutions & raw stride.
-  ContentBlock(PixelFormat pixelFormat, uint32_t width, uint32_t height, uint32_t stride = 0);
+  ContentBlock(
+      PixelFormat pixelFormat,
+      uint32_t width,
+      uint32_t height,
+      uint32_t stride = 0,
+      uint32_t stride2 = 0);
 
   ContentBlock(const ImageContentBlockSpec& imageSpec, size_t size = kSizeUnknown);
   ContentBlock(

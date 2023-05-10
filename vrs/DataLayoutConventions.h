@@ -42,8 +42,10 @@ class NextContentBlockSizeSpec : public AutoDataLayout {
 constexpr const char* kImageWidth = "image_width";
 /// DataLayout convention name for the image height.
 constexpr const char* kImageHeight = "image_height";
-/// DataLayout convention name for the image stride.
+/// DataLayout convention name for the image stride for the first plane.
 constexpr const char* kImageStride = "image_stride";
+/// DataLayout convention name for the image stride for the other planes (not the first plane).
+constexpr const char* kImageStride2 = "image_stride_2";
 /// DataLayout convention name for the pixel format specification (see vrs::ImageFormat).
 constexpr const char* kImagePixelFormat = "image_pixel_format";
 /// DataLayout convention name for the number of bytes per pixel, deprecated.
@@ -75,6 +77,7 @@ class ImageSpec : public AutoDataLayout {
   DataPieceValue<ImageSpecType> width{kImageWidth};
   DataPieceValue<ImageSpecType> height{kImageHeight};
   DataPieceValue<ImageSpecType> stride{kImageStride};
+  DataPieceValue<ImageSpecType> stride2{kImageStride2};
   DataPieceEnum<PixelFormat, ImageSpecType> pixelFormat{kImagePixelFormat};
 
   // For video encoding

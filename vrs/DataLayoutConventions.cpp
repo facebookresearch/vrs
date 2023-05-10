@@ -58,8 +58,9 @@ ContentBlock ImageSpec::getImageContentBlock(const ImageContentBlockSpec& base, 
   }
   if (readWidth != 0 && readHeight != 0 && readPixelFormat != PixelFormat::UNDEFINED) {
     uint32_t readStride = stride.get(); // get value or 0
+    uint32_t readStride2 = stride2.get(); // get value or 0
     if (base.getImageFormat() == ImageFormat::RAW) {
-      return ContentBlock(readPixelFormat, readWidth, readHeight, readStride);
+      return ContentBlock(readPixelFormat, readWidth, readHeight, readStride, readStride2);
     } else if (base.getImageFormat() == ImageFormat::VIDEO) {
       if (blockSize != ContentBlock::kSizeUnknown) {
         string aCodecName;
@@ -73,7 +74,13 @@ ContentBlock ImageSpec::getImageContentBlock(const ImageContentBlockSpec& base, 
         }
         return {
             ImageContentBlockSpec(
-                aCodecName, aCodecQuality, readPixelFormat, readWidth, readHeight, readStride),
+                aCodecName,
+                aCodecQuality,
+                readPixelFormat,
+                readWidth,
+                readHeight,
+                readStride,
+                readStride2),
             blockSize};
       }
     }
