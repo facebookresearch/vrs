@@ -364,17 +364,21 @@ class AudioContentBlockSpec {
 
   /// Compare two audio block spec.
   bool operator==(const AudioContentBlockSpec& rhs) const {
-    return sampleFormat_ == rhs.sampleFormat_ && channelCount_ == rhs.channelCount_ &&
-        sampleBlockStride_ == rhs.sampleBlockStride_ && sampleCount_ == rhs.sampleCount_ &&
-        sampleRate_ == rhs.sampleRate_;
+    auto tie = [](const AudioContentBlockSpec& s) {
+      return std::tie(
+          s.sampleFormat_, s.channelCount_, s.sampleBlockStride_, s.sampleCount_, s.sampleRate_);
+    };
+    return tie(*this) == tie(rhs);
   }
   bool operator!=(const AudioContentBlockSpec& rhs) const {
     return !operator==(rhs);
   }
   /// Tell if two audio block have identical audio formats.
   bool isCompatibleWith(const AudioContentBlockSpec& rhs) const {
-    return sampleFormat_ == rhs.sampleFormat_ && channelCount_ == rhs.channelCount_ &&
-        sampleRate_ == rhs.sampleRate_;
+    auto tie = [](const AudioContentBlockSpec& s) {
+      return std::tie(s.sampleFormat_, s.channelCount_, s.sampleRate_);
+    };
+    return tie(*this) == tie(rhs);
   }
   /// Get audio format.
   AudioFormat getAudioFormat() const {

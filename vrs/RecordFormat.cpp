@@ -326,8 +326,8 @@ void ImageContentBlockSpec::clear() {
 }
 
 bool ImageContentBlockSpec::operator==(const ImageContentBlockSpec& rhs) const {
-  auto tieImageSpec = [](const ImageContentBlockSpec& v) {
-    return tie(
+  auto tie = [](const ImageContentBlockSpec& v) {
+    return std::tie(
         v.imageFormat_,
         v.pixelFormat_,
         v.width_,
@@ -339,7 +339,7 @@ bool ImageContentBlockSpec::operator==(const ImageContentBlockSpec& rhs) const {
         v.keyFrameTimestamp_,
         v.keyFrameIndex_);
   };
-  return tieImageSpec(*this) == tieImageSpec(rhs);
+  return tie(*this) == tie(rhs);
 }
 
 bool ImageContentBlockSpec::operator!=(const ImageContentBlockSpec& rhs) const {
