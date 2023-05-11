@@ -17,8 +17,10 @@
 #include "FileHandler.h"
 
 #include <cstring>
+
 #include <iostream>
 #include <sstream>
+#include <tuple>
 
 #define DEFAULT_LOG_CHANNEL "FileHandler"
 #include <logging/Log.h>
@@ -339,8 +341,10 @@ string FileSpec::getXXHash() const {
 }
 
 bool FileSpec::operator==(const FileSpec& rhs) const {
-  return fileName == rhs.fileName && fileHandlerName == rhs.fileHandlerName && uri == rhs.uri &&
-      chunks == rhs.chunks && chunkSizes == rhs.chunkSizes && extras == rhs.extras;
+  auto tie = [](const FileSpec& fs) {
+    return std::tie(fs.fileName, fs.fileHandlerName, fs.uri, fs.chunks, fs.chunkSizes, fs.extras);
+  };
+  return tie(*this) == tie(rhs);
 }
 
 string FileSpec::getExtra(const string& name) const {

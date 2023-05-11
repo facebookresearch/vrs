@@ -17,7 +17,9 @@
 #pragma once
 
 #include <cstdint>
+
 #include <string>
+#include <tuple>
 
 #include <vrs/os/Platform.h>
 
@@ -246,7 +248,8 @@ class StreamId {
 
   /// Compare operator, so that we can use StreamId in containers, with a guarantied behavior.
   bool operator<(const StreamId& rhs) const {
-    return typeId_ < rhs.typeId_ || (typeId_ == rhs.typeId_ && instanceId_ < rhs.instanceId_);
+    auto tie = [](const StreamId& id) { return std::tie(id.typeId_, id.instanceId_); };
+    return tie(*this) < tie(rhs);
   }
 
   /// Test if the instance represents device.

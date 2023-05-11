@@ -18,6 +18,7 @@
 
 #include <deque>
 #include <set>
+#include <tuple>
 
 #include "Compressor.h"
 #include "DiskFile.h"
@@ -113,15 +114,17 @@ struct RecordInfo {
   Record::Type recordType; ///< type of record
 
   bool operator<(const RecordInfo& rhs) const {
-    return this->timestamp < rhs.timestamp ||
-        (this->timestamp <= rhs.timestamp &&
-         (this->streamId < rhs.streamId ||
-          (this->streamId == rhs.streamId && this->fileOffset < rhs.fileOffset)));
+    auto tie = [](const RecordInfo& ri) {
+      return std::tie(ri.timestamp, ri.streamId, ri.fileOffset);
+    };
+    return tie(*this) < tie(rhs);
   }
 
   bool operator==(const RecordInfo& rhs) const {
-    return this->timestamp == rhs.timestamp && this->fileOffset == rhs.fileOffset &&
-        this->streamId == rhs.streamId && this->recordType == rhs.recordType;
+    auto tie = [](const RecordInfo& ri) {
+      return std::tie(ri.timestamp, ri.fileOffset, ri.streamId, ri.recordType);
+    };
+    return tie(*this) == tie(rhs);
   }
 };
 
@@ -240,8 +243,10 @@ struct RecordSignature {
   Record::Type recordType;
 
   bool operator<(const RecordSignature& rhs) const {
-    return this->recordType < rhs.recordType ||
-        (this->recordType == rhs.recordType && this->streamId < rhs.streamId);
+    auto tie = [](const RecordSignature& recordSignature) {
+      return std::tie(recordSignature.recordType, recordSignature.streamId);
+    };
+    return tie(*this) < tie(rhs);
   }
 };
 

@@ -21,6 +21,7 @@
 #include <memory>
 #include <set>
 #include <thread>
+#include <tuple>
 
 #include "Compressor.h"
 #include "DiskFile.h"
@@ -266,12 +267,11 @@ class RecordFileWriter {
 
     /// we are sorting records primarily by timestamp, but this order is a total order
     bool operator<(const SortRecord& rhs) const {
-      return this->record->getTimestamp() < rhs.record->getTimestamp() ||
-          (this->record->getTimestamp() <= rhs.record->getTimestamp() &&
-           (this->streamId < rhs.streamId ||
-            // Records have a unique creation order within a particular device
-            (this->streamId == rhs.streamId &&
-             this->record->getCreationOrder() < rhs.record->getCreationOrder())));
+      // Records have a comparable creation order within a particular device
+      auto tie = [](const SortRecord& sr) {
+        return std::tie(sr.record->getTimestamp(), sr.streamId, sr.record->getCreationOrder());
+      };
+      return tie(*this) < tie(rhs);
     }
 
     Record* record;

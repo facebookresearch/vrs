@@ -121,11 +121,11 @@ class Record final {
       uint32_t compressedSize);
 
   /// Get the record's timestamp.
-  double getTimestamp() const {
+  const double& getTimestamp() const {
     return timestamp_;
   }
 
-  uint64_t getCreationOrder() const {
+  const uint64_t& getCreationOrder() const {
     return creationOrder_;
   }
 

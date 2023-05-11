@@ -38,8 +38,8 @@ struct OperationContext {
       : operation{std::move(rhs.operation)}, sourceLocation{std::move(rhs.sourceLocation)} {}
 
   bool operator<(const OperationContext& rhs) const {
-    return operation < rhs.operation ||
-        (operation == rhs.operation && sourceLocation < rhs.sourceLocation);
+    auto tie = [](const OperationContext& oc) { return std::tie(oc.operation, oc.sourceLocation); };
+    return tie(*this) < tie(rhs);
   }
   OperationContext& operator=(OperationContext&& rhs) {
     operation = std::move(rhs.operation);
