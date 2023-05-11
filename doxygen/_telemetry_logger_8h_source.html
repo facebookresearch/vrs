@@ -110,8 +110,8 @@ $(function() {
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      : operation{std::move(rhs.operation)}, sourceLocation{std::move(rhs.sourceLocation)} {}</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keywordtype">bool</span> operator&lt;(<span class="keyword">const</span> <a class="code" href="structvrs_1_1_operation_context.html">OperationContext</a>&amp; rhs)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordflow">return</span> operation &lt; rhs.operation ||</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        (operation == rhs.operation &amp;&amp; sourceLocation &lt; rhs.sourceLocation);</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keyword">auto</span> tie = [](<span class="keyword">const</span> <a class="code" href="structvrs_1_1_operation_context.html">OperationContext</a>&amp; oc) { <span class="keywordflow">return</span> std::tie(oc.operation, oc.sourceLocation); };</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordflow">return</span> tie(*<span class="keyword">this</span>) &lt; tie(rhs);</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  }</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <a class="code" href="structvrs_1_1_operation_context.html">OperationContext</a>&amp; operator=(<a class="code" href="structvrs_1_1_operation_context.html">OperationContext</a>&amp;&amp; rhs) {</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    operation = std::move(rhs.operation);</div>
