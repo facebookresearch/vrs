@@ -262,7 +262,7 @@ int64_t FileSpec::getFileSize() const {
 }
 
 string FileSpec::getSourceLocation() const {
-  if (!uri.empty()) {
+  if (!uri.empty() && !isDiskFile()) {
     auto colon = uri.find(':');
     if (colon != string::npos) {
       auto end = colon;

@@ -351,6 +351,26 @@ TEST_F(SimpleFileHandlerTest, pathJsonUriParse) {
   EXPECT_EQ(spec.getEasyPath(), path);
 
   invalidate(spec);
+  string filePath = "/this/is/a/file/path";
+  path = "diskfile:" + filePath;
+  EXPECT_EQ(spec.fromPathJsonUri(path), 0);
+  EXPECT_FALSE(spec.uri.empty());
+  EXPECT_EQ(spec.fileHandlerName, DiskFile::staticName());
+  chunks = {filePath};
+  EXPECT_EQ(spec.chunks, chunks);
+  EXPECT_TRUE(spec.chunkSizes.empty());
+  EXPECT_TRUE(spec.fileName.empty());
+  EXPECT_FALSE(spec.hasChunkSizes());
+  EXPECT_EQ(spec.getFileSize(), -1);
+  EXPECT_EQ(spec.getSourceLocation(), DiskFile::staticName()); // keep file location hidden
+  EXPECT_EQ(
+      spec.toJson(),
+      "{\"chunks\":[\"" + escape(filePath) +
+          "\"],\"storage\":\"diskfile\","
+          "\"source_uri\":\"diskfile:/this/is/a/file/path\"}");
+  EXPECT_EQ(spec.getEasyPath(), path);
+
+  invalidate(spec);
   path = "/this/is/a/file/path:with:colons";
   EXPECT_EQ(spec.fromPathJsonUri(path), 0);
   EXPECT_TRUE(spec.uri.empty());
@@ -519,7 +539,7 @@ TEST_F(SimpleFileHandlerTest, pathJsonUriParse) {
   EXPECT_EQ(spec.toJson(), json);
   EXPECT_EQ(spec.getEasyPath(), CHUNK1);
 
-#define PATH "123456"
+#define PATH "//domain/folder/dir/file.ext"
 #define URI "nfs:" PATH
 #define URIQ URI "?q=1"
   EXPECT_EQ(spec.fromPathJsonUri(URIQ), 0);
@@ -531,8 +551,8 @@ TEST_F(SimpleFileHandlerTest, pathJsonUriParse) {
   EXPECT_EQ(spec.fileName, "");
   EXPECT_FALSE(spec.hasChunkSizes());
   EXPECT_EQ(spec.getFileSize(), -1);
-  EXPECT_EQ(spec.getSourceLocation(), URI);
-  json = "{\"chunks\":[\"123456\"],\"storage\":\"nfs\",\"source_uri\":\"" URIQ "\",\"q\":\"1\"}";
+  EXPECT_EQ(spec.getSourceLocation(), "nfs://domain");
+  json = "{\"chunks\":[\"" PATH "\"],\"storage\":\"nfs\",\"source_uri\":\"" URIQ "\",\"q\":\"1\"}";
   EXPECT_EQ(spec.toJson(), json);
   EXPECT_EQ(spec.getEasyPath(), URIQ);
 }
