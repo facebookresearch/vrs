@@ -161,9 +161,13 @@ FileDelegator* FileHandlerFactory::getExtraDelegator(const FileSpec& fileSpec) {
   for (const auto& iter : extraDelegatorMap_) {
     const string& extraName = iter.first;
     const string& extraValue = fileSpec.getExtra(extraName);
-    const auto& delegateIter = iter.second.find(extraValue);
-    if (delegateIter != iter.second.end()) {
-      return delegateIter->second.get();
+    if (!extraValue.empty()) {
+      const auto& delegateIter = iter.second.find(extraValue);
+      if (delegateIter != iter.second.end()) {
+        return delegateIter->second.get();
+      } else {
+        XR_LOGW("Not {} delegator named {} was registered.", extraName, extraValue);
+      }
     }
   }
   return nullptr;
