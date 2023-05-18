@@ -83,6 +83,10 @@ class JobQueue {
     queue_.pop_front();
     return true;
   }
+  void wakeAll() {
+    std::unique_lock<std::mutex> locker(mutex_);
+    condition_.notify_all();
+  }
   void reset() {
     std::unique_lock<std::mutex> locker(mutex_);
     queue_.clear();
