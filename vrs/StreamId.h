@@ -86,7 +86,7 @@ enum class RecordableTypeId : uint16_t {
 
   // << Microphones >>
   MonoAudioRecordableClass = 230, ///< For mono microphones.
-  StereoAudioRecordableClass = 231, ///< For sterep microphones.
+  StereoAudioRecordableClass = 231, ///< For stereo microphones.
   AmbientAudioRecordableClass = 232, ///< For multichannel microphones.
 
   // << Discrete Sensors >>
