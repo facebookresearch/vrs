@@ -99,12 +99,12 @@ bool TestProcess::findBinary(string& inOutName) {
   const char* exactPath = getenv(envVarName.c_str());
   if (exactPath != nullptr) {
     inOutName = exactPath;
-  } else {
-    // cmake-generator setup: look for the tool next to the unit test
-    string exeFolder = os::getParentFolder(os::getCurrentExecutablePath());
-    inOutName = os::pathJoin(exeFolder, inOutName + EXECUTABLE_SUFFIX);
+    return XR_VERIFY(os::isFile(inOutName));
   }
-  return os::isFile(inOutName);
+  // cmake-generator setup: look for the tool next to the unit test
+  string exeFolder = os::getParentFolder(os::getCurrentExecutablePath());
+  inOutName = os::pathJoin(exeFolder, inOutName + EXECUTABLE_SUFFIX);
+  return XR_VERIFY(os::isFile(inOutName));
 }
 
 } // namespace test
