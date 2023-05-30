@@ -341,6 +341,17 @@ inline bool getInt(int& outInt, const JValue& piece, const char* name) {
   return false;
 }
 
+inline bool getJDouble(double& outDouble, const JValue& piece, const char* name) {
+  using namespace fb_rapidjson;
+  const JValue::ConstMemberIterator member = piece.FindMember(name);
+  if (member != piece.MemberEnd() && member->value.IsDouble()) {
+    outDouble = member->value.GetDouble();
+    return true;
+  }
+  outDouble = 0;
+  return false;
+}
+
 // double -> json -> double & float -> json -> float don't preserve prefect accuracy
 // These methods are used to verify "reasonable" accuracy of serialization/deserialization... :-(
 template <typename T>
