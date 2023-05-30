@@ -111,7 +111,7 @@ static void jsonToTags(const string& jsonTags, map<string, string>& outTags) {
   using namespace fb_rapidjson;
   outTags.clear();
   Document document;
-  document.Parse(jsonTags.c_str());
+  document.Parse(jsonTags.c_str(), jsonTags.size());
   if (XR_VERIFY(document.IsObject(), "Improper tags: '{}'", jsonTags)) {
     for (Value::ConstMemberIterator itr = document.MemberBegin(); itr != document.MemberEnd();
          ++itr) {
@@ -126,7 +126,7 @@ static bool
 jsonToNameAndTags(const string& jsonStr, string& outName, map<string, string>& outTags) {
   using namespace fb_rapidjson;
   Document document;
-  document.Parse(jsonStr.c_str());
+  document.Parse(jsonStr.c_str(), jsonStr.size());
   if (!XR_VERIFY(document.IsObject(), "Improper name & tags")) {
     return false;
   }
