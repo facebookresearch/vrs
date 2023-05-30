@@ -17,6 +17,7 @@
 #pragma once
 
 #include <cmath>
+#include <cstring>
 
 #include <map>
 #include <type_traits>
@@ -42,6 +43,18 @@ using JUtf8Encoding = fb_rapidjson::UTF8<>;
 using JCrtAllocator = fb_rapidjson::CrtAllocator;
 using JDocument = fb_rapidjson::GenericDocument<JUtf8Encoding, JCrtAllocator>;
 using JValue = fb_rapidjson::GenericValue<JUtf8Encoding, JCrtAllocator>;
+using JStringRef = fb_rapidjson::GenericStringRef<char>;
+
+static inline JStringRef jStringRef(const char* str) {
+  return JStringRef(str, strlen(str));
+}
+static inline JStringRef jStringRef(const string& str) {
+  return JStringRef(str.c_str(), str.size());
+}
+template <class T>
+static inline void jParse(JDocument& document, const T& str) {
+  document.Parse(str.data(), str.size());
+}
 
 /// Helper class to generate json messages using RapidJson.
 /// For use by VRS only.
@@ -90,21 +103,20 @@ struct JsonWrapper {
     return jv;
   }
 
-  void addMember(const char* name, JValue& v) {
-    value.AddMember(fb_rapidjson::StringRef(name), v, alloc);
+  template <typename JSTR>
+  inline void addMember(const JSTR& name, JValue& v) {
+    value.AddMember(jStringRef(name), v, alloc);
   }
 
-  void addMember(const char* name, const char* str) {
-    value.AddMember(fb_rapidjson::StringRef(name), fb_rapidjson::StringRef(str), alloc);
+  template <typename JSTR>
+  inline void addMember(const JSTR& name, const char* str) {
+    value.AddMember(jStringRef(name), jStringRef(str), alloc);
   }
 
-  void addMember(const string& name, JValue& v);
-
-  template <typename T>
-  void addMember(const char* name, const T& v);
-
-  template <typename T>
-  void addMember(const string& name, const T& v);
+  template <typename JSTR, typename T>
+  inline void addMember(const JSTR& name, const T& v) {
+    value.AddMember(jStringRef(name), jValue(v), alloc);
+  }
 };
 
 template <>
@@ -119,25 +131,8 @@ inline JValue JsonWrapper::jValue<string>(const string& str) {
   return jstring;
 }
 
-inline void JsonWrapper::addMember(const string& name, JValue& v) {
-  value.AddMember(jValue(name), v, alloc);
-}
-
-template <typename T>
-inline void JsonWrapper::addMember(const char* name, const T& v) {
-  value.AddMember(fb_rapidjson::StringRef(name), jValue(v), alloc);
-}
-
-template <typename T>
-inline void JsonWrapper::addMember(const string& name, const T& v) {
-  value.AddMember(jValue(name), jValue(v), alloc);
-}
-
-template <typename T>
-inline void serializeMap(
-    const map<string, T>& amap,
-    JsonWrapper& rj,
-    fb_rapidjson::GenericStringRef<char> name) {
+template <typename T, typename JSTR>
+inline void serializeMap(const map<string, T>& amap, JsonWrapper& rj, const JSTR& name) {
   using namespace fb_rapidjson;
   if (amap.size() > 0) {
     JValue mapValues(kObjectType);
@@ -148,24 +143,8 @@ inline void serializeMap(
   }
 }
 
-template <>
-inline void serializeMap<string>(
-    const map<string, string>& amap,
-    JsonWrapper& rj,
-    fb_rapidjson::GenericStringRef<char> name) {
-  using namespace fb_rapidjson;
-  if (amap.size() > 0) {
-    JValue mapValues(kObjectType);
-    for (const auto& element : amap) {
-      mapValues.AddMember(rj.jValue(element.first), rj.jValue(element.second), rj.alloc);
-    }
-    rj.addMember(name, mapValues);
-  }
-}
-
-template <typename T>
-inline void
-serializeVector(const vector<T>& vect, JsonWrapper& rj, fb_rapidjson::GenericStringRef<char> name) {
+template <typename T, typename JSTR>
+inline void serializeVector(const vector<T>& vect, JsonWrapper& rj, const JSTR& name) {
   using namespace fb_rapidjson;
   if (vect.size() > 0) {
     JValue arrayValues(kArrayType);
@@ -177,23 +156,8 @@ serializeVector(const vector<T>& vect, JsonWrapper& rj, fb_rapidjson::GenericStr
   }
 }
 
-template <typename T>
-inline void serializeStringMap(
-    const map<string, T>& stringMap,
-    JsonWrapper& rj,
-    fb_rapidjson::GenericStringRef<char> name) {
-  using namespace fb_rapidjson;
-  if (stringMap.size() > 0) {
-    JValue mapValues(kObjectType);
-    for (const auto& element : stringMap) {
-      mapValues.AddMember(rj.jValue(element.first), rj.jValue(element.second), rj.alloc);
-    }
-    rj.addMember(name, mapValues);
-  }
-}
-
 template <typename JSON_TYPE, typename OUT_TYPE>
-inline bool getFromRapidjsonValueAs(const JValue& value, OUT_TYPE& outValue) {
+inline bool getJValueAs(const JValue& value, OUT_TYPE& outValue) {
   if (value.Is<JSON_TYPE>()) {
     JSON_TYPE jsonValue = value.Get<JSON_TYPE>();
     outValue = static_cast<OUT_TYPE>(jsonValue);
@@ -203,28 +167,23 @@ inline bool getFromRapidjsonValueAs(const JValue& value, OUT_TYPE& outValue) {
 }
 
 template <typename T>
-inline bool getFromRapidjsonValue(const JValue& value, T& outValue) {
+inline bool getFromJValue(const JValue& value, T& outValue) {
   if (is_floating_point<T>::value) {
     if (is_same<T, double>::value) {
-      return getFromRapidjsonValueAs<double, T>(value, outValue) ||
-          getFromRapidjsonValueAs<float, T>(value, outValue) ||
-          getFromRapidjsonValueAs<int64_t, T>(value, outValue);
+      return getJValueAs<double, T>(value, outValue) || getJValueAs<float, T>(value, outValue) ||
+          getJValueAs<int64_t, T>(value, outValue);
     } else {
-      return getFromRapidjsonValueAs<float, T>(value, outValue) ||
-          getFromRapidjsonValueAs<double, T>(value, outValue) ||
-          getFromRapidjsonValueAs<int64_t, T>(value, outValue);
+      return getJValueAs<float, T>(value, outValue) || getJValueAs<double, T>(value, outValue) ||
+          getJValueAs<int64_t, T>(value, outValue);
     }
   }
   if (is_same<T, Bool>::value) {
-    return getFromRapidjsonValueAs<bool, T>(value, outValue) ||
-        getFromRapidjsonValueAs<int, T>(value, outValue);
+    return getJValueAs<bool, T>(value, outValue) || getJValueAs<int, T>(value, outValue);
   } else if (is_integral<T>::value) {
     if (is_signed<T>::value) {
-      return getFromRapidjsonValueAs<int, T>(value, outValue) ||
-          getFromRapidjsonValueAs<int64_t, T>(value, outValue);
+      return getJValueAs<int, T>(value, outValue) || getJValueAs<int64_t, T>(value, outValue);
     } else {
-      return getFromRapidjsonValueAs<unsigned, T>(value, outValue) ||
-          getFromRapidjsonValueAs<uint64_t, T>(value, outValue);
+      return getJValueAs<unsigned, T>(value, outValue) || getJValueAs<uint64_t, T>(value, outValue);
     }
   }
   XR_CHECK(false, "This type is not some number: you need to implement a specialized version");
@@ -232,7 +191,7 @@ inline bool getFromRapidjsonValue(const JValue& value, T& outValue) {
 }
 
 template <>
-inline bool getFromRapidjsonValue(const JValue& value, string& outValue) {
+inline bool getFromJValue(const JValue& value, string& outValue) {
   if (value.IsString()) {
     outValue = value.GetString();
     return true;
@@ -241,13 +200,13 @@ inline bool getFromRapidjsonValue(const JValue& value, string& outValue) {
 }
 
 template <typename T, size_t N>
-inline bool getFromRapidjsonValue(const JValue& value, PointND<T, N>& outPoint) {
+inline bool getFromJValue(const JValue& value, PointND<T, N>& outPoint) {
   using namespace fb_rapidjson;
   if (value.IsArray() && value.Size() == N) {
     for (size_t n = 0; n < N; ++n) {
-      if (!getFromRapidjsonValueAs<float, T>(value[static_cast<SizeType>(n)], outPoint.dim[n]) &&
-          !getFromRapidjsonValueAs<double, T>(value[static_cast<SizeType>(n)], outPoint.dim[n]) &&
-          !getFromRapidjsonValueAs<int32_t, T>(value[static_cast<SizeType>(n)], outPoint.dim[n])) {
+      if (!getJValueAs<float, T>(value[static_cast<SizeType>(n)], outPoint.dim[n]) &&
+          !getJValueAs<double, T>(value[static_cast<SizeType>(n)], outPoint.dim[n]) &&
+          !getJValueAs<int32_t, T>(value[static_cast<SizeType>(n)], outPoint.dim[n])) {
         return false;
       }
     }
@@ -256,11 +215,11 @@ inline bool getFromRapidjsonValue(const JValue& value, PointND<T, N>& outPoint) 
 }
 
 template <typename T, size_t N>
-inline bool getFromRapidjsonValue(const JValue& value, MatrixND<T, N>& outMatrix) {
+inline bool getFromJValue(const JValue& value, MatrixND<T, N>& outMatrix) {
   using namespace fb_rapidjson;
   if (value.IsArray() && value.Size() == N) {
     for (size_t n = 0; n < N; ++n) {
-      if (!getFromRapidjsonValue<T, N>(value[static_cast<SizeType>(n)], outMatrix.points[n])) {
+      if (!getFromJValue<T, N>(value[static_cast<SizeType>(n)], outMatrix.points[n])) {
         return false;
       }
     }
@@ -268,9 +227,8 @@ inline bool getFromRapidjsonValue(const JValue& value, MatrixND<T, N>& outMatrix
   return true;
 }
 
-template <typename T>
-inline bool
-getMap(map<string, T>& outMap, const JValue& piece, fb_rapidjson::GenericStringRef<char> name) {
+template <typename T, typename JSTR>
+inline bool getJMap(map<string, T>& outMap, const JValue& piece, const JSTR& name) {
   using namespace fb_rapidjson;
   outMap.clear();
   const JValue::ConstMemberIterator properties = piece.FindMember(name);
@@ -279,7 +237,7 @@ getMap(map<string, T>& outMap, const JValue& piece, fb_rapidjson::GenericStringR
          itr != properties->value.MemberEnd();
          ++itr) {
       T value;
-      if (getFromRapidjsonValue(itr->value, value)) {
+      if (getFromJValue(itr->value, value)) {
         outMap[itr->name.GetString()] = value;
       }
     }
@@ -288,9 +246,8 @@ getMap(map<string, T>& outMap, const JValue& piece, fb_rapidjson::GenericStringR
   return false;
 }
 
-template <typename T>
-inline bool
-getVector(vector<T>& outVector, const JValue& piece, fb_rapidjson::GenericStringRef<char> name) {
+template <typename T, typename JSTR>
+inline bool getJVector(vector<T>& outVector, const JValue& piece, const JSTR& name) {
   using namespace fb_rapidjson;
   outVector.clear();
   const JValue::ConstMemberIterator properties = piece.FindMember(name);
@@ -299,7 +256,7 @@ getVector(vector<T>& outVector, const JValue& piece, fb_rapidjson::GenericString
     for (JValue::ConstValueIterator itr = properties->value.Begin(); itr != properties->value.End();
          ++itr) {
       T value;
-      if (getFromRapidjsonValue(*itr, value)) {
+      if (getFromJValue(*itr, value)) {
         outVector.push_back(value);
       }
     }
@@ -308,7 +265,8 @@ getVector(vector<T>& outVector, const JValue& piece, fb_rapidjson::GenericString
   return false;
 }
 
-inline bool getString(string& outString, const JValue& piece, const char* name) {
+template <typename JSTR>
+inline bool getJString(string& outString, const JValue& piece, const JSTR& name) {
   using namespace fb_rapidjson;
   const JValue::ConstMemberIterator member = piece.FindMember(name);
   if (member != piece.MemberEnd() && member->value.IsString()) {
@@ -319,7 +277,8 @@ inline bool getString(string& outString, const JValue& piece, const char* name) 
   return false;
 }
 
-inline bool getInt64(int64_t& outInt64, const JValue& piece, const char* name) {
+template <typename JSTR>
+inline bool getJInt64(int64_t& outInt64, const JValue& piece, const JSTR& name) {
   using namespace fb_rapidjson;
   const JValue::ConstMemberIterator member = piece.FindMember(name);
   if (member != piece.MemberEnd() && member->value.IsInt64()) {
@@ -330,7 +289,8 @@ inline bool getInt64(int64_t& outInt64, const JValue& piece, const char* name) {
   return false;
 }
 
-inline bool getInt(int& outInt, const JValue& piece, const char* name) {
+template <typename JSTR>
+inline bool getJInt(int& outInt, const JValue& piece, const JSTR& name) {
   using namespace fb_rapidjson;
   const JValue::ConstMemberIterator member = piece.FindMember(name);
   if (member != piece.MemberEnd() && member->value.IsInt()) {
@@ -341,7 +301,8 @@ inline bool getInt(int& outInt, const JValue& piece, const char* name) {
   return false;
 }
 
-inline bool getJDouble(double& outDouble, const JValue& piece, const char* name) {
+template <typename JSTR>
+inline bool getJDouble(double& outDouble, const JValue& piece, const JSTR& name) {
   using namespace fb_rapidjson;
   const JValue::ConstMemberIterator member = piece.FindMember(name);
   if (member != piece.MemberEnd() && member->value.IsDouble()) {

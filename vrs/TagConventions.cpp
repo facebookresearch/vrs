@@ -43,7 +43,7 @@ string tag_conventions::makeTagSet(const vector<string>& tags) {
   using namespace fb_rapidjson;
   JDocument doc;
   JsonWrapper wrapper{doc};
-  serializeVector<string>(tags, wrapper, fb_rapidjson::StringRef(cTagsObjectName));
+  serializeVector<string>(tags, wrapper, cTagsObjectName);
   return jDocumentToJsonString(doc);
 }
 
@@ -51,9 +51,9 @@ bool tag_conventions::parseTagSet(const string& jsonTagSet, vector<string>& outV
   outVectorTagSet.clear();
   using namespace fb_rapidjson;
   JDocument document;
-  document.Parse(jsonTagSet.c_str());
+  jParse(document, jsonTagSet);
   if (document.IsObject()) {
-    getVector(outVectorTagSet, document, fb_rapidjson::StringRef(cTagsObjectName));
+    getJVector(outVectorTagSet, document, cTagsObjectName);
     return true;
   }
   return false;

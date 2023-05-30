@@ -1022,11 +1022,11 @@ DataPieceValue<T>::DataPieceValue(const DataPiece::MakerBundle& bundle)
   const JValue::ConstMemberIterator defaultV = bundle.piece.FindMember("default");
   if (defaultV != bundle.piece.MemberEnd()) {
     T defaultValue;
-    if (getFromRapidjsonValue(defaultV->value, defaultValue)) {
+    if (getFromJValue(defaultV->value, defaultValue)) {
       setDefault(defaultValue);
     }
   }
-  getMap(properties_, bundle.piece, "properties");
+  getJMap(properties_, bundle.piece, "properties");
 }
 
 template <typename T>
@@ -1122,8 +1122,8 @@ void DataPieceValue<T>::serialize(JsonWrapper& rj, const JsonFormatProfileSpec& 
 template <typename T>
 DataPieceArray<T>::DataPieceArray(const DataPiece::MakerBundle& bundle)
     : DataPieceArray(bundle.label, bundle.arraySize) {
-  getVector(defaultValues_, bundle.piece, "default");
-  getMap(properties_, bundle.piece, "properties");
+  getJVector(defaultValues_, bundle.piece, "default");
+  getJMap(properties_, bundle.piece, "properties");
 }
 
 namespace {
@@ -1231,7 +1231,7 @@ void DataPieceArray<T>::serialize(JsonWrapper& rj, const JsonFormatProfileSpec& 
 template <typename T>
 DataPieceVector<T>::DataPieceVector(const DataPiece::MakerBundle& bundle)
     : DataPieceVector(bundle.label) {
-  vrs::getVector(defaultValues_, bundle.piece, "default");
+  vrs::getJVector(defaultValues_, bundle.piece, "default");
 }
 
 template <>
@@ -1429,7 +1429,7 @@ void DataPieceVector<T>::serialize(JsonWrapper& rj, const JsonFormatProfileSpec&
 template <typename T>
 DataPieceStringMap<T>::DataPieceStringMap(const DataPiece::MakerBundle& bundle)
     : DataPieceStringMap(bundle.label) {
-  vrs::getMap(defaultValues_, bundle.piece, "default");
+  vrs::getJMap(defaultValues_, bundle.piece, "default");
 }
 
 template <typename T>
@@ -1542,12 +1542,12 @@ void DataPieceStringMap<T>::serialize(JsonWrapper& rj, const JsonFormatProfileSp
   if (profile.value) {
     map<string, T> values;
     if (get(values)) {
-      serializeStringMap(values, rj, "value");
+      serializeMap(values, rj, "value");
     }
   }
   DataPiece::serialize(rj, profile);
   if (profile.defaults) {
-    serializeStringMap(defaultValues_, rj, "default");
+    serializeMap(defaultValues_, rj, "default");
   }
 }
 
@@ -1670,7 +1670,7 @@ ManualDataLayout::~ManualDataLayout() {
 ManualDataLayout::ManualDataLayout(const string& json) : ManualDataLayout() {
   using namespace fb_rapidjson;
   JDocument document;
-  document.Parse(json.c_str());
+  jParse(document, json);
   // We need to assume that everything might be missing, and never crash
   if (XR_VERIFY(document.IsObject(), "Not a valid datalayout: '{}'", json)) {
     JValue::ConstMemberIterator node = document.FindMember("data_layout");

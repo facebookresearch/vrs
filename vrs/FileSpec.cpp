@@ -179,11 +179,11 @@ string FileSpec::toPathJsonUri() const {
 bool FileSpec::fromJson(const string& jsonStr) {
   using namespace fb_rapidjson;
   JDocument document;
-  document.Parse(jsonStr.c_str());
+  jParse(document, jsonStr);
   if (document.IsObject()) {
-    getString(fileName, document, kFileNameField);
-    getString(fileHandlerName, document, kFileHandlerField);
-    getString(uri, document, kUriField);
+    getJString(fileName, document, kFileNameField);
+    getJString(fileHandlerName, document, kFileHandlerField);
+    getJString(uri, document, kUriField);
     extras.clear();
     for (auto iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter) {
       const auto* key = iter->name.GetString();
@@ -193,8 +193,8 @@ bool FileSpec::fromJson(const string& jsonStr) {
         extras.emplace(key, iter->value.GetString());
       }
     }
-    getVector(chunks, document, fb_rapidjson::StringRef(kChunkField));
-    getVector(chunkSizes, document, fb_rapidjson::StringRef(kChunkSizesField));
+    getJVector(chunks, document, kChunkField);
+    getJVector(chunkSizes, document, kChunkSizesField);
     return true;
   }
   clear();
@@ -206,22 +206,22 @@ string FileSpec::toJson() const {
   JDocument document;
   JsonWrapper wrapper{document};
   if (!chunks.empty()) {
-    serializeVector<string>(chunks, wrapper, StringRef(kChunkField));
+    serializeVector<string>(chunks, wrapper, kChunkField);
   }
   if (!chunkSizes.empty()) {
-    serializeVector<int64_t>(chunkSizes, wrapper, StringRef(kChunkSizesField));
+    serializeVector<int64_t>(chunkSizes, wrapper, kChunkSizesField);
   }
   if (!fileHandlerName.empty()) {
-    wrapper.addMember(kFileHandlerField, fileHandlerName);
+    wrapper.addMember(kFileHandlerField, jStringRef(fileHandlerName));
   }
   if (!fileName.empty()) {
-    wrapper.addMember(kFileNameField, fileName);
+    wrapper.addMember(kFileNameField, jStringRef(fileName));
   }
   if (!uri.empty()) {
-    wrapper.addMember(kUriField, uri);
+    wrapper.addMember(kUriField, jStringRef(uri));
   }
   for (const auto& extra : extras) {
-    wrapper.addMember(extra.first, extra.second);
+    wrapper.addMember(extra.first, jStringRef(extra.second));
   }
   return jDocumentToJsonString(document);
 }
