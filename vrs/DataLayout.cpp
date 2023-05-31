@@ -984,7 +984,7 @@ string DataPiece::getTypeName() const {
 void DataPiece::serialize(JsonWrapper& rj, const JsonFormatProfileSpec& profile) {
   using namespace fb_rapidjson;
   if (profile.name) {
-    rj.addMember("name", getLabel());
+    rj.addMember("name", jStringRef(getLabel()));
   }
   if (profile.type) {
     string typeName = getTypeName();
@@ -1004,7 +1004,7 @@ void DataPiece::serialize(JsonWrapper& rj, const JsonFormatProfileSpec& profile)
     }
   }
   if (profile.tags) {
-    serializeMap(tags_, rj, "tags");
+    serializeStringRefMap(tags_, rj, "tags");
   }
   if (profile.required && isRequired()) {
     rj.addMember("required", true);

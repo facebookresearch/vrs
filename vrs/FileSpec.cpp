@@ -206,7 +206,7 @@ string FileSpec::toJson() const {
   JDocument document;
   JsonWrapper wrapper{document};
   if (!chunks.empty()) {
-    serializeVector<string>(chunks, wrapper, kChunkField);
+    serializeStringRefVector(chunks, wrapper, kChunkField);
   }
   if (!chunkSizes.empty()) {
     serializeVector<int64_t>(chunkSizes, wrapper, kChunkSizesField);

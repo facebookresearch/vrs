@@ -43,7 +43,7 @@ string tag_conventions::makeTagSet(const vector<string>& tags) {
   using namespace fb_rapidjson;
   JDocument doc;
   JsonWrapper wrapper{doc};
-  serializeVector<string>(tags, wrapper, cTagsObjectName);
+  serializeStringRefVector(tags, wrapper, cTagsObjectName);
   return jDocumentToJsonString(doc);
 }
 
