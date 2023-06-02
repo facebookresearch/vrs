@@ -242,6 +242,10 @@ class ImageContentBlockSpec {
   uint32_t getRawStride2() const {
     return stride2_;
   }
+  /// Get default stride for plane 0 when stride isn't specified (minimum stride value)
+  uint32_t getDefaultStride() const;
+  /// Get default stride for planes N > 0, when stride2 isn't specified (minimum stride2 value)
+  uint32_t getDefaultStride2() const;
 
   /// Get the number of planes for this pixel format.
   uint32_t getPlaneCount() const {
@@ -311,6 +315,10 @@ class ImageContentBlockSpec {
 
   /// Get the number of planes for this pixel format.
   static uint32_t getPlaneCount(PixelFormat pixelFormat);
+
+  /// Verify that stride and stride2 values are reasonable.
+  /// @return True if everything is ok, otherwise, log a warning and return false.
+  bool sanityCheckStrides() const;
 
  private:
   ImageFormat imageFormat_{ImageFormat::UNDEFINED};

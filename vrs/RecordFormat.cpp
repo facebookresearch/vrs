@@ -268,7 +268,9 @@ ImageContentBlockSpec::ImageContentBlockSpec(
       width_{width},
       height_{height},
       stride_{stride},
-      stride2_{stride2} {}
+      stride2_{stride2} {
+  sanityCheckStrides();
+}
 
 ImageContentBlockSpec::ImageContentBlockSpec(
     ImageFormat imageFormat,
@@ -290,7 +292,9 @@ ImageContentBlockSpec::ImageContentBlockSpec(
       codecName_{codecName},
       keyFrameTimestamp_{keyFrameTimestamp},
       keyFrameIndex_{keyFrameIndex},
-      codecQuality_{codecQuality} {}
+      codecQuality_{codecQuality} {
+  sanityCheckStrides();
+}
 
 ImageContentBlockSpec::ImageContentBlockSpec(
     const string& codecName,
@@ -307,11 +311,14 @@ ImageContentBlockSpec::ImageContentBlockSpec(
       stride_{stride},
       stride2_{stride2},
       codecName_{codecName},
-      codecQuality_{codecQuality} {}
+      codecQuality_{codecQuality} {
+  sanityCheckStrides();
+}
 
 ImageContentBlockSpec::ImageContentBlockSpec(const string& formatStr) {
   ContentParser parser(formatStr, '/');
   set(parser);
+  sanityCheckStrides();
 }
 
 void ImageContentBlockSpec::clear() {
@@ -521,30 +528,41 @@ uint32_t ImageContentBlockSpec::getPlaneCount(PixelFormat pixelFormat) {
   return 1;
 }
 
+bool ImageContentBlockSpec::sanityCheckStrides() const {
+  bool allGood = true;
+  if (stride_ > 0 && stride_ < getDefaultStride()) {
+    XR_LOGE("Invalid stride for {}. Minimum stride: {}.", asString(), getDefaultStride());
+    allGood = false;
+  }
+  if (stride2_ > 0 && stride2_ < getDefaultStride2()) {
+    XR_LOGE("Invalid stride2 for {}. Minimum stride2: {}.", asString(), getDefaultStride2());
+    allGood = false;
+  }
+  return allGood;
+}
+
 uint32_t ImageContentBlockSpec::getPlaneStride(uint32_t planeIndex) const {
+  if (planeIndex == 0) {
+    return getStride();
+  }
+  if (planeIndex >= getPlaneCount(pixelFormat_)) {
+    return 0;
+  }
+  return stride2_ > 0 ? stride2_ : getDefaultStride2();
+}
+
+uint32_t ImageContentBlockSpec::getDefaultStride2() const {
   switch (pixelFormat_) {
     case PixelFormat::YUV_I420_SPLIT:
-      if (planeIndex == 0) {
-        // The first block uses 1 byte-per-pixel, and a width which might be overridden by stride_
-        return stride_ > 0 ? stride_ : getWidth();
-      } else if (planeIndex < 3) {
-        // second and third planes use one byte per 2-2 squares: half the width, half the height
-        return stride2_ > 0 ? stride2_ : ((getWidth() + 1) / 2);
-      }
+      // second and third planes use one byte per 2-2 squares: half the width, half the height
+      return (getWidth() + 1) / 2;
       break;
     case PixelFormat::YUV_420_NV21:
     case PixelFormat::YUV_420_NV12:
-      if (planeIndex == 0) {
-        // The first block uses 1 byte-per-pixel, and a width which might be overridden by stride_
-        return (stride_ > 0 ? stride_ : getWidth());
-      } else if (planeIndex < 2) {
-        return stride2_ > 0 ? stride2_ : getWidth();
-      }
+      return getWidth();
       break;
     default:
-      if (planeIndex == 0) {
-        return getStride();
-      }
+      return 0;
   }
   return 0;
 }
@@ -597,9 +615,10 @@ string ImageContentBlockSpec::getImageFormatAsString() const {
 
 uint32_t ImageContentBlockSpec::getStride() const {
   // Use the explicitly set stride if available.
-  if (stride_ > 0) {
-    return stride_;
-  }
+  return stride_ > 0 ? stride_ : getDefaultStride();
+}
+
+uint32_t ImageContentBlockSpec::getDefaultStride() const {
   // Try to compute the stride using the bytes per pixel.
   size_t bytesPerPixel = getBytesPerPixel();
   if (bytesPerPixel != ContentBlock::kSizeUnknown) {

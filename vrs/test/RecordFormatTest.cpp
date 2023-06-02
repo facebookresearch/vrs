@@ -72,7 +72,7 @@ bool checkImageDimensions(
     uint32_t width,
     uint32_t height,
     uint32_t rawStride,
-    uint32_t planeStrideO,
+    uint32_t planeStride0,
     uint32_t rawStride2 = 0,
     uint32_t planeStride1 = 0,
     uint32_t planeStride2 = 0,
@@ -90,13 +90,13 @@ bool checkImageDimensions(
     planeCount = spec.getPlaneCount();
   }
   return XR_VERIFY(spec.getWidth() == width) && XR_VERIFY(spec.getHeight() == height) &&
-      XR_VERIFY(spec.getRawStride() == rawStride) && XR_VERIFY(spec.getStride() == planeStrideO) &&
-      XR_VERIFY(spec.getPlaneStride(0) == planeStrideO) &&
+      XR_VERIFY(spec.getRawStride() == rawStride) && XR_VERIFY(spec.getStride() == planeStride0) &&
+      XR_VERIFY(spec.getPlaneStride(0) == planeStride0) &&
       XR_VERIFY(spec.getRawStride2() == rawStride2) &&
       XR_VERIFY(spec.getPlaneStride(1) == planeStride1) &&
       XR_VERIFY(spec.getPlaneStride(2) == planeStride2) &&
       XR_VERIFY(spec.getPlaneStride(3) == planeStride3) && XR_VERIFY(spec.getPlaneStride(4) == 0) &&
-      XR_VERIFY(spec.getPlaneCount() == planeCount);
+      XR_VERIFY(spec.getPlaneCount() == planeCount) && XR_VERIFY(spec.sanityCheckStrides());
 }
 
 bool checkImageHeights(
@@ -341,11 +341,11 @@ TEST_F(RecordFormatTest, testBlockFormat) {
       "video/640x480/pixel=grey8/codec=H.264%20%25%20%2B%20%2F%20%5C%20%22%20%25/codec_quality=0");
 
   ContentBlock videoCodecEscaped(
-      "image/video/640x480/stride=650/pixel=grey12/codec=%2Bconfusing%2Fcodec%2Fbad%2Bname");
+      "image/video/640x480/stride=1300/pixel=grey12/codec=%2Bconfusing%2Fcodec%2Fbad%2Bname");
   EXPECT_EQ(videoCodecEscaped.getContentType(), ContentType::IMAGE);
   EXPECT_EQ(videoCodecEscaped.image().getImageFormat(), ImageFormat::VIDEO);
   EXPECT_EQ(videoCodecEscaped.image().getPixelFormat(), PixelFormat::GREY12);
-  EXPECT_TRUE(checkImageDimensions(videoCodecEscaped, 640, 480, 650, 650));
+  EXPECT_TRUE(checkImageDimensions(videoCodecEscaped, 640, 480, 1300, 1300));
   EXPECT_TRUE(checkImageHeights(videoCodecEscaped, 480));
   EXPECT_EQ(videoCodecEscaped.image().getBlockSize(), ContentBlock::kSizeUnknown);
   EXPECT_EQ(videoCodecEscaped.image().getBytesPerPixel(), 2);
@@ -414,6 +414,15 @@ TEST_F(RecordFormatTest, testBlockFormat) {
       "audio/pcm/float64be/channels=2/rate=32000/samples=100");
   FORMAT_EQUAL(ContentBlock(ContentType::CUSTOM), "custom");
   FORMAT_EQUAL(ContentBlock(ContentType::CUSTOM, 20), "custom/size=20");
+}
+
+TEST_F(RecordFormatTest, testBadStride) {
+  ImageContentBlockSpec yuv_i420_split("raw/642x480/pixel=yuv_i420_split/stride=641");
+  EXPECT_FALSE(yuv_i420_split.sanityCheckStrides());
+  ImageContentBlockSpec rgb8("raw/5312x2988/pixel=rgb8/stride=5312");
+  EXPECT_FALSE(rgb8.sanityCheckStrides());
+  ImageContentBlockSpec yuv_420_nv12("raw/640x480/pixel=yuv_420_nv12/stride=660/stride_2=639");
+  EXPECT_FALSE(yuv_420_nv12.sanityCheckStrides());
 }
 
 TEST_F(RecordFormatTest, testOperators) {
