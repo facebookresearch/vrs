@@ -169,6 +169,14 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <tr class="memitem:a80d5148525b1e34b7d97fc6252c0b2cd"><td class="memItemLeft" align="right" valign="top"><a id="a80d5148525b1e34b7d97fc6252c0b2cd"></a>
 uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>getRawStride2</b> () const</td></tr>
 <tr class="separator:a80d5148525b1e34b7d97fc6252c0b2cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad9fb5d0643dfc8438136ee7b7981ae32"><td class="memItemLeft" align="right" valign="top"><a id="ad9fb5d0643dfc8438136ee7b7981ae32"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_image_content_block_spec.html#ad9fb5d0643dfc8438136ee7b7981ae32">getDefaultStride</a> () const</td></tr>
+<tr class="memdesc:ad9fb5d0643dfc8438136ee7b7981ae32"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get default stride for plane 0 when stride isn't specified (minimum stride value) <br /></td></tr>
+<tr class="separator:ad9fb5d0643dfc8438136ee7b7981ae32"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1487d41afcf3043465766a843f69ad12"><td class="memItemLeft" align="right" valign="top"><a id="a1487d41afcf3043465766a843f69ad12"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_image_content_block_spec.html#a1487d41afcf3043465766a843f69ad12">getDefaultStride2</a> () const</td></tr>
+<tr class="memdesc:a1487d41afcf3043465766a843f69ad12"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get default stride for planes N &gt; 0, when stride2 isn't specified (minimum stride2 value) <br /></td></tr>
+<tr class="separator:a1487d41afcf3043465766a843f69ad12"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af0b102f91849564943193c76fccfe3b2"><td class="memItemLeft" align="right" valign="top"><a id="af0b102f91849564943193c76fccfe3b2"></a>
 uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_image_content_block_spec.html#af0b102f91849564943193c76fccfe3b2">getPlaneCount</a> () const</td></tr>
 <tr class="memdesc:af0b102f91849564943193c76fccfe3b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of planes for this pixel format. <br /></td></tr>
@@ -195,6 +203,8 @@ double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_image_content_block_spec.html#acc5b29b339207cc0240e76bd72deefbf">getPixelFormatAsString</a> (<a class="el" href="namespacevrs.html#a0fbbb88591f21313dd46736fba5a7aa5">PixelFormat</a> pixelFormat)</td></tr>
 <tr class="memdesc:acc5b29b339207cc0240e76bd72deefbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get pixel format presented as a readable string, from which it can be reconstructed. <br /></td></tr>
 <tr class="separator:acc5b29b339207cc0240e76bd72deefbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87000eeef368ac44d0974e2fc9ec54e9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_image_content_block_spec.html#a87000eeef368ac44d0974e2fc9ec54e9">sanityCheckStrides</a> () const</td></tr>
+<tr class="separator:a87000eeef368ac44d0974e2fc9ec54e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -510,6 +520,24 @@ static constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>kI
 </table>
 </div><div class="memdoc">
 <p>Get the raw stride parameter. Return 0 if no stride value was explicitly provided. </p>
+
+</div>
+</div>
+<a id="a87000eeef368ac44d0974e2fc9ec54e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87000eeef368ac44d0974e2fc9ec54e9">&#9670;&nbsp;</a></span>sanityCheckStrides()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool vrs::ImageContentBlockSpec::sanityCheckStrides </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Verify that stride and stride2 values are reasonable. </p><dl class="section return"><dt>Returns</dt><dd>True if everything is ok, otherwise, log a warning and return false. </dd></dl>
 
 </div>
 </div>

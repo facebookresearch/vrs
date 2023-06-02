@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['errorcode_1587',['ErrorCode',['../namespacevrs.html#a2fa96820cabc73dbe1ee5094dbc2458e',1,'vrs']]],
-  ['errordomain_1588',['ErrorDomain',['../namespacevrs.html#a2278749cac618182a91e5841f06f66c3',1,'vrs']]]
+  ['errorcode_1593',['ErrorCode',['../namespacevrs.html#a2fa96820cabc73dbe1ee5094dbc2458e',1,'vrs']]],
+  ['errordomain_1594',['ErrorDomain',['../namespacevrs.html#a2278749cac618182a91e5841f06f66c3',1,'vrs']]]
 ];
