@@ -559,7 +559,8 @@ uint32_t ImageContentBlockSpec::getDefaultStride2() const {
       break;
     case PixelFormat::YUV_420_NV21:
     case PixelFormat::YUV_420_NV12:
-      return getWidth();
+      // one pair U+V for each 2x2 block of pixels
+      return getWidth() + (getWidth() % 2);
       break;
     default:
       return 0;

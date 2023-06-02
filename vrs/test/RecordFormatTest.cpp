@@ -230,6 +230,17 @@ TEST_F(RecordFormatTest, testBlockFormat) {
   EXPECT_EQ(yuvNv21.image().getChannelCountPerPixel(), 3);
   EXPECT_EQ(yuvNv21.image().getPlaneCount(), 2);
 
+  ContentBlock yuvNv21b("image/raw/641x480/pixel=yuv_420_nv21");
+  EXPECT_EQ(yuvNv21b.getContentType(), ContentType::IMAGE);
+  EXPECT_EQ(yuvNv21b.image().getImageFormat(), ImageFormat::RAW);
+  EXPECT_EQ(yuvNv21b.image().getPixelFormat(), PixelFormat::YUV_420_NV21);
+  EXPECT_TRUE(checkImageDimensions(yuvNv21b, 641, 480, 0, 641, 0, 642));
+  EXPECT_TRUE(checkImageHeights(yuvNv21b, 480, 240));
+  EXPECT_EQ(yuvNv21b.image().getBlockSize(), 641 * 480 + 642 * 240);
+  EXPECT_EQ(yuvNv21b.image().getBytesPerPixel(), ContentBlock::kSizeUnknown);
+  EXPECT_EQ(yuvNv21b.image().getChannelCountPerPixel(), 3);
+  EXPECT_EQ(yuvNv21b.image().getPlaneCount(), 2);
+
   ContentBlock yuvNv12("image/raw/640x480/pixel=yuv_420_nv12");
   EXPECT_EQ(yuvNv12.getContentType(), ContentType::IMAGE);
   EXPECT_EQ(yuvNv12.image().getImageFormat(), ImageFormat::RAW);
@@ -263,6 +274,17 @@ TEST_F(RecordFormatTest, testBlockFormat) {
   EXPECT_EQ(yuvNv12c.image().getBytesPerPixel(), ContentBlock::kSizeUnknown);
   EXPECT_EQ(yuvNv12c.image().getChannelCountPerPixel(), 3);
   EXPECT_EQ(yuvNv12c.image().getPlaneCount(), 2);
+
+  ContentBlock yuvNv12d("image/raw/639x480/pixel=yuv_420_nv12");
+  EXPECT_EQ(yuvNv12d.getContentType(), ContentType::IMAGE);
+  EXPECT_EQ(yuvNv12d.image().getImageFormat(), ImageFormat::RAW);
+  EXPECT_EQ(yuvNv12d.image().getPixelFormat(), PixelFormat::YUV_420_NV12);
+  EXPECT_TRUE(checkImageDimensions(yuvNv12d, 639, 480, 0, 639, 0, 640));
+  EXPECT_TRUE(checkImageHeights(yuvNv12d, 480, 240));
+  EXPECT_EQ(yuvNv12d.image().getBlockSize(), 639 * 480 + 640 * 240);
+  EXPECT_EQ(yuvNv12d.image().getBytesPerPixel(), ContentBlock::kSizeUnknown);
+  EXPECT_EQ(yuvNv12d.image().getChannelCountPerPixel(), 3);
+  EXPECT_EQ(yuvNv12d.image().getPlaneCount(), 2);
 
   ContentBlock yuy2a("image/raw/642x480/pixel=yuy2");
   EXPECT_EQ(yuy2a.getContentType(), ContentType::IMAGE);
