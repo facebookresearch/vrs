@@ -190,29 +190,33 @@ char xdigitToChar(char xdigit) {
 }
 
 string escapeString(const string& str) {
-  stringstream ss;
+  string s;
+  s.reserve(str.size() + str.size() / 10 + 20);
   const char* kEscapeChars = "+/\\% \"'";
   for (char c : str) {
     if (c < 32 || c >= 127 || strchr(kEscapeChars, c) != nullptr) {
-      ss << '%' << lowXdigit(c >> 4) << lowXdigit(c);
+      s.push_back('%');
+      s.push_back(lowXdigit(c >> 4));
+      s.push_back(lowXdigit(c));
     } else {
-      ss << c;
+      s.push_back(c);
     }
   }
-  return ss.str();
+  return s;
 }
 
 string unescapeString(const char* str, size_t length) {
-  stringstream ss;
+  string s;
+  s.reserve(length);
   for (size_t k = 0; k < length && str[k] != 0; ++k) {
     char c = str[k];
     if ((c == '%') && k + 2 < length && ISXDIGIT(str[k + 1]) && ISXDIGIT(str[k + 2])) {
       c = (xdigitToChar(str[k + 1]) << 4) | xdigitToChar(str[k + 2]);
       k += 2;
     }
-    ss << c;
+    s.push_back(c);
   }
-  return ss.str();
+  return s;
 }
 
 } // namespace
@@ -399,40 +403,43 @@ void ImageContentBlockSpec::set(ContentParser& parser) {
 }
 
 string ImageContentBlockSpec::asString() const {
-  if (imageFormat_ != ImageFormat::UNDEFINED) {
-    stringstream ss;
-    ss << ImageFormatConverter::toString(imageFormat_);
-    if (width_ > 0 && height_ > 0) {
-      ss << '/' << width_ << 'x' << height_;
-    }
-    if (imageFormat_ == ImageFormat::RAW || imageFormat_ == ImageFormat::VIDEO) {
-      if (pixelFormat_ != PixelFormat::UNDEFINED) {
-        ss << "/pixel=" << PixelFormatConverter::toString(pixelFormat_);
-      }
-      if (stride_ > 0) {
-        ss << "/stride=" << stride_;
-      }
-      if (stride2_ > 0) {
-        ss << "/stride_2=" << stride2_;
-      }
-      if (imageFormat_ == ImageFormat::VIDEO) {
-        if (!codecName_.empty()) {
-          ss << "/codec=" << escapeString(codecName_);
-        }
-        if (isQualityValid(codecQuality_)) {
-          ss << "/codec_quality=" << to_string(codecQuality_);
-        }
-        if (keyFrameTimestamp_ != kInvalidTimestamp) {
-          // These conversions will only be needed for debugging, so precision issues are ok.
-          // Using 9 for up to nanosecond precision.
-          ss << "/keyframe_timestamp=" << fixed << setprecision(9) << keyFrameTimestamp_
-             << "/keyframe_index=" << to_string(keyFrameIndex_);
-        }
-      }
-    }
-    return ss.str();
+  if (imageFormat_ == ImageFormat::UNDEFINED) {
+    return {};
   }
-  return {};
+  string s;
+  s.reserve(120);
+  s.append(ImageFormatConverter::toString(imageFormat_));
+  if (width_ > 0 && height_ > 0) {
+    s.append("/").append(to_string(width_)).append("x").append(to_string(height_));
+  }
+  if (imageFormat_ == ImageFormat::RAW || imageFormat_ == ImageFormat::VIDEO) {
+    if (pixelFormat_ != PixelFormat::UNDEFINED) {
+      s.append("/pixel=").append(PixelFormatConverter::toString(pixelFormat_));
+    }
+    if (stride_ > 0) {
+      s.append("/stride=").append(to_string(stride_));
+    }
+    if (stride2_ > 0) {
+      s.append("/stride_2=").append(to_string(stride2_));
+    }
+    if (imageFormat_ == ImageFormat::VIDEO) {
+      if (!codecName_.empty()) {
+        s.append("/codec=").append(escapeString(codecName_));
+      }
+      if (isQualityValid(codecQuality_)) {
+        s.append("/codec_quality=").append(to_string(codecQuality_));
+      }
+      if (keyFrameTimestamp_ != kInvalidTimestamp) {
+        // These conversions will only be needed for debugging, so precision issues are ok.
+        // Using 9 for up to nanosecond precision.
+        s.append("/keyframe_timestamp=")
+            .append(fmt::format("{:.9f}", keyFrameTimestamp_))
+            .append("/keyframe_index=")
+            .append(to_string(keyFrameIndex_));
+      }
+    }
+  }
+  return s;
 }
 
 uint8_t ImageContentBlockSpec::getChannelCountPerPixel(PixelFormat pixel) {
@@ -740,26 +747,28 @@ void AudioContentBlockSpec::set(ContentParser& parser) {
 }
 
 string AudioContentBlockSpec::asString() const {
-  stringstream ss;
-  if (audioFormat_ != AudioFormat::UNDEFINED) {
-    ss << AudioFormatConverter::toString(audioFormat_);
-    if (sampleFormat_ != AudioSampleFormat::UNDEFINED) {
-      ss << '/' << AudioSampleFormatConverter::toString(sampleFormat_);
-    }
-    if (channelCount_ != 0) {
-      ss << "/channels=" << static_cast<int>(channelCount_);
-    }
-    if (sampleRate_ != 0) {
-      ss << "/rate=" << sampleRate_;
-    }
-    if (sampleCount_ != 0) {
-      ss << "/samples=" << sampleCount_;
-    }
-    if (getSampleBlockStride() * 8 != getBitsPerSample() * channelCount_) {
-      ss << "/stride=" << static_cast<int>(sampleBlockStride_);
-    }
+  if (audioFormat_ == AudioFormat::UNDEFINED) {
+    return {};
   }
-  return ss.str();
+  string s;
+  s.reserve(120);
+  s.append(AudioFormatConverter::toString(audioFormat_));
+  if (sampleFormat_ != AudioSampleFormat::UNDEFINED) {
+    s.append("/").append(AudioSampleFormatConverter::toString(sampleFormat_));
+  }
+  if (channelCount_ != 0) {
+    s.append("/channels=").append(to_string(channelCount_));
+  }
+  if (sampleRate_ != 0) {
+    s.append("/rate=").append(to_string(sampleRate_));
+  }
+  if (sampleCount_ != 0) {
+    s.append("/samples=").append(to_string(sampleCount_));
+  }
+  if (getSampleBlockStride() * 8 != getBitsPerSample() * channelCount_) {
+    s.append("/stride=").append(to_string(sampleBlockStride_));
+  }
+  return s;
 }
 
 size_t AudioContentBlockSpec::getBlockSize() const {
@@ -944,10 +953,11 @@ ContentBlock::ContentBlock(const string& formatStr) {
 }
 
 string ContentBlock::asString() const {
-  stringstream ss;
-  ss << ContentTypeFormatConverter::toString(contentType_);
+  string s;
+  s.reserve(120);
+  s.append(ContentTypeFormatConverter::toString(contentType_));
   if (size_ != kSizeUnknown) {
-    ss << "/size=" << size_;
+    s.append("/size=").append(to_string(size_));
   }
   string subtype;
   switch (contentType_) {
@@ -961,9 +971,9 @@ string ContentBlock::asString() const {
       break;
   }
   if (!subtype.empty()) {
-    ss << '/' << subtype;
+    s.append("/").append(subtype);
   }
-  return ss.str();
+  return s;
 }
 
 size_t ContentBlock::getBlockSize() const {
@@ -1010,16 +1020,14 @@ void RecordFormat::set(const string& format) {
 }
 
 string RecordFormat::asString() const {
-  stringstream ss;
   if (blocks_.empty()) {
-    ss << ContentBlock(ContentType::EMPTY).asString();
-  } else {
-    ss << blocks_.begin()->asString();
-    for (auto iter = ++blocks_.begin(); iter != blocks_.end(); ++iter) {
-      ss << '+' << iter->asString();
-    }
+    return ContentBlock(ContentType::EMPTY).asString();
   }
-  return ss.str();
+  string s = blocks_.begin()->asString();
+  for (auto iter = ++blocks_.begin(); iter != blocks_.end(); ++iter) {
+    s.append("+").append(iter->asString());
+  }
+  return s;
 }
 
 size_t RecordFormat::getRecordSize() const {
@@ -1073,19 +1081,25 @@ size_t RecordFormat::getBlockSize(size_t blockIndex, size_t remainingSize) const
 // These definitions are not meant to be used by anyone outside of these helper methods
 static const char* const kRecordFormatTagPrefix = "RF:";
 static const char* const kDataLayoutTagPrefix = "DL:";
-static const char* const kFieldSeparator = ":";
+static const char kFieldSeparator = ':';
 
 string RecordFormat::getRecordFormatTagName(Record::Type recordType, uint32_t formatVersion) {
-  stringstream ss;
-  ss << kRecordFormatTagPrefix << Record::typeName(recordType) << kFieldSeparator << formatVersion;
-  return ss.str();
+  string s;
+  s.reserve(30);
+  s.append(kRecordFormatTagPrefix, 3)
+      .append(Record::typeName(recordType))
+      .push_back(kFieldSeparator);
+  s.append(to_string(formatVersion));
+  return s;
 }
 
 string RecordFormat::getDataLayoutTagName(Record::Type type, uint32_t version, size_t blockIndex) {
-  stringstream ss;
-  ss << kDataLayoutTagPrefix << Record::typeName(type) << kFieldSeparator << version
-     << kFieldSeparator << blockIndex;
-  return ss.str();
+  string s;
+  s.reserve(30);
+  s.append(kDataLayoutTagPrefix, 3).append(Record::typeName(type)).push_back(kFieldSeparator);
+  s.append(to_string(version)).push_back(kFieldSeparator);
+  s.append(to_string(blockIndex));
+  return s;
 }
 
 // reads a record type name, moves the string pointer & returns true on success
@@ -1120,18 +1134,17 @@ bool RecordFormat::parseRecordFormatTagName(
     const string& tagName,
     Record::Type& recordType,
     uint32_t& outFormatVersion) {
-  const size_t tagPrefixLength = strlen(kRecordFormatTagPrefix);
+  static const size_t tagPrefixLength = strlen(kRecordFormatTagPrefix);
   // quick test for the tag prefix, to stop early
   const char* str = tagName.c_str();
   if (strncmp(str, kRecordFormatTagPrefix, tagPrefixLength) != 0 ||
       !getRecordType(str += tagPrefixLength, recordType)) {
     return false;
   }
-  const size_t separatorLength = strlen(kFieldSeparator);
-  if (strncmp(str, kFieldSeparator, separatorLength) != 0) {
+  if (*str != kFieldSeparator) {
     return false;
   }
-  str += separatorLength;
+  str += 1;
   bool parseSuccess = helpers::readUInt32(str, outFormatVersion);
   if (!parseSuccess) {
     XR_LOGE("Failed to parse '{}'.", str);
