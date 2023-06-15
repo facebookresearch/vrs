@@ -422,15 +422,18 @@ int IndexRecord::Reader::readSplitIndexRecord(
     int64_t& outUsedFileSize) {
   // The index record's size is only updated after the index body is fully written,
   // because we will add to the index while the file is written
+  int64_t firstUserRecordOffset = fileHeader_.firstUserRecordOffset.get();
+  bool noRecords = (firstUserRecordOffset == totalFileSize_);
   int64_t currentPos = file_.getPos();
   int64_t chunkStart, chunkSize;
   if (!XR_VERIFY(file_.getChunkRange(chunkStart, chunkSize) == 0) || !XR_VERIFY(chunkSize > 0) ||
-      !XR_VERIFY(currentPos >= chunkStart && currentPos < chunkStart + chunkSize)) {
+      !XR_VERIFY(
+          (currentPos >= chunkStart && currentPos < chunkStart + chunkSize) ||
+          currentPos == totalFileSize_ && noRecords)) {
     return INDEX_RECORD_ERROR;
   }
-  int64_t firstUserRecordOffset = fileHeader_.firstUserRecordOffset.get();
   const int64_t nextChunkStart = chunkStart + chunkSize;
-  indexComplete_ = (indexByteSize > 0 && firstUserRecordOffset > 0);
+  indexComplete_ = ((indexByteSize > 0 || noRecords) && firstUserRecordOffset > 0);
   if (chunkStart == 0) {
     const size_t chunkLeft = static_cast<size_t>(nextChunkStart - currentPos);
     if (indexByteSize == 0) {
@@ -473,7 +476,9 @@ int IndexRecord::Reader::readSplitIndexRecord(
   }
   const size_t maxRecordInfoCount = sizeToRead / sizeof(IndexRecord::DiskRecordInfo);
   if (maxRecordInfoCount == 0) {
-    XR_LOGW("No index data to read.");
+    if (!noRecords) {
+      XR_LOGW("No index data to read.");
+    }
     return 0;
   }
   vector<DiskRecordInfo> recordStructs(maxRecordInfoCount);
