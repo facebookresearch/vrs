@@ -33,6 +33,7 @@
 using namespace std;
 using namespace vrs;
 using namespace vrs::utils;
+using namespace vrscli;
 
 using coretech::getTestDataDir;
 
