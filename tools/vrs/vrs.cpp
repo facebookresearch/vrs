@@ -21,6 +21,7 @@
 #include <vrs/os/Utils.h>
 
 using namespace std;
+using namespace vrscli;
 
 int main(int argc, char** argv) {
   const string& appName = vrs::os::getFilename(argv[0]);

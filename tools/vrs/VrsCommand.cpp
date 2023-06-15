@@ -52,6 +52,8 @@ using vrs::RecordFileInfo::Details;
 
 namespace {
 
+using namespace vrscli;
+
 const char* sCommands[] = {
     "none",
     "help",
@@ -138,6 +140,8 @@ const CommandSpec& getCommandSpec(Command cmd) {
 } // namespace
 
 #define CMD(H, C) H ":\n  " << appName << " " C "\n"
+
+namespace vrscli {
 
 void printHelp(const string& appName) {
   cout
@@ -632,3 +636,5 @@ DecimationParams& VrsCommand::getDecimatorParams() {
   }
   return *filters.decimationParams;
 }
+
+} // namespace vrscli

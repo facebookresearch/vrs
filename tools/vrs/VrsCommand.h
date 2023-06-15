@@ -23,6 +23,7 @@
 #include <vrs/utils/Validation.h>
 #include <vrs/utils/cli/PrintRecordFormatRecords.h>
 
+namespace vrscli {
 void printHelp(const std::string& appName);
 void printSamples(const std::string& appName);
 
@@ -139,3 +140,5 @@ struct VrsCommand {
   /// Extract raw images as ".raw" files instead of converting them to png.
   bool extractImagesRaw = false;
 };
+
+} // namespace vrscli
