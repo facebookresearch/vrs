@@ -49,9 +49,9 @@ using helpers::make_printable;
 
 namespace {
 
-void printCountedName(ostream& out, size_t count, const string& name) {
+void printCountedName(ostream& out, size_t count, const string& name, bool capital = false) {
   if (count == 0) {
-    out << "no " << name;
+    out << (capital ? "No " : "no ") << name << 's';
   } else if (count == 1) {
     out << "1 " << name;
   } else {
@@ -111,7 +111,7 @@ struct RecordCounter {
   }
   void print(ostream& out, const string& name, bool showFps) const {
     if (recordCount == 0) {
-      out << "  No " << name << " record." << endl;
+      out << "  No " << name << " records." << endl;
     } else {
       out << "  ";
       printCountedName(out, recordCount, name + " record");
@@ -146,7 +146,7 @@ void overView(ostream& out, RecordFileReader& file, StreamId id, Details details
     name << " - " << flavor;
   }
   name << " [" << id.getNumericName() << "] record";
-  printCountedName(out, index.size(), name.str());
+  printCountedName(out, index.size(), name.str(), true);
   if (!nowKnownAsName.empty()) {
     out << " (device now known as \"" << nowKnownAsName << "\")";
   }
@@ -214,7 +214,7 @@ void printOverview(
   }
   const vector<pair<string, int64_t>> chunks = recordFile.getFileChunks();
   if (chunks.empty()) {
-    out << "No chunk found." << endl;
+    out << "No chunks found." << endl;
   } else if (chunks.size() == 1) {
     const pair<string, int64_t>& file = chunks[0];
     out << "VRS file: '" << file.first << "', " << humanReadableFileSize(file.second) << "."
@@ -237,10 +237,6 @@ void printOverview(
       out << ", starting with " << chunks[0].first << '.' << endl;
     }
   }
-  if (details && Details::ListFileTags) {
-    const auto& tags = recordFile.getTags();
-    printTags(out, tags);
-  }
   RecordCounter recordCounter;
   const auto& index = recordFile.getIndex();
   for (const auto& record : index) {
@@ -250,7 +246,7 @@ void printOverview(
   }
   if (details && Details::MainCounters) {
     out << "Found ";
-    printCountedName(out, streamIds.size(), "device");
+    printCountedName(out, streamIds.size(), "stream");
     out << ", ";
     printCountedName(out, recordCounter.recordCount, "record");
 
@@ -275,9 +271,13 @@ void printOverview(
       }
       printTime(out, &index[first], &index[last], recordCount, true);
     } else {
-      out << ", no data record";
+      out << ", no data records";
     }
     out << "." << endl;
+  }
+  if (details && Details::ListFileTags) {
+    const auto& tags = recordFile.getTags();
+    printTags(out, tags);
   }
   if (details && (Details::StreamNames | Details::StreamTags | Details::StreamRecordCounts)) {
     for (auto id : streamIds) {
