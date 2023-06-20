@@ -25,6 +25,7 @@
 #include <vrs/RecordFileReader.h>
 #include <vrs/RecordFormatStreamPlayer.h>
 #include <vrs/os/Utils.h>
+#include <vrs/utils/DataLayoutReader.hpp>
 
 #include "SharedDefinitions.h"
 
@@ -33,11 +34,12 @@ using namespace vrs;
 using namespace vrs::datalayout_conventions;
 using namespace vrs_sample_apps;
 
-/// Sample app, to show how to get data from configuration records, maybe to setup a replay.
+/// Sample app, showing how to read data from configuration records, maybe to setup a replay.
 /// Ideally, such data would have been stored in stream tags, which are all available when the file
 /// is open without needing any complicated code, but in practice, it's easy to get stuck, and to
-/// need data found in different configuration records.
-/// So here, you open the file,
+/// need data found in configuration records.
+
+/// Note: First run the SampleRecordingApp sample app to generate the file this code looks for!
 
 int main() {
   RecordFileReader reader;
@@ -70,5 +72,17 @@ int main() {
   map<uint16_t, vector<float>> expectedCalibrations{{1, CALIBRATION_VALUES}};
   assert(collector.calibrations == expectedCalibrations);
 
+  // Alternate way to read a particular record and extract a particular datalayout
+  StreamId camera = reader.getStreamForFlavor(
+      RecordableTypeId::ForwardCameraRecordableClass, kCameraStreamFlavor);
+  assert(camera.isValid());
+  utils::DataLayoutReader<CameraStreamConfig> configReader(reader);
+  const CameraStreamConfig* config = configReader.read(camera, Record::Type::CONFIGURATION);
+  if (config != nullptr) {
+    vector<float> calibration;
+    assert(config->cameraCalibration.get(calibration));
+    const vector<float> expectedCalibration{CALIBRATION_VALUES};
+    assert(calibration == expectedCalibration);
+  }
   return 0;
 }
