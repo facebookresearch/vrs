@@ -102,7 +102,12 @@ void normalizeRGBXfloatToRGB8(
 namespace vrs::utils {
 
 PixelFrame::PixelFrame(const ImageContentBlockSpec& spec)
-    : imageSpec_{spec.getPixelFormat(), spec.getWidth(), spec.getHeight(), spec.getStride()} {
+    : imageSpec_{
+          spec.getPixelFormat(),
+          spec.getWidth(),
+          spec.getHeight(),
+          spec.getRawStride(),
+          spec.getRawStride2()} {
   size_t size = imageSpec_.getRawImageSize();
   if (XR_VERIFY(size != ContentBlock::kSizeUnknown)) {
     frameBytes_.resize(size);
