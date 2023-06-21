@@ -86,7 +86,7 @@ int FileSpec::parseUri(
     unsigned char c = static_cast<unsigned char>(uri[p]);
     // from https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Generic_syntax
     if (p == 0 && !isalpha(c)) {
-      XR_LOGE("Schema doesn't start with alphabet {}: {}", c, uri);
+      XR_LOGE("Schema of URI '{}' should start with a letter", uri);
       return INVALID_URI_FORMAT;
     }
     if (p != 0 && !(isalnum(c) || c == '.' || c == '-' || c == '+' || c == '_')) {
@@ -99,7 +99,7 @@ int FileSpec::parseUri(
 
   // length of path should be longer than 0
   if (query <= colon + 1 || (query == uri.npos && colon >= uri.size() - 1)) {
-    XR_LOGE("Path doesn't exist in uri: {}", uri);
+    XR_LOGE("Cannot parse input string '{}'. This is not a URI.", uri);
     return INVALID_URI_FORMAT;
   }
 
