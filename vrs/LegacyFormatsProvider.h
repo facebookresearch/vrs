@@ -16,11 +16,14 @@
 
 #pragma once
 
+#include <mutex>
+
 #include "RecordFormat.h"
 
 namespace vrs {
 
 using std::map;
+using std::recursive_mutex;
 using std::string;
 using std::unique_ptr;
 using std::vector;
@@ -75,14 +78,13 @@ class RecordFormatRegistrar {
       Record::Type recordType,
       uint32_t formatVersion,
       const RecordFormat& format,
-      const vector<const DataLayout*>& layouts) {
-    return RecordFormat::addRecordFormat(
-        legacyRecordFormats_[typeId], recordType, formatVersion, format, layouts);
-  }
+      const vector<const DataLayout*>& layouts);
 
  private:
   const map<string, string>& getLegacyRegistry(RecordableTypeId typeId);
+  void registerProviderInternal(unique_ptr<LegacyFormatsProvider> provider);
 
+  recursive_mutex mutex_;
   vector<unique_ptr<LegacyFormatsProvider>> providers_;
   map<RecordableTypeId, map<string, string>> legacyRecordFormats_;
 };

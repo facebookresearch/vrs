@@ -31,7 +31,12 @@ namespace vrs {
 LegacyFormatsProvider::~LegacyFormatsProvider() = default;
 
 void RecordFormatRegistrar::registerProvider(unique_ptr<LegacyFormatsProvider> provider) {
-  getInstance().providers_.emplace_back(std::move(provider));
+  getInstance().registerProviderInternal(std::move(provider));
+}
+
+void RecordFormatRegistrar::registerProviderInternal(unique_ptr<LegacyFormatsProvider> provider) {
+  unique_lock<recursive_mutex> guard{mutex_};
+  providers_.emplace_back(std::move(provider));
 }
 
 RecordFormatRegistrar& RecordFormatRegistrar::getInstance() {
@@ -42,10 +47,12 @@ RecordFormatRegistrar& RecordFormatRegistrar::getInstance() {
 void RecordFormatRegistrar::getLegacyRecordFormats(
     RecordableTypeId id,
     RecordFormatMap& outFormats) {
+  unique_lock<recursive_mutex> guard{mutex_};
   RecordFormat::getRecordFormats(getLegacyRegistry(id), outFormats);
 }
 
 unique_ptr<DataLayout> RecordFormatRegistrar::getLegacyDataLayout(const ContentBlockId& blockId) {
+  unique_lock<recursive_mutex> guard{mutex_};
   return RecordFormat::getDataLayout(getLegacyRegistry(blockId.getRecordableTypeId()), blockId);
 }
 
@@ -55,6 +62,7 @@ unique_ptr<DataLayout> RecordFormatRegistrar::getLatestDataLayout(
   RecordFormatMap recordFormats;
   getLegacyRecordFormats(typeId, recordFormats);
   // The newest version is assumed to have a greater version number, so we iterate backwards
+  unique_lock<recursive_mutex> guard{mutex_};
   for (auto iter = recordFormats.rbegin(); iter != recordFormats.rend(); ++iter) {
     if (iter->first.first == recordType) {
       const RecordFormat& format = iter->second;
@@ -72,6 +80,17 @@ unique_ptr<DataLayout> RecordFormatRegistrar::getLatestDataLayout(
     }
   }
   return {};
+}
+
+bool RecordFormatRegistrar::addLegacyRecordFormat(
+    RecordableTypeId typeId,
+    Record::Type recordType,
+    uint32_t formatVersion,
+    const RecordFormat& format,
+    const vector<const DataLayout*>& layouts) {
+  unique_lock<recursive_mutex> guard{mutex_};
+  return RecordFormat::addRecordFormat(
+      legacyRecordFormats_[typeId], recordType, formatVersion, format, layouts);
 }
 
 const map<string, string>& RecordFormatRegistrar::getLegacyRegistry(RecordableTypeId typeId) {
