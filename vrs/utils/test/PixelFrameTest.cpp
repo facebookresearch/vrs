@@ -19,6 +19,9 @@
 
 #include <gtest/gtest.h>
 
+#define DEFAULT_LOG_CHANNEL "PixelFrameTest"
+#include <logging/Verify.h>
+
 #include <TestDataDir/TestDataDir.h>
 
 #include <vrs/RecordFileReader.h>
@@ -66,4 +69,68 @@ TEST_F(PixelFrameTest, normalize) {
     reader.setStreamPlayer(id, streamPlayers.back().get());
   }
   reader.readAllRecords();
+}
+
+static bool checkNormalized(const vector<float>& floats, const vector<uint8_t>& ints) {
+  PixelFrame pf(PixelFormat::DEPTH32F, floats.size(), 1);
+  memcpy(pf.wdata(), floats.data(), floats.size() * sizeof(float));
+  shared_ptr<PixelFrame> normalizedFrame;
+  pf.normalizeFrame(normalizedFrame, false);
+  vector<uint8_t> normalized(normalizedFrame->size());
+  memcpy(normalized.data(), normalizedFrame->rdata(), normalizedFrame->size());
+  EXPECT_EQ(normalized, ints);
+  return normalized == ints;
+}
+
+TEST_F(PixelFrameTest, normalizeDepth) {
+  EXPECT_TRUE(checkNormalized({1, 2, 3, 4}, {0, 85, 170, 255}));
+  EXPECT_TRUE(checkNormalized({-10, -100, 25, -2}, {183, 0, 255, 199}));
+  EXPECT_TRUE(checkNormalized({NAN, -100, 25, -2}, {0, 0, 255, 199}));
+  EXPECT_TRUE(checkNormalized({-10, -100, 25, NAN}, {183, 0, 255, 0}));
+  EXPECT_TRUE(checkNormalized({NAN, NAN, 25, -2}, {0, 0, 255, 0}));
+  EXPECT_TRUE(checkNormalized({NAN, NAN, NAN, NAN}, {0, 0, 0, 0}));
+}
+
+struct Triplet {
+  uint8_t a, b, c;
+  bool operator==(const Triplet& rhs) const {
+    return a == rhs.a && b == rhs.b && c == rhs.c;
+  }
+};
+
+template <>
+void testing::internal::PrintTo<Triplet>(const Triplet& value, ::std::ostream* os) {
+  *os << "{" << (int)value.a << ", " << (int)value.b << ", " << (int)value.c << "}";
+}
+
+struct TripletF {
+  float a, b, c;
+};
+
+static bool checkNormalizedRGB32F(const vector<TripletF>& floats, const vector<Triplet>& ints) {
+  if (!XR_VERIFY(floats.size() == ints.size())) {
+    return false;
+  }
+  PixelFrame pf(PixelFormat::RGB32F, floats.size(), 1);
+  memcpy(
+      pf.wdata(), reinterpret_cast<const float*>(floats.data()), 3 * floats.size() * sizeof(float));
+  shared_ptr<PixelFrame> normalizedFrame;
+  pf.normalizeFrame(normalizedFrame, false);
+  vector<Triplet> normalized(ints.size());
+  const uint8_t* normalizedSrc = normalizedFrame->rdata();
+  uint8_t* normalizedDst = reinterpret_cast<uint8_t*>(normalized.data());
+  for (size_t k = 0; k < normalizedFrame->size(); k++) {
+    normalizedDst[k] = normalizedSrc[k];
+  }
+  EXPECT_EQ(normalized, ints);
+  return normalized == ints;
+}
+
+TEST_F(PixelFrameTest, normalizeRGB32F) {
+  EXPECT_TRUE(checkNormalizedRGB32F({{1, 150, 3}, {10, 50, 100}}, {{0, 255, 0}, {255, 0, 255}}));
+  EXPECT_TRUE(checkNormalizedRGB32F(
+      {{1, 2, 3}, {10, -50, 100}, {5, 30, 150}}, {{0, 165, 0}, {255, 0, 168}, {113, 255, 255}}));
+  EXPECT_TRUE(checkNormalizedRGB32F(
+      {{1, NAN, NAN}, {10, -50, NAN}, {-5, 30, 250}, {25, NAN, 150}},
+      {{51, 0, 0}, {127, 0, 0}, {0, 255, 255}, {255, 0, 0}}));
 }
