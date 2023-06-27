@@ -16,8 +16,6 @@
 
 #include <vrs/os/Semaphore.h>
 
-#if IS_VRS_OSS_TARGET_PLATFORM()
-
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace vrs {
@@ -33,5 +31,3 @@ bool Semaphore::timedWait(const double timeSec) {
 
 } // namespace os
 } // namespace vrs
-
-#endif

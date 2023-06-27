@@ -18,8 +18,6 @@
 
 #include <vrs/os/Platform.h>
 
-#if IS_VRS_OSS_TARGET_PLATFORM()
-
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/interprocess/sync/interprocess_semaphore.hpp>
 
@@ -39,7 +37,3 @@ class Semaphore : private boost::interprocess::interprocess_semaphore {
 
 } // namespace os
 } // namespace vrs
-
-#else
-#include "Semaphore_fb.h"
-#endif
