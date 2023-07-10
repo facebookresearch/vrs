@@ -134,3 +134,35 @@ TEST_F(PixelFrameTest, normalizeRGB32F) {
       {{1, NAN, NAN}, {10, -50, NAN}, {-5, 30, 250}, {25, NAN, 150}},
       {{51, 0, 0}, {127, 0, 0}, {0, 255, 255}, {255, 0, 0}}));
 }
+
+// This streamPlayer read image, writes it as png in a buffer, reads the buffer back and finally
+// tests that the decoded PixelFrame is strictly identical from the raw data.
+class PngImageWriteRead : public RecordFormatStreamPlayer {
+  bool onImageRead(const CurrentRecord& record, size_t /*idx*/, const ContentBlock& cb) override {
+    PixelFrame frame;
+    EXPECT_TRUE(frame.readRawFrame(record.reader, cb.image()));
+    vector<uint8_t> buffer;
+    PixelFrame decoded;
+    frame.writeAsPng("", &buffer);
+    decoded.readPngFrame(buffer);
+    EXPECT_TRUE(frame.hasSamePixels(decoded.getSpec()));
+    EXPECT_EQ(frame.getBuffer(), decoded.getBuffer());
+    return true; // read next blocks, if any
+  }
+};
+
+TEST_F(PixelFrameTest, writeReadPng) {
+  RecordFileReader reader;
+  ASSERT_EQ(reader.openFile(kTestFilePath), 0);
+  PngImageWriteRead streamPlayer;
+  auto streamIdsPerfectlyConvertibleToPng = {
+      vrs::StreamId::fromNumericName("100-1"), // grey8
+      vrs::StreamId::fromNumericName("100-4"), // grey16
+      vrs::StreamId::fromNumericName("214-2"), // rgb8
+      vrs::StreamId::fromNumericName("214-4"), // rgba8
+  };
+  for (auto streamId : streamIdsPerfectlyConvertibleToPng) {
+    reader.setStreamPlayer(streamId, &streamPlayer);
+    reader.readAllRecords();
+  }
+}

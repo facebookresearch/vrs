@@ -121,7 +121,13 @@ bool PixelFrame::readPngFrame(const vector<uint8_t>& pngBuffer, bool decodePixel
       XR_LOGE("Multi-channel grey images make no sense...");
       return false;
     }
-    init(ImageContentBlockSpec(PixelFormat::GREY8, imgWidth, imgHeight));
+    if (bitdepth == 16) {
+      init(ImageContentBlockSpec(PixelFormat::GREY16, imgWidth, imgHeight));
+      png_set_swap(pngPtr);
+    } else {
+      // for any other possible bitdepth we will convert to 8 bit (see below)
+      init(ImageContentBlockSpec(PixelFormat::GREY8, imgWidth, imgHeight));
+    }
   } else if (colorType == PNG_COLOR_TYPE_RGB) {
     if (channels != 3) {
       XR_LOGE("{} channels color images make no sense with PNG_COLOR_TYPE_RGB...", channels);
@@ -143,12 +149,6 @@ bool PixelFrame::readPngFrame(const vector<uint8_t>& pngBuffer, bool decodePixel
     if (bitdepth < 8) {
       png_set_expand_gray_1_2_4_to_8(pngPtr);
       // And the bitdepth info
-      bitdepth = 8;
-    }
-    // We don't support 16 bit precision, so if the image Has 16 bits per channel
-    // precision, round it down to 8.
-    if (bitdepth == 16) {
-      png_set_strip_16(pngPtr);
       bitdepth = 8;
     }
 
