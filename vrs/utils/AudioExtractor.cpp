@@ -169,7 +169,9 @@ bool AudioExtractor::onAudioRead(
     return true;
   }
 
-  if (!currentAudioContentBlockSpec_.isCompatibleWith(audioBlockSpec)) {
+  const int64_t kMaxWavFileSize = 1LL << 32; // WAV can't handle files larger than 4 GiB.
+  if (!currentAudioContentBlockSpec_.isCompatibleWith(audioBlockSpec) ||
+      currentWavFile_.getPos() + audio_.size() >= kMaxWavFileSize) {
     closeWavFile(currentWavFile_);
 
     XR_VERIFY(os::makeDirectories(folderPath_) == 0);
