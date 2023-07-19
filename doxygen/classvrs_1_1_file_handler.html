@@ -71,7 +71,6 @@ $(function() {
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classvrs_1_1_file_handler-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">vrs::FileHandler Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
@@ -109,11 +108,11 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>CacheStatsCallbackFu
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a87333a3da593726fcb634990712b6da3"><td class="memItemLeft" align="right" valign="top"><a id="a87333a3da593726fcb634990712b6da3"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>FileHandler</b> (const string &amp;fileHandlerName)</td></tr>
-<tr class="separator:a87333a3da593726fcb634990712b6da3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac9e142b78b30f3e03cc6bfd4ac4aad5e"><td class="memItemLeft" align="right" valign="top">virtual unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#ac9e142b78b30f3e03cc6bfd4ac4aad5e">makeNew</a> () const =0</td></tr>
 <tr class="separator:ac9e142b78b30f3e03cc6bfd4ac4aad5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ac5815963b947148709f7c8e8325ed0"><td class="memItemLeft" align="right" valign="top"><a id="a2ac5815963b947148709f7c8e8325ed0"></a>
+virtual const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getFileHandlerName</b> () const =0</td></tr>
+<tr class="separator:a2ac5815963b947148709f7c8e8325ed0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc8cce8cea6320affac819d063705d9b"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#acc8cce8cea6320affac819d063705d9b">open</a> (const string &amp;filePath)</td></tr>
 <tr class="separator:acc8cce8cea6320affac819d063705d9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaaafaf72028776e1868b6d69a1210902"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#aaaafaf72028776e1868b6d69a1210902">openSpec</a> (const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;fileSpec)=0</td></tr>
@@ -170,9 +169,6 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>setStatsCallb
 <tr class="separator:a85dd822081969a71159b7206a4371177"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad49c80e3f6764c5f5627c61e8d00a3a3"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#ad49c80e3f6764c5f5627c61e8d00a3a3">purgeCache</a> ()</td></tr>
 <tr class="separator:ad49c80e3f6764c5f5627c61e8d00a3a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a12bc0f31ab6d2da1df546ea14eb79900"><td class="memItemLeft" align="right" valign="top"><a id="a12bc0f31ab6d2da1df546ea14eb79900"></a>
-string&#160;</td><td class="memItemRight" valign="bottom"><b>getFileHandlerName</b> () const</td></tr>
-<tr class="separator:a12bc0f31ab6d2da1df546ea14eb79900"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8d1a9e18368a77be359b1d23360c8ced"><td class="memItemLeft" align="right" valign="top"><a id="a8d1a9e18368a77be359b1d23360c8ced"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>isFileHandlerMatch</b> (const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;fileSpec) const</td></tr>
 <tr class="separator:a8d1a9e18368a77be359b1d23360c8ced"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -185,12 +181,6 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="inherit_header pub_methods_classvrs_1_1_file_delegator"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classvrs_1_1_file_delegator')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classvrs_1_1_file_delegator.html">vrs::FileDelegator</a></td></tr>
 <tr class="memitem:ada2b37e7ae16cc030db9fd8dab4061ae inherit pub_methods_classvrs_1_1_file_delegator"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_delegator.html#ada2b37e7ae16cc030db9fd8dab4061ae">parseUri</a> (<a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;inOutFileSpec, size_t colonIndex) const</td></tr>
 <tr class="separator:ada2b37e7ae16cc030db9fd8dab4061ae inherit pub_methods_classvrs_1_1_file_delegator"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
-Protected Attributes</h2></td></tr>
-<tr class="memitem:a55c104291ba9488e5d82e14877b8860d"><td class="memItemLeft" align="right" valign="top"><a id="a55c104291ba9488e5d82e14877b8860d"></a>
-string&#160;</td><td class="memItemRight" valign="bottom"><b>fileHandlerName_</b></td></tr>
-<tr class="separator:a55c104291ba9488e5d82e14877b8860d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class to abstract VRS file system operations, to enable support for alternate storage methods, in particular network/cloud storage implementations. </p>

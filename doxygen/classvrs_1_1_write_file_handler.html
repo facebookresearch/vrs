@@ -94,9 +94,6 @@ Inheritance diagram for vrs::WriteFileHandler:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a709f463c10c2714001bc4eb3694a2d61"><td class="memItemLeft" align="right" valign="top"><a id="a709f463c10c2714001bc4eb3694a2d61"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>WriteFileHandler</b> (const string &amp;fileHandlerName)</td></tr>
-<tr class="separator:a709f463c10c2714001bc4eb3694a2d61"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a91518076bc2908a1a4b21aace0fe79cf"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_write_file_handler.html#a91518076bc2908a1a4b21aace0fe79cf">create</a> (const string &amp;newFilePath)=0</td></tr>
 <tr class="separator:a91518076bc2908a1a4b21aace0fe79cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a42d388f28fa2202dc18ab52964d7990c"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_write_file_handler.html#a42d388f28fa2202dc18ab52964d7990c">reopenForUpdatesSupported</a> () const =0</td></tr>
@@ -128,11 +125,11 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="memdesc:afece8d46df881681dad2ed44bc73b5b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the path of the current chunk, or an empty string if no chunk is open. <br /></td></tr>
 <tr class="separator:afece8d46df881681dad2ed44bc73b5b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classvrs_1_1_file_handler"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classvrs_1_1_file_handler')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classvrs_1_1_file_handler.html">vrs::FileHandler</a></td></tr>
-<tr class="memitem:a87333a3da593726fcb634990712b6da3 inherit pub_methods_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top"><a id="a87333a3da593726fcb634990712b6da3"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>FileHandler</b> (const string &amp;fileHandlerName)</td></tr>
-<tr class="separator:a87333a3da593726fcb634990712b6da3 inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac9e142b78b30f3e03cc6bfd4ac4aad5e inherit pub_methods_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top">virtual unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#ac9e142b78b30f3e03cc6bfd4ac4aad5e">makeNew</a> () const =0</td></tr>
 <tr class="separator:ac9e142b78b30f3e03cc6bfd4ac4aad5e inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ac5815963b947148709f7c8e8325ed0 inherit pub_methods_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top"><a id="a2ac5815963b947148709f7c8e8325ed0"></a>
+virtual const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getFileHandlerName</b> () const =0</td></tr>
+<tr class="separator:a2ac5815963b947148709f7c8e8325ed0 inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc8cce8cea6320affac819d063705d9b inherit pub_methods_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#acc8cce8cea6320affac819d063705d9b">open</a> (const string &amp;filePath)</td></tr>
 <tr class="separator:acc8cce8cea6320affac819d063705d9b inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaaafaf72028776e1868b6d69a1210902 inherit pub_methods_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#aaaafaf72028776e1868b6d69a1210902">openSpec</a> (const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;fileSpec)=0</td></tr>
@@ -187,9 +184,6 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>setStatsCallb
 <tr class="separator:a85dd822081969a71159b7206a4371177 inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad49c80e3f6764c5f5627c61e8d00a3a3 inherit pub_methods_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#ad49c80e3f6764c5f5627c61e8d00a3a3">purgeCache</a> ()</td></tr>
 <tr class="separator:ad49c80e3f6764c5f5627c61e8d00a3a3 inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a12bc0f31ab6d2da1df546ea14eb79900 inherit pub_methods_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top"><a id="a12bc0f31ab6d2da1df546ea14eb79900"></a>
-string&#160;</td><td class="memItemRight" valign="bottom"><b>getFileHandlerName</b> () const</td></tr>
-<tr class="separator:a12bc0f31ab6d2da1df546ea14eb79900 inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8d1a9e18368a77be359b1d23360c8ced inherit pub_methods_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top"><a id="a8d1a9e18368a77be359b1d23360c8ced"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>isFileHandlerMatch</b> (const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;fileSpec) const</td></tr>
 <tr class="separator:a8d1a9e18368a77be359b1d23360c8ced inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -209,10 +203,6 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:a4d90cd8352b33088933df68d02572fdb inherit pub_types_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top"><a id="a4d90cd8352b33088933df68d02572fdb"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>CacheStatsCallbackFunction</b> = std::function&lt; void(const <a class="el" href="structvrs_1_1_file_handler_1_1_cache_stats.html">CacheStats</a> &amp;stats)&gt;</td></tr>
 <tr class="separator:a4d90cd8352b33088933df68d02572fdb inherit pub_types_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pro_attribs_classvrs_1_1_file_handler"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classvrs_1_1_file_handler')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classvrs_1_1_file_handler.html">vrs::FileHandler</a></td></tr>
-<tr class="memitem:a55c104291ba9488e5d82e14877b8860d inherit pro_attribs_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top"><a id="a55c104291ba9488e5d82e14877b8860d"></a>
-string&#160;</td><td class="memItemRight" valign="bottom"><b>fileHandlerName_</b></td></tr>
-<tr class="separator:a55c104291ba9488e5d82e14877b8860d inherit pro_attribs_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The <a class="el" href="classvrs_1_1_write_file_handler.html" title="The WriteFileHandler interface adds write operations to the FileHandler interface.">WriteFileHandler</a> interface adds write operations to the <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> interface. </p>
