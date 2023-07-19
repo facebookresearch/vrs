@@ -41,11 +41,13 @@ class DiskFile : public WriteFileHandler {
     }
   };
 
-  DiskFile();
+  DiskFile() = default;
   ~DiskFile() override;
 
   /// Make a new DiskFile object, with a default state.
   std::unique_ptr<FileHandler> makeNew() const override;
+
+  const string& getFileHandlerName() const override;
 
   /// Open a file in read-only mode.
   int openSpec(const FileSpec& fileSpec) override;

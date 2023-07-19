@@ -42,9 +42,12 @@ const string kUserFileRecordsFileHandler = "UserRecordsFileHandler";
 
 class UserRecordsFileHandler : public WriteFileHandler {
  public:
-  UserRecordsFileHandler() : WriteFileHandler(kUserFileRecordsFileHandler) {}
+  UserRecordsFileHandler() {}
   std::unique_ptr<FileHandler> makeNew() const override {
     return make_unique<UserRecordsFileHandler>();
+  }
+  const string& getFileHandlerName() const override {
+    return kUserFileRecordsFileHandler;
   }
 
   /// Minimal implementations needed for a custom WriteFileHandler used for data writes only

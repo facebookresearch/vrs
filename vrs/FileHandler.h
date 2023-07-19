@@ -84,12 +84,13 @@ class FileHandler : public FileDelegator {
 
   using CacheStatsCallbackFunction = std::function<void(const CacheStats& stats)>;
 
-  FileHandler(const string& fileHandlerName) : fileHandlerName_{fileHandlerName} {}
+  FileHandler() = default;
 
   /// Make a new instance of the concrete class implementing this interface in its default state,
   /// no matter what this object's state is, so that we can access more files using the same method.
   /// @return A new object of the concrete type, ready to be used to open a new file.
   virtual unique_ptr<FileHandler> makeNew() const = 0;
+  virtual const string& getFileHandlerName() const = 0;
 
   /// Open a file in read-only mode.
   /// @param filePath: a disk path, or anything that the particular module recognizes.
@@ -224,10 +225,6 @@ class FileHandler : public FileDelegator {
     return true;
   }
 
-  string getFileHandlerName() const {
-    return fileHandlerName_;
-  }
-
   bool isFileHandlerMatch(const FileSpec& fileSpec) const;
 
   /// Tell if the file handler is handling remote data, that might need caching for instance.
@@ -237,9 +234,6 @@ class FileHandler : public FileDelegator {
   virtual bool showProgress() const {
     return isRemoteFileSystem();
   }
-
- protected:
-  string fileHandlerName_;
 };
 
 /// Helper class to temporarily modify a FileHandler's caching strategy.

@@ -39,9 +39,7 @@ struct FileHandlerFactoryTest : testing::Test {
 // Fake FileHandler class that just pretends to open any path
 class FakeHandler : public DiskFile {
  public:
-  FakeHandler(const string& name) {
-    fileHandlerName_ = name;
-  }
+  FakeHandler(const string& name) : fileHandlerName_{name} {}
   unique_ptr<FileHandler> makeNew() const override {
     return make_unique<FakeHandler>(fileHandlerName_);
   }
@@ -56,6 +54,13 @@ class FakeHandler : public DiskFile {
     outNewDelegate.reset();
     return 0;
   }
+
+  const string& getFileHandlerName() const override {
+    return fileHandlerName_;
+  }
+
+ private:
+  const string fileHandlerName_;
 };
 
 static int openVRSFile(const string& path, unique_ptr<FileHandler>& outFile) {

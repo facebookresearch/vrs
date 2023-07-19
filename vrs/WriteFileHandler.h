@@ -39,7 +39,7 @@ using std::vector;
 /// VRS file creation.
 class WriteFileHandler : public FileHandler {
  public:
-  WriteFileHandler(const string& fileHandlerName) : FileHandler(fileHandlerName) {}
+  WriteFileHandler() = default;
 
   /// Create a new file for writing.
   /// @param newFilePath: a disk path to create the file.

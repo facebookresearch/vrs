@@ -26,7 +26,7 @@ namespace vrs::utils {
 /// A FileHandler that reads data from a buffer
 class BufferFileHandler : public FileHandler {
  public:
-  BufferFileHandler() : FileHandler("BufferFileHandler") {}
+  BufferFileHandler() : fileHandlerName_{"BufferFileHandler"} {}
 
   void init(const vector<uint8_t>& buffer) {
     data_ = buffer.data();
@@ -38,6 +38,9 @@ class BufferFileHandler : public FileHandler {
 
   std::unique_ptr<FileHandler> makeNew() const override {
     return std::make_unique<BufferFileHandler>();
+  }
+  const string& getFileHandlerName() const override {
+    return fileHandlerName_;
   }
 
   int openSpec(const FileSpec& fileSpec) override {
@@ -112,11 +115,12 @@ class BufferFileHandler : public FileHandler {
   }
 
  private:
-  const uint8_t* data_{};
-  int64_t totalSize_;
-  uint32_t readSize_;
-  uint32_t lastReadSize_;
-  int lastError_;
+  const string fileHandlerName_;
+  const uint8_t* data_{nullptr};
+  int64_t totalSize_{0};
+  uint32_t readSize_{0};
+  uint32_t lastReadSize_{0};
+  int lastError_{0};
 };
 
 /// A RecordReader that reads data from a buffer

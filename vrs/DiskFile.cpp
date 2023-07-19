@@ -50,14 +50,16 @@ const string& DiskFile::staticName() {
   return sDiskFileHandlerName;
 }
 
-DiskFile::DiskFile() : WriteFileHandler(DiskFile::staticName()) {}
-
 DiskFile::~DiskFile() {
   DiskFile::close(); // overrides not available in constructors & destructors
 }
 
 unique_ptr<FileHandler> DiskFile::makeNew() const {
   return make_unique<DiskFile>();
+}
+
+const string& DiskFile::getFileHandlerName() const {
+  return staticName();
 }
 
 int DiskFile::close() {
