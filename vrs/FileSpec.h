@@ -103,7 +103,9 @@ struct FileSpec {
   bool operator==(const FileSpec& rhs) const;
 
   /// Get an extra parameter, or the empty string.
-  string getExtra(const string& name) const;
+  const string& getExtra(const string& name) const;
+  /// Get an extra parameter, or the empty string.
+  const string& getExtra(const string& name, const string& defaultValue) const;
   /// Tell if an extra parameter is defined.
   bool hasExtra(const string& name) const;
   /// Get an extra parameter interpreted as an int, or a default value if not available,

@@ -347,9 +347,15 @@ bool FileSpec::operator==(const FileSpec& rhs) const {
   return tie(*this) == tie(rhs);
 }
 
-string FileSpec::getExtra(const string& name) const {
+const string& FileSpec::getExtra(const string& name) const {
+  static const string kEmptyString;
   const auto extra = extras.find(name);
-  return (extra == extras.end()) ? string() : extra->second;
+  return (extra == extras.end()) ? kEmptyString : extra->second;
+}
+
+const string& FileSpec::getExtra(const string& name, const string& defaultValue) const {
+  const auto extra = extras.find(name);
+  return (extra == extras.end()) ? defaultValue : extra->second;
 }
 
 bool FileSpec::hasExtra(const string& name) const {
