@@ -94,7 +94,7 @@ int FileHandlerFactory::parseUri(FileSpec& inOutFileSpec, size_t colonIndex) {
   }
 
   if (!inOutFileSpec.extras.empty() && (delegator = getExtraDelegator(inOutFileSpec)) != nullptr) {
-    delegator->parseUri(inOutFileSpec, colonIndex);
+    IF_ERROR_RETURN(delegator->parseUri(inOutFileSpec, colonIndex));
   }
   return SUCCESS;
 }
