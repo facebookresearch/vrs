@@ -268,10 +268,9 @@ RecordFileWriter::RecordFileWriter()
       purgeThreadData_{nullptr} {
   setMaxChunkSizeMB(0);
   initCreatedThreadCallback_ = [](thread&, ThreadRole, int) {};
-  if (LOG_FILE_OPERATIONS) {
-    // @oss-disable: arvr::logging::getChannel(DEFAULT_LOG_CHANNEL)
-        // @oss-disable: .setLevel(arvr::logging::Level::Debug);
-  }
+#if IS_VRS_FB_INTERNAL() && LOG_FILE_OPERATIONS
+  arvr::logging::getChannel(DEFAULT_LOG_CHANNEL).setLevel(arvr::logging::Level::Debug);
+#endif
 }
 
 void RecordFileWriter::addRecordable(Recordable* recordable) {
