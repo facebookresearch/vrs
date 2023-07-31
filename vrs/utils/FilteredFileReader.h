@@ -155,8 +155,6 @@ struct FilteredFileReader {
   // Add constraints, typically from command line options
   bool afterConstraint(const string& after);
   bool beforeConstraint(const string& before);
-  bool includeStream(const string& numericName);
-  bool excludeStream(const string& numericName);
 
   // Set time constraints, maybe relative to first/last data records
   void setMinTime(double minimumTime, bool relativeToBegin);

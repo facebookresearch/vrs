@@ -439,9 +439,7 @@ int FileSpec::urldecode(const string& in, string& out) {
   out.reserve(in.size());
   for (size_t p = 0; p < in.size(); p++) {
     char c = in[p];
-    if (c == '+') {
-      c = ' ';
-    } else if ((c == '%') && (in.size() - p) > 2 && ISXDIGIT(in[p + 1]) && ISXDIGIT(in[p + 2])) {
+    if ((c == '%') && (in.size() - p) > 2 && ISXDIGIT(in[p + 1]) && ISXDIGIT(in[p + 2])) {
       c = (xdigitToChar(in[p + 1]) << 4) | xdigitToChar(in[p + 2]);
       p += 2;
     }

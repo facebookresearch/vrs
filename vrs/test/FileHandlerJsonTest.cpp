@@ -177,7 +177,7 @@ TEST_F(FileHandlerJsonTest, DecodeUrlQuery) {
   EXPECT_EQ(key, "test key");
   EXPECT_EQ(value, "value=42");
   EXPECT_EQ(vrs::FileSpec::decodeQuery(kURLQueryWithEncodeAndSpace2, key, value), 0);
-  EXPECT_EQ(key, "test key");
+  EXPECT_EQ(key, "test+key");
   EXPECT_EQ(value, "value=42");
 
   EXPECT_EQ(
