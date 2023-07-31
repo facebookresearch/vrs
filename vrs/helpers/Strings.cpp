@@ -294,12 +294,22 @@ bool replaceAll(string& inOutString, const string& token, const string& replacem
   return replaced;
 }
 
-void split(const std::string& inputString, char delimiter, std::vector<std::string>& tokens) {
+void split(
+    const std::string& inputString,
+    char delimiter,
+    std::vector<std::string>& tokens,
+    bool skipEmpty,
+    const char* trimChars) {
   std::stringstream ss(inputString);
   std::string item;
 
   while (getline(ss, item, delimiter)) {
-    tokens.push_back(item);
+    if (trimChars != nullptr) {
+      item = helpers::trim(item, trimChars);
+    }
+    if (!(item.empty() && skipEmpty)) {
+      tokens.push_back(item);
+    }
   }
 }
 

@@ -156,7 +156,14 @@ std::string make_printable(const std::string& str);
 /// @param inputString: the string that needs to be split.
 /// @param delimiter: the delimiter that will be used to split the input string.
 /// @param tokens: the collection of strings after the split.
-void split(const std::string& inputString, char delimiter, std::vector<std::string>& tokens);
+/// @param skipEmpty: if true, won't return empty tokens
+/// @param trimChars: if specified, characters to trim for each token
+void split(
+    const std::string& inputString,
+    char delimiter,
+    std::vector<std::string>& tokens,
+    bool skipEmpty = false,
+    const char* trimChars = nullptr);
 
 } // namespace helpers
 } // namespace vrs

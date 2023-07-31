@@ -280,7 +280,8 @@ TEST_F(StringsHelpersTester, replaceAllTest) {
 
 TEST_F(StringsHelpersTester, splitTest) {
   string str =
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, "
+      "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
   vector<string> expectedTokens{
       "Lorem ipsum dolor sit amet",
       " consectetur adipiscing elit",
@@ -293,5 +294,21 @@ TEST_F(StringsHelpersTester, splitTest) {
   expectedTokens = {str};
   actualTokens.clear();
   helpers::split(str, '_', actualTokens);
+  EXPECT_EQ(actualTokens, expectedTokens);
+
+  actualTokens.clear();
+  str = "hello elle is cool lol. le bol de lait";
+  expectedTokens = {"he", "", "o e", "", "e is coo", " ", "o", ". ", "e bo", " de ", "ait"};
+  helpers::split(str, 'l', actualTokens);
+  EXPECT_EQ(actualTokens, expectedTokens);
+
+  actualTokens.clear();
+  expectedTokens = {"he", "o e", "e is coo", " ", "o", ". ", "e bo", " de ", "ait"};
+  helpers::split(str, 'l', actualTokens, true);
+  EXPECT_EQ(actualTokens, expectedTokens);
+
+  actualTokens.clear();
+  expectedTokens = {"he", "o e", "e is coo", "o", ".", "e bo", "de", "ait"};
+  helpers::split(str, 'l', actualTokens, true, " ");
   EXPECT_EQ(actualTokens, expectedTokens);
 }
