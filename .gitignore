@@ -1,2 +1,4 @@
 .DS_Store
 CMakeLists.txt.user
+
+build/
