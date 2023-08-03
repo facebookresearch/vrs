@@ -24,7 +24,7 @@
 
 #include <fmt/format.h>
 
-#include <vrs/helpers/Serialization.h>
+#include <vrs/helpers/Rapidjson.hpp>
 #include <vrs/helpers/Strings.h>
 
 #include <vrs/ErrorCode.h>
@@ -416,11 +416,7 @@ string jsonOverview(const string& path, Details details) {
   doc.AddMember(
       stringToJvalue("error_message", allocator), stringToJvalue(error, allocator), allocator);
 
-  vrs_rapidjson::StringBuffer strbuf;
-  vrs_rapidjson::Writer<vrs_rapidjson::StringBuffer> writer(strbuf);
-  doc.Accept(writer);
-
-  return strbuf.GetString();
+  return jDocumentToJsonString(doc);
 }
 
 string jsonOverview(RecordFileReader& recordFile, Details details) {
@@ -512,13 +508,7 @@ string jsonOverview(RecordFileReader& recordFile, const set<StreamId>& streams, 
     doc.AddMember(stringToJvalue("devices", allocator), devices, allocator);
   }
 
-  vrs_rapidjson::StringBuffer strbuf;
-  vrs_rapidjson::Writer<vrs_rapidjson::StringBuffer> writer(strbuf);
-  doc.Accept(writer);
-
-  string docStr = strbuf.GetString();
-
-  return docStr;
+  return jDocumentToJsonString(doc);
 }
 
 } // namespace RecordFileInfo
