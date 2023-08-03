@@ -28,7 +28,7 @@ target_link_libraries(vrs_helpers
   PUBLIC
     vrs_logging
     vrs_os
-    cereal::cereal
+    rapidjson::rapidjson
 )
 target_include_directories(vrs_helpers
   PUBLIC
