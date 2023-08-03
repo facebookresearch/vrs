@@ -416,7 +416,7 @@ inline bool isSame(const map<string, T>& left, const map<string, T>& right) {
 inline string jDocumentToJsonString(const JDocument& document) {
   using namespace vrs_rapidjson;
   StringBuffer buffer;
-  using JWriter = vrs_rapidjson::
+  using JWriter =
       Writer<StringBuffer, JUtf8Encoding, JUtf8Encoding, JCrtAllocator, kWriteNanAndInfFlag>;
   JWriter writer(buffer);
   document.Accept(writer);
@@ -426,7 +426,7 @@ inline string jDocumentToJsonString(const JDocument& document) {
 inline string jDocumentToJsonStringPretty(const JDocument& document) {
   using namespace vrs_rapidjson;
   StringBuffer buffer;
-  using JPrettyWriter = vrs_rapidjson::
+  using JPrettyWriter =
       PrettyWriter<StringBuffer, JUtf8Encoding, JUtf8Encoding, JCrtAllocator, kWriteNanAndInfFlag>;
   JPrettyWriter prettyWriter(buffer);
   document.Accept(prettyWriter);
