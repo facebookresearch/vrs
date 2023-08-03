@@ -18,7 +18,7 @@
 
 #include <ios>
 
-#define RAPIDJSON_NAMESPACE fb_rapidjson
+#define RAPIDJSON_NAMESPACE vrs_rapidjson
 #define RAPIDJSON_HAS_STDSTRING 1
 #define RAPIDJSON_PARSE_DEFAULT_FLAGS kParseFullPrecisionFlag | kParseNanAndInfFlag
 #define RAPIDJSON_WRITE_DEFAULT_FLAGS kWriteNoFlags

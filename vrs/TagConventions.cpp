@@ -40,7 +40,7 @@ void tag_conventions::addTagSet(RecordFileWriter& writer, const vector<string>& 
 static const char* cTagsObjectName = "tags";
 
 string tag_conventions::makeTagSet(const vector<string>& tags) {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   JDocument doc;
   JsonWrapper wrapper{doc};
   serializeStringRefVector(tags, wrapper, cTagsObjectName);
@@ -49,7 +49,7 @@ string tag_conventions::makeTagSet(const vector<string>& tags) {
 
 bool tag_conventions::parseTagSet(const string& jsonTagSet, vector<string>& outVectorTagSet) {
   outVectorTagSet.clear();
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   JDocument document;
   jParse(document, jsonTagSet);
   if (document.IsObject()) {

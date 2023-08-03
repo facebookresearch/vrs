@@ -193,7 +193,7 @@ string asJson(
     double mbPerSecond,
     uint64_t decodedCount,
     double percent) {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   JDocument document;
   JsonWrapper wrapper{document};
   wrapper.addMember("good_file", success);
@@ -208,7 +208,7 @@ string asJson(
 }
 
 string mapAsJson(const map<string, string>& strMap) {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   JDocument document;
   JsonWrapper jw{document};
   for (const auto& element : strMap) {

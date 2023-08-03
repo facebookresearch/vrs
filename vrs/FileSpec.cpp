@@ -177,7 +177,7 @@ string FileSpec::toPathJsonUri() const {
 }
 
 bool FileSpec::fromJson(const string& jsonStr) {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   JDocument document;
   jParse(document, jsonStr);
   if (document.IsObject()) {
@@ -202,7 +202,7 @@ bool FileSpec::fromJson(const string& jsonStr) {
 }
 
 string FileSpec::toJson() const {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   JDocument document;
   JsonWrapper wrapper{document};
   if (!chunks.empty()) {

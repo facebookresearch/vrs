@@ -39,11 +39,11 @@ using std::string;
 
 /// rapidjson::Document's default MemoryPoolAllocator crashes on some platforms
 /// as documented in https://github.com/cocos2d/cocos2d-x/issues/16492
-using JUtf8Encoding = fb_rapidjson::UTF8<>;
-using JCrtAllocator = fb_rapidjson::CrtAllocator;
-using JDocument = fb_rapidjson::GenericDocument<JUtf8Encoding, JCrtAllocator>;
-using JValue = fb_rapidjson::GenericValue<JUtf8Encoding, JCrtAllocator>;
-using JStringRef = fb_rapidjson::GenericStringRef<char>;
+using JUtf8Encoding = vrs_rapidjson::UTF8<>;
+using JCrtAllocator = vrs_rapidjson::CrtAllocator;
+using JDocument = vrs_rapidjson::GenericDocument<JUtf8Encoding, JCrtAllocator>;
+using JValue = vrs_rapidjson::GenericValue<JUtf8Encoding, JCrtAllocator>;
+using JStringRef = vrs_rapidjson::GenericStringRef<char>;
 
 static inline JStringRef jStringRef(const char* str) {
   return JStringRef(str, strlen(str));
@@ -75,8 +75,8 @@ struct JsonWrapper {
 
   template <typename T>
   inline JValue jValue(const std::vector<T>& vect) {
-    JValue jv(fb_rapidjson::kArrayType);
-    jv.Reserve(static_cast<fb_rapidjson::SizeType>(vect.size()), alloc);
+    JValue jv(vrs_rapidjson::kArrayType);
+    jv.Reserve(static_cast<vrs_rapidjson::SizeType>(vect.size()), alloc);
     for (const auto& v : vect) {
       jv.PushBack(jValue(v), alloc);
     }
@@ -85,8 +85,8 @@ struct JsonWrapper {
 
   template <typename T, size_t N>
   inline JValue jValue(const PointND<T, N>& point) {
-    JValue jv(fb_rapidjson::kArrayType);
-    jv.Reserve(static_cast<fb_rapidjson::SizeType>(N), alloc);
+    JValue jv(vrs_rapidjson::kArrayType);
+    jv.Reserve(static_cast<vrs_rapidjson::SizeType>(N), alloc);
     for (size_t n = 0; n < N; ++n) {
       jv.PushBack(point.dim[n], alloc);
     }
@@ -95,8 +95,8 @@ struct JsonWrapper {
 
   template <typename T, size_t N>
   JValue jValue(const MatrixND<T, N>& matrix) {
-    JValue jv(fb_rapidjson::kArrayType);
-    jv.Reserve(static_cast<fb_rapidjson::SizeType>(N), alloc);
+    JValue jv(vrs_rapidjson::kArrayType);
+    jv.Reserve(static_cast<vrs_rapidjson::SizeType>(N), alloc);
     for (size_t n = 0; n < N; ++n) {
       jv.PushBack(jValue(matrix.points[n]), alloc);
     }
@@ -127,13 +127,13 @@ inline JValue JsonWrapper::jValue<Bool>(const Bool& v) {
 template <>
 inline JValue JsonWrapper::jValue<string>(const string& str) {
   JValue jstring;
-  jstring.SetString(str.c_str(), static_cast<fb_rapidjson::SizeType>(str.length()), alloc);
+  jstring.SetString(str.c_str(), static_cast<vrs_rapidjson::SizeType>(str.length()), alloc);
   return jstring;
 }
 
 template <typename T, typename JSTR>
 inline void serializeMap(const map<string, T>& amap, JsonWrapper& rj, const JSTR& name) {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   if (amap.size() > 0) {
     JValue mapValues(kObjectType);
     for (const auto& element : amap) {
@@ -147,7 +147,7 @@ inline void serializeMap(const map<string, T>& amap, JsonWrapper& rj, const JSTR
 template <typename JSTR>
 inline void
 serializeStringRefMap(const map<string, string>& stringMap, JsonWrapper& rj, const JSTR& name) {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   if (stringMap.size() > 0) {
     JValue mapValues(kObjectType);
     for (const auto& element : stringMap) {
@@ -159,7 +159,7 @@ serializeStringRefMap(const map<string, string>& stringMap, JsonWrapper& rj, con
 
 template <typename T, typename JSTR>
 inline void serializeVector(const vector<T>& vect, JsonWrapper& rj, const JSTR& name) {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   if (vect.size() > 0) {
     JValue arrayValues(kArrayType);
     arrayValues.Reserve(static_cast<SizeType>(vect.size()), rj.alloc);
@@ -174,7 +174,7 @@ inline void serializeVector(const vector<T>& vect, JsonWrapper& rj, const JSTR& 
 template <typename JSTR>
 inline void
 serializeStringRefVector(const vector<string>& vect, JsonWrapper& rj, const JSTR& name) {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   if (vect.size() > 0) {
     JValue arrayValues(kArrayType);
     arrayValues.Reserve(static_cast<SizeType>(vect.size()), rj.alloc);
@@ -230,7 +230,7 @@ inline bool getFromJValue(const JValue& value, string& outValue) {
 
 template <typename T, size_t N>
 inline bool getFromJValue(const JValue& value, PointND<T, N>& outPoint) {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   if (value.IsArray() && value.Size() == N) {
     for (size_t n = 0; n < N; ++n) {
       if (!getJValueAs<float, T>(value[static_cast<SizeType>(n)], outPoint.dim[n]) &&
@@ -245,7 +245,7 @@ inline bool getFromJValue(const JValue& value, PointND<T, N>& outPoint) {
 
 template <typename T, size_t N>
 inline bool getFromJValue(const JValue& value, MatrixND<T, N>& outMatrix) {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   if (value.IsArray() && value.Size() == N) {
     for (size_t n = 0; n < N; ++n) {
       if (!getFromJValue<T, N>(value[static_cast<SizeType>(n)], outMatrix.points[n])) {
@@ -258,7 +258,7 @@ inline bool getFromJValue(const JValue& value, MatrixND<T, N>& outMatrix) {
 
 template <typename T, typename JSTR>
 inline bool getJMap(map<string, T>& outMap, const JValue& piece, const JSTR& name) {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   outMap.clear();
   const JValue::ConstMemberIterator properties = piece.FindMember(name);
   if (properties != piece.MemberEnd() && properties->value.IsObject()) {
@@ -277,7 +277,7 @@ inline bool getJMap(map<string, T>& outMap, const JValue& piece, const JSTR& nam
 
 template <typename T, typename JSTR>
 inline bool getJVector(vector<T>& outVector, const JValue& piece, const JSTR& name) {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   outVector.clear();
   const JValue::ConstMemberIterator properties = piece.FindMember(name);
   if (properties != piece.MemberEnd() && properties->value.IsArray()) {
@@ -296,7 +296,7 @@ inline bool getJVector(vector<T>& outVector, const JValue& piece, const JSTR& na
 
 template <typename JSTR>
 inline bool getJString(string& outString, const JValue& piece, const JSTR& name) {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   const JValue::ConstMemberIterator member = piece.FindMember(name);
   if (member != piece.MemberEnd() && member->value.IsString()) {
     outString = member->value.GetString();
@@ -308,7 +308,7 @@ inline bool getJString(string& outString, const JValue& piece, const JSTR& name)
 
 template <typename JSTR>
 inline bool getJInt64(int64_t& outInt64, const JValue& piece, const JSTR& name) {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   const JValue::ConstMemberIterator member = piece.FindMember(name);
   if (member != piece.MemberEnd() && member->value.IsInt64()) {
     outInt64 = member->value.GetInt64();
@@ -320,7 +320,7 @@ inline bool getJInt64(int64_t& outInt64, const JValue& piece, const JSTR& name) 
 
 template <typename JSTR>
 inline bool getJInt(int& outInt, const JValue& piece, const JSTR& name) {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   const JValue::ConstMemberIterator member = piece.FindMember(name);
   if (member != piece.MemberEnd() && member->value.IsInt()) {
     outInt = member->value.GetInt();
@@ -332,7 +332,7 @@ inline bool getJInt(int& outInt, const JValue& piece, const JSTR& name) {
 
 template <typename JSTR>
 inline bool getJDouble(double& outDouble, const JValue& piece, const JSTR& name) {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   const JValue::ConstMemberIterator member = piece.FindMember(name);
   if (member != piece.MemberEnd() && member->value.IsDouble()) {
     outDouble = member->value.GetDouble();
@@ -414,9 +414,9 @@ inline bool isSame(const map<string, T>& left, const map<string, T>& right) {
 }
 
 inline string jDocumentToJsonString(const JDocument& document) {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   StringBuffer buffer;
-  using JWriter = fb_rapidjson::
+  using JWriter = vrs_rapidjson::
       Writer<StringBuffer, JUtf8Encoding, JUtf8Encoding, JCrtAllocator, kWriteNanAndInfFlag>;
   JWriter writer(buffer);
   document.Accept(writer);
@@ -424,9 +424,9 @@ inline string jDocumentToJsonString(const JDocument& document) {
 }
 
 inline string jDocumentToJsonStringPretty(const JDocument& document) {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   StringBuffer buffer;
-  using JPrettyWriter = fb_rapidjson::
+  using JPrettyWriter = vrs_rapidjson::
       PrettyWriter<StringBuffer, JUtf8Encoding, JUtf8Encoding, JCrtAllocator, kWriteNanAndInfFlag>;
   JPrettyWriter prettyWriter(buffer);
   document.Accept(prettyWriter);

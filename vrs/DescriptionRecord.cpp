@@ -108,7 +108,7 @@ static const char* kNameLabel = "name";
 static const char* kTagsLabel = "tags";
 
 static void jsonToTags(const string& jsonTags, map<string, string>& outTags) {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   outTags.clear();
   Document document;
   document.Parse(jsonTags.c_str(), jsonTags.size());
@@ -124,7 +124,7 @@ static void jsonToTags(const string& jsonTags, map<string, string>& outTags) {
 
 static bool
 jsonToNameAndTags(const string& jsonStr, string& outName, map<string, string>& outTags) {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   Document document;
   document.Parse(jsonStr.c_str(), jsonStr.size());
   if (!XR_VERIFY(document.IsObject(), "Improper name & tags")) {

@@ -170,7 +170,7 @@ bool DataExtractor::DataExtractorStreamPlayer::onCustomBlockRead(
   if (size > 0 && size != ContentBlock::kSizeUnknown) {
     XR_VERIFY(record.reader->read(data) == 0);
   }
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   JDocument doc;
   doc.SetObject();
   JValue custom;
@@ -205,7 +205,7 @@ bool DataExtractor::DataExtractorStreamPlayer::onUnsupportedBlock(
 int DataExtractor::DataExtractorStreamPlayer::recordReadComplete(
     RecordFileReader& /*reader*/,
     const IndexRecord::RecordInfo& recordInfo) {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   {
     JDocument doc;
     JsonWrapper json{doc};

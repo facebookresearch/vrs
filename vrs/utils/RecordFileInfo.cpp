@@ -33,11 +33,12 @@
 #include <vrs/TagConventions.h>
 
 using namespace std;
-using namespace fb_rapidjson;
+using namespace vrs_rapidjson;
 
 using JsonDocument =
-    fb_rapidjson::GenericDocument<fb_rapidjson::UTF8<char>, fb_rapidjson::CrtAllocator>;
-using JsonValue = fb_rapidjson::GenericValue<fb_rapidjson::UTF8<char>, fb_rapidjson::CrtAllocator>;
+    vrs_rapidjson::GenericDocument<vrs_rapidjson::UTF8<char>, vrs_rapidjson::CrtAllocator>;
+using JsonValue =
+    vrs_rapidjson::GenericValue<vrs_rapidjson::UTF8<char>, vrs_rapidjson::CrtAllocator>;
 
 namespace vrs {
 namespace RecordFileInfo {
@@ -415,8 +416,8 @@ string jsonOverview(const string& path, Details details) {
   doc.AddMember(
       stringToJvalue("error_message", allocator), stringToJvalue(error, allocator), allocator);
 
-  fb_rapidjson::StringBuffer strbuf;
-  fb_rapidjson::Writer<fb_rapidjson::StringBuffer> writer(strbuf);
+  vrs_rapidjson::StringBuffer strbuf;
+  vrs_rapidjson::Writer<vrs_rapidjson::StringBuffer> writer(strbuf);
   doc.Accept(writer);
 
   return strbuf.GetString();
@@ -511,8 +512,8 @@ string jsonOverview(RecordFileReader& recordFile, const set<StreamId>& streams, 
     doc.AddMember(stringToJvalue("devices", allocator), devices, allocator);
   }
 
-  fb_rapidjson::StringBuffer strbuf;
-  fb_rapidjson::Writer<fb_rapidjson::StringBuffer> writer(strbuf);
+  vrs_rapidjson::StringBuffer strbuf;
+  vrs_rapidjson::Writer<vrs_rapidjson::StringBuffer> writer(strbuf);
   doc.Accept(writer);
 
   string docStr = strbuf.GetString();

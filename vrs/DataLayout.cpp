@@ -178,7 +178,7 @@ string DataLayout::asJson(JsonFormatProfile profile) const {
 }
 
 string DataLayout::asJson(const JsonFormatProfileSpec& profile) const {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   JDocument doc;
   JDocument::AllocatorType& alloc = doc.GetAllocator();
   doc.SetObject();
@@ -197,7 +197,7 @@ string DataLayout::asJson(const JsonFormatProfileSpec& profile) const {
     jpieces.PushBack(jpiece, alloc);
   }
   const char* kFieldName = profile.publicNames ? "metadata" : "data_layout";
-  doc.AddMember(fb_rapidjson::StringRef(kFieldName), jpieces, alloc);
+  doc.AddMember(vrs_rapidjson::StringRef(kFieldName), jpieces, alloc);
   return profile.prettyJson ? jDocumentToJsonStringPretty(doc) : jDocumentToJsonString(doc);
 }
 
@@ -982,7 +982,7 @@ string DataPiece::getTypeName() const {
 }
 
 void DataPiece::serialize(JsonWrapper& rj, const JsonFormatProfileSpec& profile) {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   if (profile.name) {
     rj.addMember("name", jStringRef(getLabel()));
   }
@@ -1018,7 +1018,7 @@ void DataPiece::serialize(JsonWrapper& rj, const JsonFormatProfileSpec& profile)
 template <typename T>
 DataPieceValue<T>::DataPieceValue(const DataPiece::MakerBundle& bundle)
     : DataPieceValue(bundle.label) {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   const JValue::ConstMemberIterator defaultV = bundle.piece.FindMember("default");
   if (defaultV != bundle.piece.MemberEnd()) {
     T defaultValue;
@@ -1214,7 +1214,7 @@ void DataPieceArray<T>::serialize(JsonWrapper& rj, const JsonFormatProfileSpec& 
   }
   DataPiece::serialize(rj, profile);
   if (profile.index) {
-    rj.addMember("size", static_cast<fb_rapidjson::SizeType>(count_));
+    rj.addMember("size", static_cast<vrs_rapidjson::SizeType>(count_));
   }
   if (profile.defaults) {
     serializeVector(defaultValues_, rj, "default");
@@ -1557,7 +1557,7 @@ void DataPieceStringMap<T>::serialize(JsonWrapper& rj, const JsonFormatProfileSp
 
 DataPieceString::DataPieceString(const DataPiece::MakerBundle& bundle)
     : DataPieceString(bundle.label) {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   JValue::ConstMemberIterator defaultString = bundle.piece.FindMember("default");
   if (defaultString != bundle.piece.MemberEnd() && defaultString->value.IsString()) {
     defaultString_ = defaultString->value.GetString();
@@ -1668,7 +1668,7 @@ ManualDataLayout::~ManualDataLayout() {
 }
 
 ManualDataLayout::ManualDataLayout(const string& json) : ManualDataLayout() {
-  using namespace fb_rapidjson;
+  using namespace vrs_rapidjson;
   JDocument document;
   jParse(document, json);
   // We need to assume that everything might be missing, and never crash
