@@ -5,7 +5,7 @@ on: [push]
 jobs:
   get-current-version:
     if: github.repository == 'facebookresearch/vrs'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: checkout-repo-content
         uses: actions/checkout@v2

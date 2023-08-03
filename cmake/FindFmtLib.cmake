@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-find_package(fmt QUIET)
+find_package(fmt)
 
 if (NOT TARGET fmt::fmt)
   find_path(Fmt_INCLUDE_DIR fmt/core.h)
