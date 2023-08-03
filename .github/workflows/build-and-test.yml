@@ -12,7 +12,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04,  macOS-latest]
+        os: [ubuntu-latest,  macOS-latest]
+      fail-fast: false
 
     steps:
       - uses: actions/checkout@v2
@@ -23,14 +24,14 @@ jobs:
             sudo apt-get update
             sudo apt-get upgrade
             sudo apt-get install -o Acquire::Retries=5 \
-              cmake ninja-build ccache libgtest-dev libfmt-dev libcereal-dev \
+              cmake ninja-build libgtest-dev libfmt-dev \
               libturbojpeg-dev libpng-dev \
               liblz4-dev libzstd-dev libxxhash-dev \
               libboost-system-dev libboost-filesystem-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev \
               qtbase5-dev portaudio19-dev
 
           elif [ "$RUNNER_OS" == "macOS" ]; then
-              brew install ninja cmake ccache googletest glog fmt cereal \
+              brew install ninja cmake googletest glog fmt \
                   jpeg-turbo libpng \
                   lz4 zstd xxhash \
                   boost \
@@ -48,7 +49,8 @@ jobs:
               export QT_DIR=$(find /usr/local/Cellar/qt\@5 -name "5.*" -depth 1)
           fi
           mkdir build
-          cmake -S . -B build '-GCodeBlocks - Ninja'
+          cmake -S . -B build -G Ninja
+
       - name: Build and Test C++
         shell: bash
         run: |

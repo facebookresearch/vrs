@@ -12,6 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# for those who have a custom homebrew installation
+if (EXISTS "$ENV{HOME}/homebrew")
+  list(APPEND CMAKE_FIND_ROOT_PATH "$ENV{HOME}/homebrew")
+endif()
+
 find_package(Boost REQUIRED
   COMPONENTS
     filesystem
@@ -21,7 +26,7 @@ find_package(Boost REQUIRED
     thread
 )
 find_package(FmtLib REQUIRED)
-find_package(Cereal REQUIRED)
+find_package(RapidjsonLib REQUIRED)
 find_package(Lz4 REQUIRED)
 find_package(Zstd REQUIRED)
 find_package(xxHash REQUIRED)
