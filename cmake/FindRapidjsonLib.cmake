@@ -23,12 +23,13 @@ endif()
 
 set(RAPIDJSON_DIR "${EXTERNAL_DEPENDENCIES_DIR}/rapidjson")
 set(RAPIDJSON_INCLUDE_DIR "${RAPIDJSON_DIR}/include")
+set(RAPIDJSON_INCLUDE_FILE "${RAPIDJSON_INCLUDE_DIR}/rapidjson/rapidjson.h")
 
-if (NOT EXISTS "${RAPIDJSON_INCLUDE_DIR}")
+if (NOT EXISTS "${RAPIDJSON_INCLUDE_FILE}")
   execute_process(COMMAND git clone https://github.com/Tencent/rapidjson.git "${RAPIDJSON_DIR}")
 endif()
 execute_process(COMMAND cd "${RAPIDJSON_DIR}" && git -f checkout a95e013b97ca6523f32da23f5095fcc9dd6067e5)
-if (NOT EXISTS "${RAPIDJSON_INCLUDE_DIR}/rapidjson/rapidjson.h")
+if (NOT EXISTS "${RAPIDJSON_INCLUDE_FILE}")
   message(FATAL_ERROR "Could not setup rapidjson external dependency at ${RAPIDJSON_DIR}")
 endif()
 

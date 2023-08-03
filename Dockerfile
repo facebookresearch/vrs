@@ -13,24 +13,21 @@
 # limitations under the License.
 
 # Start from an ubuntu container
-FROM ubuntu:focal
+FROM ubuntu:jammy
 
 # Get dependencies
 RUN apt-get update && DEBIAN_FRONTEND="noninteractive" TZ="America/New_York" apt-get install -y tzdata
-RUN apt-get install -y cmake ninja-build ccache libgtest-dev libfmt-dev libturbojpeg-dev\
+RUN apt-get install -y git cmake ninja-build ccache libgtest-dev libfmt-dev libturbojpeg-dev\
     libpng-dev liblz4-dev libzstd-dev libxxhash-dev\
     libboost-system-dev libboost-filesystem-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev\
     qtbase5-dev portaudio19-dev\
-    libpython3-dev python3-pip\
     npm doxygen;
-
-RUN pip3 install pybind11[global] numpy typing dataclasses pytest parameterized Pillow;
 
 # Code
 ADD ./ /opt/vrs
 
 # Configure
-RUN mkdir /opt/vrs_Build; cd /opt/vrs_Build;  cmake -DCMAKE_BUILD_TYPE=RELEASE /opt/vrs '-GCodeBlocks - Ninja' -Wno-dev;
+RUN mkdir /opt/vrs_Build; cd /opt/vrs_Build;  cmake -DCMAKE_BUILD_TYPE=RELEASE -S /opt/vrs -G Ninja -Wno-dev;
 
 # Build & test
 RUN cd /opt/vrs_Build; ninja all; ctest -j;

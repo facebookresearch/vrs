@@ -32,8 +32,8 @@ endif()
 # To customize where external dependencies are stored
 if ("${EXTERNAL_DEPENDENCIES_DIR}" STREQUAL "")
   set(EXTERNAL_DEPENDENCIES_DIR "${CMAKE_BINARY_DIR}/external")
-  file(MAKE_DIRECTORY "${EXTERNAL_DEPENDENCIES_DIR}")
 endif()
+file(MAKE_DIRECTORY "${EXTERNAL_DEPENDENCIES_DIR}")
 message(STATUS "External dependencies at ${EXTERNAL_DEPENDENCIES_DIR}")
 
 set(CMAKE_MODULE_PATH "${OSS_DIR}/cmake")
