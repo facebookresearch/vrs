@@ -29,6 +29,12 @@ if ("${VRS_SOURCE_DIR}" STREQUAL "")
   set(OSS_DIR "${VRS_SOURCE_DIR}")
 endif()
 
+if ("${EXTERNAL_DEPENDENCIES_DIR}" STREQUAL "")
+  set(EXTERNAL_DEPENDENCIES_DIR "${CMAKE_BINARY_DIR}/external")
+  file(MAKE_DIRECTORY "${EXTERNAL_DEPENDENCIES_DIR}")
+endif()
+message(STATUS "External dependencies at ${EXTERNAL_DEPENDENCIES_DIR}")
+
 set(CMAKE_MODULE_PATH "${OSS_DIR}/cmake")
 
 include(${CMAKE_MODULE_PATH}/Platform.cmake)

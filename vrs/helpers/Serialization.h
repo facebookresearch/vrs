@@ -16,13 +16,18 @@
 
 #pragma once
 
-#include <cereal/external/rapidjson/rapidjson.h>
+#include <ios>
 
-#include <cereal/external/rapidjson/document.h>
-#include <cereal/external/rapidjson/error/en.h>
-#include <cereal/external/rapidjson/filewritestream.h>
-#include <cereal/external/rapidjson/istreamwrapper.h>
-#include <cereal/external/rapidjson/ostreamwrapper.h>
-#include <cereal/external/rapidjson/prettywriter.h>
-#include <cereal/external/rapidjson/stringbuffer.h>
-#include <cereal/external/rapidjson/writer.h>
+#define RAPIDJSON_NAMESPACE fb_rapidjson
+#define RAPIDJSON_HAS_STDSTRING 1
+#define RAPIDJSON_PARSE_DEFAULT_FLAGS kParseFullPrecisionFlag | kParseNanAndInfFlag
+#define RAPIDJSON_WRITE_DEFAULT_FLAGS kWriteNoFlags
+
+#include <rapidjson/rapidjson.h>
+
+#include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
+#include <rapidjson/filewritestream.h>
+#include <rapidjson/istreamwrapper.h>
+#include <rapidjson/ostreamwrapper.h>
+#include <rapidjson/prettywriter.h>

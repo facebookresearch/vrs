@@ -61,7 +61,7 @@ find_package(Boost REQUIRED
     thread
 )
 find_package(FmtLib REQUIRED)
-find_package(CerealLib REQUIRED)
+find_package(RapidjsonLib REQUIRED)
 find_package(Lz4 REQUIRED)
 find_package(Zstd REQUIRED)
 find_package(xxHash REQUIRED)

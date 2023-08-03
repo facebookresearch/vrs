@@ -33,7 +33,7 @@ target_link_libraries(vrs_utils
     JPEG::JPEG
     PNG::PNG
     TurboJpeg::TurboJpeg
-    cereal::cereal
+    rapidjson::rapidjson
     vrs_logging
 )
 target_include_directories(vrs_utils

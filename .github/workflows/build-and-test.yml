@@ -23,16 +23,15 @@ jobs:
           if [ "$RUNNER_OS" == "Linux" ]; then
             sudo apt-get update
             sudo apt-get upgrade
-            apt-cache showpkg libcereal-dev
             sudo apt-get install -o Acquire::Retries=5 \
-              cmake ninja-build libgtest-dev libfmt-dev libcereal-dev \
+              cmake ninja-build libgtest-dev libfmt-dev \
               libturbojpeg-dev libpng-dev \
               liblz4-dev libzstd-dev libxxhash-dev \
               libboost-system-dev libboost-filesystem-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev \
               qtbase5-dev portaudio19-dev
 
           elif [ "$RUNNER_OS" == "macOS" ]; then
-              brew install ninja cmake googletest glog fmt cereal \
+              brew install ninja cmake googletest glog fmt \
                   jpeg-turbo libpng \
                   lz4 zstd xxhash \
                   boost \
