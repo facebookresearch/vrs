@@ -78,7 +78,7 @@ avoid installing any library on your system.
   [Brew’s web site](https://brew.sh/).
 - install tools & libraries:
   ```
-  brew install cmake ninja ccache boost fmt libpng jpeg-turbo lz4 zstd xxhash glog googletest
+  brew install cmake git ninja ccache boost fmt libpng jpeg-turbo lz4 zstd xxhash glog googletest
   brew install qt5 portaudio pybind11
   brew install node doxygen
   ```
@@ -91,7 +91,7 @@ therefore not supported._
 
 - install tools & libraries:
   ```
-  sudo apt-get install cmake ninja-build ccache libgtest-dev libfmt-dev libturbojpeg-dev libpng-dev
+  sudo apt-get install cmake git ninja-build ccache libgtest-dev libfmt-dev libturbojpeg-dev libpng-dev
   sudo apt-get install liblz4-dev libzstd-dev libxxhash-dev
   sudo apt-get install libboost-system-dev libboost-filesystem-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev
   sudo apt-get install qtbase5-dev portaudio19-dev
@@ -103,7 +103,7 @@ therefore not supported._
 - Run cmake:
 
 ```
-cmake -S <path_to_vrs_folder> -B <path_to_build_folder> '-GCodeBlocks - Ninja'
+cmake -S <path_to_vrs_folder> -B <path_to_build_folder> -G Ninja
 ```
 
 If you want to build vrsplayer, you need to specify where your installation of
@@ -229,17 +229,6 @@ pip install vrs
 
 We welcome contributions! See [CONTRIBUTING](CONTRIBUTING.md) for details on how
 to get started, and our [code of conduct](CODE_OF_CONDUCT.md).
-
-# Future Plans
-
-In this first release of VRS for open source, only the core components of VRS
-are provided. We are working on open sourcing more code:
-
-- `pyvrs`: a Python library to work with VRS files in Python.
-- integration with PyTorch, so ML jobs can consume VRS files as training data.
-- tooling to build VRS container files optimized for PyTorch training.
-- video codec compression support.
-- building blocks to implement network streaming.
 
 # License
 
