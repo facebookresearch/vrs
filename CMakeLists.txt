@@ -36,8 +36,8 @@ endif()
 file(MAKE_DIRECTORY "${EXTERNAL_DEPENDENCIES_DIR}")
 message(STATUS "External dependencies at ${EXTERNAL_DEPENDENCIES_DIR}")
 
+# Initialize key cmake settings before the project is configured
 set(CMAKE_MODULE_PATH "${OSS_DIR}/cmake")
-
 include(${CMAKE_MODULE_PATH}/Platform.cmake)
 include(${CMAKE_MODULE_PATH}/Compiler.cmake)
 include(${CMAKE_MODULE_PATH}/Options.cmake)
