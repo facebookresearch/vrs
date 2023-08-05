@@ -203,7 +203,8 @@ int RecordFileReader::doOpenFile(
   LOG_PROGRESS(FileHandlerFactory::getInstance().delegateOpen(fileSpec, file_), error, [&]() {
     const string& fileHandlerName =
         fileSpec.fileHandlerName.empty() ? file_->getFileHandlerName() : fileSpec.fileHandlerName;
-    return "Opening " + fileHandlerName + " file";
+    return "Opening " + fileHandlerName + " file " +
+        helpers::humanReadableDateTime(os::getCurrentTimeSecSinceEpoch());
   });
   // log remote file handler names with success/failure status
   if (file_ && file_->isRemoteFileSystem()) {

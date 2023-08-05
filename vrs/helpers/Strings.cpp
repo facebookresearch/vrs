@@ -20,11 +20,14 @@
 #include <climits>
 #include <cmath>
 #include <cstring>
+#include <ctime>
 
 #include <iomanip>
 #include <sstream>
 
 #include <fmt/format.h>
+
+#include <vrs/os/Platform.h>
 
 namespace vrs {
 namespace helpers {
@@ -174,6 +177,19 @@ string humanReadableTimestamp(double seconds, uint8_t precision) {
     case e9:
       return fmt::format("{:.9e}", seconds);
   }
+}
+
+string humanReadableDateTime(double secondsSinceEpoch) {
+  string date(std::size("YYYY-MM-DD HH:MM:SS"), 0);
+  time_t creationTimeSec = static_cast<time_t>(secondsSinceEpoch);
+  struct tm ltm {};
+#if IS_WINDOWS_PLATFORM()
+  localtime_s(&ltm, &creationTimeSec); // because "Windows"
+#else
+  localtime_r(&creationTimeSec, &ltm);
+#endif
+  date.resize(std::strftime(date.data(), date.size(), "%F %T", &ltm));
+  return date;
 }
 
 string make_printable(const string& str) {

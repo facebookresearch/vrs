@@ -147,6 +147,11 @@ std::string humanReadableDuration(double seconds);
 /// small or very large numbers.
 std::string humanReadableTimestamp(double seconds, uint8_t precision = 3);
 
+/// Helper to print the date and time from an EPOCH timestamp (seconds since EPOCH).
+/// @param secondsSinceEpoch: timestamp in seconds since EPOCH.
+/// @return a human readable date and time.
+std::string humanReadableDateTime(double secondsSinceEpoch);
+
 /// Helper method to make a string printable to expose control characters.
 /// This conversion is meant to make string problems visible, rather than be a proper encoding,
 /// for instance, you can't differentiate between "\n" and string that would contain a newline char.
