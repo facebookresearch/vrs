@@ -87,7 +87,7 @@ EventChannel::waitForEvent(Event& event, double timeoutSec, double lookBackSec) 
   // New listener should not enter critical section before all pre-existing listeners have waked up.
   if (pendingWakeupsCount_ > 0) {
     numEntering_++;
-    enterCondition_.wait(lock, [=] { return pendingWakeupsCount_ == 0; });
+    enterCondition_.wait(lock, [this] { return pendingWakeupsCount_ == 0; });
     numEntering_--;
     if (inDestruction_) {
       // This EventChannel is already being destructed, exit ASAP.
@@ -114,7 +114,7 @@ EventChannel::waitForEvent(Event& event, double timeoutSec, double lookBackSec) 
       // At this point, numEventsSinceLastWait is already set to 0.
       numListeners_++;
       bool waitSuccess =
-          wakeupCondition_.wait_for(lock, chrono::duration<double>(actualWaitTime), [=] {
+          wakeupCondition_.wait_for(lock, chrono::duration<double>(actualWaitTime), [this] {
             return inDestruction_ || pendingWakeupsCount_ > 0;
           });
       numListeners_--;
