@@ -83,6 +83,7 @@ enum class RecordableTypeId : uint16_t {
   MouthCameraRecordableClass = 213, ///< For cameras recording a mouth.
   RgbCameraRecordableClass = 214, ///< For color cameras.
   DisplayObserverCameraRecordableClass = 215, ///< For display observing cameras.
+  WorldObserverCameraRecordableClass = 216, ///< For world observing cameras.
 
   // << Microphones >>
   MonoAudioRecordableClass = 230, ///< For mono microphones.
