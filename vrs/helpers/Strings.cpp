@@ -22,7 +22,6 @@
 #include <cstring>
 #include <ctime>
 
-#include <iomanip>
 #include <sstream>
 
 #include <fmt/format.h>
@@ -70,25 +69,26 @@ string humanReadableFileSize(int64_t bytes) {
   }
   double exp = floor(log(bytes) / log(unit));
   char pre = string("KMGTPE").at(static_cast<size_t>(exp - 1));
-  stringstream oss;
+  string str;
   double r = bytes / pow(unit, exp);
   if (r < 1000.) {
-    oss << setprecision(3);
+    str = fmt::format("{:.2f} {}B", r, pre);
   } else {
-    oss << setprecision(0) << fixed; // avoid scientific notation switch for 1000-1023...
+    // avoid scientific notation switch for 1000-1023...
+    str = fmt::format("{} {}B", static_cast<int>(r), pre);
   }
-  oss << r << ' ' << pre << 'B';
-  return oss.str();
+  return str;
 }
 
 string humanReadableDuration(double seconds) {
-  stringstream ss;
+  string str;
+  str.reserve(30);
   if (seconds < 0) {
-    ss << '-';
+    str.push_back('-');
     seconds = -seconds;
   }
   const double kYear = 31557600; // Julian astronomical year
-  if (seconds < 1000000000 * kYear) {
+  if (seconds < 1e9 * kYear) {
     const double kMinute = 60;
     const double kHour = 60 * kMinute;
     const double kDay = 24 * kHour;
@@ -96,49 +96,55 @@ string humanReadableDuration(double seconds) {
     bool showNext = false;
     if (seconds > kYear) {
       int years = static_cast<int>(seconds / kYear);
-      ss << years << ((years == 1) ? " year " : " years ");
+      str.append(to_string(years)).append((years == 1) ? " year, " : " years, ");
       seconds -= years * kYear;
       showNext = true;
     }
     if (showNext || seconds > kWeek) {
       int weeks = static_cast<int>(seconds / kWeek);
-      ss << weeks << ((weeks == 1) ? " week " : " weeks ");
+      str.append(to_string(weeks)).append((weeks == 1) ? " week, " : " weeks, ");
       seconds -= weeks * kWeek;
       showNext = true;
     }
     if (showNext || seconds > kDay) {
       int days = static_cast<int>(seconds / kDay);
-      ss << days << ((days == 1) ? " day " : " days ");
+      str.append(to_string(days)).append((days == 1) ? " day, " : " days, ");
       seconds -= days * kDay;
       showNext = true;
     }
     if (showNext || seconds > kHour) {
       int hours = static_cast<int>(seconds / kHour);
-      ss << hours << "h ";
+      str.append(to_string(hours)).append("h ");
       seconds -= hours * kHour;
       showNext = true;
     }
     if (showNext || seconds > kMinute) {
       int minutes = static_cast<int>(seconds / kMinute);
-      ss << minutes << "m ";
+      str.append(to_string(minutes)).append("m ");
       seconds -= minutes * kMinute;
       showNext = true;
     }
     if (showNext || seconds == 0 || seconds >= 1) {
-      ss << humanReadableTimestamp(seconds) << "s";
+      str.append(humanReadableTimestamp(seconds)).append("s");
     } else if (seconds >= 2e-3) {
-      ss << fmt::format("{:.0f}ms", seconds * 1000);
+      str.append(fmt::format("{:.0f}ms", seconds * 1e03));
     } else if (seconds >= 2e-6) {
-      ss << fmt::format("{:.0f}us", seconds * 1000000);
+      str.append(fmt::format("{:.0f}us", seconds * 1e06));
     } else if (seconds >= 2e-9) {
-      ss << fmt::format("{:.0f}ns", seconds * 1000000000);
+      str.append(fmt::format("{:.0f}ns", seconds * 1e09));
+    } else if (seconds >= 2e-12) {
+      str.append(fmt::format("{:.0f}ps", seconds * 1e12));
+    } else if (seconds >= 2e-15) {
+      str.append(fmt::format("{:.0f}fs", seconds * 1e15));
+    } else if (seconds >= 2e-18) {
+      str.append(fmt::format("{:.3f}fs", seconds * 1e15));
     } else {
-      ss << fmt::format("{:.9e}", seconds);
+      str.append(fmt::format("{:g}fs", seconds * 1e15));
     }
   } else {
-    ss << humanReadableTimestamp(seconds) << "s";
+    str.append(humanReadableTimestamp(seconds)).append("s");
   }
-  return ss.str();
+  return str;
 }
 
 string humanReadableTimestamp(double seconds, uint8_t precision) {

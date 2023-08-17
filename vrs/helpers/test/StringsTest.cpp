@@ -135,17 +135,28 @@ TEST_F(StringsHelpersTester, humanReadableDurationTest) {
   const double kYear = 31557600; // Julian astronomical year
   EXPECT_EQ(humanReadableDuration(0), "0.000s");
   EXPECT_EQ(humanReadableDuration(1), "1.000s");
-  EXPECT_EQ(humanReadableDuration(0.999), "999ms");
-  EXPECT_EQ(humanReadableDuration(0.123), "123ms");
-  EXPECT_EQ(humanReadableDuration(0.002), "2ms");
+  EXPECT_EQ(humanReadableDuration(999e-3), "999ms");
+  EXPECT_EQ(humanReadableDuration(123e-3), "123ms");
+  EXPECT_EQ(humanReadableDuration(2e-3), "2ms");
+  EXPECT_EQ(humanReadableDuration(1999e-6), "1999us");
+  EXPECT_EQ(humanReadableDuration(2e-6), "2us");
+  EXPECT_EQ(humanReadableDuration(1999e-9), "1999ns");
+  EXPECT_EQ(humanReadableDuration(2e-9), "2ns");
+  EXPECT_EQ(humanReadableDuration(1999e-12), "1999ps");
+  EXPECT_EQ(humanReadableDuration(2e-12), "2ps");
+  EXPECT_EQ(humanReadableDuration(1999e-15), "1999fs");
+  EXPECT_EQ(humanReadableDuration(2e-15), "2fs");
+  EXPECT_EQ(humanReadableDuration(1999e-18), "1.999fs");
+  EXPECT_EQ(humanReadableDuration(19e-19), "0.0019fs");
+  EXPECT_EQ(humanReadableDuration(1e-25), "1e-10fs");
   EXPECT_EQ(humanReadableDuration(1000), "16m 40.000s");
   EXPECT_EQ(
-      humanReadableDuration(4 * kDay + 3 * kHour + 2 * kMinute + 15.001), "4 days 3h 2m 15.001s");
-  EXPECT_EQ(humanReadableDuration(38 * kDay + 0.001), "5 weeks 3 days 0h 0m 0.001s");
+      humanReadableDuration(4 * kDay + 3 * kHour + 2 * kMinute + 15.001), "4 days, 3h 2m 15.001s");
+  EXPECT_EQ(humanReadableDuration(38 * kDay + 0.001), "5 weeks, 3 days, 0h 0m 0.001s");
   EXPECT_EQ(
       humanReadableDuration(
           kYear * 860 + 6 * kWeek + 3 * kDay + 5 * kHour + 10 * kMinute + 15.123456),
-      "860 years 6 weeks 3 days 5h 10m 15.123s");
+      "860 years, 6 weeks, 3 days, 5h 10m 15.123s");
   EXPECT_EQ(humanReadableDuration(13 * kHour + 59 * kMinute + 59.001), "13h 59m 59.001s");
   EXPECT_EQ(humanReadableDuration(24 * kMinute), "24m 0.000s");
   EXPECT_EQ(humanReadableDuration(-3.2), "-3.200s");
