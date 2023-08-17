@@ -35,6 +35,8 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/helpers/FileMacros.h>
+
 #ifdef JXL_IS_AVAILABLE
 
 /// About Jpeg-XL support
@@ -130,10 +132,7 @@ bool PixelFrame::readJxlFrame(RecordReader* reader, const uint32_t sizeBytes) {
   // read JPEG-XL data
   vector<uint8_t> jxlBuf;
   jxlBuf.resize(sizeBytes);
-  if (!XR_VERIFY(reader->read(jxlBuf.data(), sizeBytes) == 0)) {
-    return false;
-  }
-  return readJxlFrame(jxlBuf);
+  return VERIFY_SUCCESS(reader->read(jxlBuf.data(), sizeBytes)) && readJxlFrame(jxlBuf);
 }
 
 bool PixelFrame::readJxlFrame(const vector<uint8_t>& jxlBuf, bool decodePixels) {

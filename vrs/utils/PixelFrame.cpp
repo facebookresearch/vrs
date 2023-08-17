@@ -259,14 +259,14 @@ bool PixelFrame::readRawFrame(RecordReader* reader, const ImageContentBlockSpec&
   // Read multiplane images as is
   if (inputImageSpec.getPlaneCount() != 1) {
     init(inputImageSpec);
-    return XR_VERIFY(reader->read(wdata(), size()) == 0);
+    return VERIFY_SUCCESS(reader->read(wdata(), size()));
   }
   // remove stride of single plane raw images
   ImageContentBlockSpec noStrideSpec{
       inputImageSpec.getPixelFormat(), inputImageSpec.getWidth(), inputImageSpec.getHeight()};
   if (inputImageSpec.getStride() == noStrideSpec.getStride()) {
     init(inputImageSpec);
-    return XR_VERIFY(reader->read(wdata(), size()) == 0);
+    return VERIFY_SUCCESS(reader->read(wdata(), size()));
   }
   init(noStrideSpec);
   // remove stride or extra bytes

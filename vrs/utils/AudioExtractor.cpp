@@ -174,7 +174,7 @@ bool AudioExtractor::onAudioRead(
       currentWavFile_.getPos() + audio_.size() >= kMaxWavFileSize) {
     closeWavFile(currentWavFile_);
 
-    XR_VERIFY(os::makeDirectories(folderPath_) == 0);
+    VERIFY_SUCCESS(os::makeDirectories(folderPath_));
     string path = fmt::format(
         "{}/{}-{:04}-{:.3f}.wav",
         folderPath_,
@@ -188,7 +188,7 @@ bool AudioExtractor::onAudioRead(
          << static_cast<int>(audioBlockSpec.getBitsPerSample()) << " bits per sample, "
          << static_cast<int>(audioBlockSpec.getSampleBlockStride()) << " bytes sample block stride."
          << endl;
-    XR_VERIFY(createWavFile(path, audioBlockSpec, currentWavFile_) == 0);
+    VERIFY_SUCCESS(createWavFile(path, audioBlockSpec, currentWavFile_));
 
     currentAudioContentBlockSpec_ = audioBlockSpec;
     cumulativeOutputAudioFileCount_++;
@@ -197,7 +197,7 @@ bool AudioExtractor::onAudioRead(
     segmentSamplesCount_ = 0;
   }
 
-  XR_VERIFY(writeWavAudioData(currentWavFile_, audioBlockSpec, audio_) == 0);
+  VERIFY_SUCCESS(writeWavAudioData(currentWavFile_, audioBlockSpec, audio_));
 
   // Time/sample counting validation
   if (segmentSamplesCount_ > 0) {

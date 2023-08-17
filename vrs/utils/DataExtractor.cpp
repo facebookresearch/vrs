@@ -138,7 +138,7 @@ bool DataExtractor::DataExtractorStreamPlayer::onImageRead(
   } else {
     vector<uint8_t> imageData;
     imageData.resize(imageBlock.getBlockSize());
-    if (XR_VERIFY(record.reader->read(imageData.data(), imageBlock.getBlockSize()) == 0) &&
+    if (VERIFY_SUCCESS(record.reader->read(imageData.data(), imageBlock.getBlockSize())) &&
         writeImage(record, imageBlock.image(), imageData)) {
       return true;
     }
@@ -168,7 +168,7 @@ bool DataExtractor::DataExtractorStreamPlayer::onCustomBlockRead(
   size_t size = contentBlock.getBlockSize();
   vector<uint8_t> data(size);
   if (size > 0 && size != ContentBlock::kSizeUnknown) {
-    XR_VERIFY(record.reader->read(data) == 0);
+    VERIFY_SUCCESS(record.reader->read(data));
   }
   using namespace vrs_rapidjson;
   JDocument doc;

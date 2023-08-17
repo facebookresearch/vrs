@@ -20,6 +20,7 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/helpers/FileMacros.h>
 #include <vrs/os/CompilerAttributes.h>
 
 #include "RecordFormatStreamPlayer.h"
@@ -402,17 +403,17 @@ bool DataLayoutBlockReader::readBlock(
   vector<int8_t>& fixedData = layout.getFixedData();
   fixedData.resize(layout.getFixedDataSizeNeeded());
   vector<int8_t>& varData = layout.getVarData();
-  int error = record.reader->read(fixedData);
-  if (error == 0) {
+  int readBlockStatus = record.reader->read(fixedData);
+  if (readBlockStatus == 0) {
     size_t varLength = layout.getVarDataSizeFromIndex();
     varData.resize(varLength);
     if (varLength > 0) {
-      error = record.reader->read(varData);
+      readBlockStatus = record.reader->read(varData);
     }
   } else {
     varData.resize(0);
   }
-  if (XR_VERIFY(error == 0)) {
+  if (VERIFY_SUCCESS(readBlockStatus)) {
     return player.onDataLayoutRead(record, blockIndex_, layout);
   }
   return false;

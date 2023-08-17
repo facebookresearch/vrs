@@ -70,3 +70,16 @@
           "{} failed: {}, {}", #operation_, operationError_, errorCodeToMessage(operationError_)); \
     }                                                                                              \
   } while (false)
+
+#ifdef DEFAULT_LOG_CHANNEL
+
+// Log an error if an operation returning an int status failed, and return a boolean success status
+#define VERIFY_SUCCESS(operation_)                                                         \
+  [](int opStatus_) {                                                                      \
+    if (opStatus_ != 0) {                                                                  \
+      XR_LOGE("{} failed: {}, {}", #operation_, opStatus_, errorCodeToMessage(opStatus_)); \
+    }                                                                                      \
+    return opStatus_ == 0;                                                                 \
+  }(operation_)
+
+#endif

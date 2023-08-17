@@ -537,7 +537,7 @@ string DiskFile::readTextFile(const std::string& path) {
     const int64_t kMaxReasonableTextFileSize = 50 * 1024 * 1024; // 50 MB is a huge text file...
     if (size > 0 && XR_VERIFY(size < kMaxReasonableTextFileSize)) {
       string str(size, 0);
-      if (XR_VERIFY(file.read(str.data(), size) == 0)) {
+      if (VERIFY_SUCCESS(file.read(str.data(), size))) {
         return str;
       }
     }
