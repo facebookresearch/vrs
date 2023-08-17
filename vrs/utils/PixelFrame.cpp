@@ -23,6 +23,7 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/helpers/FileMacros.h>
 #include <vrs/utils/converters/Raw10ToGrey10Converter.h>
 
 using namespace std;
@@ -277,12 +278,22 @@ bool PixelFrame::readRawFrame(RecordReader* reader, const ImageContentBlockSpec&
   }
   uint8_t* wdata = frameBytes_.data();
   for (uint32_t line = 0; line < this->getHeight(); line++) {
-    if (!XR_VERIFY(reader->read(wdata, frameStride) == 0)) {
-      return false;
-    }
+    IF_ERROR_LOG_AND_RETURN_FALSE(reader->read(wdata, frameStride));
     if (!strideGap.empty()) {
-      if (!XR_VERIFY(reader->read(strideGap) == 0)) {
-        return false;
+      int readStrideStatus = reader->read(strideGap);
+      if (readStrideStatus != 0) {
+        if (line < this->getHeight() - 1) {
+          IF_ERROR_LOG_AND_RETURN_FALSE(readStrideStatus);
+        }
+        // Compromise for data collected without expected stride for the last line only
+        // Please don't remove/reduce the warnings, fix the recording app instead!
+        // We do want to be loud, but for a while only.
+        static atomic<int> sSpamLimiter(500);
+        if (sSpamLimiter.fetch_add(-1, memory_order_relaxed) > 0) {
+          XR_LOGW("Stride data missing for the last line. Please fix the recording app.");
+        } else {
+          XR_LOGW_EVERY_N_SEC(5, "Stride data still missing. Silencing warnings for 5 seconds...");
+        }
       }
     }
     wdata += frameStride;

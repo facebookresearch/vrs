@@ -44,6 +44,16 @@
     }                                                                                              \
   } while (false)
 
+#define IF_ERROR_LOG_AND_RETURN_FALSE(operation_)                                                  \
+  do {                                                                                             \
+    int operationError_ = operation_;                                                              \
+    if (operationError_ != 0) {                                                                    \
+      XR_LOGE(                                                                                     \
+          "{} failed: {}, {}", #operation_, operationError_, errorCodeToMessage(operationError_)); \
+      return false;                                                                                \
+    }                                                                                              \
+  } while (false)
+
 #define IF_ERROR_RETURN(operation_)   \
   do {                                \
     int operationError_ = operation_; \
