@@ -280,7 +280,8 @@ bool PixelFrame::readRawFrame(RecordReader* reader, const ImageContentBlockSpec&
   for (uint32_t line = 0; line < this->getHeight(); line++) {
     IF_ERROR_LOG_AND_RETURN_FALSE(reader->read(wdata, frameStride));
     if (!strideGap.empty()) {
-      int readStrideStatus = reader->read(strideGap);
+      int readStrideStatus =
+          strideGap.size() <= reader->getUnreadBytes() ? reader->read(strideGap) : NOT_ENOUGH_DATA;
       if (readStrideStatus != 0) {
         if (line < this->getHeight() - 1) {
           IF_ERROR_LOG_AND_RETURN_FALSE(readStrideStatus);
