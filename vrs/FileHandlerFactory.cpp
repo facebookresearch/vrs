@@ -144,8 +144,8 @@ void FileHandlerFactory::registerExtraDelegator(
 }
 
 void FileHandlerFactory::unregisterExtraDelegator(
-    const std::string& extraName,
-    const std::string& extraValue) {
+    const string& extraName,
+    const string& extraValue) {
   XR_DEV_CHECK_FALSE(extraName.empty());
   XR_DEV_CHECK_FALSE(extraValue.empty());
   unique_lock<mutex> lock(mutex_);
@@ -166,14 +166,26 @@ FileDelegator* FileHandlerFactory::getExtraDelegator(const FileSpec& fileSpec) {
       if (delegateIter != iter.second.end()) {
         return delegateIter->second.get();
       } else {
-        XR_LOGW("Not {} delegator named {} was registered.", extraName, extraValue);
+        XR_LOGE("No {} delegator named {} was registered.", extraName, extraValue);
+        class FailedDelegator : public FileDelegator {
+         public:
+          int delegateOpen(const FileSpec& fileSpec, unique_ptr<FileHandler>& outNewDelegate)
+              override {
+            return REQUESTED_DELEGATOR_UNAVAILABLE;
+          }
+          int parseUri(FileSpec& inOutFileSpec, size_t colonIndex) const override {
+            return REQUESTED_DELEGATOR_UNAVAILABLE;
+          }
+        };
+        static FailedDelegator sFailedDelegator;
+        return &sFailedDelegator;
       }
     }
   }
   return nullptr;
 }
 
-FileDelegator* FileHandlerFactory::getFileDelegator(const std::string& name) {
+FileDelegator* FileHandlerFactory::getFileDelegator(const string& name) {
   unique_lock<mutex> lock(mutex_);
   auto delegator = fileDelegatorMap_.find(name);
   return (delegator == fileDelegatorMap_.end()) ? nullptr : delegator->second.get();

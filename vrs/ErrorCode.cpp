@@ -60,6 +60,7 @@ const char* getSimpleVRSErrorName(int errorCode) {
       {REINDEXING_ERROR, "Reindexing error"},
       {OPERATION_CANCELLED, "Operation cancelled"},
       {REQUESTED_FILE_HANDLER_UNAVAILABLE, "Requested FileHandler not available"},
+      {REQUESTED_DELEGATOR_UNAVAILABLE, "Requested delegator not available"},
       {FILE_HANDLER_MISMATCH, "File handler mismatch"},
       {FILEPATH_PARSE_ERROR, "Could not parse filepath"},
       {MULTICHUNKS_NOT_SUPPORTED, "FileHandler can't handle multiple chunks"},
