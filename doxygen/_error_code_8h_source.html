@@ -143,73 +143,74 @@ $(function() {
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  REINDEXING_ERROR,</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  OPERATION_CANCELLED,</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  REQUESTED_FILE_HANDLER_UNAVAILABLE,</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  FILE_HANDLER_MISMATCH,</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  FILEPATH_PARSE_ERROR,</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  MULTICHUNKS_NOT_SUPPORTED,</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  DISKFILE_NOT_OPEN,</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  DISKFILE_FILE_NOT_FOUND,</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  DISKFILE_INVALID_OFFSET,</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  DISKFILE_NOT_ENOUGH_DATA,</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  DISKFILE_READ_ONLY,</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  DISKFILE_INVALID_STATE,</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  DISKFILE_PARTIAL_WRITE_ERROR,</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;};</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
-<div class="line"><a name="l00098"></a><span class="lineno"><a class="line" href="namespacevrs.html#a2278749cac618182a91e5841f06f66c3">   98</a></span>&#160;<span class="keyword">enum class</span> <a class="code" href="namespacevrs.html#a2278749cac618182a91e5841f06f66c3">ErrorDomain</a> : int {</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  Lz4DecompressionErrorDomain,</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  ZstdCompressionErrorDomain,</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  ZstdDecompressionErrorDomain,</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  FbVrsErrorDomain, <span class="comment">// TODO(yinoue): convert fbcode to use a custom domain, then delete this.</span></div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  <span class="comment">// keep last, as we will add to this enum at runtime using newErrorDomain()</span></div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  CustomDomains</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;};</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160; </div>
-<div class="line"><a name="l00109"></a><span class="lineno"><a class="line" href="namespacevrs.html#a157a15fd819db4643d72317a6ca3e129">  109</a></span>&#160;constexpr <span class="keywordtype">int</span> <a class="code" href="namespacevrs.html#a157a15fd819db4643d72317a6ca3e129">errorDomainToErrorCodeStart</a>(<a class="code" href="namespacevrs.html#a2278749cac618182a91e5841f06f66c3">ErrorDomain</a> errorDomain) {</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  <span class="keywordflow">return</span> kDomainErrorsStart + <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(errorDomain) * kVRSErrorsDomainSize;</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;}</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160; </div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;std::string <a class="code" href="namespacevrs.html#a7122beba91b5ac34b8c4aebd2c26cf0c">errorCodeToMessage</a>(<span class="keywordtype">int</span> errorCode);</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;std::string <a class="code" href="namespacevrs.html#a7a5f29230c8013cd36049068852326e0">errorCodeToMessageWithCode</a>(<span class="keywordtype">int</span> errorCode);</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
-<div class="line"><a name="l00129"></a><span class="lineno"><a class="line" href="namespacevrs.html#a3cf892bf2d3445458591feb3359b4ef0">  129</a></span>&#160;<a class="code" href="namespacevrs.html#a2278749cac618182a91e5841f06f66c3">ErrorDomain</a> newErrorDomain(<span class="keyword">const</span> std::string&amp; domainName);</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160; </div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;<span class="keywordtype">int</span> <a class="code" href="namespacevrs.html#af8f48850a81dd113f904cd3d4ccfd50c">domainErrorCode</a>(<a class="code" href="namespacevrs.html#a2278749cac618182a91e5841f06f66c3">ErrorDomain</a> errorDomain, int64_t errorCode, <span class="keyword">const</span> <span class="keywordtype">char</span>* errorMessage);</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160; </div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00143"></a><span class="lineno"><a class="line" href="namespacevrs.html#a60e81ad2cbd310d1ed9a254abdb914e2">  143</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="namespacevrs.html#af8f48850a81dd113f904cd3d4ccfd50c">domainErrorCode</a>(<a class="code" href="namespacevrs.html#a2278749cac618182a91e5841f06f66c3">ErrorDomain</a> errorDomain, T errorCode, <span class="keyword">const</span> <span class="keywordtype">char</span>* errorMessage) {</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacevrs.html#af8f48850a81dd113f904cd3d4ccfd50c">domainErrorCode</a>(errorDomain, <span class="keyword">static_cast&lt;</span>int64_t<span class="keyword">&gt;</span>(errorCode), errorMessage);</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;}</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160; </div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160; </div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> EC&gt;</div>
-<div class="line"><a name="l00153"></a><span class="lineno"><a class="line" href="namespacevrs.html#a18a38adb0364511e70363a2fa316df34">  153</a></span>&#160;<span class="keyword">const</span> std::map&lt;EC, const char*&gt;&amp; <a class="code" href="namespacevrs.html#a18a38adb0364511e70363a2fa316df34">getErrorCodeRegistry</a>();</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160; </div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> EC&gt;</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;<a class="code" href="namespacevrs.html#a2278749cac618182a91e5841f06f66c3">ErrorDomain</a> getErrorDomain();</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160; </div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> EC&gt;</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;<span class="keywordtype">int</span> domainError(EC errorCode) {</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  <span class="keyword">const</span> std::map&lt;EC, const char*&gt;&amp; registry = getErrorCodeRegistry&lt;EC&gt;();</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;  <span class="keyword">auto</span> iter = registry.find(errorCode);</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;  <span class="keywordflow">if</span> (iter != registry.end()) {</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="namespacevrs.html#af8f48850a81dd113f904cd3d4ccfd50c">domainErrorCode</a>(getErrorDomain&lt;EC&gt;(), errorCode, iter-&gt;second);</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;  }</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  std::string msg = fmt::format(<span class="stringliteral">&quot;&lt;Unknown error code &#39;{}&#39;&gt;&quot;</span>, <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(errorCode));</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacevrs.html#af8f48850a81dd113f904cd3d4ccfd50c">domainErrorCode</a>(getErrorDomain&lt;EC&gt;(), errorCode, msg.c_str());</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;}</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160; </div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;} <span class="comment">// namespace vrs</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  REQUESTED_DELEGATOR_UNAVAILABLE,</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  FILE_HANDLER_MISMATCH,</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  FILEPATH_PARSE_ERROR,</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  MULTICHUNKS_NOT_SUPPORTED,</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  DISKFILE_NOT_OPEN,</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  DISKFILE_FILE_NOT_FOUND,</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  DISKFILE_INVALID_OFFSET,</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  DISKFILE_NOT_ENOUGH_DATA,</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  DISKFILE_READ_ONLY,</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  DISKFILE_INVALID_STATE,</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  DISKFILE_PARTIAL_WRITE_ERROR,</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;};</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160; </div>
+<div class="line"><a name="l00099"></a><span class="lineno"><a class="line" href="namespacevrs.html#a2278749cac618182a91e5841f06f66c3">   99</a></span>&#160;<span class="keyword">enum class</span> <a class="code" href="namespacevrs.html#a2278749cac618182a91e5841f06f66c3">ErrorDomain</a> : int {</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  Lz4DecompressionErrorDomain,</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  ZstdCompressionErrorDomain,</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  ZstdDecompressionErrorDomain,</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  FbVrsErrorDomain, <span class="comment">// TODO(yinoue): convert fbcode to use a custom domain, then delete this.</span></div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  <span class="comment">// keep last, as we will add to this enum at runtime using newErrorDomain()</span></div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  CustomDomains</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;};</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160; </div>
+<div class="line"><a name="l00110"></a><span class="lineno"><a class="line" href="namespacevrs.html#a157a15fd819db4643d72317a6ca3e129">  110</a></span>&#160;constexpr <span class="keywordtype">int</span> <a class="code" href="namespacevrs.html#a157a15fd819db4643d72317a6ca3e129">errorDomainToErrorCodeStart</a>(<a class="code" href="namespacevrs.html#a2278749cac618182a91e5841f06f66c3">ErrorDomain</a> errorDomain) {</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  <span class="keywordflow">return</span> kDomainErrorsStart + <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(errorDomain) * kVRSErrorsDomainSize;</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;}</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;std::string <a class="code" href="namespacevrs.html#a7122beba91b5ac34b8c4aebd2c26cf0c">errorCodeToMessage</a>(<span class="keywordtype">int</span> errorCode);</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160; </div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;std::string <a class="code" href="namespacevrs.html#a7a5f29230c8013cd36049068852326e0">errorCodeToMessageWithCode</a>(<span class="keywordtype">int</span> errorCode);</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160; </div>
+<div class="line"><a name="l00130"></a><span class="lineno"><a class="line" href="namespacevrs.html#a3cf892bf2d3445458591feb3359b4ef0">  130</a></span>&#160;<a class="code" href="namespacevrs.html#a2278749cac618182a91e5841f06f66c3">ErrorDomain</a> newErrorDomain(<span class="keyword">const</span> std::string&amp; domainName);</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160; </div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;<span class="keywordtype">int</span> <a class="code" href="namespacevrs.html#af8f48850a81dd113f904cd3d4ccfd50c">domainErrorCode</a>(<a class="code" href="namespacevrs.html#a2278749cac618182a91e5841f06f66c3">ErrorDomain</a> errorDomain, int64_t errorCode, <span class="keyword">const</span> <span class="keywordtype">char</span>* errorMessage);</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160; </div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00144"></a><span class="lineno"><a class="line" href="namespacevrs.html#a60e81ad2cbd310d1ed9a254abdb914e2">  144</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="namespacevrs.html#af8f48850a81dd113f904cd3d4ccfd50c">domainErrorCode</a>(<a class="code" href="namespacevrs.html#a2278749cac618182a91e5841f06f66c3">ErrorDomain</a> errorDomain, T errorCode, <span class="keyword">const</span> <span class="keywordtype">char</span>* errorMessage) {</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacevrs.html#af8f48850a81dd113f904cd3d4ccfd50c">domainErrorCode</a>(errorDomain, <span class="keyword">static_cast&lt;</span>int64_t<span class="keyword">&gt;</span>(errorCode), errorMessage);</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;}</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160; </div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160; </div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> EC&gt;</div>
+<div class="line"><a name="l00154"></a><span class="lineno"><a class="line" href="namespacevrs.html#a18a38adb0364511e70363a2fa316df34">  154</a></span>&#160;<span class="keyword">const</span> std::map&lt;EC, const char*&gt;&amp; <a class="code" href="namespacevrs.html#a18a38adb0364511e70363a2fa316df34">getErrorCodeRegistry</a>();</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160; </div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> EC&gt;</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<a class="code" href="namespacevrs.html#a2278749cac618182a91e5841f06f66c3">ErrorDomain</a> getErrorDomain();</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160; </div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> EC&gt;</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;<span class="keywordtype">int</span> domainError(EC errorCode) {</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;  <span class="keyword">const</span> std::map&lt;EC, const char*&gt;&amp; registry = getErrorCodeRegistry&lt;EC&gt;();</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;  <span class="keyword">auto</span> iter = registry.find(errorCode);</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;  <span class="keywordflow">if</span> (iter != registry.end()) {</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="namespacevrs.html#af8f48850a81dd113f904cd3d4ccfd50c">domainErrorCode</a>(getErrorDomain&lt;EC&gt;(), errorCode, iter-&gt;second);</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  }</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  std::string msg = fmt::format(<span class="stringliteral">&quot;&lt;Unknown error code &#39;{}&#39;&gt;&quot;</span>, <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(errorCode));</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;  <span class="keywordflow">return</span> <a class="code" href="namespacevrs.html#af8f48850a81dd113f904cd3d4ccfd50c">domainErrorCode</a>(getErrorDomain&lt;EC&gt;(), errorCode, msg.c_str());</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;}</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160; </div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;} <span class="comment">// namespace vrs</span></div>
 <div class="ttc" id="anamespacevrs_html"><div class="ttname"><a href="namespacevrs.html">vrs</a></div><div class="ttdef"><b>Definition:</b> Compressor.cpp:86</div></div>
-<div class="ttc" id="anamespacevrs_html_a157a15fd819db4643d72317a6ca3e129"><div class="ttname"><a href="namespacevrs.html#a157a15fd819db4643d72317a6ca3e129">vrs::errorDomainToErrorCodeStart</a></div><div class="ttdeci">constexpr int errorDomainToErrorCodeStart(ErrorDomain errorDomain)</div><div class="ttdoc">Conversion of a error domain to an int. For internal &amp; test purposes only.</div><div class="ttdef"><b>Definition:</b> ErrorCode.h:109</div></div>
+<div class="ttc" id="anamespacevrs_html_a157a15fd819db4643d72317a6ca3e129"><div class="ttname"><a href="namespacevrs.html#a157a15fd819db4643d72317a6ca3e129">vrs::errorDomainToErrorCodeStart</a></div><div class="ttdeci">constexpr int errorDomainToErrorCodeStart(ErrorDomain errorDomain)</div><div class="ttdoc">Conversion of a error domain to an int. For internal &amp; test purposes only.</div><div class="ttdef"><b>Definition:</b> ErrorCode.h:110</div></div>
 <div class="ttc" id="anamespacevrs_html_a18a38adb0364511e70363a2fa316df34"><div class="ttname"><a href="namespacevrs.html#a18a38adb0364511e70363a2fa316df34">vrs::getErrorCodeRegistry</a></div><div class="ttdeci">const std::map&lt; EC, const char * &gt; &amp; getErrorCodeRegistry()</div></div>
-<div class="ttc" id="anamespacevrs_html_a2278749cac618182a91e5841f06f66c3"><div class="ttname"><a href="namespacevrs.html#a2278749cac618182a91e5841f06f66c3">vrs::ErrorDomain</a></div><div class="ttdeci">ErrorDomain</div><div class="ttdoc">Core VRS error domains.</div><div class="ttdef"><b>Definition:</b> ErrorCode.h:98</div></div>
+<div class="ttc" id="anamespacevrs_html_a2278749cac618182a91e5841f06f66c3"><div class="ttname"><a href="namespacevrs.html#a2278749cac618182a91e5841f06f66c3">vrs::ErrorDomain</a></div><div class="ttdeci">ErrorDomain</div><div class="ttdoc">Core VRS error domains.</div><div class="ttdef"><b>Definition:</b> ErrorCode.h:99</div></div>
 <div class="ttc" id="anamespacevrs_html_a2fa96820cabc73dbe1ee5094dbc2458e"><div class="ttname"><a href="namespacevrs.html#a2fa96820cabc73dbe1ee5094dbc2458e">vrs::ErrorCode</a></div><div class="ttdeci">ErrorCode</div><div class="ttdoc">Enum for regular VRS errors.</div><div class="ttdef"><b>Definition:</b> ErrorCode.h:45</div></div>
-<div class="ttc" id="anamespacevrs_html_a7122beba91b5ac34b8c4aebd2c26cf0c"><div class="ttname"><a href="namespacevrs.html#a7122beba91b5ac34b8c4aebd2c26cf0c">vrs::errorCodeToMessage</a></div><div class="ttdeci">string errorCodeToMessage(int errorCode)</div><div class="ttdef"><b>Definition:</b> ErrorCode.cpp:102</div></div>
-<div class="ttc" id="anamespacevrs_html_a7a5f29230c8013cd36049068852326e0"><div class="ttname"><a href="namespacevrs.html#a7a5f29230c8013cd36049068852326e0">vrs::errorCodeToMessageWithCode</a></div><div class="ttdeci">string errorCodeToMessageWithCode(int errorCode)</div><div class="ttdef"><b>Definition:</b> ErrorCode.cpp:120</div></div>
-<div class="ttc" id="anamespacevrs_html_af8f48850a81dd113f904cd3d4ccfd50c"><div class="ttname"><a href="namespacevrs.html#af8f48850a81dd113f904cd3d4ccfd50c">vrs::domainErrorCode</a></div><div class="ttdeci">int domainErrorCode(ErrorDomain errorDomain, int64_t errorCode, const char *errorMessage)</div><div class="ttdef"><b>Definition:</b> ErrorCode.cpp:139</div></div>
+<div class="ttc" id="anamespacevrs_html_a7122beba91b5ac34b8c4aebd2c26cf0c"><div class="ttname"><a href="namespacevrs.html#a7122beba91b5ac34b8c4aebd2c26cf0c">vrs::errorCodeToMessage</a></div><div class="ttdeci">string errorCodeToMessage(int errorCode)</div><div class="ttdef"><b>Definition:</b> ErrorCode.cpp:103</div></div>
+<div class="ttc" id="anamespacevrs_html_a7a5f29230c8013cd36049068852326e0"><div class="ttname"><a href="namespacevrs.html#a7a5f29230c8013cd36049068852326e0">vrs::errorCodeToMessageWithCode</a></div><div class="ttdeci">string errorCodeToMessageWithCode(int errorCode)</div><div class="ttdef"><b>Definition:</b> ErrorCode.cpp:121</div></div>
+<div class="ttc" id="anamespacevrs_html_af8f48850a81dd113f904cd3d4ccfd50c"><div class="ttname"><a href="namespacevrs.html#af8f48850a81dd113f904cd3d4ccfd50c">vrs::domainErrorCode</a></div><div class="ttdeci">int domainErrorCode(ErrorDomain errorDomain, int64_t errorCode, const char *errorMessage)</div><div class="ttdef"><b>Definition:</b> ErrorCode.cpp:140</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
