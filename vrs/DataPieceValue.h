@@ -36,6 +36,10 @@ using std::unique_ptr;
 template <typename T>
 class DataPieceValue : public DataPiece {
  public:
+  static_assert(
+      !std::is_same<T, bool>::value,
+      "DataPieceValue does not support bool. Use vrs::Bool instead");
+
   /// @param label: Name for the DataPiece.
   DataPieceValue(const string& label) : DataPiece(label, DataPieceType::Value, sizeof(T)) {}
   /// @param label: Name for the DataPiece.
