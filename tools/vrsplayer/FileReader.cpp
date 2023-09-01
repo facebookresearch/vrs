@@ -16,6 +16,10 @@
 
 #include "FileReader.h"
 
+#ifdef Q_OS_WIN
+#include <cstdio>
+#endif
+
 #include <algorithm>
 #include <iomanip>
 #include <iostream>
@@ -761,6 +765,11 @@ int FileReader::readRecordIfNeeded(
   if (lastPlayed == recordIndex) {
     return 0;
   }
+#ifdef Q_OS_WIN
+  if (_fileno(stdout) == -2) { // _NO_CONSOLE_FILENO
+    log = false;
+  }
+#endif
   if (log) {
     fmt::print(
         "Reading {} record #{}, {} - {}\n",
