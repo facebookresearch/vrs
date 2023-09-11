@@ -81,15 +81,14 @@ void PlayerWindow::createMenus() {
   fileMenu_->addAction(openAction);
 
   QAction* openPathOrUriAction = new QAction("Open Path or URI...", this);
-  openPathOrUriAction->setShortcut(
-      static_cast<int>(Qt::CTRL) | static_cast<int>(Qt::SHIFT) | static_cast<int>(Qt::Key_O));
+  openPathOrUriAction->setShortcut(QKeySequence(Qt::CTRL, Qt::SHIFT, Qt::Key_O));
   openPathOrUriAction->setStatusTip("Open a recording using a path or URI...");
   connect(openPathOrUriAction, &QAction::triggered, &player_, &vrsp::PlayerUI::openPathChooser);
   fileMenu_->addAction(openPathOrUriAction);
 
   fileMenu_->addSeparator();
   QAction* saveFrames = new QAction("Save All Frames to...", this);
-  saveFrames->setShortcut(static_cast<int>(Qt::CTRL) | static_cast<int>(Qt::Key_S));
+  saveFrames->setShortcut(QKeySequence(Qt::CTRL, Qt::Key_S));
   saveFrames->setStatusTip("Save Visible Frames to Folder...");
   connect(saveFrames, &QAction::triggered, &player_, &vrsp::PlayerUI::saveFrames);
   fileMenu_->addAction(saveFrames);
@@ -144,7 +143,7 @@ void PlayerWindow::updateLayoutMenu(
       recallAction = make_unique<QAction>(QString("Recall Preset '" + key + "'"), this);
     }
     if (++number < 10) {
-      recallAction->setShortcut(static_cast<int>(Qt::CTRL) | static_cast<int>(Qt::Key_0 + number));
+      recallAction->setShortcut(QKeySequence(Qt::CTRL, static_cast<int>(Qt::Key_0) + number));
     }
     connect(recallAction.get(), &QAction::triggered, [this, key]() { player_.recallPreset(key); });
     layoutMenu_->addAction(recallAction.get());
@@ -198,11 +197,11 @@ void PlayerWindow::updateTextOverlayMenu() {
   addColorAction(color, Qt::magenta, "Use Magenta");
   textOverlayMenu_->addSeparator();
   QAction* smallerFont = new QAction("Smaller Font", this);
-  smallerFont->setShortcut(static_cast<int>(Qt::CTRL) | static_cast<int>(Qt::Key_Minus));
+  smallerFont->setShortcut(QKeySequence(Qt::CTRL, Qt::Key_Minus));
   connect(smallerFont, &QAction::triggered, [this]() { player_.adjustOverlayFontSize(-1); });
   textOverlayMenu_->addAction(smallerFont);
   QAction* largestFont = new QAction("Larger Font", this);
-  largestFont->setShortcut(static_cast<int>(Qt::CTRL) | static_cast<int>(Qt::Key_Plus));
+  largestFont->setShortcut(QKeySequence(Qt::CTRL, Qt::Key_Plus));
   connect(largestFont, &QAction::triggered, [this]() { player_.adjustOverlayFontSize(+1); });
   textOverlayMenu_->addAction(largestFont);
   textOverlayMenu_->addSeparator();
@@ -213,7 +212,7 @@ void PlayerWindow::updateTextOverlayMenu() {
   });
   solidBackground->setCheckable(true);
   solidBackground->setChecked(isSolid);
-  solidBackground->setShortcut(static_cast<int>(Qt::CTRL) | static_cast<int>(Qt::Key_B));
+  solidBackground->setShortcut(QKeySequence(Qt::CTRL, Qt::Key_B));
   textOverlayMenu_->addAction(solidBackground);
 }
 
