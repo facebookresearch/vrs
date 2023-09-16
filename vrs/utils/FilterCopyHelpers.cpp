@@ -124,7 +124,8 @@ void ContentChunk::fillAndAdvanceBuffer(uint8_t*& buffer) const {
 }
 
 ContentBlockChunk::ContentBlockChunk(const ContentBlock& contentBlock, const CurrentRecord& record)
-    : ContentChunk(contentBlock.getBlockSize()), contentBlock_{contentBlock} {
+    : ContentChunk(min<uint32_t>(contentBlock.getBlockSize(), record.reader->getUnreadBytes())),
+      contentBlock_{contentBlock} {
   int status = record.reader->read(getBuffer());
   if (status != 0) {
     XR_LOGW("Failed to read image block: {}", errorCodeToMessage(status));
