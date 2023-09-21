@@ -78,11 +78,15 @@ void Recordable::resetNewInstanceIds() {
   getNewInstanceId(static_cast<RecordableTypeId>(0)); // Magic value
 }
 
+recursive_mutex& Recordable::getInstanceIdMutex() {
+  static recursive_mutex sMutex;
+  return sMutex;
+}
+
 uint16_t Recordable::getNewInstanceId(RecordableTypeId typeId) {
-  static mutex sMutex_;
   static map<RecordableTypeId, uint16_t> sInstanceIds;
 
-  unique_lock<mutex> guard{sMutex_};
+  unique_lock<recursive_mutex> guard{getInstanceIdMutex()};
   // Magic to reset instance id generation
   if (typeId == static_cast<RecordableTypeId>(0)) {
     sInstanceIds.clear();

@@ -79,8 +79,14 @@ int filterCopy(
   writer.addTags(filteredReader.reader.getTags());
   vector<unique_ptr<StreamPlayer>> filters;
   filters.reserve(filteredReader.filter.streams.size());
-  for (auto id : filteredReader.filter.streams) {
-    filters.emplace_back(makeStreamFilter(filteredReader.reader, writer, id, copyOptions));
+  {
+    // Reset stream instance IDs before generating a new file.
+    // In case multiple copies happen concurrently, protect them from one another.
+    unique_lock<recursive_mutex> guard{Recordable::getInstanceIdMutex()};
+    Recordable::resetNewInstanceIds();
+    for (auto id : filteredReader.filter.streams) {
+      filters.emplace_back(makeStreamFilter(filteredReader.reader, writer, id, copyOptions));
+    }
   }
   double startTimestamp, endTimestamp;
   filteredReader.getConstrainedTimeRange(startTimestamp, endTimestamp);

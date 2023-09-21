@@ -19,6 +19,7 @@
 #include <functional>
 #include <iostream>
 #include <map>
+#include <mutex>
 #include <utility>
 
 #include "DataSource.h"
@@ -237,6 +238,8 @@ class Recordable {
   /// ATTENTION! if you call this API at the wrong time, you can end up with multiple devices with
   /// the same id, and end up in a messy situation. Avoid this API if you can!
   static void resetNewInstanceIds();
+
+  static std::recursive_mutex& getInstanceIdMutex();
 
  protected:
   /// Create a new record for this recordable. That's the only client API to do so.
