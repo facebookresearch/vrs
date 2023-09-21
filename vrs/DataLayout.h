@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <array>
 #include <cstdint>
 #include <functional>
 #include <memory>
@@ -626,6 +627,57 @@ struct DataLayoutStruct {
     dataLayoutStructEnd(_structName_);                                                        \
     init();                                                                                   \
   }
+
+/// \brief Helper class to include DataLayout structs containing a sliced array of DataPieceXXX and
+/// DataLayoutStruct while preserving the required unicity of the field names. Embedded DataPiece
+/// objects will have a name automatically prefixed with the name of the DataLayoutStruct, with a
+/// '/0'... /Size-1' in between.
+///
+///  DataLayoutStructArray can be nested within other DataLayoutStruct.
+///  If nesting arrays is not required consider using DataPieceArray instead of
+///  DataLayoutStructArray as it will be more efficient.
+/// Example:
+///
+/// struct PoseLayout : public DataLayoutStruct {
+///   DATA_LAYOUT_STRUCT(PoseLayout)
+///
+///   vrs::DataPieceVector<vrs::Matrix4Dd> orientation{"orientation"};
+///   vrs::DataPieceVector<vrs::Matrix3Dd> translation{"translation"};
+/// };
+///
+/// struct Tracking : public AutoDataLayout {
+///   DataLayoutStructArray<PoseLayout, 2> hands{"hands"};
+///
+///   vrs::AutoDataLayoutEnd endLayout;
+/// };
+///
+/// Tracking will declare:
+///  - 2 vrs::DataPieceVector<vrs::Matrix4Dd> fields, labelled:
+///  "0/orientation" and "1/orientation"
+///  - 2 vrs::DataPieceVector<vrs::Matrix3Dd> fields, labelled:
+///  "0/translation" and "1/translation"
+template <typename T, size_t Size>
+struct DataLayoutStructArray : public vrs::DataLayoutStruct {
+  DATA_LAYOUT_STRUCT(DataLayoutStructArray)
+  std::array<T, Size> array{createArrayHelper<T>(std::make_index_sequence<Size>())};
+
+  T& operator[](const size_t index) {
+    return array[index];
+  }
+
+  constexpr const T& operator[](const size_t index) const {
+    return array[index];
+  }
+
+  constexpr std::size_t size() const noexcept {
+    return array.size();
+  }
+
+  template <typename S, size_t... Indices>
+  static constexpr auto createArrayHelper(std::index_sequence<Indices...>) {
+    return std::array<S, sizeof...(Indices)>{S{std::to_string(Indices)}...};
+  }
+};
 
 /// \brief Helper function to allocate optional fields only when it is enabled.
 ///

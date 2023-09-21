@@ -16,6 +16,7 @@
 
 #include <iostream>
 #include <limits>
+#include <sstream>
 
 #include <gtest/gtest.h>
 
@@ -87,6 +88,27 @@ struct ShakenTracking : public AutoDataLayout {
   vrs::AutoDataLayoutEnd endLayout;
 };
 
+struct TestHandLayout : public vrs::DataLayoutStruct {
+  DATA_LAYOUT_STRUCT(TestHandLayout)
+
+  static constexpr size_t kNFingers = 5;
+  vrs::DataPieceArray<float> angles{"angles", kNFingers};
+};
+
+struct TestHandWindowLayout : public vrs::DataLayoutStruct {
+  DATA_LAYOUT_STRUCT(TestHandWindowLayout)
+
+  static constexpr size_t kWindowSize = 3;
+  DataLayoutStructArray<TestHandLayout, kWindowSize> window{"window"};
+};
+
+struct TestHandsLayout : public AutoDataLayout {
+  static constexpr size_t kNHands = 2;
+  DataLayoutStructArray<TestHandWindowLayout, kNHands> hands{"hands"};
+
+  vrs::AutoDataLayoutEnd endLayout;
+};
+
 struct NestedDataLayoutTester : testing::Test {};
 
 TEST_F(NestedDataLayoutTester, nestedTest) {
@@ -153,6 +175,50 @@ TEST_F(NestedDataLayoutTester, nestedTest) {
   const string readText = readTracking.leftController.rigidBody.pose.text.get();
   EXPECT_EQ(text, readText);
   EXPECT_FALSE(readTracking.string.isAvailable());
+}
+
+TEST_F(NestedDataLayoutTester, DataLayoutStructArrayHasTheCorrectLabel) {
+  TestHandsLayout layout;
+  EXPECT_EQ(layout.getDeclaredFixedDataPiecesCount(), 6);
+  EXPECT_EQ(layout.getDeclaredVarDataPiecesCount(), 0);
+
+  for (size_t handIdx = 0; handIdx < TestHandsLayout::kNHands; ++handIdx) {
+    for (size_t windowIdx = 0; windowIdx < TestHandWindowLayout::kWindowSize; ++windowIdx) {
+      SCOPED_TRACE(
+          ::testing::Message() << "Evaluating indices (handIdx, windowIdx): (" << handIdx << ", "
+                               << windowIdx << ")");
+
+      const auto& angles = layout.hands[handIdx].window[windowIdx].angles;
+
+      EXPECT_EQ(
+          angles.getLabel(),
+          "hands/" + std::to_string(handIdx) + "/window/" + std::to_string(windowIdx) + "/angles");
+      EXPECT_EQ(angles.getArraySize(), TestHandLayout::kNFingers);
+    }
+  }
+}
+
+TEST_F(NestedDataLayoutTester, DataLayoutStructArrayCanPrint) {
+  TestHandsLayout layout;
+  for (size_t handIdx = 0; handIdx < TestHandsLayout::kNHands; ++handIdx) {
+    for (size_t windowIdx = 0; windowIdx < TestHandWindowLayout::kWindowSize; ++windowIdx) {
+      auto& angles = layout.hands[handIdx].window[windowIdx].angles;
+      const std::array<float, TestHandLayout::kNFingers> mockValues{
+          static_cast<float>(handIdx), static_cast<float>(windowIdx), 0.0f, 0.0f, 0.0f};
+      angles.set(mockValues.data(), TestHandLayout::kNFingers);
+    }
+  }
+  std::ostringstream stream;
+  layout.printLayoutCompact(stream);
+  EXPECT_EQ(
+      stream.str(),
+      R"(  hands/0/window/0/angles:  0 0 0 0 0
+  hands/0/window/1/angles:  0 1 0 0 0
+  hands/0/window/2/angles:  0 2 0 0 0
+  hands/1/window/0/angles:  1 0 0 0 0
+  hands/1/window/1/angles:  1 1 0 0 0
+  hands/1/window/2/angles:  1 2 0 0 0
+)");
 }
 
 } // namespace
