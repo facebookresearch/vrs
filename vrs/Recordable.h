@@ -239,8 +239,6 @@ class Recordable {
   /// the same id, and end up in a messy situation. Avoid this API if you can!
   static void resetNewInstanceIds();
 
-  static std::recursive_mutex& getInstanceIdMutex();
-
  protected:
   /// Create a new record for this recordable. That's the only client API to do so.
   ///
@@ -299,6 +297,20 @@ class Recordable {
   static uint16_t getNewInstanceId(RecordableTypeId typeId = static_cast<RecordableTypeId>(0));
 
   const string& getTag(const map<string, string>& tags, const string& name) const;
+};
+
+/// Temporarily reset Recordable instance IDs
+/// Create on the stack, so while the object exists, Recordable instance IDs generated start at 1,
+/// and restore the instance ID generation sequence when the object is released.
+/// Note that while the object is alive, no other thread can create Recordable objects (locking).
+class TemporaryRecordableInstanceIdsResetter {
+ public:
+  TemporaryRecordableInstanceIdsResetter();
+  ~TemporaryRecordableInstanceIdsResetter();
+
+ private:
+  std::unique_lock<std::recursive_mutex> lock_;
+  map<RecordableTypeId, uint16_t> preservedState_;
 };
 
 } // namespace vrs

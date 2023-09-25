@@ -74,28 +74,28 @@ void Recordable::addTags(const StreamTags& tags) {
   }
 }
 
-void Recordable::resetNewInstanceIds() {
-  getNewInstanceId(static_cast<RecordableTypeId>(0)); // Magic value
-}
-
-recursive_mutex& Recordable::getInstanceIdMutex() {
+static recursive_mutex& getInstanceIdMutex() {
   static recursive_mutex sMutex;
   return sMutex;
 }
 
-uint16_t Recordable::getNewInstanceId(RecordableTypeId typeId) {
+static map<RecordableTypeId, uint16_t>& getInstanceIds() {
   static map<RecordableTypeId, uint16_t> sInstanceIds;
+  return sInstanceIds;
+}
 
+void Recordable::resetNewInstanceIds() {
   unique_lock<recursive_mutex> guard{getInstanceIdMutex()};
-  // Magic to reset instance id generation
-  if (typeId == static_cast<RecordableTypeId>(0)) {
-    sInstanceIds.clear();
-    return 0;
-  }
+  getInstanceIds().clear();
+}
+
+uint16_t Recordable::getNewInstanceId(RecordableTypeId typeId) {
+  unique_lock<recursive_mutex> guard{getInstanceIdMutex()};
+  map<RecordableTypeId, uint16_t>& instanceIds = getInstanceIds();
   uint16_t instanceId = 1; // default instance Id
-  auto newId = sInstanceIds.find(typeId);
-  if (newId == sInstanceIds.end()) {
-    sInstanceIds[typeId] = instanceId;
+  auto newId = instanceIds.find(typeId);
+  if (newId == instanceIds.end()) {
+    instanceIds[typeId] = instanceId;
   } else {
     instanceId = ++(newId->second);
   }
@@ -109,6 +109,15 @@ const string& Recordable::getTag(const map<string, string>& tags, const string& 
   }
   static const string sEmptyString;
   return sEmptyString;
+}
+
+TemporaryRecordableInstanceIdsResetter::TemporaryRecordableInstanceIdsResetter()
+    : lock_{getInstanceIdMutex()} {
+  preservedState_.swap(getInstanceIds());
+}
+
+TemporaryRecordableInstanceIdsResetter::~TemporaryRecordableInstanceIdsResetter() {
+  preservedState_.swap(getInstanceIds());
 }
 
 } // namespace vrs

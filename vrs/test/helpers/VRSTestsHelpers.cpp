@@ -245,7 +245,6 @@ void RecordFileWriterTester::skipFinalizeIndexRecord(RecordFileWriter& writer) {
 }
 
 int threadedCreateRecords(CreateParams& p) {
-  Recordable::resetNewInstanceIds();
   array<unique_ptr<DawnCamera>, kCameraCount> cameras;
   RecordFileWriter fileWriter;
   fileWriter.setTag("fileTag1", "fileValue1");
@@ -253,21 +252,24 @@ int threadedCreateRecords(CreateParams& p) {
   array<atomic<int>, kCameraCount> counters;
   vector<ThreadParam> threadParams;
   bool fatalError = false;
-  for (uint32_t cameraIndex = 0; cameraIndex < kCameraCount; cameraIndex++) {
-    cameras[cameraIndex] = make_unique<DawnCamera>(cameraIndex, kLongFileConfig);
-    DawnCamera* camera = cameras[cameraIndex].get();
-    fileWriter.addRecordable(camera);
-    fileWriter.setTag(p.getCameraStreamTag(cameraIndex), camera->getSerialNumber());
-    counters[cameraIndex] = 0;
-    threadParams.push_back(ThreadParam{
-        fileWriter,
-        *cameras[cameraIndex],
-        os::getTimestampSec(),
-        counters[cameraIndex],
-        counters[(cameraIndex + 1) % kCameraCount],
-        fatalError,
-        p.fileConfig,
-        (p.testOptions & TestOptions::REALTIME) != 0});
+  {
+    TemporaryRecordableInstanceIdsResetter instanceIdsResetter;
+    for (uint32_t cameraIndex = 0; cameraIndex < kCameraCount; cameraIndex++) {
+      cameras[cameraIndex] = make_unique<DawnCamera>(cameraIndex, kLongFileConfig);
+      DawnCamera* camera = cameras[cameraIndex].get();
+      fileWriter.addRecordable(camera);
+      fileWriter.setTag(p.getCameraStreamTag(cameraIndex), camera->getSerialNumber());
+      counters[cameraIndex] = 0;
+      threadParams.push_back(ThreadParam{
+          fileWriter,
+          *cameras[cameraIndex],
+          os::getTimestampSec(),
+          counters[cameraIndex],
+          counters[(cameraIndex + 1) % kCameraCount],
+          fatalError,
+          p.fileConfig,
+          (p.testOptions & TestOptions::REALTIME) != 0});
+    }
   }
   fileWriter.setCompressionThreadPoolSize(p.fileWriterThreadCount);
   if (p.preallocateIndexSize > 0) {
@@ -304,16 +306,18 @@ int threadedCreateRecords(CreateParams& p) {
 }
 
 int singleThreadCreateRecords(CreateParams& p) {
-  Recordable::resetNewInstanceIds();
   array<unique_ptr<DawnCamera>, kCameraCount> cameras;
   RecordFileWriter fileWriter;
   fileWriter.setTag("fileTag1", "fileValue1");
   fileWriter.setTag("fileTag2", "fileValue2");
-  for (uint32_t cameraIndex = 0; cameraIndex < kCameraCount; cameraIndex++) {
-    cameras[cameraIndex] = make_unique<DawnCamera>(cameraIndex, kLongFileConfig);
-    DawnCamera* camera = cameras[cameraIndex].get();
-    fileWriter.addRecordable(camera);
-    camera->setRecordableIsActive(true);
+  {
+    TemporaryRecordableInstanceIdsResetter instanceIdsResetter;
+    for (uint32_t cameraIndex = 0; cameraIndex < kCameraCount; cameraIndex++) {
+      cameras[cameraIndex] = make_unique<DawnCamera>(cameraIndex, kLongFileConfig);
+      DawnCamera* camera = cameras[cameraIndex].get();
+      fileWriter.addRecordable(camera);
+      camera->setRecordableIsActive(true);
+    }
   }
   if (p.preallocateIndexSize > 0) {
     fileWriter.preallocateIndex(createPreliminaryIndex(cameras, p));

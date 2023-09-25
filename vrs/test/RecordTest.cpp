@@ -319,3 +319,35 @@ TEST_F(RecordTester, initRecordTest) {
   EXPECT_EQ(sizeof(u.initialized_bytes), kSize);
   EXPECT_EQ(sizeof(u), kSize);
 }
+
+namespace {
+class TestRecordable : public Recordable {
+ public:
+  TestRecordable(RecordableTypeId typeId = RecordableTypeId::UnitTest1) : Recordable(typeId) {}
+  const Record* createConfigurationRecord() override {
+    return nullptr;
+  }
+  const Record* createStateRecord() override {
+    return nullptr;
+  }
+};
+} // namespace
+
+TEST_F(RecordTester, instanceIdTest) {
+  TemporaryRecordableInstanceIdsResetter instanceIdsResetter;
+  TestRecordable r1;
+  TestRecordable r2;
+  EXPECT_EQ(r1.getRecordableInstanceId(), 1);
+  EXPECT_EQ(r2.getRecordableInstanceId(), 2);
+  {
+    TemporaryRecordableInstanceIdsResetter instanceIdsResetter2;
+    TestRecordable r3;
+    TestRecordable r4;
+    TestRecordable r5;
+    EXPECT_EQ(r3.getRecordableInstanceId(), 1);
+    EXPECT_EQ(r4.getRecordableInstanceId(), 2);
+    EXPECT_EQ(r5.getRecordableInstanceId(), 3);
+  }
+  TestRecordable r3;
+  EXPECT_EQ(r3.getRecordableInstanceId(), 3);
+}

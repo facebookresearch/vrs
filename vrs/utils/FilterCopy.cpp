@@ -80,10 +80,7 @@ int filterCopy(
   vector<unique_ptr<StreamPlayer>> filters;
   filters.reserve(filteredReader.filter.streams.size());
   {
-    // Reset stream instance IDs before generating a new file.
-    // In case multiple copies happen concurrently, protect them from one another.
-    unique_lock<recursive_mutex> guard{Recordable::getInstanceIdMutex()};
-    Recordable::resetNewInstanceIds();
+    TemporaryRecordableInstanceIdsResetter resetter;
     for (auto id : filteredReader.filter.streams) {
       filters.emplace_back(makeStreamFilter(filteredReader.reader, writer, id, copyOptions));
     }
