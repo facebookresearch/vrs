@@ -103,6 +103,7 @@ enum class RecordableTypeId : uint16_t {
   EMGRecordableClass = 249, ///< For electromyography data streams
   CapacitiveTouchRecordableClass = 250, ///< For capacitive touch data streams.
   HeartRateRecordableClass = 251, // Heart rate data streams.
+  CaloriesRecordableClass = 252, // Calories data streams.
 
   // << Calibration, Setup, Diagnostic, etc >>
   CalibrationRecordableClass = 260, ///< For calibration data streams.
