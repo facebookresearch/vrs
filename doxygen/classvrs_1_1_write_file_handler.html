@@ -96,6 +96,8 @@ Inheritance diagram for vrs::WriteFileHandler:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a91518076bc2908a1a4b21aace0fe79cf"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_write_file_handler.html#a91518076bc2908a1a4b21aace0fe79cf">create</a> (const string &amp;newFilePath)=0</td></tr>
 <tr class="separator:a91518076bc2908a1a4b21aace0fe79cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff0f64ed8b7ada9f6e0a2c55d3fd3a59"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_write_file_handler.html#aff0f64ed8b7ada9f6e0a2c55d3fd3a59">createSplitFile</a> (const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;spec, const string &amp;initialFilePath)</td></tr>
+<tr class="separator:aff0f64ed8b7ada9f6e0a2c55d3fd3a59"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a42d388f28fa2202dc18ab52964d7990c"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_write_file_handler.html#a42d388f28fa2202dc18ab52964d7990c">reopenForUpdatesSupported</a> () const =0</td></tr>
 <tr class="separator:a42d388f28fa2202dc18ab52964d7990c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a92afff70611d619395c027f01de60c6e"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_write_file_handler.html#a92afff70611d619395c027f01de60c6e">reopenForUpdates</a> ()=0</td></tr>
@@ -271,6 +273,50 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>CacheStatsCallbackFu
 <dl class="section return"><dt>Returns</dt><dd>A status code, 0 meaning success. </dd></dl>
 
 <p>Implemented in <a class="el" href="classvrs_1_1_atomic_disk_file.html#a5f679fc55d41375bc186797a32d883a7">vrs::AtomicDiskFile</a>, and <a class="el" href="classvrs_1_1_disk_file.html#afcc5c48732bf694f2cb76f83e9dd0f2e">vrs::DiskFile</a>.</p>
+
+</div>
+</div>
+<a id="aff0f64ed8b7ada9f6e0a2c55d3fd3a59"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff0f64ed8b7ada9f6e0a2c55d3fd3a59">&#9670;&nbsp;</a></span>createSplitFile()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual int vrs::WriteFileHandler::createSplitFile </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;&#160;</td>
+          <td class="paramname"><em>spec</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const string &amp;&#160;</td>
+          <td class="paramname"><em>initialFilePath</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Create a new file for writing, in split-head file mode, the body part. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">spec</td><td>spec as converted already from initialFilePath, if that helps. </td></tr>
+    <tr><td class="paramname">initialFilePath</td><td>path as given when the file creation was started. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A status code, 0 meaning success. </dd></dl>
 
 </div>
 </div>
