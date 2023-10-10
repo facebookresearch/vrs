@@ -212,7 +212,7 @@ int FilteredFileReader::openFile(unique_ptr<FileHandler>& file) const {
 string FilteredFileReader::getCopyPath() {
   // if uploading, but no temp file path has been provided, automatically generate one
   string fileName = getFileName();
-  return os::getTempFolder() + (fileName.empty() ? "file.tmp" : fileName);
+  return os::makeUniqueFolder() + (fileName.empty() ? "file.tmp" : fileName);
 }
 
 bool FilteredFileReader::afterConstraint(const string& after) {
