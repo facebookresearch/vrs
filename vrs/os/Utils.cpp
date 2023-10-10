@@ -19,6 +19,7 @@
 #include <cstdio>
 
 #include <algorithm>
+#include <random>
 #include <vector>
 
 #include <logging/Checks.h>
@@ -166,13 +167,10 @@ string fileErrorToString(int errnum) {
 // we can't use std::tmpnam, because it's deprecated, and throws a warning, breaking the build...
 // So yes, we're reinventing the wheel.
 string randomName(int length) {
-  auto randchar = []() -> char {
-    const char charset[] =
-        "0123456789_"
-        "abcdefghijklmnopqrstuvwxyz";
-    const size_t max_index = (sizeof(charset) - 1);
-    return charset[static_cast<size_t>(rand()) % max_index];
-  };
+  const char charset[] = "0123456789_abcdefghijklmnopqrstuvwxyz";
+  std::default_random_engine rng(std::random_device{}());
+  std::uniform_int_distribution<> dist(0, sizeof(charset) - 2);
+  auto randchar = [charset, &dist, &rng]() { return charset[dist(rng)]; };
   string str(length, 0);
   generate_n(str.begin(), length, randchar);
   return str;
@@ -240,11 +238,15 @@ int hidePath(MAYBE_UNUSED const string& path, MAYBE_UNUSED bool hide) {
 
 string getUniquePath(const string& baseName, size_t randomSuffixLength) {
   string uniqueName;
-  uniqueName.reserve(baseName.size() + 1 + randomSuffixLength);
-  uniqueName = baseName + '~';
+  uniqueName.reserve(baseName.size() + 2 + randomSuffixLength);
+  uniqueName.append(baseName);
+  if (!baseName.empty() && baseName.back() != '/') {
+    uniqueName.push_back('~');
+  }
+  size_t baseLength = uniqueName.length();
   do {
-    uniqueName.resize(baseName.size() + 1);
-    uniqueName += randomName(randomSuffixLength);
+    uniqueName.resize(baseLength);
+    uniqueName.append(randomName(randomSuffixLength));
   } while (os::pathExists(uniqueName));
   return uniqueName;
 }
@@ -299,6 +301,15 @@ string sanitizeFileName(const string& filename) {
     return '~' + sanitizedName;
   }
   return sanitizedName;
+}
+
+string makeUniqueFolder(const std::string& baseName, size_t randomSuffixLength) {
+  string path;
+  do {
+    path = getUniquePath(baseName.empty() ? getTempFolder() : baseName, randomSuffixLength);
+  } while (makeDir(path) != 0);
+  path += '/';
+  return path;
 }
 
 #if IS_VRS_OSS_CODE()

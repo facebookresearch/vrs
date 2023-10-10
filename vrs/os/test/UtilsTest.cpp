@@ -38,7 +38,7 @@ struct FileTest : testing::Test {
   string testDataDir = coretech::getTestDataDir();
 
   void testFileName(const string& filename) {
-    string path = os::pathJoin(os::getTempFolder(), os::sanitizeFileName(filename));
+    string path = os::pathJoin(os::makeUniqueFolder(), os::sanitizeFileName(filename));
     int status = os::makeDir(path);
     if (status != 0) {
       EXPECT_EQ(path, ""); // make sure the bad path is  printed
@@ -186,7 +186,7 @@ TEST_F(FileTest, testGetFilename) {
 }
 
 TEST_F(FileTest, testFileResize) {
-  string tempDir = os::getTempFolder();
+  string tempDir = os::makeUniqueFolder();
   string testFilePath = os::pathJoin(tempDir, "a.txt");
 
   { // Create a dummy file in the temp dir that we can grow and shrink.
@@ -232,7 +232,7 @@ TEST_F(FileTest, testFileResize) {
 }
 
 TEST_F(FileTest, testListDir) {
-  string testDir = os::pathJoin(os::getTempFolder(), "filetest", "testlistdir");
+  string testDir = os::pathJoin(os::makeUniqueFolder(), "filetest", "testlistdir");
   ASSERT_EQ(os::makeDirectories(testDir), 0);
   vector<string> expectedFiles = {
       os::pathJoin(testDir, "a.txt"),

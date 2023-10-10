@@ -52,6 +52,7 @@ std::string sanitizeFileName(const std::string& filename);
 std::string randomName(int length);
 const std::string& getTempFolder();
 std::string getUniquePath(const std::string& baseName, size_t randomSuffixLength = 5);
+std::string makeUniqueFolder(const std::string& baseName = {}, size_t randomSuffixLength = 10);
 
 /// Error helpers
 int getLastFileError();
