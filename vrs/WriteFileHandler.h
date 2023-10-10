@@ -46,6 +46,19 @@ class WriteFileHandler : public FileHandler {
   /// @return A status code, 0 meaning success.
   virtual int create(const string& newFilePath) = 0;
 
+  /// Create a new file for writing, in split-head file mode, the body part.
+  /// @param spec: spec as converted already from initialFilePath, if that helps.
+  /// @param initialFilePath: path as given when the file creation was started.
+  /// @return A status code, 0 meaning success.
+  virtual int createSplitFile(const FileSpec& spec, const string& initialFilePath) {
+    // create the (first) user record chunk
+    if (spec.chunks.size() == 1) {
+      return create(spec.chunks.front() + "_1");
+    } else {
+      return create(initialFilePath);
+    }
+  }
+
   /// Tell if modifying files is supported by this FileHandler implementation.
   /// @return True if file modification and creation is supported.
   virtual bool reopenForUpdatesSupported() const = 0;

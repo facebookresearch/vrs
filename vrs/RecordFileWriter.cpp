@@ -854,12 +854,7 @@ int RecordFileWriter::createFile(const string& filePath, bool splitHead) {
 
   if (splitHead) {
     IF_ERROR_LOG_CLOSE_AND_RETURN(indexRecordWriter_.createSplitIndexRecord(lastRecordSize_))
-    // create the (first) user record chunk
-    if (spec.chunks.size() == 1) {
-      IF_ERROR_LOG_CLOSE_AND_RETURN(file_->create(spec.chunks.front() + "_1"))
-    } else {
-      IF_ERROR_LOG_CLOSE_AND_RETURN(file_->create(filePath))
-    }
+    IF_ERROR_LOG_CLOSE_AND_RETURN(file_->createSplitFile(spec, filePath));
   } else if (preliminaryIndex_ && !preliminaryIndex_->empty()) {
     // only use this preliminary index once
     unique_ptr<deque<IndexRecord::DiskRecordInfo>> index = std::move(preliminaryIndex_);
