@@ -83,6 +83,7 @@ int CompressedRecordReader::read(
     uint32_t& outReadSize) {
   outReadSize = 0;
   do {
+    bool readData = false;
     if (decompressor_.getRemainingCompressedDataBufferSize() == 0 && remainingDiskBytes_ > 0) {
       size_t targetReadSize = (knownNeedSize - outReadSize >= remainingUncompressedSize_)
           ? remainingDiskBytes_
@@ -100,6 +101,7 @@ int CompressedRecordReader::read(
       if (error != 0) {
         return error;
       }
+      readData = true;
     }
     uint32_t decompressedSize = 0;
     int error = decompressor_.decompress(
@@ -108,6 +110,9 @@ int CompressedRecordReader::read(
     remainingUncompressedSize_ -= decompressedSize;
     if (error != 0) {
       return error;
+    }
+    if (!readData && decompressedSize == 0) {
+      return NOT_ENOUGH_DATA;
     }
   } while (outReadSize < destSize);
   return 0;
