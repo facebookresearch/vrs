@@ -23,6 +23,7 @@
 #include <logging/Log.h>
 
 #include <vrs/ErrorCode.h>
+#include <vrs/helpers/FileMacros.h>
 
 using namespace std;
 
@@ -66,14 +67,17 @@ void DecoderFactory::registerDecoderMaker(DecoderMaker decoderMaker) {
   decoderMakers_.emplace_back(decoderMaker);
 }
 
-unique_ptr<DecoderI> DecoderFactory::makeDecoder(const string& codecName) {
+unique_ptr<DecoderI> DecoderFactory::makeDecoder(
+    const vector<uint8_t>& encodedFrame,
+    void* outDecodedFrame,
+    const ImageContentBlockSpec& outputImageSpec) {
   for (const DecoderMaker& decoderMaker : decoderMakers_) {
-    unique_ptr<DecoderI> decoder = decoderMaker(codecName);
+    unique_ptr<DecoderI> decoder = decoderMaker(encodedFrame, outDecodedFrame, outputImageSpec);
     if (decoder) {
       return decoder;
     }
   }
-  XR_LOGW("Could not create a decoder for '{}'!", codecName);
+  XR_LOGW("Could not create a decoder for '{}'!", outputImageSpec.getCodecName());
   return nullptr;
 }
 

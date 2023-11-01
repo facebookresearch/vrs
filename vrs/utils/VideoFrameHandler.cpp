@@ -21,6 +21,7 @@
 
 #include <vrs/ErrorCode.h>
 #include <vrs/RecordFileReader.h>
+#include <vrs/helpers/FileMacros.h>
 #include <vrs/utils/PixelFrame.h>
 
 using namespace std;
@@ -28,12 +29,13 @@ using namespace std;
 namespace vrs::utils {
 
 int VideoFrameHandler::tryToDecodeFrame(
-    void* outBuffer,
+    void* outDecodedFrame,
     RecordReader* reader,
     const ContentBlock& contentBlock) {
+  const ImageContentBlockSpec& spec = contentBlock.image();
   isVideo_ = true;
-  requestedKeyFrameTimestamp_ = contentBlock.image().getKeyFrameTimestamp();
-  requestedKeyFrameIndex_ = contentBlock.image().getKeyFrameIndex();
+  requestedKeyFrameTimestamp_ = spec.getKeyFrameTimestamp();
+  requestedKeyFrameIndex_ = spec.getKeyFrameIndex();
   videoGoodState_ = requestedKeyFrameIndex_ == 0 ||
       (requestedKeyFrameTimestamp_ == decodedKeyFrameTimestamp_ &&
        requestedKeyFrameIndex_ == decodedKeyFrameIndex_ + 1);
@@ -41,13 +43,14 @@ int VideoFrameHandler::tryToDecodeFrame(
     decodedKeyFrameTimestamp_ = requestedKeyFrameTimestamp_;
     decodedKeyFrameIndex_ = requestedKeyFrameIndex_;
     // XR_LOGI("Reading frame {}/{}", requestedKeyFrameTimestamp_, requestedKeyFrameIndex_);
-    if (!decoder_) {
-      decoder_ = DecoderFactory::get().makeDecoder(contentBlock.image().getCodecName());
-      if (!decoder_) {
-        return domainError(DecodeStatus::CodecNotFound);
-      }
+    encodedFrame_.resize(contentBlock.getBlockSize());
+    IF_ERROR_LOG_AND_RETURN(reader->read(encodedFrame_));
+    if (decoder_) {
+      return decoder_->decode(encodedFrame_, outDecodedFrame, contentBlock.image());
     }
-    return decoder_->decode(reader, contentBlock.getBlockSize(), outBuffer, contentBlock.image());
+    decoder_ =
+        DecoderFactory::get().makeDecoder(encodedFrame_, outDecodedFrame, contentBlock.image());
+    return decoder_ ? SUCCESS : domainError(DecodeStatus::CodecNotFound);
   }
   if (requestedKeyFrameTimestamp_ == decodedKeyFrameTimestamp_) {
     XR_LOGW(

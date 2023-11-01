@@ -99,6 +99,7 @@ class VideoFrameHandler {
 
  private:
   std::unique_ptr<DecoderI> decoder_;
+  std::vector<uint8_t> encodedFrame_;
 
   double decodedKeyFrameTimestamp_{};
   uint32_t decodedKeyFrameIndex_{kInvalidFrameIndex};

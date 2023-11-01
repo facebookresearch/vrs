@@ -43,15 +43,15 @@ class DecoderI {
   virtual ~DecoderI();
   /// Decode compressed image to a frame
   virtual int decode(
-      RecordReader* reader,
-      const uint32_t sizeBytes,
-      void* outBuffer,
-      const ImageContentBlockSpec& inputImageSpec) = 0;
-  /// Decode compressed image, to update internal buffers
-  virtual int decode(RecordReader* reader, const uint32_t sizeBytes) = 0;
+      const vector<uint8_t>& encodedFrame,
+      void* outDecodedFrame,
+      const ImageContentBlockSpec& outputImageSpec) = 0;
 };
 
-using DecoderMaker = std::function<std::unique_ptr<DecoderI>(const std::string& codecName)>;
+using DecoderMaker = std::function<std::unique_ptr<DecoderI>(
+    const vector<uint8_t>& encodedFrame,
+    void* outDecodedFrame,
+    const ImageContentBlockSpec& outputImageSpec)>;
 
 class DecoderFactory {
  public:
@@ -59,7 +59,10 @@ class DecoderFactory {
 
   void registerDecoderMaker(DecoderMaker decoderMaker);
 
-  std::unique_ptr<DecoderI> makeDecoder(const std::string& codecName);
+  std::unique_ptr<DecoderI> makeDecoder(
+      const vector<uint8_t>& encodedFrame,
+      void* outDecodedFrame,
+      const ImageContentBlockSpec& outputImageSpec);
 
  protected:
   DecoderFactory() = default;
