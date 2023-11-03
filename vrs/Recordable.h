@@ -191,7 +191,7 @@ class Recordable {
   }
 
   /// Get the stream's unique serial number generated on stream creation.
-  /// That serial number is universaly unique and it will be preserved during file copies, file
+  /// That serial number is universally unique and it will be preserved during file copies, file
   /// processing, and other manipulations that preserve stream tags, whereas the stream's streamID
   /// may change.
   /// Note that VRS internal tags might be overwritten, in particular during file copy operations,
@@ -274,7 +274,7 @@ class Recordable {
         : recordManager_.createRecord(timestampSec, recordType, formatVersion, data);
   }
 
-  /// When direct edits of VRS tags is conventient (record filters)
+  /// When direct edits of VRS tags is convenient (record filters)
   map<string, string>& getVRSTags() {
     return tags_.vrs;
   }
