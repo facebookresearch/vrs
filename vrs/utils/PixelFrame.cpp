@@ -658,6 +658,10 @@ bool PixelFrame::normalizeToPixelFormat(
   return false;
 }
 
+bool PixelFrame::ssimCompare(const PixelFrame& other, double& meanSSIM, double& meanContrast) {
+  XR_LOGE_ONCE("PixelFrame::ssimCompare has no open source implementation");
+}
+
 #endif // !IS_VRS_OSS_CODE()
 
 } // namespace vrs::utils

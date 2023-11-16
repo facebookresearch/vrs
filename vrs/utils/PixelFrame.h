@@ -274,6 +274,13 @@ class PixelFrame {
   /// @return True if the conversion was performed, false if source wasn't an RGBA frame.
   bool convertRgbaToRgb(shared_ptr<PixelFrame>& outRgbFrame) const;
 
+  /// Compare this image with another image, and return an MS-SSIM score.
+  /// @param other: the other image to compare with.
+  /// @param msssim: on exit, the MS-SSIM score.
+  /// @return True if the images have identical dimensions and pixel formats, the pixel format is
+  /// supported (grey8 or rgb8), and the comparison succeeded.
+  bool msssimCompare(const PixelFrame& other, double& msssim);
+
  private:
   /// Conversion from an external buffer
   /// @param convertedFrame: frame to convert to. May not be allocated yet.
