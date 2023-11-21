@@ -173,6 +173,9 @@ struct FilteredFileReader {
   // Constrain the given time range to the current filter's time constraints
   void constrainTimeRange(double& inOutStartTimestamp, double& inOutEndTimestamp) const;
 
+  // Decimate data record with a minimum time interval
+  void decimateByInterval(double minIntervalSec);
+
   // Apply filters, which can only be done after the file was opened already
   void applyFilters(const RecordFilterParams& filters);
   void applyRecordableFilters(const vector<string>& filter);

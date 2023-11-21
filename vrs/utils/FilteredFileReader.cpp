@@ -276,6 +276,12 @@ void FilteredFileReader::constrainTimeRange(double& inOutStartTimestamp, double&
   }
 }
 
+void FilteredFileReader::decimateByInterval(double minIntervalSec) {
+  utils::DecimationParams params;
+  params.bucketInterval = minIntervalSec;
+  decimator_ = make_unique<utils::Decimator>(*this, params);
+}
+
 void FilteredFileReader::getConstrainedTimeRange(
     double& outStartTimestamp,
     double& outEndTimestamp) {
