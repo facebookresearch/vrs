@@ -257,14 +257,8 @@ class DecodeChecker : public VideoRecordFormatStreamPlayer {
   }
   bool onImageRead(const CurrentRecord& record, size_t blockIndex, const ContentBlock& cb)
       override {
-    if (cb.image().getImageFormat() == ImageFormat::VIDEO) {
-      PixelFrame frame;
-      return isSuccess(tryToDecodeFrame(frame, record, cb) == 0, cb.getContentType());
-    } else {
-      shared_ptr<PixelFrame> frame;
-      return isSuccess(PixelFrame::readFrame(frame, record.reader, cb), cb.getContentType());
-    }
-    return onUnsupportedBlock(record, blockIndex, cb);
+    PixelFrame frame;
+    return isSuccess(readFrame(frame, record, cb), cb.getContentType());
   }
   bool onAudioRead(const CurrentRecord& record, size_t blockIndex, const ContentBlock& cb)
       override {

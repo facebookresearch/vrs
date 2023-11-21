@@ -116,6 +116,7 @@ class PixelFrame {
   /// @return True if the frame type is supported & the frame was read.
   static bool
   readFrame(shared_ptr<PixelFrame>& frame, RecordReader* reader, const ContentBlock& cb);
+  bool readFrame(RecordReader* reader, const ContentBlock& cb);
 
   /// Read a RAW frame into the internal buffer.
   /// @return True if the frame type is supported & the frame was read.

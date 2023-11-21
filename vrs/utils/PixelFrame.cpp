@@ -232,24 +232,28 @@ bool PixelFrame::readFrame(
     shared_ptr<PixelFrame>& frame,
     RecordReader* reader,
     const ContentBlock& cb) {
+  if (!frame) {
+    frame = make_shared<PixelFrame>();
+  }
+  return frame->readFrame(reader, cb);
+}
+
+bool PixelFrame::readFrame(RecordReader* reader, const ContentBlock& cb) {
   if (!XR_VERIFY(cb.getContentType() == ContentType::IMAGE)) {
     return false;
   }
   if (cb.image().getImageFormat() == ImageFormat::VIDEO) {
     return false;
   }
-  if (!frame) {
-    frame = make_shared<PixelFrame>();
-  }
   switch (cb.image().getImageFormat()) {
     case ImageFormat::RAW:
-      return frame->readRawFrame(reader, cb.image());
+      return readRawFrame(reader, cb.image());
     case ImageFormat::PNG:
-      return frame->readPngFrame(reader, cb.getBlockSize());
+      return readPngFrame(reader, cb.getBlockSize());
     case ImageFormat::JPG:
-      return frame->readJpegFrame(reader, cb.getBlockSize());
+      return readJpegFrame(reader, cb.getBlockSize());
     case ImageFormat::JXL:
-      return frame->readJxlFrame(reader, cb.getBlockSize());
+      return readJxlFrame(reader, cb.getBlockSize());
     default:
       return false;
   }

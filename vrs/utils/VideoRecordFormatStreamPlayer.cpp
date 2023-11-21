@@ -20,6 +20,7 @@
 #include <logging/Checks.h>
 
 #include <vrs/IndexRecord.h>
+#include <vrs/utils/PixelFrame.h>
 
 namespace vrs::utils {
 
@@ -59,6 +60,19 @@ int VideoRecordFormatStreamPlayer::tryToDecodeFrame(
     const CurrentRecord& record,
     const ContentBlock& contentBlock) {
   return handlers_[record.streamId].tryToDecodeFrame(outFrame, record.reader, contentBlock);
+}
+
+bool VideoRecordFormatStreamPlayer::readFrame(
+    PixelFrame& outFrame,
+    const CurrentRecord& record,
+    const ContentBlock& cb) {
+  if (cb.getContentType() != ContentType::IMAGE) {
+    return false;
+  }
+  if (cb.image().getImageFormat() == ImageFormat::VIDEO) {
+    return tryToDecodeFrame(outFrame, record, cb) == 0;
+  }
+  return outFrame.readFrame(record.reader, cb);
 }
 
 void VideoRecordFormatStreamPlayer::resetVideoFrameHandler(const StreamId& streamId) {

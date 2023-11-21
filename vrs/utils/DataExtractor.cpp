@@ -120,17 +120,11 @@ bool DataExtractor::DataExtractorStreamPlayer::onImageRead(
   imageCounter_++;
   auto format = imageBlock.image().getImageFormat();
 
-  if (format == vrs::ImageFormat::RAW) {
-    if (PixelFrame::readRawFrame(inputFrame_, record.reader, imageBlock.image())) {
-      PixelFrame::normalizeFrame(inputFrame_, processedFrame_, true);
-      writePngImage(record);
-      return true;
-    }
-  } else if (format == vrs::ImageFormat::VIDEO) {
+  if (format == vrs::ImageFormat::RAW || format == vrs::ImageFormat::VIDEO) {
     if (!inputFrame_) {
       inputFrame_ = make_shared<PixelFrame>(imageBlock.image());
     }
-    if (tryToDecodeFrame(*inputFrame_, record, imageBlock) == 0) {
+    if (readFrame(*inputFrame_, record, imageBlock)) {
       PixelFrame::normalizeFrame(inputFrame_, processedFrame_, true);
       writePngImage(record);
       return true;

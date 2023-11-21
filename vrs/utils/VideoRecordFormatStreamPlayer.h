@@ -40,6 +40,9 @@ class VideoRecordFormatStreamPlayer : public RecordFormatStreamPlayer {
   /// PixelFrame version of the API above.
   int tryToDecodeFrame(PixelFrame& outFrame, const CurrentRecord& record, const ContentBlock& cb);
 
+  /// Convenience 1-stop function to read any type of image, no matter what the image format is.
+  bool readFrame(PixelFrame& outFrame, const CurrentRecord& record, const ContentBlock& cb);
+
   /// Tell if the last image played from a stream couldn't be decoded because of missing frames.
   /// @param streamId: the id of the stream to check, required because a stream player may be
   /// attached to multiple streams at once.
