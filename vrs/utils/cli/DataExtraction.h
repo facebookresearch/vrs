@@ -20,6 +20,8 @@
 
 namespace vrs::utils {
 
+class ImageNamer;
+
 /// Helper for cli tool to extract images from a VRS file into image files.
 /// Streams containing no images will be ignored.
 /// @param folderPath: path to a folder where to extract the files
@@ -27,11 +29,13 @@ namespace vrs::utils {
 /// @param extractImagesRaw: if true, raw images will be saved as ".raw" files with no processing,
 /// otherwise, raw images will be saved as png files, even if that means that a pixel format
 /// conversion is performed.
+/// @param imageNamer: an optional helper to customize how extracted images are named.
 /// @return A status code, 0 meaning success.
 void extractImages(
     const std::string& path,
     FilteredFileReader& filteredReader,
-    bool extractImagesRaw = false);
+    bool extractImagesRaw = false,
+    ImageNamer* imageNamer = nullptr);
 
 /// Helper for cli tool to extract raw audio streams from a VRS file into WAV files.
 /// Streams containing no audio will be ignored.

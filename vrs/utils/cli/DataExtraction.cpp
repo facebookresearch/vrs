@@ -32,15 +32,25 @@ using namespace std;
 
 namespace vrs::utils {
 
-void extractImages(const string& path, FilteredFileReader& filteredReader, bool extractImagesRaw) {
+void extractImages(
+    const string& path,
+    FilteredFileReader& filteredReader,
+    bool extractImagesRaw,
+    ImageNamer* imageNamer) {
   if (path.length() > 0) {
     os::makeDirectories(path);
   }
+  ImageNamer defaultImageNamer;
+  if (imageNamer == nullptr) {
+    imageNamer = &defaultImageNamer;
+  }
+  imageNamer->init(filteredReader.reader);
   uint32_t imageCounter = 0;
   deque<unique_ptr<StreamPlayer>> extractors;
   for (auto id : filteredReader.filter.streams) {
     if (filteredReader.reader.mightContainImages(id)) {
-      extractors.emplace_back(make_unique<ImageExtractor>(path, imageCounter, extractImagesRaw));
+      extractors.emplace_back(
+          make_unique<ImageExtractor>(*imageNamer, path, imageCounter, extractImagesRaw));
       filteredReader.reader.setStreamPlayer(id, extractors.back().get());
     }
   }
