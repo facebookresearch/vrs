@@ -58,6 +58,7 @@ class FileDelegator {
   /// exists or can be opened, merely, that parsing the URI did not fail.
   /// On success, any of the fields may have been set or changed, including fileHandlerName and URI.
   virtual int parseUri(FileSpec& inOutFileSpec, size_t colonIndex) const {
+    (void)colonIndex;
     return inOutFileSpec.parseUri();
   }
 };

@@ -136,6 +136,7 @@ class FileHandler : public FileDelegator {
   /// @param length: the number of bytes to check availability of.
   /// @return true if available, false if unavailable (e.g. requiring a network fetch)
   virtual bool isAvailableOrPrefetch(size_t length) {
+    (void)length;
     return !isRemoteFileSystem();
   }
   /// Read a number of bytes, in a chunk aware way.
@@ -211,6 +212,8 @@ class FileHandler : public FileDelegator {
   virtual bool prefetchReadSequence(
       const vector<std::pair<size_t, size_t>>& sequence,
       bool clearSequence = true) {
+    (void)sequence;
+    (void)clearSequence;
     return false;
   }
 
