@@ -245,6 +245,7 @@ string extractAudioTrack(FilteredFileReader& filteredReader, const std::string& 
       return failure(doc, jsonFilePath);
     }
   }
+  filteredReader.reader.clearStreamPlayers();
   bool stop = false;
   unique_ptr<AudioTrackExtractor> audioExtractor;
   StreamId streamId;

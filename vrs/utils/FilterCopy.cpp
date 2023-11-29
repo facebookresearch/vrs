@@ -77,6 +77,7 @@ int filterCopy(
   ThrottledWriter throttledWriter(copyOptions, *throttledFileDelegate);
   RecordFileWriter& writer = throttledWriter.getWriter();
   writer.addTags(filteredReader.reader.getTags());
+  filteredReader.reader.clearStreamPlayers();
   vector<unique_ptr<StreamPlayer>> filters;
   filters.reserve(filteredReader.filter.streams.size());
   {
@@ -196,6 +197,7 @@ int filterMerge(
   // setup the record file writer and hook-up the readers to record copiers, and copy/merge tags
   ThrottledWriter throttledWriter(copyOptions, *throttledFileDelegate);
   RecordFileWriter& recordFileWriter = throttledWriter.getWriter();
+  firstRecordFilter.reader.clearStreamPlayers();
   list<NoDuplicateCopier> copiers; // to delete copiers on exit
   // track copiers by recordable type id in sequence/instance order in the output file
   map<RecordableTypeId, vector<NoDuplicateCopier*>> copiersMap;
@@ -210,6 +212,7 @@ int filterMerge(
   firstRecordFilter.getTimeRange(startTimestamp, endTimestamp);
   for (auto* recordFilter : moreRecordFilters) {
     RecordFileReader& reader = recordFilter->reader;
+    reader.clearStreamPlayers();
     recordFilter->expandTimeRange(startTimestamp, endTimestamp);
     // add the global tags
     map<string, string> tags;

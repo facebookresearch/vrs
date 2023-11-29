@@ -45,6 +45,7 @@ void extractImages(
     imageNamer = &defaultImageNamer;
   }
   imageNamer->init(filteredReader.reader);
+  filteredReader.reader.clearStreamPlayers();
   uint32_t imageCounter = 0;
   deque<unique_ptr<StreamPlayer>> extractors;
   for (auto id : filteredReader.filter.streams) {
@@ -73,6 +74,7 @@ int extractAudio(const string& path, FilteredFileReader& filteredReader) {
       return FAILURE;
     }
   }
+  filteredReader.reader.clearStreamPlayers();
   uint32_t audioFileCount = 0;
   uint32_t streamCount = 0;
   deque<unique_ptr<StreamPlayer>> extractors;

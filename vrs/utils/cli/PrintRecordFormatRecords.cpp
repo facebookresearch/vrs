@@ -191,6 +191,7 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
 namespace vrs::utils {
 
 void printRecordFormatRecords(FilteredFileReader& filteredReader, PrintoutType type) {
+  filteredReader.reader.clearStreamPlayers();
   DataLayoutPrinter lister(type);
   for (auto id : filteredReader.filter.streams) {
     filteredReader.reader.setStreamPlayer(id, &lister);

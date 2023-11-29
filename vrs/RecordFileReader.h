@@ -115,8 +115,7 @@ class RecordFileReader {
   void setStreamPlayer(StreamId streamId, StreamPlayer* streamPlayer);
 
   /// Remove all registered stream players.
-  /// @return O on success, or an error if the file isn't closed, and stream players were not
-  /// removed.
+  /// @return O on success.
   int clearStreamPlayers();
 
   /// When streaming a VRS file from the cloud, it may be very beneficial to tell before hand which

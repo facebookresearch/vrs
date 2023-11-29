@@ -464,9 +464,6 @@ int RecordFileReader::closeFile() {
 }
 
 int RecordFileReader::clearStreamPlayers() {
-  if (file_->isOpened()) {
-    return INVALID_REQUEST;
-  }
   streamPlayers_.clear();
   return 0;
 }

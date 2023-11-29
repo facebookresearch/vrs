@@ -59,6 +59,7 @@ class RecordLister : public StreamPlayer {
 namespace vrs::utils {
 
 void listRecords(utils::FilteredFileReader& filteredReader) {
+  filteredReader.reader.clearStreamPlayers();
   RecordLister lister;
   for (auto id : filteredReader.filter.streams) {
     filteredReader.reader.setStreamPlayer(id, &lister);

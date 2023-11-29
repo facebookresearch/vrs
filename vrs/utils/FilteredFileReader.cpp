@@ -623,9 +623,7 @@ uint32_t FilteredFileReader::iterateAdvanced(ThrottledWriter* throttledWriter) {
         return true;
       },
       throttledWriter);
-  for (auto id : filter.streams) {
-    reader.setStreamPlayer(id, nullptr);
-  }
+  reader.clearStreamPlayers();
   return readCounter;
 }
 

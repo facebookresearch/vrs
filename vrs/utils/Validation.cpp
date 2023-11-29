@@ -179,9 +179,7 @@ bool iterateChecker(
         return outNoError;
       },
       throttledWriter);
-  for (auto id : reader.filter.streams) {
-    reader.reader.setStreamPlayer(id, nullptr);
-  }
+  reader.reader.clearStreamPlayers();
   outDuration = os::getTimestampSec() - beforeTime;
   return true;
 }
@@ -295,6 +293,7 @@ class DecodeChecker : public VideoRecordFormatStreamPlayer {
 string decodeValidation(FilteredFileReader& filteredReader, const CopyOptions& copyOptions) {
   uint32_t decodeErrorCount{0};
   uint32_t imageCount{0};
+  filteredReader.reader.clearStreamPlayers();
   vector<unique_ptr<DecodeChecker>> checkers;
   for (auto id : filteredReader.filter.streams) {
     checkers.emplace_back(make_unique<DecodeChecker>(decodeErrorCount, imageCount));
@@ -350,6 +349,7 @@ string checkRecords(
   if (!filteredReader.reader.isOpened()) {
     return {};
   }
+  filteredReader.reader.clearStreamPlayers();
   if (checkType == CheckType::Decode) {
     return decodeValidation(filteredReader, copyOptions);
   }
@@ -770,6 +770,8 @@ bool compareVRSfiles(
   if (!match) {
     return false;
   }
+  first.reader.clearStreamPlayers();
+  second.reader.clearStreamPlayers();
   atomic<int> diffCounter{0};
   bool noError;
   vector<unique_ptr<RecordHolder>> holders;
