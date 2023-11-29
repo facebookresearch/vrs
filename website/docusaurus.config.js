@@ -52,7 +52,7 @@ const repoUrl = 'https://github.com/facebookresearch/vrs';
           customCss: require.resolve('./src/css/custom.css'),
         },
         staticDocsProject: 'vrs',
-        trackingFile: 'xplat/staticdocs/WATCHED_FILES',
+        trackingFile: 'fbcode/staticdocs/WATCHED_FILES',
         'remark-code-snippets': {
           baseDir: '..',
         },
