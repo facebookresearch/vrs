@@ -116,11 +116,12 @@ $(function() {
 <div class="line"><a name="l00051"></a><span class="lineno"><a class="line" href="classvrs_1_1_file_delegator.html#a20ed43d0540c28802acdec6c33001cc6">   51</a></span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classvrs_1_1_file_delegator.html#a20ed43d0540c28802acdec6c33001cc6">delegateOpen</a>(<span class="keyword">const</span> <a class="code" href="structvrs_1_1_file_spec.html">FileSpec</a>&amp; fileSpec, unique_ptr&lt;FileHandler&gt;&amp; outNewDelegate) = 0;</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
 <div class="line"><a name="l00060"></a><span class="lineno"><a class="line" href="classvrs_1_1_file_delegator.html#ada2b37e7ae16cc030db9fd8dab4061ae">   60</a></span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classvrs_1_1_file_delegator.html#ada2b37e7ae16cc030db9fd8dab4061ae">parseUri</a>(<a class="code" href="structvrs_1_1_file_spec.html">FileSpec</a>&amp; inOutFileSpec, <span class="keywordtype">size_t</span> colonIndex)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keywordflow">return</span> inOutFileSpec.parseUri();</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  }</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;};</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;} <span class="comment">// namespace vrs</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    (void)colonIndex;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keywordflow">return</span> inOutFileSpec.parseUri();</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  }</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;};</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;} <span class="comment">// namespace vrs</span></div>
 <div class="ttc" id="aclassvrs_1_1_file_delegator_html"><div class="ttname"><a href="classvrs_1_1_file_delegator.html">vrs::FileDelegator</a></div><div class="ttdoc">Class to abstract the delegate file open operation for VRS file.</div><div class="ttdef"><b>Definition:</b> FileDelegator.h:38</div></div>
 <div class="ttc" id="aclassvrs_1_1_file_delegator_html_a20ed43d0540c28802acdec6c33001cc6"><div class="ttname"><a href="classvrs_1_1_file_delegator.html#a20ed43d0540c28802acdec6c33001cc6">vrs::FileDelegator::delegateOpen</a></div><div class="ttdeci">virtual int delegateOpen(const FileSpec &amp;fileSpec, unique_ptr&lt; FileHandler &gt; &amp;outNewDelegate)=0</div></div>
 <div class="ttc" id="aclassvrs_1_1_file_delegator_html_ada2b37e7ae16cc030db9fd8dab4061ae"><div class="ttname"><a href="classvrs_1_1_file_delegator.html#ada2b37e7ae16cc030db9fd8dab4061ae">vrs::FileDelegator::parseUri</a></div><div class="ttdeci">virtual int parseUri(FileSpec &amp;inOutFileSpec, size_t colonIndex) const</div><div class="ttdef"><b>Definition:</b> FileDelegator.h:60</div></div>
