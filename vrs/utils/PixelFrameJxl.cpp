@@ -148,7 +148,7 @@ bool PixelFrame::readJxlFrame(const vector<uint8_t>& jxlBuf, bool decodePixels) 
 
   size_t hw_threads = JxlThreadParallelRunnerDefaultNumWorkerThreads();
   JxlThreadParallelRunnerPtr runner_fixed =
-      JxlThreadParallelRunnerMake(nullptr, std::min<size_t>(hw_threads, 4));
+      JxlThreadParallelRunnerMake(nullptr, std::min<size_t>(hw_threads, 16));
   DEC_CHECK(JxlDecoderSetParallelRunner(dec, JxlThreadParallelRunner, runner_fixed.get()));
 
   DEC_CHECK(JxlDecoderSubscribeEvents(
