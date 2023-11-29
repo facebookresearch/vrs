@@ -31,7 +31,7 @@ using namespace std;
 
 namespace {
 
-static const uint8_t kNaNPixel = 0;
+const uint8_t kNaNPixel = 0;
 
 /// normalize floating point pixels to grey8
 template <class Float>

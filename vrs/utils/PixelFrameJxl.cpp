@@ -27,6 +27,7 @@
 #include <jxl/decode_cxx.h>
 #include <jxl/encode.h>
 #include <jxl/encode_cxx.h>
+#include <jxl/thread_parallel_runner_cxx.h>
 #include <jxl/types.h>
 #endif
 
@@ -140,10 +141,16 @@ bool PixelFrame::readJxlFrame(RecordReader* reader, const uint32_t sizeBytes) {
 
 bool PixelFrame::readJxlFrame(const vector<uint8_t>& jxlBuf, bool decodePixels) {
 #ifdef JXL_IS_AVAILABLE
-  auto dec = getThreadJxlDecoder();
+  JxlDecoder* dec = getThreadJxlDecoder();
   if (!XR_VERIFY(dec != nullptr)) {
     return false;
   }
+
+  size_t hw_threads = JxlThreadParallelRunnerDefaultNumWorkerThreads();
+  JxlThreadParallelRunnerPtr runner_fixed =
+      JxlThreadParallelRunnerMake(nullptr, std::min<size_t>(hw_threads, 4));
+  DEC_CHECK(JxlDecoderSetParallelRunner(dec, JxlThreadParallelRunner, runner_fixed.get()));
+
   DEC_CHECK(JxlDecoderSubscribeEvents(
       dec, JXL_DEC_BASIC_INFO | JXL_DEC_COLOR_ENCODING | JXL_DEC_FULL_IMAGE));
 
@@ -338,7 +345,7 @@ bool PixelFrame::jxlCompress(
   }
   ENC_CHECK(JxlEncoderSetColorEncoding(enc, &color_encoding));
 
-  auto settings = JxlEncoderFrameSettingsCreate(enc, nullptr);
+  JxlEncoderFrameSettings* settings = JxlEncoderFrameSettingsCreate(enc, nullptr);
   ENC_CHECK(JxlEncoderFrameSettingsSetOption(settings, JXL_ENC_FRAME_SETTING_EFFORT, effort));
   ENC_CHECK(JxlEncoderFrameSettingsSetOption(
       settings, JXL_ENC_FRAME_SETTING_DECODING_SPEED, decoding_speed_tier));
