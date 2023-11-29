@@ -100,6 +100,9 @@ JxlEncoder* getThreadJxlEncoder() {
 }
 
 inline float percent_to_butteraugli_distance(float quality) {
+  // Make quality behave more like jpg's quality setting accoding to MS-SSIM. Very empirical.
+  float to100 = 100 - quality;
+  quality = 100 - to100 / 4;
   // Quality calculation inspired by cjxl.cc
   // Extended to work meaningfully between 99.99 and 99.999, so with quality = 99.999,
   // the file size is now getting close to that of lossless.
