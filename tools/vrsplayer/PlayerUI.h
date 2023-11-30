@@ -53,7 +53,7 @@ class PlayerUI : public QWidget {
 
   void openPath(const QString& url);
   void resizeToDefault();
-  void resizeIfNecessary();
+  void resizeIfNecessary(bool maxSizeOnly = false);
   FileReader& getFileReader() {
     return fileReader_;
   }

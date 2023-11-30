@@ -114,6 +114,11 @@ void PlayerWindow::createMenus() {
   orientationMenu_->addAction(resetAction);
 }
 
+void PlayerWindow::moveEvent(QMoveEvent* event) {
+  player_.resizeIfNecessary(true);
+  QMainWindow::moveEvent(event);
+}
+
 void PlayerWindow::updateLayoutMenu(
     int frameCount,
     int visibleCount,

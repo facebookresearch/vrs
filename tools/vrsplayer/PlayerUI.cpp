@@ -309,7 +309,7 @@ void PlayerUI::resizeToDefault() {
 #endif
 }
 
-void PlayerUI::resizeIfNecessary() {
+void PlayerUI::resizeIfNecessary(bool maxSizeOnly) {
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
   QRect screenRect = QApplication::desktop()->screenGeometry(this);
 #else
@@ -319,7 +319,7 @@ void PlayerUI::resizeIfNecessary() {
   QRect windowInScreen(mapToGlobal(windowRect.topLeft()), mapToGlobal(windowRect.bottomRight()));
   if (screenRect.contains(windowInScreen)) {
     window()->setMaximumSize(screenRect.size());
-  } else {
+  } else if (!maxSizeOnly) {
     resizeToDefault();
   }
 }

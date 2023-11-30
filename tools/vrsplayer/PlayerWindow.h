@@ -43,6 +43,7 @@ class PlayerWindow : public QMainWindow {
   PlayerUI& getPlayerUI() {
     return player_;
   }
+  void moveEvent(QMoveEvent* event) override;
 
  signals:
 
