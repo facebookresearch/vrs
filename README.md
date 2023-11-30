@@ -207,13 +207,14 @@ podman/docker run -it --volume <your_local_data>:/data vrs:latest
 The `vrs` command line tool allows you to inspect and extract data out of VRS
 files. It can create new VRS files by generating a modified copy of an original
 recording. It can also extract images, dump metadata for human or computer
-consumption (json). The vrs command line tool can be found at `tools/vrs`. It
-has many options,
+consumption (json). The vrs command line tool can be found in the cmake build
+folder at `oss/tools/vrs/vrs`. It has many options,
 [documented here](https://facebookresearch.github.io/vrs/docs/VrsCliTool).
 
 `vrsplayer` is a GUI tool which can "play" VRS files as multi-stream video files
 and audio files. It also provides ways to visualize record's metadata as they
-are played. For more information, see the
+are played. It can be found in the cmake build folder at
+`oss/tools/vrsplayer/vrsplayer`. For more information, see the
 [`vrsplayer` documentation](https://facebookresearch.github.io/vrs/docs/vrsplayer).
 
 # Python interface
