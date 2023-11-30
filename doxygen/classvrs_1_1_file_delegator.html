@@ -96,8 +96,8 @@ Inheritance diagram for vrs::FileDelegator:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a20ed43d0540c28802acdec6c33001cc6"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_delegator.html#a20ed43d0540c28802acdec6c33001cc6">delegateOpen</a> (const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;fileSpec, unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt; &amp;outNewDelegate)=0</td></tr>
 <tr class="separator:a20ed43d0540c28802acdec6c33001cc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada2b37e7ae16cc030db9fd8dab4061ae"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_delegator.html#ada2b37e7ae16cc030db9fd8dab4061ae">parseUri</a> (<a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;inOutFileSpec, size_t colonIndex) const</td></tr>
-<tr class="separator:ada2b37e7ae16cc030db9fd8dab4061ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5845c233b0fd236b50b64989743332d7"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_delegator.html#a5845c233b0fd236b50b64989743332d7">parseUri</a> (<a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;inOutFileSpec, MAYBE_UNUSED size_t colonIndex) const</td></tr>
+<tr class="separator:a5845c233b0fd236b50b64989743332d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class to abstract the delegate file open operation for VRS file. </p>
@@ -148,8 +148,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ada2b37e7ae16cc030db9fd8dab4061ae"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ada2b37e7ae16cc030db9fd8dab4061ae">&#9670;&nbsp;</a></span>parseUri()</h2>
+<a id="a5845c233b0fd236b50b64989743332d7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5845c233b0fd236b50b64989743332d7">&#9670;&nbsp;</a></span>parseUri()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -166,7 +166,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t&#160;</td>
+          <td class="paramtype">MAYBE_UNUSED size_t&#160;</td>
           <td class="paramname"><em>colonIndex</em>&#160;</td>
         </tr>
         <tr>
@@ -189,8 +189,6 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A status code, 0 on success, which doesn't necessarily mean that the file/object exists or can be opened, merely, that parsing the URI did not fail. On success, any of the fields may have been set or changed, including fileHandlerName and URI. </dd></dl>
-
-<p>Reimplemented in <a class="el" href="classvrs_1_1_disk_file.html#af07c3877155f6ba23af97b9990659f3f">vrs::DiskFile</a>.</p>
 
 </div>
 </div>

@@ -129,8 +129,8 @@ virtual const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><b
 <tr class="separator:a42a6383b17a7a60d61a3ad6322f90c1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa5bd0d5b3926fbabf4a925e7b3b8d3eb"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#aa5bd0d5b3926fbabf4a925e7b3b8d3eb">setPos</a> (int64_t offset)=0</td></tr>
 <tr class="separator:aa5bd0d5b3926fbabf4a925e7b3b8d3eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab4971d8f9405714e9556b18d37bcf2e5"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#ab4971d8f9405714e9556b18d37bcf2e5">isAvailableOrPrefetch</a> (size_t length)</td></tr>
-<tr class="separator:ab4971d8f9405714e9556b18d37bcf2e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a084abde45300ff923db012709e3c9df6"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#a084abde45300ff923db012709e3c9df6">isAvailableOrPrefetch</a> (MAYBE_UNUSED size_t length)</td></tr>
+<tr class="separator:a084abde45300ff923db012709e3c9df6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a089df90a7e403b784abe8d8c144459c7"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#a089df90a7e403b784abe8d8c144459c7">read</a> (void *buffer, size_t length)=0</td></tr>
 <tr class="separator:a089df90a7e403b784abe8d8c144459c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a862ed4edd6b651c810c71593e4d2f6c1"><td class="memTemplParams" colspan="2"><a id="a862ed4edd6b651c810c71593e4d2f6c1"></a>
@@ -162,8 +162,8 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="separator:ae8ad8cb958456d4ff23b7103dcc100af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9df905d36e9a89b467e542a8ae8d6fb4"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacevrs.html#acb1b4358038394407db2b2dc6200afae">CachingStrategy</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#a9df905d36e9a89b467e542a8ae8d6fb4">getCachingStrategy</a> () const</td></tr>
 <tr class="separator:a9df905d36e9a89b467e542a8ae8d6fb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad61094a22f1e1fb624ae8ecf9818679d"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#ad61094a22f1e1fb624ae8ecf9818679d">prefetchReadSequence</a> (const vector&lt; std::pair&lt; size_t, size_t &gt;&gt; &amp;sequence, bool clearSequence=true)</td></tr>
-<tr class="separator:ad61094a22f1e1fb624ae8ecf9818679d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acde57d88f70a2542cf8139a72f801452"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#acde57d88f70a2542cf8139a72f801452">prefetchReadSequence</a> (MAYBE_UNUSED const vector&lt; std::pair&lt; size_t, size_t &gt;&gt; &amp;sequence, MAYBE_UNUSED bool clearSequence=true)</td></tr>
+<tr class="separator:acde57d88f70a2542cf8139a72f801452"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a85dd822081969a71159b7206a4371177"><td class="memItemLeft" align="right" valign="top"><a id="a85dd822081969a71159b7206a4371177"></a>
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>setStatsCallback</b> (CacheStatsCallbackFunction)</td></tr>
 <tr class="separator:a85dd822081969a71159b7206a4371177"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -179,8 +179,8 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="memdesc:a9648c85d534485a206c519b931723ffd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tell if the file handler is probably slow, and extra progress information might be useful. <br /></td></tr>
 <tr class="separator:a9648c85d534485a206c519b931723ffd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classvrs_1_1_file_delegator"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classvrs_1_1_file_delegator')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classvrs_1_1_file_delegator.html">vrs::FileDelegator</a></td></tr>
-<tr class="memitem:ada2b37e7ae16cc030db9fd8dab4061ae inherit pub_methods_classvrs_1_1_file_delegator"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_delegator.html#ada2b37e7ae16cc030db9fd8dab4061ae">parseUri</a> (<a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;inOutFileSpec, size_t colonIndex) const</td></tr>
-<tr class="separator:ada2b37e7ae16cc030db9fd8dab4061ae inherit pub_methods_classvrs_1_1_file_delegator"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5845c233b0fd236b50b64989743332d7 inherit pub_methods_classvrs_1_1_file_delegator"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_delegator.html#a5845c233b0fd236b50b64989743332d7">parseUri</a> (<a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;inOutFileSpec, MAYBE_UNUSED size_t colonIndex) const</td></tr>
+<tr class="separator:a5845c233b0fd236b50b64989743332d7 inherit pub_methods_classvrs_1_1_file_delegator"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class to abstract VRS file system operations, to enable support for alternate storage methods, in particular network/cloud storage implementations. </p>
@@ -502,8 +502,8 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 
 </div>
 </div>
-<a id="ab4971d8f9405714e9556b18d37bcf2e5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab4971d8f9405714e9556b18d37bcf2e5">&#9670;&nbsp;</a></span>isAvailableOrPrefetch()</h2>
+<a id="a084abde45300ff923db012709e3c9df6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a084abde45300ff923db012709e3c9df6">&#9670;&nbsp;</a></span>isAvailableOrPrefetch()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -514,7 +514,7 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
         <tr>
           <td class="memname">virtual bool vrs::FileHandler::isAvailableOrPrefetch </td>
           <td>(</td>
-          <td class="paramtype">size_t&#160;</td>
+          <td class="paramtype">MAYBE_UNUSED size_t&#160;</td>
           <td class="paramname"><em>length</em></td><td>)</td>
           <td></td>
         </tr>
@@ -743,8 +743,8 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 
 </div>
 </div>
-<a id="ad61094a22f1e1fb624ae8ecf9818679d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad61094a22f1e1fb624ae8ecf9818679d">&#9670;&nbsp;</a></span>prefetchReadSequence()</h2>
+<a id="acde57d88f70a2542cf8139a72f801452"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acde57d88f70a2542cf8139a72f801452">&#9670;&nbsp;</a></span>prefetchReadSequence()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -755,13 +755,13 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
         <tr>
           <td class="memname">virtual bool vrs::FileHandler::prefetchReadSequence </td>
           <td>(</td>
-          <td class="paramtype">const vector&lt; std::pair&lt; size_t, size_t &gt;&gt; &amp;&#160;</td>
+          <td class="paramtype">MAYBE_UNUSED const vector&lt; std::pair&lt; size_t, size_t &gt;&gt; &amp;&#160;</td>
           <td class="paramname"><em>sequence</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">bool&#160;</td>
+          <td class="paramtype">MAYBE_UNUSED bool&#160;</td>
           <td class="paramname"><em>clearSequence</em> = <code>true</code>&#160;</td>
         </tr>
         <tr>

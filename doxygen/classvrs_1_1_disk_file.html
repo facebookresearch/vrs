@@ -233,7 +233,8 @@ template&lt;typename T , std::enable_if_t&lt; std::is_trivially_copyable&lt; T &
 template&lt;typename T , std::enable_if_t&lt; std::is_trivially_copyable&lt; T &gt;::value, int &gt;  = 0&gt; </td></tr>
 <tr class="memitem:a0306b8eef3423601751820777ef79eff"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><b>readZstdFile</b> (const string &amp;path, T &amp;object)</td></tr>
 <tr class="separator:a0306b8eef3423601751820777ef79eff"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af07c3877155f6ba23af97b9990659f3f"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_disk_file.html#af07c3877155f6ba23af97b9990659f3f">parseUri</a> (<a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;intOutFileSpec, size_t colonIndex) const override</td></tr>
+<tr class="memitem:af07c3877155f6ba23af97b9990659f3f"><td class="memItemLeft" align="right" valign="top"><a id="af07c3877155f6ba23af97b9990659f3f"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>parseUri</b> (<a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;intOutFileSpec, size_t colonIndex) const override</td></tr>
 <tr class="separator:af07c3877155f6ba23af97b9990659f3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classvrs_1_1_write_file_handler"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classvrs_1_1_write_file_handler')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classvrs_1_1_write_file_handler.html">vrs::WriteFileHandler</a></td></tr>
 <tr class="memitem:aff0f64ed8b7ada9f6e0a2c55d3fd3a59 inherit pub_methods_classvrs_1_1_write_file_handler"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_write_file_handler.html#aff0f64ed8b7ada9f6e0a2c55d3fd3a59">createSplitFile</a> (const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;spec, const string &amp;initialFilePath)</td></tr>
@@ -253,8 +254,8 @@ template&lt;typename T , std::enable_if_t&lt; std::is_trivially_copyable&lt; T &
 <tr class="separator:acc8cce8cea6320affac819d063705d9b inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a29c9ecdcaec465eded60d96890b23670 inherit pub_methods_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#a29c9ecdcaec465eded60d96890b23670">delegateOpen</a> (const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;fileSpec, unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt; &amp;outNewDelegate) override</td></tr>
 <tr class="separator:a29c9ecdcaec465eded60d96890b23670 inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab4971d8f9405714e9556b18d37bcf2e5 inherit pub_methods_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#ab4971d8f9405714e9556b18d37bcf2e5">isAvailableOrPrefetch</a> (size_t length)</td></tr>
-<tr class="separator:ab4971d8f9405714e9556b18d37bcf2e5 inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a084abde45300ff923db012709e3c9df6 inherit pub_methods_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#a084abde45300ff923db012709e3c9df6">isAvailableOrPrefetch</a> (MAYBE_UNUSED size_t length)</td></tr>
+<tr class="separator:a084abde45300ff923db012709e3c9df6 inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a862ed4edd6b651c810c71593e4d2f6c1 inherit pub_methods_classvrs_1_1_file_handler"><td class="memTemplParams" colspan="2"><a id="a862ed4edd6b651c810c71593e4d2f6c1"></a>
 template&lt;typename T , std::enable_if_t&lt; std::is_trivially_copyable&lt; T &gt;::value, int &gt;  = 0&gt; </td></tr>
 <tr class="memitem:a862ed4edd6b651c810c71593e4d2f6c1 inherit pub_methods_classvrs_1_1_file_handler"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#a862ed4edd6b651c810c71593e4d2f6c1">read</a> (T &amp;object)</td></tr>
@@ -264,8 +265,8 @@ template&lt;typename T , std::enable_if_t&lt; std::is_trivially_copyable&lt; T &
 <tr class="separator:ae8ad8cb958456d4ff23b7103dcc100af inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9df905d36e9a89b467e542a8ae8d6fb4 inherit pub_methods_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacevrs.html#acb1b4358038394407db2b2dc6200afae">CachingStrategy</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#a9df905d36e9a89b467e542a8ae8d6fb4">getCachingStrategy</a> () const</td></tr>
 <tr class="separator:a9df905d36e9a89b467e542a8ae8d6fb4 inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad61094a22f1e1fb624ae8ecf9818679d inherit pub_methods_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#ad61094a22f1e1fb624ae8ecf9818679d">prefetchReadSequence</a> (const vector&lt; std::pair&lt; size_t, size_t &gt;&gt; &amp;sequence, bool clearSequence=true)</td></tr>
-<tr class="separator:ad61094a22f1e1fb624ae8ecf9818679d inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acde57d88f70a2542cf8139a72f801452 inherit pub_methods_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#acde57d88f70a2542cf8139a72f801452">prefetchReadSequence</a> (MAYBE_UNUSED const vector&lt; std::pair&lt; size_t, size_t &gt;&gt; &amp;sequence, MAYBE_UNUSED bool clearSequence=true)</td></tr>
+<tr class="separator:acde57d88f70a2542cf8139a72f801452 inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a85dd822081969a71159b7206a4371177 inherit pub_methods_classvrs_1_1_file_handler"><td class="memItemLeft" align="right" valign="top"><a id="a85dd822081969a71159b7206a4371177"></a>
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>setStatsCallback</b> (CacheStatsCallbackFunction)</td></tr>
 <tr class="separator:a85dd822081969a71159b7206a4371177 inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -278,6 +279,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>isFileHandlerMatch</b
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#a9648c85d534485a206c519b931723ffd">showProgress</a> () const</td></tr>
 <tr class="memdesc:a9648c85d534485a206c519b931723ffd inherit pub_methods_classvrs_1_1_file_handler"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tell if the file handler is probably slow, and extra progress information might be useful. <br /></td></tr>
 <tr class="separator:a9648c85d534485a206c519b931723ffd inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classvrs_1_1_file_delegator"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classvrs_1_1_file_delegator')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classvrs_1_1_file_delegator.html">vrs::FileDelegator</a></td></tr>
+<tr class="memitem:a5845c233b0fd236b50b64989743332d7 inherit pub_methods_classvrs_1_1_file_delegator"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_delegator.html#a5845c233b0fd236b50b64989743332d7">parseUri</a> (<a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;inOutFileSpec, MAYBE_UNUSED size_t colonIndex) const</td></tr>
+<tr class="separator:a5845c233b0fd236b50b64989743332d7 inherit pub_methods_classvrs_1_1_file_delegator"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -421,52 +425,6 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>CacheStatsCallbackFu
 <p>Write a number of bytes to the file, in a chunk aware way, only ever extending the file's last chunk. </p>
 
 <p>Implements <a class="el" href="classvrs_1_1_write_file_handler.html#a5230f683f4e4c109c7de198d7e3e98b3">vrs::WriteFileHandler</a>.</p>
-
-</div>
-</div>
-<a id="af07c3877155f6ba23af97b9990659f3f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af07c3877155f6ba23af97b9990659f3f">&#9670;&nbsp;</a></span>parseUri()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">int vrs::DiskFile::parseUri </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;&#160;</td>
-          <td class="paramname"><em>inOutFileSpec</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>colonIndex</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>When converting a URI to a <a class="el" href="structvrs_1_1_file_spec.html" title="Generalized file descriptor class, allowing the efficient representation of complex file objects,...">FileSpec</a>, some custom parsing maybe required. </p><dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">inOutFileSpec</td><td>on input, both the fileHandlerName &amp; URI fields are set. All the other fields of the <a class="el" href="structvrs_1_1_file_spec.html" title="Generalized file descriptor class, allowing the efficient representation of complex file objects,...">FileSpec</a> object are cleared, and URI holds the full original URI. </td></tr>
-    <tr><td class="paramname">colonIndex</td><td>index of the ':' character of the URI. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>A status code, 0 on success, which doesn't necessarily mean that the file/object exists or can be opened, merely, that parsing the URI did not fail. On success, any of the fields may have been set or changed, including fileHandlerName and URI. </dd></dl>
-
-<p>Reimplemented from <a class="el" href="classvrs_1_1_file_delegator.html#ada2b37e7ae16cc030db9fd8dab4061ae">vrs::FileDelegator</a>.</p>
 
 </div>
 </div>
