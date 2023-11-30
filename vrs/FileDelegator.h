@@ -16,17 +16,11 @@
 
 #pragma once
 
-#include <cstdint>
-
-#include <functional>
-#include <map>
 #include <memory>
-#include <string>
-#include <utility>
-#include <vector>
 
 #include <vrs/ErrorCode.h>
 #include <vrs/FileSpec.h>
+#include <vrs/os/CompilerAttributes.h>
 
 namespace vrs {
 
@@ -57,8 +51,7 @@ class FileDelegator {
   /// @return A status code, 0 on success, which doesn't necessarily mean that the file/object
   /// exists or can be opened, merely, that parsing the URI did not fail.
   /// On success, any of the fields may have been set or changed, including fileHandlerName and URI.
-  virtual int parseUri(FileSpec& inOutFileSpec, size_t colonIndex) const {
-    (void)colonIndex;
+  virtual int parseUri(FileSpec& inOutFileSpec, MAYBE_UNUSED size_t colonIndex) const {
     return inOutFileSpec.parseUri();
   }
 };

@@ -20,7 +20,6 @@
 
 #include <functional>
 #include <map>
-#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -28,6 +27,7 @@
 #include <vrs/FileDelegator.h>
 #include <vrs/FileSpec.h>
 #include <vrs/helpers/EnumTemplates.hpp>
+#include <vrs/os/CompilerAttributes.h>
 
 namespace vrs {
 
@@ -135,8 +135,7 @@ class FileHandler : public FileDelegator {
   /// Check if a number of bytes are available for immediate return (e.g. on disk or in-cache)
   /// @param length: the number of bytes to check availability of.
   /// @return true if available, false if unavailable (e.g. requiring a network fetch)
-  virtual bool isAvailableOrPrefetch(size_t length) {
-    (void)length;
+  virtual bool isAvailableOrPrefetch(MAYBE_UNUSED size_t length) {
     return !isRemoteFileSystem();
   }
   /// Read a number of bytes, in a chunk aware way.
@@ -210,10 +209,8 @@ class FileHandler : public FileDelegator {
   /// caching starts.
   /// @return True if the file handler support custom read sequences.
   virtual bool prefetchReadSequence(
-      const vector<std::pair<size_t, size_t>>& sequence,
-      bool clearSequence = true) {
-    (void)sequence;
-    (void)clearSequence;
+      MAYBE_UNUSED const vector<std::pair<size_t, size_t>>& sequence,
+      MAYBE_UNUSED bool clearSequence = true) {
     return false;
   }
 
