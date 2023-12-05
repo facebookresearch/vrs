@@ -50,6 +50,7 @@ class PixelFrame {
  public:
   PixelFrame() = default;
   PixelFrame(const ImageContentBlockSpec& spec);
+  PixelFrame(const ImageContentBlockSpec& spec, vector<uint8_t>&& frameBytes);
   PixelFrame(PixelFormat pf, uint32_t w, uint32_t h, uint32_t stride = 0)
       : PixelFrame(ImageContentBlockSpec(pf, w, h, stride)) {}
 
@@ -57,6 +58,7 @@ class PixelFrame {
   inline void init(PixelFormat pf, uint32_t w, uint32_t h, uint32_t stride = 0) {
     init(ImageContentBlockSpec(pf, w, h, stride));
   }
+  void init(const ImageContentBlockSpec& spec, vector<uint8_t>&& frameBytes);
 
   static void init(shared_ptr<PixelFrame>& inOutFrame, const ImageContentBlockSpec& spec);
   static inline void init(
@@ -118,11 +120,22 @@ class PixelFrame {
   readFrame(shared_ptr<PixelFrame>& frame, RecordReader* reader, const ContentBlock& cb);
   bool readFrame(RecordReader* reader, const ContentBlock& cb);
 
+  /// Read a record's image data, merely reading the disk data without any decompression.
+  /// The resulting PixelFrame will have an unmodified ImageFormat (raw, jpg, png, jxl, video).
+  static bool
+  readDiskImageData(shared_ptr<PixelFrame>& frame, RecordReader* reader, const ContentBlock& cb);
+  bool readDiskImageData(RecordReader* reader, const ContentBlock& cb);
+
+  /// From any ImageFormat, decompress the image to ImageFormat::RAW if necessary.
+  /// To decompress ImageFormat::VIDEO data, you must provide a valid VideoFrameHandler object, the
+  /// same one for all the frames of a particular stream.
+  bool decompressImage(VideoFrameHandler* videoFrameHandler = nullptr);
+
   /// Read a RAW frame into the internal buffer.
   /// @return True if the frame type is supported & the frame was read.
   bool readRawFrame(RecordReader* reader, const ImageContentBlockSpec& inputImageSpec);
 
-  /// Read a compressed image, except for video codec compression.
+  /// Decode compressed image data, except for video codec compression.
   bool readCompressedFrame(const vector<uint8_t>& pixels, ImageFormat imageFormat);
 
   static bool readRawFrame(

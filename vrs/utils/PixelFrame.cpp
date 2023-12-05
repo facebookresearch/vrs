@@ -25,6 +25,7 @@
 #include <logging/Verify.h>
 
 #include <vrs/helpers/FileMacros.h>
+#include <vrs/utils/BufferRecordReader.hpp>
 #include <vrs/utils/converters/Raw10ToGrey10Converter.h>
 
 using namespace std;
@@ -179,14 +180,27 @@ PixelFrame::PixelFrame(const ImageContentBlockSpec& spec)
   }
 }
 
+PixelFrame::PixelFrame(const ImageContentBlockSpec& spec, vector<uint8_t>&& frameBytes)
+    : imageSpec_{spec}, frameBytes_{std::move(frameBytes)} {}
+
 void PixelFrame::init(const ImageContentBlockSpec& spec) {
-  if (!hasSamePixels(spec)) {
-    imageSpec_ = spec;
+  if (imageSpec_.getImageFormat() != ImageFormat::RAW || !hasSamePixels(spec)) {
+    imageSpec_ = {
+        spec.getPixelFormat(),
+        spec.getWidth(),
+        spec.getHeight(),
+        spec.getRawStride(),
+        spec.getRawStride2()};
     size_t size = imageSpec_.getRawImageSize();
     if (XR_VERIFY(size != ContentBlock::kSizeUnknown)) {
       frameBytes_.resize(size);
     }
   }
+}
+
+void PixelFrame::init(const ImageContentBlockSpec& spec, vector<uint8_t>&& frameBytes) {
+  imageSpec_ = spec;
+  frameBytes_ = std::move(frameBytes);
 }
 
 void PixelFrame::init(shared_ptr<PixelFrame>& inOutFrame, const ImageContentBlockSpec& spec) {
@@ -254,6 +268,60 @@ bool PixelFrame::readFrame(RecordReader* reader, const ContentBlock& cb) {
       return readJpegFrame(reader, cb.getBlockSize());
     case ImageFormat::JXL:
       return readJxlFrame(reader, cb.getBlockSize());
+    default:
+      return false;
+  }
+  return false;
+}
+
+bool PixelFrame::readDiskImageData(
+    shared_ptr<PixelFrame>& frame,
+    RecordReader* reader,
+    const ContentBlock& cb) {
+  if (!frame) {
+    frame = make_shared<PixelFrame>();
+  }
+  return frame->readDiskImageData(reader, cb);
+}
+
+bool PixelFrame::readDiskImageData(RecordReader* reader, const ContentBlock& cb) {
+  size_t blockSize = cb.getBlockSize();
+  if (cb.getContentType() != ContentType::IMAGE || blockSize == ContentBlock::kSizeUnknown) {
+    return false;
+  }
+  const auto& spec = cb.image();
+  if (spec.getImageFormat() == ImageFormat::RAW) {
+    return readRawFrame(reader, spec);
+  }
+  imageSpec_ = spec;
+  frameBytes_.resize(blockSize);
+  return VERIFY_SUCCESS(reader->read(frameBytes_.data(), blockSize));
+}
+
+bool PixelFrame::decompressImage(VideoFrameHandler* videoFrameHandler) {
+  switch (imageSpec_.getImageFormat()) {
+    case ImageFormat::RAW:
+      return true;
+    case ImageFormat::VIDEO:
+      if (videoFrameHandler != nullptr) {
+        vector<uint8_t> compressedData(std::move(frameBytes_));
+        BufferReader reader;
+        return videoFrameHandler->tryToDecodeFrame(
+                   *this, reader.init(compressedData), {imageSpec_, compressedData.size()}) == 0;
+      }
+      break;
+    case ImageFormat::PNG: {
+      vector<uint8_t> compressedData(std::move(frameBytes_));
+      return readPngFrame(compressedData);
+    }
+    case ImageFormat::JPG: {
+      vector<uint8_t> compressedData(std::move(frameBytes_));
+      return readJpegFrame(compressedData);
+    }
+    case ImageFormat::JXL: {
+      vector<uint8_t> compressedData(std::move(frameBytes_));
+      return readJxlFrame(compressedData);
+    }
     default:
       return false;
   }
