@@ -16,9 +16,9 @@
 
 #pragma once
 
+#include <atomic>
 #include <memory>
 #include <mutex>
-#include <thread>
 
 #include <QtCore/qglobal.h>
 #include <qobject.h>
@@ -51,12 +51,7 @@ using ::vrs::StreamPlayer;
 using ::vrs::utils::PixelFrame;
 using ::vrs::utils::VideoRecordFormatStreamPlayer;
 
-struct ImageJob {
-  ImageJob(vrs::ImageFormat imageFormat) : imageFormat{imageFormat} {}
-  vrs::ImageFormat imageFormat;
-  shared_ptr<PixelFrame> frame;
-  vector<uint8_t> buffer;
-};
+using ImageJob = shared_ptr<PixelFrame>;
 
 class FramePlayer : public QObject, public VideoRecordFormatStreamPlayer {
   Q_OBJECT
@@ -94,6 +89,7 @@ class FramePlayer : public QObject, public VideoRecordFormatStreamPlayer {
   void mediaStateChanged(FileReaderState state);
 
  private:
+  std::mutex videoDecodingMutex_;
   std::mutex frameMutex_;
   vector<shared_ptr<PixelFrame>> inputFrames_;
   vector<shared_ptr<PixelFrame>> convertedframes_;
@@ -105,6 +101,7 @@ class FramePlayer : public QObject, public VideoRecordFormatStreamPlayer {
   bool visible_{true};
   bool blankMode_{true};
   bool firstImage_{true};
+  std::atomic<bool> iframesOnly_{true};
   string saveNextFramePath_;
   int estimatedFps_;
   Fps dataFps_;

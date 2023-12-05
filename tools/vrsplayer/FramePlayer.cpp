@@ -69,37 +69,32 @@ bool FramePlayer::onImageRead(
   const auto& spec = contentBlock.image();
   shared_ptr<PixelFrame> frame = getFrame(true);
   bool frameValid = false;
-  unique_ptr<ImageJob> job;
   imageFormat_ = spec.getImageFormat();
-  if (imageFormat_ == vrs::ImageFormat::RAW) {
-    // RAW images are read from disk directly, but pixel format conversion is asynchronous
-    frameValid = PixelFrame::readRawFrame(frame, record.reader, spec);
-    if (!firstImage_ && frameValid) {
-      job = make_unique<ImageJob>(vrs::ImageFormat::RAW);
-    }
-  } else if (imageFormat_ == vrs::ImageFormat::VIDEO) {
+  if (imageFormat_ == vrs::ImageFormat::VIDEO) {
     // Video codec decompression happens here, but pixel format conversion is asynchronous
-    PixelFrame::init(frame, contentBlock.image());
-    frameValid = (tryToDecodeFrame(*frame, record, contentBlock) == 0);
-    if (!firstImage_ && frameValid) {
-      job = make_unique<ImageJob>(vrs::ImageFormat::VIDEO);
+    if (spec.getKeyFrameIndex() > 0) {
+      iframesOnly_.store(false, memory_order_relaxed);
+    }
+    if (firstImage_ || !iframesOnly_.load(memory_order_relaxed)) {
+      PixelFrame::init(frame, contentBlock.image());
+      unique_lock<mutex> lock(videoDecodingMutex_);
+      frameValid = (tryToDecodeFrame(*frame, record, contentBlock) == 0);
+    } else {
+      frameValid = PixelFrame::readDiskImageData(frame, record.reader, contentBlock);
     }
   } else {
     if (firstImage_) {
       frameValid = PixelFrame::readFrame(frame, record.reader, contentBlock);
     } else {
-      // decoding & pixel format conversion happen asynchronously
-      job = make_unique<ImageJob>(imageFormat_);
-      job->buffer.resize(contentBlock.getBlockSize());
-      frameValid = (record.reader->read(job->buffer) == 0);
+      frameValid = PixelFrame::readDiskImageData(frame, record.reader, contentBlock);
     }
   }
-  if (frameValid && job) {
-    job->frame = std::move(frame);
+  if (frameValid && !firstImage_) {
     imageJobs_.startThreadIfNeeded(&FramePlayer::imageJobsThreadActivity, this);
-    imageJobs_.sendJob(std::move(job));
+    imageJobs_.sendJob(make_unique<ImageJob>(std::move(frame)));
     return true;
   }
+  // Processing was not sent in the background, complete here!
   if (firstImage_) {
     fmt::print(
         "Found '{} - {}': {}, {}",
@@ -111,10 +106,8 @@ bool FramePlayer::onImageRead(
       fmt::print(" - {}", frame->getSpec().asString());
     }
     blankMode_ = false;
-  }
-  if (frameValid) {
-    convertFrame(frame);
-    if (firstImage_) {
+    if (frameValid) {
+      convertFrame(frame);
       if (needsConvertedFrame_) {
         fmt::print(" -> {}", frame->getSpec().asString());
       }
@@ -123,14 +116,18 @@ bool FramePlayer::onImageRead(
       }
       frame->blankFrame();
       blankMode_ = true;
+      widget_->swapImage(frame);
     }
-    widget_->swapImage(frame);
-  }
-  recycle(frame, !needsConvertedFrame_);
-  if (firstImage_) {
     fmt::print("\n");
     firstImage_ = false;
+  } else {
+    // !firstImage_
+    if (frameValid) {
+      convertFrame(frame);
+      widget_->swapImage(frame);
+    }
   }
+  recycle(frame, !needsConvertedFrame_);
   return true; // read next blocks, if any
 }
 
@@ -257,26 +254,28 @@ bool FramePlayer::saveFrame(
 void FramePlayer::imageJobsThreadActivity() {
   unique_ptr<ImageJob> job;
   while (imageJobs_.waitForJob(job)) {
-    shared_ptr<PixelFrame> frame = std::move(job->frame);
     // if we're behind, we just drop images except the last one!
     while (imageJobs_.getJob(job)) {
-      recycle(frame, true);
-      frame = std::move(job->frame);
+      ; // just skip!
     }
+    shared_ptr<PixelFrame>& frame = *job;
     bool frameValid = false;
-    if (job->imageFormat == vrs::ImageFormat::RAW || job->imageFormat == vrs::ImageFormat::VIDEO) {
+    vrs::ImageFormat imageFormat = frame->getSpec().getImageFormat();
+    if (imageFormat == vrs::ImageFormat::RAW) {
       frameValid = (frame != nullptr);
+    } else if (imageFormat == vrs::ImageFormat::VIDEO) {
+      unique_lock<mutex> lock(videoDecodingMutex_);
+      frameValid = frame->decompressImage(&getVideoFrameHandler(id_));
     } else {
-      if (!frame) {
-        frame = make_shared<PixelFrame>();
-      }
-      frameValid = frame->readCompressedFrame(job->buffer, job->imageFormat);
+      frameValid = frame->decompressImage();
     }
     if (frameValid) {
       convertFrame(frame);
       widget_->swapImage(frame);
     }
-    recycle(frame, !frameValid || !needsConvertedFrame_);
+    if (imageFormat != vrs::ImageFormat::VIDEO) {
+      recycle(frame, !frameValid || !needsConvertedFrame_);
+    }
   }
 }
 

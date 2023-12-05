@@ -48,6 +48,10 @@ int VideoRecordFormatStreamPlayer::readMissingFrames(
   return result;
 }
 
+VideoFrameHandler& VideoRecordFormatStreamPlayer::getVideoFrameHandler(StreamId streamId) {
+  return handlers_[streamId];
+}
+
 int VideoRecordFormatStreamPlayer::tryToDecodeFrame(
     void* outBuffer,
     const CurrentRecord& record,
@@ -75,7 +79,7 @@ bool VideoRecordFormatStreamPlayer::readFrame(
   return outFrame.readFrame(record.reader, cb);
 }
 
-void VideoRecordFormatStreamPlayer::resetVideoFrameHandler(const StreamId& streamId) {
+void VideoRecordFormatStreamPlayer::resetVideoFrameHandler(StreamId streamId) {
   if (streamId.isValid()) {
     handlers_[streamId].reset();
   } else {
