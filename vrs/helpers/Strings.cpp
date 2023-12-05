@@ -22,6 +22,7 @@
 #include <cstring>
 #include <ctime>
 
+#include <algorithm>
 #include <sstream>
 
 #include <fmt/format.h>
@@ -60,6 +61,56 @@ bool endsWith(const string& text, const string& suffix) {
   return text.length() >= suffix.length() &&
       vrs::helpers::strncasecmp(
           text.c_str() + text.length() - suffix.length(), suffix.c_str(), suffix.length()) == 0;
+}
+
+inline bool isdigit(char c) {
+  return std::isdigit(static_cast<uint8_t>(c));
+}
+
+static uint32_t lastDigitIndex(const char* str, uint32_t index) {
+  while (isdigit(str[index + 1])) {
+    index++;
+  }
+  return index;
+}
+
+inline char paddedChar(const char* str, uint32_t pos, uint32_t pad, uint32_t index) {
+  return index < pad ? '0' : str[pos + index - pad];
+}
+
+#define LEFT_C (left[left_p])
+#define RIGHT_C (right[right_p])
+
+bool beforeFileName(const char* left, const char* right) {
+  uint32_t leftPos = 0;
+  uint32_t rightPos = 0;
+  bool bothDigits = false;
+  while ((bothDigits = (isdigit(left[leftPos]) && isdigit(right[rightPos]))) ||
+         (left[leftPos] == right[rightPos] && left[leftPos] != 0)) {
+    if (bothDigits) {
+      uint32_t leftDigitLength = lastDigitIndex(left, leftPos) - leftPos;
+      uint32_t rightDigitLength = lastDigitIndex(right, rightPos) - rightPos;
+      uint32_t leftPad =
+          leftDigitLength < rightDigitLength ? rightDigitLength - leftDigitLength : 0;
+      uint32_t rightPad =
+          rightDigitLength < leftDigitLength ? leftDigitLength - rightDigitLength : 0;
+      uint32_t lastDigitIndex = max<uint32_t>(leftDigitLength, rightDigitLength);
+      for (uint32_t digitIndex = 0; digitIndex <= lastDigitIndex; digitIndex++) {
+        char lc = paddedChar(left, leftPos, leftPad, digitIndex);
+        char rc = paddedChar(right, rightPos, rightPad, digitIndex);
+        if (lc != rc) {
+          return lc < rc;
+        }
+      }
+      leftPos += leftDigitLength;
+      rightPos += rightDigitLength;
+    }
+    leftPos++, rightPos++;
+  }
+  if (left[leftPos] == 0) {
+    return right[rightPos] != 0;
+  }
+  return left[leftPos] < right[rightPos];
 }
 
 string humanReadableFileSize(int64_t bytes) {

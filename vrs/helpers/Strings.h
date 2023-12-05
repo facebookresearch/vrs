@@ -18,7 +18,6 @@
 
 #include <cstdint>
 
-#include <algorithm>
 #include <map>
 #include <string>
 #include <vector>
@@ -52,6 +51,17 @@ inline int strncasecmp(const char* first, const char* second, size_t size) {
   return ::strncasecmp(first, second, size);
 }
 #endif
+
+/// Compare strings, as you'd expect in a modern desktop OS (Explorer/Finder), treating digit
+/// sections as numbers, so that "image1.png" is before "image02.png", and "image010.png" is the
+/// same as "image00010.png".
+/// Note: This is not a total order, since beforeFileName("image1.png", "image01.png") and
+/// beforeFileName("image01.png", "image1.png") are both false!
+bool beforeFileName(const char* left, const char* right);
+
+inline bool beforefileName(const std::string& left, const std::string& right) {
+  return beforeFileName(left.c_str(), right.c_str());
+}
 
 /// Returns a copy of the string from which all the characters in whiteChars
 /// at the beginning or at the end of the string have been removed.

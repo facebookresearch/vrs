@@ -323,3 +323,65 @@ TEST_F(StringsHelpersTester, splitTest) {
   helpers::split(str, 'l', actualTokens, true, " ");
   EXPECT_EQ(actualTokens, expectedTokens);
 }
+
+#define CHECK_BEFORE(a, b)                    \
+  EXPECT_TRUE(helpers::beforeFileName(a, b)); \
+  EXPECT_FALSE(helpers::beforeFileName(b, a));
+
+#define CHECK_SAME(a, b)                       \
+  EXPECT_FALSE(helpers::beforeFileName(a, b)); \
+  EXPECT_FALSE(helpers::beforeFileName(b, a));
+
+#define CHECK_BEFORE_SELF(a) EXPECT_FALSE(helpers::beforeFileName(a, a))
+
+TEST_F(StringsHelpersTester, beforeFileNameTest) {
+  helpers::beforeFileName("part0image10.png", "part0000image011.png");
+
+  CHECK_BEFORE_SELF("");
+  CHECK_BEFORE_SELF("a");
+  CHECK_BEFORE_SELF("abcd");
+  CHECK_BEFORE_SELF("abcd000z");
+
+  CHECK_BEFORE("", "a");
+  CHECK_BEFORE("", "0");
+  CHECK_BEFORE("00", "001");
+  CHECK_BEFORE("00", "0a");
+  CHECK_BEFORE("10", "011");
+
+  CHECK_SAME("0", "00");
+  CHECK_SAME("0", "0000000");
+  CHECK_SAME("10", "0010");
+  CHECK_SAME("123", "123");
+  CHECK_SAME("123", "0123");
+  CHECK_SAME("0123", "00000000123");
+  CHECK_SAME("image0123section3z", "image000123section003z");
+  CHECK_SAME("02image0123section3z", "2image0123section03z");
+
+  CHECK_SAME("image10.png", "image10.png");
+  CHECK_SAME("image010.png", "image10.png");
+  CHECK_SAME("image0010.png", "image10.png");
+  CHECK_SAME("image010.png", "image000010.png");
+
+  CHECK_BEFORE("image10a", "image10b");
+  CHECK_BEFORE("image010a", "image10b");
+  CHECK_BEFORE("image010a", "image0010b");
+
+  CHECK_BEFORE("image10.png", "image11.png");
+  CHECK_BEFORE("image010.png", "image11.png");
+  CHECK_BEFORE("image10.png", "image011.png");
+  CHECK_BEFORE("image90.png", "image0110.png");
+  CHECK_BEFORE("image90.png", "image0190.png");
+  CHECK_BEFORE("image19.png", "image90.png");
+  CHECK_BEFORE("image019.png", "image90.png");
+  CHECK_BEFORE("image019.png", "image0090.png");
+  CHECK_BEFORE("image1901.png", "image19010.png");
+
+  CHECK_BEFORE("part0image10.png", "part0image11.png");
+  CHECK_BEFORE("part00image010.png", "part0image11.png");
+  CHECK_BEFORE("part0image10.png", "part0000image011.png");
+  CHECK_BEFORE("part0image90.png", "part000image0110.png");
+  CHECK_BEFORE("part0image90.png", "part0image0190.png");
+  CHECK_BEFORE("part0image19.png", "part00image90.png");
+  CHECK_BEFORE("part0image019.png", "part0image90.png");
+  CHECK_BEFORE("part0image019.png", "part0image0090.png");
+}
