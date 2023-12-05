@@ -170,16 +170,8 @@ bool PixelFrame::readJxlFrame(const vector<uint8_t>& jxlBuf, bool decodePixels) 
 
       case JXL_DEC_COLOR_ENCODING: {
         JxlColorEncoding colorEncoding;
-        if (JxlDecoderGetColorAsEncodedProfile(
-                dec, &format, JXL_COLOR_PROFILE_TARGET_ORIGINAL, &colorEncoding) ==
-                JXL_DEC_SUCCESS &&
-            colorEncoding.color_space == JXL_COLOR_SPACE_GRAY) {
-          colorEncoding.gamma = 0.5;
-          colorEncoding.transfer_function = JXL_TRANSFER_FUNCTION_GAMMA;
-        } else {
-          DEC_CHECK(JxlDecoderGetColorAsEncodedProfile(
-              dec, &format, JXL_COLOR_PROFILE_TARGET_ORIGINAL, &colorEncoding));
-        }
+        DEC_CHECK(JxlDecoderGetColorAsEncodedProfile(
+            dec, &format, JXL_COLOR_PROFILE_TARGET_ORIGINAL, &colorEncoding));
         DEC_CHECK(JxlDecoderSetPreferredColorProfile(dec, &colorEncoding));
       } break;
 
@@ -334,15 +326,7 @@ bool PixelFrame::jxlCompress(
   ENC_CHECK(JxlEncoderSetBasicInfo(enc, &basic_info));
 
   JxlColorEncoding color_encoding = {};
-  if (basic_info.num_color_channels > 1) {
-    JxlColorEncodingSetToLinearSRGB(
-        &color_encoding,
-        /*is_gray=*/pixel_format.num_channels < 3);
-  } else {
-    JxlColorEncodingSetToSRGB(
-        &color_encoding,
-        /*is_gray=*/pixel_format.num_channels < 3);
-  }
+  JxlColorEncodingSetToLinearSRGB(&color_encoding, basic_info.num_color_channels < 2);
   ENC_CHECK(JxlEncoderSetColorEncoding(enc, &color_encoding));
 
   JxlEncoderFrameSettings* settings = JxlEncoderFrameSettingsCreate(enc, nullptr);
