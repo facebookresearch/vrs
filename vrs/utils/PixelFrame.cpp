@@ -175,7 +175,7 @@ PixelFrame::PixelFrame(const ImageContentBlockSpec& spec)
           spec.getRawStride(),
           spec.getRawStride2()} {
   size_t size = imageSpec_.getRawImageSize();
-  if (XR_VERIFY(size != ContentBlock::kSizeUnknown)) {
+  if (size != ContentBlock::kSizeUnknown) {
     frameBytes_.resize(size);
   }
 }
@@ -192,7 +192,7 @@ void PixelFrame::init(const ImageContentBlockSpec& spec) {
         spec.getRawStride(),
         spec.getRawStride2()};
     size_t size = imageSpec_.getRawImageSize();
-    if (XR_VERIFY(size != ContentBlock::kSizeUnknown)) {
+    if (size != ContentBlock::kSizeUnknown) {
       frameBytes_.resize(size);
     }
   }
