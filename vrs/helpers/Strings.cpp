@@ -234,6 +234,9 @@ string humanReadableTimestamp(double seconds, uint8_t precision) {
     case e9:
       return fmt::format("{:.9e}", seconds);
   }
+
+  // Mute bogus warnings needed by some compilers.
+  return fmt::format("{:.3f}", seconds);
 }
 
 string humanReadableDateTime(double secondsSinceEpoch) {
