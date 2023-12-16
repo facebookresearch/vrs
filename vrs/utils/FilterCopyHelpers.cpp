@@ -153,8 +153,9 @@ RecordFilterCopier::RecordFilterCopier(
     RecordFileReader& fileReader,
     RecordFileWriter& fileWriter,
     StreamId id,
+    RecordableTypeId copyRecordableTypeId,
     const CopyOptions& copyOptions)
-    : writer_(id.getTypeId(), fileReader.getFlavor(id)),
+    : writer_(copyRecordableTypeId, fileReader.getFlavor(id)),
       fileWriter_{fileWriter},
       options_{copyOptions} {
   fileReader.setStreamPlayer(id, this);

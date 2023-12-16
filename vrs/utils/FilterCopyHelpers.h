@@ -183,8 +183,15 @@ class RecordFilterCopier : public RecordFormatStreamPlayer {
       RecordFileReader& fileReader,
       RecordFileWriter& fileWriter,
       StreamId id,
-      const CopyOptions& copyOptions);
+      const CopyOptions& copyOptions)
+      : RecordFilterCopier(fileReader, fileWriter, id, id.getTypeId(), copyOptions) {}
 
+  RecordFilterCopier(
+      RecordFileReader& fileReader,
+      RecordFileWriter& fileWriter,
+      StreamId id,
+      RecordableTypeId copyRecordableTypeId,
+      const CopyOptions& copyOptions);
   // Tell if this particular record should be copied verbatim, or edited.
   virtual bool shouldCopyVerbatim(const CurrentRecord& record) = 0;
 
