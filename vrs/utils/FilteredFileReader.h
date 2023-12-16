@@ -51,8 +51,11 @@ struct RecordFilterParams {
   unique_ptr<DecimationParams> decimationParams;
 
   // Add constraints, typically from command line options
-  bool includeStream(const string& numericName);
-  bool excludeStream(const string& numericName);
+  bool includeStream(const string& streamFilter);
+  bool excludeStream(const string& streamFilter);
+  // Same as above, but assumes streamFilter starts with '+' to add,
+  // or '-', or '~'to remove streams. '~' is useful for CLI tools use cases.
+  bool includeExcludeStream(const string& plusMinusStreamFilter);
   bool includeType(const string& type);
   bool excludeType(const string& type);
 };

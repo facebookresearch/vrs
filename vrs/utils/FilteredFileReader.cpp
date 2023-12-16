@@ -44,14 +44,15 @@ namespace {
 /// @param outStreamIds: on exit, a set of stream ids extracted
 /// @return true if no parsing error occurred.
 /// Supported forms for ids:
-///   N-M  where N is a recordable type id as a number, and M an instance id (also a number)
-///   N-   where N is a recordable type id as a number.
+///   R-N  where R is a recordable type id as a number, and N an instance id (also a number)
+///   R+N  where R is a recordable type id as a number, and N relative instance id (Nth stream)
+///   R-   where R is a recordable type id as a number.
 ///        Returns all the streams in the file with that recordable type id
-///   N    Same as N-
-///   N-<flavor> Returns all the streams in the file with that recordable type id and flavor
-/// Actual examples: 1004-1 or 1005- or 1005 or 100-test/synthetic/grey8
+///   R    Same as R-
+///   R-<flavor> Returns all the streams in the file with that recordable type id and flavor
+/// Actual examples: 1004-1 or 1004+3 or 1005- or 1005 or 100-test/synthetic/grey8
 bool stringToIds(const string& ids, RecordFileReader& reader, set<StreamId>& outStreamIds) {
-  StreamId singleId = StreamId::fromNumericName(ids);
+  StreamId singleId = reader.getStreamForName(ids);
   if (singleId.isValid()) {
     outStreamIds.insert(singleId);
     return true;
@@ -110,8 +111,9 @@ inline bool isSigned(const string& str) {
   return !str.empty() && (str.front() == '+' || str.front() == '-');
 }
 
-bool isValidNumericName(const string& numericName) {
-  if (StreamId::fromNumericName(numericName).isValid()) {
+bool isValidStreamFilter(const string& numericName) {
+  if (StreamId::fromNumericName(numericName).isValid() ||
+      StreamId::fromNumericNamePlus(numericName).isValid()) {
     return true;
   }
   try {
@@ -124,22 +126,32 @@ bool isValidNumericName(const string& numericName) {
 
 } // namespace
 
-bool RecordFilterParams::includeStream(const string& numericName) {
-  if (!isValidNumericName(numericName)) {
+bool RecordFilterParams::includeStream(const string& streamFilter) {
+  if (!isValidStreamFilter(streamFilter)) {
     return false;
   }
   streamFilters.emplace_back("+");
-  streamFilters.emplace_back(numericName);
+  streamFilters.emplace_back(streamFilter);
   return true;
 }
 
-bool RecordFilterParams::excludeStream(const string& numericName) {
-  if (!isValidNumericName(numericName)) {
+bool RecordFilterParams::excludeStream(const string& streamFilter) {
+  if (!isValidStreamFilter(streamFilter)) {
     return false;
   }
   streamFilters.emplace_back("-");
-  streamFilters.emplace_back(numericName);
+  streamFilters.emplace_back(streamFilter);
   return true;
+}
+
+bool RecordFilterParams::includeExcludeStream(const string& plusMinusStreamFilter) {
+  char first = *plusMinusStreamFilter.c_str();
+  if (first == '+') {
+    return includeStream(plusMinusStreamFilter.substr(1));
+  } else if (first == '-' || first == '~') {
+    return excludeStream(plusMinusStreamFilter.substr(1));
+  }
+  return includeStream(plusMinusStreamFilter);
 }
 
 bool RecordFilterParams::includeType(const string& type) {
