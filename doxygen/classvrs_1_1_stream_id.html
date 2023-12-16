@@ -122,6 +122,8 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a3809517b98d689aeaceb038a124ab44e"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_stream_id.html#a3809517b98d689aeaceb038a124ab44e">fromNumericName</a> (const string &amp;numericName)</td></tr>
 <tr class="separator:a3809517b98d689aeaceb038a124ab44e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6fa4ca2888eaca5f3da7dc59ccb024d0"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_stream_id.html#a6fa4ca2888eaca5f3da7dc59ccb024d0">fromNumericNamePlus</a> (const string &amp;numericName)</td></tr>
+<tr class="separator:a6fa4ca2888eaca5f3da7dc59ccb024d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aec15be76b5f44e60d2265a793063d294"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_stream_id.html#aec15be76b5f44e60d2265a793063d294">isKnownTypeId</a> (<a class="el" href="namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5">RecordableTypeId</a> typeId)</td></tr>
 <tr class="separator:aec15be76b5f44e60d2265a793063d294"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad85821cc3baf7d6a75105e31a37b084e"><td class="memItemLeft" align="right" valign="top"><a id="ad85821cc3baf7d6a75105e31a37b084e"></a>
@@ -161,6 +163,39 @@ static <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>&#160;</td><
 <p>Convert from a stream ID numeric string representation </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">numericName</td><td>a stream ID name in numeric representation, e.g., "1100-1" </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A stream ID. Use <a class="el" href="classvrs_1_1_stream_id.html#a611065420d3fec26556c0e1df316f4f3">isValid()</a> to know if the conversion succeeded. </dd></dl>
+
+</div>
+</div>
+<a id="a6fa4ca2888eaca5f3da7dc59ccb024d0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6fa4ca2888eaca5f3da7dc59ccb024d0">&#9670;&nbsp;</a></span>fromNumericNamePlus()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classvrs_1_1_stream_id.html">StreamId</a> vrs::StreamId::fromNumericNamePlus </td>
+          <td>(</td>
+          <td class="paramtype">const string &amp;&#160;</td>
+          <td class="paramname"><em>numericName</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Convert from a stream ID numeric string representation with a '+' sign between numbers Useful to parse relative stream IDs, which need a file for complete resolution. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">numericName</td><td>a stream ID name in numeric representation, e.g., "1100+1" </td></tr>
   </table>
   </dd>
 </dl>

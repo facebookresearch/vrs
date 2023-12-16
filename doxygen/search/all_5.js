@@ -34,8 +34,9 @@ var searchData=
   ['forwardcamerarecordableclass_211',['ForwardCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5af964e078c2b87e047a9e2418038eb371',1,'vrs']]],
   ['fourcharcode_212',['fourCharCode',['../namespacevrs_1_1_file_format.html#a2334b3b96dac72f21afcb6ca3029ce4e',1,'vrs::FileFormat']]],
   ['fromnumericname_213',['fromNumericName',['../classvrs_1_1_stream_id.html#a3809517b98d689aeaceb038a124ab44e',1,'vrs::StreamId']]],
-  ['frompathjsonuri_214',['fromPathJsonUri',['../structvrs_1_1_file_spec.html#a5732993a13eaa89580fb81017c66c322',1,'vrs::FileSpec']]],
-  ['future2_215',['future2',['../structvrs_1_1_file_format_1_1_file_header.html#a4161f94317d1f396194963498018696a',1,'vrs::FileFormat::FileHeader']]],
-  ['future3_216',['future3',['../structvrs_1_1_file_format_1_1_file_header.html#a94bade31d6f0141462d85f182628ad0d',1,'vrs::FileFormat::FileHeader']]],
-  ['future4_217',['future4',['../structvrs_1_1_file_format_1_1_file_header.html#a8cfa635bbc224a2d1a8b8792b602185a',1,'vrs::FileFormat::FileHeader']]]
+  ['fromnumericnameplus_214',['fromNumericNamePlus',['../classvrs_1_1_stream_id.html#a6fa4ca2888eaca5f3da7dc59ccb024d0',1,'vrs::StreamId']]],
+  ['frompathjsonuri_215',['fromPathJsonUri',['../structvrs_1_1_file_spec.html#a5732993a13eaa89580fb81017c66c322',1,'vrs::FileSpec']]],
+  ['future2_216',['future2',['../structvrs_1_1_file_format_1_1_file_header.html#a4161f94317d1f396194963498018696a',1,'vrs::FileFormat::FileHeader']]],
+  ['future3_217',['future3',['../structvrs_1_1_file_format_1_1_file_header.html#a94bade31d6f0141462d85f182628ad0d',1,'vrs::FileFormat::FileHeader']]],
+  ['future4_218',['future4',['../structvrs_1_1_file_format_1_1_file_header.html#a8cfa635bbc224a2d1a8b8792b602185a',1,'vrs::FileFormat::FileHeader']]]
 ];

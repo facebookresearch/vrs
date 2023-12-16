@@ -133,6 +133,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:acb770d30ce7b22fac2c259e2430540bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a286fea5e9d8553ea36064d433719067b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a286fea5e9d8553ea36064d433719067b">getStreamForType</a> (<a class="el" href="namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5">RecordableTypeId</a> typeId, uint32_t indexNumber=0) const</td></tr>
 <tr class="separator:a286fea5e9d8553ea36064d433719067b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3da8e7327759dbfe6a347b3a794dd7c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#ad3da8e7327759dbfe6a347b3a794dd7c">getStreamForName</a> (const string &amp;name) const</td></tr>
+<tr class="separator:ad3da8e7327759dbfe6a347b3a794dd7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a31723e14ae3e1498eaaf9624753305c4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a31723e14ae3e1498eaaf9624753305c4">getStreamForFlavor</a> (<a class="el" href="namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5">RecordableTypeId</a> typeId, const string &amp;flavor, uint32_t indexNumber=0) const</td></tr>
 <tr class="separator:a31723e14ae3e1498eaaf9624753305c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad5b17a801f4af270df7bf3e5a311d23e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#ad5b17a801f4af270df7bf3e5a311d23e">getStreamForTag</a> (const string &amp;tagName, const string &amp;tag, <a class="el" href="namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5">RecordableTypeId</a> typeId=<a class="el" href="namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5aec0fc0100c4fc1ce4eea230c3dc10360">RecordableTypeId::Undefined</a>) const</td></tr>
@@ -1055,6 +1057,31 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="classvrs_1_1_stream_id.html" title="VRS stream identifier class.">StreamId</a>. Call isValid() to know if a matching <a class="el" href="classvrs_1_1_stream_id.html" title="VRS stream identifier class.">StreamId</a> was actually found. </dd></dl>
+
+</div>
+</div>
+<a id="ad3da8e7327759dbfe6a347b3a794dd7c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad3da8e7327759dbfe6a347b3a794dd7c">&#9670;&nbsp;</a></span>getStreamForName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classvrs_1_1_stream_id.html">StreamId</a> vrs::RecordFileReader::getStreamForName </td>
+          <td>(</td>
+          <td class="paramtype">const string &amp;&#160;</td>
+          <td class="paramname"><em>name</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Find a stream from an absolute or relative numeric name. Absolute numeric names are in the form &lt;numeric_recordable_type_id&gt;-&lt;instance_id&gt;, eg 1201-1 Relative numeric names are in the form &lt;numeric_recordable_type_id&gt;+&lt;instance_id&gt;, eg 1201+1 Relative numeric names have instance ids interpreted as the nth stream of that type, eg 1201+3 is the 3rd stream with the recordable type id 1201 (if there is such a stream). In all cases, use isValid() to verify that the stream was found in the file. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>an absolute or relative numeric name </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a <a class="el" href="classvrs_1_1_stream_id.html" title="VRS stream identifier class.">StreamId</a>, valid only if the numeric name exists in the file. </dd></dl>
 
 </div>
 </div>
