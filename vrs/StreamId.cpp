@@ -159,6 +159,31 @@ const map<RecordableTypeId, const char*>& getRecordableTypeIdRegistry() {
   return sRegistry;
 }
 
+StreamId fromNumericNameWithSeparator(const string& numericName, uint8_t separator) {
+  // Quick parsing of "NNN-DDD", two uint numbers separated by a separator.
+  const auto* s = reinterpret_cast<const uint8_t*>(numericName.c_str());
+  if (*s < '0' || *s > '9') {
+    return {}; // must start with a digit
+  }
+  int recordableTypeId = 0;
+  for (; *s >= '0' && *s <= '9'; ++s) {
+    recordableTypeId = 10 * recordableTypeId + (*s - '0');
+  }
+  if (*s++ == separator) {
+    if (*s < '0' || *s > '9') {
+      return {}; // instance id must start with a digit
+    }
+    uint16_t index = 0;
+    while (*s >= '0' && *s <= '9') {
+      index = 10 * index + (*s++ - '0');
+    }
+    if (*s == 0) {
+      return {static_cast<RecordableTypeId>(recordableTypeId), index};
+    }
+  }
+  return {};
+}
+
 } // namespace
 
 string toString(RecordableTypeId typeId) {
@@ -184,28 +209,11 @@ string StreamId::getNumericName() const {
 }
 
 StreamId StreamId::fromNumericName(const string& numericName) {
-  // Quick parsing of "NNN-DDD", two uint numbers separated by a '-'.
-  const uint8_t* s = reinterpret_cast<const uint8_t*>(numericName.c_str());
-  if (*s < '0' || *s > '9') {
-    return {}; // must start with a digit
-  }
-  int recordableTypeId;
-  for (recordableTypeId = 0; *s >= '0' && *s <= '9'; ++s) {
-    recordableTypeId = 10 * recordableTypeId + (*s - '0');
-  }
-  if (*s++ == '-') {
-    if (*s < '0' || *s > '9') {
-      return {}; // instance id must start with a digit
-    }
-    uint16_t index = 0;
-    while (*s >= '0' && *s <= '9') {
-      index = 10 * index + (*s++ - '0');
-    }
-    if (*s == 0) {
-      return StreamId(static_cast<RecordableTypeId>(recordableTypeId), index);
-    }
-  }
-  return {};
+  return fromNumericNameWithSeparator(numericName, '-');
+}
+
+StreamId StreamId::fromNumericNamePlus(const string& numericName) {
+  return fromNumericNameWithSeparator(numericName, '+');
 }
 
 } // namespace vrs

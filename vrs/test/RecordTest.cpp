@@ -94,6 +94,26 @@ TEST_F(RecordTester, streamIdTest) {
   EXPECT_FALSE(StreamId::fromNumericName("65535").isValid());
   EXPECT_FALSE(StreamId::fromNumericName("123-45s").isValid());
   EXPECT_FALSE(StreamId::fromNumericName("123-a45").isValid());
+  EXPECT_FALSE(StreamId::fromNumericName("123+1").isValid());
+}
+
+TEST_F(RecordTester, streamIdPlusTest) {
+  StreamId id(RecordableTypeId::UnitTest1, 1);
+  string numName = to_string((uint32_t)RecordableTypeId::UnitTest1) + "+1";
+  EXPECT_EQ(StreamId::fromNumericNamePlus(numName), id);
+  EXPECT_EQ(StreamId::fromNumericNamePlus("1+0"), StreamId(static_cast<RecordableTypeId>(1), 0));
+  EXPECT_EQ(
+      StreamId::fromNumericNamePlus("123+2"), StreamId(static_cast<RecordableTypeId>(123), 2));
+  EXPECT_EQ(
+      StreamId::fromNumericNamePlus("65535+65535"),
+      StreamId(static_cast<RecordableTypeId>(65535), 65535));
+  EXPECT_FALSE(StreamId::fromNumericNamePlus("-65535+65535").isValid());
+  EXPECT_FALSE(StreamId::fromNumericNamePlus("65535+").isValid());
+  EXPECT_FALSE(StreamId::fromNumericNamePlus("65d535+1").isValid());
+  EXPECT_FALSE(StreamId::fromNumericNamePlus("65535").isValid());
+  EXPECT_FALSE(StreamId::fromNumericNamePlus("123+45s").isValid());
+  EXPECT_FALSE(StreamId::fromNumericNamePlus("123+a45").isValid());
+  EXPECT_FALSE(StreamId::fromNumericNamePlus("123-1").isValid());
 }
 
 TEST_F(RecordTester, addRecordBatchesToSortedRecordsTester) {

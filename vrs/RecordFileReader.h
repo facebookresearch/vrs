@@ -203,6 +203,16 @@ class RecordFileReader {
   /// @return A StreamId. Call isValid() to know if a matching StreamId was actually found.
   StreamId getStreamForType(RecordableTypeId typeId, uint32_t indexNumber = 0) const;
 
+  /// Find a stream from an absolute or relative numeric name.
+  /// Absolute numeric names are in the form <numeric_recordable_type_id>-<instance_id>, eg 1201-1
+  /// Relative numeric names are in the form <numeric_recordable_type_id>+<instance_id>, eg 1201+1
+  /// Relative numeric names have instance ids interpreted as the nth stream of that type, eg
+  /// 1201+3 is the 3rd stream with the recordable type id 1201 (if there is such a stream).
+  /// In all cases, use isValid() to verify that the stream was found in the file.
+  /// @param name: an absolute or relative numeric name
+  /// @return a StreamId, valid only if the numeric name exists in the file.
+  StreamId getStreamForName(const string& name) const;
+
   /// Find a stream of a specific flavor, by index number.
   /// Use isValid() to tell if a device was found.
   /// @param typeId: The RecordableTypeId of the type of device to look for.

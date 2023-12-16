@@ -540,6 +540,19 @@ StreamId RecordFileReader::getStreamForType(RecordableTypeId typeId, uint32_t in
   return StreamId{RecordableTypeId::Undefined, 0};
 }
 
+StreamId RecordFileReader::getStreamForName(const string& name) const {
+  StreamId id = StreamId::fromNumericName(name);
+  if (!id.isValid()) {
+    StreamId relativeId = StreamId::fromNumericNamePlus(name);
+    if (relativeId.isValid()) {
+      id = getStreamForType(relativeId.getTypeId(), relativeId.getInstanceId() - 1);
+    }
+  }
+  return id.isValid() && streamIds_.find(id) != streamIds_.end()
+      ? id
+      : StreamId{RecordableTypeId::Undefined, 0};
+}
+
 StreamId RecordFileReader::getStreamForFlavor(
     RecordableTypeId typeId,
     const string& flavor,

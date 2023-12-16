@@ -228,6 +228,21 @@ vector<UniqueStreamId> MultiRecordFileReader::getStreams(
   return streamIds;
 }
 
+MultiRecordFileReader::UniqueStreamId MultiRecordFileReader::getStreamForName(
+    const string& name) const {
+  if (hasSingleFile()) {
+    return readers_.front()->getStreamForName(name);
+  }
+  StreamId id = StreamId::fromNumericName(name);
+  if (!id.isValid()) {
+    // relative IDs match unique stream IDs directly
+    id = StreamId::fromNumericNamePlus(name);
+  }
+  return id.isValid() && uniqueStreamIds_.find(id) != uniqueStreamIds_.end()
+      ? id
+      : StreamId{RecordableTypeId::Undefined, 0};
+}
+
 UniqueStreamId MultiRecordFileReader::getStreamForTag(
     const string& tagName,
     const string& tag,
@@ -708,8 +723,8 @@ void MultiRecordFileReader::initializeFileTags() {
 }
 
 UniqueStreamId MultiRecordFileReader::generateUniqueStreamId(StreamId duplicateStreamId) const {
-  auto candidateStreamId = duplicateStreamId;
-  auto typeId = candidateStreamId.getTypeId();
+  StreamId candidateStreamId = duplicateStreamId;
+  RecordableTypeId typeId = candidateStreamId.getTypeId();
   do {
     candidateStreamId = StreamId(typeId, candidateStreamId.getInstanceId() + 1);
   } while (uniqueStreamIds_.find(candidateStreamId) != uniqueStreamIds_.end());
