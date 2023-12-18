@@ -43,6 +43,10 @@ int64_t fileTell(std::FILE* file);
 int fileSeek(std::FILE* file, int64_t offset, int origin);
 int fileSetSize(std::FILE* file, int64_t size);
 
+inline bool fileWriteString(FILE* f, const std::string& str) {
+  return os::fileWrite(str.c_str(), 1, str.size(), f) == str.size();
+}
+
 /// Misc helpers
 int remove(const std::string& path); // file or folder
 int rename(const std::string& originalName, const std::string& newName); // file or folder

@@ -20,6 +20,12 @@
 
 #include <vrs/os/Platform.h>
 
+#if IS_MAC_PLATFORM() || IS_LINUX_PLATFORM()
+#include <sys/resource.h>
+#elif IS_WINDOWS_PLATFORM()
+#include <Windows.h>
+#endif
+
 namespace vrs {
 namespace os {
 
@@ -38,6 +44,53 @@ int64_t getCurrentTimeSecSinceEpoch() {
 int64_t getTimestampMs() {
   using namespace std::chrono;
   return duration_cast<std::chrono::milliseconds>(steady_clock::now().time_since_epoch()).count();
+}
+
+bool getProcessCpuTimes(double& outUserCpuTime, double& outSystemCpuTime) {
+#if IS_MAC_PLATFORM() || IS_LINUX_PLATFORM()
+  struct rusage r_usage;
+  getrusage(RUSAGE_SELF, &r_usage);
+  const double cMicroseconds = 1e-6;
+  outUserCpuTime = r_usage.ru_utime.tv_sec + r_usage.ru_utime.tv_usec * cMicroseconds;
+  outSystemCpuTime = r_usage.ru_stime.tv_sec + r_usage.ru_stime.tv_usec * cMicroseconds;
+  return true;
+
+#elif IS_WINDOWS_PLATFORM()
+  FILETIME start;
+  FILETIME exit;
+  ULARGE_INTEGER kernelTime;
+  ULARGE_INTEGER userTime;
+
+  if (GetProcessTimes(
+          GetCurrentProcess(),
+          &start,
+          &exit,
+          reinterpret_cast<PFILETIME>(&kernelTime),
+          reinterpret_cast<PFILETIME>(&userTime)) == 0) {
+    outUserCpuTime = 0;
+    outSystemCpuTime = 0;
+    return false;
+  }
+
+  const double cSecFactor = 1e-7; // source is a count of 0.1us
+  outUserCpuTime = userTime.QuadPart * cSecFactor;
+  outSystemCpuTime = kernelTime.QuadPart * cSecFactor;
+  return true;
+
+#else
+  outUserCpuTime = 0;
+  outSystemCpuTime = 0;
+  return false;
+#endif
+}
+
+double getTotalProcessCpuTime() {
+  double user = 0;
+  double kernel = 0;
+  if (!getProcessCpuTimes(user, kernel)) {
+    return 0;
+  }
+  return user + kernel;
 }
 
 } // namespace os

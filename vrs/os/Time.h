@@ -41,5 +41,13 @@ int64_t getTimestampMs();
 /// Therefore, using double is misleading & dangerous.
 int64_t getCurrentTimeSecSinceEpoch();
 
+/// Get process usage time, splitting User CPU time and System CPU time
+/// Returns false if not implemented on that platform.
+bool getProcessCpuTimes(double& outUserCpuTime, double& outSystemCpuTime);
+
+/// Get User and System CPU time as one
+/// Returns 0 if not supported.
+double getTotalProcessCpuTime();
+
 } // namespace os
 } // namespace vrs
