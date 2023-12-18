@@ -144,7 +144,7 @@ bool AudioBlockReader::readAudioContentBlock(
   size_t sampleCount = audioContent.getSampleCount();
   if (sampleCount == 0) {
     if (remainingBlockSize != ContentBlock::kSizeUnknown) {
-      if (audioContent.getAudioFormat() == AudioFormat::PCM) {
+      if (remainingBlockSize > 0 && audioContent.getAudioFormat() == AudioFormat::PCM) {
         // The sample count is undefined, but we can to do the math,
         // using the remaining bytes in the record.
         uint8_t sampleBlockStride = audioContent.getSampleBlockStride();
@@ -160,10 +160,9 @@ bool AudioBlockReader::readAudioContentBlock(
                   static_cast<uint32_t>(remainingBlockSize / sampleBlockStride),
                   audioContent.getSampleBlockStride()));
         }
-      } else {
-        return player.onAudioRead(
-            record, blockIndex_, ContentBlock(contentBlock, remainingBlockSize));
       }
+      return player.onAudioRead(
+          record, blockIndex_, ContentBlock(contentBlock, remainingBlockSize));
     }
   } else {
     size_t expectedSize = sampleCount * audioContent.getSampleBlockStride();
