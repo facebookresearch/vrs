@@ -16,8 +16,6 @@
 
 #include "VrsCommand.h"
 
-#include <iostream>
-
 #include <vrs/os/Utils.h>
 
 using namespace std;

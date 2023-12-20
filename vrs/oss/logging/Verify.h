@@ -19,10 +19,6 @@
 #include <fmt/color.h>
 #include <fmt/core.h>
 
-#include <vrs/os/CompilerAttributes.h>
-
-#include "LogLevel.h"
-
 #ifndef DEFAULT_LOG_CHANNEL
 #error "DEFAULT_LOG_CHANNEL must be defined before including <logging/Verify.h>"
 #endif // DEFAULT_LOG_CHANNEL
@@ -33,14 +29,15 @@
 // condition.
 //
 
-#define XR_VERIFY_C(channel_, condition_, ...)  \
-  (condition_ ? 1                               \
-              : (fmt::print(                    \
-                     stderr,                    \
-                     fg(fmt::color::red),       \
-                     "Verify {} failed: {}",    \
-                     #condition_,               \
-                     fmt::format(__VA_ARGS__)), \
+#define XR_VERIFY_C(channel_, condition_, fmtstr, ...)      \
+  (condition_ ? 1                                           \
+              : (fmt::print(                                \
+                     stderr,                                \
+                     fg(fmt::color::red),                   \
+                     "{}: Verify '{}' failed. {}\x1b[0m\n", \
+                     channel_,                              \
+                     #condition_,                           \
+                     fmt::format(fmtstr, ##__VA_ARGS__)),   \
                  0))
 
-#define XR_VERIFY(cond, ...) XR_VERIFY_C(DEFAULT_LOG_CHANNEL, cond, ##__VA_ARGS__, "")
+#define XR_VERIFY(cond, ...) XR_VERIFY_C(DEFAULT_LOG_CHANNEL, cond, "" __VA_ARGS__)
