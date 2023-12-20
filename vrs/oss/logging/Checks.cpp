@@ -17,10 +17,11 @@
 #include "Checks.h"
 
 #include <cstdlib>
-#include <string>
 
 #include <fmt/color.h>
 #include <fmt/core.h>
+
+#include <vrs/os/Platform.h>
 
 // Abort Macro.
 #if IS_ANDROID_PLATFORM()
@@ -41,8 +42,8 @@
 namespace vrs {
 namespace logging {
 
-void logAndAbort(const std::string& condition, const std::string& message) {
-  fmt::print(stderr, fg(fmt::color::red), "{} {}", condition, message);
+void logAndAbort(const char* condition, const std::string& message) {
+  fmt::print(stderr, fg(fmt::color::red), "Check '{}' failed. {}\n", condition, message);
   XR_ABORT_IMPL(message);
 }
 
