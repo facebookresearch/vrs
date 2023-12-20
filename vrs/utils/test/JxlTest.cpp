@@ -16,6 +16,7 @@
 
 #include <gtest/gtest.h>
 
+#define _USE_MATH_DEFINES // needed for M_PI definition on Windows
 #include <math.h>
 #include <algorithm>
 #include <atomic>
