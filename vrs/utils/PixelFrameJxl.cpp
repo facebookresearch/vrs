@@ -266,9 +266,8 @@ bool PixelFrame::readJxlFrame(const vector<uint8_t>& jxlBuf, bool decodePixels) 
 bool PixelFrame::jxlCompress(
     vector<uint8_t>& outBuffer,
     float quality,
-    bool percentNotDistance,
-    int effort) {
-  return jxlCompress(imageSpec_, frameBytes_, outBuffer, quality, percentNotDistance, effort);
+    const CompressionOptions& options) {
+  return jxlCompress(imageSpec_, frameBytes_, outBuffer, quality, options);
 }
 
 bool PixelFrame::jxlCompress(
@@ -276,8 +275,7 @@ bool PixelFrame::jxlCompress(
     const vector<uint8_t>& pixels,
     vector<uint8_t>& outBuffer,
     float quality,
-    bool percentNotDistance,
-    int effort) {
+    const CompressionOptions& options) {
 #ifdef JXL_IS_AVAILABLE
   // Image quality, between 8.5 and 100 (lossless), with floating point resolution,
   // so 99 is less than 99.5 which is less than 99.9, which is also less than 99.99.
@@ -287,7 +285,8 @@ bool PixelFrame::jxlCompress(
   // decode, at the cost of some quality/density). Default is 0.
   int decoding_speed_tier = 0;
 
-  const float butteraugli = percentNotDistance ? percent_to_butteraugli_distance(quality) : quality;
+  const float butteraugli =
+      options.jxlQualityIsButteraugliDistance ? quality : percent_to_butteraugli_distance(quality);
 
   JxlEncoder* enc = getThreadJxlEncoder();
   if (!XR_VERIFY(enc != nullptr)) {
@@ -330,7 +329,8 @@ bool PixelFrame::jxlCompress(
   ENC_CHECK(JxlEncoderSetColorEncoding(enc, &color_encoding));
 
   JxlEncoderFrameSettings* settings = JxlEncoderFrameSettingsCreate(enc, nullptr);
-  ENC_CHECK(JxlEncoderFrameSettingsSetOption(settings, JXL_ENC_FRAME_SETTING_EFFORT, effort));
+  ENC_CHECK(
+      JxlEncoderFrameSettingsSetOption(settings, JXL_ENC_FRAME_SETTING_EFFORT, options.jxlEffort));
   ENC_CHECK(JxlEncoderFrameSettingsSetOption(
       settings, JXL_ENC_FRAME_SETTING_DECODING_SPEED, decoding_speed_tier));
 #if 0
