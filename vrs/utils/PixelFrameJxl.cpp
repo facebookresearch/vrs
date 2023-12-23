@@ -293,6 +293,29 @@ bool PixelFrame::jxlCompress(
     return false;
   }
 
+  JxlThreadParallelRunnerPtr runner_fixed;
+  uint32_t maxThreads = options.maxCompressionThreads;
+  if (maxThreads == 0) {
+    // default: only use multithreading if the image is large enough (very arbitrary cutoff limits)
+    uint32_t pixelCount = pixelSpec.getWidth() * pixelSpec.getHeight();
+    if (pixelCount >= 4000 * 4000) {
+      maxThreads = 16;
+    } else if (pixelCount >= 2000 * 2000) {
+      maxThreads = 8;
+    } else if (pixelCount >= 1024 * 768) {
+      maxThreads = 4;
+    } else {
+      maxThreads = 1;
+    }
+  }
+  if (maxThreads > 1) {
+    maxThreads = std::min<size_t>(JxlThreadParallelRunnerDefaultNumWorkerThreads(), maxThreads);
+    if (maxThreads > 1) {
+      runner_fixed = JxlThreadParallelRunnerMake(nullptr, maxThreads);
+      ENC_CHECK(JxlEncoderSetParallelRunner(enc, JxlThreadParallelRunner, runner_fixed.get()));
+    }
+  }
+
   const uint32_t totalChannels = pixelSpec.getChannelCountPerPixel();
   const uint32_t colorChannels = min<uint32_t>(totalChannels, 3);
   const uint32_t extraChannels = totalChannels - colorChannels;

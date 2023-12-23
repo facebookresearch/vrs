@@ -37,6 +37,8 @@ using std::vector;
 
 // When additional compression options are needed, use this struct instead of overloading the API
 struct CompressionOptions {
+  uint16_t maxCompressionThreads{0}; // max compression threads, or 0 to let encoder decide.
+
   /// jxl specific options
 
   /// jxlQualityIsButteraugliDistance: if false, quality is a percentage, 100% being lossless.
