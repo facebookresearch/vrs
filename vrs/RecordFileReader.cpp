@@ -201,10 +201,7 @@ int RecordFileReader::doOpenFile(
   const int kOpenTotalStepCount = 5;
   openProgressLogger_->setStepCount(kOpenTotalStepCount);
   LOG_PROGRESS(FileHandlerFactory::getInstance().delegateOpen(fileSpec, file_), error, [&]() {
-    const string& fileHandlerName =
-        fileSpec.fileHandlerName.empty() ? file_->getFileHandlerName() : fileSpec.fileHandlerName;
-    return "Opening " + fileHandlerName + " file " +
-        helpers::humanReadableDateTime(os::getCurrentTimeSecSinceEpoch());
+    return "Opening " + fileSpec.getEasyPath();
   });
   // log remote file handler names with success/failure status
   if (file_ && file_->isRemoteFileSystem()) {

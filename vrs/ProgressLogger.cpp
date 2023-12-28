@@ -21,6 +21,7 @@
 
 #define DEFAULT_LOG_CHANNEL "ProgressLogger"
 #include <logging/Log.h>
+#include <vrs/helpers/Strings.h>
 #include <vrs/os/Time.h>
 
 using namespace std;
@@ -103,11 +104,11 @@ void ProgressLogger::updateNextProgressTime() {
 }
 
 void ProgressLogger::logMessage(const string& message) {
-  XR_LOGI("{:.3f}: {}", os::getTimestampSec(), message);
+  XR_LOGI("{}: {}", helpers::humanReadableDateTime(os::getCurrentTimeSecSinceEpoch()), message);
 }
 
 void ProgressLogger::logError(const string& message) {
-  XR_LOGE("{:.3f}: {}", os::getTimestampSec(), message);
+  XR_LOGE("{}: {}", helpers::humanReadableDateTime(os::getCurrentTimeSecSinceEpoch()), message);
 }
 
 void ProgressLogger::updateStep(size_t /*progress*/, size_t /*maxProgress*/) {}
