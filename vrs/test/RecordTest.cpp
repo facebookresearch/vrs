@@ -45,7 +45,7 @@ size_t collect(
     list<Record*>& records = batch.back().second;
     r.first->collectOldRecords(maxTime, records);
     for (auto record : records) {
-      EXPECT_LE(record->getTimestamp(), maxTime);
+      EXPECT_LT(record->getTimestamp(), maxTime);
     }
     count += records.size();
   }
@@ -150,9 +150,9 @@ TEST_F(RecordTester, addRecordBatchesToSortedRecordsTester) {
   vector<pair<RecordManager*, StreamId>> recordManagerBOnly{{&recordManagerB, idB}};
   vector<pair<RecordManager*, StreamId>> recordManagerCOnly{{&recordManagerC, idC}};
 
-  EXPECT_EQ(collect(batches, recordManagersAll, 5), 86);
+  EXPECT_EQ(collect(batches, recordManagersAll, 5), 85);
   RecordFileWriterTester::addRecordBatchesToSortedRecords(batches, sr);
-  EXPECT_EQ(sr.size(), 86);
+  EXPECT_EQ(sr.size(), 85);
   EXPECT_TRUE(isProperlySorted(sr));
   batches.clear();
 
@@ -160,22 +160,22 @@ TEST_F(RecordTester, addRecordBatchesToSortedRecordsTester) {
   EXPECT_EQ(collect(batches, recordManagerCOnly, 8), 20);
   recordManagerA.createRecord(6.25, Record::Type::DATA, 1, DataSource());
   recordManagerB.createRecord(4, Record::Type::DATA, 1, DataSource());
-  EXPECT_EQ(collect(batches, recordManagersAll, 10), 38);
+  EXPECT_EQ(collect(batches, recordManagersAll, 10), 37);
   RecordFileWriterTester::addRecordBatchesToSortedRecords(batches, sr);
-  EXPECT_EQ(sr.size(), 177);
+  EXPECT_EQ(sr.size(), 175);
   EXPECT_TRUE(isProperlySorted(sr));
   batches.clear();
 
   // don't collect anything this time
   EXPECT_EQ(collect(batches, recordManagersAll, 10), 0);
   RecordFileWriterTester::addRecordBatchesToSortedRecords(batches, sr);
-  EXPECT_EQ(sr.size(), 177);
+  EXPECT_EQ(sr.size(), 175);
   EXPECT_TRUE(isProperlySorted(sr));
   batches.clear();
 
   recordManagerA.createRecord(2.5, Record::Type::DATA, 1, DataSource());
   recordManagerA.createRecord(3.5, Record::Type::DATA, 1, DataSource());
-  EXPECT_EQ(collect(batches, recordManagersAll, 100), 277);
+  EXPECT_EQ(collect(batches, recordManagersAll, 100), 279);
   RecordFileWriterTester::addRecordBatchesToSortedRecords(batches, sr);
   EXPECT_EQ(sr.size(), 454);
   EXPECT_TRUE(isProperlySorted(sr));

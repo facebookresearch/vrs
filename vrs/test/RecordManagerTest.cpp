@@ -41,9 +41,9 @@ TEST(RecordManager, CollectOldRecords) {
   // Verify that we can pull a subsection of the records.
   list<Record*> recordData;
   manager.collectOldRecords(1.33, recordData);
-  EXPECT_EQ(recordData.size(), 134);
+  EXPECT_EQ(recordData.size(), 133);
   EXPECT_DOUBLE_EQ(recordData.front()->getTimestamp(), 0.0);
-  EXPECT_DOUBLE_EQ(recordData.back()->getTimestamp(), 1.33);
+  EXPECT_LT(recordData.back()->getTimestamp(), 1.33);
   for (auto* r : recordData) {
     r->recycle();
   }
@@ -52,9 +52,11 @@ TEST(RecordManager, CollectOldRecords) {
   list<Record*> noRecords;
   manager.collectOldRecords(0.74, noRecords);
   EXPECT_TRUE(noRecords.empty());
+  manager.collectOldRecords(1.33, noRecords);
+  EXPECT_TRUE(noRecords.empty());
 
   // Purge the rest of the records.
-  EXPECT_EQ(1000 - 134, manager.purgeOldRecords(10.0));
+  EXPECT_EQ(1000 - recordData.size(), manager.purgeOldRecords(10.0));
 
   // Call it again. There shouldn't be anymore.
   manager.collectOldRecords(1000.0, noRecords);

@@ -172,7 +172,7 @@ void RecordManager::collectOldRecords(double maxAge, list<Record*>& outCollected
   if (!activeRecords_.empty()) {
     auto iterator = upper_bound(
         activeRecords_.begin(), activeRecords_.end(), maxAge, [](double age, Record* record) {
-          return age < record->timestamp_;
+          return record->timestamp_ >= age;
         });
 
     // Move a range without copying elements.
