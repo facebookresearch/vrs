@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include <memory>
+#include <mutex>
 #include <thread>
 #include <utility>
 
@@ -26,53 +28,53 @@ using namespace std;
 
 using vrs::os::EventChannel;
 
-void* dispatchEvents(void* data, bool synchronous);
-void waitOnEvents(void* data, vector<double> waitIntervals);
+void dispatchEvents(void* data, bool synchronous);
+void waitOnEvents(void* data, const vector<double>& waitIntervals);
 
 struct EventTest : public testing::Test {
-  virtual void TearDown() {
-    if (dispatchThread.get() != nullptr && dispatchThread->joinable()) {
+  void TearDown() override {
+    if (dispatchThread && dispatchThread->joinable()) {
       dispatchThread->join();
     }
-    for (auto&& thread : waitThreads) {
+    dispatchThread.reset();
+    for (auto& thread : waitThreads) {
       if (thread->joinable()) {
         thread->join();
       }
     }
+    waitThreads.clear();
+    eventParams.clear();
+    launched = false;
+    launchReady = 0;
+    launchTarget = 0;
   }
 
-  EventTest()
-      : lookback_time_sec(0.1),
-        wait_time_sec(0.05),
-        launchReady(0),
-        launchTarget(0),
-        launched(false) {}
-
   void setupEvent(EventChannel::NotificationMode mode) {
+    TearDown();
+
     testEventChannel.reset(new EventChannel("TestEventChannel", mode));
     EXPECT_NE(nullptr, testEventChannel);
   }
 
   void addEventInstance(double a_sleep_time_sec, void* data) {
-    eventParams.push_back(pair<double, void*>(a_sleep_time_sec, data));
+    eventParams.emplace_back(a_sleep_time_sec, data);
   }
 
   void startDispatchThread(bool synchronous = false) {
     dispatchThread = make_unique<thread>(dispatchEvents, this, synchronous);
   }
 
-  void startWaitThread(vector<double>& waitIntervals) {
+  void startWaitThread(const vector<double>& waitIntervals) {
     waitThreads.push_back(make_unique<thread>(waitOnEvents, this, waitIntervals));
   }
 
   void waitForLaunch() {
     unique_lock<mutex> lock(launchLock);
-    ++launchReady;
-    if (launchReady == launchTarget) {
+    if (++launchReady == launchTarget && launchTarget > 0) {
       launched = true;
       launchCond.notify_all();
     } else {
-      launchCond.wait(lock, [=] { return launched; });
+      launchCond.wait(lock, [this] { return this->launched; });
     }
   }
 
@@ -83,7 +85,7 @@ struct EventTest : public testing::Test {
       launched = true;
       launchCond.notify_all();
     } else {
-      launchCond.wait(lock, [=] { return launched; });
+      launchCond.wait(lock, [this] { return this->launched; });
     }
   }
 
@@ -93,25 +95,25 @@ struct EventTest : public testing::Test {
   void runNumPastEvents(EventChannel::NotificationMode mode);
   void runSpuriousWakeup(EventChannel::NotificationMode mode);
 
-  const double lookback_time_sec; // Look-back 100 ms.
-  const double
-      wait_time_sec; // Assume 50 ms after threaded started, we are already waiting on event.
+  const double lookback_time_sec{0.2}; // Look-back 200 ms.
+  const double wait_time_sec{
+      0.05}; // Assume 50 ms after threaded started, we are already waiting on event.
   unique_ptr<EventChannel> testEventChannel;
   mutex launchLock;
   condition_variable launchCond;
-  uint32_t launchReady;
-  uint32_t launchTarget;
-  bool launched;
+  uint32_t launchReady{0};
+  uint32_t launchTarget{0};
+  bool launched{false};
   unique_ptr<thread> dispatchThread;
   vector<unique_ptr<thread>> waitThreads;
   vector<pair<double, void*>> eventParams;
   EventChannel::Event event;
 };
 
-void* dispatchEvents(void* data, bool synchronous) {
+void dispatchEvents(void* data, bool synchronous) {
   EventTest* test = static_cast<EventTest*>(data);
   test->waitForLaunch();
-  for (auto i : test->eventParams) {
+  for (const auto& i : test->eventParams) {
     this_thread::sleep_for(chrono::duration<double>(i.first));
     if (synchronous) {
       // waiting for an event has the effect of completing any previous wakeups
@@ -120,10 +122,9 @@ void* dispatchEvents(void* data, bool synchronous) {
     }
     test->testEventChannel->dispatchEvent(i.second);
   }
-  return nullptr;
 }
 
-void waitOnEvents(void* data, vector<double> waitIntervals) {
+void waitOnEvents(void* data, const vector<double>& waitIntervals) {
   EventTest* test = static_cast<EventTest*>(data);
   test->waitForLaunch();
   EventChannel::Event event;
@@ -136,9 +137,9 @@ void waitOnEvents(void* data, vector<double> waitIntervals) {
 }
 
 void EventTest::runWaitAndDispatch(EventChannel::NotificationMode mode) {
-  int a;
+  int a = 0;
   setupEvent(mode);
-  addEventInstance(wait_time_sec, static_cast<void*>(&a));
+  addEventInstance(wait_time_sec, &a);
   startDispatchThread();
   launch();
 
