@@ -89,9 +89,11 @@ string vrs::os::getOsFingerPrint() {
   DWORD dwMajorVersion = 0;
   DWORD dwMinorVersion = 0;
   DWORD dwBuild = 0;
-  dwVersion = GetVersion();
 
-  // Get the Windows version.
+#if _MSC_VER < 1900
+
+  dwVersion = GetVersion();
+    Get the Windows version.
   dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
   dwMinorVersion = (DWORD)(HIBYTE(LOWORD(dwVersion)));
 
@@ -99,6 +101,26 @@ string vrs::os::getOsFingerPrint() {
   if (dwVersion < 0x80000000) {
     dwBuild = (DWORD)(HIWORD(dwVersion));
   }
+
+#else
+
+  OSVERSIONINFOEX versionInfo;
+  DWORD dwMask = 0;
+  DWORDLONG dwlConditionMask = 0;
+  ZeroMemory(&versionInfo, sizeof(OSVERSIONINFOEX));
+  versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+  VER_SET_CONDITION(dwlConditionMask, VER_MAJORVERSION, VER_GREATER_EQUAL);
+  VER_SET_CONDITION(dwlConditionMask, VER_MINORVERSION, VER_GREATER_EQUAL);
+  VER_SET_CONDITION(dwlConditionMask, VER_BUILDNUMBER, VER_GREATER_EQUAL);
+  VerifyVersionInfo(
+      &versionInfo, VER_MAJORVERSION | VER_MINORVERSION | VER_BUILDNUMBER,
+      dwlConditionMask);
+
+  dwMajorVersion = versionInfo.dwMajorVersion;
+  dwMinorVersion = versionInfo.dwMinorVersion;
+  dwBuild = versionInfo.dwBuildNumber;
+#endif
+
   string osFingerprintString;
   osFingerprintString = "Windows ";
   osFingerprintString += to_string(dwMajorVersion);
