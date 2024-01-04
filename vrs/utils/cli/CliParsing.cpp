@@ -53,8 +53,8 @@ bool parseCopyOptions(
     if (preset != CompressionPreset::Undefined) {
       copyOptions.setCompressionPreset(preset);
     } else {
-      cerr << appName << ": error. Invalid --compression argument value: '" << optionValue << "'."
-           << endl;
+      cerr << appName << ": error. Invalid --compression argument value: '" << optionValue
+           << "'.\n";
       outStatusCode = EXIT_FAILURE;
     }
   } else if (arg == "--chunk-size") {
@@ -76,11 +76,11 @@ bool parseCopyOptions(
       try {
         copyOptions.maxChunkSizeMB = stoull(param) * factor;
       } catch (logic_error&) {
-        cerr << appName << ": error. Invalid '--chunk-size' numeric value." << endl;
+        cerr << appName << ": error. Invalid '--chunk-size' numeric value.\n";
         outStatusCode = EXIT_FAILURE;
       }
     } else {
-      cerr << appName << ": '--chunk-size' <nb>[M|G]" << endl;
+      cerr << appName << ": '--chunk-size' <nb>[M|G]\n";
       outStatusCode = EXIT_FAILURE;
     }
   } else if (arg == "--mt") {
@@ -88,11 +88,11 @@ bool parseCopyOptions(
       try {
         copyOptions.compressionPoolSize = static_cast<unsigned>(stoul(argv[argn]));
       } catch (logic_error&) {
-        cerr << appName << ": error. Invalid '--mt' numeric value." << endl;
+        cerr << appName << ": error. Invalid '--mt' numeric value.\n";
         outStatusCode = EXIT_FAILURE;
       }
     } else {
-      cerr << appName << ": '--mt' requires a number of threads." << endl;
+      cerr << appName << ": '--mt' requires a number of threads.\n";
       outStatusCode = EXIT_FAILURE;
     }
   } else {
@@ -124,13 +124,13 @@ bool parseTagOverrideOptions(
       const string tagName = string(argv[++argn]);
       const string tagValue = string(argv[++argn]);
       if (tagName.empty()) {
-        cerr << appName << ": error. '--file-tag' requires a real tag name." << endl;
+        cerr << appName << ": error. '--file-tag' requires a real tag name.\n";
         outStatusCode = EXIT_FAILURE;
       } else {
         copyOptions.getTagOverrider().fileTags[tagName] = tagValue;
       }
     } else {
-      cerr << appName << ": error. '--file-tag' requires a tag name & a tag value." << endl;
+      cerr << appName << ": error. '--file-tag' requires a tag name & a tag value.\n";
       outStatusCode = EXIT_FAILURE;
     }
   } else if (arg == "--stream-tag") {
@@ -138,22 +138,21 @@ bool parseTagOverrideOptions(
       const string streamId = string(argv[++argn]);
       StreamId id = StreamId::fromNumericName(streamId);
       if (!id.isValid()) {
-        cerr << appName << ": error. '--stream-tag' invalid stream id '" << streamId << "'."
-             << endl;
+        cerr << appName << ": error. '--stream-tag' invalid stream id '" << streamId << "'.\n";
         outStatusCode = EXIT_FAILURE;
       } else {
         const string tagName = string(argv[++argn]);
         const string tagValue = string(argv[++argn]);
         if (tagName.empty()) {
-          cerr << appName << ": error. '--stream-tag' requires a real tag name." << endl;
+          cerr << appName << ": error. '--stream-tag' requires a real tag name.\n";
           outStatusCode = EXIT_FAILURE;
         } else {
           copyOptions.getTagOverrider().streamTags[id][tagName] = tagValue;
         }
       }
     } else {
-      cerr << appName << ": error. '--stream-tag' requires a stream id, a tag name & a tag value."
-           << endl;
+      cerr << appName
+           << ": error. '--stream-tag' requires a stream id, a tag name & a tag value.\n";
       outStatusCode = EXIT_FAILURE;
     }
   } else {
@@ -181,21 +180,21 @@ bool parseTimeAndStreamFilters(
   if (arg == "--after") {
     if (++argn < argc) {
       if (!filteredReader.afterConstraint(argv[argn])) {
-        cerr << appName << ": error. Invalid '--after' numeric value." << endl;
+        cerr << appName << ": error. Invalid '--after' numeric value.\n";
         outStatusCode = EXIT_FAILURE;
       }
     } else {
-      cerr << appName << ": error. '--after' requires a numeric parameter." << endl;
+      cerr << appName << ": error. '--after' requires a numeric parameter.\n";
       outStatusCode = EXIT_FAILURE;
     }
   } else if (arg == "--before") {
     if (++argn < argc) {
       if (!filteredReader.beforeConstraint(argv[argn])) {
-        cerr << appName << ": error. Invalid '--before' numeric value." << endl;
+        cerr << appName << ": error. Invalid '--before' numeric value.\n";
         outStatusCode = EXIT_FAILURE;
       }
     } else {
-      cerr << appName << ": error. '--before' requires a numeric parameter." << endl;
+      cerr << appName << ": error. '--before' requires a numeric parameter.\n";
       outStatusCode = EXIT_FAILURE;
     }
   } else if (arg == "--range") {
@@ -203,11 +202,11 @@ bool parseTimeAndStreamFilters(
       string after = argv[++argn];
       string before = argv[++argn];
       if (!filteredReader.afterConstraint(after) || !filteredReader.beforeConstraint(before)) {
-        cerr << appName << ": error. Invalid '--range' numeric value(s)." << endl;
+        cerr << appName << ": error. Invalid '--range' numeric value(s).\n";
         outStatusCode = EXIT_FAILURE;
       }
     } else {
-      cerr << appName << ": error. '--range' requires two numeric parameters." << endl;
+      cerr << appName << ": error. '--range' requires two numeric parameters.\n";
       outStatusCode = EXIT_FAILURE;
     }
   } else if (arg == "--around") {
@@ -218,11 +217,11 @@ bool parseTimeAndStreamFilters(
         filteredReader.filter.maxTime = stod(argv[++argn]);
         filteredReader.filter.aroundTime = true;
       } catch (logic_error&) {
-        cerr << appName << ": error. Invalid '--around' numeric value(s)." << endl;
+        cerr << appName << ": error. Invalid '--around' numeric value(s).\n";
         outStatusCode = EXIT_FAILURE;
       }
     } else {
-      cerr << appName << ": error. '--range' requires two numeric parameters." << endl;
+      cerr << appName << ": error. '--range' requires two numeric parameters.\n";
       outStatusCode = EXIT_FAILURE;
     }
   } else if (arg == "-" || arg == "+") {
@@ -235,11 +234,11 @@ bool parseTimeAndStreamFilters(
         valid = exc ? outFilters.excludeType(argv[argn]) : outFilters.includeType(argv[argn]);
       }
       if (!valid) {
-        cerr << appName << ": error. Invalid '" << arg << "' argument." << endl;
+        cerr << appName << ": error. Invalid '" << arg << "' argument.\n";
         outStatusCode = EXIT_FAILURE;
       }
     } else {
-      cerr << appName << ": error. '" << arg << "' option requires a second argument." << endl;
+      cerr << appName << ": error. '" << arg << "' option requires a second argument.\n";
       outStatusCode = EXIT_FAILURE;
     }
   } else if (arg == "--first-records") {
@@ -296,12 +295,11 @@ bool parseDecimationOptions(
         const double interval = stod(argv[++argn]);
         getDecimatorParams(outFilters).decimationIntervals.push_back({streamId, interval});
       } catch (logic_error&) {
-        cerr << appName << ": error. Invalid --decimate numeric value." << endl;
+        cerr << appName << ": error. Invalid --decimate numeric value.\n";
         outStatusCode = EXIT_FAILURE;
       }
     } else {
-      cerr << appName << ": error. '--decimate' requires a stream id and a numeric parameter."
-           << endl;
+      cerr << appName << ": error. '--decimate' requires a stream id and a numeric parameter.\n";
       outStatusCode = EXIT_FAILURE;
     }
   } else if (arg == "--bucket-interval") {
@@ -309,11 +307,11 @@ bool parseDecimationOptions(
       try {
         getDecimatorParams(outFilters).bucketInterval = stod(argv[argn]);
       } catch (logic_error&) {
-        cerr << appName << ": error. Invalid '--bucket-interval' numeric value." << endl;
+        cerr << appName << ": error. Invalid '--bucket-interval' numeric value.\n";
         outStatusCode = EXIT_FAILURE;
       }
     } else {
-      cerr << appName << ": error. '--bucket-interval' requires a numeric parameter." << endl;
+      cerr << appName << ": error. '--bucket-interval' requires a numeric parameter.\n";
       outStatusCode = EXIT_FAILURE;
     }
   } else if (arg == "--bucket-max-delta") {
@@ -321,11 +319,11 @@ bool parseDecimationOptions(
       try {
         getDecimatorParams(outFilters).bucketMaxTimestampDelta = stod(argv[argn]);
       } catch (logic_error&) {
-        cerr << appName << ": error. Invalid '--bucket-max-delta' numeric value." << endl;
+        cerr << appName << ": error. Invalid '--bucket-max-delta' numeric value.\n";
         outStatusCode = EXIT_FAILURE;
       }
     } else {
-      cerr << appName << ": error. '--bucket-max-delta' requires a numeric parameter." << endl;
+      cerr << appName << ": error. '--bucket-max-delta' requires a numeric parameter.\n";
       outStatusCode = EXIT_FAILURE;
     }
   } else {

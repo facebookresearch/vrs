@@ -122,7 +122,7 @@ class RecordChecker : public StreamPlayer {
           csDigester_.ingest(buffer_);
           cout << sanitizedId_.getNumericName() << ": " << fixed << setprecision(3)
                << record.timestamp << " " << toString(record.recordType) << " s=" << buffer_.size()
-               << " CS=" << csDigester_.digestToString() << endl;
+               << " CS=" << csDigester_.digestToString() << "\n";
           hexdump(buffer_, 32);
         }
       } break;
@@ -166,7 +166,7 @@ bool iterateChecker(
   outDecodedRecords = 0;
   outNoError = true;
   if (!reader.timeRangeValid()) {
-    cerr << "Time Range invalid: " << reader.getTimeConstraintDescription() << endl;
+    cerr << "Time Range invalid: " << reader.getTimeConstraintDescription() << "\n";
     outDuration = 0;
     return false;
   }
@@ -391,7 +391,7 @@ string checkRecords(
       if (copyOptions.jsonOutput) {
         checksums["filetags"] = fileTagsChecksum;
       } else {
-        ss << "FileTags: " << fileTagsChecksum << endl;
+        ss << "FileTags: " << fileTagsChecksum << "\n";
       }
     }
     stringstream ids;
@@ -416,10 +416,10 @@ string checkRecords(
             checksums[id.getNumericName() + "_headers"] = headerChecksum;
             checksums[id.getNumericName() + "_payload"] = payloadChecksum;
           } else {
-            ss << id.getNumericName() << " VRS tags: " << vrsTagsChecksum << endl;
-            ss << id.getNumericName() << " User tags: " << userTagsChecksum << endl;
-            ss << id.getNumericName() << " Headers: " << headerChecksum << endl;
-            ss << id.getNumericName() << " Payload: " << payloadChecksum << endl;
+            ss << id.getNumericName() << " VRS tags: " << vrsTagsChecksum << "\n";
+            ss << id.getNumericName() << " User tags: " << userTagsChecksum << "\n";
+            ss << id.getNumericName() << " Headers: " << headerChecksum << "\n";
+            ss << id.getNumericName() << " Payload: " << payloadChecksum << "\n";
           }
           sum.ingest(vrsTagsChecksum)
               .ingest(userTagsChecksum)
@@ -492,7 +492,7 @@ string verbatimChecksum(const string& path, bool showProgress) {
     if (error == 0) {
       digester.ingest(buffer);
     } else {
-      cerr << kReset << "Read file error: " << errorCodeToMessage(error) << "." << endl;
+      cerr << kReset << "Read file error: " << errorCodeToMessage(error) << ".\n";
       return "<read error>";
     }
   }
@@ -599,10 +599,10 @@ static void printDifferences(
   // if there are too many differences, don't bother printing the details...
   if (byteDiffs > 500) {
     cout << "Too many differences to print: " << byteDiffs << " bytes differ out of "
-         << buffer.size() << " total (" << 100 * byteDiffs / buffer.size() << "%)." << endl;
+         << buffer.size() << " total (" << 100 * byteDiffs / buffer.size() << "%).\n";
     return;
   }
-  cout << byteDiffs << " bytes and " << bitDiffs << " bits differ." << endl;
+  cout << byteDiffs << " bytes and " << bitDiffs << " bits differ.\n";
 
   size_t offset = 0;
   while (offset < buffer.size()) {
@@ -628,7 +628,7 @@ static void printDifferences(
       offset += diffCount * lineSize;
     }
   }
-  cout << endl;
+  cout << "\n";
 }
 
 class RecordHolder : public StreamPlayer {
@@ -696,20 +696,20 @@ class RecordMaster : public StreamPlayer {
         noError_ = false;
         cerr << "Record " << record.streamId.getNumericName() << " t: " << fixed << setprecision(3)
              << record.timestamp << " " << toString(record.recordType)
-             << " Error while reading the record." << endl;
+             << " Error while reading the record.\n";
       } else {
         if (holder_->getReadCounter() != readCounter_) {
-          cerr << "Record counter is different." << endl;
+          cerr << "Record counter is different.\n";
           diffCounter_++;
         } else if (holder_->getBuffer() != buffer_) {
           diffCounter_++;
           cerr << "Record " << record.streamId.getNumericName() << " t: " << fixed
                << setprecision(3) << record.timestamp << " " << toString(record.recordType)
-               << " payload mismatch." << endl;
+               << " payload mismatch.\n";
           const vector<char>& otherBuffer = holder_->getBuffer();
           if (otherBuffer.size() != buffer_.size()) {
             cerr << "Payload sizes differ: " << buffer_.size() << " vs. " << otherBuffer.size()
-                 << "." << endl;
+                 << ".\n";
           } else {
             const size_t kLineSize = 8; // How many bytes per line
             const bool kPrintAscii = false;
@@ -745,12 +745,12 @@ bool compareVRSfiles(
 
   map<StreamId, StreamId> idMap;
   if (!buildIdMap(first, second, idMap)) {
-    cerr << "Streams don't match." << endl;
+    cerr << "Streams don't match.\n";
     return false;
   }
   bool match = true;
   if (first.reader.getTags() != second.reader.getTags()) {
-    cerr << "File tags don't match." << endl;
+    cerr << "File tags don't match.\n";
     match = false;
   }
   for (auto ids : idMap) {
@@ -758,12 +758,12 @@ bool compareVRSfiles(
     const StreamTags& secondTags = second.reader.getTags(ids.second);
     if (firstTags.vrs != secondTags.vrs) {
       cerr << "The VRS tags of the stream " << ids.first.getNumericName() << '/'
-           << ids.second.getNumericName() << " don't match." << endl;
+           << ids.second.getNumericName() << " don't match.\n";
       match = false;
     }
     if (firstTags.user != secondTags.user) {
       cerr << "The user tags of the stream " << ids.first.getNumericName() << '/'
-           << ids.second.getNumericName() << " don't match." << endl;
+           << ids.second.getNumericName() << " don't match.\n";
       match = false;
     }
   }
@@ -789,7 +789,7 @@ bool compareVRSfiles(
     return false;
   }
   if (!noError) {
-    cerr << "Errors happened while reading the files" << endl;
+    cerr << "Errors happened while reading the files\n";
   }
   throttledWriter.closeFile();
   return noError && diffCounter == 0;
@@ -801,12 +801,12 @@ bool compareVerbatim(FilteredFileReader& first, FilteredFileReader& second, bool
   unique_ptr<FileHandler> source, dest;
   int status = first.openFile(source);
   if (status != 0 || (status = second.openFile(dest)) != 0) {
-    cerr << "Can't open files to compare: " << errorCodeToMessage(status) << "." << endl;
+    cerr << "Can't open files to compare: " << errorCodeToMessage(status) << ".\n";
     return false;
   }
   if (source->getTotalSize() != dest->getTotalSize()) {
     cout << "The files have different sizes: " << source->getTotalSize() << " vs. "
-         << dest->getTotalSize() << " bytes. " << endl;
+         << dest->getTotalSize() << " bytes.\n";
     return false;
   }
   size_t totalSize = static_cast<size_t>(source->getTotalSize());
@@ -822,19 +822,18 @@ bool compareVerbatim(FilteredFileReader& first, FilteredFileReader& second, bool
       error = dest->read(dstBuffer.data(), length);
       if (error == 0) {
         if (srcBuffer != dstBuffer) {
-          cout << kReset << "Chunk #" << (offset / kDownloadChunkSize) + 1 << " is different."
-               << endl;
+          cout << kReset << "Chunk #" << (offset / kDownloadChunkSize) + 1 << " is different.\n";
           const size_t kLineSize = 16; // How many bytes per line
           const bool kPrintAscii = true;
           printDifferences(srcBuffer, dstBuffer, kLineSize, kPrintAscii);
           return false;
         }
       } else {
-        cerr << kReset << "Read file error: " << errorCodeToMessage(error) << "." << endl;
+        cerr << kReset << "Read file error: " << errorCodeToMessage(error) << ".\n";
         return false;
       }
     } else {
-      cerr << kReset << "Read file error: " << errorCodeToMessage(error) << "." << endl;
+      cerr << kReset << "Read file error: " << errorCodeToMessage(error) << ".\n";
       return false;
     }
   }

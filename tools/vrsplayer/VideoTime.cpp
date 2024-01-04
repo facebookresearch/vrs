@@ -102,10 +102,10 @@ void VideoTime::validateTime() {
       XR_LOGE("{}", msg.str());
     }
     if (!sValidatedTime && sPlayerUI) {
-      msg << endl
-          << endl
-          << "VRSplayer will try using the system's clock instead." << endl
-          << endl
+      msg << "\n"
+          << "\n"
+          << "VRSplayer will try using the system's clock instead.\n"
+          << "\n"
           << "You could try to select a different default audio device using "
           << "your system's preferences/control panel.";
       QMetaObject::invokeMethod(

@@ -189,18 +189,18 @@ RecordableTypeId readRecordableTypeId(const FileFormat::LittleEndian<int32_t>& r
 bool printVRSFileInternals(FileHandler& file) {
   using namespace std;
   TemporaryCachingStrategy temporaryCachingStrategy(file, CachingStrategy::Passive);
-  cout << "FileHandler: " << file.getFileHandlerName() << endl;
+  cout << "FileHandler: " << file.getFileHandlerName() << "\n";
   FileFormat::FileHeader fileHeader;
   int error = file.read(fileHeader);
   if (error != 0) {
-    cerr << "Can't read file header, error #" << error << ": " << errorCodeToMessage(error) << endl;
+    cerr << "Can't read file header, error #" << error << ": " << errorCodeToMessage(error) << "\n";
     return false;
   }
   // Let's check the file header...
   if (fileHeader.looksLikeAVRSFile()) {
-    cout << "File header integrity: OK." << endl;
+    cout << "File header integrity: OK.\n";
   } else {
-    cerr << "File header integrity check failed. This is not a VRS file." << endl;
+    cerr << "File header integrity check failed. This is not a VRS file.\n";
     return false;
   }
   bool returnValue = true;
@@ -208,28 +208,28 @@ bool printVRSFileInternals(FileHandler& file) {
   cout << "File format version: '" << char(fileFormatVersion & 0xff)
        << char((fileFormatVersion >> 8) & 0xff) << char((fileFormatVersion >> 16) & 0xff)
        << char((fileFormatVersion >> 24) & 0xff) << "', "
-       << (fileHeader.isFormatSupported() ? "supported." : "NOT SUPPORTED.") << endl;
-  cout << "Creation ID: " << hex << fileHeader.creationId.get() << dec << '.' << endl;
+       << (fileHeader.isFormatSupported() ? "supported." : "NOT SUPPORTED.") << "\n";
+  cout << "Creation ID: " << hex << fileHeader.creationId.get() << dec << ".\n";
   time_t creationTimeSec = static_cast<time_t>(fileHeader.creationId.get() / 1000000000);
   cout << "Creation date: " << put_time(localtime(&creationTimeSec), "%c %Z.") << '\n';
   cout << "File header size: " << fileHeader.fileHeaderSize.get() << " bytes";
   if (fileHeader.fileHeaderSize.get() == sizeof(fileHeader)) {
-    cout << ", as expected." << endl;
+    cout << ", as expected.\n";
   } else {
-    cout << ", compared to " << sizeof(fileHeader) << " bytes expected." << endl;
+    cout << ", compared to " << sizeof(fileHeader) << " bytes expected.\n";
   }
   cout << "Record header size: " << fileHeader.recordHeaderSize.get() << " bytes";
   if (fileHeader.recordHeaderSize.get() == sizeof(FileFormat::RecordHeader)) {
-    cout << ", as expected." << endl;
+    cout << ", as expected.\n";
   } else {
-    cout << ", compared to " << sizeof(FileFormat::RecordHeader) << " bytes expected." << endl;
+    cout << ", compared to " << sizeof(FileFormat::RecordHeader) << " bytes expected.\n";
   }
   bool descriptionRecordAfterFileHeader =
       fileHeader.descriptionRecordOffset.get() == fileHeader.fileHeaderSize.get();
   cout << "Description record offset: " << fileHeader.descriptionRecordOffset.get() << ", "
        << (descriptionRecordAfterFileHeader ? "right after the file header, as expected."
                                             : "NOT RIGHT AFTER THE FILE HEADER")
-       << endl;
+       << "\n";
   if (!descriptionRecordAfterFileHeader) {
     returnValue = false;
   }
@@ -239,20 +239,19 @@ bool printVRSFileInternals(FileHandler& file) {
   IF_ERROR_LOG(file.setPos(fileHeader.descriptionRecordOffset.get()));
   IF_ERROR_LOG(file.read(descriptionRecordHeader));
 
-  cout << "Description record size: " << descriptionRecordHeader.recordSize.get() << " bytes."
-       << endl;
+  cout << "Description record size: " << descriptionRecordHeader.recordSize.get() << " bytes.\n";
   int64_t indexRecordOffset = fileHeader.indexRecordOffset.get();
   cout << "Index record offset: " << indexRecordOffset << ", ";
   if (indexRecordOffset ==
       fileHeader.fileHeaderSize.get() + descriptionRecordHeader.recordSize.get()) {
-    cout << "right after the description record (Ready for streaming)." << endl;
+    cout << "right after the description record (Ready for streaming).\n";
   } else {
     if (indexRecordOffset == 0) {
       indexRecordOffset =
           fileHeader.fileHeaderSize.get() + descriptionRecordHeader.recordSize.get();
-      cout << "anticipated at " << indexRecordOffset << ", after the description record." << endl;
+      cout << "anticipated at " << indexRecordOffset << ", after the description record.\n";
     } else {
-      cout << "NOT after the decription record. Not great for streaming." << endl;
+      cout << "NOT after the decription record. Not great for streaming.\n";
     }
   }
 
@@ -261,20 +260,20 @@ bool printVRSFileInternals(FileHandler& file) {
   IF_ERROR_LOG(file.setPos(indexRecordOffset));
   IF_ERROR_LOG(file.read(indexRecordHeader));
 
-  cout << "Index Record size: " << indexRecordHeader.recordSize.get() << " bytes." << endl;
+  cout << "Index Record size: " << indexRecordHeader.recordSize.get() << " bytes.\n";
   if (indexRecordHeader.recordSize.get() == fileHeader.recordHeaderSize.get()) {
-    cout << "This index record looks empty" << endl;
+    cout << "This index record looks empty\n";
   } else if (indexRecordHeader.recordSize.get() < fileHeader.recordHeaderSize.get()) {
-    cerr << "This is smaller than the record index, something's really off!" << endl;
+    cerr << "This is smaller than the record index, something's really off!\n";
     returnValue = false;
   }
   int64_t endOfSplitIndexRecordOffset = 0;
   uint32_t indexFormatVersion = indexRecordHeader.formatVersion.get();
   cout << "Index Record format version: ";
   if (indexFormatVersion == vrs::IndexRecord::kClassicIndexFormatVersion) {
-    cout << "Classic." << endl;
+    cout << "Classic.\n";
   } else if (indexFormatVersion == vrs::IndexRecord::kSplitIndexFormatVersion) {
-    cout << "Split File Head." << endl;
+    cout << "Split File Head.\n";
     int64_t currentPos = file.getPos();
     int64_t chunkStart, chunkSize;
     if (file.getChunkRange(chunkStart, chunkSize) == 0 &&
@@ -288,30 +287,30 @@ bool printVRSFileInternals(FileHandler& file) {
         size_t count =
             static_cast<size_t>(indexByteSize) / sizeof(vrs::IndexRecord::DiskRecordInfo);
         if (leftover == 0) {
-          cout << "precisely " << count << " records." << endl;
+          cout << "precisely " << count << " records.\n";
         } else {
-          cout << count << " records, and " << leftover << " extra bytes (not good!)" << endl;
+          cout << count << " records, and " << leftover << " extra bytes (not good!)\n";
           returnValue = false;
         }
         endOfSplitIndexRecordOffset = nextChunkStart;
       } else {
         // We're already in the next chunk: is the index empty?
         if (chunkStart == currentPos) {
-          cout << "Split index empty." << endl;
+          cout << "Split index empty.\n";
           endOfSplitIndexRecordOffset = chunkStart;
         } else {
           // something's really off...
           cerr << "Split index error! Ends at " << currentPos << ", but the first chunk is from "
-               << chunkStart << " to " << nextChunkStart - 1 << '.' << endl;
+               << chunkStart << " to " << nextChunkStart - 1 << ".\n";
           returnValue = false;
         }
       }
     } else {
-      cerr << "Can't get current chunk information!" << endl;
+      cerr << "Can't get current chunk information!\n";
       returnValue = false;
     }
   } else {
-    cerr << "Unknown! (" << indexFormatVersion << ")." << endl;
+    cerr << "Unknown! (" << indexFormatVersion << ").\n";
     returnValue = false;
   }
 
@@ -320,44 +319,43 @@ bool printVRSFileInternals(FileHandler& file) {
   if (firstUserRecordOffset == 0) {
     cout << "value not set";
     if (indexFormatVersion == vrs::IndexRecord::kClassicIndexFormatVersion) {
-      cout << ", which is expected with legacy files, pre-streaming optimizations." << endl;
+      cout << ", which is expected with legacy files, pre-streaming optimizations.\n";
       int64_t endOfDescriptionRecord =
           fileHeader.descriptionRecordOffset.get() + descriptionRecordHeader.recordSize.get();
       if (endOfDescriptionRecord < fileHeader.indexRecordOffset.get()) {
         cout << "First user record at " << endOfDescriptionRecord
-             << ", after the description record." << endl;
+             << ", after the description record.\n";
         firstUserRecordOffset = endOfDescriptionRecord;
       }
     } else if (indexFormatVersion == vrs::IndexRecord::kSplitIndexFormatVersion) {
-      cout << ", which means the recording was probably interrupted." << endl;
+      cout << ", which means the recording was probably interrupted.\n";
     } else {
-      cout << "." << endl;
+      cout << ".\n";
     }
   } else {
-    cout << "value set, when doing streaming optimizations." << endl;
+    cout << "value set, when doing streaming optimizations.\n";
   }
   if (endOfSplitIndexRecordOffset != 0) {
-    cout << "End of split index record: " << endOfSplitIndexRecordOffset << '.' << endl;
+    cout << "End of split index record: " << endOfSplitIndexRecordOffset << ".\n";
   }
 
   if (firstUserRecordOffset != 0 && endOfSplitIndexRecordOffset != 0) {
     if (firstUserRecordOffset != endOfSplitIndexRecordOffset) {
-      cout << "The end of the index record doesn't match the location of the first user record!"
-           << endl;
+      cout << "The end of the index record doesn't match the location of the first user record!\n";
     }
   } else if (firstUserRecordOffset == 0 && endOfSplitIndexRecordOffset != 0) {
     firstUserRecordOffset = endOfSplitIndexRecordOffset;
   }
 
   if (firstUserRecordOffset == 0) {
-    cerr << "We don't know where the first user record is." << endl;
+    cerr << "We don't know where the first user record is.\n";
     returnValue = false;
   } else {
     FileFormat::RecordHeader firstUserRecord;
     IF_ERROR_LOG(file.setPos(firstUserRecordOffset));
     IF_ERROR_LOG(file.read(firstUserRecord));
     cout << "Size of record before first user record: " << firstUserRecord.previousRecordSize.get()
-         << " bytes." << endl;
+         << " bytes.\n";
   }
 
   return returnValue;

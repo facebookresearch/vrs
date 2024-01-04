@@ -145,14 +145,14 @@ void DataLayout::printLayout(ostream& out, const string& indent) const {
   string subindent = indent + "  ";
   if (!fixedSizePieces_.empty()) {
     out << indent << fixedSizePieces_.size() << " fixed size pieces, total " << fixedData_.size()
-        << " bytes." << endl;
+        << " bytes.\n";
     for (auto* piece : fixedSizePieces_) {
       piece->print(out, subindent);
     }
   }
   if (!varSizePieces_.empty()) {
     out << indent << varSizePieces_.size() << " variable size pieces, total "
-        << getVarDataSizeFromIndex() << " bytes." << endl;
+        << getVarDataSizeFromIndex() << " bytes.\n";
     for (auto* piece : varSizePieces_) {
       piece->print(out, subindent);
     }
@@ -1067,10 +1067,10 @@ void DataPieceValue<T>::print(ostream& out, const string& indent) const {
   if (hasValue) {
     out << (isDefault ? " Value (default): " : " Value: ");
     printValue<T>(out, value, getLabel());
-    out << endl;
+    out << "\n";
   }
   for (const auto& prop : properties_) {
-    out << indent << "  " << prop.first << ": " << FORMAT(prop.second, out) << endl;
+    out << indent << "  " << prop.first << ": " << FORMAT(prop.second, out) << "\n";
   }
 }
 
@@ -1079,7 +1079,7 @@ void DataPieceValue<T>::printCompact(ostream& out, const string& indent) const {
   using namespace special_chars;
   out << indent << getLabel() << ": ";
   printValue<T>(out, get(), getLabel());
-  out << ((getOffset() == DataLayout::kNotFound) ? " *" : "") << endl;
+  out << ((getOffset() == DataLayout::kNotFound) ? " *\n" : "\n");
 }
 
 template <typename T>
@@ -1137,7 +1137,7 @@ size_t getCountPerLine(const T& value) {
 
 template <typename T>
 void DataPieceArray<T>::print(ostream& out, const string& indent) const {
-  out << indent << getLabel() << " (" << getElementTypeName() << '[' << count_ << ']' << ") @ ";
+  out << indent << getLabel() << " (" << getElementTypeName() << '[' << count_ << "]) @ ";
   if (getOffset() == DataLayout::kNotFound) {
     out << "<unavailable>";
   } else {
@@ -1147,7 +1147,7 @@ void DataPieceArray<T>::print(ostream& out, const string& indent) const {
   if (isRequired()) {
     out << " required";
   }
-  out << endl;
+  out << "\n";
   using namespace special_chars;
   vector<T> values;
   bool hasValue = get(values);
@@ -1157,16 +1157,16 @@ void DataPieceArray<T>::print(ostream& out, const string& indent) const {
     out << indent << (isDefault ? "  Values (default):" : "  Values:");
     for (size_t k = 0; k < values.size(); k++) {
       if (k % kCountPerLine == 0 && values.size() > kCountPerLine) {
-        out << endl << indent << "    ";
+        out << "\n" << indent << "    ";
       } else {
         out << " ";
       }
       out << FORMAT(values[k], out);
     }
-    out << endl;
+    out << "\n";
   }
   for (const auto& prop : properties_) {
-    out << indent << "  " << prop.first << ": " << FORMAT(prop.second, out) << endl;
+    out << indent << "  " << prop.first << ": " << FORMAT(prop.second, out) << "\n";
   }
 }
 
@@ -1178,7 +1178,7 @@ void DataPieceArray<T>::printCompact(ostream& out, const string& indent) const {
   const size_t kCountPerLine = values.empty() ? 1 : getCountPerLine<T>(values.front());
   for (size_t k = 0; k < values.size(); k++) {
     if (k % kCountPerLine == 0 && values.size() > kCountPerLine) {
-      out << endl << indent << "    ";
+      out << "\n" << indent << "    ";
     } else {
       out << " ";
     }
@@ -1186,9 +1186,9 @@ void DataPieceArray<T>::printCompact(ostream& out, const string& indent) const {
     out << FORMAT(values[k], out);
   }
   if (!hasValue) {
-    out << " *" << endl;
+    out << " *\n";
   }
-  out << endl;
+  out << "\n";
 }
 
 template <typename T>
@@ -1312,20 +1312,20 @@ void DataPieceVector<T>::print(ostream& out, const string& indent) const {
   }
   vector<T> values;
   bool isDefault = !get(values);
-  out << ", count: " << values.size() << endl;
+  out << ", count: " << values.size() << "\n";
   if (!values.empty()) {
     const size_t kCountPerLine = getCountPerLine<T>(values.front());
     out << indent << (isDefault ? "  Values (default):" : "  Values:");
     for (size_t k = 0; k < values.size(); k++) {
       if (k % kCountPerLine == 0 && values.size() > kCountPerLine) {
-        out << endl << indent << "    ";
+        out << "\n" << indent << "    ";
       } else {
         out << ' ';
       }
       using namespace special_chars;
       out << FORMAT(values[k], out);
     }
-    out << endl;
+    out << "\n";
   }
 }
 
@@ -1343,18 +1343,18 @@ void DataPieceVector<string>::print(ostream& out, const string& indent) const {
   }
   vector<string> values;
   bool isDefault = !get(values);
-  out << ", count: " << values.size() << endl;
+  out << ", count: " << values.size() << "\n";
   if (!values.empty()) {
     out << indent << (isDefault ? "  Values (default):" : "  Values:");
     for (size_t k = 0; k < values.size(); k++) {
       if (k % kCountPerLine == 0 && values.size() > kCountPerLine) {
-        out << endl << indent << "    ";
+        out << "\n" << indent << "    ";
       } else {
         out << ' ';
       }
       out << '"' << helpers::make_printable(values[k]) << '"';
     }
-    out << endl;
+    out << "\n";
   }
 }
 
@@ -1366,7 +1366,7 @@ void DataPieceVector<T>::printCompact(ostream& out, const string& indent) const 
   const size_t kCountPerLine = values.empty() ? 1 : getCountPerLine<T>(values.front());
   for (size_t k = 0; k < values.size(); k++) {
     if (k % kCountPerLine == 0 && values.size() > kCountPerLine) {
-      out << endl << indent << "    ";
+      out << "\n" << indent << "    ";
     } else {
       out << ' ';
     }
@@ -1376,7 +1376,7 @@ void DataPieceVector<T>::printCompact(ostream& out, const string& indent) const 
   if (getOffset() == DataLayout::kNotFound) {
     out << "<unavailable>";
   }
-  out << endl;
+  out << "\n";
 }
 
 template <>
@@ -1387,7 +1387,7 @@ void DataPieceVector<string>::printCompact(ostream& out, const string& indent) c
   get(values);
   for (size_t k = 0; k < values.size(); k++) {
     if (k % kCountPerLine == 0 && values.size() > kCountPerLine) {
-      out << endl << indent << "    ";
+      out << "\n" << indent << "    ";
     } else {
       out << ' ';
     }
@@ -1396,7 +1396,7 @@ void DataPieceVector<string>::printCompact(ostream& out, const string& indent) c
   if (getOffset() == DataLayout::kNotFound) {
     out << "<unavailable>";
   }
-  out << endl;
+  out << "\n";
 }
 
 template <typename T>
@@ -1490,13 +1490,13 @@ void DataPieceStringMap<T>::print(ostream& out, const string& indent) const {
   }
   map<string, T> values;
   bool isDefault = !get(values);
-  out << ", count: " << values.size() << endl;
+  out << ", count: " << values.size() << "\n";
   if (!values.empty()) {
-    out << indent << (isDefault ? "  Values (default):" : "  Values:") << endl;
+    out << indent << (isDefault ? "  Values (default):" : "  Values:") << "\n";
     for (auto& iter : values) {
       out << indent << "    \"" << iter.first << "\": ";
       using namespace special_chars;
-      out << iter.second << endl;
+      out << iter.second << "\n";
     }
   }
 }
@@ -1506,11 +1506,11 @@ void DataPieceStringMap<T>::printCompact(ostream& out, const string& indent) con
   out << indent << getLabel();
   map<string, T> values;
   bool isDefault = !get(values);
-  out << ", " << values.size() << (isDefault ? " default" : "") << " values:" << endl;
+  out << ", " << values.size() << (isDefault ? " default" : "") << " values:\n";
   for (auto& iter : values) {
     out << indent << "    \"" << iter.first << "\": ";
     using namespace special_chars;
-    out << iter.second << endl;
+    out << iter.second << "\n";
   }
 }
 
@@ -1519,9 +1519,9 @@ void DataPieceStringMap<string>::printCompact(ostream& out, const string& indent
   out << indent << getLabel();
   map<string, string> values;
   bool isDefault = !get(values);
-  out << ", " << values.size() << (isDefault ? " default" : "") << " values:" << endl;
+  out << ", " << values.size() << (isDefault ? " default" : "") << " values:\n";
   for (auto& iter : values) {
-    out << indent << "    \"" << iter.first << "\": " << compactString(iter.second) << endl;
+    out << indent << "    \"" << iter.first << "\": " << compactString(iter.second) << "\n";
   }
 }
 
@@ -1612,7 +1612,7 @@ void DataPieceString::print(ostream& out, const string& indent) const {
   }
   string value = get();
   out << " = \"" << helpers::make_printable(value) << (isAvailable() ? "\"" : "\" (default value)");
-  out << endl;
+  out << "\n";
 }
 
 void DataPieceString::printCompact(ostream& out, const string& indent) const {
@@ -1620,7 +1620,7 @@ void DataPieceString::printCompact(ostream& out, const string& indent) const {
   if (getOffset() == DataLayout::kNotFound) {
     out << "<unavailable>";
   }
-  out << endl;
+  out << "\n";
 }
 
 bool DataPieceString::isSame(const DataPiece* rhs) const {

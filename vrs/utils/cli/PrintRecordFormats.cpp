@@ -41,15 +41,15 @@ string printRecordFormats(FilteredFileReader& filteredReader) {
       if (filteredReader.filter.types.find(iter.first.first) != filteredReader.filter.types.end()) {
         RecordFormat& format = iter.second;
         ss << id.getNumericName() << " " << id.getName() << " " << toString(iter.first.first)
-           << " v" << iter.first.second << ": " << format.asString() << endl;
+           << " v" << iter.first.second << ": " << format.asString() << "\n";
         for (size_t block = 0; block < format.getUsedBlocksCount(); block++) {
           if (format.getContentBlock(block).getContentType() == ContentType::DATA_LAYOUT) {
             ContentBlockId blockId(id.getTypeId(), iter.first.first, iter.first.second, block);
             unique_ptr<DataLayout> dl = filteredReader.reader.getDataLayout(id, blockId);
             if (dl) {
-              ss << "Content block " << block << ": " << dl->asJson(spec) << endl;
+              ss << "Content block " << block << ": " << dl->asJson(spec) << "\n";
             } else {
-              ss << "<no DataLayout>" << endl;
+              ss << "<no DataLayout>\n";
             }
           }
         }

@@ -206,7 +206,7 @@ int DataExtractor::DataExtractorStreamPlayer::recordReadComplete(
     json.addMember("stream", recordInfo.streamId.getNumericName());
     json.addMember("type", Record::typeName(recordInfo.recordType));
     json.addMember("timestamp", recordInfo.timestamp);
-    output_ << jDocumentToJsonString(doc) << endl;
+    output_ << jDocumentToJsonString(doc) << "\n";
   }
   output_ << "{\"content\":[";
   bool first = true;
@@ -218,7 +218,7 @@ int DataExtractor::DataExtractorStreamPlayer::recordReadComplete(
     }
     output_ << block;
   }
-  output_ << "]}" << endl;
+  output_ << "]}\n";
   blocks_.clear();
 
   return output_.fail() ? FAILURE : SUCCESS;
@@ -286,9 +286,9 @@ int DataExtractor::createOutput() {
   RecordFileInfo::Details details =
       RecordFileInfo::Details::Everything | RecordFileInfo::Details::UsePublicNames;
   const auto ids = getStreams();
-  readme << kReadMeContent << endl << "```" << endl;
+  readme << kReadMeContent << "\n```\n";
   RecordFileInfo::printOverview(readme, reader_, ids, details);
-  readme << endl << "```" << endl;
+  readme << "\n```\n";
 
   string path = os::pathJoin(outputFolder_, "metadata.jsons");
   output_.open(path, ofstream::out | ofstream::trunc);
@@ -296,7 +296,7 @@ int DataExtractor::createOutput() {
     XR_LOGE("Couldn't create file {}", path);
     return FAILURE;
   }
-  output_ << RecordFileInfo::jsonOverview(reader_, ids, details) << endl;
+  output_ << RecordFileInfo::jsonOverview(reader_, ids, details) << "\n";
   return SUCCESS;
 }
 

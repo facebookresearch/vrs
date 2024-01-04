@@ -146,7 +146,7 @@ TEST_F(DataLayoutTester, testDataLayout) {
   size_t lineCount = static_cast<size_t>(count(json.begin(), json.end(), '\n'));
   EXPECT_EQ(lineCount, 410);
 #if JSON_DUMP
-  cout << "Json: " << json << endl;
+  cout << "Json: " << json << "\n";
 #endif
 }
 
@@ -429,7 +429,7 @@ TEST_F(DataLayoutTester, testVarSizeFields) {
   EXPECT_TRUE(varSizeLayout.isVarDataIndexValid());
   varSizeLayout.printLayout(cout);
 #if JSON_DUMP
-  cout << "Json: " << varSizeLayout.asJson(JsonFormatProfile::EXTERNAL_PRETTY) << endl;
+  cout << "Json: " << varSizeLayout.asJson(JsonFormatProfile::EXTERNAL_PRETTY) << "\n";
 #endif
   OldVarSizeLayout oldVarSizeLayout;
   EXPECT_TRUE(oldVarSizeLayout.isVarDataIndexValid());
@@ -438,7 +438,7 @@ TEST_F(DataLayoutTester, testVarSizeFields) {
   EXPECT_FALSE(varSizeLayout.mapLayout(oldVarSizeLayout));
   varSizeLayout.printLayout(cout);
 #if JSON_DUMP
-  cout << "Json: " << varSizeLayout.asJson(JsonFormatProfile::EXTERNAL_PRETTY) << endl;
+  cout << "Json: " << varSizeLayout.asJson(JsonFormatProfile::EXTERNAL_PRETTY) << "\n";
 #endif
 
   EXPECT_EQ(varSizeLayout.getDeclaredFixedDataPiecesCount(), 3);
@@ -737,8 +737,8 @@ TEST_F(DataLayoutTester, testSerialization) {
 
   unique_ptr<DataLayout> newManualLayout = DataLayout::makeFromJson(manualLayout.asJson());
 #if JSON_DUMP
-  cout << "Json: " << manualLayout.asJson(JsonFormatProfile::EXTERNAL_PRETTY) << endl;
-  cout << "New Json: " << newManualLayout.get()->asJson(JsonFormatProfile::EXTERNAL_PRETTY) << endl;
+  cout << "Json: " << manualLayout.asJson(JsonFormatProfile::EXTERNAL_PRETTY) << "\n";
+  cout << "New Json: " << newManualLayout.get()->asJson(JsonFormatProfile::EXTERNAL_PRETTY) << "\n";
 #endif
 
   newManualLayout->printLayout(cout);

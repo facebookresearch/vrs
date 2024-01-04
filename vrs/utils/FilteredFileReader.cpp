@@ -88,7 +88,7 @@ bool stringToIds(const string& ids, RecordFileReader& reader, set<StreamId>& out
     }
   }
   if (error) {
-    cerr << "Can't parse '" << ids << "' as one or more stream id." << endl;
+    cerr << "Can't parse '" << ids << "' as one or more stream id.\n";
   }
   return !error;
 }
@@ -103,7 +103,7 @@ Record::Type stringToType(const string& type) {
   if (helpers::startsWith("data", type)) {
     return Record::Type::DATA;
   }
-  cerr << "Can't parse '" << type << "' as a record type." << endl;
+  cerr << "Can't parse '" << type << "' as a record type.\n";
   return Record::Type::UNDEFINED;
 }
 
@@ -216,7 +216,7 @@ int FilteredFileReader::openFile(unique_ptr<FileHandler>& file) const {
   file = make_unique<DiskFile>();
   int status = file->openSpec(spec);
   if (status != 0) {
-    cerr << "Can't open '" << getPathOrUri() << "': " << errorCodeToMessage(status) << endl;
+    cerr << "Can't open '" << getPathOrUri() << "': " << errorCodeToMessage(status) << "\n";
   }
   return status;
 }
@@ -624,7 +624,7 @@ unique_ptr<deque<IndexRecord::DiskRecordInfo>> FilteredFileReader::buildIndex() 
 
 uint32_t FilteredFileReader::iterateAdvanced(ThrottledWriter* throttledWriter) {
   if (!timeRangeValid()) {
-    cerr << "Time Range invalid: " << getTimeConstraintDescription() << endl;
+    cerr << "Time Range invalid: " << getTimeConstraintDescription() << "\n";
     return 0;
   }
   uint32_t readCounter = 0;

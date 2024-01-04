@@ -242,7 +242,7 @@ FileReader::openFile(const QString& qpath, QVBoxLayout* videoFrame, QWidget* wid
   }
   unique_lock<recursive_mutex> guard{mutex_};
   OpenProgressDialog progressUi(playerUi_, spec);
-  cout << "Loading " << path << "..." << endl;
+  cout << "Loading " << path << "...\n";
   fileReader_ = make_unique<RecordFileReader>();
   widget->setWindowTitle(getFileName(spec));
   int error = 0;
@@ -265,7 +265,7 @@ FileReader::openFile(const QString& qpath, QVBoxLayout* videoFrame, QWidget* wid
     }
     isLocalFile_ = false;
     cout << "Opened from " << spec.fileHandlerName << " in "
-         << helpers::humanReadableDuration(VideoTime::getRawTime() - before) << "." << endl;
+         << helpers::humanReadableDuration(VideoTime::getRawTime() - before) << ".\n";
   }
   if (error == 0) {
     fileChanged(widget, spec);
@@ -448,7 +448,7 @@ void FileReader::setPosition(int position) {
   const auto& index = fileReader_->getIndex();
   nextRecord_ =
       static_cast<size_t>(lower_bound(index.begin(), index.end(), seekTime) - index.begin());
-  cout << "Seek to " << FIXED_3 << seekTime.timestamp << ", record #" << nextRecord_ << endl;
+  cout << "Seek to " << FIXED_3 << seekTime.timestamp << ", record #" << nextRecord_ << "\n";
   waitEvent_.dispatchEvent(isSliderActive_ ? kReadCurrentFrameFast : kReadCurrentFrame);
 }
 
@@ -940,7 +940,7 @@ void FileReader::updatePosition() {
     timeChanged(0, 0);
   } else {
     if (state_ == FileReaderState::Playing && nextRecord_ >= fileReader_->getIndex().size()) {
-      cout << "End of file reached" << endl;
+      cout << "End of file reached\n";
       pause();
     }
     double time = time_.getTime();
@@ -1253,7 +1253,7 @@ void FileReader::setState(FileReaderState newState) {
       time_.pause();
     }
   }
-  cout << "Video state: " << FileReaderStateConverter::toString(newState) << endl;
+  cout << "Video state: " << FileReaderStateConverter::toString(newState) << "\n";
   mediaStateChanged(state_);
 }
 
@@ -1262,7 +1262,7 @@ void FileReader::setTimeRange(double start, double end, uint32_t firstDataRecord
   endTime_ = end;
   firstDataRecordIndex_ = firstDataRecordIndex;
   cout << "Start: " << helpers::humanReadableTimestamp(start)
-       << ", end: " << helpers::humanReadableTimestamp(end) << endl;
+       << ", end: " << helpers::humanReadableTimestamp(end) << "\n";
   durationChanged(start, end, rawTimeToPosition(endTime_ - startTime_));
 }
 

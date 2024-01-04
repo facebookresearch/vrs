@@ -32,7 +32,7 @@ namespace vrs::utils {
 
 int compressionBenchmark(FilteredFileReader& source, const CopyOptions& inOptions) {
   if (!source.spec.isDiskFile()) {
-    cerr << "Benchmarks only available for local files." << endl;
+    cerr << "Benchmarks only available for local files.\n";
     return FAILURE;
   }
   const string sourcePath = source.getPathOrUri();
@@ -53,7 +53,7 @@ int compressionBenchmark(FilteredFileReader& source, const CopyOptions& inOption
     master.applyTypeFilters({});
     int64_t sourceSize = master.reader.getTotalSourceSize();
     cout << os::getFilename(masterPath) << "\t" << helpers::humanReadableFileSize(sourceSize)
-         << endl;
+         << "\n";
     string copyPath = sourceBasename + "-comp.vrs";
     double firstCompressionDuration = 0;
     for (int preset = static_cast<int>(CompressionPreset::CompressedFirst);
@@ -72,7 +72,7 @@ int compressionBenchmark(FilteredFileReader& source, const CopyOptions& inOption
         int64_t processingSpeed = static_cast<int64_t>(sourceSize / duration);
         cout << helpers::humanReadableFileSize(processingSpeed) << "/s\t";
         if (change == 0) {
-          cout << "No file size change." << endl;
+          cout << "No file size change.\n";
         } else {
           if (change < 0) {
             cout << "File size increase\t";
@@ -90,15 +90,15 @@ int compressionBenchmark(FilteredFileReader& source, const CopyOptions& inOption
         } else {
           cout << "\t" << duration / firstCompressionDuration;
         }
-        cout << endl;
+        cout << "\n";
       } else {
         cerr << "Error compressing '" << copyPath << "'. Error #" << copyError << ": "
-             << errorCodeToMessage(copyError) << endl;
+             << errorCodeToMessage(copyError) << "\n";
       }
     }
   } else {
     cerr << "Could not copy '" << masterPath << "' for compression experiment. Error #" << error
-         << ": " << errorCodeToMessage(error) << endl;
+         << ": " << errorCodeToMessage(error) << "\n";
   }
   remove(masterPath.c_str());
   return error;

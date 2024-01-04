@@ -93,7 +93,7 @@ void printTags(ostream& out, const map<string, string>& tags) {
         out << put_time(localtime(&creationTimeSec), " -- %c %Z");
       }
     }
-    out << endl;
+    out << "\n";
   }
 }
 
@@ -112,13 +112,13 @@ struct RecordCounter {
   }
   void print(ostream& out, const string& name, bool showFps) const {
     if (recordCount == 0) {
-      out << "  No " << name << " records." << endl;
+      out << "  No " << name << " records.\n";
     } else {
       out << "  ";
       printCountedName(out, recordCount, name + " record");
       out << ", ";
       printTime(out, firstRecord, lastRecord, recordCount, showFps);
-      out << "." << endl;
+      out << ".\n";
     }
   }
 };
@@ -151,7 +151,7 @@ void overView(ostream& out, RecordFileReader& file, StreamId id, Details details
   if (!nowKnownAsName.empty()) {
     out << " (device now known as \"" << nowKnownAsName << "\")";
   }
-  out << "." << endl;
+  out << ".\n";
   if (details && Details::StreamTags) {
     const StreamTags& tags = file.getTags(id);
     for (const auto& iter : tags.vrs) {
@@ -159,9 +159,9 @@ void overView(ostream& out, RecordFileReader& file, StreamId id, Details details
       ss << "  VRS Tag: " << iter.first << " = " << iter.second;
       string t = ss.str();
       if (t.size() > kMaxVRSTagLineLength) {
-        out << make_printable(t.substr(0, kMaxVRSTagLineLength)) << "..." << endl;
+        out << make_printable(t.substr(0, kMaxVRSTagLineLength)) << "...\n";
       } else {
-        out << make_printable(t) << endl;
+        out << make_printable(t) << "\n";
       }
     }
     printTags(out, tags.user);
@@ -210,16 +210,15 @@ void printOverview(
     const set<StreamId>& streamIds,
     Details details) {
   if (!recordFile.isOpened()) {
-    out << "No open file." << endl;
+    out << "No open file.\n";
     return;
   }
   const vector<pair<string, int64_t>> chunks = recordFile.getFileChunks();
   if (chunks.empty()) {
-    out << "No chunks found." << endl;
+    out << "No chunks found.\n";
   } else if (chunks.size() == 1) {
     const pair<string, int64_t>& file = chunks[0];
-    out << "VRS file: '" << file.first << "', " << humanReadableFileSize(file.second) << "."
-        << endl;
+    out << "VRS file: '" << file.first << "', " << humanReadableFileSize(file.second) << ".\n";
   } else {
     int64_t totalSize = 0;
     for (const auto& chunk : chunks) {
@@ -228,14 +227,14 @@ void printOverview(
     out << "VRS file with " << chunks.size() << " chunks, " << humanReadableFileSize(totalSize)
         << " total";
     if (details && Details::ChunkList) {
-      out << ":" << endl;
+      out << ":\n";
       for (size_t index = 0; index < chunks.size(); index++) {
         const pair<string, int64_t>& chunk = chunks[index];
         out << "  Chunk #" << index << ": '" << chunk.first << "', "
-            << humanReadableFileSize(chunk.second) << "." << endl;
+            << humanReadableFileSize(chunk.second) << ".\n";
       }
     } else {
-      out << ", starting with " << chunks[0].first << '.' << endl;
+      out << ", starting with " << chunks[0].first << ".\n";
     }
   }
   RecordCounter recordCounter;
@@ -274,7 +273,7 @@ void printOverview(
     } else {
       out << ", no data records";
     }
-    out << "." << endl;
+    out << ".\n";
   }
   if (details && Details::ListFileTags) {
     const auto& tags = recordFile.getTags();

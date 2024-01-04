@@ -110,7 +110,7 @@ int AudioExtractor::writeWavAudioData(
   uint32_t totalSamples = audioBlock.getSampleCount();
   for (uint32_t i = 0; i < totalSamples; ++i) {
     if (srcOffset >= (uint32_t)audio.size()) {
-      cout << "Malformed audio block encountered, read past end of audio block" << endl;
+      cout << "Malformed audio block encountered, read past end of audio block\n";
       break;
     }
 
@@ -181,13 +181,13 @@ bool AudioExtractor::onAudioRead(
         id_.getNumericName(),
         streamOutputAudioFileCount_,
         record.timestamp);
-    cout << "Writing " << path << endl;
+    cout << "Writing " << path << "\n";
     cout << "WAV file details: " << static_cast<int>(audioBlockSpec.getChannelCount()) << " channel"
          << (audioBlockSpec.getChannelCount() != 1 ? "s, " : ", ") << audioBlockSpec.getSampleRate()
          << " " << audioBlockSpec.getSampleFormatAsString() << " samples/s, "
          << static_cast<int>(audioBlockSpec.getBitsPerSample()) << " bits per sample, "
-         << static_cast<int>(audioBlockSpec.getSampleBlockStride()) << " bytes sample block stride."
-         << endl;
+         << static_cast<int>(audioBlockSpec.getSampleBlockStride())
+         << " bytes sample block stride.\n";
     VERIFY_SUCCESS(createWavFile(path, audioBlockSpec, currentWavFile_));
 
     currentAudioContentBlockSpec_ = audioBlockSpec;

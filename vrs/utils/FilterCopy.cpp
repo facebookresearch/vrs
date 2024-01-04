@@ -29,23 +29,23 @@ namespace vrs::utils {
 
 void copyMergeDoc() {
   cout << "When combining multiple VRS files into a single VRS file, the following rules apply:\n";
-  cout << endl;
+  cout << "\n";
   cout << "File tags will be merged. If a tag name is used in multiple file, the value found in\n";
   cout << "the first file is used, the others are ignored.\n";
-  cout << endl;
+  cout << "\n";
   cout << "The 'copy' option keeps streams separate, even when two streams found in different\n";
   cout << "source files have the same StreamId.\n";
-  cout << endl;
+  cout << "\n";
   cout << "The 'merge' option will merge streams with the same RecordableTypeId,\n";
   cout << "in their respective order in each source file. So for each RecordableTypeId:\n";
   cout << " - the first streams with that RecordableTypeId in each file are merged together,\n";
   cout << " - the second streams with that RecordableTypeId in each file are merged together,\n";
   cout << " - etc.\n";
   cout << "Stream tags are also merged, using the priority logic as for file tags.\n";
-  cout << endl;
+  cout << "\n";
   cout << "If the files don't have streams with matching RecordableTypeId, both copy and merge\n";
   cout << "operations produce the same output.\n";
-  cout << endl;
+  cout << "\n";
   cout << "Important: it's the RecordableTypeId that's matched, not the StreamId.\n";
   cout << "So if you stream-merge two files, each with a single stream, the streams will be\n";
   cout << "merged into a single stream if their RecordableTypeId is identical, regardless of\n";
@@ -129,11 +129,11 @@ void mergeTags(
         if (isVrsPrivate) {
           // don't merge private VRS tags, but warn...
           cerr << "Warning! The tag '" << newTag.first << "' was already set, ignoring value '"
-               << newTag.second << "' from " << source << endl;
+               << newTag.second << "' from " << source << "\n";
         } else {
           // store value using a new name, to preserve (some) context
           cerr << "Warning! The tag '" << newTag.first
-               << "' was already set. Dup found in: " << source << endl;
+               << "' was already set. Dup found in: " << source << "\n";
           string newName = newTag.first + "_merged";
           int count = 1;
           // find a name that's not in use anywhere.

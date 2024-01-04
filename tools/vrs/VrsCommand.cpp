@@ -145,13 +145,13 @@ void printHelp(const string& appName) {
   cout
       << CMD("Get details about a VRS files", "[ file.vrs ] [filter-options]")
 
-      << endl
+      << "\n"
       << CMD("All the other commands have the following format", "<command> [ arguments ]*")
 
-      << endl
+      << "\n"
       << CMD("Show this documentation", "help")
 
-      << endl
+      << "\n"
       << CMD("Copy all the streams from one or more files into one",
              "copy [ vrsfiles.vrs ]+ --to <target.vrs> [copy-options] [tag-options] [filter-options]")
       << CMD("Merge all the streams from one or more files into one",
@@ -160,7 +160,7 @@ void printHelp(const string& appName) {
              "so the copy is much smaller because of lossless compression",
              "copy --zero-vrs <file.vrs> --to <output.vrs>")
 
-      << endl
+      << "\n"
       << CMD("List records, with their timestamp, stream name and identifier, and record type.",
              "list <file.vrs> [filter-options]")
       << CMD("Show RecordFormat and DataLayout definitions", "record-formats <file.vrs>")
@@ -174,7 +174,7 @@ void printHelp(const string& appName) {
       << CMD("Print detailed file info and first records for one-stop diagnostic purposes",
              "rage <file.vrs>")
 
-      << endl
+      << "\n"
       << CMD("Extract images in a folder. jpg and png are extracted as is.\n"
              "RAW images are saved as GREY8, GREY16, RGB8 or RGBA8 png files,\n"
              "or as .raw image files without any conversion with the --raw-images option.",
@@ -184,7 +184,7 @@ void printHelp(const string& appName) {
       << CMD("Extract images, audio, and meta data in a folder",
              "extract-all file.vrs [ --to <folder_path> ] [filter-options]")
 
-      << endl
+      << "\n"
       << CMD("Check that a file can be read (checks integrity)",
              "check <file.vrs> [filter-options]")
       << CMD("Check that a file can be decoded (record-format integrity and image decompression)",
@@ -202,11 +202,11 @@ void printHelp(const string& appName) {
       << CMD("Compare two files at the raw level (VRS or not)",
              "compare-verbatim <original.vrs> <other.vrs>")
 
-      << endl
+      << "\n"
       << CMD("Compute some lossless compression benchmarks", "compression-benchmark <file.vrs>")
 
-      << endl
-      << "Special Commands:" << endl
+      << "\n"
+      << "Special Commands:\n"
       << CMD("Fix VRS index in place, if necessary. MIGHT MODIFY THE ORIGINAL FILES IF NEEDED.",
              "fix-index <file.vrs> [<file2.vrs>+")
       << CMD("Print VRS file format debug information", "debug <file.vrs>")
@@ -228,8 +228,8 @@ void printHelp(const string& appName) {
 #define SP(x) "  " << appName << " " x "\n"
 
 void printSamples(const string& appName) {
-  cout << endl
-       << "Examples:" << endl
+  cout << "\n"
+       << "Examples:\n"
        << "To peek at what's inside a recording:\n"
        << SP("src.vrs")
 
@@ -275,7 +275,7 @@ void printSamples(const string& appName) {
        << SP("src.vrs # to see that '100' is ImageStream...")
        << SP("extract-images file.vrs --to imageFolder + 100 --before +5")
 
-       << endl;
+       << "\n";
 }
 
 VrsCommand::VrsCommand() {
@@ -319,7 +319,7 @@ bool VrsCommand::parseArgument(
     if (++argn < argc) {
       targetPath = argv[argn];
     } else {
-      cerr << appName << ": error. '--copy|-c' requires a destination path." << endl;
+      cerr << appName << ": error. '--copy|-c' requires a destination path.\n";
       outStatusCode = EXIT_FAILURE;
     }
   } else if (arg == "--raw-images") {
@@ -338,7 +338,7 @@ bool VrsCommand::parseArgument(
 
 bool VrsCommand::processUnrecognizedArgument(const string& appName, const string& arg) {
   if (!arg.empty() && arg.front() == '-') {
-    cerr << appName << ": Invalid argument: '" << arg << '\'' << endl;
+    cerr << appName << ": Invalid argument: '" << arg << "'\n";
     return false;
   }
   FileSpec spec;
@@ -359,7 +359,7 @@ bool VrsCommand::processUnrecognizedArgument(const string& appName, const string
     }
   }
   if (!isAcceptable) {
-    cerr << appName << ": Invalid file path: '" << arg << '\'' << endl;
+    cerr << appName << ": Invalid file path: '" << arg << "'\n";
     return false;
   }
   size_t maxFileCount = (cmd == Command::None) ? 1 : getCommandSpec(cmd).maxFiles;
@@ -371,7 +371,7 @@ bool VrsCommand::processUnrecognizedArgument(const string& appName, const string
       otherFilteredReaders.emplace_back(arg);
     }
   } else {
-    cerr << appName << ": Too many file parameters." << endl;
+    cerr << appName << ": Too many file parameters.\n";
     return false;
   }
   return true;
@@ -383,7 +383,7 @@ bool VrsCommand::openVrsFile() {
     return true;
   }
   if (filteredReader.spec.empty()) {
-    cerr << "Missing VRS file arguments." << endl;
+    cerr << "Missing VRS file arguments.\n";
     return false;
   }
   if (getCommandSpec(cmd).mainFileIsVRS) {
@@ -398,7 +398,7 @@ bool VrsCommand::openOtherVrsFile(
   if (!otherReader.reader.isOpened()) {
     // Open the reader, apply the filters and print their overview
     if (otherReader.reader.openFile(otherReader.spec, cmd == Command::FixIndex) != 0) {
-      cerr << "Error: could not open " << otherReader.spec.getEasyPath() << endl;
+      cerr << "Error: could not open " << otherReader.spec.getEasyPath() << "\n";
       return false;
     }
     otherReader.filter = filteredReader.filter;
@@ -457,41 +457,41 @@ int VrsCommand::runCommands() {
       statusCode = doCopyMerge();
       break;
     case Command::Check:
-      cout << checkRecords(filteredReader, copyOptions, CheckType::Check) << endl;
+      cout << checkRecords(filteredReader, copyOptions, CheckType::Check) << "\n";
       break;
     case Command::Decode:
-      cout << checkRecords(filteredReader, copyOptions, CheckType::Decode) << endl;
+      cout << checkRecords(filteredReader, copyOptions, CheckType::Decode) << "\n";
       break;
     case Command::Checksum:
-      cout << checkRecords(filteredReader, copyOptions, CheckType::Checksum) << endl;
+      cout << checkRecords(filteredReader, copyOptions, CheckType::Checksum) << "\n";
       break;
     case Command::Checksums:
-      cout << checkRecords(filteredReader, copyOptions, CheckType::Checksums) << endl;
+      cout << checkRecords(filteredReader, copyOptions, CheckType::Checksums) << "\n";
       break;
     case Command::Hexdump:
       copyOptions.showProgress = false;
-      cout << checkRecords(filteredReader, copyOptions, CheckType::HexDump) << endl;
+      cout << checkRecords(filteredReader, copyOptions, CheckType::HexDump) << "\n";
       break;
     case Command::ChecksumVerbatim:
-      cout << verbatimChecksum(filteredReader.getPathOrUri(), copyOptions.showProgress) << endl;
+      cout << verbatimChecksum(filteredReader.getPathOrUri(), copyOptions.showProgress) << "\n";
       break;
     case Command::Compare:
       for (auto& otherFile : otherFilteredReaders) {
         cout << "Comparing with ";
         if (openOtherVrsFile(otherFile, cmdSpec.fileDetails)) {
           bool areSame = compareVRSfiles(filteredReader, otherFile, copyOptions);
-          cout << (areSame ? "Files are equivalent." : "Files differ.") << endl;
+          cout << (areSame ? "Files are equivalent." : "Files differ.") << "\n";
         }
       }
       break;
     case Command::CompareVerbatim:
       for (auto& otherFile : otherFilteredReaders) {
         bool areSame = compareVerbatim(filteredReader, otherFile, copyOptions.showProgress);
-        cout << (areSame ? "Files are identical." : "Files differ.") << endl;
+        cout << (areSame ? "Files are identical." : "Files differ.") << "\n";
       }
       break;
     case Command::Debug: {
-      cout << "VRS file internals of '" << filteredReader.getPathOrUri() << '\'' << endl;
+      cout << "VRS file internals of '" << filteredReader.getPathOrUri() << "'\n";
       FileSpec spec;
       unique_ptr<FileHandler> file;
       if (RecordFileReader::vrsFilePathToFileSpec(filteredReader.getPathOrUri(), spec) != 0 ||
@@ -501,7 +501,7 @@ int VrsCommand::runCommands() {
       }
     } break;
     case Command::PrintRecordFormats:
-      cout << printRecordFormats(filteredReader) << endl;
+      cout << printRecordFormats(filteredReader) << "\n";
       break;
     case Command::ListRecords:
       listRecords(filteredReader);
@@ -519,7 +519,7 @@ int VrsCommand::runCommands() {
       printRecordFormatRecords(filteredReader, PrintoutType::JsonPretty);
       break;
     case Command::Rage:
-      cout << endl << "First records:" << endl;
+      cout << "\nFirst records:\n";
       filteredReader.firstRecordsOnly = true;
       printRecordFormatRecords(filteredReader, PrintoutType::Details);
       break;
@@ -537,7 +537,7 @@ int VrsCommand::runCommands() {
                   filteredReader.reader,
                   filteredReader.filter.streams,
                   RecordFileInfo::Details::Everything)
-           << endl;
+           << "\n";
       break;
     case Command::CompressionBenchmark:
       statusCode = compressionBenchmark(filteredReader, copyOptions);
@@ -573,14 +573,14 @@ int VrsCommand::doCopyMerge() {
     statusCode = filterMerge(filteredReader, recordFilters, targetPath, copyOptions);
   }
   if (statusCode != 0) {
-    cerr << commandName << " failed: " << errorCodeToMessage(statusCode) << endl;
+    cerr << commandName << " failed: " << errorCodeToMessage(statusCode) << "\n";
   } else {
     double duration = os::getTimestampSec() - timeBefore;
     if (!copyOptions.outUri.empty() && copyOptions.outUri != "gaia:0") {
-      cout << commandName << " successful to " << copyOptions.outUri << endl;
+      cout << commandName << " successful to " << copyOptions.outUri << "\n";
     }
     cout << "Wrote " << copyOptions.outRecordCopiedCount << " records in "
-         << helpers::humanReadableDuration(duration) << '.' << endl;
+         << helpers::humanReadableDuration(duration) << ".\n";
     // If this is an upload operation, the output file is removed after it is uploaded.
     // If you directly upload to remote storage, you also don't have a local file.
     if (!isRemoteFileSystem(targetPath)) {
@@ -596,7 +596,7 @@ int VrsCommand::doCopyMerge() {
         int64_t change = sourceSize - copySize;
         cout << "Preset " << vrs::toPrettyName(copyOptions.getCompression()) << ": ";
         if (change == 0) {
-          cout << "No file size change." << endl;
+          cout << "No file size change.\n";
         } else {
           if (change > 0) {
             cout << "Saved ";
@@ -612,7 +612,7 @@ int VrsCommand::doCopyMerge() {
         }
       } else {
         cerr << "Error: could not open copied file '" << filteredReader.getPathOrUri()
-             << "', error #" << error << ": " << errorCodeToMessage(error) << endl;
+             << "', error #" << error << ": " << errorCodeToMessage(error) << "\n";
         statusCode = EXIT_FAILURE;
       }
     }

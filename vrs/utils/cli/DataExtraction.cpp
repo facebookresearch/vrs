@@ -57,7 +57,7 @@ void extractImages(
   }
   filteredReader.iterateSafe();
   extractors.clear();
-  cout << "Found " << imageCounter << " image(s)." << endl;
+  cout << "Found " << imageCounter << " image(s).\n";
 }
 
 int extractAudio(const string& path, FilteredFileReader& filteredReader) {
@@ -86,8 +86,7 @@ int extractAudio(const string& path, FilteredFileReader& filteredReader) {
     }
   }
   filteredReader.iterateSafe();
-  cout << "Wrote " << audioFileCount << " audio file(s) from " << streamCount << " stream(s)."
-       << endl;
+  cout << "Wrote " << audioFileCount << " audio file(s) from " << streamCount << " stream(s).\n";
   return 0;
 }
 
