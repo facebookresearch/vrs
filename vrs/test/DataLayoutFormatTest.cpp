@@ -85,6 +85,18 @@ struct Data : public AutoDataLayout {
   AutoDataLayoutEnd endLayout;
 };
 
+struct FormatValues : public AutoDataLayout {
+  DataPieceValue<int32_t> int32{"int32_t"};
+  DataPieceValue<uint32_t> uint32{"uint32_t"};
+  DataPieceValue<int64_t> int64{"int64_t"};
+  DataPieceValue<uint64_t> uint64{"uint64_t"};
+  DataPieceValue<float> floatv{"float"};
+  DataPieceValue<double> doublev{"double"};
+  DataPieceStringMap<double> stringMapDouble{"string_map_double"};
+
+  AutoDataLayoutEnd endLayout;
+};
+
 } // namespace TestFormat
 
 namespace {
@@ -336,4 +348,35 @@ TEST_F(DataLayoutFormatTester, DataLayoutFormatTest) {
   ASSERT_EQ(createFile(), 0);
   EXPECT_EQ(checkFile(), 0);
   os::remove(fileName);
+}
+
+#define SAMPLE_EPOCH_TIME 2000000000
+
+TEST_F(DataLayoutFormatTester, FormatValuesTest) {
+  using namespace TestFormat;
+  FormatValues valuesdl;
+  valuesdl.int32.set(SAMPLE_EPOCH_TIME);
+  valuesdl.uint32.set(SAMPLE_EPOCH_TIME);
+  valuesdl.int64.set(SAMPLE_EPOCH_TIME);
+  valuesdl.uint64.set(SAMPLE_EPOCH_TIME);
+  valuesdl.doublev.set(1.7044e9);
+  valuesdl.floatv.set(SAMPLE_EPOCH_TIME);
+  valuesdl.stringMapDouble.stagedValues()["walltime"] = SAMPLE_EPOCH_TIME;
+  valuesdl.stringMapDouble.stagedValues()["arrival"] = 1.7044e9;
+
+  valuesdl.collectVariableDataAndUpdateIndex();
+
+  stringstream ss;
+  valuesdl.printLayoutCompact(ss);
+  EXPECT_EQ(
+      ss.str(),
+      "  int32_t: 2000000000\n"
+      "  uint32_t: 2000000000\n"
+      "  int64_t: 2000000000\n"
+      "  uint64_t: 2000000000\n"
+      "  float: 2e+09\n"
+      "  double: 1704400000.000\n"
+      "  string_map_double, 2 values:\n"
+      "      \"arrival\": 1704400000.000\n"
+      "      \"walltime\": 2000000000.000\n");
 }

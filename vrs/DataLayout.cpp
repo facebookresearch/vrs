@@ -1495,8 +1495,8 @@ void DataPieceStringMap<T>::print(ostream& out, const string& indent) const {
     out << indent << (isDefault ? "  Values (default):" : "  Values:") << "\n";
     for (auto& iter : values) {
       out << indent << "    \"" << iter.first << "\": ";
-      using namespace special_chars;
-      out << iter.second << "\n";
+      printValue<T>(out, iter.second, getLabel());
+      out << "\n";
     }
   }
 }
@@ -1509,8 +1509,8 @@ void DataPieceStringMap<T>::printCompact(ostream& out, const string& indent) con
   out << ", " << values.size() << (isDefault ? " default" : "") << " values:\n";
   for (auto& iter : values) {
     out << indent << "    \"" << iter.first << "\": ";
-    using namespace special_chars;
-    out << iter.second << "\n";
+    printValue<T>(out, iter.second, getLabel());
+    out << "\n";
   }
 }
 
