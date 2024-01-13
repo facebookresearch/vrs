@@ -177,7 +177,7 @@ TEST_F(StringsHelpersTester, getValueTest) {
       {"double", "-3.5"},
       {"double_bad", "abc"},
   };
-  bool boolValue;
+  bool boolValue = false;
   EXPECT_TRUE(getBool(m, "bool_true", boolValue));
   EXPECT_EQ(boolValue, true);
   EXPECT_TRUE(getBool(m, "bool_false", boolValue));
@@ -186,26 +186,26 @@ TEST_F(StringsHelpersTester, getValueTest) {
   EXPECT_EQ(boolValue, false);
   EXPECT_FALSE(getBool(m, "nobool", boolValue));
 
-  int intValue;
+  int intValue = 0;
   EXPECT_TRUE(getInt(m, "int", intValue));
   EXPECT_EQ(intValue, 1234567890);
   EXPECT_FALSE(getInt(m, "noint", intValue));
 
-  int64_t int64Value;
+  int64_t int64Value = 0;
   EXPECT_TRUE(getInt64(m, "int64_pos", int64Value));
   EXPECT_EQ(int64Value, 1234567890);
   EXPECT_TRUE(getInt64(m, "int64_neg", int64Value));
   EXPECT_EQ(int64Value, -1234567890);
   EXPECT_FALSE(getInt64(m, "noint64", int64Value));
 
-  uint64_t uint64Value;
+  uint64_t uint64Value = 0;
   EXPECT_TRUE(getUInt64(m, "uint64", uint64Value));
   EXPECT_EQ(uint64Value, 1234567890);
   EXPECT_TRUE(getUInt64(m, "uint64_neg", uint64Value));
   EXPECT_EQ(uint64Value, 0xffffffffffffffff);
   EXPECT_FALSE(getUInt64(m, "nouint64", uint64Value));
 
-  double doubleValue;
+  double doubleValue = 0;
   EXPECT_TRUE(getDouble(m, "double", doubleValue));
   EXPECT_EQ(doubleValue, -3.5);
   EXPECT_FALSE(getDouble(m, "double_bad", doubleValue));
@@ -252,7 +252,7 @@ TEST_F(StringsHelpersTester, humanReadableTimestampTest) {
 
 TEST_F(StringsHelpersTester, readUnsignedInt32) {
   using namespace vrs::helpers;
-  uint32_t outInt;
+  uint32_t outInt = 0;
   const char* strInt = "123";
   readUInt32(strInt, outInt);
   EXPECT_EQ(outInt, 123);

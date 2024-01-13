@@ -120,7 +120,7 @@ class Decimator {
   // iteration specific variables
   map<StreamId, double> decimateCursors_;
   // Timestamp of the current bucket we are creating
-  double bucketCurrentTimestamp_;
+  double bucketCurrentTimestamp_{};
   map<StreamId, const IndexRecord::RecordInfo*> bucketCandidates_;
 };
 
@@ -136,7 +136,9 @@ struct FilteredFileReader {
   bool firstRecordsOnly = false;
 
   FilteredFileReader() = default;
-  FilteredFileReader(const string& filePath, const unique_ptr<FileHandler>& vrsFileProvider = {}) {
+  explicit FilteredFileReader(
+      const string& filePath,
+      const unique_ptr<FileHandler>& vrsFileProvider = {}) {
     FilteredFileReader::setSource(filePath, vrsFileProvider);
   }
   virtual ~FilteredFileReader() = default;
@@ -198,7 +200,7 @@ struct FilteredFileReader {
   // Make sure the latest config & state records are read before reading.
   // Needed when we don't read from the start
   // This version hands the records to the function provided
-  void preRollConfigAndState(RecordReaderFunc recordReaderFunc);
+  void preRollConfigAndState(const RecordReaderFunc& recordReaderFunc);
 
   // ** Preferred iteration method for code that doesn't require expert internal knowledge **
   // Determine the time range boundaries based on the file and the filters,

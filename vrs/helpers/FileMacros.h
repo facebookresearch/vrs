@@ -19,13 +19,14 @@
 // Macro to write a known number of bytes to a file, and return the error if necessary
 #define WRITE_OR_LOG_AND_RETURN(file_, data_, byteCount_)        \
   do {                                                           \
-    if (byteCount_ > 0) {                                        \
-      int error_ = file_.write(data_, byteCount_);               \
+    size_t __length = byteCount_;                                \
+    if (__length > 0) {                                          \
+      int error_ = (file_).write(data_, __length);               \
       if (error_ != 0) {                                         \
         XR_LOGE(                                                 \
             "File write error, {} instead of {}, Error: {}, {}", \
-            file_.getLastRWSize(),                               \
-            byteCount_,                                          \
+            (file_).getLastRWSize(),                             \
+            __length,                                            \
             error_,                                              \
             errorCodeToMessage(error_));                         \
         return error_;                                           \
@@ -36,7 +37,7 @@
 // Helper macro for some file operations
 #define IF_ERROR_LOG_AND_RETURN(operation_)                                                        \
   do {                                                                                             \
-    int operationError_ = operation_;                                                              \
+    int operationError_ = (operation_);                                                            \
     if (operationError_ != 0) {                                                                    \
       XR_LOGE(                                                                                     \
           "{} failed: {}, {}", #operation_, operationError_, errorCodeToMessage(operationError_)); \

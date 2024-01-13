@@ -39,7 +39,7 @@ namespace vrs::utils {
 using namespace std;
 
 struct SourceBuffer {
-  SourceBuffer(const vector<uint8_t>& abuffer) : buffer{abuffer} {}
+  explicit SourceBuffer(const vector<uint8_t>& abuffer) : buffer{abuffer} {}
   const vector<uint8_t>& buffer;
   size_t readSize = 0;
 };
@@ -54,7 +54,7 @@ static void pngStreamRead(png_structp pngPtr, png_bytep data, png_size_t length)
   }
 }
 
-bool PixelFrame::readPngFrame(RecordReader* reader, const uint32_t sizeBytes) {
+bool PixelFrame::readPngFrame(RecordReader* reader, uint32_t sizeBytes) {
   if (sizeBytes < kPngSigBytes) {
     return false; // empty image
   }
@@ -85,16 +85,14 @@ bool PixelFrame::readPngFrame(const vector<uint8_t>& pngBuffer, bool decodePixel
   png_infop infoPtr = png_create_info_struct(pngPtr);
   if (!infoPtr) {
     XR_LOGE("Could not initialize png info struct.");
-    png_destroy_read_struct(&pngPtr, (png_infopp)0, (png_infopp)0);
+    png_destroy_read_struct(&pngPtr, nullptr, nullptr);
     return false;
   }
   png_bytep* rowPtrs = nullptr;
   if (setjmp(png_jmpbuf(pngPtr))) {
     // An error occurred, so clean up what we have allocated so far.
-    png_destroy_read_struct(&pngPtr, &infoPtr, (png_infopp)0);
-    if (rowPtrs != nullptr) {
-      delete[] rowPtrs;
-    }
+    png_destroy_read_struct(&pngPtr, &infoPtr, nullptr);
+    delete[] rowPtrs;
     XR_LOGE("An error occurred while reading the PNG file.");
     // libPNG will jump to here if something goes wrong.
     return false;
@@ -170,7 +168,7 @@ bool PixelFrame::readPngFrame(const vector<uint8_t>& pngBuffer, bool decodePixel
   }
 
   // Clean up the read and info structs
-  png_destroy_read_struct(&pngPtr, &infoPtr, (png_infopp)0);
+  png_destroy_read_struct(&pngPtr, &infoPtr, nullptr);
 
   return true;
 }
@@ -178,7 +176,7 @@ bool PixelFrame::readPngFrame(const vector<uint8_t>& pngBuffer, bool decodePixel
 bool PixelFrame::readPngFrame(
     shared_ptr<PixelFrame>& frame,
     RecordReader* reader,
-    const uint32_t sizeBytes) {
+    uint32_t sizeBytes) {
   if (!frame) {
     frame = make_shared<PixelFrame>();
   }
@@ -198,7 +196,7 @@ void mem_png_flush(png_structp png_ptr) {}
 
 } // namespace
 
-int PixelFrame::writeAsPng(const string& filename, std::vector<uint8_t>* const outBuffer) const {
+int PixelFrame::writeAsPng(const string& filename, vector<uint8_t>* outBuffer) const {
   PixelFormat pixelFormat = this->getPixelFormat();
   if (!XR_VERIFY(
           pixelFormat == PixelFormat::GREY8 || pixelFormat == PixelFormat::GREY16 ||

@@ -52,7 +52,7 @@ struct EventTest : public testing::Test {
   void setupEvent(EventChannel::NotificationMode mode) {
     TearDown();
 
-    testEventChannel.reset(new EventChannel("TestEventChannel", mode));
+    testEventChannel = make_unique<EventChannel>("TestEventChannel", mode);
     EXPECT_NE(nullptr, testEventChannel);
   }
 
@@ -65,7 +65,7 @@ struct EventTest : public testing::Test {
   }
 
   void startWaitThread(const vector<double>& waitIntervals) {
-    waitThreads.push_back(make_unique<thread>(waitOnEvents, this, waitIntervals));
+    waitThreads.emplace_back(make_unique<thread>(waitOnEvents, this, waitIntervals));
   }
 
   void waitForLaunch() {
@@ -107,7 +107,7 @@ struct EventTest : public testing::Test {
   unique_ptr<thread> dispatchThread;
   vector<unique_ptr<thread>> waitThreads;
   vector<pair<double, void*>> eventParams;
-  EventChannel::Event event;
+  EventChannel::Event event{};
 };
 
 void dispatchEvents(void* data, bool synchronous) {

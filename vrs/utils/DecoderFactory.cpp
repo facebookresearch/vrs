@@ -63,7 +63,7 @@ DecoderFactory& DecoderFactory::get() {
   return sInstance;
 }
 
-void DecoderFactory::registerDecoderMaker(DecoderMaker decoderMaker) {
+void DecoderFactory::registerDecoderMaker(const DecoderMaker& decoderMaker) {
   decoderMakers_.emplace_back(decoderMaker);
 }
 

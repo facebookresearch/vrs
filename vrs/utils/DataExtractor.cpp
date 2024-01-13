@@ -104,8 +104,8 @@ bool DataExtractor::DataExtractorStreamPlayer::writeImage(
 }
 
 bool DataExtractor::DataExtractorStreamPlayer::onDataLayoutRead(
-    const CurrentRecord& record,
-    size_t blockIndex,
+    const CurrentRecord& /*record*/,
+    size_t /*blockIndex*/,
     DataLayout& dl) {
   JsonFormatProfileSpec profile(JsonFormatProfile::Public);
   profile.type = false;
@@ -115,7 +115,7 @@ bool DataExtractor::DataExtractorStreamPlayer::onDataLayoutRead(
 
 bool DataExtractor::DataExtractorStreamPlayer::onImageRead(
     const vrs::CurrentRecord& record,
-    size_t blockIndex,
+    size_t /*blockIndex*/,
     const vrs::ContentBlock& imageBlock) {
   imageCounter_++;
   auto format = imageBlock.image().getImageFormat();
@@ -157,7 +157,7 @@ bool DataExtractor::DataExtractorStreamPlayer::onAudioRead(
 
 bool DataExtractor::DataExtractorStreamPlayer::onCustomBlockRead(
     const CurrentRecord& record,
-    size_t blockIndex,
+    size_t /*blockIndex*/,
     const ContentBlock& contentBlock) {
   size_t size = contentBlock.getBlockSize();
   vector<uint8_t> data(size);

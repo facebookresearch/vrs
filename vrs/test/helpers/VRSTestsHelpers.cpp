@@ -66,12 +66,12 @@ class ForwardDiskFile : public DiskFile {
 
 class BlankStreamPlayer : public StreamPlayer {
  public:
-  virtual bool processRecordHeader(const CurrentRecord& record, DataReference& outDataReference) {
+  bool processRecordHeader(const CurrentRecord& record, DataReference& outDataReference) override {
     buffer_.resize(record.recordSize);
     outDataReference.useVector(buffer_);
     return true;
   }
-  virtual void processRecord(const CurrentRecord&, uint32_t) {}
+  void processRecord(const CurrentRecord&, uint32_t) override {}
   vector<char> buffer_;
 };
 
@@ -98,7 +98,7 @@ class DawnCamera : public Recordable {
     return createRecord(-1, Record::Type::STATE, kStateVersion);
   }
   void addStateRecord(deque<IndexRecord::DiskRecordInfo>& index) {
-    index.push_back({-1, 0, this->getStreamId(), Record::Type::STATE});
+    index.emplace_back(-1, 0, this->getStreamId(), Record::Type::STATE);
   }
 
   const Record* createConfigurationRecord() override {
@@ -106,7 +106,7 @@ class DawnCamera : public Recordable {
     return createRecord(-2, Record::Type::CONFIGURATION, kConfigurationVersion);
   }
   void addConfigurationRecord(deque<IndexRecord::DiskRecordInfo>& index) {
-    index.push_back({-2, 0, this->getStreamId(), Record::Type::CONFIGURATION});
+    index.emplace_back(-2, 0, this->getStreamId(), Record::Type::CONFIGURATION);
   }
 
   const Record* createFrame(uint32_t frameNumber) {
@@ -125,18 +125,18 @@ class DawnCamera : public Recordable {
         DataSource(frameData_, buffer));
   }
   void addFrame(deque<IndexRecord::DiskRecordInfo>& index, uint32_t frameNumber) {
-    index.push_back(
-        {getFrameTime(frameNumber),
-         getSizeOfFrame(frameNumber),
-         this->getStreamId(),
-         Record::Type::DATA});
+    index.emplace_back(
+        getFrameTime(frameNumber),
+        getSizeOfFrame(frameNumber),
+        this->getStreamId(),
+        Record::Type::DATA);
   }
 
   uint32_t getIndex() const {
     return cameraIndex_;
   }
 
-  uint32_t getSizeOfFrame(uint32_t) const {
+  static uint32_t getSizeOfFrame(uint32_t) {
     return kFrameWidth * kFrameHeight;
   }
 
@@ -291,7 +291,7 @@ int threadedCreateRecords(CreateParams& p) {
   vector<thread> threads;
   threads.reserve(kCameraCount);
   for (uint32_t threadIndex = 0; threadIndex < kCameraCount; threadIndex++) {
-    threads.push_back(thread{&createRecordsThreadTask, &threadParams[threadIndex]});
+    threads.emplace_back(&createRecordsThreadTask, &threadParams[threadIndex]);
   }
   for (uint32_t threadIndex = 0; threadIndex < kCameraCount; threadIndex++) {
     XR_LOGD("Joining thread #{}", threadIndex);

@@ -72,7 +72,7 @@ int filterCopy(
     FilteredFileReader& filteredReader,
     const string& pathToCopy,
     const CopyOptions& copyOptions,
-    MakeStreamFilterFunction makeStreamFilter,
+    const MakeStreamFilterFunction& makeStreamFilter,
     unique_ptr<ThrottledFileDelegate> throttledFileDelegate) {
   ThrottledWriter throttledWriter(copyOptions, *throttledFileDelegate);
   RecordFileWriter& writer = throttledWriter.getWriter();
@@ -86,7 +86,7 @@ int filterCopy(
       filters.emplace_back(makeStreamFilter(filteredReader.reader, writer, id, copyOptions));
     }
   }
-  double startTimestamp, endTimestamp;
+  double startTimestamp{}, endTimestamp{};
   filteredReader.getConstrainedTimeRange(startTimestamp, endTimestamp);
   if (copyOptions.tagOverrider) {
     copyOptions.tagOverrider->overrideTags(writer);
@@ -174,7 +174,7 @@ class NoDuplicateCopier : public Copier {
   }
 
  protected:
-  array<double, static_cast<size_t>(Record::Type::COUNT)> lastRecordTimestamps_;
+  array<double, static_cast<size_t>(Record::Type::COUNT)> lastRecordTimestamps_{};
 };
 
 struct SourceRecord {
@@ -208,7 +208,7 @@ int filterMerge(
     copiersMap[id.getTypeId()].push_back(&copiers.back());
   }
   // calculate the overall timerange, so we can resolve time constraints on the overall file
-  double startTimestamp, endTimestamp;
+  double startTimestamp{}, endTimestamp{};
   firstRecordFilter.getTimeRange(startTimestamp, endTimestamp);
   for (auto* recordFilter : moreRecordFilters) {
     RecordFileReader& reader = recordFilter->reader;

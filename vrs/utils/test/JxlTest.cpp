@@ -17,11 +17,7 @@
 #include <gtest/gtest.h>
 
 #define _USE_MATH_DEFINES // needed for M_PI definition on Windows
-#include <math.h>
-#include <algorithm>
-#include <atomic>
-#include <deque>
-#include <thread>
+#include <cmath>
 #include <vector>
 
 #include <TestDataDir/TestDataDir.h>
@@ -194,9 +190,7 @@ void ComputeMeanNoramlizedAbsDiff(double* result, PixelFrame& a, PixelFrame& b) 
   *result = sum / (a.getWidth() * a.getHeight());
 }
 
-struct JxlVerificationTest : testing::Test, public ::testing::WithParamInterface<PixelFormat> {
-  JxlVerificationTest() {}
-};
+struct JxlVerificationTest : testing::Test, public ::testing::WithParamInterface<PixelFormat> {};
 
 #ifdef JXL_IS_AVAILABLE
 //#define WRITE_TEST_PATTERN

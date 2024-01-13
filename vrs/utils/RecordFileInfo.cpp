@@ -142,7 +142,7 @@ void overView(ostream& out, RecordFileReader& file, StreamId id, Details details
     }
   }
   name << " #" << static_cast<int>(id.getInstanceId());
-  string flavor = file.getFlavor(id);
+  const string& flavor = file.getFlavor(id);
   if (!flavor.empty()) {
     name << " - " << flavor;
   }
@@ -328,7 +328,7 @@ static JsonValue devicesOverView(
     recordData.AddMember(recTypId, static_cast<int>(id.getTypeId()), allocator);
     JsonValue recInstId = stringToJvalue(pub ? "device_instance_id" : "instance_id", allocator);
     recordData.AddMember(recInstId, id.getInstanceId(), allocator);
-    string flavor = file.getFlavor(id);
+    const string& flavor = file.getFlavor(id);
     if (!flavor.empty()) {
       JsonValue recFlavor = stringToJvalue(pub ? "device_flavor" : "recordable_flavor", allocator);
       recordData.AddMember(recFlavor, stringToJvalue(flavor, allocator), allocator);
@@ -427,7 +427,7 @@ string jsonOverview(RecordFileReader& recordFile, const set<StreamId>& streams, 
   doc.SetObject();
   JsonDocument::AllocatorType& allocator = doc.GetAllocator();
 
-  int64_t fileSize;
+  int64_t fileSize = 0;
   const vector<pair<string, int64_t>> chunks = recordFile.getFileChunks();
   const pair<string, int64_t>& file = chunks[0];
   if (details && Details::Basics) {

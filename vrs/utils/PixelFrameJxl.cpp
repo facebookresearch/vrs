@@ -108,7 +108,7 @@ inline float percent_to_butteraugli_distance(float quality) {
   // Extended to work meaningfully between 99.99 and 99.999, so with quality = 99.999,
   // the file size is now getting close to that of lossless.
   // Improved continuity around the 26-30 range.
-  float butteraugli_distance;
+  float butteraugli_distance = 0;
   if (quality >= 100) {
     butteraugli_distance = 0;
   } else if (quality >= 99.99) {
@@ -129,7 +129,7 @@ inline float percent_to_butteraugli_distance(float quality) {
 
 namespace vrs::utils {
 
-bool PixelFrame::readJxlFrame(RecordReader* reader, const uint32_t sizeBytes) {
+bool PixelFrame::readJxlFrame(RecordReader* reader, uint32_t sizeBytes) {
   if (sizeBytes == 0) {
     return false; // empty image
   }
@@ -158,7 +158,8 @@ bool PixelFrame::readJxlFrame(const vector<uint8_t>& jxlBuf, bool decodePixels) 
   JxlDecoderCloseInput(dec);
 
   JxlPixelFormat format = {3, JXL_TYPE_UINT8, JXL_NATIVE_ENDIAN, 0 /* alignment */};
-  for (JxlDecoderStatus status; (status = JxlDecoderProcessInput(dec)) != JXL_DEC_SUCCESS;) {
+  for (JxlDecoderStatus status = JXL_DEC_SUCCESS;
+       (status = JxlDecoderProcessInput(dec)) != JXL_DEC_SUCCESS;) {
     switch (status) {
       case JXL_DEC_ERROR:
         XR_LOGE("JPEG XL decoder: Decoder error");
@@ -239,7 +240,7 @@ bool PixelFrame::readJxlFrame(const vector<uint8_t>& jxlBuf, bool decodePixels) 
       } break;
 
       case JXL_DEC_NEED_IMAGE_OUT_BUFFER: {
-        size_t buffer_size;
+        size_t buffer_size = 0;
         DEC_CHECK(JxlDecoderImageOutBufferSize(dec, &format, &buffer_size));
         vector<uint8_t>& pixels = getBuffer();
         if (buffer_size != pixels.size()) {
@@ -383,7 +384,7 @@ bool PixelFrame::jxlCompress(
   helpers::MemBuffer memBuffer(allocSize);
 
   uint8_t* outData{};
-  JxlEncoderStatus encoderStatus;
+  JxlEncoderStatus encoderStatus{};
   do {
     size_t allocatedSize = memBuffer.allocateSpace(outData, allocSize);
     size_t remainingSize = allocatedSize;

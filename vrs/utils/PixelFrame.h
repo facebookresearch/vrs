@@ -65,7 +65,7 @@ struct CompressionOptions {
 class PixelFrame {
  public:
   PixelFrame() = default;
-  PixelFrame(const ImageContentBlockSpec& spec);
+  explicit PixelFrame(const ImageContentBlockSpec& spec);
   PixelFrame(const ImageContentBlockSpec& spec, vector<uint8_t>&& frameBytes);
   PixelFrame(PixelFormat pf, uint32_t w, uint32_t h, uint32_t stride = 0)
       : PixelFrame(ImageContentBlockSpec(pf, w, h, stride)) {}
@@ -92,7 +92,7 @@ class PixelFrame {
   }
 #endif
 
-  void swap(PixelFrame& other);
+  void swap(PixelFrame& other) noexcept;
 
   const ImageContentBlockSpec& getSpec() const {
     return imageSpec_;
@@ -161,7 +161,7 @@ class PixelFrame {
 
   /// Read a JPEG encoded frame into the internal buffer.
   /// @return True if the frame type is supported & the frame was read.
-  bool readJpegFrame(RecordReader* reader, const uint32_t sizeBytes);
+  bool readJpegFrame(RecordReader* reader, uint32_t sizeBytes);
   /// Decode a JPEG encoded frame into the internal buffer.
   /// @param buffer: jpg data, possibly read from a valid jpg file (the whole file).
   /// @param decodePixels: if true, decode the image in the buffer, otherwise, only read the format.
@@ -174,7 +174,7 @@ class PixelFrame {
   bool readJpegFrameFromFile(const string& path, bool decodePixels = true);
 
   static bool
-  readJpegFrame(shared_ptr<PixelFrame>& frame, RecordReader* reader, const uint32_t sizeBytes);
+  readJpegFrame(shared_ptr<PixelFrame>& frame, RecordReader* reader, uint32_t sizeBytes);
 
   /// Compress pixel frame to jpg. Supports ImageFormat::RAW and PixelFormat::RGB8 or GREY8 only.
   /// @param outBuffer: on exit, the jpg payload which can be saved as a .jpg file
@@ -200,7 +200,7 @@ class PixelFrame {
   /// Read a JPEG-XL encoded frame into the internal buffer.
   /// @return True if the frame type is supported & the frame was read.
   /// Returns false, if no decoder was installed, or the data couldn't be decoded correctly.
-  bool readJxlFrame(RecordReader* reader, const uint32_t sizeBytes);
+  bool readJxlFrame(RecordReader* reader, uint32_t sizeBytes);
   /// Decode a JPEG-XL encoded frame into the internal buffer.
   /// @param buffer: jpeg-xl data, possibly read from a valid jxl file (the whole file).
   /// @param decodePixels: if true, decode the image in the buffer, otherwise, only read the format.
@@ -237,21 +237,20 @@ class PixelFrame {
   /// @param reader: The record reader to read data from.
   /// @param sizeBytes: Number of bytes to read from the reader.
   /// @return True if the frame type is supported & the frame was read.
-  bool readPngFrame(RecordReader* reader, const uint32_t sizeBytes);
+  bool readPngFrame(RecordReader* reader, uint32_t sizeBytes);
   /// Decode a png buffer data into the image.
   /// @param pngBuffer: png data, possibly read from a valid png file (the whole file).
   /// @param decodePixels: if true, decode the image in the buffer, otherwise, only read the format.
   /// @return True if the frame type is supported & the frame was read.
   bool readPngFrame(const vector<uint8_t>& pngBuffer, bool decodePixels = true);
 
-  static bool
-  readPngFrame(shared_ptr<PixelFrame>& frame, RecordReader* reader, const uint32_t sizeBytes);
+  static bool readPngFrame(shared_ptr<PixelFrame>& frame, RecordReader* reader, uint32_t sizeBytes);
 
   /// Save image as PNG
   /// @param path: path of the file to write, if no outBuffer is provided
   /// @param outBuffer: if provided, a vector where to write the data, instead of writing to disk
   /// @return A status code, 0 meaning success.
-  int writeAsPng(const string& path, vector<uint8_t>* const outBuffer = nullptr) const;
+  int writeAsPng(const string& path, vector<uint8_t>* outBuffer = nullptr) const;
 
   /// Normalize an input frame if possible and as necessary,
   /// which means it has one of the following pixel formats:

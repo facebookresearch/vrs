@@ -39,7 +39,7 @@ class MemBuffer {
  public:
   /// Create a MemBuffer with a minimum block allocation size.
   /// If that size is equal or greater than the total data, memory copies are minimized.
-  MemBuffer(size_t allocSize = 256 * 1024);
+  explicit MemBuffer(size_t allocSize = 256 * 1024);
 
   /// Add block of bytes
   /// @param data: pointer to the data

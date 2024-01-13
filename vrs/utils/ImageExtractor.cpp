@@ -106,7 +106,7 @@ bool writeRawImage(const string& path, const vector<uint8_t>& imageData) {
 enum JobType { SaveToPng, EndQueue };
 
 struct ImageJob {
-  ImageJob(const string&& path)
+  explicit ImageJob(const string&& path)
       : jobType{JobType::SaveToPng}, path{path}, frame{make_shared<PixelFrame>()} {}
   ImageJob() : jobType{EndQueue} {}
 
@@ -208,7 +208,7 @@ bool ImageExtractor::onDataLayoutRead(const CurrentRecord& r, size_t idx, DataLa
   return imageNamer_.onDataLayoutRead(r, idx, dl, *this);
 }
 
-bool ImageExtractor::onImageRead(const CurrentRecord& record, size_t idx, const ContentBlock& ib) {
+bool ImageExtractor::onImageRead(const CurrentRecord& record, size_t, const ContentBlock& ib) {
   JobQueue<unique_ptr<ImageJob>>& imageQueue = ImageProcessor::get().getImageQueue();
   while (imageQueue.getQueueSize() > 2 * thread::hardware_concurrency()) {
     this_thread::sleep_for(chrono::milliseconds(50));
@@ -250,7 +250,7 @@ bool ImageExtractor::onImageRead(const CurrentRecord& record, size_t idx, const 
   return false;
 }
 
-bool ImageExtractor::onUnsupportedBlock(const CurrentRecord& r, size_t i, const ContentBlock& cb) {
+bool ImageExtractor::onUnsupportedBlock(const CurrentRecord& r, size_t, const ContentBlock& cb) {
   // the image was not decoded, probably because the image spec are incomplete
   if (cb.getContentType() == ContentType::IMAGE) {
     imageCounter_++;

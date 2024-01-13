@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include <list>
 #include <string>
 
 #include <vrs/Compressor.h>

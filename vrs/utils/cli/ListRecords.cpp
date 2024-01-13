@@ -28,22 +28,22 @@ namespace {
 
 class RecordLister : public StreamPlayer {
  public:
-  bool processConfigurationHeader(const CurrentRecord& record, DataReference& outDataRef) override {
+  bool processConfigurationHeader(const CurrentRecord& record, DataReference&) override {
     list(record);
     return false;
   }
 
-  bool processStateHeader(const CurrentRecord& record, DataReference& outDataReference) override {
+  bool processStateHeader(const CurrentRecord& record, DataReference&) override {
     list(record);
     return false;
   }
 
-  bool processDataHeader(const CurrentRecord& record, DataReference& outDataReference) override {
+  bool processDataHeader(const CurrentRecord& record, DataReference&) override {
     list(record);
     return false;
   }
 
-  void list(const CurrentRecord& record) {
+  static void list(const CurrentRecord& record) {
     fmt::print(
         "{:.3f} {} [{}], {} record, {} bytes total.\n",
         record.timestamp,
@@ -65,7 +65,7 @@ void listRecords(utils::FilteredFileReader& filteredReader) {
     filteredReader.reader.setStreamPlayer(id, &lister);
   }
   // this option doesn't use RecordFormat, and it's only a record list: no need to preroll at all!
-  double startTimestamp, endTimestamp;
+  double startTimestamp{}, endTimestamp{};
   filteredReader.getConstrainedTimeRange(startTimestamp, endTimestamp);
   filteredReader.iterateAdvanced();
 }

@@ -29,7 +29,7 @@ TEST_F(XXHTest, sums) {
   string a{"a"};
   string b{"b"};
   string c{"c"};
-  string empty{""};
+  string empty;
   XXH64Digester digester;
   digester.ingest(a);
   EXPECT_EQ(digester.digestToString(), "e513e02c99167f96");

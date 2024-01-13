@@ -31,7 +31,7 @@ class Semaphore : private boost::interprocess::interprocess_semaphore {
   using boost::interprocess::interprocess_semaphore::post;
   using boost::interprocess::interprocess_semaphore::wait;
 
-  bool timedWait(const double timeSec);
+  bool timedWait(double timeSec);
   bool timed_wait(const boost::posix_time::ptime& absTime) = delete;
 };
 

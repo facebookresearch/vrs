@@ -58,7 +58,7 @@ bool stringToIds(const string& ids, RecordFileReader& reader, set<StreamId>& out
     return true;
   }
   stringstream ss(ids);
-  int typeIdNum;
+  int typeIdNum = 0;
   bool error = false;
   if (ss >> typeIdNum) {
     bool multiTypeId = false;
@@ -559,7 +559,7 @@ void FilteredFileReader::preRollConfigAndState() {
       });
 }
 
-void FilteredFileReader::preRollConfigAndState(RecordReaderFunc recordReaderFunc) {
+void FilteredFileReader::preRollConfigAndState(const RecordReaderFunc& recordReaderFunc) {
   if (!timeRangeValid()) {
     return;
   }
@@ -598,7 +598,7 @@ void FilteredFileReader::preRollConfigAndState(RecordReaderFunc recordReaderFunc
 }
 
 uint32_t FilteredFileReader::iterateSafe() {
-  double startTimestamp, endTimestamp;
+  double startTimestamp{}, endTimestamp{};
   getConstrainedTimeRange(startTimestamp, endTimestamp);
   preRollConfigAndState();
   return iterateAdvanced();

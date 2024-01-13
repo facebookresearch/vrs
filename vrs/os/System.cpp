@@ -58,7 +58,7 @@ string vrs::os::getOsFingerPrint() {
   return osFingerprintString;
 
 #elif IS_MAC_PLATFORM()
-  array<char, 256> osFingerprint;
+  array<char, 256> osFingerprint{};
   size_t size = osFingerprint.size();
   string osFingerprintString = "MacOS ";
   if (sysctlbyname("kern.osrelease", osFingerprint.data(), &size, nullptr, 0) == 0) {

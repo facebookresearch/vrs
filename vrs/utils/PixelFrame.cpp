@@ -211,7 +211,7 @@ void PixelFrame::init(shared_ptr<PixelFrame>& inOutFrame, const ImageContentBloc
   }
 }
 
-void PixelFrame::swap(PixelFrame& other) {
+void PixelFrame::swap(PixelFrame& other) noexcept {
   if (!hasSamePixels(other.imageSpec_)) {
     ImageContentBlockSpec tempSpec = other.imageSpec_;
     other.imageSpec_ = imageSpec_;

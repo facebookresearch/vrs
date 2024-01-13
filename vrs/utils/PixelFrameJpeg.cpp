@@ -27,7 +27,7 @@ namespace vrs::utils {
 
 using namespace std;
 
-bool PixelFrame::readJpegFrame(RecordReader* reader, const uint32_t sizeBytes) {
+bool PixelFrame::readJpegFrame(RecordReader* reader, uint32_t sizeBytes) {
   if (sizeBytes == 0) {
     return false; // empty image
   }
@@ -66,8 +66,8 @@ readJpegFrameHelper(PixelFrame& frame, struct jpeg_decompress_struct& cinfo, boo
 
 bool PixelFrame::readJpegFrame(const vector<uint8_t>& jpegBuf, bool decodePixels) {
   // setup libjpeg
-  struct jpeg_decompress_struct cinfo;
-  struct jpeg_error_mgr jerr;
+  struct jpeg_decompress_struct cinfo {};
+  struct jpeg_error_mgr jerr {};
   cinfo.err = jpeg_std_error(&jerr);
   jpeg_create_decompress(&cinfo);
   jpeg_mem_src(&cinfo, jpegBuf.data(), jpegBuf.size());
@@ -81,8 +81,8 @@ bool PixelFrame::readJpegFrameFromFile(const std::string& path, bool decodePixel
   }
 
   // setup libjpeg
-  struct jpeg_decompress_struct cinfo;
-  struct jpeg_error_mgr jerr;
+  struct jpeg_decompress_struct cinfo {};
+  struct jpeg_error_mgr jerr {};
   cinfo.err = jpeg_std_error(&jerr);
   jpeg_create_decompress(&cinfo);
   jpeg_stdio_src(&cinfo, infile);
@@ -94,7 +94,7 @@ bool PixelFrame::readJpegFrameFromFile(const std::string& path, bool decodePixel
 bool PixelFrame::readJpegFrame(
     shared_ptr<PixelFrame>& frame,
     RecordReader* reader,
-    const uint32_t sizeBytes) {
+    uint32_t sizeBytes) {
   if (!frame) {
     frame = make_shared<PixelFrame>();
   }

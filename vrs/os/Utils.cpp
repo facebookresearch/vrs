@@ -50,11 +50,12 @@
 #if IS_LINUX_PLATFORM()
 #include <linux/limits.h>
 #endif
-#include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
 #include <cerrno>
+#include <cstdlib>
 #include <cstring>
 #endif // !IS_WINDOWS_PLATFORM()
 
@@ -67,7 +68,6 @@ constexpr auto kRegularFileType = boost::filesystem::file_type::regular_file;
 #endif
 
 using std::string;
-using std::vector;
 
 namespace vrs {
 namespace os {

@@ -43,7 +43,7 @@ class BufferFileHandler : public FileHandler {
     return fileHandlerName_;
   }
 
-  int openSpec(const FileSpec& fileSpec) override {
+  int openSpec(const FileSpec& /*fileSpec*/) override {
     return FAILURE;
   }
   bool isOpened() const override {

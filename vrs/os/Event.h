@@ -37,12 +37,12 @@ class EventChannel {
   static const uint32_t kInfiniteTimeout = std::numeric_limits<uint32_t>::max();
 
   /// Event represents an instance of an event.
-  typedef struct event_ {
+  struct Event {
     void* pointer;
     int64_t value;
     int32_t numMissedEvents;
     double timestampSec;
-  } Event;
+  };
 
   /// Construct EventChannel.
   /// @param notificationMode: whether event can be unicasted or broadcasted

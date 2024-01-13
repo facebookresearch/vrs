@@ -237,7 +237,7 @@ bool RecordFilterCopier::onAudioRead(const CurrentRecord& rec, size_t idx, const
 
 bool RecordFilterCopier::onUnsupportedBlock(
     const CurrentRecord& record,
-    size_t idx,
+    size_t /*idx*/,
     const ContentBlock& cb) {
   bool readNext = true;
   size_t blockSize = cb.getBlockSize();

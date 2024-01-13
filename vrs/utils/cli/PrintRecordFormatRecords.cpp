@@ -138,7 +138,7 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
     }
     return readContentBlockData(r, cb);
   }
-  bool readContentBlockData(const CurrentRecord& record, const ContentBlock& contentBlock) {
+  static bool readContentBlockData(const CurrentRecord& record, const ContentBlock& contentBlock) {
     size_t blockSize = contentBlock.getBlockSize();
     if (blockSize == ContentBlock::kSizeUnknown) {
       fmt::print(stderr, "  *** Content block size unknown! ***\n");
@@ -196,7 +196,7 @@ void printRecordFormatRecords(FilteredFileReader& filteredReader, PrintoutType t
   for (auto id : filteredReader.filter.streams) {
     filteredReader.reader.setStreamPlayer(id, &lister);
   }
-  double startTimestamp, endTimestamp;
+  double startTimestamp{}, endTimestamp{};
   filteredReader.getConstrainedTimeRange(startTimestamp, endTimestamp);
   // Required to Load RecordFormat & DataLayout definitions from filtered-out configuration records!
   filteredReader.preRollConfigAndState();

@@ -293,7 +293,7 @@ bool parseDecimationOptions(
       try {
         const string streamId = string(argv[++argn]);
         const double interval = stod(argv[++argn]);
-        getDecimatorParams(outFilters).decimationIntervals.push_back({streamId, interval});
+        getDecimatorParams(outFilters).decimationIntervals.emplace_back(streamId, interval);
       } catch (logic_error&) {
         cerr << appName << ": error. Invalid --decimate numeric value.\n";
         outStatusCode = EXIT_FAILURE;

@@ -39,7 +39,7 @@ enum class DecodeStatus {
 
 class DecoderI {
  public:
-  DecoderI() {}
+  DecoderI() = default;
   virtual ~DecoderI();
   /// Decode compressed image to a frame
   virtual int decode(
@@ -57,7 +57,7 @@ class DecoderFactory {
  public:
   static DecoderFactory& get();
 
-  void registerDecoderMaker(DecoderMaker decoderMaker);
+  void registerDecoderMaker(const DecoderMaker& decoderMaker);
 
   std::unique_ptr<DecoderI> makeDecoder(
       const vector<uint8_t>& encodedFrame,

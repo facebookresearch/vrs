@@ -28,16 +28,16 @@ using namespace vrs::helpers;
 
 #define ADD(MB, PTR, SIZE) \
   MB.addData(PTR, SIZE);   \
-  PTR += SIZE
+  (PTR) += (SIZE)
 
-#define ALLOCATE_ADD(MB, PTR, SIZE_ALLOC, SIZE_COPY)           \
-  {                                                            \
-    uint8_t* ptr_;                                             \
-    size_t allocatedSize = MB.allocateSpace(ptr_, SIZE_ALLOC); \
-    EXPECT_GE(allocatedSize, SIZE_ALLOC);                      \
-    memcpy(ptr_, PTR, SIZE_COPY);                              \
-    MB.addAllocatedSpace(SIZE_COPY);                           \
-    PTR += SIZE_COPY;                                          \
+#define ALLOCATE_ADD(MB, PTR, SIZE_ALLOC, SIZE_COPY)             \
+  {                                                              \
+    uint8_t* ptr_;                                               \
+    size_t allocatedSize = (MB).allocateSpace(ptr_, SIZE_ALLOC); \
+    EXPECT_GE(allocatedSize, SIZE_ALLOC);                        \
+    memcpy(ptr_, PTR, SIZE_COPY);                                \
+    (MB).addAllocatedSpace(SIZE_COPY);                           \
+    (PTR) += (SIZE_COPY);                                        \
   }
 
 namespace {

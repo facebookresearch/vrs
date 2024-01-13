@@ -16,13 +16,12 @@
 
 #pragma once
 
-#include <algorithm>
 #include <atomic>
 #include <condition_variable>
+#include <deque>
 #include <functional>
 #include <memory>
 #include <mutex>
-#include <queue>
 #include <thread>
 
 #include <vrs/os/Time.h>
@@ -53,7 +52,7 @@ class JobQueue {
     }
     double limit = os::getTimestampSec() + waitTime;
     std::unique_lock<std::mutex> locker(mutex_);
-    double actualWaitTime;
+    double actualWaitTime = 0;
     while (!hasEnded_ && queue_.empty() && (actualWaitTime = limit - os::getTimestampSec()) >= 0) {
       condition_.wait_for(locker, std::chrono::duration<double>(actualWaitTime));
     }

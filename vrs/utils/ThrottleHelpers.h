@@ -61,7 +61,7 @@ class ThrottledWriter {
 
   void printPercentAndQueueSize(uint64_t queueByteSize, bool waiting);
 
-  void addWaitCondition(function<bool()> waitCondition) {
+  void addWaitCondition(const function<bool()>& waitCondition) {
     waitCondition_ = waitCondition;
   }
 

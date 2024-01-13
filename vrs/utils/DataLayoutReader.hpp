@@ -38,7 +38,7 @@ namespace vrs::utils {
 template <class T>
 class DataLayoutReader : public RecordFormatStreamPlayer {
  public:
-  DataLayoutReader(RecordFileReader& fileReader) : fileReader_{fileReader} {}
+  explicit DataLayoutReader(RecordFileReader& fileReader) : fileReader_{fileReader} {}
 
   /// Read a record, and return a pointer to the first DataLayout that maps to the requested type
   /// @param streamId: stream to read from
@@ -66,7 +66,7 @@ class DataLayoutReader : public RecordFormatStreamPlayer {
   }
 
  protected:
-  bool onDataLayoutRead(const CurrentRecord& record, size_t index, DataLayout& dl) override {
+  bool onDataLayoutRead(const CurrentRecord& /*record*/, size_t index, DataLayout& dl) override {
     const T& layout = getExpectedLayout<T>(dl, index);
     if (layout.hasAllRequiredPieces()) {
       datalayoutRead_ = &layout;

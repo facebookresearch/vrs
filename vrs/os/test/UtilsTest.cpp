@@ -33,11 +33,11 @@ using namespace std;
 using namespace vrs;
 
 struct FileTest : testing::Test {
-  FileTest() {}
+  FileTest() = default;
 
   string testDataDir = coretech::getTestDataDir();
 
-  void testFileName(const string& filename) {
+  static void testFileName(const string& filename) {
     string path = os::pathJoin(os::makeUniqueFolder(), os::sanitizeFileName(filename));
     int status = os::makeDir(path);
     if (status != 0) {
@@ -136,7 +136,7 @@ TEST_F(FileTest, testGetFileSize) {
 #endif // !IS_ANDROID_PLATFORM()
 
 struct GetCurrentExecutablePathTest : testing::Test {
-  GetCurrentExecutablePathTest() {}
+  GetCurrentExecutablePathTest() = default;
 
   string currentExectable = os::getCurrentExecutablePath();
 };

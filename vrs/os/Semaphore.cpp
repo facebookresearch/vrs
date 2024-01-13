@@ -21,7 +21,7 @@
 namespace vrs {
 namespace os {
 
-bool Semaphore::timedWait(const double timeSec) {
+bool Semaphore::timedWait(double timeSec) {
   using namespace boost::posix_time;
   long integralTime = static_cast<long>(std::floor(timeSec));
   long microSeconds = static_cast<long>((timeSec - integralTime) * 1000000);

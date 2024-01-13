@@ -48,7 +48,7 @@ int64_t getTimestampMs() {
 
 bool getProcessCpuTimes(double& outUserCpuTime, double& outSystemCpuTime) {
 #if IS_MAC_PLATFORM() || IS_LINUX_PLATFORM()
-  struct rusage r_usage;
+  struct rusage r_usage {};
   getrusage(RUSAGE_SELF, &r_usage);
   const double cMicroseconds = 1e-6;
   outUserCpuTime = r_usage.ru_utime.tv_sec + r_usage.ru_utime.tv_usec * cMicroseconds;

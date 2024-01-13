@@ -39,10 +39,10 @@ class ImageNamer {
   /// For each record in image streams, get their datalayouts.
   /// Use extractor.getExpectedLayout<T>() as needed.
   virtual bool onDataLayoutRead(
-      const CurrentRecord& record,
-      size_t blockIndex,
-      DataLayout& datalayout,
-      ImageExtractor& extractor) {
+      const CurrentRecord& /*record*/,
+      size_t /*blockIndex*/,
+      DataLayout& /*datalayout*/,
+      ImageExtractor& /*extractor*/) {
     return true;
   }
 
@@ -57,7 +57,7 @@ class ImageNamer {
       double timestamp);
 
  protected:
-  string getRawImageFormatAsString(const ImageContentBlockSpec& imageSpec);
+  static string getRawImageFormatAsString(const ImageContentBlockSpec& imageSpec);
 };
 
 class ImageExtractor : public utils::VideoRecordFormatStreamPlayer {

@@ -98,7 +98,7 @@ struct CreateParams {
   using CustomCreateFileFunction =
       function<int(CreateParams& createParams, RecordFileWriter& fileWriter)>;
 
-  CreateParams(const string& _path, const FileConfig& _fileConfig = kClassicFileConfig)
+  explicit CreateParams(const string& _path, const FileConfig& _fileConfig = kClassicFileConfig)
       : path{_path}, fileConfig{_fileConfig} {}
 
   // Required params
@@ -126,7 +126,8 @@ struct CreateParams {
     chunkHandler = std::move(handler);
     return *this;
   }
-  CreateParams& setCustomCreateFileFunction(CustomCreateFileFunction _customCreateFileFunction) {
+  CreateParams& setCustomCreateFileFunction(
+      const CustomCreateFileFunction& _customCreateFileFunction) {
     customCreateFileFunction = _customCreateFileFunction;
     return *this;
   }
@@ -155,7 +156,7 @@ int singleThreadCreateRecords(CreateParams& createParams);
 
 /// Parameterization of the checks to be performed, so we can verify a wide variety of situations.
 struct CheckParams {
-  CheckParams(const string& _path, const FileConfig& _fileConfig = kClassicFileConfig)
+  explicit CheckParams(const string& _path, const FileConfig& _fileConfig = kClassicFileConfig)
       : filePath{_path}, fileConfig{_fileConfig} {}
 
   // Required params

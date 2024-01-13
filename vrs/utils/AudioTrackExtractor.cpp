@@ -138,10 +138,7 @@ bool AudioTrackExtractor::onAudioRead(
   return !stop_;
 }
 
-bool AudioTrackExtractor::onUnsupportedBlock(
-    const CurrentRecord& record,
-    size_t,
-    const ContentBlock& cb) {
+bool AudioTrackExtractor::onUnsupportedBlock(const CurrentRecord&, size_t, const ContentBlock& cb) {
   // the audio was not decoded ... not sure why?
   if (cb.getContentType() == ContentType::AUDIO) {
     stop(fmt::format("Unable to handle audio block {}", cb.audio().asString()));
@@ -208,9 +205,9 @@ string AudioTrackExtractor::getSummary(
 }
 
 namespace {
-string writeJson(const string& jsonFilePath, const string& diagnostic, bool success) {
+string writeJson(const string& jsonFilePath, const string& diagnostic, bool /*success*/) {
   DiskFile jsonFile;
-  int status;
+  int status{};
   if (((status = jsonFile.create(jsonFilePath)) != 0) ||
       ((status = jsonFile.write(diagnostic.c_str(), diagnostic.size())) != 0) ||
       ((status = jsonFile.close()) != 0)) {

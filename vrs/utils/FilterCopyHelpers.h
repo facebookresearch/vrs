@@ -90,8 +90,8 @@ class Writer : public Recordable {
  public:
   Writer(RecordableTypeId typeId, const string& flavor) : Recordable(typeId, flavor) {}
 
-  const Record* createStateRecord();
-  const Record* createConfigurationRecord();
+  const Record* createStateRecord() override;
+  const Record* createConfigurationRecord() override;
   const Record* createRecord(const CurrentRecord& record, vector<int8_t>& data);
   const Record* createRecord(const CurrentRecord& record, DataSource& source);
   const Record*
@@ -130,11 +130,11 @@ class Copier : public StreamPlayer {
 class ContentChunk {
  public:
   ContentChunk() = default;
-  ContentChunk(DataLayout& layout);
-  ContentChunk(size_t size) {
+  explicit ContentChunk(DataLayout& layout);
+  explicit ContentChunk(size_t size) {
     buffer_.resize(size);
   }
-  ContentChunk(vector<uint8_t>&& buffer) : buffer_{buffer} {}
+  explicit ContentChunk(vector<uint8_t>&& buffer) : buffer_{buffer} {}
   virtual ~ContentChunk() = default;
   vector<uint8_t>& getBuffer() {
     return buffer_;
@@ -246,8 +246,8 @@ class RecordFilterCopier : public RecordFormatStreamPlayer {
   Writer writer_;
   RecordFileWriter& fileWriter_;
   const CopyOptions& options_;
-  bool copyVerbatim_;
-  bool skipRecord_;
+  bool copyVerbatim_{false};
+  bool skipRecord_{false};
   deque<unique_ptr<ContentChunk>> chunks_;
   vector<int8_t> verbatimRecordData_;
 };

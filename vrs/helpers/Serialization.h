@@ -20,7 +20,7 @@
 
 #define RAPIDJSON_NAMESPACE vrs_rapidjson
 #define RAPIDJSON_HAS_STDSTRING 1
-#define RAPIDJSON_PARSE_DEFAULT_FLAGS kParseFullPrecisionFlag | kParseNanAndInfFlag
+#define RAPIDJSON_PARSE_DEFAULT_FLAGS (kParseFullPrecisionFlag | kParseNanAndInfFlag)
 #define RAPIDJSON_WRITE_DEFAULT_FLAGS kWriteNanAndInfFlag
 
 #include <rapidjson/rapidjson.h>

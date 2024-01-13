@@ -140,7 +140,7 @@ void ThrottledWriter::waitForBackgroundThreadQueueSize(size_t maxSize) {
     cout << kResetCurrentLine;
   }
   // To avoid stalls, don't wait quite until we have nothing left to process,
-  uint64_t queueByteSize;
+  uint64_t queueByteSize = 0;
   while ((queueByteSize = writer_.getBackgroundThreadQueueByteSize()) > maxSize) {
     if (showProgress()) {
       cout << kResetCurrentLine << "Processing " << setw(7)

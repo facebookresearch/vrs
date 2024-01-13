@@ -148,7 +148,7 @@ template <typename JSTR>
 inline void
 serializeStringRefMap(const map<string, string>& stringMap, JsonWrapper& rj, const JSTR& name) {
   using namespace vrs_rapidjson;
-  if (stringMap.size() > 0) {
+  if (!stringMap.empty()) {
     JValue mapValues(kObjectType);
     for (const auto& element : stringMap) {
       mapValues.AddMember(jStringRef(element.first), jStringRef(element.second), rj.alloc);
@@ -160,7 +160,7 @@ serializeStringRefMap(const map<string, string>& stringMap, JsonWrapper& rj, con
 template <typename T, typename JSTR>
 inline void serializeVector(const vector<T>& vect, JsonWrapper& rj, const JSTR& name) {
   using namespace vrs_rapidjson;
-  if (vect.size() > 0) {
+  if (!vect.empty()) {
     JValue arrayValues(kArrayType);
     arrayValues.Reserve(static_cast<SizeType>(vect.size()), rj.alloc);
     for (const auto& element : vect) {
@@ -175,7 +175,7 @@ template <typename JSTR>
 inline void
 serializeStringRefVector(const vector<string>& vect, JsonWrapper& rj, const JSTR& name) {
   using namespace vrs_rapidjson;
-  if (vect.size() > 0) {
+  if (!vect.empty()) {
     JValue arrayValues(kArrayType);
     arrayValues.Reserve(static_cast<SizeType>(vect.size()), rj.alloc);
     for (const auto& str : vect) {

@@ -71,7 +71,7 @@ int filterCopy(
     FilteredFileReader& filteredReader,
     const string& pathToCopy,
     const CopyOptions& copyOptions,
-    MakeStreamFilterFunction makeStreamFilter = makeCopier,
+    const MakeStreamFilterFunction& makeStreamFilter = makeCopier,
     unique_ptr<ThrottledFileDelegate> throttledFileDelegate =
         std::make_unique<ThrottledFileDelegate>());
 

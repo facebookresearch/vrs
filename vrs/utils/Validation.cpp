@@ -104,12 +104,12 @@ class RecordChecker : public StreamPlayer {
  public:
   RecordChecker(StreamId id, uint16_t instance, CheckType checkType)
       : id_{id}, sanitizedId_{id.getTypeId(), instance}, checkType_{checkType} {}
-  virtual bool processRecordHeader(const CurrentRecord& record, DataReference& outDataReference) {
+  bool processRecordHeader(const CurrentRecord& record, DataReference& outDataReference) override {
     buffer_.resize(record.recordSize);
     outDataReference.useVector(buffer_);
     return true;
   }
-  virtual void processRecord(const CurrentRecord& record, uint32_t /*readSize*/) {
+  void processRecord(const CurrentRecord& record, uint32_t /*readSize*/) override {
     switch (checkType_) {
       case CheckType::Checksum:
       case CheckType::Checksums:
@@ -250,10 +250,10 @@ class DecodeChecker : public VideoRecordFormatStreamPlayer {
       errorCount_++;
     }
   }
-  bool onDataLayoutRead(const CurrentRecord& r, size_t /* blockIndex */, DataLayout& dl) override {
+  bool onDataLayoutRead(const CurrentRecord&, size_t /*blkIdx*/, DataLayout&) override {
     return true;
   }
-  bool onImageRead(const CurrentRecord& record, size_t blockIndex, const ContentBlock& cb)
+  bool onImageRead(const CurrentRecord& record, size_t /*blkIdx*/, const ContentBlock& cb)
       override {
     PixelFrame frame;
     return isSuccess(readFrame(frame, record, cb), cb.getContentType());
@@ -265,7 +265,7 @@ class DecodeChecker : public VideoRecordFormatStreamPlayer {
   bool onCustomBlockRead(const CurrentRecord& rec, size_t blkIdx, const ContentBlock& cb) override {
     return onUnsupportedBlock(rec, blkIdx, cb);
   }
-  bool onUnsupportedBlock(const CurrentRecord& rec, size_t blkIdx, const ContentBlock& cb)
+  bool onUnsupportedBlock(const CurrentRecord& rec, size_t /*blkIdx*/, const ContentBlock& cb)
       override {
     size_t blockSize = cb.getBlockSize();
     if (blockSize == ContentBlock::kSizeUnknown) {
@@ -300,15 +300,15 @@ string decodeValidation(FilteredFileReader& filteredReader, const CopyOptions& c
     filteredReader.reader.setStreamPlayer(id, checkers.back().get());
   }
 
-  double startTimestamp, endTimestamp;
+  double startTimestamp{}, endTimestamp{};
   filteredReader.getConstrainedTimeRange(startTimestamp, endTimestamp);
   filteredReader.preRollConfigAndState(); // make sure to copy most recent config & state records
 
   ThrottledWriter throttledWriter(copyOptions);
   throttledWriter.initTimeRange(startTimestamp, endTimestamp);
 
-  size_t readRecordCount;
-  bool noError;
+  size_t readRecordCount = 0;
+  bool noError = true;
   double timeSpent = 0;
   if (!iterateChecker(filteredReader, readRecordCount, noError, &throttledWriter, timeSpent)) {
     return "<invalid timerange>";
@@ -363,15 +363,15 @@ string checkRecords(
     filteredReader.reader.setStreamPlayer(id, checkers.back().get());
   }
 
-  double startTimestamp, endTimestamp;
+  double startTimestamp{}, endTimestamp{};
   filteredReader.getConstrainedTimeRange(startTimestamp, endTimestamp);
   filteredReader.preRollConfigAndState(); // make sure to copy most recent config & state records
 
   ThrottledWriter throttledWriter(copyOptions);
   throttledWriter.initTimeRange(startTimestamp, endTimestamp);
 
-  size_t decodedCount;
-  bool noError;
+  size_t decodedCount = 0;
+  bool noError = true;
   double timeSpent = 0;
   if (!iterateChecker(filteredReader, decodedCount, noError, &throttledWriter, timeSpent)) {
     return "<invalid timerange>";
@@ -633,12 +633,12 @@ static void printDifferences(
 
 class RecordHolder : public StreamPlayer {
  public:
-  virtual bool processRecordHeader(const CurrentRecord& record, DataReference& outDataReference) {
+  bool processRecordHeader(const CurrentRecord& record, DataReference& outDataReference) override {
     buffer_.resize(record.recordSize);
     outDataReference.useVector(buffer_);
     return true;
   }
-  virtual void processRecord(const CurrentRecord& record, uint32_t /*readSize*/) {
+  void processRecord(const CurrentRecord& /*record*/, uint32_t /*readSize*/) override {
     readCounter_++;
   }
   const vector<char>& getBuffer() const {
@@ -669,12 +669,12 @@ class RecordMaster : public StreamPlayer {
         index_{reader_.getIndex(id_)},
         lastRecord_{0},
         readCounter_{0} {}
-  virtual bool processRecordHeader(const CurrentRecord& record, DataReference& outDataReference) {
+  bool processRecordHeader(const CurrentRecord& record, DataReference& outDataReference) override {
     buffer_.resize(record.recordSize);
     outDataReference.useVector(buffer_);
     return true;
   }
-  virtual void processRecord(const CurrentRecord& record, uint32_t /*readSize*/) {
+  void processRecord(const CurrentRecord& record, uint32_t /*readSize*/) override {
     readCounter_++;
     while (lastRecord_ < index_.size() && index_[lastRecord_]->timestamp < record.timestamp) {
       lastRecord_++;
@@ -727,8 +727,8 @@ class RecordMaster : public StreamPlayer {
   RecordFileReader& reader_;
   RecordHolder* holder_;
   const vector<const IndexRecord::RecordInfo*>& index_;
-  size_t lastRecord_;
-  size_t readCounter_;
+  size_t lastRecord_{};
+  size_t readCounter_{};
   vector<char> buffer_;
 };
 
@@ -736,7 +736,7 @@ bool compareVRSfiles(
     FilteredFileReader& first,
     FilteredFileReader& second,
     const CopyOptions& copyOptions) {
-  double startTimestamp, endTimestamp;
+  double startTimestamp{}, endTimestamp{};
   first.getConstrainedTimeRange(startTimestamp, endTimestamp);
   first.preRollConfigAndState(); // make sure to copy most recent config & state records
 
@@ -773,7 +773,7 @@ bool compareVRSfiles(
   first.reader.clearStreamPlayers();
   second.reader.clearStreamPlayers();
   atomic<int> diffCounter{0};
-  bool noError;
+  bool noError = true;
   vector<unique_ptr<RecordHolder>> holders;
   vector<unique_ptr<RecordMaster>> checkers;
   for (const auto& iter : idMap) {
@@ -783,7 +783,7 @@ bool compareVRSfiles(
         diffCounter, noError, iter.second, second.reader, holders.back().get()));
     first.reader.setStreamPlayer(iter.first, checkers.back().get());
   }
-  size_t decodedCount;
+  size_t decodedCount = 0;
   double timeSpent = 0;
   if (!iterateChecker(first, decodedCount, noError, &throttledWriter, timeSpent)) {
     return false;
