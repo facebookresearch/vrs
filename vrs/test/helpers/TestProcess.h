@@ -40,13 +40,13 @@ namespace bp = boost::process;
 
 class TestProcess {
  public:
-  TestProcess(const char* processName) : processName_{processName} {}
-  bool start(std::string arg, bp::ipstream& sout) {
+  explicit TestProcess(const char* processName) : processName_{processName} {}
+  bool start(const std::string& arg, bp::ipstream& sout) {
     return start(arg, &sout);
   }
-  bool start(std::string arg, bp::ipstream* sout = nullptr);
+  bool start(const std::string& arg, bp::ipstream* sout = nullptr);
 
-  std::string getJsonOutput(bp::ipstream& output) const;
+  static std::string getJsonOutput(bp::ipstream& output);
 
   int runProcess();
 
@@ -54,9 +54,9 @@ class TestProcess {
   std::unique_ptr<bp::child> process;
   const char* processName_;
 
-  bool looksLikeAFbCentOSServer();
+  static bool looksLikeAFbCentOSServer();
 
-  bool findBinary(std::string& inOutName);
+  static bool findBinary(std::string& inOutName);
 };
 
 } // namespace test

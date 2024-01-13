@@ -34,7 +34,7 @@ namespace {
 
 struct UserRecordsFileHandlerTest : testing::Test {};
 
-const string kUserFileRecordsFileHandler = "UserRecordsFileHandler";
+string kUserFileRecordsFileHandler = "UserRecordsFileHandler";
 
 #define METHOD_NOT_SUPPORTED() \
   throw std::runtime_error(    \
@@ -42,7 +42,7 @@ const string kUserFileRecordsFileHandler = "UserRecordsFileHandler";
 
 class UserRecordsFileHandler : public WriteFileHandler {
  public:
-  UserRecordsFileHandler() {}
+  UserRecordsFileHandler() = default;
   std::unique_ptr<FileHandler> makeNew() const override {
     return make_unique<UserRecordsFileHandler>();
   }
@@ -112,7 +112,7 @@ class UserRecordsFileHandler : public WriteFileHandler {
   bool isRemoteFileSystem() const override {
     return false;
   }
-  int parseUri(FileSpec& intOutFileSpec, size_t colonIndex) const override {
+  int parseUri(FileSpec& intOutFileSpec, size_t /*colonIndex*/) const override {
     intOutFileSpec.chunks.resize(1);
     return FileSpec::parseUri(
         intOutFileSpec.uri,

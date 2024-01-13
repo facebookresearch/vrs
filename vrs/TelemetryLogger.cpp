@@ -78,7 +78,7 @@ unique_ptr<TelemetryLogger>& TelemetryLogger::getInstance() {
   return sInstance;
 }
 
-TelemetryLogger::~TelemetryLogger() {}
+TelemetryLogger::~TelemetryLogger() = default;
 
 TrafficEvent& TrafficEvent::setAttemptStartTime() {
   transferStartTime = os::getCurrentTimeSecSinceEpoch();

@@ -238,7 +238,7 @@ TEST_F(DataLayoutTester, testDataLayoutMatcher) {
   // make a missing required field fail the mapping
   otherConfig.double_.setRequired();
   EXPECT_FALSE(otherConfig.mapLayout(testConfig));
-  double v;
+  double v = 0;
   EXPECT_FALSE(otherConfig.double_.get(v));
   EXPECT_FALSE(otherConfig.double_.getDefault(v));
 
@@ -276,7 +276,7 @@ TEST_F(DataLayoutTester, testDataLayoutMatcher) {
   EXPECT_FALSE(newConfig.char_.get(chart));
   EXPECT_EQ(chart, 'a');
 
-  int8_t int8;
+  int8_t int8 = 0;
   EXPECT_EQ(newConfig.int8_.get(), oldConfig.int8_.get());
   EXPECT_TRUE(newConfig.int8_.get(int8));
   EXPECT_EQ(int8, oldConfig.int8_.get());
@@ -291,7 +291,7 @@ TEST_F(DataLayoutTester, testDataLayoutMatcher) {
   EXPECT_FALSE(newConfig.float_.isAvailable());
 
   // check missing data, with no default
-  float floatt;
+  float floatt = 0;
   EXPECT_FALSE(newConfig.float_.getDefault(floatt));
   EXPECT_EQ(newConfig.float_.get(), 0);
   floatt = -1;
@@ -300,7 +300,7 @@ TEST_F(DataLayoutTester, testDataLayoutMatcher) {
 
   // check missing data, with default
   EXPECT_FALSE(newConfig.double_.isAvailable());
-  double doublet_default;
+  double doublet_default = 0;
   EXPECT_TRUE(newConfig.double_.getDefault(doublet_default));
   EXPECT_EQ(doublet_default, 3.14);
   EXPECT_EQ(newConfig.double_.get(), doublet_default);
@@ -482,7 +482,7 @@ TEST_F(DataLayoutTester, testVarSizeFields) {
   EXPECT_EQ(strings.size(), 3);
   EXPECT_TRUE(strings[0] == "Eline");
   EXPECT_TRUE(strings[1] == "Marlene");
-  EXPECT_TRUE(strings[2] == "");
+  EXPECT_TRUE(strings[2].empty());
 
   EXPECT_FALSE(varSizeLayout.int_.isAvailable());
 
@@ -508,7 +508,7 @@ struct OptionalFields {
 };
 
 struct LayoutWithOptionalFields : public AutoDataLayout {
-  LayoutWithOptionalFields(bool allocateOptionalFields = false)
+  explicit LayoutWithOptionalFields(bool allocateOptionalFields = false)
       : optionalFields(allocateOptionalFields) {}
 
   DataPieceString normalField{"normal_field"};
@@ -560,7 +560,7 @@ struct Counters {
 template <typename T>
 inline void addTemplatePiece(ManualDataLayout& layout, Counters& c, const T& defaultValue) {
   string valuePieceName = to_string(++c.pieceCounter) + "_value";
-  DataPieceValue<T>* newValue = new DataPieceValue<T>(valuePieceName.c_str(), defaultValue);
+  DataPieceValue<T>* newValue = new DataPieceValue<T>(valuePieceName, defaultValue);
   layout.add(unique_ptr<DataPiece>(newValue));
   newValue->setMin(numeric_limits<T>::lowest());
   newValue->setMax(numeric_limits<T>::max());
@@ -572,7 +572,7 @@ inline void addTemplatePiece(ManualDataLayout& layout, Counters& c, const T& def
   newValue->setTag("units", "metric");
 
   string arrayPieceName = to_string(++c.pieceCounter) + "_array";
-  DataPieceArray<T>* newArray = new DataPieceArray<T>(arrayPieceName.c_str(), c.arraySize++);
+  DataPieceArray<T>* newArray = new DataPieceArray<T>(arrayPieceName, c.arraySize++);
   layout.add(unique_ptr<DataPiece>(newArray));
   vector<T> values;
   for (size_t k = 0; k < newArray->getArraySize(); ++k) {
@@ -584,13 +584,13 @@ inline void addTemplatePiece(ManualDataLayout& layout, Counters& c, const T& def
   newArray->setTag(arrayPieceName, valuePieceName); // make something variable...
 
   string vectorPieceName = to_string(++c.pieceCounter) + "_vector";
-  DataPieceVector<T>* newVector = new DataPieceVector<T>(vectorPieceName.c_str());
+  DataPieceVector<T>* newVector = new DataPieceVector<T>(vectorPieceName);
   layout.add(unique_ptr<DataPiece>(newVector));
   newVector->setDefault(values);
   newArray->setTag(vectorPieceName, arrayPieceName); // make something variable...
 
   string stringMapPieceName = to_string(++c.pieceCounter) + "_stringMap";
-  DataPieceStringMap<T>* newStringMap = new DataPieceStringMap<T>(stringMapPieceName.c_str());
+  DataPieceStringMap<T>* newStringMap = new DataPieceStringMap<T>(stringMapPieceName);
   layout.add(unique_ptr<DataPiece>(newStringMap));
   map<string, T> stringMap;
   stringMap["lowest"] = numeric_limits<T>::lowest();
@@ -612,13 +612,13 @@ T makePoint(size_t baseValue) {
 template <typename T>
 inline void addTemplatePiecePoint(ManualDataLayout& layout, Counters& c) {
   string valuePieceName = to_string(++c.pieceCounter) + "_value";
-  DataPieceValue<T>* newValue = new DataPieceValue<T>(valuePieceName.c_str());
+  DataPieceValue<T>* newValue = new DataPieceValue<T>(valuePieceName);
   layout.add(unique_ptr<DataPiece>(newValue));
   newValue->setTag("description", string("this is ") + valuePieceName);
   newValue->setTag("units", "metric");
 
   string arrayPieceName = to_string(++c.pieceCounter) + "_array";
-  DataPieceArray<T>* newArray = new DataPieceArray<T>(arrayPieceName.c_str(), c.arraySize++);
+  DataPieceArray<T>* newArray = new DataPieceArray<T>(arrayPieceName, c.arraySize++);
   layout.add(unique_ptr<DataPiece>(newArray));
   vector<T> values;
   for (size_t k = 0; k < newArray->getArraySize(); ++k) {
@@ -630,13 +630,13 @@ inline void addTemplatePiecePoint(ManualDataLayout& layout, Counters& c) {
   newArray->setTag(arrayPieceName, valuePieceName); // make something variable...
 
   string vectorPieceName = to_string(++c.pieceCounter) + "_vector";
-  DataPieceVector<T>* newVector = new DataPieceVector<T>(vectorPieceName.c_str());
+  DataPieceVector<T>* newVector = new DataPieceVector<T>(vectorPieceName);
   layout.add(unique_ptr<DataPiece>(newVector));
   newVector->setDefault(values);
   newArray->setTag(vectorPieceName, arrayPieceName); // make something variable...
 
   string stringMapPieceName = to_string(++c.pieceCounter) + "_stringMap";
-  DataPieceStringMap<T>* newStringMap = new DataPieceStringMap<T>(stringMapPieceName.c_str());
+  DataPieceStringMap<T>* newStringMap = new DataPieceStringMap<T>(stringMapPieceName);
   layout.add(unique_ptr<DataPiece>(newStringMap));
   map<string, T> stringMap;
   stringMap["one"] = makePoint<T>(c.arraySize + 0);
@@ -658,13 +658,13 @@ T makeMatrix(size_t baseValue) {
 template <typename T>
 inline void addTemplatePieceMatrix(ManualDataLayout& layout, Counters& c) {
   string valuePieceName = to_string(++c.pieceCounter) + "_value";
-  DataPieceValue<T>* newValue = new DataPieceValue<T>(valuePieceName.c_str());
+  DataPieceValue<T>* newValue = new DataPieceValue<T>(valuePieceName);
   layout.add(unique_ptr<DataPiece>(newValue));
   newValue->setTag("description", string("this is ") + valuePieceName);
   newValue->setTag("units", "metric");
 
   string arrayPieceName = to_string(++c.pieceCounter) + "_array";
-  DataPieceArray<T>* newArray = new DataPieceArray<T>(arrayPieceName.c_str(), c.arraySize++);
+  DataPieceArray<T>* newArray = new DataPieceArray<T>(arrayPieceName, c.arraySize++);
   layout.add(unique_ptr<DataPiece>(newArray));
   vector<T> values;
   for (size_t k = 0; k < newArray->getArraySize(); ++k) {
@@ -676,13 +676,13 @@ inline void addTemplatePieceMatrix(ManualDataLayout& layout, Counters& c) {
   newArray->setTag(arrayPieceName, valuePieceName); // make something variable...
 
   string vectorPieceName = to_string(++c.pieceCounter) + "_vector";
-  DataPieceVector<T>* newVector = new DataPieceVector<T>(vectorPieceName.c_str());
+  DataPieceVector<T>* newVector = new DataPieceVector<T>(vectorPieceName);
   layout.add(unique_ptr<DataPiece>(newVector));
   newVector->setDefault(values);
   newArray->setTag(vectorPieceName, arrayPieceName); // make something variable...
 
   string stringMapPieceName = to_string(++c.pieceCounter) + "_stringMap";
-  DataPieceStringMap<T>* newStringMap = new DataPieceStringMap<T>(stringMapPieceName.c_str());
+  DataPieceStringMap<T>* newStringMap = new DataPieceStringMap<T>(stringMapPieceName);
   layout.add(unique_ptr<DataPiece>(newStringMap));
   map<string, T> stringMap;
   stringMap["one"] = makeMatrix<T>(c.arraySize + 0);
@@ -722,7 +722,7 @@ TEST_F(DataLayoutTester, testSerialization) {
   addTemplatePieceMatrix<Matrix4Di>(manualLayout, counters);
 
   DataPieceString* stringPiece =
-      new DataPieceString((to_string(++counters.pieceCounter) + "_string").c_str());
+      new DataPieceString(to_string(++counters.pieceCounter) + "_string");
   manualLayout.add(unique_ptr<DataPiece>(stringPiece));
   stringPiece->setDefault("a default string");
 
@@ -807,7 +807,7 @@ TEST_F(DataLayoutTester, testMetaData) {
 
   const DataPieceValue<int32_t>* intValue = dl->findDataPieceValue<int32_t>("int");
   ASSERT_NE(intValue, nullptr);
-  int32_t v;
+  int32_t v = 0;
   EXPECT_TRUE(intValue->getMin(v));
   EXPECT_EQ(v, 10);
   EXPECT_TRUE(intValue->getMax(v));
@@ -824,7 +824,7 @@ TEST_F(DataLayoutTester, testMetaData) {
 
   const DataPieceValue<float>* floatValue = dl->findDataPieceValue<float>("float");
   ASSERT_NE(floatValue, nullptr);
-  float f;
+  float f = 0;
   EXPECT_TRUE(floatValue->getMin(f));
   EXPECT_NEAR(f, -10.f, 0.0001f);
   EXPECT_TRUE(floatValue->getMax(f));
@@ -945,7 +945,7 @@ struct ALayout : public AutoDataLayout {
   AutoDataLayoutEnd end;
 };
 
-static void checkValues(DataLayout& layout) {
+void checkValues(DataLayout& layout) {
   ALayout alayout;
   alayout.mapLayout(layout);
   EXPECT_EQ(alayout.int8_.get(), kInt8);

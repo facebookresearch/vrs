@@ -97,7 +97,7 @@ class RecordManager {
   }
 
  private:
-  size_t getAcceptableOverCapacity(size_t capacity) const;
+  static size_t getAcceptableOverCapacity(size_t capacity);
   void recycle(Record* record);
 
   std::mutex mutex_;

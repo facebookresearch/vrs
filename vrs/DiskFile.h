@@ -156,7 +156,7 @@ class DiskFile : public WriteFileHandler {
   /// @return A status code, 0 for success.
   static int writeTextFile(const string& path, const string& text);
 
-  virtual int parseUri(FileSpec& intOutFileSpec, size_t colonIndex) const override;
+  int parseUri(FileSpec& intOutFileSpec, size_t colonIndex) const override;
 
  protected:
   int checkChunks(const vector<string>& chunks);

@@ -29,19 +29,19 @@ struct OperationContext {
   string operation;
   string sourceLocation;
 
-  OperationContext() {}
+  OperationContext() = default;
   OperationContext(const string& op, const string& sourceLoc)
       : operation{op}, sourceLocation{sourceLoc} {}
   OperationContext(const OperationContext& rhs)
       : operation{rhs.operation}, sourceLocation{rhs.sourceLocation} {}
-  OperationContext(OperationContext&& rhs)
+  OperationContext(OperationContext&& rhs) noexcept
       : operation{std::move(rhs.operation)}, sourceLocation{std::move(rhs.sourceLocation)} {}
 
   bool operator<(const OperationContext& rhs) const {
     auto tie = [](const OperationContext& oc) { return std::tie(oc.operation, oc.sourceLocation); };
     return tie(*this) < tie(rhs);
   }
-  OperationContext& operator=(OperationContext&& rhs) {
+  OperationContext& operator=(OperationContext&& rhs) noexcept {
     operation = std::move(rhs.operation);
     sourceLocation = std::move(rhs.sourceLocation);
     return *this;
@@ -57,13 +57,13 @@ struct LogEvent {
       const std::string& message,
       const string& serverReply)
       : type{type}, operationContext{opContext}, message{message}, serverReply{serverReply} {}
-  LogEvent(LogEvent&& rhs)
+  LogEvent(LogEvent&& rhs) noexcept
       : type{std::move(rhs.type)},
         operationContext{std::move(rhs.operationContext)},
         message{std::move(rhs.message)},
         serverReply{std::move(rhs.serverReply)} {}
 
-  LogEvent& operator=(LogEvent&& rhs) {
+  LogEvent& operator=(LogEvent&& rhs) noexcept {
     type = std::move(rhs.type);
     operationContext = std::move(rhs.operationContext);
     message = std::move(rhs.message);

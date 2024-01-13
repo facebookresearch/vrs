@@ -39,11 +39,11 @@ template <typename T>
 class DataPieceStringMap : public DataPiece {
  public:
   /// @param label: Name for the DataPiece.
-  DataPieceStringMap(const string& label)
+  explicit DataPieceStringMap(const string& label)
       : DataPiece(label, DataPieceType::StringMap, DataLayout::kVariableSize) {}
   /// @param bundle: Bundle to reconstruct a DataPieceStringMap from disk.
   /// @internal
-  DataPieceStringMap(const MakerBundle& bundle);
+  explicit DataPieceStringMap(const MakerBundle& bundle);
 
   /// Get the name of the element type <T>.
   /// @internal
@@ -104,7 +104,7 @@ class DataPieceStringMap : public DataPiece {
   /// Tell if the DataPiece is available, directly or mapped successfully.
   /// @return True if values can be read without using default values.
   bool isAvailable() const override {
-    size_t count;
+    size_t count = 0;
     return layout_.getVarData<int8_t>(offset_, count) != nullptr;
   }
 

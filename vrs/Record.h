@@ -152,15 +152,15 @@ class Record final {
   friend class RecordManager;
 
   /// Records are created & deleted exclusively by a Recordable's RecordManager.
-  Record(RecordManager& recordManager) : recordManager_(recordManager) {}
+  explicit Record(RecordManager& recordManager) : recordManager_(recordManager) {}
   ~Record() = default;
 
-  double timestamp_;
-  Type recordType_;
-  uint32_t formatVersion_;
+  double timestamp_{};
+  Type recordType_{};
+  uint32_t formatVersion_{};
   std::vector<uninitialized_byte> buffer_;
-  size_t bufferUsedSize_;
-  uint64_t creationOrder_;
+  size_t bufferUsedSize_{};
+  uint64_t creationOrder_{};
 
   RecordManager& recordManager_;
 };

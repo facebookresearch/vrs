@@ -599,8 +599,9 @@ DataPieceString* DataLayout::findDataPieceString(const string& label) {
       const_cast<const DataLayout*>(this)->findDataPieceString(label));
 }
 
-void DataLayout::forEachDataPiece(function<void(const DataPiece*)> callback, DataPieceType type)
-    const {
+void DataLayout::forEachDataPiece(
+    const function<void(const DataPiece*)>& callback,
+    DataPieceType type) const {
   if (type == DataPieceType::Undefined || type == DataPieceType::Value ||
       type == DataPieceType::Array) {
     for (const DataPiece* piece : fixedSizePieces_) {
@@ -618,7 +619,7 @@ void DataLayout::forEachDataPiece(function<void(const DataPiece*)> callback, Dat
   }
 }
 
-void DataLayout::forEachDataPiece(function<void(DataPiece*)> callback, DataPieceType type) {
+void DataLayout::forEachDataPiece(const function<void(DataPiece*)>& callback, DataPieceType type) {
   if (type == DataPieceType::Undefined || type == DataPieceType::Value ||
       type == DataPieceType::Array) {
     for (DataPiece* piece : fixedSizePieces_) {
@@ -795,19 +796,19 @@ void adjustPrecision<double>(const double& v, ostream& str) {
 // Print char/int8/uint8 as numbers
 // https://stackoverflow.com/questions/19562103/uint8-t-cant-be-printed-with-cout
 namespace special_chars {
-static ostream& operator<<(ostream& os, char c) {
+ostream& operator<<(ostream& os, char c) {
   return is_signed<char>::value ? os << static_cast<int>(c) : os << static_cast<unsigned int>(c);
 }
 
-static ostream& operator<<(ostream& os, signed char c) {
+ostream& operator<<(ostream& os, signed char c) {
   return os << static_cast<int>(c);
 }
 
-static ostream& operator<<(ostream& os, unsigned char c) {
+ostream& operator<<(ostream& os, unsigned char c) {
   return os << static_cast<unsigned int>(c);
 }
 
-static ostream& operator<<(ostream& os, const string& s) {
+ostream& operator<<(ostream& os, const string& s) {
   return std::operator<<(os, helpers::make_printable(s));
 }
 
@@ -1087,12 +1088,9 @@ bool DataPieceValue<T>::isSame(const DataPiece* rhs) const {
   if (!DataPiece::isSame(rhs)) {
     return false;
   }
-  const DataPieceValue<T>& other = *reinterpret_cast<const DataPieceValue<T>*>(rhs);
-  if (!vrs::isSame(this->defaultValue_, other.defaultValue_) ||
-      !vrs::isSame(this->properties_, other.properties_)) {
-    return false;
-  }
-  return true;
+  const auto* other = reinterpret_cast<const DataPieceValue<T>*>(rhs);
+  return vrs::isSame(this->defaultValue_, other->defaultValue_) &&
+      vrs::isSame(this->properties_, other->properties_);
 }
 
 template <typename T>
@@ -1196,12 +1194,9 @@ bool DataPieceArray<T>::isSame(const DataPiece* rhs) const {
   if (!DataPiece::isSame(rhs)) {
     return false;
   }
-  const DataPieceArray<T>& other = *reinterpret_cast<const DataPieceArray<T>*>(rhs);
-  if (!vrs::isSame(this->defaultValues_, other.defaultValues_) ||
-      !vrs::isSame(this->properties_, other.properties_)) {
-    return false;
-  }
-  return true;
+  const auto* other = reinterpret_cast<const DataPieceArray<T>*>(rhs);
+  return vrs::isSame(this->defaultValues_, other->defaultValues_) &&
+      vrs::isSame(this->properties_, other->properties_);
 }
 
 template <typename T>
@@ -1272,9 +1267,9 @@ size_t DataPieceVector<string>::collectVariableData(int8_t* data, size_t bufferS
 
 template <>
 bool DataPieceVector<string>::get(vector<string>& outValues) const {
-  size_t byteCount;
+  size_t byteCount = 0;
   const int8_t* source = layout_.getVarData<int8_t>(offset_, byteCount);
-  uint32_t vectorSize;
+  uint32_t vectorSize = 0;
   size_t readSize = 0;
   if (loadElement<uint32_t>(vectorSize, source, readSize, byteCount)) {
     if ((vectorSize + 1) * sizeof(uint32_t) <= byteCount) {
@@ -1456,7 +1451,7 @@ size_t DataPieceStringMap<T>::collectVariableData(int8_t* data, size_t bufferSiz
 template <typename T>
 bool DataPieceStringMap<T>::get(map<string, T>& outValues) const {
   outValues.clear();
-  size_t dataSize;
+  size_t dataSize = 0;
   const int8_t* ptr = layout_.getVarData<int8_t>(offset_, dataSize);
   size_t readSize = 0;
   if (ptr != nullptr && dataSize > 0) {
@@ -1530,11 +1525,8 @@ bool DataPieceStringMap<T>::isSame(const DataPiece* rhs) const {
   if (!DataPiece::isSame(rhs)) {
     return false;
   }
-  const DataPieceStringMap<T>& other = *reinterpret_cast<const DataPieceStringMap<T>*>(rhs);
-  if (!vrs::isSame(this->defaultValues_, other.defaultValues_)) {
-    return false;
-  }
-  return true;
+  const auto* other = reinterpret_cast<const DataPieceStringMap<T>*>(rhs);
+  return vrs::isSame(this->defaultValues_, other->defaultValues_);
 }
 
 template <typename T>
@@ -1578,13 +1570,13 @@ size_t DataPieceString::collectVariableData(int8_t* data, size_t bufferSize) con
 }
 
 string DataPieceString::get() const {
-  size_t size;
+  size_t size = 0;
   const char* ptr = layout_.getVarData<char>(offset_, size);
   return ptr != nullptr ? string(ptr, size) : defaultString_;
 }
 
 bool DataPieceString::get(string& outString) const {
-  size_t size;
+  size_t size = 0;
   const char* ptr = layout_.getVarData<char>(offset_, size);
   if (ptr != nullptr) {
     outString.resize(0);
@@ -1596,7 +1588,7 @@ bool DataPieceString::get(string& outString) const {
 }
 
 bool DataPieceString::isAvailable() const {
-  size_t count;
+  size_t count = 0;
   return layout_.getVarData<char>(offset_, count) != nullptr;
 }
 

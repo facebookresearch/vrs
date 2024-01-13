@@ -32,7 +32,7 @@ using namespace vrs;
 using coretech::getTestDataDir;
 
 namespace {
-int addPies(DiskFile& file, string path) {
+int addPies(DiskFile& file, const string& path) {
   int status = file.create(path);
   EXPECT_EQ(status, 0);
   if (status != 0) {

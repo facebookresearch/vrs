@@ -141,7 +141,7 @@ class ImageContentBlockSpec {
   static constexpr uint8_t kQualityUndefined = 255;
   static constexpr double kInvalidTimestamp = -1E-308; // arbitrary unrealistic value
 
-  ImageContentBlockSpec() {}
+  ImageContentBlockSpec() = default;
 
   ImageContentBlockSpec(const ImageContentBlockSpec&) = default;
   ImageContentBlockSpec(
@@ -309,7 +309,7 @@ class ImageContentBlockSpec {
   static size_t getBytesPerPixel(PixelFormat pixel);
 
   /// Get pixel format presented as a readable string, from which it can be reconstructed.
-  inline string getPixelFormatAsString(PixelFormat pixelFormat) {
+  static string getPixelFormatAsString(PixelFormat pixelFormat) {
     return toString(pixelFormat);
   }
 
@@ -337,7 +337,7 @@ class ImageContentBlockSpec {
 /// Specification of an audio content block.
 class AudioContentBlockSpec {
  public:
-  AudioContentBlockSpec() {}
+  AudioContentBlockSpec() = default;
   /// Default copy constructor
   AudioContentBlockSpec(const AudioContentBlockSpec&) = default;
   /// For audio formats with encoding (mp3, flac, etc).
@@ -448,17 +448,17 @@ class AudioContentBlockSpec {
   /// Get the number of bits per audio sample for a specific audio sample format.
   static uint8_t getBitsPerSample(AudioSampleFormat sampleFormat);
   /// Get an audio sample format as a string.
-  inline string getSampleFormatAsString(AudioSampleFormat sampleFormat) {
+  static string getSampleFormatAsString(AudioSampleFormat sampleFormat) {
     return toString(sampleFormat);
   }
 
  private:
-  AudioFormat audioFormat_;
-  AudioSampleFormat sampleFormat_;
-  uint8_t sampleBlockStride_;
-  uint8_t channelCount_;
-  uint32_t sampleRate_;
-  uint32_t sampleCount_;
+  AudioFormat audioFormat_{};
+  AudioSampleFormat sampleFormat_{};
+  uint8_t sampleBlockStride_{};
+  uint8_t channelCount_{};
+  uint32_t sampleRate_{};
+  uint32_t sampleCount_{};
 };
 
 /// \brief Specification of a VRS record content block.
@@ -586,7 +586,7 @@ class ContentBlock {
 };
 
 /// Map a pair of record type/format version to a record format, for a particular stream.
-typedef map<pair<Record::Type, uint32_t>, RecordFormat> RecordFormatMap;
+using RecordFormatMap = map<pair<Record::Type, uint32_t>, RecordFormat>;
 
 /// \brief Helper to identify a particular content block within a file.
 ///
@@ -643,7 +643,7 @@ class ContentBlockId {
 class RecordFormat {
  public:
   /// Empty record format definition.
-  RecordFormat() {}
+  RecordFormat() = default;
   /// Default copy constructor
   RecordFormat(const RecordFormat&) = default;
 
@@ -682,7 +682,7 @@ class RecordFormat {
   /// @param size: Size of the block, or ContentBlock::kSizeUnknown, if the size of the block isn't
   /// known/fixed.
   RecordFormat(ContentType type, size_t size = ContentBlock::kSizeUnknown) {
-    blocks_.emplace_back(ContentBlock(type, size));
+    blocks_.emplace_back(type, size);
   }
 
   /// Append a ContentBlock to this RecordFormat.

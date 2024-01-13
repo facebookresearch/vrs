@@ -69,7 +69,7 @@ class FileCache {
   int getFile(const string& domain, const string& filename, string& outFilePath);
 
  protected:
-  FileCache(const string& mainFolder) : mainFolder_{mainFolder} {}
+  explicit FileCache(string mainFolder) : mainFolder_{std::move(mainFolder)} {}
 
  private:
   string mainFolder_;

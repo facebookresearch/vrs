@@ -40,8 +40,8 @@ using namespace vrs::datalayout_conventions;
 namespace {
 
 // Some not so-nice strings to verify they are saved & restored as provided...
-static const string kBadString1 = "\0x00hello\0x00";
-static const string kBadString2 = "\t1PASH3T1RS8113\n";
+const string kBadString1 = "\0x00hello\0x00";
+const string kBadString2 = "\t1PASH3T1RS8113\n";
 
 // The SantaCruzCamera definitions were copied from the real SantaCruz definitions,
 // which aren't visible from the VRS module.
@@ -51,18 +51,16 @@ namespace SantaCruzCamera {
 
 using ::vrs::AutoDataLayout;
 using ::vrs::AutoDataLayoutEnd;
-using ::vrs::Bool;
 using ::vrs::DataPieceArray;
 using ::vrs::DataPieceValue;
 using ::vrs::DataReference;
 using ::vrs::Point3Df;
 using ::vrs::Point4Df;
-using ::vrs::StreamPlayer;
 using ::vrs::datalayout_conventions::ImageSpecType;
 using ::vrs::FileFormat::LittleEndian;
 
-static const int32_t kCalibrationDataSize = 22;
-static const uint32_t kConfigurationVersion = 5;
+const int32_t kCalibrationDataSize = 22;
+const uint32_t kConfigurationVersion = 5;
 
 #pragma pack(push, 1)
 
@@ -102,7 +100,7 @@ struct VRSDataV4 : VRSDataV3 {
   LittleEndian<double> exposureDuration;
 };
 
-static constexpr float kGainMultiplierConvertor = 16.0;
+constexpr float kGainMultiplierConvertor = 16.0;
 
 struct VRSDataV5 : VRSDataV4 {
   enum : uint32_t { kVersion = 5 };
@@ -149,7 +147,7 @@ struct VRSData : VRSDataV5 {
 };
 
 struct VRSConfiguration {
-  VRSConfiguration() {}
+  VRSConfiguration() = default;
 
   LittleEndian<uint32_t> width;
   LittleEndian<uint32_t> height;
@@ -236,11 +234,11 @@ class VariableImageSpec : public AutoDataLayout {
   AutoDataLayoutEnd end;
 };
 
-static const uint32_t kVariableImageRecordFormatVersion = 100;
+const uint32_t kVariableImageRecordFormatVersion = 100;
 
 class OtherRecordable : public Recordable {
  public:
-  OtherRecordable(uint32_t cameraId) : Recordable(RecordableTypeId::UnitTest2) {
+  explicit OtherRecordable(uint32_t cameraId) : Recordable(RecordableTypeId::UnitTest2) {
     addRecordFormat(
         Record::Type::CONFIGURATION,
         SantaCruzCamera::DataLayoutConfiguration::kVersion,
@@ -316,8 +314,8 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
   const size_t kFrameCount = 10; // count for each frame type
 
  public:
-  DataLayoutFileTest(string fileName)
-      : Recordable(RecordableTypeId::UnitTest1), fileName_(fileName) {}
+  explicit DataLayoutFileTest(string fileName)
+      : Recordable(RecordableTypeId::UnitTest1), fileName_{std::move(fileName)} {}
 
   const Record* createStateRecord() override {
     return createRecord(kTime, Record::Type::STATE, kStateVersion);
@@ -758,10 +756,10 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
 
  private:
   string fileName_;
-  size_t unsupportedBlockCount_;
-  uint32_t configurationCount_;
-  uint32_t fixedImageCount_;
-  uint32_t variableImageCount_;
+  size_t unsupportedBlockCount_{};
+  uint32_t configurationCount_{};
+  uint32_t fixedImageCount_{};
+  uint32_t variableImageCount_{};
   VariableImageSpec imageSpec_;
   bool usesCompression{false};
 };
@@ -781,7 +779,7 @@ struct DataLayoutFileTester : testing::Test {
 
 TEST_F(DataLayoutFileTester, createAndReadDataLayoutFile) {
   // arvr::logging::Channel::setGlobalLevel(arvr::logging::Level::Debug);
-  time_t timeBefore = time(NULL);
+  time_t timeBefore = time(nullptr);
   ASSERT_EQ(recordable.createVrsFile(), 0);
 
   EXPECT_EQ(recordable.readVrsFile(timeBefore), 0);

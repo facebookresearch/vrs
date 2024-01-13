@@ -34,7 +34,7 @@ class LegacyFormatsProvider;
 /// Utility class to handle record format registry manipulations
 class RecordFormatRegistrar {
   /// Private constructor, since there must be only one instance.
-  RecordFormatRegistrar() {}
+  RecordFormatRegistrar() = default;
 
  public:
   // Public interface
@@ -118,7 +118,7 @@ class LegacyFormatsProvider {
   /// block of the RecordFormat, a pointer to a DataLayout must be provided for the matching index.
   /// @return True if the RecordFormat and the layouts match as expected. Otherwise, false is
   /// returned and errors will be logged to help debug the problem.
-  bool addLegacyRecordFormat(
+  static bool addLegacyRecordFormat(
       RecordableTypeId typeId,
       Record::Type recordType,
       uint32_t formatVersion,

@@ -37,7 +37,7 @@ struct FileCacheTest : testing::Test {};
 } // namespace
 
 TEST_F(FileCacheTest, cacheTest) {
-  const string mainFolder = os::getTempFolder();
+  const string& mainFolder = os::getTempFolder();
   const string cacheName = "unit_test_vrs_file_cache";
   ASSERT_EQ(FileCache::makeFileCache(cacheName, mainFolder), 0);
   FileCache* fcache = FileCache::getFileCache();
@@ -58,7 +58,7 @@ TEST_F(FileCacheTest, cacheTest) {
 }
 
 TEST_F(FileCacheTest, cacheDomainTest) {
-  const string mainFolder = os::getTempFolder();
+  const string& mainFolder = os::getTempFolder();
   const string cacheName = "unit_test_vrs_file_cache";
   ASSERT_EQ(FileCache::makeFileCache(cacheName, mainFolder), 0);
   FileCache* fcache = FileCache::getFileCache();
@@ -98,7 +98,7 @@ void verifyDetails(
   map<string, string> fileTags;
   map<StreamId, StreamTags> streamTags;
   vector<IndexRecord::RecordInfo> recordIndex;
-  bool hasProperIndex;
+  bool hasProperIndex = false;
   int readStatus = FileDetailsCache::read(
       cacheFile, streamIds, fileTags, streamTags, recordIndex, hasProperIndex);
   if (readStatus == 0) {
@@ -152,7 +152,7 @@ TEST_F(FileCacheTest, detailsTest) {
   threads.reserve(kThreadCount);
   ThreadParam params{cacheFile, reader, false};
   for (uint32_t threadIndex = 0; threadIndex < kThreadCount; threadIndex++) {
-    threads.push_back(thread{createRecordsThreadTask, &params});
+    threads.emplace_back(createRecordsThreadTask, &params);
   }
   for (uint32_t threadIndex = 0; threadIndex < kThreadCount; threadIndex++) {
     threads[threadIndex].join();

@@ -65,7 +65,7 @@ class TestRecordable : public Recordable {
 } // namespace
 
 #define FORMAT_EQUAL(_block_format, _cstring) \
-  EXPECT_STREQ(_block_format.asString().c_str(), _cstring)
+  EXPECT_STREQ((_block_format).asString().c_str(), _cstring)
 
 bool checkImageDimensions(
     const ContentBlock& cb,
@@ -595,8 +595,8 @@ TEST_F(RecordFormatTest, testGetFormatVersionFromTagName) {
   const Record::Type STATE = Record::Type::STATE;
   const Record::Type DATA = Record::Type::DATA;
 
-  Record::Type recordType;
-  uint32_t formatVersion;
+  Record::Type recordType{};
+  uint32_t formatVersion = 0;
   TEST_RECORD_FORMAT_NAME("RF:Data:0", DATA, 0);
   TEST_RECORD_FORMAT_NAME("RF:Data:00", DATA, 0);
   TEST_RECORD_FORMAT_NAME("RF:Data:1", DATA, 1);
@@ -734,13 +734,13 @@ TEST_F(RecordFormatTest, testTagSetHelpers) {
   EXPECT_TRUE(tag_conventions::parseTagSet(jsonTags, readTags));
   EXPECT_EQ(tags, readTags);
 
-  tags.push_back("hello");
+  tags.emplace_back("hello");
   jsonTags = tag_conventions::makeTagSet(tags);
   EXPECT_EQ(strcmp(jsonTags.c_str(), "{\"tags\":[\"hello\"]}"), 0);
   EXPECT_TRUE(tag_conventions::parseTagSet(jsonTags, readTags));
   EXPECT_EQ(tags, readTags);
 
-  tags.push_back(jsonTags);
+  tags.emplace_back(jsonTags);
   jsonTags = tag_conventions::makeTagSet(tags);
   EXPECT_TRUE(tag_conventions::parseTagSet(jsonTags, readTags));
   EXPECT_EQ(tags, readTags);

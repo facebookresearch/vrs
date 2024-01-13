@@ -67,7 +67,7 @@ class RecordFormatStreamPlayer : public StreamPlayer {
   /// Return false, if the record should not be read entirely, for instance, if you only need to
   /// read some metadata stored in the first content block, but don't need to read & decode the rest
   /// of the record.
-  virtual bool onDataLayoutRead(const CurrentRecord& r, size_t /* blockIndex */, DataLayout& dl) {
+  virtual bool onDataLayoutRead(const CurrentRecord& record, size_t /* blockIndex */, DataLayout&) {
     return true; // we can go read the next block, if any, since we've read the data
   }
 

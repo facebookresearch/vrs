@@ -18,7 +18,6 @@
 
 #include <cstdint>
 
-#include <functional>
 #include <map>
 #include <memory>
 #include <string>
@@ -39,13 +38,13 @@ using std::vector;
 /// If no file handler name is specified, the object is assumed to a set of local files.
 /// Additional properties may be specified in the extras field, which has helper methods.
 struct FileSpec {
-  FileSpec() {}
+  FileSpec() = default;
   FileSpec(const string& filehandler, const vector<string>& chunks)
       : fileHandlerName{filehandler}, chunks{chunks} {}
   FileSpec(const string& filehandler, const vector<string>&& chunks)
       : fileHandlerName{filehandler}, chunks{chunks} {}
-  FileSpec(const vector<string>& chunks) : chunks{chunks} {}
-  FileSpec(vector<string>&& chunks) : chunks{std::move(chunks)} {}
+  explicit FileSpec(const vector<string>& chunks) : chunks{chunks} {}
+  explicit FileSpec(vector<string>&& chunks) : chunks{std::move(chunks)} {}
 
   /// clear all the fields.
   void clear();

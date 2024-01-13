@@ -46,7 +46,7 @@ inline string trim(const string& line) {
   return vrs::helpers::trim(line, " \t\r\n");
 }
 
-bool TestProcess::start(string arg, bp::ipstream* sout) {
+bool TestProcess::start(const string& arg, bp::ipstream* sout) {
   string path = string(processName_);
   if (XR_VERIFY(findBinary(path))) {
 #if IS_VRS_FB_INTERNAL()
@@ -55,16 +55,17 @@ bool TestProcess::start(string arg, bp::ipstream* sout) {
     }
 #endif
     if (sout != nullptr) {
-      process.reset(new bp::child(path + ' ' + arg, bp::std_out > *sout, bp::std_err > bp::null));
+      process =
+          make_unique<bp::child>(path + ' ' + arg, bp::std_out > *sout, bp::std_err > bp::null);
     } else {
-      process.reset(new bp::child(path + ' ' + arg));
+      process = make_unique<bp::child>(path + ' ' + arg);
     }
     return true;
   }
   return false;
 }
 
-string TestProcess::getJsonOutput(bp::ipstream& output) const {
+string TestProcess::getJsonOutput(bp::ipstream& output) {
   string line;
   while (getline(output, line)) {
     line = trim(line);

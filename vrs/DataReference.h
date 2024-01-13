@@ -62,7 +62,7 @@ class DataReference {
   /// @param size1: Size of first block of bytes.
   /// @param data2: Pointer to second block of bytes.
   /// @param size2: Size of second block of bytes.
-  DataReference(
+  explicit DataReference(
       void* data1 = nullptr,
       uint32_t size1 = 0,
       void* data2 = nullptr,

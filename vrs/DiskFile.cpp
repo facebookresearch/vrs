@@ -66,7 +66,7 @@ int DiskFile::close() {
   lastError_ = 0;
   for (auto& chunk : chunks_) {
     if (chunk.file != nullptr) {
-      int error;
+      int error = 0;
       if (!readOnly_) {
         error = ::fflush(chunk.file);
         if (error != 0 && lastError_ == 0) {
@@ -174,8 +174,9 @@ int64_t DiskFile::getTotalSize() const {
 
 vector<pair<string, int64_t>> DiskFile::getFileChunks() const {
   vector<pair<string, int64_t>> chunks;
+  chunks.reserve(chunks_.size());
   for (const Chunk& chunk : chunks_) {
-    chunks.emplace_back(make_pair(chunk.path, chunk.size));
+    chunks.emplace_back(chunk.path, chunk.size);
   }
   return chunks;
 }
@@ -494,7 +495,7 @@ int readZstdFileTemplate(const string& path, T& outContent) {
     return (fileSize < 0) ? FAILURE : 0;
   }
   Decompressor decompressor;
-  size_t frameSize;
+  size_t frameSize = 0;
   size_t maxReadSize = static_cast<size_t>(fileSize);
   IF_ERROR_LOG_AND_RETURN(decompressor.initFrame(file, frameSize, maxReadSize));
   outContent.resize(frameSize / sizeof(typename T::value_type));
@@ -520,7 +521,7 @@ int DiskFile::readZstdFile(const string& path, void* data, size_t dataSize) {
     return (fileSize < 0) ? FAILURE : 0;
   }
   Decompressor decompressor;
-  size_t frameSize;
+  size_t frameSize = 0;
   size_t maxReadSize = static_cast<size_t>(fileSize);
   IF_ERROR_LOG_AND_RETURN(decompressor.initFrame(file, frameSize, maxReadSize));
   if (frameSize != dataSize) {
@@ -552,7 +553,7 @@ int DiskFile::writeTextFile(const std::string& path, const std::string& text) {
   return file.close();
 }
 
-int DiskFile::parseUri(FileSpec& inOutFileSpec, size_t colonIndex) const {
+int DiskFile::parseUri(FileSpec& inOutFileSpec, size_t /*colonIndex*/) const {
   string scheme;
   string path;
   map<string, string> queryParams;
@@ -585,7 +586,7 @@ int AtomicDiskFile::close() {
   string currentName = chunks_.front().path;
   IF_ERROR_RETURN(DiskFile::close());
   int retry = 3;
-  int status;
+  int status = 0;
   while ((status = os::rename(currentName, finalName_)) != 0 && os::isFile(currentName) &&
          retry-- > 0) {
     os::remove(finalName_); // if there was a collision, make room

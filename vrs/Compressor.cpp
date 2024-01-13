@@ -175,7 +175,7 @@ class Compressor::CompressorImpl {
       zstdContext_ = ZSTD_createCCtx();
     }
     int compressionLevel = sZstdPresets[zstdPreset];
-    size_t zresult;
+    size_t zresult = 0;
     IF_ZCOMP_ERROR_LOG_AND_RETURN(
         ZSTD_CCtx_setParameter(zstdContext_, ZSTD_c_compressionLevel, compressionLevel));
     IF_ZCOMP_ERROR_LOG_AND_RETURN(ZSTD_CCtx_setPledgedSrcSize(zstdContext_, dataSize));
@@ -188,7 +188,7 @@ class Compressor::CompressorImpl {
       uint32_t& inOutCompressedSize,
       size_t maxCompressedSize,
       bool endFrame) {
-    size_t zresult;
+    size_t zresult = 0;
     do {
       IF_ZCOMP_ERROR_LOG_AND_RETURN(ZSTD_compressStream2(
           zstdContext_, output, input, endFrame ? ZSTD_e_end : ZSTD_e_continue));
@@ -210,7 +210,7 @@ class Compressor::CompressorImpl {
   }
 
  private:
-  const LZ4F_preferences_t* getLz4Preferences(CompressionPreset lz4Preset) const {
+  static const LZ4F_preferences_t* getLz4Preferences(CompressionPreset lz4Preset) {
     static LZ4F_preferences_t sLz4FastPreset;
     static LZ4F_preferences_t sLz4TightPreset;
     static once_flag sPresetInitFlag;

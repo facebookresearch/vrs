@@ -275,7 +275,7 @@ bool printVRSFileInternals(FileHandler& file) {
   } else if (indexFormatVersion == vrs::IndexRecord::kSplitIndexFormatVersion) {
     cout << "Split File Head.\n";
     int64_t currentPos = file.getPos();
-    int64_t chunkStart, chunkSize;
+    int64_t chunkStart{}, chunkSize{};
     if (file.getChunkRange(chunkStart, chunkSize) == 0 &&
         XR_VERIFY(currentPos >= chunkStart && currentPos < chunkStart + chunkSize)) {
       int64_t nextChunkStart = chunkStart + chunkSize;

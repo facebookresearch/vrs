@@ -92,8 +92,8 @@ struct JsonFormatProfileSpec {
   bool required = true; ///< Include the required flag.
 
   // Default format
-  JsonFormatProfileSpec() {}
-  JsonFormatProfileSpec(JsonFormatProfile profile);
+  JsonFormatProfileSpec() = default;
+  explicit JsonFormatProfileSpec(JsonFormatProfile profile);
 };
 
 /// \brief The DataLayout class describes the data stored inside a DataLayoutContentBlock.
@@ -188,10 +188,11 @@ struct JsonFormatProfileSpec {
 class DataLayout {
  protected:
   DataLayout() = default;
+
+ public:
   DataLayout& operator=(const DataLayout&) = delete;
   DataLayout(const DataLayout&) = delete;
 
- public:
   /// DataLayout has no virtual method, but it is used in containers, and some of its
   /// derived classes have important clean-up work to do in their destructor.
   /// Therefore, DataLayout requires a virtual destructor.
@@ -395,11 +396,11 @@ class DataLayout {
   /// @param callback: a function to call for each element found.
   /// @param type: filter to select only an element type, of UNDEFINED for no filtering.
   void forEachDataPiece(
-      std::function<void(const DataPiece*)>,
+      const std::function<void(const DataPiece*)>&,
       DataPieceType type = DataPieceType::Undefined) const;
   /// Same as above, but as a non-const version.
   void forEachDataPiece(
-      std::function<void(DataPiece*)>,
+      const std::function<void(DataPiece*)>&,
       DataPieceType type = DataPieceType::Undefined);
 
   /// For debugging: validate that the index for the variable size data looks valid.
@@ -501,7 +502,7 @@ class DataLayout {
   /// Buffer to hold fixed-size pieces, and the index of var size pieces (if any).
   vector<int8_t> fixedData_;
   /// Byte count for all the fixed size pieces + var size index.
-  size_t fixedDataSizeNeeded_;
+  size_t fixedDataSizeNeeded_{};
   /// Buffer holding variable-size pieces, after they've been collected, or read from disk.
   vector<int8_t> varData_;
   /// Tells all the required pieces have been mapped successfully.
@@ -561,7 +562,7 @@ class ManualDataLayout : public DataLayout {
   ManualDataLayout();
   /// For manual construction, based on an existing layout, cloning all the pieces.
   /// Add more pieces using "add()", but don't forget to call endLayout() when you're done.
-  ManualDataLayout(const DataLayout& layout);
+  explicit ManualDataLayout(const DataLayout& layout);
 
   ~ManualDataLayout() override;
 
@@ -613,19 +614,21 @@ class ManualDataLayout : public DataLayout {
 /// Use the alternate macro DATA_LAYOUT_STRUCT_WITH_INIT if you need your DataLayoutStruct to be
 /// initialized by an init() method, to assign default values to DataPiece fields for instance.
 struct DataLayoutStruct {
-  DataLayoutStruct(const string& structName);
-  void dataLayoutStructEnd(const string& structName);
+  explicit DataLayoutStruct(const string& structName);
+  static void dataLayoutStructEnd(const string& structName);
 };
 
-#define DATA_LAYOUT_STRUCT(DATA_LAYOUT_STRUCT_TYPE)                                           \
-  DATA_LAYOUT_STRUCT_TYPE(const std::string& _structName_) : DataLayoutStruct(_structName_) { \
-    dataLayoutStructEnd(_structName_);                                                        \
+#define DATA_LAYOUT_STRUCT(DATA_LAYOUT_STRUCT_TYPE)                 \
+  explicit DATA_LAYOUT_STRUCT_TYPE(const std::string& _structName_) \
+      : DataLayoutStruct(_structName_) {                            \
+    dataLayoutStructEnd(_structName_);                              \
   }
 
-#define DATA_LAYOUT_STRUCT_WITH_INIT(DATA_LAYOUT_STRUCT_TYPE)                                 \
-  DATA_LAYOUT_STRUCT_TYPE(const std::string& _structName_) : DataLayoutStruct(_structName_) { \
-    dataLayoutStructEnd(_structName_);                                                        \
-    init();                                                                                   \
+#define DATA_LAYOUT_STRUCT_WITH_INIT(DATA_LAYOUT_STRUCT_TYPE)       \
+  explicit DATA_LAYOUT_STRUCT_TYPE(const std::string& _structName_) \
+      : DataLayoutStruct(_structName_) {                            \
+    dataLayoutStructEnd(_structName_);                              \
+    init();                                                         \
   }
 
 /// \brief Helper class to include DataLayout structs containing a sliced array of DataPieceXXX and
@@ -685,7 +688,7 @@ struct DataLayoutStructArray : public vrs::DataLayoutStruct {
 template <class OptionalFields>
 class OptionalDataPieces : public std::unique_ptr<OptionalFields> {
  public:
-  OptionalDataPieces(bool allocateFields)
+  explicit OptionalDataPieces(bool allocateFields)
       : std::unique_ptr<OptionalFields>(
             allocateFields ? std::make_unique<OptionalFields>() : nullptr) {}
 };

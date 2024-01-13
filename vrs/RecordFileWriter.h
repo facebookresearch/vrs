@@ -118,7 +118,7 @@ class RecordFileWriter {
   /// This is an optional call, but must be performed before calling createFileAsync().
   /// @param initCreatedThreadCallback Callback that returns a reference to the thread
   /// created, the ThreadRole, and the thread index (only used for Compression threads)
-  void setInitCreatedThreadCallback(InitCreatedThreadCallback initCreatedThreadCallback);
+  void setInitCreatedThreadCallback(const InitCreatedThreadCallback& initCreatedThreadCallback);
 
   /// Take all the records of all the registered and *active* recordables,
   /// and write them all to disk. All synchronous, won't return until the file is closed.
@@ -190,7 +190,7 @@ class RecordFileWriter {
   /// to the background thread(s) writing records to disk. All records sent to disk are older.
   /// @param delay: Number of seconds between automated calls to send records for writing.
   /// @return A status code: 0 if no error occurred, a file system error code otherwise.
-  int autoWriteRecordsAsync(function<double()> maxTimestampProvider, double delay);
+  int autoWriteRecordsAsync(const function<double()>& maxTimestampProvider, double delay);
 
   /// To purge old records automatically, when no file is being written.
   /// Note: while writing a VRS file asynchronously, record purging will automatically be disabled
@@ -199,7 +199,7 @@ class RecordFileWriter {
   /// purged.
   /// @param delay: Number of seconds between automated calls to purge records.
   /// @return A status code: 0 if no error occurred, a file system error code otherwise.
-  int autoPurgeRecords(function<double()> maxTimestampProvider, double delay);
+  int autoPurgeRecords(const function<double()>& maxTimestampProvider, double delay);
 
   /// Tell if a disk file is being written.
   /// @return True is a file is being written by this RecordFileWriter instance.
@@ -302,7 +302,7 @@ class RecordFileWriter {
   void writeOneRecord(
       RecordFileWriter_::RecordWriterData& rwd,
       Record* record,
-      const StreamId id,
+      StreamId id,
       Compressor& compressor,
       uint32_t compressedSize);
   int completeAndCloseFile(); ///< internal
@@ -317,10 +317,10 @@ class RecordFileWriter {
  protected:
   /// data members valid while a file is being worked on
   unique_ptr<WriteFileHandler> file_;
-  uint64_t maxChunkSize_;
+  uint64_t maxChunkSize_{};
   unique_ptr<NewChunkHandler> newChunkHandler_;
   FileFormat::FileHeader fileHeader_;
-  uint32_t lastRecordSize_;
+  uint32_t lastRecordSize_{};
   bool skipFinalizeIndexRecords_ = false; // for unit testing only!
   unique_ptr<deque<IndexRecord::DiskRecordInfo>> preliminaryIndex_;
   IndexRecord::Writer indexRecordWriter_;

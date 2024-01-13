@@ -205,7 +205,7 @@ int Decompressor::readFrame(
     void* dst,
     size_t frameSize,
     size_t& inOutMaxReadSize) {
-  size_t zresult;
+  size_t zresult = 0;
   IF_DECOMP_ERROR_LOG_AND_RETURN(ZSTD_initDStream(zstdContext_->getContext()));
   if (getCompressedDataSize() < zresult) {
     READ_OR_LOG_AND_RETURN(zresult - getCompressedDataSize());

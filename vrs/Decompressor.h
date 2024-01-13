@@ -102,7 +102,7 @@ class Decompressor {
   class ZstdDecompressor;
   std::unique_ptr<ZstdDecompressor> zstdContext_;
   std::vector<uint8_t> compressedBuffer_;
-  CompressionType compressionType_;
+  CompressionType compressionType_{};
   size_t readSize_ = {};
   size_t decodedSize_ = {};
   size_t lastResult_ = {};

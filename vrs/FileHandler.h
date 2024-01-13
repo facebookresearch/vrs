@@ -214,7 +214,7 @@ class FileHandler : public FileDelegator {
     return false;
   }
 
-  virtual bool setStatsCallback(CacheStatsCallbackFunction /* callback */) {
+  virtual bool setStatsCallback(const CacheStatsCallbackFunction& /* callback */) {
     return false;
   }
 

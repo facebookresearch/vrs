@@ -352,7 +352,7 @@ int IndexRecord::Reader::readClassicIndexRecord(
   const size_t indexSize = indexRecordPayloadSize - preludeSize;
   if (recordCount > 0) {
     vector<DiskRecordInfo> recordStructs(recordCount);
-    int status;
+    int status = 0;
     if (uncompressedSize > 0) {
       Decompressor decompressor;
       size_t frameSize = 0;
@@ -425,7 +425,7 @@ int IndexRecord::Reader::readSplitIndexRecord(
   int64_t firstUserRecordOffset = fileHeader_.firstUserRecordOffset.get();
   bool noRecords = (firstUserRecordOffset == totalFileSize_);
   int64_t currentPos = file_.getPos();
-  int64_t chunkStart, chunkSize;
+  int64_t chunkStart{}, chunkSize{};
   if (!XR_VERIFY(file_.getChunkRange(chunkStart, chunkSize) == 0) || !XR_VERIFY(chunkSize > 0) ||
       !XR_VERIFY(
           (currentPos >= chunkStart && currentPos < chunkStart + chunkSize) ||
@@ -491,10 +491,10 @@ int IndexRecord::Reader::readSplitIndexRecord(
   } else {
     size_t decompressedRecords = 0;
     Decompressor decompressor;
-    int error;
+    int error = 0;
     char* endBuffer = reinterpret_cast<char*>(recordStructs.data()) + sizeToRead;
     while (sizeToRead > 0) {
-      size_t frameSize;
+      size_t frameSize = 0;
       BREAK_ON_ERROR(decompressor.initFrame(file_, frameSize, indexByteSize));
       BREAK_ON_FALSE(frameSize <= sizeToRead);
       BREAK_ON_ERROR(
@@ -597,7 +597,7 @@ int IndexRecord::Reader::rebuildIndex(bool writeFixedIndex) {
   }
   if (hasSplitHeadChunk_) {
     // go to the start of the second chunk
-    int64_t chunkStart, chunkSize;
+    int64_t chunkStart{}, chunkSize{};
     if (!XR_VERIFY(file_.getChunkRange(chunkStart, chunkSize) == 0) || !XR_VERIFY(chunkSize > 0) ||
         !XR_VERIFY(chunkStart == 0)) {
       return REINDEXING_ERROR;

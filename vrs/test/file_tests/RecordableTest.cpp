@@ -35,16 +35,16 @@ namespace {
 
 // Frame 0 is a random noise, just large enough to make that we attempt to compress it
 // leading to compressed data larger than the source data
-static const uint32_t kFrame0Size = 320 * 240;
-static vector<uint8_t> sFrame0;
+const uint32_t kFrame0Size = 320 * 240;
+vector<uint8_t> sFrame0;
 
 // Compress using different presets
-static vector<vrs::CompressionPreset> sCompression = {
+vector<vrs::CompressionPreset> sCompression = {
     vrs::CompressionPreset::Lz4Fast,
     vrs::CompressionPreset::ZstdFast,
     vrs::CompressionPreset::ZstdLight};
 
-static size_t sCompressionIndex = 0;
+size_t sCompressionIndex = 0;
 
 void initFrame0() {
   default_random_engine generator;
@@ -211,7 +211,7 @@ class RecordableTest : public Recordable, StreamPlayer {
     }
   }
 
-  static const char* getTag(const map<string, string>& tags, string name) {
+  static const char* getTag(const map<string, string>& tags, const string& name) {
     auto iter = tags.find(name);
     if (iter != tags.end()) {
       return iter->second.c_str();
@@ -367,7 +367,7 @@ class RecordableTest : public Recordable, StreamPlayer {
     return filePlayer.closeFile();
   }
 
-  int rebuildIndex(const string& fileName) {
+  static int rebuildIndex(const string& fileName) {
     RecordFileReader filePlayer;
     RETURN_ON_FAILURE(filePlayer.openFile(fileName));
     EXPECT_TRUE(filePlayer.hasIndex());
@@ -476,8 +476,8 @@ class RecordableTest : public Recordable, StreamPlayer {
     }
     vector<thread> threads;
     for (uint32_t threadIndex = 0; threadIndex < kThreadCount; threadIndex++) {
-      threads.push_back(
-          thread{&RecordableTest::createRecordsThreadTask, this, &threadParams[threadIndex]});
+      threads.emplace_back(
+          &RecordableTest::createRecordsThreadTask, this, &threadParams[threadIndex]);
     }
     for (uint32_t threadIndex = 0; threadIndex < kThreadCount; threadIndex++) {
       threads[threadIndex].join();
@@ -536,7 +536,7 @@ class RecordableTest : public Recordable, StreamPlayer {
     return fileWriter.waitForFileClosed();
   }
 
-  void checkShortFile(const string& fileName) {
+  static void checkShortFile(const string& fileName) {
     RecordFileReader file;
     EXPECT_EQ(file.openFile(fileName), 0);
     EXPECT_EQ(file.getStreams().size(), 1);
@@ -553,7 +553,7 @@ class RecordableTest : public Recordable, StreamPlayer {
                              : kFrameWidth * kFrameHeight - (frameNumber % 200);
   }
 
-  uint8_t getByteOfFrame(uint32_t frameNumber, uint32_t byteNumber) {
+  static uint8_t getByteOfFrame(uint32_t frameNumber, uint32_t byteNumber) {
     if (frameNumber == 0) {
       return sFrame0[byteNumber];
     }
@@ -566,7 +566,7 @@ class RecordableTest : public Recordable, StreamPlayer {
 
  private:
   string typeName_;
-  uint32_t frameNumber_;
+  uint32_t frameNumber_{};
   vector<uint8_t> readBuffer_;
   double lastTimestamp_ = -DBL_MAX;
 };
@@ -641,7 +641,7 @@ TEST_F(RecordableTester, ReuseRecordFileWriter) {
   string testFilePath = os::getTempFolder() + "RecordableTest-f.vrs";
   RecordFileWriter fileWriter;
   ASSERT_EQ(recordable.createShortFile(fileWriter, testFilePath), 0);
-  recordable.checkShortFile(testFilePath);
+  RecordableTest::checkShortFile(testFilePath);
   ASSERT_EQ(recordable.createShortFile(fileWriter, testFilePath), 0);
-  recordable.checkShortFile(testFilePath);
+  RecordableTest::checkShortFile(testFilePath);
 }

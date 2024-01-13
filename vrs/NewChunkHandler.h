@@ -63,7 +63,7 @@ class NewChunkNotifier {
  private:
   NewChunkHandler* chunkHandler_;
   string path_;
-  size_t index_;
+  size_t index_{};
 };
 
 } // namespace vrs

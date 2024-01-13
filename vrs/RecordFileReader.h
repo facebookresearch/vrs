@@ -17,7 +17,6 @@
 #pragma once
 
 #include <array>
-#include <functional>
 #include <map>
 #include <memory>
 #include <set>
@@ -491,7 +490,7 @@ class RecordFileReader {
   }
 
   /// Set callback function for cache stats
-  bool setStatsCallback(FileHandler::CacheStatsCallbackFunction statsCallback) {
+  bool setStatsCallback(const FileHandler::CacheStatsCallbackFunction& statsCallback) {
     return file_->setStatsCallback(statsCallback);
   }
 
@@ -553,7 +552,7 @@ class RecordFileReader {
       const set<const IndexRecord::RecordInfo*>& configRecords,
       StreamPlayer* streamPlayer);
 
-  const string& getTag(const map<string, string>& tags, const string& name) const; ///< private
+  static const string& getTag(const map<string, string>& tags, const string& name); ///< private
   bool mightContainContentTypeInDataRecord(StreamId streamId, ContentType type) const; ///< private
 
   // Members to read an open VRS file
@@ -579,9 +578,9 @@ class RecordFileReader {
   // Location of the last record searched for a specific stream & record type
   // The pair: index of the record for the type (query), index of the record in the stream (result)
   mutable map<pair<StreamId, Record::Type>, pair<uint32_t, size_t>> lastRequest_;
-  int64_t endOfUserRecordsOffset_;
-  uint32_t recordHeaderSize_;
-  bool fileHasAnIndex_;
+  int64_t endOfUserRecordsOffset_{};
+  uint32_t recordHeaderSize_{};
+  bool fileHasAnIndex_{};
 };
 
 /// The method to search the nearest record from the index list.

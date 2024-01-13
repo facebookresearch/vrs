@@ -103,10 +103,11 @@ struct PointND {
   bool operator!=(const PointND<T, N>& rhs) const {
     return !operator==(rhs);
   }
-  void operator=(const T rhs[N]) {
+  PointND& operator=(const T rhs[N]) {
     for (size_t s = 0; s < N; s++) {
       dim[s] = rhs[s];
     }
+    return *this;
   }
 
   // Convenience aliases for the dimensions that actually exist
@@ -176,7 +177,7 @@ struct MatrixND {
   using type = T;
   static constexpr size_t kMatrixSize = N;
 
-  MatrixND() {}
+  MatrixND() = default;
   MatrixND(const T arr[N][N]) {
     operator=(arr);
   }
@@ -199,10 +200,11 @@ struct MatrixND {
   bool operator!=(const MatrixND<T, N>& rhs) const {
     return !operator==(rhs);
   }
-  void operator=(const T rhs[N][N]) {
+  MatrixND& operator=(const T rhs[N][N]) {
     for (size_t s = 0; s < N; s++) {
       points[s] = rhs[s];
     }
+    return *this;
   }
 
   PointND<T, N> points[N];

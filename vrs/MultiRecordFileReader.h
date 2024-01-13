@@ -471,7 +471,7 @@ class MultiRecordFileReader {
 
   const StreamIdReaderPair* getStreamIdReaderPair(UniqueStreamId uniqueStreamId) const;
 
-  const string& getTag(const map<string, string>& tags, const string& name) const;
+  static const string& getTag(const map<string, string>& tags, const string& name);
 
   /// Returns the RecordFileReader corresponding to the given record.
   /// nullptr is returned in case the given record doesn't belong to any of the underlying readers.

@@ -93,8 +93,8 @@ class CompressionWorker {
       : workQueue_{workQueue},
         resultsQueue_{resultsQueue},
         threadIndex_{threadIndex},
-        initCreatedThreadCallback_{initCreatedThreadCallback},
-        thread_(&CompressionWorker::threadActivity, this) {}
+        initCreatedThreadCallback_{std::move(initCreatedThreadCallback)},
+        thread_{&CompressionWorker::threadActivity, this} {}
   ~CompressionWorker() {
     thread_.join();
   }
@@ -103,7 +103,7 @@ class CompressionWorker {
   void threadActivity() {
     initCreatedThreadCallback_(thread_, ThreadRole::Compression, threadIndex_);
 
-    CompressionJob* job;
+    CompressionJob* job = nullptr;
     while (workQueue_.waitForJob(job)) {
       job->performJob();
       resultsQueue_.sendJob(job);
@@ -127,7 +127,7 @@ struct CompressionThreadsData {
 
   void addThreadUntil(
       size_t maxThreadPoolSize,
-      InitCreatedThreadCallback initCreatedThreadCallback) {
+      const InitCreatedThreadCallback& initCreatedThreadCallback) {
     if (compressionThreadsPool_.size() < maxThreadPoolSize) {
       compressionThreadsPool_.reserve(maxThreadPoolSize);
       CompressionWorker* worker = new CompressionWorker(
@@ -177,7 +177,7 @@ struct WriterThreadData {
   atomic<bool> hasRecordsReadyToWrite;
   function<double()> maxTimestampProvider; // for auto-writing records
   atomic<double> autoCollectDelay; // for auto-writing records
-  double nextAutoCollectTime; // for auto-writing records
+  double nextAutoCollectTime{}; // for auto-writing records
 
   CompressionThreadsData compressionThreadsData_;
 
@@ -196,7 +196,10 @@ struct WriterThreadData {
 };
 
 struct PurgeThreadData {
-  PurgeThreadData(function<double()> maxTimestampProvider, double autoPurgeDelay, bool purgePaused)
+  PurgeThreadData(
+      const function<double()>& maxTimestampProvider,
+      double autoPurgeDelay,
+      bool purgePaused)
       : shouldEndThread{false},
         maxTimestampProvider{maxTimestampProvider},
         autoPurgeDelay{autoPurgeDelay},
@@ -322,7 +325,7 @@ void RecordFileWriter::setCompressionThreadPoolSize(size_t size) {
 }
 
 void RecordFileWriter::setInitCreatedThreadCallback(
-    InitCreatedThreadCallback initCreatedThreadCallback) {
+    const InitCreatedThreadCallback& initCreatedThreadCallback) {
   initCreatedThreadCallback_ = initCreatedThreadCallback;
 }
 
@@ -444,7 +447,7 @@ void RecordFileWriter::backgroundPurgeThreadActivity() {
   while (!purgeThreadData_->shouldEndThread &&
          (status == os::EventChannel::Status::SUCCESS ||
           status == os::EventChannel::Status::TIMEOUT)) {
-    double waitDelay;
+    double waitDelay = 0;
     if (purgeThreadData_->purgingPaused_ || purgeThreadData_->autoPurgeDelay <= 0) {
       waitDelay = 1;
     } else {
@@ -550,7 +553,9 @@ int RecordFileWriter::writeRecordsAsync(double maxTimestamp) {
   return writerThreadData_->fileError; // if there was some error already, say so
 }
 
-int RecordFileWriter::autoWriteRecordsAsync(function<double()> maxTimestampProvider, double delay) {
+int RecordFileWriter::autoWriteRecordsAsync(
+    const function<double()>& maxTimestampProvider,
+    double delay) {
   if (writerThreadData_ == nullptr || writerThreadData_->shouldEndThread) {
     return INVALID_REQUEST;
   }
@@ -563,7 +568,9 @@ int RecordFileWriter::autoWriteRecordsAsync(function<double()> maxTimestampProvi
   return 0;
 }
 
-int RecordFileWriter::autoPurgeRecords(function<double()> maxTimestampProvider, double delay) {
+int RecordFileWriter::autoPurgeRecords(
+    const function<double()>& maxTimestampProvider,
+    double delay) {
   if (purgeThreadData_ != nullptr) {
     unique_lock<recursive_mutex> guard{purgeThreadData_->mutex};
     purgeThreadData_->maxTimestampProvider = maxTimestampProvider;
@@ -968,7 +975,7 @@ struct RecordFileWriter_::RecordWriterData {
 void RecordFileWriter::writeOneRecord(
     RecordFileWriter_::RecordWriterData& rwd,
     Record* record,
-    const StreamId streamId,
+    StreamId streamId,
     Compressor& compressor,
     uint32_t compressedSize) {
   double timestamp = record->getTimestamp();
@@ -1098,7 +1105,7 @@ int RecordFileWriter::writeRecordsMultiThread(
       waitTime = 0;
     }
     // Check if we have a results to process
-    CompressionJob* job;
+    CompressionJob* job = nullptr;
     while (compressionThreadsData.resultsQueue.waitForJob(job, waitTime)) {
       compressionResults.emplace(job->getSortRecord(), job);
       waitTime = 0;

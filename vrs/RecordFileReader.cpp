@@ -187,7 +187,7 @@ bool RecordFileReader::isVrsFile(const string& filePath) {
       XR_LOGW("Open cancelled");                                     \
       return OPERATION_CANCELLED;                                    \
     }                                                                \
-    error__ = operation__;                                           \
+    (error__) = operation__;                                         \
   } while (false)
 
 int RecordFileReader::doOpenFile(
@@ -815,7 +815,7 @@ bool RecordFileReader::readConfigRecords(
   for (auto configRecord : configRecords) {
     if (configRecord != nullptr) {
       foundAtLeastOneStream = true;
-      int status;
+      int status = 0;
       if (streamPlayer == nullptr) {
         status = readRecord(*configRecord);
       } else {
@@ -885,7 +885,7 @@ unique_ptr<DataLayout> RecordFileReader::getDataLayout(
   return layout;
 }
 
-const string& RecordFileReader::getTag(const map<string, string>& tags, const string& name) const {
+const string& RecordFileReader::getTag(const map<string, string>& tags, const string& name) {
   auto iter = tags.find(name);
   if (iter != tags.end()) {
     return iter->second;
@@ -1105,7 +1105,7 @@ int RecordFileReader::readRecord(
     return INVALID_DISK_DATA;
   }
   uint32_t dataSize = recordSize - recordHeaderSize_;
-  uint32_t uncompressedDataSize;
+  uint32_t uncompressedDataSize = 0;
   RecordReader* reader = nullptr;
   CompressionType compressionType = recordHeader.getCompressionType();
   switch (compressionType) {

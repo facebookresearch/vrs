@@ -35,7 +35,7 @@ class ProgressLogger {
   /// silent, unless a slow re-indexing operation is required.
   /// @param detailedProgress: pass true to log every new step, regardless of timing.
   /// @param updateDelay: time in seconds between updates.
-  ProgressLogger(bool detailedProgress = false, double updateDelay = kDefaultUpdateDelay);
+  explicit ProgressLogger(bool detailedProgress = false, double updateDelay = kDefaultUpdateDelay);
   virtual ~ProgressLogger();
 
   /// Set the number of steps anticipated, if expecting more than one step.
@@ -126,11 +126,11 @@ class ProgressLogger {
 /// \brief Progress logger to ignore all progress notifications.
 class SilentLogger : public ProgressLogger {
  public:
-  ~SilentLogger();
-  virtual bool logProgress(const string&, size_t = 0, size_t = 100, bool = false) {
+  ~SilentLogger() override;
+  bool logProgress(const string&, size_t = 0, size_t = 100, bool = false) override {
     return true;
   }
-  virtual bool logStatus(const string&, int = 0) {
+  bool logStatus(const string&, int = 0) override {
     return true;
   }
 };

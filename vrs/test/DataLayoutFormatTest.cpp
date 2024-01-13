@@ -101,9 +101,9 @@ struct FormatValues : public AutoDataLayout {
 
 namespace {
 
-static const ImageSpecType kWidth = 640;
-static const ImageSpecType kHeight = 480;
-static const ImageSpecType kBytesPerPixel = 1;
+const ImageSpecType kWidth = 640;
+const ImageSpecType kHeight = 480;
+const ImageSpecType kBytesPerPixel = 1;
 
 template <typename T, size_t S>
 void check(
@@ -229,7 +229,7 @@ class RecordableDevice : public Recordable {
         {&data_});
   }
 
-  double getTimeStamp() {
+  static double getTimeStamp() {
     static double sTimeStamp = 0;
     return sTimeStamp += 1;
   }

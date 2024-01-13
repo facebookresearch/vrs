@@ -52,7 +52,7 @@ class DataPieceArray : public DataPiece {
   }
   /// @param bundle: Bundle to reconstruct a DataPieceArray from disk.
   /// @internal
-  DataPieceArray(const MakerBundle& bundle);
+  explicit DataPieceArray(const MakerBundle& bundle);
 
   /// Get the size of the array.
   size_t getArraySize() const {
@@ -327,7 +327,7 @@ class DataPieceArray : public DataPiece {
   }
 
  private:
-  const size_t count_;
+  const size_t count_{};
   map<string, T> properties_;
   vector<T> defaultValues_;
 };

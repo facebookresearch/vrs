@@ -82,28 +82,31 @@ int FileSpec::parseUri(
     return INVALID_URI_FORMAT;
   }
   // validate url schema
-  for (size_t p = 0; p < colon && colon != uri.npos; p++) {
+  for (size_t p = 0; p < colon && colon != string::npos; p++) {
     unsigned char c = static_cast<unsigned char>(uri[p]);
     // from https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Generic_syntax
-    if (p == 0 && !isalpha(c)) {
-      XR_LOGE("Schema of URI '{}' should start with a letter", uri);
-      return INVALID_URI_FORMAT;
-    }
-    if (p != 0 && !(isalnum(c) || c == '.' || c == '-' || c == '+' || c == '_')) {
-      XR_LOGE("Schema contains an invalid character {}: {}", c, uri);
-      return INVALID_URI_FORMAT;
+    if (p == 0) {
+      if (!isalpha(c)) {
+        XR_LOGE("Schema of URI '{}' should start with a letter", uri);
+        return INVALID_URI_FORMAT;
+      }
+    } else {
+      if (!isalnum(c) && c != '.' && c != '-' && c != '+' && c != '_') {
+        XR_LOGE("Schema contains an invalid character {}: {}", c, uri);
+        return INVALID_URI_FORMAT;
+      }
     }
   }
 
   auto query = uri.find('?');
 
   // length of path should be longer than 0
-  if (query <= colon + 1 || (query == uri.npos && colon >= uri.size() - 1)) {
+  if (query <= colon + 1 || (query == string::npos && colon >= uri.size() - 1)) {
     XR_LOGE("Cannot parse input string '{}'. This is not a URI.", uri);
     return INVALID_URI_FORMAT;
   }
 
-  if (query != uri.npos) {
+  if (query != string::npos) {
     size_t start = query + 1;
     for (size_t p = start; p < uri.size(); p++) {
       unsigned char c = static_cast<unsigned char>(uri[p]);
@@ -118,12 +121,12 @@ int FileSpec::parseUri(
     }
   }
 
-  if (colon != uri.npos && colon > 0) {
+  if (colon != string::npos && colon > 0) {
     outScheme = uri.substr(0, colon);
   }
 
   string path =
-      (colon != uri.npos) ? uri.substr(colon + 1, query - colon - 1) : uri.substr(0, query);
+      (colon != string::npos) ? uri.substr(colon + 1, query - colon - 1) : uri.substr(0, query);
   int status = FileSpec::urldecode(path, outPath);
   if (status != 0) {
     XR_LOGE("Path contains invalid character {}", path);
@@ -144,7 +147,7 @@ int FileSpec::fromPathJsonUri(const string& pathJsonUri, const string& defaultFi
     return fromJson(pathJsonUri) ? SUCCESS : FILEPATH_PARSE_ERROR;
   }
   auto colon = pathJsonUri.find(':');
-  bool isUri = colon != pathJsonUri.npos && colon > 1;
+  bool isUri = colon != string::npos && colon > 1;
   for (size_t p = 0; p < colon && isUri; p++) {
     unsigned char c = static_cast<unsigned char>(pathJsonUri[p]);
     // from https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Generic_syntax
@@ -266,7 +269,7 @@ string FileSpec::getSourceLocation() const {
     auto colon = uri.find(':');
     if (colon != string::npos) {
       auto end = colon;
-      unsigned char c;
+      unsigned char c = 0;
       do {
         c = static_cast<unsigned char>(uri[++end]);
       } while (c == '/');
@@ -363,27 +366,27 @@ bool FileSpec::hasExtra(const string& name) const {
 }
 
 int FileSpec::getExtraAsInt(const string& name, int defaultValue) const {
-  int result;
+  int result = 0;
   return helpers::getInt(extras, name, result) ? result : defaultValue;
 }
 
 int64_t FileSpec::getExtraAsInt64(const string& name, int64_t defaultValue) const {
-  int64_t result;
+  int64_t result = 0;
   return helpers::getInt64(extras, name, result) ? result : defaultValue;
 }
 
 uint64_t FileSpec::getExtraAsUInt64(const string& name, uint64_t defaultValue) const {
-  uint64_t result;
+  uint64_t result = 0;
   return helpers::getUInt64(extras, name, result) ? result : defaultValue;
 }
 
 double FileSpec::getExtraAsDouble(const string& name, double defaultValue) const {
-  double result;
+  double result = 0;
   return helpers::getDouble(extras, name, result) ? result : defaultValue;
 }
 
 bool FileSpec::getExtraAsBool(const string& name, bool defaultValue) const {
-  bool result;
+  bool result = false;
   return helpers::getBool(extras, name, result) ? result : defaultValue;
 }
 
@@ -393,7 +396,7 @@ void FileSpec::unsetExtra(const string& name) {
 
 int FileSpec::decodeQuery(const string& query, string& outKey, string& outValue) {
   auto equal = query.find('=');
-  if (equal == query.npos) {
+  if (equal == string::npos) {
     XR_LOGW("'=' doesn't exist in query: {}", query);
     return INVALID_URI_FORMAT;
   }
@@ -409,7 +412,7 @@ int FileSpec::decodeQuery(const string& query, string& outKey, string& outValue)
   }
 
   string value = query.substr(equal + 1);
-  if (value.find('=') != value.npos) {
+  if (value.find('=') != string::npos) {
     XR_LOGW("More than one '=' in query: {}", query);
     return INVALID_URI_FORMAT;
   }

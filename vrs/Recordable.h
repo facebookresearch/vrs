@@ -57,7 +57,7 @@ class Recordable {
   /// @param typeId: an id telling which type of stream this is.
   /// @param flavor: a flavor required when using << recordable class >> type ids.
   /// Note: you may always provide a flavor, but you are required to with << recordable class> ids.
-  Recordable(RecordableTypeId typeId, const string& flavor = {});
+  explicit Recordable(RecordableTypeId typeId, const string& flavor = {});
 
  public:
   virtual ~Recordable();
@@ -123,7 +123,7 @@ class Recordable {
       Record::Type recordType,
       uint32_t formatVersion,
       const RecordFormat& format,
-      vector<const DataLayout*> layouts = {});
+      const vector<const DataLayout*>& layouts = {});
 
   /// Configuration records describe how the device recorded is configured/setup.
   /// The configuration of a recordable is probably not changed by data flowing through.
@@ -296,7 +296,7 @@ class Recordable {
   /// @internal
   static uint16_t getNewInstanceId(RecordableTypeId typeId = static_cast<RecordableTypeId>(0));
 
-  const string& getTag(const map<string, string>& tags, const string& name) const;
+  static const string& getTag(const map<string, string>& tags, const string& name);
 };
 
 /// Temporarily reset Recordable instance IDs

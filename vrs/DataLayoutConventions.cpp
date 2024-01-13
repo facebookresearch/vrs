@@ -60,14 +60,14 @@ ContentBlock ImageSpec::getImageContentBlock(const ImageContentBlockSpec& base, 
     uint32_t readStride = stride.get(); // get value or 0
     uint32_t readStride2 = stride2.get(); // get value or 0
     if (base.getImageFormat() == ImageFormat::RAW) {
-      return ContentBlock(readPixelFormat, readWidth, readHeight, readStride, readStride2);
+      return {readPixelFormat, readWidth, readHeight, readStride, readStride2};
     } else if (base.getImageFormat() == ImageFormat::VIDEO) {
       if (blockSize != ContentBlock::kSizeUnknown) {
         string aCodecName;
         if (!codecName.get(aCodecName) || aCodecName.empty()) {
           aCodecName = base.getCodecName();
         }
-        uint32_t aCodecQuality;
+        uint32_t aCodecQuality = 0;
         if (!codecQuality.get(aCodecQuality) ||
             !ImageContentBlockSpec::isQualityValid(aCodecQuality)) {
           aCodecQuality = base.getCodecQuality();

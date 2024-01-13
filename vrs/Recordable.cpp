@@ -51,7 +51,7 @@ bool Recordable::addRecordFormat(
     Record::Type recordType,
     uint32_t formatVersion,
     const RecordFormat& format,
-    vector<const DataLayout*> layouts) {
+    const vector<const DataLayout*>& layouts) {
   return RecordFormat::addRecordFormat(tags_.vrs, recordType, formatVersion, format, layouts);
 }
 
@@ -102,7 +102,7 @@ uint16_t Recordable::getNewInstanceId(RecordableTypeId typeId) {
   return instanceId;
 }
 
-const string& Recordable::getTag(const map<string, string>& tags, const string& name) const {
+const string& Recordable::getTag(const map<string, string>& tags, const string& name) {
   auto iter = tags.find(name);
   if (iter != tags.end()) {
     return iter->second;

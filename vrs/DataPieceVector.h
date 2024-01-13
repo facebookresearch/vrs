@@ -37,11 +37,11 @@ template <typename T>
 class DataPieceVector : public DataPiece {
  public:
   /// @param label: Name for the DataPiece.
-  DataPieceVector(const string& label)
+  explicit DataPieceVector(const string& label)
       : DataPiece(label, DataPieceType::Vector, DataLayout::kVariableSize) {}
   /// @param bundle: Bundle to reconstruct a DataPieceVector from disk.
   /// @internal
-  DataPieceVector(const MakerBundle& bundle);
+  explicit DataPieceVector(const MakerBundle& bundle);
 
   /// Get the name of the element type <T>.
   /// @internal
@@ -106,7 +106,7 @@ class DataPieceVector : public DataPiece {
   /// @param outValues: Reference to a vector<T> for the read or default values.
   /// @return True if outValues was set from read values (maybe mapped), not default values.
   bool get(vector<T>& outValues) const {
-    size_t count;
+    size_t count = 0;
     const T* ptr = layout_.getVarData<T>(offset_, count);
     if (ptr != nullptr && count > 0) {
       outValues.resize(count);
@@ -151,7 +151,7 @@ class DataPieceVector : public DataPiece {
   /// Tell if the DataPiece is available, directly or mapped successfully.
   /// @return True if values can be read without using default values.
   bool isAvailable() const override {
-    size_t count;
+    size_t count = 0;
     return layout_.getVarData<T>(offset_, count) != nullptr;
   }
 

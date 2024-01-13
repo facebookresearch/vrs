@@ -44,7 +44,7 @@ static const uint32_t kOriginalFileFormatVersion = FileFormat::fourCharCode('V',
 /// \brief Helper class to store stream id on disk.
 struct DiskStreamId {
   DiskStreamId() : typeId(static_cast<uint16_t>(RecordableTypeId::Undefined)), instanceId(0) {}
-  DiskStreamId(StreamId id)
+  explicit DiskStreamId(StreamId id)
       : typeId(static_cast<uint16_t>(id.getTypeId())), instanceId(id.getInstanceId()) {}
 
   FileFormat::LittleEndian<uint16_t> typeId;
@@ -59,14 +59,14 @@ struct DiskStreamId {
   }
 
   StreamId getStreamId() const {
-    return StreamId(getTypeId(), getInstanceId());
+    return {getTypeId(), getInstanceId()};
   }
 };
 
 /// \brief Helper class to store record information on disk.
 struct DiskRecordInfo {
-  DiskRecordInfo() {}
-  DiskRecordInfo(const IndexRecord::RecordInfo& record)
+  DiskRecordInfo() = default;
+  explicit DiskRecordInfo(const IndexRecord::RecordInfo& record)
       : timestamp(record.timestamp),
         recordOffset(record.fileOffset),
         streamId(record.streamId),
@@ -198,7 +198,7 @@ int readIndexData(
   size_t indexByteSize = indexSize - sizeof(recordableCount) -
       sizeof(IndexRecord::DiskStreamId) * recordableCount.get() - sizeof(diskIndexSize);
   while (outIndex.size() < diskIndexSize.get() && indexByteSize > 0) {
-    size_t frameSize;
+    size_t frameSize = 0;
     IF_ERROR_LOG_AND_RETURN(decompressor.initFrame(file, frameSize, indexByteSize));
     if (!XR_VERIFY(frameSize % sizeof(DiskRecordInfo) == 0)) {
       return FAILURE;
@@ -287,7 +287,7 @@ int read(
     return FAILURE;
   }
   IF_ERROR_LOG_AND_RETURN(file.setPos(descriptionOffset));
-  uint32_t descriptionSize;
+  uint32_t descriptionSize = 0;
   IF_ERROR_LOG_AND_RETURN(DescriptionRecord::readDescriptionRecord(
       file, fileHeader.recordHeaderSize.get(), descriptionSize, outStreamTags, outFileTags));
   if (!XR_VERIFY(descriptionOffset + descriptionSize == indexRecordOffset)) {

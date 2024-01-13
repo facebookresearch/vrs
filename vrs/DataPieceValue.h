@@ -41,7 +41,8 @@ class DataPieceValue : public DataPiece {
       "DataPieceValue does not support bool. Use vrs::Bool instead");
 
   /// @param label: Name for the DataPiece.
-  DataPieceValue(const string& label) : DataPiece(label, DataPieceType::Value, sizeof(T)) {}
+  explicit DataPieceValue(const string& label)
+      : DataPiece(label, DataPieceType::Value, sizeof(T)) {}
   /// @param label: Name for the DataPiece.
   /// @param defaultValue: Default value for the DataPiece.
   DataPieceValue(const string& label, T defaultValue)
@@ -50,7 +51,7 @@ class DataPieceValue : public DataPiece {
   }
   /// @param bundle: Bundle to reconstruct a DataPieceValue from disk.
   /// @internal
-  DataPieceValue(const MakerBundle& bundle);
+  explicit DataPieceValue(const MakerBundle& bundle);
 
   /// Get the name of the element type <T>.
   /// @internal
@@ -285,7 +286,7 @@ template <typename EnumType, typename StorageType>
 class DataPieceEnum : public DataPieceValue<StorageType> {
  public:
   /// @param label: Name for the DataPiece.
-  DataPieceEnum(const string& label) : DataPieceValue<StorageType>(label) {}
+  explicit DataPieceEnum(const string& label) : DataPieceValue<StorageType>(label) {}
 
   /// @param label: Name for the DataPiece.
   /// @param defaultValue: Default value for the DataPiece.

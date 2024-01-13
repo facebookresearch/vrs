@@ -35,19 +35,19 @@ using namespace vrs;
 
 namespace {
 
-static const uint32_t kFrameWidth = 640;
-static const uint32_t kFrameHeight = 480;
-static const uint32_t kPixelByteSize = 1;
+const uint32_t kFrameWidth = 640;
+const uint32_t kFrameHeight = 480;
+const uint32_t kPixelByteSize = 1;
 
-static const uint32_t kFrameRate = 30; // Hz
-static const uint32_t kImagesPerTimestamp = 4; // to test ordering of records with identical tstamps
-static const uint32_t kFrameCount = kFrameRate * 5; // 5 seconds worth of frames
-static const double kInterFrameDelay = 1.0 / kFrameRate;
+const uint32_t kFrameRate = 30; // Hz
+const uint32_t kImagesPerTimestamp = 4; // to test ordering of records with identical tstamps
+const uint32_t kFrameCount = kFrameRate * 5; // 5 seconds worth of frames
+const double kInterFrameDelay = 1.0 / kFrameRate;
 
-static const uint32_t kConfigurationVersion = 1;
-static const uint32_t kDataVersion = 1;
+const uint32_t kConfigurationVersion = 1;
+const uint32_t kDataVersion = 1;
 
-static const double kStartTimestamp = 1543864285;
+const double kStartTimestamp = 1543864285;
 
 using datalayout_conventions::ImageSpecType;
 
@@ -139,10 +139,10 @@ class ImageStream : public Recordable {
 
 class ImageStreamPlayer : public RecordFormatStreamPlayer {
  public:
-  virtual bool onDataLayoutRead(const CurrentRecord& record, size_t blockIndex, DataLayout& dl) {
+  bool onDataLayoutRead(const CurrentRecord& record, size_t blockIndex, DataLayout& dl) override {
     if (record.recordType == Record::Type::DATA) {
       ImageStreamMetaData& data = getExpectedLayout<ImageStreamMetaData>(dl, blockIndex);
-      uint64_t frameCounter;
+      uint64_t frameCounter = 0;
       bool foundFrameCounter = data.frameCounter.get(frameCounter);
       EXPECT_TRUE(foundFrameCounter);
       if (foundFrameCounter) {
@@ -158,7 +158,7 @@ class ImageStreamPlayer : public RecordFormatStreamPlayer {
 struct SimpleFileHandlerTest : testing::Test {
   // Demonstrate how to create a VRS file,
   // holding all the records in memory before writing them all in a single call.
-  int createFileAtOnce(const string& filePath) {
+  static int createFileAtOnce(const string& filePath) {
     // Create a container to hold all references to all the streams we want to record
     RecordFileWriter fileWriter;
 
@@ -189,7 +189,7 @@ struct SimpleFileHandlerTest : testing::Test {
   // Demonstrate how to create a VRS file,
   // writing records in the background as we create more.
   // Even if all your records fit in memory, this version is much faster, so you should use it!
-  int createFileStreamingToDisk(const string& filePath) {
+  static int createFileStreamingToDisk(const string& filePath) {
     // Create a container to hold all references to all the streams we want to record
     RecordFileWriter fileWriter;
 
@@ -227,7 +227,7 @@ struct SimpleFileHandlerTest : testing::Test {
     return 0;
   }
 
-  void checkFileHandler(const string& filePath) {
+  static void checkFileHandler(const string& filePath) {
     // Verify that the file was created, and looks like we think it should
     RecordFileReader reader;
     int openFileStatus = reader.openFile(filePath);

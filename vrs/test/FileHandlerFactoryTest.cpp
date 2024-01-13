@@ -39,18 +39,17 @@ struct FileHandlerFactoryTest : testing::Test {
 // Fake FileHandler class that just pretends to open any path
 class FakeHandler : public DiskFile {
  public:
-  FakeHandler(const string& name) : fileHandlerName_{name} {}
+  explicit FakeHandler(string name) : fileHandlerName_{std::move(name)} {}
   unique_ptr<FileHandler> makeNew() const override {
     return make_unique<FakeHandler>(fileHandlerName_);
   }
-  int open(const string& filePath) override {
+  int open(const string& /*filePath*/) override {
     return 0;
   }
-  int openSpec(const FileSpec& fileSpec) override {
+  int openSpec(const FileSpec& /*fileSpec*/) override {
     return 0;
   }
-  virtual int delegateOpen(const FileSpec& fileSpec, unique_ptr<FileHandler>& outNewDelegate)
-      override {
+  int delegateOpen(const FileSpec& /*fileSpec*/, unique_ptr<FileHandler>& outNewDelegate) override {
     outNewDelegate.reset();
     return 0;
   }

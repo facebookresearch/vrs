@@ -29,30 +29,30 @@ using namespace vrs;
 
 namespace {
 
-static const uint32_t kConfigurationVersion = 1;
-static const uint32_t kDataVersion = 1;
-static const uint32_t kStateVersion = 1;
+const uint32_t kConfigurationVersion = 1;
+const uint32_t kDataVersion = 1;
+const uint32_t kStateVersion = 1;
 
-static const uint32_t kFrameWidth = 640;
-static const uint32_t kFrameHeight = 480;
-static const uint32_t kPixelByteSize = 1;
+const uint32_t kFrameWidth = 640;
+const uint32_t kFrameHeight = 480;
+const uint32_t kPixelByteSize = 1;
 
-static const size_t kConfigCustomBlockSize0 = 190;
-static const size_t kStateCustomBlockSize1 = 25;
-static const size_t kStateCustomBlockSize3 = 39;
-static const size_t kDataCustomBlockSize1 = 37;
-static const size_t kDataCustomBlockSize3 = 125;
-static const size_t kDataCustomBlockSize4 = 9;
+const size_t kConfigCustomBlockSize0 = 190;
+const size_t kStateCustomBlockSize1 = 25;
+const size_t kStateCustomBlockSize3 = 39;
+const size_t kDataCustomBlockSize1 = 37;
+const size_t kDataCustomBlockSize3 = 125;
+const size_t kDataCustomBlockSize4 = 9;
 
-static const double kStartTimestamp = 1543864285;
+const double kStartTimestamp = 1543864285;
 
-static const size_t kRecordSetCount = 3;
+const size_t kRecordSetCount = 3;
 
 using namespace datalayout_conventions;
 
 // Generate/check a custom block of data with a (very) pseudo random pattern
 struct CustomBlob {
-  CustomBlob(size_t size) {
+  explicit CustomBlob(size_t size) {
     blob.resize(size);
     for (size_t k = 0; k < size; k++) {
       blob[k] = dataAt(k, size);
@@ -119,7 +119,7 @@ class DataRecordDataSource : public DataSource {
       const DataSourceChunk& cb2,
       const DataSourceChunk& cb3)
       : DataSource(dl1, dl2, cb1, cb2, cb3) {}
-  virtual void copyTo(uint8_t* buffer) const {
+  void copyTo(uint8_t* buffer) const override {
     dataLayout1_.fillAndAdvanceBuffer(buffer);
     if (chunk1_.size() > 0) {
       chunk1_.fillAndAdvanceBuffer(buffer);
@@ -220,7 +220,7 @@ class CustomStreams : public Recordable {
 
 class CustomStreamPlayer : public RecordFormatStreamPlayer {
  public:
-  virtual bool onDataLayoutRead(const CurrentRecord& record, size_t blockIndex, DataLayout& dl) {
+  bool onDataLayoutRead(const CurrentRecord& record, size_t blockIndex, DataLayout& dl) override {
     if (record.recordType == Record::Type::CONFIGURATION) {
       GTEST_NONFATAL_FAILURE_("No datalayout expected for config records");
       return false;
@@ -234,8 +234,8 @@ class CustomStreamPlayer : public RecordFormatStreamPlayer {
     }
     return true;
   }
-  virtual bool
-  onImageRead(const CurrentRecord& record, size_t blockIndex, const ContentBlock& contentBlock) {
+  bool onImageRead(const CurrentRecord& record, size_t blockIndex, const ContentBlock& contentBlock)
+      override {
     EXPECT_EQ(record.recordType, Record::Type::STATE);
     EXPECT_EQ(blockIndex, 2);
     size_t size = contentBlock.getBlockSize();
@@ -249,10 +249,10 @@ class CustomStreamPlayer : public RecordFormatStreamPlayer {
     stateImageCount++;
     return true;
   }
-  virtual bool onCustomBlockRead(
+  bool onCustomBlockRead(
       const CurrentRecord& record,
       size_t blockIndex,
-      const ContentBlock& contentBlock) {
+      const ContentBlock& contentBlock) override {
     size_t size = contentBlock.getBlockSize();
     if (size == ContentBlock::kSizeUnknown) {
       GTEST_NONFATAL_FAILURE_("Unknown custom block size!");
@@ -303,7 +303,7 @@ class CustomStreamPlayer : public RecordFormatStreamPlayer {
 };
 
 struct CustomBlockTest : testing::Test {
-  int createFileAtOnce(const string& filePath) {
+  static int createFileAtOnce(const string& filePath) {
     RecordFileWriter fileWriter;
     fileWriter.setTag("purpose", "this is a test");
     CustomStreams imageStream;
@@ -317,7 +317,7 @@ struct CustomBlockTest : testing::Test {
     return 0;
   }
 
-  void checkFileHandler(const string& filePath) {
+  static void checkFileHandler(const string& filePath) {
     // Verify that the file was created, and looks like we think it should
     RecordFileReader reader;
     int openFileStatus = reader.openFile(filePath);
@@ -360,7 +360,7 @@ TEST_F(CustomBlockTest, simpleCreation) {
 }
 
 TEST_F(CustomBlockTest, DataSourceChunkTest) {
-  int anint;
+  int anint = 0;
   DataSourceChunk intdl(anint);
   EXPECT_EQ(intdl.size(), sizeof(int));
 

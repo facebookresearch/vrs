@@ -169,11 +169,10 @@ FileDelegator* FileHandlerFactory::getExtraDelegator(const FileSpec& fileSpec) {
         XR_LOGE("No {} delegator named {} was registered.", extraName, extraValue);
         class FailedDelegator : public FileDelegator {
          public:
-          int delegateOpen(const FileSpec& fileSpec, unique_ptr<FileHandler>& outNewDelegate)
-              override {
+          int delegateOpen(const FileSpec&, unique_ptr<FileHandler>&) override {
             return REQUESTED_DELEGATOR_UNAVAILABLE;
           }
-          int parseUri(FileSpec& inOutFileSpec, size_t colonIndex) const override {
+          int parseUri(FileSpec&, size_t) const override {
             return REQUESTED_DELEGATOR_UNAVAILABLE;
           }
         };

@@ -740,8 +740,7 @@ const MultiRecordFileReader::StreamIdReaderPair* MultiRecordFileReader::getStrea
   return &it->second;
 }
 
-const string& MultiRecordFileReader::getTag(const map<string, string>& tags, const string& name)
-    const {
+const string& MultiRecordFileReader::getTag(const map<string, string>& tags, const string& name) {
   auto iter = tags.find(name);
   if (iter != tags.end()) {
     return iter->second;

@@ -112,7 +112,7 @@ ContentBlockReader::~ContentBlockReader() = default;
 size_t ContentBlockReader::findContentBlockSize(
     const CurrentRecord& record,
     RecordFormatStreamPlayer& player) {
-  uint32_t size32;
+  uint32_t size32 = 0;
   // Have we successfully mapped the content block size already?
   if (contentBlockSizeSpec_ && contentBlockSizeSpec_->isMapped() &&
       contentBlockSizeSpec_->nextContentBlockSize.get(size32)) {
@@ -229,7 +229,7 @@ bool AudioBlockReader::findAudioSpec(
 
 bool AudioBlockReader::audioContentFromAudioSpec(
     const datalayout_conventions::AudioSpec& audioSpec,
-    ContentBlock& audioContentBlock) const {
+    ContentBlock& audioContentBlock) {
   AudioSampleFormat sampleFormat = AudioSampleFormat::UNDEFINED;
   uint8_t numChannels = 0;
   uint32_t sampleRate = 0;

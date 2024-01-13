@@ -94,7 +94,7 @@ class AudioBlockReader : public ContentBlockReader {
 
  protected:
   bool readAudioContentBlock(const CurrentRecord&, RecordFormatStreamPlayer&, const ContentBlock&);
-  bool audioContentFromAudioSpec(const datalayout_conventions::AudioSpec&, ContentBlock&) const;
+  static bool audioContentFromAudioSpec(const datalayout_conventions::AudioSpec&, ContentBlock&);
   bool findAudioSpec(
       const CurrentRecord&,
       RecordFormatStreamPlayer&,

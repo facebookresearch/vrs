@@ -36,11 +36,11 @@ using std::string;
 class DataPieceString : public DataPiece {
  public:
   /// @param label: Name for the DataPiece.
-  DataPieceString(const string& label)
+  explicit DataPieceString(const string& label)
       : DataPiece(label, DataPieceType::String, DataLayout::kVariableSize) {}
   /// @param bundle: Bundle to reconstruct a DataPieceString from disk.
   /// @internal
-  DataPieceString(const MakerBundle& bundle);
+  explicit DataPieceString(const MakerBundle& bundle);
 
   /// Get the DataPiece element type name.
   /// @return "string".

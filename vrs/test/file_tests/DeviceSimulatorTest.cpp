@@ -144,10 +144,10 @@ TEST_F(DeviceSimulator, preallocateTooManyIndex) {
 }
 
 struct ChunkCollector : public NewChunkHandler {
-  ChunkCollector(map<size_t, string>& _chunks) : chunks{_chunks} {
+  explicit ChunkCollector(map<size_t, string>& _chunks) : chunks{_chunks} {
     chunks.clear();
   }
-  void newChunk(const string& path, size_t index, bool isLastChunk) override {
+  void newChunk(const string& path, size_t index, bool /*isLastChunk*/) override {
     EXPECT_EQ(chunks.find(index), chunks.end());
     chunks[index] = path;
   }
@@ -156,7 +156,7 @@ struct ChunkCollector : public NewChunkHandler {
 
 void checkChunks(const map<size_t, string>& chunks, const string& path, size_t count) {
   EXPECT_EQ(chunks.size(), count);
-  if (chunks.size() > 0) {
+  if (!chunks.empty()) {
     auto iter = chunks.begin();
     EXPECT_STREQ(iter->second.c_str(), path.c_str());
     EXPECT_EQ(iter->first, 0);

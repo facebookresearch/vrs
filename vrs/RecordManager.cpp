@@ -181,7 +181,7 @@ void RecordManager::collectOldRecords(double maxAge, list<Record*>& outCollected
   }
 }
 
-size_t RecordManager::getAcceptableOverCapacity(size_t capacity) const {
+size_t RecordManager::getAcceptableOverCapacity(size_t capacity) {
   return capacity + capacity / 5; // 20%
 }
 
@@ -194,9 +194,7 @@ void RecordManager::recycle(Record* record) {
       record = nullptr;
     }
   } // mutex scope limiting
-  if (record != nullptr) {
-    delete record;
-  }
+  delete record;
 }
 
 } // namespace vrs

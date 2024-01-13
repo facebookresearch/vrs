@@ -35,7 +35,7 @@ struct RecordTester : testing::Test {};
 
 size_t collect(
     RecordFileWriter::RecordBatches& batches,
-    vector<pair<RecordManager*, StreamId>> recordManagers,
+    const vector<pair<RecordManager*, StreamId>>& recordManagers,
     double maxTime) {
   batches.emplace_back(new RecordFileWriter::RecordBatch());
   RecordFileWriter::RecordBatch& batch = *batches.back();
@@ -292,7 +292,7 @@ static uint8_t f(uint8_t k) {
 const size_t kSize = 9; // odd, to expose padding issues
 
 union ArrayUnion {
-  ArrayUnion() {} // required
+  ArrayUnion() {} // required, do not use '= default' which would initialize the fields!
   Record::uninitialized_byte uninitialized_bytes[kSize];
   uint8_t initialized_bytes[kSize];
 };
@@ -304,28 +304,28 @@ TEST_F(RecordTester, initRecordTest) {
   // init reserved capacity to our pattern
   uint8_t* b = &buffer[0].byte;
   size_t initCapacity = buffer.capacity();
-  for (uint8_t k = 0; k < initCapacity; k++) {
+  for (size_t k = 0; k < initCapacity; k++) {
     b[k] = f(k);
   }
   // allocate & verify that the buffer data wasn't initialized (still our pattern)
   buffer.resize(0);
   buffer.resize(10);
   const uint8_t* b1 = &buffer[0].byte;
-  for (uint8_t k = 0; k < initCapacity; k++) {
+  for (size_t k = 0; k < initCapacity; k++) {
     EXPECT_EQ(b1[k], f(k));
   }
   // allocate & verify that the buffer data wasn't initialized (still our pattern)
   buffer.resize(0);
   buffer.resize(30);
   const uint8_t* b2 = &buffer[0].byte;
-  for (uint8_t k = 0; k < initCapacity; k++) {
+  for (size_t k = 0; k < initCapacity; k++) {
     EXPECT_EQ(b2[k], f(k));
   }
   buffer.resize(0);
   buffer.resize(2000); // we should get a new buffer which data should be different
   const uint8_t* b3 = &buffer[0].byte;
   bool differentData = false;
-  for (uint8_t k = 0; !differentData && k < initCapacity; k++) {
+  for (size_t k = 0; !differentData && k < initCapacity; k++) {
     if (b3[k] != f(k)) {
       differentData = true;
     }
@@ -343,7 +343,8 @@ TEST_F(RecordTester, initRecordTest) {
 namespace {
 class TestRecordable : public Recordable {
  public:
-  TestRecordable(RecordableTypeId typeId = RecordableTypeId::UnitTest1) : Recordable(typeId) {}
+  explicit TestRecordable(RecordableTypeId typeId = RecordableTypeId::UnitTest1)
+      : Recordable(typeId) {}
   const Record* createConfigurationRecord() override {
     return nullptr;
   }

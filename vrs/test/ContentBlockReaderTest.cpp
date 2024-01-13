@@ -38,7 +38,7 @@ ContentBlock getImageContentBlock(
 }
 
 bool isImageSpec(
-    ImageContentBlockSpec spec,
+    const ImageContentBlockSpec& spec,
     DataLayout& layout,
     const ImageContentBlockSpec& base,
     size_t blockSize = ContentBlock::kSizeUnknown) {

@@ -375,7 +375,7 @@ int makeAndWriteFrame(
     size_t& totalSize) {
   input.resize(frameSize);
   randomInit(input, root);
-  uint32_t writtenSize;
+  uint32_t writtenSize = 0;
   EXPECT_ZERO_OR_RETURN(compressor.startFrame(input.size(), preset, writtenSize));
   size_t addedSize = 0;
   size_t remainingSize = frameSize;

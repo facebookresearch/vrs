@@ -366,9 +366,9 @@ void ImageContentBlockSpec::set(ContentParser& parser) {
   if (imageFormat_ == ImageFormat::UNDEFINED) {
     XR_LOGE("Could not parse image format '{}' in '{}'", parser.str, parser.source());
   } else {
-    uint32_t width, height, stride, quality, keyFrameIndex;
-    double keyFrameTimestamp;
-    array<char, 200> text;
+    uint32_t width{}, height{}, stride{}, quality{}, keyFrameIndex{};
+    double keyFrameTimestamp = 0;
+    array<char, 200> text = {};
     while (parser.next()) {
       const char* cstr = parser.str.c_str();
       int firstChar = static_cast<uint8_t>(*cstr); // could be 0, but that's ok
@@ -704,7 +704,7 @@ void AudioContentBlockSpec::set(ContentParser& parser) {
   if (audioFormat_ == AudioFormat::UNDEFINED) {
     XR_LOGE("Could not parse audio format '{}' in '{}'", parser.str, parser.source());
   } else {
-    unsigned int tmp;
+    unsigned int tmp = 0;
     while (parser.next()) {
       // peek at first character
       switch (parser.str[0]) {
@@ -930,7 +930,7 @@ ContentBlock::ContentBlock(const string& formatStr) {
   ContentParser parser(formatStr, '/');
   contentType_ = ContentTypeFormatConverter::toEnum(parser.str.c_str());
   parser.next();
-  uint32_t size;
+  uint32_t size = 0;
   if (sscanf(parser.str.c_str(), "size=%u", &size) == 1) {
     size_ = size;
     parser.next();
@@ -998,7 +998,7 @@ size_t ContentBlock::getBlockSize() const {
 }
 
 RecordFormat ContentBlock::operator+(const ContentBlock& other) const {
-  return RecordFormat(*this, other);
+  return {*this, other};
 }
 
 const ImageContentBlockSpec& ContentBlock::image() const {
@@ -1015,7 +1015,7 @@ void RecordFormat::set(const string& format) {
   blocks_.clear();
   ContentParser parser(format, '+');
   do {
-    blocks_.emplace_back(ContentBlock(parser.str)); // do this at least once to get one block!
+    blocks_.emplace_back(parser.str); // do this at least once to get one block!
   } while (parser.next());
 }
 
@@ -1200,8 +1200,8 @@ void RecordFormat::getRecordFormats(
     const map<string, string>& recordFormatRegister,
     RecordFormatMap& outFormats) {
   for (const auto& tag : recordFormatRegister) {
-    Record::Type recordType;
-    uint32_t formatVersion;
+    Record::Type recordType{};
+    uint32_t formatVersion = 0;
     if (RecordFormat::parseRecordFormatTagName(tag.first, recordType, formatVersion) &&
         outFormats.find({recordType, formatVersion}) == outFormats.end()) {
       outFormats[{recordType, formatVersion}].set(tag.second);

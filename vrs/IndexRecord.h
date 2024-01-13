@@ -52,7 +52,7 @@ enum {
 /// \brief Helper class to store StreamID objects on disk.
 struct DiskStreamId {
   DiskStreamId() : typeId(static_cast<int32_t>(RecordableTypeId::Undefined)), instanceId(0) {}
-  DiskStreamId(StreamId streamId)
+  explicit DiskStreamId(StreamId streamId)
       : typeId(static_cast<int32_t>(streamId.getTypeId())), instanceId(streamId.getInstanceId()) {}
 
   FileFormat::LittleEndian<int32_t> typeId;
@@ -67,13 +67,13 @@ struct DiskStreamId {
   }
 
   StreamId getStreamId() const {
-    return StreamId(getTypeId(), getInstanceId());
+    return {getTypeId(), getInstanceId()};
   }
 };
 
 /// \brief Helper class to store details about a single VRS record on disk.
 struct DiskRecordInfo {
-  DiskRecordInfo() {}
+  DiskRecordInfo() = default;
   DiskRecordInfo(double timestamp, uint32_t recordSize, StreamId streamId, Record::Type recordType)
       : timestamp(timestamp),
         recordSize(recordSize),
@@ -103,14 +103,14 @@ struct DiskRecordInfo {
 
 /// \brief Helper class to hold the details about a single VRS record in memory.
 struct RecordInfo {
-  RecordInfo() {}
+  RecordInfo() = default;
   RecordInfo(double timestamp, int64_t fileOffset, StreamId streamId, Record::Type recordType)
       : timestamp(timestamp), fileOffset(fileOffset), streamId(streamId), recordType(recordType) {}
 
-  double timestamp; ///< timestamp of the record
-  int64_t fileOffset; ///< absolute byte offset of the record in the whole file
-  StreamId streamId; ///< creator of the record
-  Record::Type recordType; ///< type of record
+  double timestamp{}; ///< timestamp of the record
+  int64_t fileOffset{}; ///< absolute byte offset of the record in the whole file
+  StreamId streamId{}; ///< creator of the record
+  Record::Type recordType{}; ///< type of record
 
   bool operator<(const RecordInfo& rhs) const {
     return this->timestamp < rhs.timestamp ||
@@ -128,7 +128,7 @@ struct RecordInfo {
 /// \brief Helper class to write VRS index records.
 class Writer {
  public:
-  Writer(FileFormat::FileHeader& fileHeader)
+  explicit Writer(FileFormat::FileHeader& fileHeader)
       : fileHeader_{fileHeader}, preallocatedIndexRecordSize_{} {}
 
   void reset() {
@@ -177,12 +177,12 @@ class Writer {
   std::unique_ptr<DiskFile> splitHeadFile_; // When the file head is split from the user records
   FileFormat::FileHeader& fileHeader_;
   FileFormat::RecordHeader splitIndexRecordHeader_;
-  uint32_t preallocatedIndexRecordSize_;
+  uint32_t preallocatedIndexRecordSize_{};
   Compressor compressor_;
   set<StreamId> streamIds_;
   deque<IndexRecord::DiskRecordInfo> writtenRecords_;
-  size_t writtenBytesCount_; // how many bytes have been written in a partial index
-  size_t writtenIndexCount_; // how many index entries have been written in the partial index
+  size_t writtenBytesCount_{}; // how many bytes have been written in a partial index
+  size_t writtenIndexCount_{}; // how many index entries have been written in the partial index
 };
 
 /// \brief Helper class to read VRS index records.
@@ -228,10 +228,10 @@ class Reader {
   set<StreamId>& streamIds_;
   vector<RecordInfo>& index_;
   unique_ptr<deque<IndexRecord::DiskRecordInfo>> diskIndex_; // only when rewriting the index
-  bool indexComplete_;
-  bool hasSplitHeadChunk_;
-  int32_t sortErrorCount_;
-  int32_t droppedRecordCount_;
+  bool indexComplete_{};
+  bool hasSplitHeadChunk_{};
+  int32_t sortErrorCount_{};
+  int32_t droppedRecordCount_{};
 };
 
 /// This is used to count records to different kinds

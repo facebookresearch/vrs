@@ -105,7 +105,7 @@ class TestRecordable : public Recordable {
 };
 
 struct VrsFileBuilder {
-  VrsFileBuilder(const string& path) : path_(path) {
+  explicit VrsFileBuilder(string path) : path_{std::move(path)} {
     XR_CHECK_FALSE(os::isFile(path_));
     fileWriter_.addRecordable(&recordable_);
     recordable_.setRecordableIsActive(true);
@@ -195,8 +195,7 @@ void assertEmptyStreamTags(const MultiRecordFileReader& reader) {
 
 class TestStreamPlayer : public StreamPlayer {
  public:
-  virtual bool processRecordHeader(const CurrentRecord& record, DataReference& outDataReference)
-      override {
+  bool processRecordHeader(const CurrentRecord&, DataReference&) override {
     return true;
   }
 
@@ -547,7 +546,7 @@ TEST_F(MultiRecordFileReaderTest, getFirstAndLastRecord) {
 /// internally and match the record counts of each type
 class StreamIdCollisionTester {
  public:
-  StreamIdCollisionTester() : filePaths_(getOsTempPaths(kFilePathCount)), totalRecordCount_(0) {
+  StreamIdCollisionTester() : filePaths_(getOsTempPaths(kFilePathCount)) {
     for (size_t i = 0; i < filePaths_.size(); i++) {
       auto& filePath = filePaths_[i];
       XR_CHECK_FALSE(os::isFile(filePath));
@@ -640,7 +639,7 @@ class StreamIdCollisionTester {
     recordable.setTag(kOriginalStreamIdTag, recordable.getStreamId().getName());
   }
 
-  string getExpectedRecordCountTagKey(Record::Type type) const {
+  static string getExpectedRecordCountTagKey(Record::Type type) {
     return fmt::format("{}{}", kExpectedRecordCountTagPrefix, Record::typeName(type));
   }
 
@@ -749,7 +748,7 @@ class StreamIdCollisionTester {
   RecordFileWriter fileWriters_[kFilePathCount];
   vector<string> filePaths_;
 
-  size_t totalRecordCount_;
+  size_t totalRecordCount_{};
   MultiRecordFileReader reader_;
 };
 
@@ -787,7 +786,7 @@ TEST_F(MultiRecordFileReaderTest, getFileChunks) {
   const auto fileChunks = multiReader.getFileChunks();
   ASSERT_EQ(filePaths.size(), fileChunks.size());
   for (size_t i = 0; i < filePaths.size(); i++) {
-    const auto fileChunk = fileChunks[i];
+    const auto& fileChunk = fileChunks[i];
     ASSERT_EQ(filePaths[i], fileChunk.first);
     ASSERT_EQ(expectedSize, fileChunk.second);
   }

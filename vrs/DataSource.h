@@ -39,7 +39,7 @@ class DataLayout;
 /// briefly for the purpose of calling createRecord().
 struct DataLayoutChunk {
   /// Default constructor to no DataLayout.
-  DataLayoutChunk() {}
+  DataLayoutChunk() = default;
   /// Constructor to reference a DataLayout, which must outlive this DataLayoutChunk.
   explicit DataLayoutChunk(DataLayout& dataLayout);
 
@@ -80,7 +80,7 @@ class DataSourceChunk {
   template <typename T>
   /* implicit */ DataSourceChunk(const vector<T>& vectorT)
       : data_{vectorT.data()}, size_{sizeof(T) * vectorT.size()} {}
-  virtual ~DataSourceChunk() {}
+  virtual ~DataSourceChunk() = default;
 
   /// Constructor for a trivially copyable type T.
   template <

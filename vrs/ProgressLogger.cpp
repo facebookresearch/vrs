@@ -39,7 +39,7 @@ void ProgressLogger::setStepCount(int stepCount) {
   stepCount_ = stepCount;
 }
 
-ProgressLogger::~ProgressLogger() {}
+ProgressLogger::~ProgressLogger() = default;
 
 void ProgressLogger::setDetailedProgress(bool detailedProgress) {
   detailedProgress_ = detailedProgress;
@@ -113,6 +113,6 @@ void ProgressLogger::logError(const string& message) {
 
 void ProgressLogger::updateStep(size_t /*progress*/, size_t /*maxProgress*/) {}
 
-SilentLogger::~SilentLogger() {}
+SilentLogger::~SilentLogger() = default;
 
 } // namespace vrs
