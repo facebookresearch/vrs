@@ -56,7 +56,7 @@ class ImagePlayer : public RecordFormatStreamPlayer {
 /// Sample basic code to demonstrate how to read a VRS file.
 struct SampleImageReader {
   /// This function is the entry point for your reader
-  void imageReader(const string& vrsFilePath) {
+  static void imageReader(const string& vrsFilePath) {
     RecordFileReader reader;
     if (reader.openFile(vrsFilePath) == 0) {
       vector<unique_ptr<StreamPlayer>> streamPlayers;

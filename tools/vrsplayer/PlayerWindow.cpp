@@ -28,7 +28,7 @@ using namespace vrsp;
 using namespace std;
 
 inline QKeySequence shortcut(int keyA, int keyB, int keyC = 0) {
-  return QKeySequence(keyA + keyB + keyC);
+  return {keyA + keyB + keyC};
 }
 
 PlayerWindow::PlayerWindow(QApplication& app) : QMainWindow(nullptr) {

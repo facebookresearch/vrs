@@ -77,7 +77,7 @@ class Fps {
 class FrameWidget : public QWidget {
   Q_OBJECT
  public:
-  explicit FrameWidget(QWidget* parent = 0);
+  explicit FrameWidget(QWidget* parent = nullptr);
 
   void paintEvent(QPaintEvent* evt) override;
   QSize sizeHint() const override;

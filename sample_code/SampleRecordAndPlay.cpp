@@ -145,7 +145,7 @@ class RecordableDemo : public Recordable {
   }
 
   // pseudocode helper function
-  bool iNeedToRecordMoreData() {
+  static bool iNeedToRecordMoreData() {
     static int count = 5000;
     return --count > 0; // arbitrary condition for our demo
   }
@@ -250,7 +250,7 @@ class PlaybackSample {
   /*
    * VRS File playback sample
    */
-  static void readVRSFile(string filePath) {
+  static void readVRSFile(const string& filePath) {
     RecordFileReader reader;
     if (reader.openFile(filePath) == 0) {
       vector<unique_ptr<StreamPlayer>> streamPlayers;

@@ -78,7 +78,7 @@ QString kLayoutPresets("layout_presets");
 
 class FlagKeeper {
  public:
-  FlagKeeper(bool& flag) : flag_{flag}, finalValue_{flag_} {
+  explicit FlagKeeper(bool& flag) : flag_{flag}, finalValue_{flag_} {
     flag_ = false;
   }
   FlagKeeper(bool& flag, bool finalValue) : flag_{flag}, finalValue_{finalValue} {
@@ -565,7 +565,7 @@ void FileReader::setBlankMode(bool blank) {
 }
 
 void FileReader::clearLayout(QLayout* layout, bool deleteWidgets) {
-  QLayoutItem* child;
+  QLayoutItem* child{};
   while ((child = layout->takeAt(0)) != nullptr) {
     if (child->layout() != nullptr) {
       clearLayout(child->layout(), deleteWidgets);
@@ -719,7 +719,7 @@ double FileReader::getNextRecordDelay() {
 }
 
 void FileReader::playThreadActivity() {
-  EventChannel::Event event;
+  EventChannel::Event event{};
   while (runThread_) {
     double delay = getNextRecordDelay();
     if (delay > 0) {

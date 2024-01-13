@@ -85,7 +85,7 @@ class FileReader : public QObject {
   static constexpr double kMaxPlaybackAge = 0.2;
 
   explicit FileReader(QObject* parent = nullptr);
-  ~FileReader();
+  ~FileReader() override;
 
   void setPlayerUi(PlayerUI* ui) {
     playerUi_ = ui;
@@ -128,7 +128,7 @@ class FileReader : public QObject {
   void setPosition(int position);
   void sliderPressed();
   void sliderReleased();
-  bool eventFilter(QObject* obj, QEvent* event);
+  bool eventFilter(QObject* obj, QEvent* event) override;
   void stop();
   void play();
   void pause();
@@ -181,7 +181,7 @@ class FileReader : public QObject {
   void closeFile();
 
  private:
-  PlayerUI* playerUi_;
+  PlayerUI* playerUi_{};
   std::vector<StreamId> visibleStreams_;
   QVBoxLayout* videoFrames_{};
   int lastMaxPerRow_{0};
@@ -190,16 +190,16 @@ class FileReader : public QObject {
   std::map<StreamId, size_t> lastReadRecords_;
   Record::Type recordType_{Record::Type::UNDEFINED};
   QTimer slowTimer_;
-  FileReaderState state_;
+  FileReaderState state_{};
   std::unique_ptr<RecordFileReader> fileReader_;
-  bool isLocalFile_;
-  bool isSliderActive_;
+  bool isLocalFile_{};
+  bool isSliderActive_{};
   bool layoutUpdatesEnabled_{true};
-  double startTime_;
-  double endTime_;
-  uint32_t firstDataRecordIndex_;
-  double lastShownTime_;
-  size_t nextRecord_;
+  double startTime_{};
+  double endTime_{};
+  uint32_t firstDataRecordIndex_{};
+  double lastShownTime_{};
+  size_t nextRecord_{};
   QString lastSaveLocation_;
   VideoTime time_;
   bool runThread_{true};

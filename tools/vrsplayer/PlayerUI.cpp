@@ -74,11 +74,11 @@ class JumpSlider : public QSlider {
   JumpSlider() : QSlider(Qt::Horizontal) {}
 
  protected:
-  void mousePressEvent(QMouseEvent* event) {
+  void mousePressEvent(QMouseEvent* event) override {
     QStyleOptionSlider opt;
     initStyleOption(&opt);
     QRect sr = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, this);
-    if (event->button() == Qt::LeftButton && sr.contains(event->pos()) == false) {
+    if (event->button() == Qt::LeftButton && !sr.contains(event->pos())) {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
       int newVal = minimum() + ((maximum() - minimum()) * event->x()) / width();
 #else
@@ -231,7 +231,7 @@ void PlayerUI::openFileChooser() {
 void PlayerUI::openPathChooser() {
   setStatusText({});
   fileReader_.stop();
-  bool ok;
+  bool ok{};
   QString text = QInputDialog::getText(
                      nullptr,
                      "Open VRS File",
@@ -374,7 +374,7 @@ void PlayerUI::toggleVisibleStreams() {
 }
 
 void PlayerUI::savePreset() {
-  bool ok;
+  bool ok{};
   QString text = QInputDialog::getText(
                      nullptr,
                      "Save Preset",
@@ -399,7 +399,7 @@ void PlayerUI::deletePreset(const QString& preset) {
   fileReader_.deletePreset(preset);
 }
 
-void PlayerUI::reportError(QString errorTitle, QString errorMessage) {
+void PlayerUI::reportError(const QString& errorTitle, const QString& errorMessage) {
   emit fileReader_.stop();
   QMessageBox messageBox(QMessageBox::Critical, "", errorMessage, QMessageBox::Ok);
   messageBox.QDialog::setWindowTitle(errorTitle); // Backdoor for MacOS

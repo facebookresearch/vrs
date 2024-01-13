@@ -45,7 +45,7 @@ using PathPreparer = std::function<QString(const QString&)>;
 class PlayerUI : public QWidget {
   Q_OBJECT
  public:
-  PlayerUI(QWidget* parent = nullptr);
+  explicit PlayerUI(QWidget* parent = nullptr);
 
   void setPathPreparer(const PathPreparer& pathPreparer) {
     pathPreparer_ = pathPreparer;
@@ -78,7 +78,7 @@ class PlayerUI : public QWidget {
   void savePreset();
   void recallPreset(const QString& preset);
   void deletePreset(const QString& preset);
-  void reportError(QString errorTitle, QString errorMessage);
+  void reportError(const QString& errorTitle, const QString& errorMessage);
   void setOverlayColor(QColor color);
   QColor getOverlayColor() const {
     return overlayColor_;
@@ -97,7 +97,7 @@ class PlayerUI : public QWidget {
   void recordTypeChanged(int index);
   void speedControlChanged(int index);
   void setStatusText(const std::string& statusText);
-  bool eventFilter(QObject* obj, QEvent* event);
+  bool eventFilter(QObject* obj, QEvent* event) override;
 
  private:
   QSettings settings_;

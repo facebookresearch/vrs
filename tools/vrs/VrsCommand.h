@@ -113,7 +113,7 @@ struct VrsCommand {
   /// Perform Copy, Merge operation
   int doCopyMerge();
 
-  bool isRemoteFileSystem(const std::string& path);
+  static bool isRemoteFileSystem(const std::string& path);
 
   /// Main operation
   Command cmd = Command::None;

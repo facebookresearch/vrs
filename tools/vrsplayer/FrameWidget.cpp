@@ -87,7 +87,7 @@ void FrameWidget::paintEvent(QPaintEvent* evt) {
     unique_lock<mutex> lock;
     PixelFrame* image = image_.get();
     if (image != nullptr) {
-      QImage::Format qformat;
+      QImage::Format qformat{};
       hasImage = convertToQImageFormat(image->getPixelFormat(), qformat);
       if (hasImage) {
         QSize size = image->qsize();
@@ -97,7 +97,7 @@ void FrameWidget::paintEvent(QPaintEvent* evt) {
             size.height(),
             static_cast<int>(image->getStride()),
             qformat);
-        painter.translate(rect.width() / 2, rect.height() / 2);
+        painter.translate(rect.width() / 2.f, rect.height() / 2.f);
         QSize rsize = size;
         rsize.scale(rotate(rect.size()), Qt::KeepAspectRatio);
         bool sideWays = rotation_ % 180 != 0;
@@ -122,8 +122,7 @@ void FrameWidget::paintEvent(QPaintEvent* evt) {
         painter.setPen(Qt::black);
         painter.setBackground(QBrush(Qt::white));
         painter.setBackgroundMode(Qt::BGMode::OpaqueMode);
-        QString description =
-            QString::fromStdString(vrs::toString(image->getPixelFormat()).c_str()) +
+        QString description = QString::fromStdString(vrs::toString(image->getPixelFormat())) +
             " pixel format not supported...";
         painter.drawText(QPointF(rect.left() + 4, rect.bottom() - 4), description);
       }

@@ -90,7 +90,7 @@ struct CommandConverter : public EnumStringConverter<
   static_assert(COUNT_OF(sCommands) == enumCount<Command>(), "Missing GaiaOp name definitions");
 };
 
-static const RecordFileInfo::Details kCopyOpsDetails = Details::MainCounters;
+const RecordFileInfo::Details kCopyOpsDetails = Details::MainCounters;
 
 struct CommandSpec {
   Command cmd;

@@ -103,14 +103,14 @@ class FramePlayer : public QObject, public VideoRecordFormatStreamPlayer {
   bool firstImage_{true};
   std::atomic<bool> iframesOnly_{true};
   string saveNextFramePath_;
-  int estimatedFps_;
+  int estimatedFps_{};
   Fps dataFps_;
   FileReaderState state_{};
 
   vrs::JobQueueWithThread<std::unique_ptr<ImageJob>> imageJobs_;
 
   void convertFrame(shared_ptr<PixelFrame>& frame);
-  void makeBlankFrame(shared_ptr<PixelFrame>& frame);
+  static void makeBlankFrame(shared_ptr<PixelFrame>& frame);
   shared_ptr<PixelFrame> getFrame(bool inputNotConvertedFrame);
   void recycle(shared_ptr<PixelFrame>& frame, bool inputNotConvertedFrame);
   bool saveFrame(const CurrentRecord& record, const ContentBlock& contentBlock);

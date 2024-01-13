@@ -61,10 +61,10 @@ class PlayerWindow : public QMainWindow {
 
  private:
   PlayerUI player_;
-  QMenu* fileMenu_;
-  QMenu* layoutMenu_;
-  QMenu* orientationMenu_;
-  QMenu* textOverlayMenu_;
+  QMenu* fileMenu_{};
+  QMenu* layoutMenu_{};
+  QMenu* orientationMenu_{};
+  QMenu* textOverlayMenu_{};
   std::vector<std::unique_ptr<QAction>> layoutActions_;
 };
 
