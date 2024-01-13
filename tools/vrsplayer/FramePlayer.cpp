@@ -197,7 +197,8 @@ void FramePlayer::setBlankMode(bool blankOn) {
 }
 
 string FramePlayer::getFrameName(size_t index, const vrs::IndexRecord::RecordInfo& record) {
-  string extension = toString(imageFormat_);
+  string extension =
+      toString(imageFormat_ == vrs::ImageFormat::RAW ? vrs::ImageFormat::PNG : imageFormat_);
   return fmt::format(
       "{}-{:05}-{:.3f}.{}", record.streamId.getNumericName(), index, record.timestamp, extension);
 }
