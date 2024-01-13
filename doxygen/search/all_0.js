@@ -9,10 +9,10 @@ var searchData=
   ['adddeviceid_6',['addDeviceId',['../namespacevrs_1_1tag__conventions.html#af6414b6b6430f35cc640116adc42226f',1,'vrs::tag_conventions']]],
   ['addfirmwaredetails_7',['addFirmwareDetails',['../namespacevrs_1_1tag__conventions.html#ad9135ebbeceb88923b448684130e210a',1,'vrs::tag_conventions']]],
   ['addframedata_8',['addFrameData',['../classvrs_1_1_compressor.html#a9210b6c2c1205e2ad6292ed1f5835dbb',1,'vrs::Compressor']]],
-  ['addlegacyrecordformat_9',['addLegacyRecordFormat',['../classvrs_1_1_record_format_registrar.html#a6f1f36f52b7518cd4ac54182967e57df',1,'vrs::RecordFormatRegistrar::addLegacyRecordFormat()'],['../classvrs_1_1_legacy_formats_provider.html#a0fd1625faa9d4e7d13f5f360b0201596',1,'vrs::LegacyFormatsProvider::addLegacyRecordFormat()']]],
+  ['addlegacyrecordformat_9',['addLegacyRecordFormat',['../classvrs_1_1_record_format_registrar.html#a6f1f36f52b7518cd4ac54182967e57df',1,'vrs::RecordFormatRegistrar::addLegacyRecordFormat()'],['../classvrs_1_1_legacy_formats_provider.html#ab6595f29152bf85c091be234df374fba',1,'vrs::LegacyFormatsProvider::addLegacyRecordFormat()']]],
   ['addosfingerprint_10',['addOsFingerprint',['../namespacevrs_1_1tag__conventions.html#a308301349e9faf7f628dad11b4d8c39b',1,'vrs::tag_conventions']]],
   ['addrecordable_11',['addRecordable',['../classvrs_1_1_record_file_writer.html#aece09053cfb5ae3a9378db6e0ef9b180',1,'vrs::RecordFileWriter']]],
-  ['addrecordformat_12',['addRecordFormat',['../classvrs_1_1_recordable.html#a587f641ecdaedc396be59908878c9ed2',1,'vrs::Recordable::addRecordFormat()'],['../classvrs_1_1_record_format.html#a4bb88867e1f983ab46cf8cff83b4e69f',1,'vrs::RecordFormat::addRecordFormat()']]],
+  ['addrecordformat_12',['addRecordFormat',['../classvrs_1_1_recordable.html#aa801d89039dc4435461210f53e5c5c89',1,'vrs::Recordable::addRecordFormat()'],['../classvrs_1_1_record_format.html#a4bb88867e1f983ab46cf8cff83b4e69f',1,'vrs::RecordFormat::addRecordFormat()']]],
   ['addsoftwaredetails_13',['addSoftwareDetails',['../namespacevrs_1_1tag__conventions.html#a67ff625be83d2f948f1116fb04c51931',1,'vrs::tag_conventions']]],
   ['addtags_14',['addTags',['../classvrs_1_1_recordable.html#ac97c9ca729acf1dfe2673c114401c834',1,'vrs::Recordable::addTags(const map&lt; string, string &gt; &amp;newTags)'],['../classvrs_1_1_recordable.html#ae61b438be2513c28ad26dcd70f0fa193',1,'vrs::Recordable::addTags(const StreamTags &amp;tags)'],['../classvrs_1_1_record_file_writer.html#abb5d20c53fcd9e5c5bb309c0ace6e581',1,'vrs::RecordFileWriter::addTags()']]],
   ['addtagset_15',['addTagSet',['../namespacevrs_1_1tag__conventions.html#a476bbcbb15e95d2da63d23f91c9f76a1',1,'vrs::tag_conventions']]],
@@ -40,6 +40,6 @@ var searchData=
   ['audiostreamplayer_37',['AudioStreamPlayer',['../classvrs__sample__apps_1_1_audio_stream_player.html',1,'vrs_sample_apps']]],
   ['autodatalayout_38',['AutoDataLayout',['../classvrs_1_1_auto_data_layout.html',1,'vrs']]],
   ['autodatalayoutend_39',['AutoDataLayoutEnd',['../classvrs_1_1_auto_data_layout_end.html',1,'vrs']]],
-  ['autopurgerecords_40',['autoPurgeRecords',['../classvrs_1_1_record_file_writer.html#a77665871e7530751c50c44a55ba6fbc6',1,'vrs::RecordFileWriter']]],
-  ['autowriterecordsasync_41',['autoWriteRecordsAsync',['../classvrs_1_1_record_file_writer.html#a1cd69399fdcb69de42b95224068b674c',1,'vrs::RecordFileWriter']]]
+  ['autopurgerecords_40',['autoPurgeRecords',['../classvrs_1_1_record_file_writer.html#a99522ed232b7179766420ef32819b954',1,'vrs::RecordFileWriter']]],
+  ['autowriterecordsasync_41',['autoWriteRecordsAsync',['../classvrs_1_1_record_file_writer.html#a3456d07552e4834d658ba92f2ee7272d',1,'vrs::RecordFileWriter']]]
 ];

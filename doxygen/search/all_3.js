@@ -5,7 +5,7 @@ var searchData=
   ['datalayout_105',['DataLayout',['../classvrs_1_1_data_layout.html',1,'vrs']]],
   ['datalayoutbegin_106',['dataLayoutBegin',['../classvrs_1_1internal_1_1_data_layouter.html#ac0d333f3834c679854a7e64cbfea2916',1,'vrs::internal::DataLayouter']]],
   ['datalayoutblockreader_107',['DataLayoutBlockReader',['../classvrs_1_1_data_layout_block_reader.html',1,'vrs']]],
-  ['datalayoutchunk_108',['DataLayoutChunk',['../structvrs_1_1_data_layout_chunk.html#a9885dd4c942151bb3e850b44f1993901',1,'vrs::DataLayoutChunk::DataLayoutChunk(DataLayout &amp;dataLayout)'],['../structvrs_1_1_data_layout_chunk.html#ae603213778f6c2f2251fc98668709885',1,'vrs::DataLayoutChunk::DataLayoutChunk()'],['../structvrs_1_1_data_layout_chunk.html',1,'vrs::DataLayoutChunk']]],
+  ['datalayoutchunk_108',['DataLayoutChunk',['../structvrs_1_1_data_layout_chunk.html#a9885dd4c942151bb3e850b44f1993901',1,'vrs::DataLayoutChunk::DataLayoutChunk(DataLayout &amp;dataLayout)'],['../structvrs_1_1_data_layout_chunk.html#a0e3b361b86fbb52fc5dce6c6649541ba',1,'vrs::DataLayoutChunk::DataLayoutChunk()=default'],['../structvrs_1_1_data_layout_chunk.html',1,'vrs::DataLayoutChunk']]],
   ['datalayoutend_109',['dataLayoutEnd',['../classvrs_1_1internal_1_1_data_layouter.html#a6d4df5e07704d3051ec7f62fcb3d6f28',1,'vrs::internal::DataLayouter']]],
   ['datalayouter_110',['DataLayouter',['../classvrs_1_1internal_1_1_data_layouter.html',1,'vrs::internal']]],
   ['datalayoutpiecelabel_111',['dataLayoutPieceLabel',['../classvrs_1_1internal_1_1_data_layouter.html#ac7d311d1997a031bd461ee93e9b48efb',1,'vrs::internal::DataLayouter']]],

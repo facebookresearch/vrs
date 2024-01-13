@@ -118,8 +118,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ac937546f2c6f8c2841c927362ac7bbe5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a797755d90703adc2e866df76c58fcce2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_recordable.html#a797755d90703adc2e866df76c58fcce2">setCompression</a> (<a class="el" href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7b">CompressionPreset</a> preset)</td></tr>
 <tr class="separator:a797755d90703adc2e866df76c58fcce2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a587f641ecdaedc396be59908878c9ed2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_recordable.html#a587f641ecdaedc396be59908878c9ed2">addRecordFormat</a> (<a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> recordType, uint32_t formatVersion, const <a class="el" href="classvrs_1_1_record_format.html">RecordFormat</a> &amp;format, vector&lt; const <a class="el" href="classvrs_1_1_data_layout.html">DataLayout</a> * &gt; layouts={})</td></tr>
-<tr class="separator:a587f641ecdaedc396be59908878c9ed2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa801d89039dc4435461210f53e5c5c89"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_recordable.html#aa801d89039dc4435461210f53e5c5c89">addRecordFormat</a> (<a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> recordType, uint32_t formatVersion, const <a class="el" href="classvrs_1_1_record_format.html">RecordFormat</a> &amp;format, const vector&lt; const <a class="el" href="classvrs_1_1_data_layout.html">DataLayout</a> * &gt; &amp;layouts={})</td></tr>
+<tr class="separator:aa801d89039dc4435461210f53e5c5c89"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a08410f3e3269524fbc0e0773bd7b1f0d"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="classvrs_1_1_record.html">Record</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_recordable.html#a08410f3e3269524fbc0e0773bd7b1f0d">createConfigurationRecord</a> ()=0</td></tr>
 <tr class="separator:a08410f3e3269524fbc0e0773bd7b1f0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3017dbf8e9f3ce041552ad50697b872e"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="classvrs_1_1_record.html">Record</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_recordable.html#a3017dbf8e9f3ce041552ad50697b872e">createStateRecord</a> ()=0</td></tr>
@@ -220,7 +220,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>RecordFileWriter</b>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+<span class="mlabels"><span class="mlabel">explicit</span><span class="mlabel">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -236,8 +236,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>RecordFileWriter</b>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a587f641ecdaedc396be59908878c9ed2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a587f641ecdaedc396be59908878c9ed2">&#9670;&nbsp;</a></span>addRecordFormat()</h2>
+<a id="aa801d89039dc4435461210f53e5c5c89"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa801d89039dc4435461210f53e5c5c89">&#9670;&nbsp;</a></span>addRecordFormat()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -263,7 +263,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>RecordFileWriter</b>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">vector&lt; const <a class="el" href="classvrs_1_1_data_layout.html">DataLayout</a> * &gt;&#160;</td>
+          <td class="paramtype">const vector&lt; const <a class="el" href="classvrs_1_1_data_layout.html">DataLayout</a> * &gt; &amp;&#160;</td>
           <td class="paramname"><em>layouts</em> = <code>{}</code>&#160;</td>
         </tr>
         <tr>

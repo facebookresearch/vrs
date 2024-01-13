@@ -119,8 +119,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a4ddaf6a011bb1a64bd827f6d5b30a3e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a906335888ed3769039c1b2be493959b3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#a906335888ed3769039c1b2be493959b3">setCompressionThreadPoolSize</a> (size_t size=kMaxThreadPoolSizeForHW)</td></tr>
 <tr class="separator:a906335888ed3769039c1b2be493959b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a363eba543cf95745741d75c1d976ddff"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#a363eba543cf95745741d75c1d976ddff">setInitCreatedThreadCallback</a> (<a class="el" href="namespacevrs.html#a142c4b247fe86fb372c27f77d46e96b4">InitCreatedThreadCallback</a> initCreatedThreadCallback)</td></tr>
-<tr class="separator:a363eba543cf95745741d75c1d976ddff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a30ff88dda319f43410152dabcbad6959"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#a30ff88dda319f43410152dabcbad6959">setInitCreatedThreadCallback</a> (const <a class="el" href="namespacevrs.html#a142c4b247fe86fb372c27f77d46e96b4">InitCreatedThreadCallback</a> &amp;initCreatedThreadCallback)</td></tr>
+<tr class="separator:a30ff88dda319f43410152dabcbad6959"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad3a1faddddafd31345419dd1845533c1"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#ad3a1faddddafd31345419dd1845533c1">writeToFile</a> (const string &amp;filePath)</td></tr>
 <tr class="separator:ad3a1faddddafd31345419dd1845533c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c39b244d61c2784ac96504c2da8c94d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#a0c39b244d61c2784ac96504c2da8c94d">purgeOldRecords</a> (double maxTimestamp, bool recycleBuffers=true)</td></tr>
@@ -135,10 +135,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a71d708366d44df51c9c500a2852279ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abd37c181ccb84adaba5e67f0868b717c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#abd37c181ccb84adaba5e67f0868b717c">writeRecordsAsync</a> (double maxTimestamp)</td></tr>
 <tr class="separator:abd37c181ccb84adaba5e67f0868b717c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1cd69399fdcb69de42b95224068b674c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#a1cd69399fdcb69de42b95224068b674c">autoWriteRecordsAsync</a> (function&lt; double()&gt; maxTimestampProvider, double delay)</td></tr>
-<tr class="separator:a1cd69399fdcb69de42b95224068b674c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a77665871e7530751c50c44a55ba6fbc6"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#a77665871e7530751c50c44a55ba6fbc6">autoPurgeRecords</a> (function&lt; double()&gt; maxTimestampProvider, double delay)</td></tr>
-<tr class="separator:a77665871e7530751c50c44a55ba6fbc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3456d07552e4834d658ba92f2ee7272d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#a3456d07552e4834d658ba92f2ee7272d">autoWriteRecordsAsync</a> (const function&lt; double()&gt; &amp;maxTimestampProvider, double delay)</td></tr>
+<tr class="separator:a3456d07552e4834d658ba92f2ee7272d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99522ed232b7179766420ef32819b954"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#a99522ed232b7179766420ef32819b954">autoPurgeRecords</a> (const function&lt; double()&gt; &amp;maxTimestampProvider, double delay)</td></tr>
+<tr class="separator:a99522ed232b7179766420ef32819b954"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adf3a7ed71bdec9326a781aba2789828f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#adf3a7ed71bdec9326a781aba2789828f">isWriting</a> () const</td></tr>
 <tr class="separator:adf3a7ed71bdec9326a781aba2789828f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae13cabd33d9e7b2b7f7a97d52c13291a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#ae13cabd33d9e7b2b7f7a97d52c13291a">trackBackgroundThreadQueueByteSize</a> ()</td></tr>
@@ -175,7 +175,7 @@ unique_ptr&lt; <a class="el" href="classvrs_1_1_write_file_handler.html">WriteFi
 <tr class="memdesc:aa42829c98ee8c2f8317a641b5ee09daa"><td class="mdescLeft">&#160;</td><td class="mdescRight">data members valid while a file is being worked on <br /></td></tr>
 <tr class="separator:aa42829c98ee8c2f8317a641b5ee09daa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a45a490310a4d50f37b5cb7054b12b5ed"><td class="memItemLeft" align="right" valign="top"><a id="a45a490310a4d50f37b5cb7054b12b5ed"></a>
-uint64_t&#160;</td><td class="memItemRight" valign="bottom"><b>maxChunkSize_</b></td></tr>
+uint64_t&#160;</td><td class="memItemRight" valign="bottom"><b>maxChunkSize_</b> {}</td></tr>
 <tr class="separator:a45a490310a4d50f37b5cb7054b12b5ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a193b561b250c7d6691b22bb1a10d7993"><td class="memItemLeft" align="right" valign="top"><a id="a193b561b250c7d6691b22bb1a10d7993"></a>
 unique_ptr&lt; <a class="el" href="classvrs_1_1_new_chunk_handler.html">NewChunkHandler</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>newChunkHandler_</b></td></tr>
@@ -184,7 +184,7 @@ unique_ptr&lt; <a class="el" href="classvrs_1_1_new_chunk_handler.html">NewChunk
 <a class="el" href="structvrs_1_1_file_format_1_1_file_header.html">FileFormat::FileHeader</a>&#160;</td><td class="memItemRight" valign="bottom"><b>fileHeader_</b></td></tr>
 <tr class="separator:a2a809bf599a146dd331db0f6bc09fa64"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8eb551588a0ef6cd94d07505d49d0bab"><td class="memItemLeft" align="right" valign="top"><a id="a8eb551588a0ef6cd94d07505d49d0bab"></a>
-uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>lastRecordSize_</b></td></tr>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>lastRecordSize_</b> {}</td></tr>
 <tr class="separator:a8eb551588a0ef6cd94d07505d49d0bab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a07d63268827836fcf23a440603a7ed6f"><td class="memItemLeft" align="right" valign="top"><a id="a07d63268827836fcf23a440603a7ed6f"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>skipFinalizeIndexRecords_</b> = false</td></tr>
@@ -291,8 +291,8 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>::vrs::test::Record
 
 </div>
 </div>
-<a id="a77665871e7530751c50c44a55ba6fbc6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a77665871e7530751c50c44a55ba6fbc6">&#9670;&nbsp;</a></span>autoPurgeRecords()</h2>
+<a id="a99522ed232b7179766420ef32819b954"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a99522ed232b7179766420ef32819b954">&#9670;&nbsp;</a></span>autoPurgeRecords()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -300,7 +300,7 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>::vrs::test::Record
         <tr>
           <td class="memname">int vrs::RecordFileWriter::autoPurgeRecords </td>
           <td>(</td>
-          <td class="paramtype">function&lt; double()&gt;&#160;</td>
+          <td class="paramtype">const function&lt; double()&gt; &amp;&#160;</td>
           <td class="paramname"><em>maxTimestampProvider</em>, </td>
         </tr>
         <tr>
@@ -327,8 +327,8 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>::vrs::test::Record
 
 </div>
 </div>
-<a id="a1cd69399fdcb69de42b95224068b674c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1cd69399fdcb69de42b95224068b674c">&#9670;&nbsp;</a></span>autoWriteRecordsAsync()</h2>
+<a id="a3456d07552e4834d658ba92f2ee7272d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3456d07552e4834d658ba92f2ee7272d">&#9670;&nbsp;</a></span>autoWriteRecordsAsync()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -336,7 +336,7 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>::vrs::test::Record
         <tr>
           <td class="memname">int vrs::RecordFileWriter::autoWriteRecordsAsync </td>
           <td>(</td>
-          <td class="paramtype">function&lt; double()&gt;&#160;</td>
+          <td class="paramtype">const function&lt; double()&gt; &amp;&#160;</td>
           <td class="paramname"><em>maxTimestampProvider</em>, </td>
         </tr>
         <tr>
@@ -663,8 +663,8 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>::vrs::test::Record
 
 </div>
 </div>
-<a id="a363eba543cf95745741d75c1d976ddff"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a363eba543cf95745741d75c1d976ddff">&#9670;&nbsp;</a></span>setInitCreatedThreadCallback()</h2>
+<a id="a30ff88dda319f43410152dabcbad6959"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a30ff88dda319f43410152dabcbad6959">&#9670;&nbsp;</a></span>setInitCreatedThreadCallback()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -672,7 +672,7 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>::vrs::test::Record
         <tr>
           <td class="memname">void vrs::RecordFileWriter::setInitCreatedThreadCallback </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="namespacevrs.html#a142c4b247fe86fb372c27f77d46e96b4">InitCreatedThreadCallback</a>&#160;</td>
+          <td class="paramtype">const <a class="el" href="namespacevrs.html#a142c4b247fe86fb372c27f77d46e96b4">InitCreatedThreadCallback</a> &amp;&#160;</td>
           <td class="paramname"><em>initCreatedThreadCallback</em></td><td>)</td>
           <td></td>
         </tr>

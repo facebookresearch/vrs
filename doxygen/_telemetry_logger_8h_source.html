@@ -101,19 +101,19 @@ $(function() {
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <span class="keywordtype">string</span> operation;</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="keywordtype">string</span> sourceLocation;</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <a class="code" href="structvrs_1_1_operation_context.html">OperationContext</a>() {}</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <a class="code" href="structvrs_1_1_operation_context.html">OperationContext</a>() = <span class="keywordflow">default</span>;</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <a class="code" href="structvrs_1_1_operation_context.html">OperationContext</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; op, <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; sourceLoc)</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;      : operation{op}, sourceLocation{sourceLoc} {}</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <a class="code" href="structvrs_1_1_operation_context.html">OperationContext</a>(<span class="keyword">const</span> <a class="code" href="structvrs_1_1_operation_context.html">OperationContext</a>&amp; rhs)</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;      : operation{rhs.operation}, sourceLocation{rhs.sourceLocation} {}</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <a class="code" href="structvrs_1_1_operation_context.html">OperationContext</a>(<a class="code" href="structvrs_1_1_operation_context.html">OperationContext</a>&amp;&amp; rhs)</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <a class="code" href="structvrs_1_1_operation_context.html">OperationContext</a>(<a class="code" href="structvrs_1_1_operation_context.html">OperationContext</a>&amp;&amp; rhs) noexcept</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      : operation{std::move(rhs.operation)}, sourceLocation{std::move(rhs.sourceLocation)} {}</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keywordtype">bool</span> operator&lt;(<span class="keyword">const</span> <a class="code" href="structvrs_1_1_operation_context.html">OperationContext</a>&amp; rhs)<span class="keyword"> const </span>{</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keyword">auto</span> tie = [](<span class="keyword">const</span> <a class="code" href="structvrs_1_1_operation_context.html">OperationContext</a>&amp; oc) { <span class="keywordflow">return</span> std::tie(oc.operation, oc.sourceLocation); };</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordflow">return</span> tie(*<span class="keyword">this</span>) &lt; tie(rhs);</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  }</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <a class="code" href="structvrs_1_1_operation_context.html">OperationContext</a>&amp; operator=(<a class="code" href="structvrs_1_1_operation_context.html">OperationContext</a>&amp;&amp; rhs) {</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <a class="code" href="structvrs_1_1_operation_context.html">OperationContext</a>&amp; operator=(<a class="code" href="structvrs_1_1_operation_context.html">OperationContext</a>&amp;&amp; rhs) noexcept {</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    operation = std::move(rhs.operation);</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    sourceLocation = std::move(rhs.sourceLocation);</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
@@ -128,13 +128,13 @@ $(function() {
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      <span class="keyword">const</span> std::string&amp; message,</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">string</span>&amp; serverReply)</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;      : type{type}, operationContext{opContext}, message{message}, serverReply{serverReply} {}</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <a class="code" href="structvrs_1_1_log_event.html">LogEvent</a>(<a class="code" href="structvrs_1_1_log_event.html">LogEvent</a>&amp;&amp; rhs)</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <a class="code" href="structvrs_1_1_log_event.html">LogEvent</a>(<a class="code" href="structvrs_1_1_log_event.html">LogEvent</a>&amp;&amp; rhs) noexcept</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;      : type{std::move(rhs.type)},</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        operationContext{std::move(rhs.operationContext)},</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        message{std::move(rhs.message)},</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        serverReply{std::move(rhs.serverReply)} {}</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  <a class="code" href="structvrs_1_1_log_event.html">LogEvent</a>&amp; operator=(<a class="code" href="structvrs_1_1_log_event.html">LogEvent</a>&amp;&amp; rhs) {</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  <a class="code" href="structvrs_1_1_log_event.html">LogEvent</a>&amp; operator=(<a class="code" href="structvrs_1_1_log_event.html">LogEvent</a>&amp;&amp; rhs) noexcept {</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    type = std::move(rhs.type);</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    operationContext = std::move(rhs.operationContext);</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    message = std::move(rhs.message);</div>

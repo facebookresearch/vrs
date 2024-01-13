@@ -1,7 +1,7 @@
 var searchData=
 [
   ['datalayoutbegin_1103',['dataLayoutBegin',['../classvrs_1_1internal_1_1_data_layouter.html#ac0d333f3834c679854a7e64cbfea2916',1,'vrs::internal::DataLayouter']]],
-  ['datalayoutchunk_1104',['DataLayoutChunk',['../structvrs_1_1_data_layout_chunk.html#ae603213778f6c2f2251fc98668709885',1,'vrs::DataLayoutChunk::DataLayoutChunk()'],['../structvrs_1_1_data_layout_chunk.html#a9885dd4c942151bb3e850b44f1993901',1,'vrs::DataLayoutChunk::DataLayoutChunk(DataLayout &amp;dataLayout)']]],
+  ['datalayoutchunk_1104',['DataLayoutChunk',['../structvrs_1_1_data_layout_chunk.html#a0e3b361b86fbb52fc5dce6c6649541ba',1,'vrs::DataLayoutChunk::DataLayoutChunk()=default'],['../structvrs_1_1_data_layout_chunk.html#a9885dd4c942151bb3e850b44f1993901',1,'vrs::DataLayoutChunk::DataLayoutChunk(DataLayout &amp;dataLayout)']]],
   ['datalayoutend_1105',['dataLayoutEnd',['../classvrs_1_1internal_1_1_data_layouter.html#a6d4df5e07704d3051ec7f62fcb3d6f28',1,'vrs::internal::DataLayouter']]],
   ['datalayoutpiecelabel_1106',['dataLayoutPieceLabel',['../classvrs_1_1internal_1_1_data_layouter.html#ac7d311d1997a031bd461ee93e9b48efb',1,'vrs::internal::DataLayouter']]],
   ['datalayoutstructend_1107',['dataLayoutStructEnd',['../classvrs_1_1internal_1_1_data_layouter.html#a2c91e8f24b724cc90b6781837b6d890b',1,'vrs::internal::DataLayouter']]],

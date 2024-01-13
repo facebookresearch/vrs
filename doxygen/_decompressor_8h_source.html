@@ -130,7 +130,7 @@ $(function() {
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  <span class="keyword">class </span>ZstdDecompressor;</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  std::unique_ptr&lt;ZstdDecompressor&gt; zstdContext_;</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  std::vector&lt;uint8_t&gt; compressedBuffer_;</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  <a class="code" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a> compressionType_;</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;  <a class="code" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a> compressionType_{};</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  <span class="keywordtype">size_t</span> readSize_ = {};</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  <span class="keywordtype">size_t</span> decodedSize_ = {};</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;  <span class="keywordtype">size_t</span> lastResult_ = {};</div>

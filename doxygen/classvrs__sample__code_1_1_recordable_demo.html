@@ -69,6 +69,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="classvrs__sample__code_1_1_recordable_demo-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">vrs_sample_code::RecordableDemo Class Reference</div>  </div>
@@ -96,9 +97,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8138e384ae318a3f979573e2a46a7a99"><td class="memItemLeft" align="right" valign="top"><a id="a8138e384ae318a3f979573e2a46a7a99"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>createData</b> (uint32_t sensorValue)</td></tr>
 <tr class="separator:a8138e384ae318a3f979573e2a46a7a99"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6ba73d312764567495afad5d70bab940"><td class="memItemLeft" align="right" valign="top"><a id="a6ba73d312764567495afad5d70bab940"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>iNeedToRecordMoreData</b> ()</td></tr>
-<tr class="separator:a6ba73d312764567495afad5d70bab940"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa60ac6859b0cbaa1b3833f3ce95b01a0"><td class="memItemLeft" align="right" valign="top"><a id="aa60ac6859b0cbaa1b3833f3ce95b01a0"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>createMoreRecords</b> ()</td></tr>
 <tr class="separator:aa60ac6859b0cbaa1b3833f3ce95b01a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -117,8 +115,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>createMoreRecords</b>
 <tr class="separator:ac937546f2c6f8c2841c927362ac7bbe5 inherit pub_methods_classvrs_1_1_recordable"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a797755d90703adc2e866df76c58fcce2 inherit pub_methods_classvrs_1_1_recordable"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_recordable.html#a797755d90703adc2e866df76c58fcce2">setCompression</a> (<a class="el" href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7b">CompressionPreset</a> preset)</td></tr>
 <tr class="separator:a797755d90703adc2e866df76c58fcce2 inherit pub_methods_classvrs_1_1_recordable"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a587f641ecdaedc396be59908878c9ed2 inherit pub_methods_classvrs_1_1_recordable"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_recordable.html#a587f641ecdaedc396be59908878c9ed2">addRecordFormat</a> (<a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> recordType, uint32_t formatVersion, const <a class="el" href="classvrs_1_1_record_format.html">RecordFormat</a> &amp;format, vector&lt; const <a class="el" href="classvrs_1_1_data_layout.html">DataLayout</a> * &gt; layouts={})</td></tr>
-<tr class="separator:a587f641ecdaedc396be59908878c9ed2 inherit pub_methods_classvrs_1_1_recordable"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa801d89039dc4435461210f53e5c5c89 inherit pub_methods_classvrs_1_1_recordable"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_recordable.html#aa801d89039dc4435461210f53e5c5c89">addRecordFormat</a> (<a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> recordType, uint32_t formatVersion, const <a class="el" href="classvrs_1_1_record_format.html">RecordFormat</a> &amp;format, const vector&lt; const <a class="el" href="classvrs_1_1_data_layout.html">DataLayout</a> * &gt; &amp;layouts={})</td></tr>
+<tr class="separator:aa801d89039dc4435461210f53e5c5c89 inherit pub_methods_classvrs_1_1_recordable"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aba87b5b80ab4a4536e0d80ebf7157c38 inherit pub_methods_classvrs_1_1_recordable"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_recordable.html#aba87b5b80ab4a4536e0d80ebf7157c38">setCreateRecordDelegate</a> (<a class="el" href="classvrs_1_1_recordable.html#a6fb72295d3b60cc1ed3e571c158dec2a">CreateRecordDelegate</a> delegate)</td></tr>
 <tr class="separator:aba87b5b80ab4a4536e0d80ebf7157c38 inherit pub_methods_classvrs_1_1_recordable"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a56b5dbb294126e32a8f63a7d7c9ce652 inherit pub_methods_classvrs_1_1_recordable"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_recordable.html#a56b5dbb294126e32a8f63a7d7c9ce652">setTag</a> (const string &amp;tagName, const string &amp;tagValue)</td></tr>
@@ -136,11 +134,11 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>createMoreRecords</b>
 <tr class="memitem:a6f7d754b5dbb1a60997971db1d5a5c15 inherit pub_methods_classvrs_1_1_recordable"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classvrs_1_1_record_manager.html">RecordManager</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_recordable.html#a6f7d754b5dbb1a60997971db1d5a5c15">getRecordManager</a> ()</td></tr>
 <tr class="separator:a6f7d754b5dbb1a60997971db1d5a5c15 inherit pub_methods_classvrs_1_1_recordable"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
-Additional Inherited Members</h2></td></tr>
-<tr class="inherit_header pub_types_classvrs_1_1_recordable"><td colspan="2" onclick="javascript:toggleInherit('pub_types_classvrs_1_1_recordable')"><img src="closed.png" alt="-"/>&#160;Public Types inherited from <a class="el" href="classvrs_1_1_recordable.html">vrs::Recordable</a></td></tr>
-<tr class="memitem:a6fb72295d3b60cc1ed3e571c158dec2a inherit pub_types_classvrs_1_1_recordable"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_recordable.html#a6fb72295d3b60cc1ed3e571c158dec2a">CreateRecordDelegate</a> = std::function&lt; const <a class="el" href="classvrs_1_1_record.html">Record</a> *(<a class="el" href="classvrs_1_1_stream_id.html">StreamId</a> streamId, double timestamp, <a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> recordType, uint32_t recordFormatVersion, const <a class="el" href="classvrs_1_1_data_source.html">DataSource</a> &amp;data)&gt;</td></tr>
-<tr class="separator:a6fb72295d3b60cc1ed3e571c158dec2a inherit pub_types_classvrs_1_1_recordable"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a3d7a1ab6990109fc13a16f4b4d279f2d"><td class="memItemLeft" align="right" valign="top"><a id="a3d7a1ab6990109fc13a16f4b4d279f2d"></a>
+static bool&#160;</td><td class="memItemRight" valign="bottom"><b>iNeedToRecordMoreData</b> ()</td></tr>
+<tr class="separator:a3d7a1ab6990109fc13a16f4b4d279f2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_static_methods_classvrs_1_1_recordable"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_classvrs_1_1_recordable')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="classvrs_1_1_recordable.html">vrs::Recordable</a></td></tr>
 <tr class="memitem:ad3b2a8a571160b7dbf5136a2edeafa2d inherit pub_static_methods_classvrs_1_1_recordable"><td class="memItemLeft" align="right" valign="top">static const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_recordable.html#ad3b2a8a571160b7dbf5136a2edeafa2d">getOriginalNameTagName</a> ()</td></tr>
 <tr class="separator:ad3b2a8a571160b7dbf5136a2edeafa2d inherit pub_static_methods_classvrs_1_1_recordable"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -152,6 +150,12 @@ static const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a 
 <tr class="separator:a4e50574e4759508a13510ae6e7d74513 inherit pub_static_methods_classvrs_1_1_recordable"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2a7c86260e9094619a48601f41faabe2 inherit pub_static_methods_classvrs_1_1_recordable"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_recordable.html#a2a7c86260e9094619a48601f41faabe2">resetNewInstanceIds</a> ()</td></tr>
 <tr class="separator:a2a7c86260e9094619a48601f41faabe2 inherit pub_static_methods_classvrs_1_1_recordable"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pub_types_classvrs_1_1_recordable"><td colspan="2" onclick="javascript:toggleInherit('pub_types_classvrs_1_1_recordable')"><img src="closed.png" alt="-"/>&#160;Public Types inherited from <a class="el" href="classvrs_1_1_recordable.html">vrs::Recordable</a></td></tr>
+<tr class="memitem:a6fb72295d3b60cc1ed3e571c158dec2a inherit pub_types_classvrs_1_1_recordable"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_recordable.html#a6fb72295d3b60cc1ed3e571c158dec2a">CreateRecordDelegate</a> = std::function&lt; const <a class="el" href="classvrs_1_1_record.html">Record</a> *(<a class="el" href="classvrs_1_1_stream_id.html">StreamId</a> streamId, double timestamp, <a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> recordType, uint32_t recordFormatVersion, const <a class="el" href="classvrs_1_1_data_source.html">DataSource</a> &amp;data)&gt;</td></tr>
+<tr class="separator:a6fb72295d3b60cc1ed3e571c158dec2a inherit pub_types_classvrs_1_1_recordable"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classvrs_1_1_recordable"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classvrs_1_1_recordable')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classvrs_1_1_recordable.html">vrs::Recordable</a></td></tr>
 <tr class="memitem:a822a517531c5c44b21db59cde04eda09 inherit pro_methods_classvrs_1_1_recordable"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_recordable.html#a822a517531c5c44b21db59cde04eda09">Recordable</a> (<a class="el" href="namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5">RecordableTypeId</a> typeId, const string &amp;flavor={})</td></tr>
 <tr class="separator:a822a517531c5c44b21db59cde04eda09 inherit pro_methods_classvrs_1_1_recordable"><td class="memSeparator" colspan="2">&#160;</td></tr>

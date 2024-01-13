@@ -209,7 +209,7 @@ const map&lt; <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>, <a 
 <tr class="separator:a6fc3f6e58aba6d53e66dabeff41deb8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a35ecb4050743d4cfb0d979a8d6184e0d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a35ecb4050743d4cfb0d979a8d6184e0d">getRecordFormat</a> (<a class="el" href="classvrs_1_1_stream_id.html">StreamId</a> streamId, <a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> recordType, uint32_t formatVersion, <a class="el" href="classvrs_1_1_record_format.html">RecordFormat</a> &amp;outFormat) const</td></tr>
 <tr class="separator:a35ecb4050743d4cfb0d979a8d6184e0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a02976fb2d32461f5ed9a469b0bc644ac"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a02976fb2d32461f5ed9a469b0bc644ac">getRecordFormats</a> (<a class="el" href="classvrs_1_1_stream_id.html">StreamId</a> streamId, <a class="el" href="namespacevrs.html#a952b31358e6db377269e28e77ba53100">RecordFormatMap</a> &amp;outFormats) const</td></tr>
+<tr class="memitem:a02976fb2d32461f5ed9a469b0bc644ac"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a02976fb2d32461f5ed9a469b0bc644ac">getRecordFormats</a> (<a class="el" href="classvrs_1_1_stream_id.html">StreamId</a> streamId, <a class="el" href="namespacevrs.html#a04d155e698e82b4cd67ec9312fadefb0">RecordFormatMap</a> &amp;outFormats) const</td></tr>
 <tr class="separator:a02976fb2d32461f5ed9a469b0bc644ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5968d413f0e3e7ad69854c765c178afd"><td class="memItemLeft" align="right" valign="top"><a id="a5968d413f0e3e7ad69854c765c178afd"></a>
 std::unique_ptr&lt; <a class="el" href="classvrs_1_1_data_layout.html">DataLayout</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getDataLayout</b> (<a class="el" href="classvrs_1_1_stream_id.html">StreamId</a> streamId, const <a class="el" href="classvrs_1_1_content_block_id.html">ContentBlockId</a> &amp;blockId) const</td></tr>
@@ -221,10 +221,10 @@ std::unique_ptr&lt; <a class="el" href="classvrs_1_1_data_layout.html">DataLayou
 <tr class="memitem:a77ebf2a9c78c03470fcfcbe14cb902e6"><td class="memItemLeft" align="right" valign="top"><a id="a77ebf2a9c78c03470fcfcbe14cb902e6"></a>
 <a class="el" href="namespacevrs.html#acb1b4358038394407db2b2dc6200afae">CachingStrategy</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getCachingStrategy</b> () const</td></tr>
 <tr class="separator:a77ebf2a9c78c03470fcfcbe14cb902e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a31bf4c708cdda7ece8a771fc1d12381d"><td class="memItemLeft" align="right" valign="top"><a id="a31bf4c708cdda7ece8a771fc1d12381d"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a31bf4c708cdda7ece8a771fc1d12381d">setStatsCallback</a> (FileHandler::CacheStatsCallbackFunction statsCallback)</td></tr>
-<tr class="memdesc:a31bf4c708cdda7ece8a771fc1d12381d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set callback function for cache stats. <br /></td></tr>
-<tr class="separator:a31bf4c708cdda7ece8a771fc1d12381d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa8d0f022f92f9939090d18e824f4b312"><td class="memItemLeft" align="right" valign="top"><a id="aa8d0f022f92f9939090d18e824f4b312"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#aa8d0f022f92f9939090d18e824f4b312">setStatsCallback</a> (const FileHandler::CacheStatsCallbackFunction &amp;statsCallback)</td></tr>
+<tr class="memdesc:aa8d0f022f92f9939090d18e824f4b312"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set callback function for cache stats. <br /></td></tr>
+<tr class="separator:aa8d0f022f92f9939090d18e824f4b312"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a09e29787a837db9844b460fb1aa38eca"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a09e29787a837db9844b460fb1aa38eca">purgeFileCache</a> ()</td></tr>
 <tr class="separator:a09e29787a837db9844b460fb1aa38eca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abdc88304db2863c0ee09294e91c187dd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#abdc88304db2863c0ee09294e91c187dd">setFileHandler</a> (std::unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt; fileHandler)</td></tr>
@@ -921,7 +921,7 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="namespacevrs.html#a952b31358e6db377269e28e77ba53100">RecordFormatMap</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="namespacevrs.html#a04d155e698e82b4cd67ec9312fadefb0">RecordFormatMap</a> &amp;&#160;</td>
           <td class="paramname"><em>outFormats</em>&#160;</td>
         </tr>
         <tr>
