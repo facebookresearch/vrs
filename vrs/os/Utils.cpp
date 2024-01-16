@@ -68,6 +68,7 @@ constexpr auto kRegularFileType = boost::filesystem::file_type::regular_file;
 #endif
 
 using std::string;
+using std::vector;
 
 namespace vrs {
 namespace os {
