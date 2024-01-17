@@ -89,42 +89,40 @@ $(function() {
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#pragma once</span></div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &lt;functional&gt;</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &quot;WriteFileHandler.h&quot;</span></div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &quot;WriteFileHandler.h&quot;</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacevrs.html">vrs</a> {</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacevrs.html">vrs</a> {</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
-<div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="classvrs_1_1_new_chunk_handler.html">   29</a></span>&#160;<span class="keyword">class </span><a class="code" href="classvrs_1_1_new_chunk_handler.html">NewChunkHandler</a> {</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="keyword">virtual</span> ~<a class="code" href="classvrs_1_1_new_chunk_handler.html">NewChunkHandler</a>() = <span class="keywordflow">default</span>;</div>
-<div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="classvrs_1_1_new_chunk_handler.html#aba760eec0aa2b500632f3327a34f06c4">   41</a></span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classvrs_1_1_new_chunk_handler.html#aba760eec0aa2b500632f3327a34f06c4">newChunk</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; path, <span class="keywordtype">size_t</span> index, <span class="keywordtype">bool</span> isLastChunk) = 0;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;};</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno"><a class="line" href="classvrs_1_1_new_chunk_notifier.html">   49</a></span>&#160;<span class="keyword">class </span><a class="code" href="classvrs_1_1_new_chunk_notifier.html">NewChunkNotifier</a> {</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <a class="code" href="classvrs_1_1_new_chunk_notifier.html">NewChunkNotifier</a>(<a class="code" href="classvrs_1_1_write_file_handler.html">WriteFileHandler</a>&amp; file, <span class="keyword">const</span> std::unique_ptr&lt;NewChunkHandler&gt;&amp; chunkHandler)</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;      : chunkHandler_{chunkHandler.get()} {</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keywordflow">if</span> (chunkHandler_ != <span class="keyword">nullptr</span>) {</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;      file.<a class="code" href="classvrs_1_1_write_file_handler.html#afece8d46df881681dad2ed44bc73b5b3">getCurrentChunk</a>(path_, index_);</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    }</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  }</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <span class="keywordtype">void</span> notify(<span class="keywordtype">size_t</span> indexOffset = 0, <span class="keywordtype">bool</span> isLastChunk = <span class="keyword">false</span>) {</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keywordflow">if</span> (chunkHandler_ != <span class="keyword">nullptr</span>) {</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;      chunkHandler_-&gt;<a class="code" href="classvrs_1_1_new_chunk_handler.html#aba760eec0aa2b500632f3327a34f06c4">newChunk</a>(path_, index_ + indexOffset, isLastChunk);</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    }</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  }</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160; <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  <a class="code" href="classvrs_1_1_new_chunk_handler.html">NewChunkHandler</a>* chunkHandler_;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  <span class="keywordtype">string</span> path_;</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  <span class="keywordtype">size_t</span> index_{};</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;};</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;} <span class="comment">// namespace vrs</span></div>
-<div class="ttc" id="aclassvrs_1_1_new_chunk_handler_html"><div class="ttname"><a href="classvrs_1_1_new_chunk_handler.html">vrs::NewChunkHandler</a></div><div class="ttdoc">Listener to be notified when a new file chunk is finalized.</div><div class="ttdef"><b>Definition:</b> NewChunkHandler.h:29</div></div>
+<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="classvrs_1_1_new_chunk_handler.html">   27</a></span>&#160;<span class="keyword">class </span><a class="code" href="classvrs_1_1_new_chunk_handler.html">NewChunkHandler</a> {</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <span class="keyword">virtual</span> ~<a class="code" href="classvrs_1_1_new_chunk_handler.html">NewChunkHandler</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="classvrs_1_1_new_chunk_handler.html#aba760eec0aa2b500632f3327a34f06c4">   39</a></span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classvrs_1_1_new_chunk_handler.html#aba760eec0aa2b500632f3327a34f06c4">newChunk</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; path, <span class="keywordtype">size_t</span> index, <span class="keywordtype">bool</span> isLastChunk) = 0;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;};</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
+<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="classvrs_1_1_new_chunk_notifier.html">   47</a></span>&#160;<span class="keyword">class </span><a class="code" href="classvrs_1_1_new_chunk_notifier.html">NewChunkNotifier</a> {</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <a class="code" href="classvrs_1_1_new_chunk_notifier.html">NewChunkNotifier</a>(<a class="code" href="classvrs_1_1_write_file_handler.html">WriteFileHandler</a>&amp; file, <span class="keyword">const</span> std::unique_ptr&lt;NewChunkHandler&gt;&amp; chunkHandler)</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;      : chunkHandler_{chunkHandler.get()} {</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordflow">if</span> (chunkHandler_ != <span class="keyword">nullptr</span>) {</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;      file.<a class="code" href="classvrs_1_1_write_file_handler.html#afece8d46df881681dad2ed44bc73b5b3">getCurrentChunk</a>(path_, index_);</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    }</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  }</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <span class="keywordtype">void</span> notify(<span class="keywordtype">size_t</span> indexOffset = 0, <span class="keywordtype">bool</span> isLastChunk = <span class="keyword">false</span>) {</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keywordflow">if</span> (chunkHandler_ != <span class="keyword">nullptr</span>) {</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      chunkHandler_-&gt;<a class="code" href="classvrs_1_1_new_chunk_handler.html#aba760eec0aa2b500632f3327a34f06c4">newChunk</a>(path_, index_ + indexOffset, isLastChunk);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    }</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  }</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  <a class="code" href="classvrs_1_1_new_chunk_handler.html">NewChunkHandler</a>* chunkHandler_;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  <span class="keywordtype">string</span> path_;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  <span class="keywordtype">size_t</span> index_{};</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;};</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;} <span class="comment">// namespace vrs</span></div>
+<div class="ttc" id="aclassvrs_1_1_new_chunk_handler_html"><div class="ttname"><a href="classvrs_1_1_new_chunk_handler.html">vrs::NewChunkHandler</a></div><div class="ttdoc">Listener to be notified when a new file chunk is finalized.</div><div class="ttdef"><b>Definition:</b> NewChunkHandler.h:27</div></div>
 <div class="ttc" id="aclassvrs_1_1_new_chunk_handler_html_aba760eec0aa2b500632f3327a34f06c4"><div class="ttname"><a href="classvrs_1_1_new_chunk_handler.html#aba760eec0aa2b500632f3327a34f06c4">vrs::NewChunkHandler::newChunk</a></div><div class="ttdeci">virtual void newChunk(const string &amp;path, size_t index, bool isLastChunk)=0</div></div>
-<div class="ttc" id="aclassvrs_1_1_new_chunk_notifier_html"><div class="ttname"><a href="classvrs_1_1_new_chunk_notifier.html">vrs::NewChunkNotifier</a></div><div class="ttdoc">Helper to make new chunks notifications simpler and safer.</div><div class="ttdef"><b>Definition:</b> NewChunkHandler.h:49</div></div>
+<div class="ttc" id="aclassvrs_1_1_new_chunk_notifier_html"><div class="ttname"><a href="classvrs_1_1_new_chunk_notifier.html">vrs::NewChunkNotifier</a></div><div class="ttdoc">Helper to make new chunks notifications simpler and safer.</div><div class="ttdef"><b>Definition:</b> NewChunkHandler.h:47</div></div>
 <div class="ttc" id="aclassvrs_1_1_write_file_handler_html"><div class="ttname"><a href="classvrs_1_1_write_file_handler.html">vrs::WriteFileHandler</a></div><div class="ttdoc">The WriteFileHandler interface adds write operations to the FileHandler interface.</div><div class="ttdef"><b>Definition:</b> WriteFileHandler.h:40</div></div>
 <div class="ttc" id="aclassvrs_1_1_write_file_handler_html_afece8d46df881681dad2ed44bc73b5b3"><div class="ttname"><a href="classvrs_1_1_write_file_handler.html#afece8d46df881681dad2ed44bc73b5b3">vrs::WriteFileHandler::getCurrentChunk</a></div><div class="ttdeci">virtual bool getCurrentChunk(string &amp;outChunkPath, size_t &amp;outChunkIndex) const =0</div><div class="ttdoc">Get the path of the current chunk, or an empty string if no chunk is open.</div></div>
 <div class="ttc" id="anamespacevrs_html"><div class="ttname"><a href="namespacevrs.html">vrs</a></div><div class="ttdef"><b>Definition:</b> Compressor.cpp:86</div></div>
