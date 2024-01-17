@@ -61,7 +61,7 @@ class DataExtractor {
 
   class DataExtractorStreamPlayer : public utils::VideoRecordFormatStreamPlayer {
    public:
-    DataExtractorStreamPlayer(std::ofstream& output, const string& outputFolder);
+    DataExtractorStreamPlayer(std::ofstream& output, string outputFolder);
     bool onDataLayoutRead(const CurrentRecord&, size_t blockIndex, DataLayout&) override;
     bool onImageRead(const CurrentRecord&, size_t blockIndex, const ContentBlock&) override;
     bool onAudioRead(const CurrentRecord& record, size_t, const ContentBlock& audioBlock) override;
