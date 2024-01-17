@@ -16,6 +16,8 @@
 
 #include "DataExtractor.h"
 
+#include <utility>
+
 #include <fmt/format.h>
 
 #define DEFAULT_LOG_CHANNEL "DataExtractor"
@@ -39,8 +41,8 @@ using namespace vrs;
 
 DataExtractor::DataExtractorStreamPlayer::DataExtractorStreamPlayer(
     ofstream& output,
-    const string& outputFolder)
-    : output_{output}, outputFolder_{outputFolder} {}
+    string outputFolder)
+    : output_{output}, outputFolder_{std::move(outputFolder)} {}
 
 bool DataExtractor::DataExtractorStreamPlayer::writeImage(
     const CurrentRecord& record,

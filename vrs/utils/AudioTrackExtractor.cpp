@@ -16,8 +16,8 @@
 
 #include "AudioTrackExtractor.h"
 
-#include <iostream>
 #include <limits>
+#include <utility>
 
 #define DEFAULT_LOG_CHANNEL "AudioTrackExtractor"
 #include <logging/Log.h>
@@ -37,8 +37,10 @@ using namespace vrs::helpers;
 
 namespace vrs::utils {
 
-AudioTrackExtractor::AudioTrackExtractor(const string& wavFilePath, bool& outStop)
-    : wavFilePath_{wavFilePath}, stop_{outStop}, fileAudioSpec_{AudioFormat::UNDEFINED} {}
+AudioTrackExtractor::AudioTrackExtractor(string wavFilePath, bool& outStop)
+    : wavFilePath_{std::move(wavFilePath)},
+      stop_{outStop},
+      fileAudioSpec_{AudioFormat::UNDEFINED} {}
 
 AudioTrackExtractor::~AudioTrackExtractor() {
   AudioExtractor::closeWavFile(wavFile_);

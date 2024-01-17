@@ -24,7 +24,7 @@ namespace vrs::utils {
 
 class AudioTrackExtractor : public RecordFormatStreamPlayer {
  public:
-  AudioTrackExtractor(const string& wavFilePath, bool& outStop);
+  AudioTrackExtractor(string wavFilePath, bool& outStop);
   ~AudioTrackExtractor() override;
 
   bool onAudioRead(const CurrentRecord& record, size_t, const ContentBlock& audioBlock) override;

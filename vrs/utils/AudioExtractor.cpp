@@ -18,6 +18,7 @@
 
 #include <array>
 #include <iostream>
+#include <utility>
 
 #define DEFAULT_LOG_CHANNEL "AudioExtractor"
 #include <logging/Log.h>
@@ -136,8 +137,8 @@ int AudioExtractor::closeWavFile(DiskFile& inFile) {
   return inFile.close();
 }
 
-AudioExtractor::AudioExtractor(const string& folderPath, StreamId id, uint32_t& counter)
-    : folderPath_{folderPath},
+AudioExtractor::AudioExtractor(string folderPath, StreamId id, uint32_t& counter)
+    : folderPath_{std::move(folderPath)},
       id_{id},
       cumulativeOutputAudioFileCount_{counter},
       currentAudioContentBlockSpec_{AudioFormat::UNDEFINED} {}

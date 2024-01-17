@@ -144,6 +144,7 @@ class Record final {
 
   /// Public for testing
   struct uninitialized_byte final {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, modernize-use-equals-default)
     uninitialized_byte() {} // do not use '= default' as it will initialize byte!
     uint8_t byte;
   };

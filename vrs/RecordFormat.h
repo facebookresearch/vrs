@@ -163,6 +163,7 @@ class ImageContentBlockSpec {
       uint32_t keyFrameIndex = 0);
 
   /// Image formats with encoding (png, jpeg, etc).
+  // NOLINTNEXTLINE(hicpp-explicit-conversions)
   ImageContentBlockSpec(ImageFormat imageFormat, uint32_t width = 0, uint32_t height = 0);
 
   /// Raw pixels image formats.
@@ -343,6 +344,7 @@ class AudioContentBlockSpec {
   /// For audio formats with encoding (mp3, flac, etc).
   explicit AudioContentBlockSpec(AudioFormat audioFormat, uint8_t channelCount = 0);
   /// For PCM audio formats.
+  // NOLINTNEXTLINE(hicpp-explicit-conversions)
   AudioContentBlockSpec(
       AudioSampleFormat sampleFormat,
       uint8_t channelCount = 0,
@@ -479,12 +481,14 @@ class ContentBlock {
   static const size_t kSizeUnknown;
 
   /// Very generic block description.
+  // NOLINTNEXTLINE(hicpp-explicit-conversions)
   ContentBlock(ContentType type = ContentType::EMPTY, size_t size = kSizeUnknown);
 
   /// Factory-style reconstruct from persisted description as string on disk.
   explicit ContentBlock(const string& formatStr);
 
   /// Image formats with encoding (png, jpeg, etc).
+  // NOLINTNEXTLINE(hicpp-explicit-conversions)
   ContentBlock(ImageFormat imageFormat, uint32_t width = 0, uint32_t height = 0);
 
   /// Image formats with custom codec encoding.
@@ -505,6 +509,7 @@ class ContentBlock {
       uint32_t stride = 0,
       uint32_t stride2 = 0);
 
+  // NOLINTNEXTLINE(hicpp-explicit-conversions)
   ContentBlock(const ImageContentBlockSpec& imageSpec, size_t size = kSizeUnknown);
   ContentBlock(
       const ContentBlock& imageContentBlock,
@@ -512,9 +517,11 @@ class ContentBlock {
       uint32_t keyFrameIndex);
 
   /// Very generic audio block description.
+  // NOLINTNEXTLINE(hicpp-explicit-conversions)
   ContentBlock(AudioFormat audioFormat, uint8_t channelCount = 0);
 
   /// PCM audio block description.
+  // NOLINTNEXTLINE(hicpp-explicit-conversions)
   ContentBlock(
       AudioSampleFormat sampleFormat,
       uint8_t numChannels = 0,
@@ -645,25 +652,30 @@ class RecordFormat {
   /// Empty record format definition.
   RecordFormat() = default;
   /// Default copy constructor
+  // NOLINTNEXTLINE(hicpp-explicit-conversions)
   RecordFormat(const RecordFormat&) = default;
 
   /// Build a RecordFormat from a string description.
   /// This constructor is meant for internal VRS usage only.
   /// @internal
+  // NOLINTNEXTLINE(hicpp-explicit-conversions)
   RecordFormat(const string& format) {
     set(format);
   }
   /// Build a RecordFormat from a string description.
   /// This constructor is meant for internal VRS usage only.
   /// @internal
+  // NOLINTNEXTLINE(hicpp-explicit-conversions)
   RecordFormat(const char* format) {
     set(format);
   }
   /// Build a RecordFormat from a single ContentBlock.
+  // NOLINTNEXTLINE(hicpp-explicit-conversions)
   RecordFormat(const ContentBlock& block) {
     blocks_.emplace_back(block);
   }
   /// Build a RecordFormat from a single ContentBlock.
+  // NOLINTNEXTLINE(hicpp-explicit-conversions)
   RecordFormat(ContentBlock&& block) {
     blocks_.emplace_back(block);
   }
@@ -681,6 +693,7 @@ class RecordFormat {
   /// @param type: Content type of the block.
   /// @param size: Size of the block, or ContentBlock::kSizeUnknown, if the size of the block isn't
   /// known/fixed.
+  // NOLINTNEXTLINE(hicpp-explicit-conversions)
   RecordFormat(ContentType type, size_t size = ContentBlock::kSizeUnknown) {
     blocks_.emplace_back(type, size);
   }

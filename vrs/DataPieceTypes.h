@@ -36,12 +36,14 @@ using std::size_t;
 /// https://stackoverflow.com/questions/17794569/why-isnt-vectorbool-a-stl-container
 class Bool {
  public:
-  /*implicit*/ Bool(bool value = false) : value_(value) {}
+  // NOLINTNEXTLINE(hicpp-explicit-conversions)
+  Bool(bool value = false) : value_(value) {}
   Bool& operator=(bool value) {
     value_ = value;
     return *this;
   }
-  /*implicit*/ operator bool() const {
+  // NOLINTNEXTLINE(hicpp-explicit-conversions)
+  operator bool() const {
     return value_;
   }
   const bool* operator&() const {
@@ -77,7 +79,8 @@ struct PointND {
   static constexpr size_t kSize = N;
 
   PointND() : dim{} {}
-  /*implicit*/ PointND(const T arr[N]) {
+  // NOLINTNEXTLINE(hicpp-explicit-conversions)
+  PointND(const T arr[N]) {
     operator=(arr);
   }
 
@@ -179,7 +182,8 @@ struct MatrixND {
   static constexpr size_t kMatrixSize = N;
 
   MatrixND() = default;
-  /*implicit*/ MatrixND(const T arr[N][N]) {
+  // NOLINTNEXTLINE(hicpp-explicit-conversions)
+  MatrixND(const T arr[N][N]) {
     operator=(arr);
   }
 

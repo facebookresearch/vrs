@@ -73,7 +73,7 @@ class DataReference {
   /// @param data: Pointer to second block of bytes.
   /// @param size: Size of second block of bytes.
   template <class T>
-  DataReference(vector<T>& vectorT, void* data = nullptr, uint32_t size = 0)
+  explicit DataReference(vector<T>& vectorT, void* data = nullptr, uint32_t size = 0)
       : DataReference(
             vectorT.data(),
             static_cast<uint32_t>(sizeof(T) * vectorT.size()),
@@ -104,7 +104,7 @@ class DataReference {
   /// @param data: Pointer to second block of bytes.
   /// @param size: Size of second block of bytes.
   template <class T>
-  DataReference(T& object, void* data = nullptr, uint32_t size = 0)
+  explicit DataReference(T& object, void* data = nullptr, uint32_t size = 0)
       : DataReference(&object, sizeof(T), data, size) {}
 
   /// @param data1: Pointer to first block of bytes.

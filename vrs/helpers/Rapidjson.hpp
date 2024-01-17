@@ -45,9 +45,11 @@ using JValue = vrs_rapidjson::GenericValue<JUtf8Encoding, JCrtAllocator>;
 using JStringRef = vrs_rapidjson::GenericStringRef<char>;
 
 static inline JStringRef jStringRef(const char* str) {
+  // NOLINTNEXTLINE(modernize-return-braced-init-list)
   return JStringRef(str, strlen(str));
 }
 static inline JStringRef jStringRef(const string& str) {
+  // NOLINTNEXTLINE(modernize-return-braced-init-list)
   return JStringRef(str.c_str(), str.size());
 }
 template <class T>

@@ -27,7 +27,7 @@ namespace vrs::utils {
 
 class AudioExtractor : public RecordFormatStreamPlayer {
  public:
-  AudioExtractor(const string& folderPath, StreamId id, uint32_t& counter);
+  AudioExtractor(string folderPath, StreamId id, uint32_t& counter);
 
   ~AudioExtractor() override;
 

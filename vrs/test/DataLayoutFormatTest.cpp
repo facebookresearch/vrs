@@ -350,6 +350,7 @@ TEST_F(DataLayoutFormatTester, DataLayoutFormatTest) {
   os::remove(fileName);
 }
 
+// NOLINTNEXTLINE(modernize-macro-to-enum)
 #define SAMPLE_EPOCH_TIME 2000000000
 
 TEST_F(DataLayoutFormatTester, FormatValuesTest) {

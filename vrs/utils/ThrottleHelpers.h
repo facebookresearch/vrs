@@ -30,7 +30,7 @@ class ThrottledFileDelegate;
 /// using a RecordFileWriter object.
 class ThrottledWriter {
  public:
-  ThrottledWriter(const CopyOptions& options);
+  explicit ThrottledWriter(const CopyOptions& options);
   ThrottledWriter(const CopyOptions& options, ThrottledFileDelegate& fileDelegate);
 
   /// Init writer with latest copy options values (if they were changed since constructor)

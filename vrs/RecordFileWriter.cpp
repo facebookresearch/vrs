@@ -148,15 +148,9 @@ struct CompressionThreadsData {
 // structure holding the background save thread's data, if any
 struct WriterThreadData {
   WriterThreadData()
-      : fileError{0},
-        shouldEndThread{false},
-        writeEventChannel{
+      : writeEventChannel{
             "WriterThreadDataWriteEventChannel",
-            os::EventChannel::NotificationMode::UNICAST},
-        hasRecordsReadyToWrite{false},
-        maxTimestampProvider{nullptr},
-        autoCollectDelay{0},
-        nextAutoCollectTime{0} {
+            os::EventChannel::NotificationMode::UNICAST} {
     // Do *not* start the thread here, as this will create race conditions.
     // The thread may start before the constructor even finished and returned, which means the
     // main thread may not even have a reference to this object.
@@ -168,15 +162,15 @@ struct WriterThreadData {
     }
   }
 
-  atomic<int> fileError; // 0, or last write error
-  atomic<bool> shouldEndThread; // set when this thread should finish-up & end
+  atomic<int> fileError{}; // 0, or last write error
+  atomic<bool> shouldEndThread{}; // set when this thread should finish-up & end
   os::EventChannel writeEventChannel; // wake the background thread to write prepared records
 
   recursive_mutex mutex; // mutex to protect access to the following fields
-  RecordFileWriter::RecordBatches recordsReadyToWrite;
-  atomic<bool> hasRecordsReadyToWrite;
+  RecordFileWriter::RecordBatches recordsReadyToWrite{};
+  atomic<bool> hasRecordsReadyToWrite{};
   function<double()> maxTimestampProvider; // for auto-writing records
-  atomic<double> autoCollectDelay; // for auto-writing records
+  atomic<double> autoCollectDelay{}; // for auto-writing records
   double nextAutoCollectTime{}; // for auto-writing records
 
   CompressionThreadsData compressionThreadsData_;

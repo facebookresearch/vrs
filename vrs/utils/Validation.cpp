@@ -666,9 +666,7 @@ class RecordMaster : public StreamPlayer {
         id_{matchingId},
         reader_{matchingReader},
         holder_{holder},
-        index_{reader_.getIndex(id_)},
-        lastRecord_{0},
-        readCounter_{0} {}
+        index_{reader_.getIndex(id_)} {}
   bool processRecordHeader(const CurrentRecord& record, DataReference& outDataReference) override {
     buffer_.resize(record.recordSize);
     outDataReference.useVector(buffer_);

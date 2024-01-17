@@ -40,7 +40,8 @@ struct TagOverrider {
 
 // Optional parameters for copy (or merge) operations, to override defaults
 struct CopyOptions {
-  CopyOptions(bool showProgress = true) : showProgress{showProgress} {}
+  CopyOptions() = default;
+  explicit CopyOptions(bool showProgress) : showProgress{showProgress} {}
   CopyOptions(const CopyOptions& rhs);
 
   // Compression preset of the output file. Use this method to set the user's explicit choice.
@@ -164,7 +165,7 @@ class ContentBlockChunk : public ContentChunk {
 
 class FilteredChunksSource : public DataSource {
  public:
-  FilteredChunksSource(deque<unique_ptr<ContentChunk>>& chunks)
+  explicit FilteredChunksSource(deque<unique_ptr<ContentChunk>>& chunks)
       : DataSource(getFilteredChunksSize(chunks)), chunks_{chunks} {}
   void copyTo(uint8_t* buffer) const override;
 

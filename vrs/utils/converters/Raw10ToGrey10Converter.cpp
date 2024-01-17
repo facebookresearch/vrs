@@ -62,7 +62,7 @@ void convertVectorized(
   if (contiguous) {
     const int numFullOperations = (heightInPixels * widthInPixels) / 8;
     // The width must be a multiple of 4, so there is at most one leftover pixel group.
-    bool hasLeftover = (heightInPixels * widthInPixels) % 8 ? true : false;
+    bool hasLeftover = (heightInPixels * widthInPixels) % 8;
     for (int op = 0; op < numFullOperations; ++op) {
       const uint8x16_t encoded = vld1q_u8(src);
       const uint8x16_t r = vqtbl1q_u8(encoded, rshuf);

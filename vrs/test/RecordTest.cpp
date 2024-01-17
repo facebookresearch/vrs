@@ -292,6 +292,7 @@ static uint8_t f(uint8_t k) {
 const size_t kSize = 9; // odd, to expose padding issues
 
 union ArrayUnion {
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
   ArrayUnion() {} // required, do not use '= default' which would initialize the fields!
   Record::uninitialized_byte uninitialized_bytes[kSize];
   uint8_t initialized_bytes[kSize];
