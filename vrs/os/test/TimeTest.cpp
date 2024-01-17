@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-#include <memory>
-
 #include <gtest/gtest.h>
 
 #include <vrs/os/Time.h>

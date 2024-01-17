@@ -19,7 +19,6 @@
 #include <cstdint>
 
 #include <map>
-#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -39,10 +38,10 @@ using std::vector;
 /// Additional properties may be specified in the extras field, which has helper methods.
 struct FileSpec {
   FileSpec() = default;
-  FileSpec(const string& filehandler, const vector<string>& chunks)
-      : fileHandlerName{filehandler}, chunks{chunks} {}
-  FileSpec(const string& filehandler, const vector<string>&& chunks)
-      : fileHandlerName{filehandler}, chunks{chunks} {}
+  FileSpec(string filehandler, const vector<string>& chunks)
+      : fileHandlerName{std::move(filehandler)}, chunks{chunks} {}
+  FileSpec(string filehandler, const vector<string>&& chunks)
+      : fileHandlerName{std::move(filehandler)}, chunks{chunks} {}
   explicit FileSpec(const vector<string>& chunks) : chunks{chunks} {}
   explicit FileSpec(vector<string>&& chunks) : chunks{std::move(chunks)} {}
 

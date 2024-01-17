@@ -26,7 +26,6 @@
 
 #elif IS_MAC_PLATFORM()
 #include <sys/sysctl.h>
-#include <cerrno>
 
 #elif IS_LINUX_PLATFORM()
 #include <sys/utsname.h>

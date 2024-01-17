@@ -15,14 +15,15 @@
  */
 
 #include "Recordable.h"
-#include "DataLayout.h"
-#include "RecordFormat.h"
 
 #define DEFAULT_LOG_CHANNEL "Recordable"
 #include <logging/Checks.h>
 #include <logging/Log.h>
 
 #include <vrs/os/System.h>
+
+#include "DataLayout.h"
+#include "RecordFormat.h"
 
 using namespace std;
 

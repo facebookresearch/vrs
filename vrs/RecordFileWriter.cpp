@@ -372,7 +372,7 @@ void RecordFileWriter::backgroundWriterThreadActivity() {
 
   while (!writerThreadData_->shouldEndThread) {
     double waitDelay = writerThreadData_->getBackgroundThreadWaitTime();
-    os::EventChannel::Event event;
+    os::EventChannel::Event event{};
     os::EventChannel::Status status =
         writerThreadData_->writeEventChannel.waitForEvent(event, waitDelay);
     if (status == os::EventChannel::Status::SUCCESS) {
@@ -463,7 +463,7 @@ void RecordFileWriter::backgroundPurgeThreadActivity() {
         purgeOldRecords(maxTimestamp);
       }
     }
-    os::EventChannel::Event event;
+    os::EventChannel::Event event{};
     status = purgeThreadData_->purgeEventChannel.waitForEvent(event, waitDelay);
   }
   if (status != os::EventChannel::Status::SUCCESS && status != os::EventChannel::Status::TIMEOUT) {
@@ -717,7 +717,7 @@ uint64_t RecordFileWriter::collectOldRecords(RecordBatch& batch, double maxTimes
 /// This class doesn't not modify the list, simply iterating on it.
 class RecordList {
  public:
-  RecordList(const pair<StreamId, list<Record*>>& deviceRecords)
+  explicit RecordList(const pair<StreamId, list<Record*>>& deviceRecords)
       : deviceRecords_{&deviceRecords}, iter_{deviceRecords.second.begin()} {}
   RecordList(const RecordList& rhs) = default;
   RecordList& operator=(const RecordList& rhs) = default;

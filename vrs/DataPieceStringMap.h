@@ -19,8 +19,6 @@
 #ifndef DATA_PIECES_STRING_MAP_H
 #define DATA_PIECES_STRING_MAP_H
 
-#include <cstring>
-
 #ifndef DATA_PIECES_H
 #include "DataPieces.h"
 #endif

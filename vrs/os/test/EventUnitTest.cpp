@@ -117,7 +117,7 @@ void dispatchEvents(void* data, bool synchronous) {
     this_thread::sleep_for(chrono::duration<double>(i.first));
     if (synchronous) {
       // waiting for an event has the effect of completing any previous wakeups
-      EventChannel::Event e;
+      EventChannel::Event e{};
       EXPECT_EQ(EventChannel::Status::TIMEOUT, test->testEventChannel->waitForEvent(e, 0.0, 0.0));
     }
     test->testEventChannel->dispatchEvent(i.second);
@@ -127,7 +127,7 @@ void dispatchEvents(void* data, bool synchronous) {
 void waitOnEvents(void* data, const vector<double>& waitIntervals) {
   EventTest* test = static_cast<EventTest*>(data);
   test->waitForLaunch();
-  EventChannel::Event event;
+  EventChannel::Event event{};
   for (auto interval : waitIntervals) {
     this_thread::sleep_for(chrono::duration<double>(interval));
     EventChannel::Status status =
@@ -259,7 +259,7 @@ TEST_F(EventTest, MultipleListenersUnicast) {
   }
   launch();
 
-  EventChannel::Event event;
+  EventChannel::Event event{};
   EventChannel::Status status =
       testEventChannel->waitForEvent(event, EventChannel::kInfiniteTimeout);
   EXPECT_EQ(EventChannel::Status::SUCCESS, status);
@@ -277,7 +277,7 @@ TEST_F(EventTest, MultipleListenersBroadcast) {
   }
   launch();
 
-  EventChannel::Event event;
+  EventChannel::Event event{};
   EventChannel::Status status =
       testEventChannel->waitForEvent(event, EventChannel::kInfiniteTimeout);
   EXPECT_EQ(EventChannel::Status::SUCCESS, status);

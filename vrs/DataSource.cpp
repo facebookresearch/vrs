@@ -18,9 +18,9 @@
 
 #include <cstring>
 
-#include "DataLayout.h"
-
 #include <logging/Checks.h>
+
+#include "DataLayout.h"
 
 namespace vrs {
 

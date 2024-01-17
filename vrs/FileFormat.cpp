@@ -16,9 +16,10 @@
 
 #include "FileFormat.h"
 
+#include <ctime>
+
 #include <algorithm>
 #include <chrono>
-#include <ctime>
 #include <iomanip>
 #include <iostream>
 #include <random>
@@ -28,6 +29,7 @@
 #include <logging/Verify.h>
 
 #include <vrs/helpers/FileMacros.h>
+
 #include "ErrorCode.h"
 #include "IndexRecord.h"
 

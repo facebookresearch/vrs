@@ -24,7 +24,6 @@
 
 #include "Compressor.h"
 #include "DataSource.h"
-#include "ErrorCode.h"
 #include "FileFormat.h"
 #include "RecordManager.h"
 

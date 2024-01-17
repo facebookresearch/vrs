@@ -18,6 +18,7 @@
 
 #include <array>
 #include <iomanip>
+#include <iostream>
 
 #define DEFAULT_LOG_CHANNEL "FilterCopy"
 #include <logging/Log.h>

@@ -16,6 +16,8 @@
 
 #include "PrintRecordFormatRecords.h"
 
+#include <iostream>
+
 #include <fmt/format.h>
 
 #include <vrs/RecordFormatStreamPlayer.h>

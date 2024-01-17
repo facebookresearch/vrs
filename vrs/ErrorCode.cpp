@@ -16,13 +16,13 @@
 
 #include <vrs/ErrorCode.h>
 
-#define DEFAULT_LOG_CHANNEL "ErrorCode"
-
 #include <map>
 #include <mutex>
 #include <string>
 
+#define DEFAULT_LOG_CHANNEL "ErrorCode"
 #include <logging/Log.h>
+
 #include <vrs/os/Utils.h>
 
 using namespace std;

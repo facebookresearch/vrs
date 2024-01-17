@@ -47,7 +47,7 @@ class EventChannel {
   /// Construct EventChannel.
   /// @param notificationMode: whether event can be unicasted or broadcasted
   /// @param name: name of event. name should better be unique but nothing enforces that.
-  EventChannel(const std::string& name, NotificationMode notificationMode);
+  EventChannel(std::string name, NotificationMode notificationMode);
   ~EventChannel();
 
   /// Fires an event instance to listener(s).

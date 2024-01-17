@@ -17,6 +17,7 @@
 #include "ThrottleHelpers.h"
 
 #include <iomanip>
+#include <iostream>
 
 #include <vrs/helpers/Strings.h>
 #include <vrs/os/Time.h>

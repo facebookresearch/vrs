@@ -29,6 +29,7 @@
 #include <logging/Log.h>
 
 #include <vrs/helpers/FileMacros.h>
+
 #include "ErrorCode.h"
 #include "FileHandler.h"
 #include "Record.h"

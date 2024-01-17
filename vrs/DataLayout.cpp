@@ -23,9 +23,7 @@
 #pragma warning(disable : 4800)
 #endif
 
-#include <algorithm>
 #include <iomanip>
-#include <memory>
 #include <mutex>
 #include <sstream>
 

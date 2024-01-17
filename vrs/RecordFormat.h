@@ -157,7 +157,7 @@ class ImageContentBlockSpec {
       uint32_t height = 0,
       uint32_t stride = 0,
       uint32_t stride2 = 0,
-      const string& codecName = {},
+      string codecName = {},
       uint8_t codecQuality = kQualityUndefined,
       double keyFrameTimestamp = kInvalidTimestamp,
       uint32_t keyFrameIndex = 0);
@@ -176,7 +176,7 @@ class ImageContentBlockSpec {
 
   /// Video image with codec.
   ImageContentBlockSpec(
-      const string& codecName,
+      string codecName,
       uint8_t codecQuality,
       PixelFormat pixelFormat,
       uint32_t width,

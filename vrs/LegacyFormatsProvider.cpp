@@ -19,8 +19,6 @@
 #include "DataLayout.h"
 #include "DataPieces.h"
 
-#include <algorithm>
-
 #define DEFAULT_LOG_CHANNEL "LegacyFormatsProvider"
 #include <logging/Log.h>
 

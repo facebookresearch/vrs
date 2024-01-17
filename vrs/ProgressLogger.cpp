@@ -21,6 +21,7 @@
 
 #define DEFAULT_LOG_CHANNEL "ProgressLogger"
 #include <logging/Log.h>
+
 #include <vrs/helpers/Strings.h>
 #include <vrs/os/Time.h>
 

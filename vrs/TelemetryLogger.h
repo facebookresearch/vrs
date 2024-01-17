@@ -18,7 +18,6 @@
 
 #include <memory>
 #include <string>
-#include <vector>
 
 namespace vrs {
 
@@ -30,10 +29,9 @@ struct OperationContext {
   string sourceLocation;
 
   OperationContext() = default;
-  OperationContext(const string& op, const string& sourceLoc)
-      : operation{op}, sourceLocation{sourceLoc} {}
-  OperationContext(const OperationContext& rhs)
-      : operation{rhs.operation}, sourceLocation{rhs.sourceLocation} {}
+  OperationContext(string op, string sourceLoc)
+      : operation{std::move(op)}, sourceLocation{std::move(sourceLoc)} {}
+  OperationContext(const OperationContext& rhs) = default;
   OperationContext(OperationContext&& rhs) noexcept
       : operation{std::move(rhs.operation)}, sourceLocation{std::move(rhs.sourceLocation)} {}
 
@@ -51,12 +49,11 @@ struct OperationContext {
 /// General purpose telemetry event.
 struct LogEvent {
   LogEvent() = default;
-  LogEvent(
-      const std::string& type,
-      const OperationContext& opContext,
-      const std::string& message,
-      const string& serverReply)
-      : type{type}, operationContext{opContext}, message{message}, serverReply{serverReply} {}
+  LogEvent(std::string type, OperationContext opContext, std::string message, string serverReply)
+      : type{std::move(type)},
+        operationContext{std::move(opContext)},
+        message{std::move(message)},
+        serverReply{std::move(serverReply)} {}
   LogEvent(LogEvent&& rhs) noexcept
       : type{std::move(rhs.type)},
         operationContext{std::move(rhs.operationContext)},

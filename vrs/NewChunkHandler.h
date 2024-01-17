@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include <functional>
-
 #include "WriteFileHandler.h"
 
 namespace vrs {

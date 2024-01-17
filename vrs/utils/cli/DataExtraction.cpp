@@ -16,6 +16,8 @@
 
 #include "DataExtraction.h"
 
+#include <iostream>
+
 #define DEFAULT_LOG_CHANNEL "DataExtraction"
 #include <logging/Log.h>
 

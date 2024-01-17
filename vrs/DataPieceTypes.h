@@ -17,6 +17,7 @@
 #pragma once
 
 #include <cstdint>
+
 #include <type_traits>
 
 namespace vrs {
@@ -35,12 +36,12 @@ using std::size_t;
 /// https://stackoverflow.com/questions/17794569/why-isnt-vectorbool-a-stl-container
 class Bool {
  public:
-  Bool(bool value = false) : value_(value) {}
+  /*implicit*/ Bool(bool value = false) : value_(value) {}
   Bool& operator=(bool value) {
     value_ = value;
     return *this;
   }
-  operator bool() const {
+  /*implicit*/ operator bool() const {
     return value_;
   }
   const bool* operator&() const {
@@ -76,7 +77,7 @@ struct PointND {
   static constexpr size_t kSize = N;
 
   PointND() : dim{} {}
-  PointND(const T arr[N]) {
+  /*implicit*/ PointND(const T arr[N]) {
     operator=(arr);
   }
 
@@ -178,7 +179,7 @@ struct MatrixND {
   static constexpr size_t kMatrixSize = N;
 
   MatrixND() = default;
-  MatrixND(const T arr[N][N]) {
+  /*implicit*/ MatrixND(const T arr[N][N]) {
     operator=(arr);
   }
 

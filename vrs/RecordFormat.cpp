@@ -17,14 +17,12 @@
 #include "RecordFormat.h"
 
 #include <cassert>
-#include <cerrno>
-#include <climits>
 
 #include <array>
-#include <iomanip>
 #include <limits>
 #include <sstream>
 #include <tuple>
+#include <utility>
 
 #define DEFAULT_LOG_CHANNEL "RecordFormat"
 #include <logging/Log.h>
@@ -283,7 +281,7 @@ ImageContentBlockSpec::ImageContentBlockSpec(
     uint32_t height,
     uint32_t stride,
     uint32_t stride2,
-    const string& codecName,
+    string codecName,
     uint8_t codecQuality,
     double keyFrameTimestamp,
     uint32_t keyFrameIndex)
@@ -293,7 +291,7 @@ ImageContentBlockSpec::ImageContentBlockSpec(
       height_{height},
       stride_{stride},
       stride2_{stride2},
-      codecName_{codecName},
+      codecName_{std::move(codecName)},
       keyFrameTimestamp_{keyFrameTimestamp},
       keyFrameIndex_{keyFrameIndex},
       codecQuality_{codecQuality} {
@@ -301,7 +299,7 @@ ImageContentBlockSpec::ImageContentBlockSpec(
 }
 
 ImageContentBlockSpec::ImageContentBlockSpec(
-    const string& codecName,
+    string codecName,
     uint8_t codecQuality,
     PixelFormat pixelFormat,
     uint32_t width,
@@ -314,7 +312,7 @@ ImageContentBlockSpec::ImageContentBlockSpec(
       height_{height},
       stride_{stride},
       stride2_{stride2},
-      codecName_{codecName},
+      codecName_{std::move(codecName)},
       codecQuality_{codecQuality} {
   sanityCheckStrides();
 }

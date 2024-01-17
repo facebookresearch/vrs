@@ -17,6 +17,7 @@
 #include <vrs/os/Event.h>
 
 #include <condition_variable>
+#include <utility>
 
 #include <vrs/os/Time.h>
 
@@ -28,8 +29,8 @@ using namespace std;
 namespace vrs {
 namespace os {
 
-EventChannel::EventChannel(const string& name, NotificationMode notificationMode)
-    : name_{name},
+EventChannel::EventChannel(string name, NotificationMode notificationMode)
+    : name_{std::move(name)},
       notificationMode_{notificationMode},
       numEventsSinceLastWait_{0},
       numEntering_{0},

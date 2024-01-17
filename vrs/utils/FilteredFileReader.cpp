@@ -19,6 +19,7 @@
 #include <cmath>
 
 #include <iomanip>
+#include <iostream>
 #include <sstream>
 
 #include <vrs/helpers/Strings.h>

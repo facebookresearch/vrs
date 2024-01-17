@@ -17,7 +17,7 @@
 #pragma once
 
 #include <cstdint>
-#include <cstdio>
+
 #include <vector>
 
 namespace vrs {
@@ -195,10 +195,10 @@ class DataReference {
   }
 
  private:
-  void* data1_;
-  uint32_t size1_;
-  void* data2_;
-  uint32_t size2_;
+  void* data1_{};
+  uint32_t size1_{};
+  void* data2_{};
+  uint32_t size2_{};
 };
 
 } // namespace vrs

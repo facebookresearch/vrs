@@ -128,8 +128,7 @@ struct RecordInfo {
 /// \brief Helper class to write VRS index records.
 class Writer {
  public:
-  explicit Writer(FileFormat::FileHeader& fileHeader)
-      : fileHeader_{fileHeader}, preallocatedIndexRecordSize_{} {}
+  explicit Writer(FileFormat::FileHeader& fileHeader) : fileHeader_{fileHeader} {}
 
   void reset() {
     streamIds_.clear();
