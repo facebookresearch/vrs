@@ -24,8 +24,8 @@ jobs:
           current_tag=$(echo $output | awk '{print $2}')
           echo "current version is $current_version"
           echo "current tag is $current_tag"
-          echo ::set-output name=version::$current_version
-          echo ::set-output name=tag::$current_tag
+          echo "version=$current_version" >> $GITHUB_OUTPUT
+          echo "tag=$current_tag" >> $GITHUB_OUTPUT
     outputs:
       current_version: ${{ steps.get-current-version-and-tag.outputs.version }}
       current_tag: ${{ steps.get-current-version-and-tag.outputs.tag }}
