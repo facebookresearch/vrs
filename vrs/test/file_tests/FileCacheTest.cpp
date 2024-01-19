@@ -26,6 +26,7 @@
 #include <vrs/FileDetailsCache.h>
 #include <vrs/RecordFileReader.h>
 #include <vrs/os/Utils.h>
+#include <vrs/utils/BufferRecordReader.hpp>
 
 using namespace std;
 using namespace vrs;
@@ -158,4 +159,21 @@ TEST_F(FileCacheTest, detailsTest) {
     threads[threadIndex].join();
   }
   verifyDetails(cacheFile, reader, false, true);
+}
+
+TEST_F(FileCacheTest, memoryVrsFileTest) {
+  string kTestFile = string(coretech::getTestDataDir()) + "/VRS_Files/sample_file.vrs";
+
+  vector<uint8_t> vrsfile;
+  DiskFile file;
+  ASSERT_EQ(file.open(kTestFile), 0);
+  int64_t size = file.getTotalSize();
+  vrsfile.resize(size);
+  ASSERT_EQ(file.read(vrsfile.data(), size), 0);
+
+  RecordFileReader reader;
+  reader.setFileHandler(make_unique<utils::BufferFileHandler>(vrsfile));
+  ASSERT_EQ(reader.openFile(kTestFile), 0); // the path doesn't matter, but you must call openFile()
+  EXPECT_EQ(reader.getStreams().size(), 3);
+  EXPECT_EQ(reader.getIndex().size(), 307);
 }

@@ -27,11 +27,19 @@ namespace vrs::utils {
 class BufferFileHandler : public FileHandler {
  public:
   BufferFileHandler() : fileHandlerName_{"BufferFileHandler"} {}
+  template <class T>
+  explicit BufferFileHandler(const vector<T>& buffer) {
+    init(buffer);
+  }
 
-  void init(const vector<uint8_t>& buffer) {
-    data_ = buffer.data();
-    readSize_ = 0;
-    totalSize_ = static_cast<int64_t>(buffer.size());
+  template <class T>
+  inline void init(const vector<T>& buffer) {
+    init(buffer.data(), buffer.size() * sizeof(T));
+  }
+  void init(const void* data, size_t length) {
+    data_ = reinterpret_cast<const uint8_t*>(data);
+    readPos_ = 0;
+    totalSize_ = length;
     lastReadSize_ = 0;
     lastError_ = 0;
   }
@@ -44,7 +52,7 @@ class BufferFileHandler : public FileHandler {
   }
 
   int openSpec(const FileSpec& /*fileSpec*/) override {
-    return FAILURE;
+    return data_ != nullptr ? 0 : FAILURE;
   }
   bool isOpened() const override {
     return data_ != nullptr;
@@ -54,7 +62,7 @@ class BufferFileHandler : public FileHandler {
   }
   int close() override {
     data_ = nullptr;
-    readSize_ = 0;
+    readPos_ = 0;
     totalSize_ = 0;
     lastError_ = 0;
     return 0;
@@ -64,26 +72,26 @@ class BufferFileHandler : public FileHandler {
     return lastError_;
   }
   int skipForward(int64_t offset) override {
-    if (readSize_ + offset > totalSize_ || readSize_ + offset < 0) {
+    if (readPos_ + offset > totalSize_ || readPos_ + offset < 0) {
       return status(FAILURE);
     }
-    readSize_ += offset;
+    readPos_ += offset;
     return status(0);
   }
   int setPos(int64_t offset) override {
     if (offset < 0 || offset > totalSize_) {
       return status(FAILURE);
     }
-    readSize_ = static_cast<uint32_t>(offset);
+    readPos_ = offset;
     return status(0);
   }
   int read(void* buffer, size_t length) override {
-    if (readSize_ + static_cast<int64_t>(length) > totalSize_) {
+    if (readPos_ + length > totalSize_) {
       return status(FAILURE);
     }
-    memcpy(buffer, data_ + readSize_, length);
-    readSize_ += length;
-    lastReadSize_ = static_cast<uint32_t>(length);
+    memcpy(buffer, data_ + readPos_, length);
+    readPos_ += length;
+    lastReadSize_ = length;
     return status(0);
   }
   size_t getLastRWSize() const override {
@@ -100,13 +108,13 @@ class BufferFileHandler : public FileHandler {
     return lastError_;
   }
   bool isEof() const override {
-    return readSize_ >= totalSize_;
+    return readPos_ >= totalSize_;
   }
   int64_t getPos() const override {
-    return readSize_;
+    return readPos_;
   }
   int64_t getChunkPos() const override {
-    return readSize_;
+    return readPos_;
   }
   int getChunkRange(int64_t& outChunkOffset, int64_t& outChunkSize) const override {
     outChunkOffset = 0;
@@ -116,10 +124,10 @@ class BufferFileHandler : public FileHandler {
 
  private:
   const string fileHandlerName_;
-  const uint8_t* data_{nullptr};
+  const uint8_t* data_{};
   int64_t totalSize_{0};
-  uint32_t readSize_{0};
-  uint32_t lastReadSize_{0};
+  int64_t readPos_{0};
+  size_t lastReadSize_{0};
   int lastError_{0};
 };
 
