@@ -793,13 +793,18 @@ bool compareVRSfiles(
   return noError && diffCounter == 0;
 }
 
-bool compareVerbatim(FilteredFileReader& first, FilteredFileReader& second, bool showProgress) {
+bool compareVerbatim(const FileSpec& first, const FileSpec& second, bool showProgress) {
   const char* kStatus = "Comparing ";
   const char* kReset = showProgress ? kResetCurrentLine : "";
-  unique_ptr<FileHandler> source, dest;
-  int status = first.openFile(source);
-  if (status != 0 || (status = second.openFile(dest)) != 0) {
-    cerr << "Can't open files to compare: " << errorCodeToMessage(status) << ".\n";
+  unique_ptr<FileHandler> source = make_unique<DiskFile>();
+  int status = source->openSpec(first);
+  if (status != 0) {
+    cerr << "Can't open source file to compare: " << errorCodeToMessage(status) << ".\n";
+    return false;
+  }
+  unique_ptr<FileHandler> dest = make_unique<DiskFile>();
+  if ((status = dest->openSpec(second)) != 0) {
+    cerr << "Can't open second file to compare: " << errorCodeToMessage(status) << ".\n";
     return false;
   }
   if (source->getTotalSize() != dest->getTotalSize()) {

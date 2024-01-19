@@ -152,9 +152,6 @@ struct FilteredFileReader {
 
   virtual int openFile(const RecordFilterParams& filters = {});
 
-  // Open the file, local or not, as a standard file
-  virtual int openFile(unique_ptr<FileHandler>& file) const;
-
   string getCopyPath();
 
   // Add constraints, typically from command line options

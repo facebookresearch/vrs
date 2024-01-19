@@ -486,7 +486,8 @@ int VrsCommand::runCommands() {
       break;
     case Command::CompareVerbatim:
       for (auto& otherFile : otherFilteredReaders) {
-        bool areSame = compareVerbatim(filteredReader, otherFile, copyOptions.showProgress);
+        bool areSame =
+            compareVerbatim(filteredReader.spec, otherFile.spec, copyOptions.showProgress);
         cout << (areSame ? "Files are identical." : "Files differ.") << "\n";
       }
       break;

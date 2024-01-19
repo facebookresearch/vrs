@@ -57,6 +57,6 @@ bool compareVRSfiles(
 /// Compare files at the byte level. Useful to validate upload copy/upload operations.
 /// @param first: First file (not necessarily a VRS file)
 /// @param second: Second file (not necessarily a VRS file)
-bool compareVerbatim(FilteredFileReader& first, FilteredFileReader& second, bool showProgress);
+bool compareVerbatim(const FileSpec& first, const FileSpec& second, bool showProgress);
 
 } // namespace vrs::utils

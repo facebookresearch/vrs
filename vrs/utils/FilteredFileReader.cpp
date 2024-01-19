@@ -213,15 +213,6 @@ int FilteredFileReader::openFile(const RecordFilterParams& filters) {
   return status;
 }
 
-int FilteredFileReader::openFile(unique_ptr<FileHandler>& file) const {
-  file = make_unique<DiskFile>();
-  int status = file->openSpec(spec);
-  if (status != 0) {
-    cerr << "Can't open '" << getPathOrUri() << "': " << errorCodeToMessage(status) << "\n";
-  }
-  return status;
-}
-
 string FilteredFileReader::getCopyPath() {
   // if uploading, but no temp file path has been provided, automatically generate one
   string fileName = getFileName();
