@@ -91,11 +91,10 @@ Inheritance diagram for vrs::NonContiguousChunk:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a20ee5e0be3a806a5183c2bc91fff7576"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_non_contiguous_chunk.html#a20ee5e0be3a806a5183c2bc91fff7576">NonContiguousChunk</a> (const void *data, std::size_t blockSize, std::size_t numBlocks, std::size_t strideInBytes)</td></tr>
-<tr class="separator:a20ee5e0be3a806a5183c2bc91fff7576"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af279c069c7787f0fefd1e20bb13f6c74"><td class="memItemLeft" align="right" valign="top"><a id="af279c069c7787f0fefd1e20bb13f6c74"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>fillAndAdvanceBuffer</b> (std::uint8_t *&amp;buffer) const final</td></tr>
-<tr class="separator:af279c069c7787f0fefd1e20bb13f6c74"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a545c6d740c645f2a2842605a9d50d0a4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_non_contiguous_chunk.html#a545c6d740c645f2a2842605a9d50d0a4">NonContiguousChunk</a> (const void *data, size_t blockSize, size_t numBlocks, size_t strideInBytes)</td></tr>
+<tr class="separator:a545c6d740c645f2a2842605a9d50d0a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad868b0728d2d31d372fe9032c77c2b4e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_non_contiguous_chunk.html#ad868b0728d2d31d372fe9032c77c2b4e">fillAndAdvanceBuffer</a> (uint8_t *&amp;buffer) const final</td></tr>
+<tr class="separator:ad868b0728d2d31d372fe9032c77c2b4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classvrs_1_1_data_source_chunk"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classvrs_1_1_data_source_chunk')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classvrs_1_1_data_source_chunk.html">vrs::DataSourceChunk</a></td></tr>
 <tr class="memitem:a0badaa7069e8f48c56828a9f161e2410 inherit pub_methods_classvrs_1_1_data_source_chunk"><td class="memItemLeft" align="right" valign="top"><a id="a0badaa7069e8f48c56828a9f161e2410"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_source_chunk.html#a0badaa7069e8f48c56828a9f161e2410">DataSourceChunk</a> (const <a class="el" href="classvrs_1_1_data_source_chunk.html">DataSourceChunk</a> &amp;other)=delete</td></tr>
@@ -118,12 +117,10 @@ template&lt;typename T &gt; </td></tr>
 <tr class="memdesc:a7c2562480133feb1fd039731efed9849 inherit pub_methods_classvrs_1_1_data_source_chunk"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for a vector&lt;T&gt; of objects of POD type T. <br /></td></tr>
 <tr class="separator:a7c2562480133feb1fd039731efed9849 inherit pub_methods_classvrs_1_1_data_source_chunk"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6619d99a868b5522fe6f5acf7928c39a inherit pub_methods_classvrs_1_1_data_source_chunk"><td class="memTemplParams" colspan="2"><a id="a6619d99a868b5522fe6f5acf7928c39a"></a>
-template&lt;typename T , std::enable_if_t&lt; std::is_trivially_copyable&lt; T &gt;::value, int &gt;  = 0, typename  = typename enable_if&lt;!is_pointer&lt;T&gt;::value, T&gt;::type&gt; </td></tr>
+template&lt;typename T , std::enable_if_t&lt; std::is_trivially_copyable&lt; T &gt;::value, int &gt;  = 0, typename  = typename std::enable_if&lt;!is_pointer&lt;T&gt;::value, T&gt;::type&gt; </td></tr>
 <tr class="memitem:a6619d99a868b5522fe6f5acf7928c39a inherit pub_methods_classvrs_1_1_data_source_chunk"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_source_chunk.html#a6619d99a868b5522fe6f5acf7928c39a">DataSourceChunk</a> (const T &amp;object)</td></tr>
 <tr class="memdesc:a6619d99a868b5522fe6f5acf7928c39a inherit pub_methods_classvrs_1_1_data_source_chunk"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for a trivially copyable type T. <br /></td></tr>
 <tr class="separator:a6619d99a868b5522fe6f5acf7928c39a inherit pub_methods_classvrs_1_1_data_source_chunk"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab004cbcacb03c672b054f769fbbd7464 inherit pub_methods_classvrs_1_1_data_source_chunk"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_source_chunk.html#ab004cbcacb03c672b054f769fbbd7464">fillAndAdvanceBuffer</a> (uint8_t *&amp;buffer) const</td></tr>
-<tr class="separator:ab004cbcacb03c672b054f769fbbd7464 inherit pub_methods_classvrs_1_1_data_source_chunk"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae3e9c0d8fc43c2c7c08701a02ec8e88d inherit pub_methods_classvrs_1_1_data_source_chunk"><td class="memItemLeft" align="right" valign="top"><a id="ae3e9c0d8fc43c2c7c08701a02ec8e88d"></a>
 const void *&#160;</td><td class="memItemRight" valign="bottom"><b>data</b> () const</td></tr>
 <tr class="separator:ae3e9c0d8fc43c2c7c08701a02ec8e88d inherit pub_methods_classvrs_1_1_data_source_chunk"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -135,8 +132,8 @@ size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class to represent a data chunk composed of multiple smaller chunks that each have fixed offsets from each other in memory. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a20ee5e0be3a806a5183c2bc91fff7576"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a20ee5e0be3a806a5183c2bc91fff7576">&#9670;&nbsp;</a></span>NonContiguousChunk()</h2>
+<a id="a545c6d740c645f2a2842605a9d50d0a4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a545c6d740c645f2a2842605a9d50d0a4">&#9670;&nbsp;</a></span>NonContiguousChunk()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -150,19 +147,19 @@ size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>blockSize</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>numBlocks</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>strideInBytes</em>&#160;</td>
         </tr>
         <tr>
@@ -181,6 +178,36 @@ size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="ad868b0728d2d31d372fe9032c77c2b4e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad868b0728d2d31d372fe9032c77c2b4e">&#9670;&nbsp;</a></span>fillAndAdvanceBuffer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void vrs::NonContiguousChunk::fillAndAdvanceBuffer </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t *&amp;&#160;</td>
+          <td class="paramname"><em>buffer</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">final</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Copy the data (if any), and update the provided buffer pointer accordingly. The number of bytes copied <em>must be the exact size</em> specified in the constructor. </p>
+
+<p>Reimplemented from <a class="el" href="classvrs_1_1_data_source_chunk.html#ab004cbcacb03c672b054f769fbbd7464">vrs::DataSourceChunk</a>.</p>
 
 </div>
 </div>
