@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include <cstdint>
-
 #include <vector>
 
 // Make this class usable both when Qt is available, and when not

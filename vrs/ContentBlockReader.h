@@ -24,7 +24,6 @@
 
 namespace vrs {
 
-using std::move;
 using std::unique_ptr;
 
 class ContentBlock;

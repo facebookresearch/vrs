@@ -25,9 +25,7 @@
 
 namespace vrs {
 
-using std::get;
 using std::map;
-using std::move;
 using std::pair;
 using std::string;
 using std::tuple;

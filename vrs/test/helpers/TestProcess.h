@@ -17,6 +17,7 @@
 #pragma once
 
 #include <vrs/os/Platform.h>
+
 #if IS_WINDOWS_PLATFORM()
 #ifndef BOOST_USE_WINDOWS_H
 #define BOOST_USE_WINDOWS_H

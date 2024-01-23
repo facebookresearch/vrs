@@ -15,7 +15,6 @@
  */
 
 #include <cassert>
-#include <chrono>
 #include <iostream>
 
 #include <vrs/os/Time.h>

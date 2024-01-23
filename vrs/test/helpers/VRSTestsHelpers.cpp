@@ -16,18 +16,19 @@
 
 #include "VRSTestsHelpers.h"
 
-#include <gtest/gtest.h>
 #include <array>
+
+#include <gtest/gtest.h>
 
 #define DEFAULT_LOG_CHANNEL "VRSTestHelpers"
 #include <logging/Log.h>
 
 #include <test_helpers/GTestMacros.h>
-#include <vrs/os/Time.h>
-#include <vrs/os/Utils.h>
 
 #include <vrs/FileCache.h>
 #include <vrs/StreamPlayer.h>
+#include <vrs/os/Time.h>
+#include <vrs/os/Utils.h>
 
 using namespace std;
 using namespace vrs;

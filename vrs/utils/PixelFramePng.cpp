@@ -20,8 +20,6 @@
 #include <cerrno>
 
 #include <atomic>
-#include <deque>
-#include <vector>
 
 #define DEFAULT_LOG_CHANNEL "PixelFramePng"
 #include <logging/Log.h>

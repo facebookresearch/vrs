@@ -20,7 +20,9 @@
 
 #define DEFAULT_LOG_CHANNEL "DeviceSimulator"
 #include <logging/Log.h>
+
 #include <portability/Filesystem.h>
+
 #include <vrs/RecordFileReader.h>
 #include <vrs/os/Utils.h>
 

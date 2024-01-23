@@ -21,6 +21,7 @@
 #include <logging/Verify.h>
 
 #include <vrs/helpers/FileMacros.h>
+
 #include "Compressor.h"
 #include "Decompressor.h"
 #include "DescriptionRecord.h"

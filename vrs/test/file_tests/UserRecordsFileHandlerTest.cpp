@@ -20,6 +20,7 @@
 
 #define DEFAULT_LOG_CHANNEL "UserRecordsFileHandler"
 #include <logging/Log.h>
+
 #include <vrs/FileHandlerFactory.h>
 #include <vrs/RecordFileReader.h>
 #include <vrs/os/Utils.h>

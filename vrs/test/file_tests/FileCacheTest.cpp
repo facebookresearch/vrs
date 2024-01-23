@@ -21,6 +21,7 @@
 #include <gtest/gtest.h>
 
 #include <TestDataDir/TestDataDir.h>
+
 #include <vrs/ErrorCode.h>
 #include <vrs/FileCache.h>
 #include <vrs/FileDetailsCache.h>

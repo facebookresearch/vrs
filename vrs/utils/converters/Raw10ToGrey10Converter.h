@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-#include <cstddef>
-
 #pragma once
+
+#include <cstddef>
 
 namespace vrs::utils {
 
 bool convertRaw10ToGrey10(
     void* dst,
     const void* src,
-    std::size_t widthInPixels,
-    std::size_t heightInPixels,
-    std::size_t strideInBytes);
+    size_t widthInPixels,
+    size_t heightInPixels,
+    size_t strideInBytes);
 
 } // namespace vrs::utils

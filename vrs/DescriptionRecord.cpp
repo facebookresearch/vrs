@@ -20,13 +20,12 @@
 
 #include "DescriptionRecord.h"
 
-#include <vrs/helpers/Serialization.h>
-
 #define DEFAULT_LOG_CHANNEL "VRSDescriptionRecord"
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
 #include <vrs/helpers/FileMacros.h>
+#include <vrs/helpers/Serialization.h>
 #include <vrs/utils/xxhash/xxhash.h>
 
 #include "ErrorCode.h"

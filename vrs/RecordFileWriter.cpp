@@ -23,7 +23,6 @@
 #include <thread>
 
 #define DEFAULT_LOG_CHANNEL "RecordFileWriter"
-
 #include <logging/Log.h>
 #include <logging/Verify.h>
 

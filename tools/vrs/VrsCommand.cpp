@@ -18,11 +18,13 @@
 
 #include <cstdlib>
 #include <cstring>
+
 #include <iostream>
 #include <string>
 
-#define DEFAULT_LOG_CHANNEL "VrsCommand"
 #include <fmt/format.h>
+
+#define DEFAULT_LOG_CHANNEL "VrsCommand"
 #include <logging/Log.h>
 #include <logging/Verify.h>
 

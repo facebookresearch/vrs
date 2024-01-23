@@ -16,7 +16,6 @@
 
 #include "Strings.h"
 
-#include <cctype>
 #include <climits>
 #include <cmath>
 #include <cstring>

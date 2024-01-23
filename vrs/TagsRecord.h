@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include <functional>
 #include <limits>
 
 #include "DataLayout.h"

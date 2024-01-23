@@ -15,14 +15,16 @@
  */
 
 #include <cmath>
+
 #include <random>
-#include "vrs/StreamId.h"
 
 #include <gtest/gtest.h>
 
 #include <TestDataDir/TestDataDir.h>
+
 #include <vrs/IndexRecord.h>
 #include <vrs/RecordFileReader.h>
+#include <vrs/StreamId.h>
 
 using namespace std;
 using namespace vrs;

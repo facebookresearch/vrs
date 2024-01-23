@@ -21,6 +21,7 @@
 
 #include <portability/Filesystem.h>
 #include <test_helpers/GTestMacros.h>
+
 #include <vrs/RecordFileReader.h>
 #include <vrs/RecordFileWriter.h>
 #include <vrs/Recordable.h>

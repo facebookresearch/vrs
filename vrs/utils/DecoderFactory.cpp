@@ -16,7 +16,6 @@
 
 #include "DecoderFactory.h"
 
-#include <map>
 #include <mutex>
 
 #define DEFAULT_LOG_CHANNEL "DecoderFactory"

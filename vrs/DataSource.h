@@ -19,11 +19,11 @@
 #include <cstddef>
 #include <cstdint>
 
+#include <type_traits>
 #include <vector>
 
 namespace vrs {
 
-using std::enable_if;
 using std::is_base_of;
 using std::is_pointer;
 using std::vector;
@@ -89,7 +89,7 @@ class DataSourceChunk {
       // T must be trivially copyable.
       std::enable_if_t<std::is_trivially_copyable<T>::value, int> = 0,
       // T may not be a pointer.
-      typename = typename enable_if<!is_pointer<T>::value, T>::type>
+      typename = typename std::enable_if<!is_pointer<T>::value, T>::type>
   // NOLINTNEXTLINE(hicpp-explicit-conversions)
   DataSourceChunk(const T& object) : data_{&object}, size_{sizeof(T)} {}
 
@@ -121,18 +121,14 @@ class NonContiguousChunk final : public vrs::DataSourceChunk {
   /// @param strideInBytes: number of bytes between the first byte of consecutive blocks.
   /// (strideInBytes - blockSize) is the number of bytes to skip between blocks, therefore
   /// strideInBytes should be greater than blockSize.
-  NonContiguousChunk(
-      const void* data,
-      std::size_t blockSize,
-      std::size_t numBlocks,
-      std::size_t strideInBytes);
+  NonContiguousChunk(const void* data, size_t blockSize, size_t numBlocks, size_t strideInBytes);
 
-  void fillAndAdvanceBuffer(std::uint8_t*& buffer) const final;
+  void fillAndAdvanceBuffer(uint8_t*& buffer) const final;
 
  private:
-  const std::size_t blockSize_;
-  const std::size_t numBlocks_;
-  const std::size_t strideInBytes_;
+  const size_t blockSize_;
+  const size_t numBlocks_;
+  const size_t strideInBytes_;
 };
 
 /// \brief A class referencing data to be captured in a record at creation.

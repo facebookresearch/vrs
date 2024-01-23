@@ -17,7 +17,6 @@
 #include "CliParsing.h"
 
 #include <iostream>
-#include <sstream>
 
 #include <vrs/helpers/Strings.h>
 

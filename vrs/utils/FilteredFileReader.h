@@ -16,12 +16,7 @@
 
 #pragma once
 
-#include <functional>
 #include <limits>
-#include <map>
-#include <memory>
-#include <string>
-#include <vector>
 
 #include <vrs/Record.h>
 #include <vrs/RecordFileReader.h>

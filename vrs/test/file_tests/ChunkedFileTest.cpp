@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
+#include <vrs/os/Platform.h>
+
+#if !IS_WINDOWS_PLATFORM()
+#include <unistd.h>
+#endif
+
 #include <utility>
 
 #include <gtest/gtest.h>
 
 #include <TestDataDir/TestDataDir.h>
-#include <vrs/os/Utils.h>
 #include <vrs/test/helpers/VRSTestsHelpers.h>
 
-#if !IS_WINDOWS_PLATFORM()
-#include <unistd.h>
-#endif
+#include <vrs/os/Utils.h>
 
 using namespace std;
 using namespace vrs;

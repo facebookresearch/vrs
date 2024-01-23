@@ -19,6 +19,7 @@
 #include <gtest/gtest.h>
 
 #include <test_helpers/GTestMacros.h>
+
 #include <vrs/DataLayoutConventions.h>
 #include <vrs/RecordFileReader.h>
 #include <vrs/RecordFileWriter.h>

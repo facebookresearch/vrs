@@ -16,9 +16,6 @@
 
 #pragma once
 
-#include <memory>
-#include <vector>
-
 #include <vrs/helpers/JobQueue.h>
 #include <vrs/utils/PixelFrame.h>
 #include <vrs/utils/VideoRecordFormatStreamPlayer.h>

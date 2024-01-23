@@ -16,8 +16,6 @@
 
 #include <gtest/gtest.h>
 
-#include <vector>
-
 #define DEFAULT_LOG_CHANNEL "FrameCompressionTest"
 #include <logging/Log.h>
 

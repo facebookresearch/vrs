@@ -19,6 +19,7 @@
 #include <gtest/gtest.h>
 
 #include <TestDataDir/TestDataDir.h>
+
 #include <vrs/DataLayoutConventions.h>
 #include <vrs/FileHandler.h>
 #include <vrs/RecordFileReader.h>

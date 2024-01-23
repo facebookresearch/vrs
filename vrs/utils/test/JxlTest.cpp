@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
-
 #define _USE_MATH_DEFINES // needed for M_PI definition on Windows
 #include <cmath>
+
 #include <vector>
 
-#include <TestDataDir/TestDataDir.h>
 #include <gtest/gtest.h>
+
+#include <TestDataDir/TestDataDir.h>
 
 #include <vrs/utils/PixelFrame.h>
 

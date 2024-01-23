@@ -16,8 +16,9 @@
 
 #include "PixelFrame.h"
 
-#include <atomic>
 #include <cstring>
+
+#include <atomic>
 
 #define DEFAULT_LOG_CHANNEL "PixelFrame"
 #include <logging/Checks.h>

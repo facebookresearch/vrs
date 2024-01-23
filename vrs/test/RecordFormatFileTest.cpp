@@ -17,7 +17,11 @@
 #include <ctime>
 
 #include <gtest/gtest.h>
+
 #include <test_helpers/GTestMacros.h>
+
+#define DEFAULT_LOG_CHANNEL "RecordFormatFileTest"
+#include <logging/Log.h>
 
 #include <vrs/DataLayoutConventions.h>
 #include <vrs/FileFormat.h>
@@ -29,9 +33,6 @@
 #include <vrs/helpers/Strings.h>
 #include <vrs/os/Time.h>
 #include <vrs/os/Utils.h>
-
-#define DEFAULT_LOG_CHANNEL "RecordFormatFileTest"
-#include <logging/Log.h>
 
 using namespace std;
 using namespace vrs;

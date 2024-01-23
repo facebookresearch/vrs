@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-#include <iostream>
-#include <limits>
 #include <sstream>
 
 #include <gtest/gtest.h>

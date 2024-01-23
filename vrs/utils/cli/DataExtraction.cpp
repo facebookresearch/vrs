@@ -18,10 +18,10 @@
 
 #include <iostream>
 
+#include <fmt/format.h>
+
 #define DEFAULT_LOG_CHANNEL "DataExtraction"
 #include <logging/Log.h>
-
-#include <fmt/format.h>
 
 #include <vrs/RecordFileReader.h>
 #include <vrs/helpers/FileMacros.h>

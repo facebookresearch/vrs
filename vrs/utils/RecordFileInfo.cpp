@@ -16,9 +16,6 @@
 
 #include "RecordFileInfo.h"
 
-#include <cctype>
-#include <cmath>
-
 #include <iomanip>
 #include <sstream>
 

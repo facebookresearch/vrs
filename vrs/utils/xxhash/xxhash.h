@@ -18,7 +18,6 @@
 
 #include <cstring>
 
-#include <array>
 #include <map>
 #include <string>
 #include <vector>

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#pragma once
+
 #include <set>
 
 #include <vrs/RecordFileReader.h>

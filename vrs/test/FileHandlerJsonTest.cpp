@@ -16,7 +16,6 @@
 
 #include <gtest/gtest.h>
 #include <map>
-#include <vector>
 
 #include <vrs/DiskFile.h>
 #include <vrs/ErrorCode.h>

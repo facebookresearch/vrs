@@ -15,13 +15,13 @@
  */
 
 #include <algorithm>
-#include <cstddef>
 #include <queue>
 #include <utility>
 
 #define DEFAULT_LOG_CHANNEL "MultiRecordFileReader"
 #include <logging/Checks.h>
 #include <logging/Log.h>
+
 #include <vrs/ErrorCode.h>
 #include <vrs/IndexRecord.h>
 #include <vrs/MultiRecordFileReader.h>

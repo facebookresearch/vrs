@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include <thread>
-
 #include <QtCore/qglobal.h>
 #include <qobject.h>
 

@@ -17,7 +17,6 @@
 #pragma once
 
 #include <fstream>
-#include <map>
 #include <memory>
 
 #include <vrs/RecordFileReader.h>

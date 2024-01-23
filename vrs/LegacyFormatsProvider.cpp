@@ -16,11 +16,11 @@
 
 #include "LegacyFormatsProvider.h"
 
-#include "DataLayout.h"
-#include "DataPieces.h"
-
 #define DEFAULT_LOG_CHANNEL "LegacyFormatsProvider"
 #include <logging/Log.h>
+
+#include "DataLayout.h"
+#include "DataPieces.h"
 
 using namespace std;
 
