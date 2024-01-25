@@ -24,6 +24,8 @@
 
 #if IS_VRS_FB_INTERNAL()
 #include <vrs/os/Utils_fb.h>
+#else
+#include <vector>
 #endif
 
 /// Mini-OS abstraction layer. Only VRS should use these.
