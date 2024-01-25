@@ -21,8 +21,19 @@
 #include <logging/Verify.h>
 
 #include <vrs/helpers/FileMacros.h>
+#include <vrs/helpers/Throttler.h>
+
 #include "ErrorCode.h"
 #include "FileHandler.h"
+
+namespace {
+
+vrs::utils::Throttler& getThrottler() {
+  static vrs::utils::Throttler sThrottler{20 /*instances*/, 10 /*seconds*/};
+  return sThrottler;
+}
+
+} // namespace
 
 namespace vrs {
 
@@ -38,7 +49,8 @@ RecordReader* RecordReader::init(FileHandler& file, uint32_t diskSize, uint32_t 
 int UncompressedRecordReader::read(DataReference& destination, uint32_t& outReadSize) {
   outReadSize = 0;
   if (remainingUncompressedSize_ < destination.getSize()) {
-    XR_LOGE(
+    THROTTLED_LOGE(
+        file_,
         "Tried to read {} bytes when at most {} are available.",
         destination.getSize(),
         remainingUncompressedSize_);
@@ -57,7 +69,8 @@ void CompressedRecordReader::initCompressionType(CompressionType compressionType
 int CompressedRecordReader::read(DataReference& destination, uint32_t& outReadSize) {
   outReadSize = 0;
   if (remainingUncompressedSize_ < destination.getSize()) {
-    XR_LOGE(
+    THROTTLED_LOGE(
+        file_,
         "Tried to read {} bytes when at most {} are available.",
         destination.getSize(),
         remainingUncompressedSize_);
