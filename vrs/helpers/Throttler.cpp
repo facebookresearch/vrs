@@ -56,8 +56,11 @@ bool Throttler::report(int line, const void* throttledObjectPtr) {
   return doIt;
 }
 
-// 0-10 -> 1, 11-100 -> 10, 101-1000 -> 100, 1001-10000 -> 10000, etc
+// 0-10 -> 1, 11-100 -> 10, 101-1000 -> 100, 1001-1000 -> 1000, etc
 int64_t Throttler::reportFrequency(int64_t counter) {
+  if (counter <= 10) {
+    return 1;
+  }
   int64_t power = log10(counter - 1);
   int64_t res = 1;
   for (int64_t p = 1; p <= power; p++) {
