@@ -11,7 +11,7 @@ var searchData=
   ['littleendian_3c_20uint32_5ft_20_3e_497',['LittleEndian&lt; uint32_t &gt;',['../classvrs_1_1_file_format_1_1_little_endian.html',1,'vrs::FileFormat']]],
   ['littleendian_3c_20uint64_5ft_20_3e_498',['LittleEndian&lt; uint64_t &gt;',['../classvrs_1_1_file_format_1_1_little_endian.html',1,'vrs::FileFormat']]],
   ['littleendian_3c_20uint8_5ft_20_3e_499',['LittleEndian&lt; uint8_t &gt;',['../classvrs_1_1_file_format_1_1_little_endian.html',1,'vrs::FileFormat']]],
-  ['logduration_500',['logDuration',['../classvrs_1_1_progress_logger.html#a11fd9409df363eb21fcd5cdca5093e3b',1,'vrs::ProgressLogger']]],
+  ['logduration_500',['logDuration',['../classvrs_1_1_progress_logger.html#a11fd9409df363eb21fcd5cdca5093e3b',1,'vrs::ProgressLogger::logDuration()'],['../classvrs_1_1_silent_logger.html#a67b06167c7d1b4eb4ddad89307ffbd6b',1,'vrs::SilentLogger::logDuration()']]],
   ['logerror_501',['logError',['../classvrs_1_1_progress_logger.html#ac1fd1026616bc5e38917c14ff3829258',1,'vrs::ProgressLogger']]],
   ['logevent_502',['logEvent',['../classvrs_1_1_telemetry_logger.html#a947eb78b85578ad00c2ee5f48ffe9890',1,'vrs::TelemetryLogger']]],
   ['logevent_503',['LogEvent',['../structvrs_1_1_log_event.html',1,'vrs']]],

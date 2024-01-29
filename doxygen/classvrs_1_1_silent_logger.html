@@ -95,6 +95,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:af4cd43baf40cacc320f2169065812fd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7fda61f41d6c9912e3905e7c81f9edd5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_silent_logger.html#a7fda61f41d6c9912e3905e7c81f9edd5">logStatus</a> (const string &amp;, int=0) override</td></tr>
 <tr class="separator:a7fda61f41d6c9912e3905e7c81f9edd5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a67b06167c7d1b4eb4ddad89307ffbd6b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_silent_logger.html#a67b06167c7d1b4eb4ddad89307ffbd6b">logDuration</a> (const string &amp;operationName, double duration, int precision=1) override</td></tr>
+<tr class="separator:a67b06167c7d1b4eb4ddad89307ffbd6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classvrs_1_1_progress_logger"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classvrs_1_1_progress_logger')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classvrs_1_1_progress_logger.html">vrs::ProgressLogger</a></td></tr>
 <tr class="memitem:af022240666843d6101652b4db5eb0ec5 inherit pub_methods_classvrs_1_1_progress_logger"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_progress_logger.html#af022240666843d6101652b4db5eb0ec5">ProgressLogger</a> (bool detailedProgress=false, double updateDelay=kDefaultUpdateDelay)</td></tr>
 <tr class="separator:af022240666843d6101652b4db5eb0ec5 inherit pub_methods_classvrs_1_1_progress_logger"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -110,8 +112,6 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a5c1267f5c9afb150cc694dbf17710f29 inherit pub_methods_classvrs_1_1_progress_logger"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8534fb432dbdbbfde7c78a7cfb112da4 inherit pub_methods_classvrs_1_1_progress_logger"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_progress_logger.html#a8534fb432dbdbbfde7c78a7cfb112da4">logProgress</a> (const string &amp;stepName, int64_t progress, int64_t maxProgress)</td></tr>
 <tr class="separator:a8534fb432dbdbbfde7c78a7cfb112da4 inherit pub_methods_classvrs_1_1_progress_logger"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a11fd9409df363eb21fcd5cdca5093e3b inherit pub_methods_classvrs_1_1_progress_logger"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_progress_logger.html#a11fd9409df363eb21fcd5cdca5093e3b">logDuration</a> (const string &amp;operationName, double duration, int precision=1)</td></tr>
-<tr class="separator:a11fd9409df363eb21fcd5cdca5093e3b inherit pub_methods_classvrs_1_1_progress_logger"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -152,6 +152,59 @@ double&#160;</td><td class="memItemRight" valign="bottom"><b>nextProgressTime_</
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Progress logger to ignore all progress notifications. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a67b06167c7d1b4eb4ddad89307ffbd6b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a67b06167c7d1b4eb4ddad89307ffbd6b">&#9670;&nbsp;</a></span>logDuration()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool vrs::SilentLogger::logDuration </td>
+          <td>(</td>
+          <td class="paramtype">const string &amp;&#160;</td>
+          <td class="paramname"><em>operationName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>duration</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>precision</em> = <code>1</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Log that an operation was performed in a specific duration. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">operationName</td><td>text describing the operation. </td></tr>
+    <tr><td class="paramname">duration</td><td>number of seconds the operation lasted. </td></tr>
+    <tr><td class="paramname">precision</td><td>precision to use when printing the duration. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the operation should continue, false if it should be cancelled. </dd></dl>
+
+<p>Reimplemented from <a class="el" href="classvrs_1_1_progress_logger.html#a11fd9409df363eb21fcd5cdca5093e3b">vrs::ProgressLogger</a>.</p>
+
+</div>
+</div>
 <a id="af4cd43baf40cacc320f2169065812fd9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af4cd43baf40cacc320f2169065812fd9">&#9670;&nbsp;</a></span>logProgress()</h2>
 
