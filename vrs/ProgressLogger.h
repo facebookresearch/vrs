@@ -133,6 +133,9 @@ class SilentLogger : public ProgressLogger {
   bool logStatus(const string&, int = 0) override {
     return true;
   }
+  bool logDuration(const string& operationName, double duration, int precision = 1) override {
+    return true;
+  }
 };
 
 } // namespace vrs
