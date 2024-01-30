@@ -27,12 +27,18 @@
 #include <vrs/RecordReaders.h>
 #include <vrs/helpers/Endian.h>
 #include <vrs/helpers/FileMacros.h>
+#include <vrs/helpers/Throttler.h>
 #include <vrs/os/Utils.h>
 
 using namespace std;
 using namespace vrs;
 
 namespace {
+
+utils::Throttler& getThrottler() {
+  static utils::Throttler sThrottler;
+  return sThrottler;
+}
 
 template <class T>
 inline void writeHeader(void* p, const T t) {
@@ -155,7 +161,8 @@ bool AudioExtractor::onAudioRead(
   audio_.resize(audioBlock.getBlockSize());
   int readStatus = record.reader->read(audio_);
   if (readStatus != 0) {
-    XR_LOGW(
+    THROTTLED_LOGW(
+        record.fileReader,
         "{} - {} record @ {}: Failed read audio data ({}).",
         record.streamId.getNumericName(),
         toString(record.recordType),
@@ -207,9 +214,14 @@ bool AudioExtractor::onAudioRead(
     double expectedTime =
         static_cast<double>(segmentSamplesCount_) / currentAudioContentBlockSpec_.getSampleRate();
     if (actualTime - expectedTime > kMaxJitter) {
-      XR_LOGW("Audio block at {:.3f} {:.3f} ms late.", actualTime, actualTime - expectedTime);
+      THROTTLED_LOGW(
+          record.fileReader,
+          "Audio block at {:.3f} {:.3f} ms late.",
+          actualTime,
+          actualTime - expectedTime);
     } else if (expectedTime - actualTime > kMaxJitter) {
-      XR_LOGW(
+      THROTTLED_LOGW(
+          record.fileReader,
           "Audio block at {:.3f} {:.3f} ms, {:.2f}% early.",
           expectedTime,
           expectedTime - actualTime,
@@ -229,7 +241,11 @@ bool AudioExtractor::onUnsupportedBlock(
     const ContentBlock& cb) {
   // the audio was not decoded ... not sure why?
   if (cb.getContentType() == ContentType::AUDIO) {
-    XR_LOGW("Audio block skipped for {}, content: {}", record.streamId.getName(), cb.asString());
+    THROTTLED_LOGW(
+        record.fileReader,
+        "Audio block skipped for {}, content: {}",
+        record.streamId.getName(),
+        cb.asString());
   }
   return false;
 }

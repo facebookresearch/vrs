@@ -26,12 +26,19 @@
 #include <logging/Verify.h>
 
 #include <vrs/helpers/FileMacros.h>
+#include <vrs/helpers/Throttler.h>
 #include <vrs/utils/BufferRecordReader.hpp>
 #include <vrs/utils/converters/Raw10ToGrey10Converter.h>
 
 using namespace std;
+using namespace vrs;
 
 namespace {
+
+utils::Throttler& getThrottler() {
+  static utils::Throttler sThrottler;
+  return sThrottler;
+}
 
 const uint8_t kNaNPixel = 0;
 
@@ -360,15 +367,9 @@ bool PixelFrame::readRawFrame(RecordReader* reader, const ImageContentBlockSpec&
         if (line < this->getHeight() - 1) {
           IF_ERROR_LOG_AND_RETURN_FALSE(readStrideStatus);
         }
-        // Compromise for data collected without expected stride for the last line only
-        // Please don't remove/reduce the warnings, fix the recording app instead!
-        // We do want to be loud, but for a while only.
-        static atomic<int> sSpamLimiter(500);
-        if (sSpamLimiter.fetch_add(-1, memory_order_relaxed) > 0) {
-          XR_LOGW("Stride data missing for the last line. Please fix the recording app.");
-        } else {
-          XR_LOGW_EVERY_N_SEC(5, "Stride data still missing. Silencing warnings for 5 seconds...");
-        }
+        THROTTLED_LOGW(
+            reader->getRef(),
+            "Stride data missing for the last line. Please fix the recording app.");
       }
     }
     wdata += frameStride;
@@ -732,7 +733,7 @@ bool PixelFrame::normalizeToPixelFormat(
 }
 
 bool PixelFrame::msssimCompare(const PixelFrame& other, double& msssim) {
-  XR_LOGW("PixelFrame::ssimCompare has no open source implementation");
+  THROTTLED_LOGW(nullptr, "PixelFrame::ssimCompare has no open source implementation");
   return false;
 }
 

@@ -26,6 +26,7 @@
 
 #include <vrs/helpers/FileMacros.h>
 #include <vrs/helpers/Rapidjson.hpp>
+#include <vrs/helpers/Throttler.h>
 #include <vrs/os/Utils.h>
 #include <vrs/utils/PixelFrame.h>
 #include <vrs/utils/RecordFileInfo.h>
@@ -34,10 +35,19 @@ const char* kReadMeContent =
 #include "DataExtractorReadMe.hpp"
     ;
 
-namespace vrs::utils {
-
 using namespace std;
 using namespace vrs;
+
+namespace {
+
+utils::Throttler& getThrottler() {
+  static utils::Throttler sThrottler;
+  return sThrottler;
+}
+
+} // namespace
+
+namespace vrs::utils {
 
 DataExtractor::DataExtractorStreamPlayer::DataExtractorStreamPlayer(
     ofstream& output,
@@ -139,7 +149,8 @@ bool DataExtractor::DataExtractorStreamPlayer::onImageRead(
       return true;
     }
   }
-  XR_LOGW(
+  THROTTLED_LOGW(
+      record.fileReader,
       "Could not convert image for {}, format: {}",
       record.streamId.getName(),
       imageBlock.asString());
@@ -182,7 +193,8 @@ bool DataExtractor::DataExtractorStreamPlayer::onUnsupportedBlock(
     const CurrentRecord& record,
     size_t,
     const ContentBlock& contentBlock) {
-  XR_LOGW(
+  THROTTLED_LOGW(
+      record.fileReader,
       "Unsupported block: {} {} @ {:.6f}: {}, {}.",
       record.streamId.getNumericName(),
       toString(record.recordType),

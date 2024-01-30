@@ -21,9 +21,19 @@
 
 #include <vrs/RecordFileReader.h>
 #include <vrs/RecordFileWriter.h>
+#include <vrs/helpers/Throttler.h>
 
 using namespace std;
 using namespace vrs;
+
+namespace {
+
+utils::Throttler& getThrottler() {
+  static utils::Throttler sThrottler;
+  return sThrottler;
+}
+
+} // namespace
 
 namespace vrs::utils {
 
@@ -128,7 +138,7 @@ ContentBlockChunk::ContentBlockChunk(const ContentBlock& contentBlock, const Cur
       contentBlock_{contentBlock} {
   int status = record.reader->read(getBuffer());
   if (status != 0) {
-    XR_LOGW("Failed to read image block: {}", errorCodeToMessage(status));
+    THROTTLED_LOGW(record.fileReader, "Failed to read image block: {}", errorCodeToMessage(status));
   }
 }
 
@@ -249,7 +259,11 @@ bool RecordFilterCopier::onUnsupportedBlock(
   unique_ptr<ContentChunk> bufferSourceChunk = make_unique<ContentChunk>(blockSize);
   int status = record.reader->read(bufferSourceChunk->getBuffer());
   if (status != 0) {
-    XR_LOGW("Failed to read {} block: {}", cb.asString(), errorCodeToMessage(status));
+    THROTTLED_LOGW(
+        record.fileReader,
+        "Failed to read {} block: {}",
+        cb.asString(),
+        errorCodeToMessage(status));
   }
   chunks_.emplace_back(std::move(bufferSourceChunk));
   return readNext;

@@ -25,12 +25,13 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/helpers/Throttler.h>
+
 using namespace std;
 using namespace vrs;
-using namespace utils;
+using namespace vrs::utils;
 
-namespace vrs {
-namespace utils {
+namespace vrs::utils {
 
 string ImageNamer::namePngImage(StreamId id, uint32_t imageCounter, double timestamp) {
   return fmt::format("{}-{:05}-{:.3f}.png", id.getNumericName(), imageCounter, timestamp);
@@ -81,10 +82,14 @@ string ImageNamer::getRawImageFormatAsString(const ImageContentBlockSpec& imageS
   return fmt::format("{}.{}", filenamePostfix, extension);
 }
 
-} // namespace utils
-} // namespace vrs
+} // namespace vrs::utils
 
 namespace {
+
+Throttler& getThrottler() {
+  static Throttler sThrottler;
+  return sThrottler;
+}
 
 const bool kSupportGrey16Export = true;
 
@@ -182,8 +187,7 @@ ImageNamer& getDefaultImageNamer() {
 
 } // namespace
 
-namespace vrs {
-namespace utils {
+namespace vrs::utils {
 
 ImageExtractor::ImageExtractor(const string& folderPath, uint32_t& counter, bool extractImagesRaw)
     : ImageExtractor(getDefaultImageNamer(), folderPath, counter, extractImagesRaw) {}
@@ -233,7 +237,8 @@ bool ImageExtractor::onImageRead(const CurrentRecord& record, size_t, const Cont
     imageData.resize(ib.getBlockSize());
     int readStatus = record.reader->read(imageData.data(), ib.getBlockSize());
     if (readStatus != 0) {
-      XR_LOGW(
+      THROTTLED_LOGW(
+          record.fileReader,
           "{} - {} record @ {}: Failed read image data ({}).",
           id.getNumericName(),
           toString(record.recordType),
@@ -246,18 +251,19 @@ bool ImageExtractor::onImageRead(const CurrentRecord& record, size_t, const Cont
     writeRawImage(filepath, imageData);
     return true;
   }
-  XR_LOGW("Could not convert image for {}, format: {}", id.getName(), ib.asString());
+  THROTTLED_LOGW(
+      record.fileReader, "Could not convert image for {}, format: {}", id.getName(), ib.asString());
   return false;
 }
 
-bool ImageExtractor::onUnsupportedBlock(const CurrentRecord& r, size_t, const ContentBlock& cb) {
+bool ImageExtractor::onUnsupportedBlock(const CurrentRecord& rec, size_t, const ContentBlock& cb) {
   // the image was not decoded, probably because the image spec are incomplete
   if (cb.getContentType() == ContentType::IMAGE) {
     imageCounter_++;
-    XR_LOGW("Image skipped for {}, content: {}", r.streamId.getName(), cb.asString());
+    THROTTLED_LOGW(
+        rec.fileReader, "Image skipped for {}, content: {}", rec.streamId.getName(), cb.asString());
   }
   return false;
 }
 
-} // namespace utils
-} // namespace vrs
+} // namespace vrs::utils

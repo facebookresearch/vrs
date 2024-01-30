@@ -29,12 +29,22 @@
 #include <logging/Log.h>
 
 #include <vrs/helpers/FileMacros.h>
+#include <vrs/helpers/Throttler.h>
 
 #include "ErrorCode.h"
 #include "FileHandler.h"
 #include "Record.h"
 
 using namespace std;
+
+namespace {
+
+vrs::utils::Throttler& getThrottler() {
+  static vrs::utils::Throttler sThrottler;
+  return sThrottler;
+}
+
+} // namespace
 
 namespace vrs {
 
@@ -169,21 +179,29 @@ void Decompressor::reset() {
 #define DECOMPRESSION_ERROR(code__, name__) \
   domainErrorCode(ErrorDomain::ZstdDecompressionErrorDomain, code__, name__)
 
-#define IF_DECOMP_ERROR_LOG_AND_RETURN(operation__)                   \
-  do {                                                                \
-    zresult = operation__;                                            \
-    if (ZSTD_isError(zresult)) {                                      \
-      const char* errorName = ZSTD_getErrorName(zresult);             \
-      XR_LOGE("{} failed: {}, {}", #operation__, zresult, errorName); \
-      return DECOMPRESSION_ERROR(zresult, errorName);                 \
-    }                                                                 \
+#define IF_DECOMP_ERROR_LOG_AND_RETURN(operation__)                                              \
+  do {                                                                                           \
+    zresult = operation__;                                                                       \
+    if (ZSTD_isError(zresult)) {                                                                 \
+      const char* errorName = ZSTD_getErrorName(zresult);                                        \
+      THROTTLED_LOGE(zstdContext_.get(), "{} failed: {}, {}", #operation__, zresult, errorName); \
+      return DECOMPRESSION_ERROR(zresult, errorName);                                            \
+    }                                                                                            \
   } while (false)
 
-#define READ_OR_LOG_AND_RETURN(size__)                                                        \
-  do {                                                                                        \
-    size_t readSize__ = min(min<size_t>(size__, inOutMaxReadSize), kMaxInputBufferSize);      \
-    IF_ERROR_LOG_AND_RETURN(file.read(allocateCompressedDataBuffer(readSize__), readSize__)); \
-    inOutMaxReadSize -= readSize__;                                                           \
+#define READ_OR_LOG_AND_RETURN(size__)                                                     \
+  do {                                                                                     \
+    size_t readSize__ = min(min<size_t>(size__, inOutMaxReadSize), kMaxInputBufferSize);   \
+    int operationError_ = file.read(allocateCompressedDataBuffer(readSize__), readSize__); \
+    if (operationError_ != 0) {                                                            \
+      THROTTLED_LOGW(                                                                      \
+          zstdContext_.get(),                                                              \
+          "file.read() failed: {}, {}",                                                    \
+          operationError_,                                                                 \
+          errorCodeToMessage(operationError_));                                            \
+      return operationError_;                                                              \
+    }                                                                                      \
+    inOutMaxReadSize -= readSize__;                                                        \
   } while (false)
 
 int Decompressor::initFrame(FileHandler& file, size_t& outFrameSize, size_t& inOutMaxReadSize) {
@@ -215,7 +233,8 @@ int Decompressor::readFrame(
   do {
     if (getCompressedDataSize() == 0 && zresult > 0) {
       if (inOutMaxReadSize == 0) {
-        XR_LOGW("Decompression error: {} more input bytes needed", zresult);
+        THROTTLED_LOGW(
+            zstdContext_.get(), "Decompression error: {} more input bytes needed", zresult);
         return NOT_ENOUGH_DATA;
       }
       READ_OR_LOG_AND_RETURN(zresult);
@@ -235,7 +254,7 @@ int Decompressor::decompress(void* destination, uint32_t destinationSize, uint32
     lastResult_ = lz4Context_->decompress(
         destination, &writtenSize, compressedBuffer_.data() + decodedSize_, &sourceSize);
     if (LZ4F_isError(lastResult_)) {
-      XR_LOGE("Decompression error {}", LZ4F_getErrorName(lastResult_));
+      THROTTLED_LOGW(lz4Context_.get(), "Decompression error {}", LZ4F_getErrorName(lastResult_));
       return domainErrorCode(
           ErrorDomain::Lz4DecompressionErrorDomain, lastResult_, LZ4F_getErrorName(lastResult_));
     }
@@ -250,7 +269,7 @@ int Decompressor::decompress(void* destination, uint32_t destinationSize, uint32
         destinationSize,
         outReadSize);
     if (ZSTD_isError(lastResult_)) {
-      XR_LOGE("Decompression error {}", ZSTD_getErrorName(lastResult_));
+      THROTTLED_LOGW(lz4Context_.get(), "Decompression error {}", ZSTD_getErrorName(lastResult_));
       return domainErrorCode(
           ErrorDomain::ZstdDecompressionErrorDomain, lastResult_, ZSTD_getErrorName(lastResult_));
     }

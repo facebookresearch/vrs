@@ -87,6 +87,11 @@ class RecordReader {
     return remainingDiskBytes_ != remainingUncompressedSize_;
   }
 
+  // for warning/error throttling only
+  const void* getRef() const {
+    return file_;
+  }
+
  protected:
   FileHandler* file_;
   uint32_t remainingDiskBytes_;

@@ -21,6 +21,7 @@
 #include <logging/Verify.h>
 
 #include <vrs/helpers/FileMacros.h>
+#include <vrs/helpers/Throttler.h>
 #include <vrs/os/CompilerAttributes.h>
 
 #include "RecordFormatStreamPlayer.h"
@@ -28,6 +29,14 @@
 
 using namespace std;
 
+namespace {
+
+vrs::utils::Throttler& getThrottler() {
+  static vrs::utils::Throttler sThrottler;
+  return sThrottler;
+}
+
+} // namespace
 namespace vrs {
 
 namespace {
@@ -47,7 +56,8 @@ bool mayUsePastConfigurationReader(
       ? "no configuration record was read prior to reading this"
       : "the most recent configuration record read for this stream has a newer"
         " timestamp than this";
-  XR_LOGW(
+  THROTTLED_LOGW(
+      record.fileReader,
       "Can't define the {} block format for {} to read this {} block with DataLayout. "
       "This might be happening, because the {} format is defined in a configuration record using "
       "datalayout conventions, but {} {} record.",
@@ -170,7 +180,8 @@ bool AudioBlockReader::readAudioContentBlock(
     if (remainingBlockSize == ContentBlock::kSizeUnknown || remainingBlockSize == expectedSize) {
       return player.onAudioRead(record, blockIndex_, contentBlock);
     }
-    XR_LOGW(
+    THROTTLED_LOGW(
+        record.fileReader,
         "Non-matching audio block size, got {} bytes, expected {} bytes.",
         remainingBlockSize,
         expectedSize);

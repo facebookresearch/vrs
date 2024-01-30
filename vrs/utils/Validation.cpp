@@ -29,6 +29,7 @@
 #include <vrs/FileHandlerFactory.h>
 #include <vrs/helpers/Rapidjson.hpp>
 #include <vrs/helpers/Strings.h>
+#include <vrs/helpers/Throttler.h>
 #include <vrs/os/Time.h>
 #include <vrs/utils/FilterCopy.h>
 #include <vrs/utils/PixelFrame.h>
@@ -41,6 +42,11 @@ using namespace vrs;
 namespace {
 
 using namespace vrs::utils;
+
+Throttler& getThrottler() {
+  static Throttler sThrottler;
+  return sThrottler;
+}
 
 #pragma pack(push, 1)
 struct PackedHeader {
@@ -234,14 +240,16 @@ class DecodeChecker : public VideoRecordFormatStreamPlayer {
     size_t unreadBytes = record.reader->getUnreadBytes();
     if (unreadBytes > 0) {
       processSuccess = false;
-      XR_LOGW(
+      THROTTLED_LOGW(
+          record.fileReader,
           "{} - {}: {} bytes unread out of {} bytes.",
           record.streamId.getNumericName(),
           Record::typeName(record.recordType),
           unreadBytes,
           record.recordSize);
     } else if (!processSuccess) {
-      XR_LOGW(
+      THROTTLED_LOGW(
+          record.fileReader,
           "{} - {}: could not be decoded.",
           record.streamId.getNumericName(),
           Record::typeName(record.recordType));
@@ -269,7 +277,7 @@ class DecodeChecker : public VideoRecordFormatStreamPlayer {
       override {
     size_t blockSize = cb.getBlockSize();
     if (blockSize == ContentBlock::kSizeUnknown) {
-      XR_LOGW("Block size for {} unknown.", cb.asString());
+      THROTTLED_LOGW(rec.fileReader, "Block size for {} unknown.", cb.asString());
       return isSuccess(false);
     }
     vector<char> data(blockSize);
