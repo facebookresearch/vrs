@@ -95,6 +95,7 @@ string toString(PixelFormat pixelFormat);
 enum class AudioFormat : uint8_t {
   UNDEFINED = 0, ///< Unknown/unspecified.
   PCM = 1, ///< Raw PCM audio data.
+  OPUS = 2, ///< Audio data compressed using Opus. https://opus-codec.org/
   COUNT ///< Count of values in this enum type. @internal
 };
 

@@ -135,7 +135,7 @@ static_assert(
 static_assert(
     static_cast<int>(PixelFormat::YUV_420_NV12) == 22,
     "PixelFormat enum values CHANGED!");
-const char* sAudioFormatNames[] = {"undefined", "pcm"};
+const char* sAudioFormatNames[] = {"undefined", "pcm", "opus"};
 struct AudioFormatConverter : public EnumStringConverter<
                                   AudioFormat,
                                   sAudioFormatNames,
@@ -147,6 +147,7 @@ struct AudioFormatConverter : public EnumStringConverter<
 
 // Enum values may NEVER BE CHANGED, as they are used in data layout definitions!!
 static_assert(static_cast<int>(AudioFormat::PCM) == 1, "AudioFormat enum values CHANGED!");
+static_assert(static_cast<int>(AudioFormat::OPUS) == 2, "AudioFormat enum values CHANGED!");
 
 // These text names may NEVER BE CHANGED, as they are used in data layout definitions!!
 const char* sAudioSampleFormatNames[] = {

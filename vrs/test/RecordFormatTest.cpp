@@ -436,6 +436,22 @@ TEST_F(RecordFormatTest, testBlockFormat) {
       "audio/pcm/float64be/channels=2/rate=32000/samples=100");
   FORMAT_EQUAL(ContentBlock(ContentType::CUSTOM), "custom");
   FORMAT_EQUAL(ContentBlock(ContentType::CUSTOM, 20), "custom/size=20");
+
+  ContentBlock opus("audio/opus");
+  EXPECT_EQ(opus.getContentType(), ContentType::AUDIO);
+  EXPECT_EQ(opus.audio().getAudioFormat(), AudioFormat::OPUS);
+
+  ContentBlock opusFull("audio/opus/float64be/channels=2/rate=32000/samples=100/stride=16");
+  EXPECT_EQ(opusFull.getContentType(), ContentType::AUDIO);
+  EXPECT_EQ(opusFull.getBlockSize(), 100 * 8 * 2);
+  EXPECT_EQ(opusFull.audio().getAudioFormat(), AudioFormat::OPUS);
+  EXPECT_EQ(opusFull.audio().getSampleFormat(), AudioSampleFormat::F64_BE);
+  EXPECT_EQ(opusFull.audio().getSampleRate(), 32000);
+  EXPECT_EQ(opusFull.audio().getChannelCount(), 2);
+  EXPECT_EQ(opusFull.audio().getBitsPerSample(), 64);
+  EXPECT_EQ(opusFull.audio().isLittleEndian(), false);
+  EXPECT_EQ(opusFull.audio().getSampleBlockStride(), 16);
+  EXPECT_EQ(opusFull.audio().getSampleCount(), 100);
 }
 
 TEST_F(RecordFormatTest, testBadStride) {
