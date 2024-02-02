@@ -342,14 +342,13 @@ class AudioContentBlockSpec {
   AudioContentBlockSpec(const AudioContentBlockSpec&) = default;
   /// For audio formats with encoding (mp3, flac, etc).
   explicit AudioContentBlockSpec(AudioFormat audioFormat, uint8_t channelCount = 0);
-  /// For PCM audio formats.
-  // NOLINTNEXTLINE(hicpp-explicit-conversions)
   AudioContentBlockSpec(
+      AudioFormat audioFormat,
       AudioSampleFormat sampleFormat,
       uint8_t channelCount = 0,
-      uint32_t sampleRate = 0,
-      uint32_t sampleCount = 0,
-      uint8_t sampleBlockStride = 0);
+      uint8_t sampleFrameStride = 0,
+      uint32_t sampleFrameRate = 0,
+      uint32_t sampleFrameCount = 0);
 
   /// Constructor used for factory construction.
   /// @internal
@@ -375,7 +374,11 @@ class AudioContentBlockSpec {
   bool operator==(const AudioContentBlockSpec& rhs) const {
     auto tie = [](const AudioContentBlockSpec& s) {
       return std::tie(
-          s.sampleFormat_, s.channelCount_, s.sampleBlockStride_, s.sampleCount_, s.sampleRate_);
+          s.sampleFormat_,
+          s.channelCount_,
+          s.sampleFrameStride_,
+          s.sampleFrameCount_,
+          s.sampleFrameRate_);
     };
     return tie(*this) == tie(rhs);
   }
@@ -385,7 +388,7 @@ class AudioContentBlockSpec {
   /// Tell if two audio block have identical audio formats.
   bool isCompatibleWith(const AudioContentBlockSpec& rhs) const {
     auto tie = [](const AudioContentBlockSpec& s) {
-      return std::tie(s.sampleFormat_, s.channelCount_, s.sampleRate_);
+      return std::tie(s.sampleFormat_, s.channelCount_, s.sampleFrameRate_);
     };
     return tie(*this) == tie(rhs);
   }
@@ -415,19 +418,19 @@ class AudioContentBlockSpec {
   uint8_t getBytesPerSample() const {
     return (getBitsPerSample(sampleFormat_) + 7) / 8; // round up
   }
-  /// Number of bytes used by group of synchronous audio samples, including padding
-  uint8_t getSampleBlockStride() const;
-  /// Get the number of audio channels in a sample block (not per content block).
+  /// Number of bytes used by a group of synchronous audio samples, including padding
+  uint8_t getSampleFrameStride() const;
+  /// Get the number of audio channels in each sample frame (not in the content block).
   uint8_t getChannelCount() const {
     return channelCount_;
   }
-  /// Get the audio sample rate.
+  /// Get the audio frame sample rate.
   uint32_t getSampleRate() const {
-    return sampleRate_;
+    return sampleFrameRate_;
   }
-  /// Get the number of audio sample blocks in the block.
+  /// Get the number of audio sample frames in the content block.
   uint32_t getSampleCount() const {
-    return sampleCount_;
+    return sampleFrameCount_;
   }
   /// Tell if the audio sample format is fully defined.
   /// For instance, PCM audio data when we have enough details: sample format & channel count.
@@ -448,6 +451,8 @@ class AudioContentBlockSpec {
   static bool isIEEEFloat(AudioSampleFormat sampleFormat);
   /// Get the number of bits per audio sample for a specific audio sample format.
   static uint8_t getBitsPerSample(AudioSampleFormat sampleFormat);
+  /// Get the number of bytes per audio sample for a specific audio sample format.
+  static uint8_t getBytesPerSample(AudioSampleFormat sampleFormat);
   /// Get an audio sample format as a string.
   static string getSampleFormatAsString(AudioSampleFormat sampleFormat) {
     return toString(sampleFormat);
@@ -456,10 +461,10 @@ class AudioContentBlockSpec {
  private:
   AudioFormat audioFormat_{};
   AudioSampleFormat sampleFormat_{};
-  uint8_t sampleBlockStride_{};
+  uint8_t sampleFrameStride_{};
   uint8_t channelCount_{};
-  uint32_t sampleRate_{};
-  uint32_t sampleCount_{};
+  uint32_t sampleFrameRate_{};
+  uint32_t sampleFrameCount_{};
 };
 
 /// \brief Specification of a VRS record content block.
@@ -519,14 +524,14 @@ class ContentBlock {
   // NOLINTNEXTLINE(hicpp-explicit-conversions)
   ContentBlock(AudioFormat audioFormat, uint8_t channelCount = 0);
 
-  /// PCM audio block description.
-  // NOLINTNEXTLINE(hicpp-explicit-conversions)
+  /// Audio block description.
   ContentBlock(
+      AudioFormat audioFormat,
       AudioSampleFormat sampleFormat,
       uint8_t numChannels = 0,
+      uint8_t sampleFrameStride = 0,
       uint32_t sampleRate = 0,
-      uint32_t sampleCount = 0,
-      uint8_t sampleBlockStride = 0);
+      uint32_t sampleCount = 0);
 
   /// Default copy constructor
   ContentBlock(const ContentBlock&) = default;

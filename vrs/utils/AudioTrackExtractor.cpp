@@ -73,8 +73,10 @@ bool AudioTrackExtractor::onAudioRead(
 
   if (!wavFile_.isOpened() || !fileAudioSpec_.isCompatibleWith(audioBlockSpec)) {
     AudioContentBlockSpec rawSpec(
+        audioBlockSpec.getAudioFormat(),
         audioBlockSpec.getSampleFormat(),
         audioBlockSpec.getChannelCount(),
+        audioBlockSpec.getSampleFrameStride(),
         audioBlockSpec.getSampleRate());
     if (wavFile_.isOpened()) {
       return stop(fmt::format(

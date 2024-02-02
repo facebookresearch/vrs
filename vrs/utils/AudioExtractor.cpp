@@ -113,7 +113,7 @@ int AudioExtractor::writeWavAudioData(
   uint32_t srcOffset = 0;
   uint32_t bytesPerSampleBlock =
       (audioBlock.getBitsPerSample() + 7) / 8 * audioBlock.getChannelCount();
-  uint32_t srcStride = audioBlock.getSampleBlockStride();
+  uint32_t srcStride = audioBlock.getSampleFrameStride();
   uint32_t totalSamples = audioBlock.getSampleCount();
   for (uint32_t i = 0; i < totalSamples; ++i) {
     if (srcOffset >= (uint32_t)audio.size()) {
@@ -194,8 +194,8 @@ bool AudioExtractor::onAudioRead(
          << (audioBlockSpec.getChannelCount() != 1 ? "s, " : ", ") << audioBlockSpec.getSampleRate()
          << " " << audioBlockSpec.getSampleFormatAsString() << " samples/s, "
          << static_cast<int>(audioBlockSpec.getBitsPerSample()) << " bits per sample, "
-         << static_cast<int>(audioBlockSpec.getSampleBlockStride())
-         << " bytes sample block stride.\n";
+         << static_cast<int>(audioBlockSpec.getSampleFrameStride())
+         << " bytes sample frame stride.\n";
     VERIFY_SUCCESS(createWavFile(path, audioBlockSpec, currentWavFile_));
 
     currentAudioContentBlockSpec_ = audioBlockSpec;

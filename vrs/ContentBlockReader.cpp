@@ -157,25 +157,26 @@ bool AudioBlockReader::readAudioContentBlock(
       if (remainingBlockSize > 0 && audioContent.getAudioFormat() == AudioFormat::PCM) {
         // The sample count is undefined, but we can to do the math,
         // using the remaining bytes in the record.
-        uint8_t sampleBlockStride = audioContent.getSampleBlockStride();
-        if (sampleBlockStride > 0 && (remainingBlockSize % sampleBlockStride) == 0) {
+        uint8_t sampleFrameStride = audioContent.getSampleFrameStride();
+        if (sampleFrameStride > 0 && (remainingBlockSize % sampleFrameStride) == 0) {
           // update contentBlock with the actual sample count
           return player.onAudioRead(
               record,
               blockIndex_,
               ContentBlock(
+                  AudioFormat::PCM,
                   audioContent.getSampleFormat(),
                   audioContent.getChannelCount(),
+                  audioContent.getSampleFrameStride(),
                   audioContent.getSampleRate(),
-                  static_cast<uint32_t>(remainingBlockSize / sampleBlockStride),
-                  audioContent.getSampleBlockStride()));
+                  static_cast<uint32_t>(remainingBlockSize / sampleFrameStride)));
         }
       }
       return player.onAudioRead(
           record, blockIndex_, ContentBlock(contentBlock, remainingBlockSize));
     }
   } else {
-    size_t expectedSize = sampleCount * audioContent.getSampleBlockStride();
+    size_t expectedSize = sampleCount * audioContent.getSampleFrameStride();
     // if we have redundant size information, validate our values
     if (remainingBlockSize == ContentBlock::kSizeUnknown || remainingBlockSize == expectedSize) {
       return player.onAudioRead(record, blockIndex_, contentBlock);
@@ -250,21 +251,22 @@ bool AudioBlockReader::audioContentFromAudioSpec(
       (audioSpec.channelCount.get(numChannels) && numChannels > 0) &&
       (audioSpec.sampleRate.get(sampleRate) && sampleRate > 0)) {
     // everything looks fine, check optional fields
-    uint8_t blockAlign = 0;
+    uint8_t sampleFrameStride = 0;
     uint32_t sampleCount = 0;
     uint32_t sampleSizeInBytes =
-        (AudioContentBlockSpec::getBitsPerSample(sampleFormat) >> 3) * numChannels;
-    // If blockAlign field is set, perform a sanity check based on the format. Assume that any
+        AudioContentBlockSpec::getBytesPerSample(sampleFormat) * numChannels;
+    // If sampleStride field is set, perform a sanity check based on the format. Assume that any
     // meaningful alignment of a sample won't be longer than additional 2 bytes per channel e.g. if
     // uint16_t samples is stored in uint32_t for some reason
-    if (audioSpec.sampleStride.get(blockAlign) &&
-        (blockAlign < sampleSizeInBytes || blockAlign > sampleSizeInBytes + numChannels * 2)) {
+    if (audioSpec.sampleStride.get(sampleFrameStride) &&
+        (sampleFrameStride < sampleSizeInBytes ||
+         sampleFrameStride > sampleSizeInBytes + numChannels * 2)) {
       // has invalid block align
       return false;
     }
     audioSpec.sampleCount.get(sampleCount);
-    audioContentBlock =
-        ContentBlock(sampleFormat, numChannels, sampleRate, sampleCount, blockAlign);
+    audioContentBlock = ContentBlock(
+        AudioFormat::PCM, sampleFormat, numChannels, sampleFrameStride, sampleRate, sampleCount);
     return true;
   }
   return false;

@@ -384,7 +384,7 @@ TEST_F(RecordFormatTest, testBlockFormat) {
   EXPECT_EQ(partial.audio().getChannelCount(), 1);
   EXPECT_EQ(partial.audio().getBitsPerSample(), 24);
   EXPECT_EQ(partial.audio().isLittleEndian(), false);
-  EXPECT_EQ(partial.audio().getSampleBlockStride(), 3);
+  EXPECT_EQ(partial.audio().getSampleFrameStride(), 3);
   EXPECT_EQ(partial.audio().getSampleCount(), 0);
 
   ContentBlock full("audio/pcm/float64be/channels=2/rate=32000/samples=100/stride=16");
@@ -396,7 +396,7 @@ TEST_F(RecordFormatTest, testBlockFormat) {
   EXPECT_EQ(full.audio().getChannelCount(), 2);
   EXPECT_EQ(full.audio().getBitsPerSample(), 64);
   EXPECT_EQ(full.audio().isLittleEndian(), false);
-  EXPECT_EQ(full.audio().getSampleBlockStride(), 16);
+  EXPECT_EQ(full.audio().getSampleFrameStride(), 16);
   EXPECT_EQ(full.audio().getSampleCount(), 100);
 
   ContentBlock direct("audio/pcm/float64be/channels=2/rate=32000/samples=100/stride=16");
@@ -408,7 +408,7 @@ TEST_F(RecordFormatTest, testBlockFormat) {
   EXPECT_EQ(direct.audio().getChannelCount(), 2);
   EXPECT_EQ(direct.audio().getBitsPerSample(), 64);
   EXPECT_EQ(direct.audio().isLittleEndian(), false);
-  EXPECT_EQ(direct.audio().getSampleBlockStride(), 16);
+  EXPECT_EQ(direct.audio().getSampleFrameStride(), 16);
   EXPECT_EQ(direct.audio().getSampleCount(), 100);
 
   ContentBlock exotic("audio/pcm/int24be/channels=3/rate=12345");
@@ -418,7 +418,7 @@ TEST_F(RecordFormatTest, testBlockFormat) {
   EXPECT_EQ(exotic.audio().getSampleRate(), 12345);
   EXPECT_EQ(exotic.audio().getChannelCount(), 3);
   EXPECT_EQ(exotic.audio().getBitsPerSample(), 24);
-  EXPECT_EQ(exotic.audio().getSampleBlockStride(), 9);
+  EXPECT_EQ(exotic.audio().getSampleFrameStride(), 9);
 
   ContentBlock telco("audio/pcm/uint8mulaw/channels=1/rate=8000/samples=800");
   EXPECT_EQ(telco.getContentType(), ContentType::AUDIO);
@@ -428,11 +428,11 @@ TEST_F(RecordFormatTest, testBlockFormat) {
   EXPECT_EQ(telco.audio().getSampleRate(), 8000);
   EXPECT_EQ(telco.audio().getChannelCount(), 1);
   EXPECT_EQ(telco.audio().getBitsPerSample(), 8);
-  EXPECT_EQ(telco.audio().getSampleBlockStride(), 1);
+  EXPECT_EQ(telco.audio().getSampleFrameStride(), 1);
 
   FORMAT_EQUAL(ContentBlock(ContentType::AUDIO), "audio");
   FORMAT_EQUAL(
-      ContentBlock(AudioSampleFormat::F64_BE, 2, 32000, 100, 16),
+      ContentBlock(AudioFormat::PCM, AudioSampleFormat::F64_BE, 2, 16, 32000, 100),
       "audio/pcm/float64be/channels=2/rate=32000/samples=100");
   FORMAT_EQUAL(ContentBlock(ContentType::CUSTOM), "custom");
   FORMAT_EQUAL(ContentBlock(ContentType::CUSTOM, 20), "custom/size=20");
@@ -450,7 +450,7 @@ TEST_F(RecordFormatTest, testBlockFormat) {
   EXPECT_EQ(opusFull.audio().getChannelCount(), 2);
   EXPECT_EQ(opusFull.audio().getBitsPerSample(), 64);
   EXPECT_EQ(opusFull.audio().isLittleEndian(), false);
-  EXPECT_EQ(opusFull.audio().getSampleBlockStride(), 16);
+  EXPECT_EQ(opusFull.audio().getSampleFrameStride(), 16);
   EXPECT_EQ(opusFull.audio().getSampleCount(), 100);
 }
 

@@ -26,6 +26,7 @@
 
 #define DEFAULT_LOG_CHANNEL "RecordFormat"
 #include <logging/Log.h>
+#include <logging/Verify.h>
 
 #include <vrs/DataLayout.h>
 #include <vrs/helpers/EnumStringConverter.h>
@@ -665,19 +666,21 @@ AudioContentBlockSpec::AudioContentBlockSpec(AudioFormat audioFormat, uint8_t ch
 }
 
 AudioContentBlockSpec::AudioContentBlockSpec(
+    AudioFormat audioFormat,
     AudioSampleFormat sampleFormat,
     uint8_t channelCount,
-    uint32_t sampleRate,
-    uint32_t sampleCount,
-    uint8_t sampleBlockStride)
-    : audioFormat_{AudioFormat::PCM},
+    uint8_t sampleFrameStride,
+    uint32_t sampleFrameRate,
+    uint32_t sampleFrameCount)
+    : audioFormat_{audioFormat},
       sampleFormat_{sampleFormat},
-      sampleBlockStride_{sampleBlockStride},
+      sampleFrameStride_{sampleFrameStride},
       channelCount_{channelCount},
-      sampleRate_{sampleRate},
-      sampleCount_{sampleCount} {
-  assert(sampleFormat != AudioSampleFormat::UNDEFINED);
-  assert(sampleBlockStride_ == 0 || sampleBlockStride_ * 8 >= getBitsPerSample() * channelCount);
+      sampleFrameRate_{sampleFrameRate},
+      sampleFrameCount_{sampleFrameCount} {
+  XR_VERIFY(audioFormat != AudioFormat::UNDEFINED);
+  XR_VERIFY(sampleFormat != AudioSampleFormat::UNDEFINED);
+  XR_VERIFY(sampleFrameStride_ == 0 || sampleFrameStride_ * 8 >= getBitsPerSample() * channelCount);
 }
 
 AudioContentBlockSpec::AudioContentBlockSpec(const string& formatStr) {
@@ -689,9 +692,9 @@ void AudioContentBlockSpec::clear() {
   audioFormat_ = AudioFormat::UNDEFINED;
   sampleFormat_ = AudioSampleFormat::UNDEFINED;
   channelCount_ = 0;
-  sampleBlockStride_ = 0;
-  sampleRate_ = 0;
-  sampleCount_ = 0;
+  sampleFrameStride_ = 0;
+  sampleFrameRate_ = 0;
+  sampleFrameCount_ = 0;
 }
 
 void AudioContentBlockSpec::set(ContentParser& parser) {
@@ -724,18 +727,18 @@ void AudioContentBlockSpec::set(ContentParser& parser) {
           }
           break;
         case 'r':
-          if (sampleRate_ == 0 && sscanf(parser.str.c_str(), "rate=%u", &tmp) == 1) {
-            sampleRate_ = static_cast<uint32_t>(tmp);
+          if (sampleFrameRate_ == 0 && sscanf(parser.str.c_str(), "rate=%u", &tmp) == 1) {
+            sampleFrameRate_ = static_cast<uint32_t>(tmp);
             continue;
           }
           break;
         case 's':
-          if (sampleCount_ == 0 && sscanf(parser.str.c_str(), "samples=%u", &tmp) == 1) {
-            sampleCount_ = static_cast<uint32_t>(tmp);
+          if (sampleFrameCount_ == 0 && sscanf(parser.str.c_str(), "samples=%u", &tmp) == 1) {
+            sampleFrameCount_ = static_cast<uint32_t>(tmp);
             continue;
           } else if (
-              sampleBlockStride_ == 0 && sscanf(parser.str.c_str(), "stride=%u", &tmp) == 1) {
-            sampleBlockStride_ = static_cast<uint8_t>(tmp);
+              sampleFrameStride_ == 0 && sscanf(parser.str.c_str(), "stride=%u", &tmp) == 1) {
+            sampleFrameStride_ = static_cast<uint8_t>(tmp);
             continue;
           }
           break;
@@ -758,21 +761,21 @@ string AudioContentBlockSpec::asString() const {
   if (channelCount_ != 0) {
     s.append("/channels=").append(to_string(channelCount_));
   }
-  if (sampleRate_ != 0) {
-    s.append("/rate=").append(to_string(sampleRate_));
+  if (sampleFrameRate_ != 0) {
+    s.append("/rate=").append(to_string(sampleFrameRate_));
   }
-  if (sampleCount_ != 0) {
-    s.append("/samples=").append(to_string(sampleCount_));
+  if (sampleFrameCount_ != 0) {
+    s.append("/samples=").append(to_string(sampleFrameCount_));
   }
-  if (getSampleBlockStride() * 8 != getBitsPerSample() * channelCount_) {
-    s.append("/stride=").append(to_string(sampleBlockStride_));
+  if (getSampleFrameStride() * 8 != getBitsPerSample() * channelCount_) {
+    s.append("/stride=").append(to_string(sampleFrameStride_));
   }
   return s;
 }
 
 size_t AudioContentBlockSpec::getBlockSize() const {
-  if (sampleFormat_ != AudioSampleFormat::UNDEFINED && channelCount_ > 0 && sampleCount_ > 0) {
-    return getSampleBlockStride() * sampleCount_;
+  if (sampleFormat_ != AudioSampleFormat::UNDEFINED && channelCount_ > 0 && sampleFrameCount_ > 0) {
+    return getSampleFrameStride() * sampleFrameCount_;
   }
   return ContentBlock::kSizeUnknown;
 }
@@ -860,9 +863,13 @@ uint8_t AudioContentBlockSpec::getBitsPerSample(AudioSampleFormat sampleFormat) 
   return 0; // required by some compilers
 }
 
-uint8_t AudioContentBlockSpec::getSampleBlockStride() const {
-  if (sampleBlockStride_ != 0) {
-    return sampleBlockStride_;
+uint8_t AudioContentBlockSpec::getBytesPerSample(AudioSampleFormat sampleFormat) {
+  return (getBitsPerSample(sampleFormat) + 7) >> 3;
+}
+
+uint8_t AudioContentBlockSpec::getSampleFrameStride() const {
+  if (sampleFrameStride_ != 0) {
+    return sampleFrameStride_;
   }
   return getBytesPerSample() * channelCount_;
 }
@@ -904,13 +911,20 @@ ContentBlock::ContentBlock(AudioFormat audioFormat, uint8_t channelCount)
     : contentType_{ContentType::AUDIO}, audioSpec_{audioFormat, channelCount} {}
 
 ContentBlock::ContentBlock(
+    AudioFormat audioFormat,
     AudioSampleFormat sampleFormat,
     uint8_t numChannels,
+    uint8_t sampleFrameStride,
     uint32_t sampleRate,
-    uint32_t sampleCount,
-    uint8_t sampleBlockStride)
+    uint32_t sampleCount)
     : contentType_(ContentType::AUDIO),
-      audioSpec_(sampleFormat, numChannels, sampleRate, sampleCount, sampleBlockStride) {}
+      audioSpec_(
+          audioFormat,
+          sampleFormat,
+          numChannels,
+          sampleFrameStride,
+          sampleRate,
+          sampleCount) {}
 
 ContentBlock::ContentBlock(ContentType type, size_t size) : contentType_(type), size_(size) {
   switch (contentType_) {
@@ -1001,12 +1015,12 @@ RecordFormat ContentBlock::operator+(const ContentBlock& other) const {
 }
 
 const ImageContentBlockSpec& ContentBlock::image() const {
-  assert(contentType_ == ContentType::IMAGE);
+  XR_VERIFY(contentType_ == ContentType::IMAGE);
   return imageSpec_;
 }
 
 const AudioContentBlockSpec& ContentBlock::audio() const {
-  assert(contentType_ == ContentType::AUDIO);
+  XR_VERIFY(contentType_ == ContentType::AUDIO);
   return audioSpec_;
 }
 

@@ -136,7 +136,7 @@ class AudioStream : public Recordable {
         Record::Type::DATA,
         kDataRecordFormatVersion,
         // the following describe data records' format: a block of audio samples
-        ContentBlock(AudioSampleFormat::S16_LE, kNumChannels, kSampleRate),
+        ContentBlock(AudioFormat::PCM, AudioSampleFormat::S16_LE, kNumChannels, 0, kSampleRate),
         {});
   }
   const Record* createConfigurationRecord() override {
