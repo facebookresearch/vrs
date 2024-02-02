@@ -91,10 +91,9 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_audio_content_block_spec.html#afd737e918926934fa519c1abff26c913">AudioContentBlockSpec</a> (<a class="el" href="namespacevrs.html#add2bb21a732f1a1a425cb65c9cb69a03">AudioFormat</a> audioFormat, uint8_t channelCount=0)</td></tr>
 <tr class="memdesc:afd737e918926934fa519c1abff26c913"><td class="mdescLeft">&#160;</td><td class="mdescRight">For audio formats with encoding (mp3, flac, etc). <br /></td></tr>
 <tr class="separator:afd737e918926934fa519c1abff26c913"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a50ed0bf237514bf9ee91bb8ea6d35589"><td class="memItemLeft" align="right" valign="top"><a id="a50ed0bf237514bf9ee91bb8ea6d35589"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_audio_content_block_spec.html#a50ed0bf237514bf9ee91bb8ea6d35589">AudioContentBlockSpec</a> (<a class="el" href="namespacevrs.html#a52303127bf307e1191fcb9b2ee2841d4">AudioSampleFormat</a> sampleFormat, uint8_t channelCount=0, uint32_t sampleRate=0, uint32_t sampleCount=0, uint8_t sampleBlockStride=0)</td></tr>
-<tr class="memdesc:a50ed0bf237514bf9ee91bb8ea6d35589"><td class="mdescLeft">&#160;</td><td class="mdescRight">For PCM audio formats. <br /></td></tr>
-<tr class="separator:a50ed0bf237514bf9ee91bb8ea6d35589"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a5e87e983037d8a8064af5df7f1c16f"><td class="memItemLeft" align="right" valign="top"><a id="a9a5e87e983037d8a8064af5df7f1c16f"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>AudioContentBlockSpec</b> (<a class="el" href="namespacevrs.html#add2bb21a732f1a1a425cb65c9cb69a03">AudioFormat</a> audioFormat, <a class="el" href="namespacevrs.html#a52303127bf307e1191fcb9b2ee2841d4">AudioSampleFormat</a> sampleFormat, uint8_t channelCount=0, uint8_t sampleFrameStride=0, uint32_t sampleFrameRate=0, uint32_t sampleFrameCount=0)</td></tr>
+<tr class="separator:a9a5e87e983037d8a8064af5df7f1c16f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af17a111767e6ebda58a97fa85ff8580f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_audio_content_block_spec.html#af17a111767e6ebda58a97fa85ff8580f">AudioContentBlockSpec</a> (const string &amp;formatStr)</td></tr>
 <tr class="separator:af17a111767e6ebda58a97fa85ff8580f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a155607aa414f67561a2a8aefd19c7568"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_audio_content_block_spec.html#a155607aa414f67561a2a8aefd19c7568">set</a> (<a class="el" href="classvrs_1_1_content_parser.html">ContentParser</a> &amp;parser)</td></tr>
@@ -152,21 +151,21 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_audio_content_block_spec.html#a63bd5cd0e90766f514fb6e06418c64e6">getBytesPerSample</a> () const</td></tr>
 <tr class="memdesc:a63bd5cd0e90766f514fb6e06418c64e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of bytes per audio sample. <br /></td></tr>
 <tr class="separator:a63bd5cd0e90766f514fb6e06418c64e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aff454ebec258026a5036500f5de4d752"><td class="memItemLeft" align="right" valign="top"><a id="aff454ebec258026a5036500f5de4d752"></a>
-uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_audio_content_block_spec.html#aff454ebec258026a5036500f5de4d752">getSampleBlockStride</a> () const</td></tr>
-<tr class="memdesc:aff454ebec258026a5036500f5de4d752"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of bytes used by group of synchronous audio samples, including padding. <br /></td></tr>
-<tr class="separator:aff454ebec258026a5036500f5de4d752"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b70ac0dbaceddc3ed31430d92e9d13c"><td class="memItemLeft" align="right" valign="top"><a id="a6b70ac0dbaceddc3ed31430d92e9d13c"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_audio_content_block_spec.html#a6b70ac0dbaceddc3ed31430d92e9d13c">getSampleFrameStride</a> () const</td></tr>
+<tr class="memdesc:a6b70ac0dbaceddc3ed31430d92e9d13c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of bytes used by a group of synchronous audio samples, including padding. <br /></td></tr>
+<tr class="separator:a6b70ac0dbaceddc3ed31430d92e9d13c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a09803d8a9de55c018167b8fdc825fb5d"><td class="memItemLeft" align="right" valign="top"><a id="a09803d8a9de55c018167b8fdc825fb5d"></a>
 uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_audio_content_block_spec.html#a09803d8a9de55c018167b8fdc825fb5d">getChannelCount</a> () const</td></tr>
-<tr class="memdesc:a09803d8a9de55c018167b8fdc825fb5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of audio channels in a sample block (not per content block). <br /></td></tr>
+<tr class="memdesc:a09803d8a9de55c018167b8fdc825fb5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of audio channels in each sample frame (not in the content block). <br /></td></tr>
 <tr class="separator:a09803d8a9de55c018167b8fdc825fb5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a80b0ffdbecd9629efe62e0be31557434"><td class="memItemLeft" align="right" valign="top"><a id="a80b0ffdbecd9629efe62e0be31557434"></a>
 uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_audio_content_block_spec.html#a80b0ffdbecd9629efe62e0be31557434">getSampleRate</a> () const</td></tr>
-<tr class="memdesc:a80b0ffdbecd9629efe62e0be31557434"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the audio sample rate. <br /></td></tr>
+<tr class="memdesc:a80b0ffdbecd9629efe62e0be31557434"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the audio frame sample rate. <br /></td></tr>
 <tr class="separator:a80b0ffdbecd9629efe62e0be31557434"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5d9e2ffed6d5bbe89caa589dbc954b1a"><td class="memItemLeft" align="right" valign="top"><a id="a5d9e2ffed6d5bbe89caa589dbc954b1a"></a>
 uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_audio_content_block_spec.html#a5d9e2ffed6d5bbe89caa589dbc954b1a">getSampleCount</a> () const</td></tr>
-<tr class="memdesc:a5d9e2ffed6d5bbe89caa589dbc954b1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of audio sample blocks in the block. <br /></td></tr>
+<tr class="memdesc:a5d9e2ffed6d5bbe89caa589dbc954b1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of audio sample frames in the content block. <br /></td></tr>
 <tr class="separator:a5d9e2ffed6d5bbe89caa589dbc954b1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a502ebad03cc6af8be363c041cd9cdc37"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_audio_content_block_spec.html#a502ebad03cc6af8be363c041cd9cdc37">isSampleBlockFormatDefined</a> () const</td></tr>
 <tr class="separator:a502ebad03cc6af8be363c041cd9cdc37"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -185,6 +184,10 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_audio_content_block_spec.html#aa169cb478d04e182d082beafab75a0b0">getBitsPerSample</a> (<a class="el" href="namespacevrs.html#a52303127bf307e1191fcb9b2ee2841d4">AudioSampleFormat</a> sampleFormat)</td></tr>
 <tr class="memdesc:aa169cb478d04e182d082beafab75a0b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of bits per audio sample for a specific audio sample format. <br /></td></tr>
 <tr class="separator:aa169cb478d04e182d082beafab75a0b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae0add6afbd71d0a505e9a7b75f50a377"><td class="memItemLeft" align="right" valign="top"><a id="ae0add6afbd71d0a505e9a7b75f50a377"></a>
+static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_audio_content_block_spec.html#ae0add6afbd71d0a505e9a7b75f50a377">getBytesPerSample</a> (<a class="el" href="namespacevrs.html#a52303127bf307e1191fcb9b2ee2841d4">AudioSampleFormat</a> sampleFormat)</td></tr>
+<tr class="memdesc:ae0add6afbd71d0a505e9a7b75f50a377"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of bytes per audio sample for a specific audio sample format. <br /></td></tr>
+<tr class="separator:ae0add6afbd71d0a505e9a7b75f50a377"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af18897a1ab157147355973a20ce6e7bc"><td class="memItemLeft" align="right" valign="top"><a id="af18897a1ab157147355973a20ce6e7bc"></a>
 static string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_audio_content_block_spec.html#af18897a1ab157147355973a20ce6e7bc">getSampleFormatAsString</a> (<a class="el" href="namespacevrs.html#a52303127bf307e1191fcb9b2ee2841d4">AudioSampleFormat</a> sampleFormat)</td></tr>
 <tr class="memdesc:af18897a1ab157147355973a20ce6e7bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get an audio sample format as a string. <br /></td></tr>
