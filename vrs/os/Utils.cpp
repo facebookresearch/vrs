@@ -75,6 +75,10 @@ namespace os {
 std::wstring osUtf8ToWstring(const string& utf8String) {
   return std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().from_bytes(utf8String);
 }
+
+std::string osWstringtoUtf8(const std::wstring& wstring) {
+  return std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(wstring);
+}
 #endif // IS_WINDOWS_PLATFORM()
 
 FILE* fileOpen(const string& path, const char* modes) {
@@ -211,6 +215,7 @@ bool getLinkedTarget(const string& sourcePath, string& outLinkedPath) {
   if (fs::symlink_status(source).type() == fs::symlink_file) {
     // Note: apply canonical() instead of readlink()
     // so that relative paths in symlinks are resolved properly
+
     outLinkedPath = fs::canonical(source).string();
     return true;
   }
@@ -328,7 +333,7 @@ bool isDir(const string& path) {
 
 bool isFile(const string& path) {
   fs_error_code ec;
-  auto type = fs::status(fs::path(path), ec).type(); // This will traverse symlinks
+  auto type = fs::status(fs::path(osUtf8ToWstring(path)), ec).type(); // This will traverse symlinks
   if (ec) { // Underlying OS API error - we cannot access it.
     return false;
   }
@@ -356,7 +361,7 @@ bool pathExists(const string& path) {
 
 int64_t getFileSize(const string& path) {
   fs_error_code ec;
-  auto size = fs::file_size(fs::path(path), ec);
+  auto size = fs::file_size(fs::path(osUtf8ToWstring(path)), ec);
   if (ec) {
     return -1;
   }

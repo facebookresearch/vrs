@@ -134,7 +134,7 @@ uint32_t MultiRecordFileReader::getRecordCount() const {
   if (hasSingleFile()) {
     return readers_.front()->getRecordCount();
   }
-  return XR_DEV_PRECONDITION_NOTNULL(recordIndex_)->size();
+  return (size_t)XR_DEV_PRECONDITION_NOTNULL(recordIndex_)->size();
 }
 
 uint32_t MultiRecordFileReader::getRecordCount(UniqueStreamId uniqueStreamId) const {

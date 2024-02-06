@@ -93,8 +93,7 @@ string vrs::os::getOsFingerPrint() {
 #if _MSC_VER < 1900
 
   dwVersion = GetVersion();
-    Get the Windows version.
-  dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
+  Get the Windows version.dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
   dwMinorVersion = (DWORD)(HIBYTE(LOWORD(dwVersion)));
 
   // Get the build number.
@@ -113,8 +112,7 @@ string vrs::os::getOsFingerPrint() {
   VER_SET_CONDITION(dwlConditionMask, VER_MINORVERSION, VER_GREATER_EQUAL);
   VER_SET_CONDITION(dwlConditionMask, VER_BUILDNUMBER, VER_GREATER_EQUAL);
   VerifyVersionInfo(
-      &versionInfo, VER_MAJORVERSION | VER_MINORVERSION | VER_BUILDNUMBER,
-      dwlConditionMask);
+      &versionInfo, VER_MAJORVERSION | VER_MINORVERSION | VER_BUILDNUMBER, dwlConditionMask);
 
   dwMajorVersion = versionInfo.dwMajorVersion;
   dwMinorVersion = versionInfo.dwMinorVersion;
