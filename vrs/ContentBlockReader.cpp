@@ -242,11 +242,17 @@ bool AudioBlockReader::findAudioSpec(
 bool AudioBlockReader::audioContentFromAudioSpec(
     const datalayout_conventions::AudioSpec& audioSpec,
     ContentBlock& audioContentBlock) {
+  AudioFormat audioFormat = AudioFormat::UNDEFINED;
   AudioSampleFormat sampleFormat = AudioSampleFormat::UNDEFINED;
   uint8_t numChannels = 0;
   uint32_t sampleRate = 0;
+  // if audioFormat is missing, assume it's AudioFormat::PCM (legacy behavior)
+  if (!audioSpec.audioFormat.get(audioFormat)) {
+    audioFormat = AudioFormat::PCM;
+  }
   // check minimal set of required fields
-  if ((audioSpec.sampleType.get(sampleFormat) && sampleFormat > AudioSampleFormat::UNDEFINED &&
+  if (audioFormat > AudioFormat::UNDEFINED &&
+      (audioSpec.sampleType.get(sampleFormat) && sampleFormat > AudioSampleFormat::UNDEFINED &&
        sampleFormat < AudioSampleFormat::COUNT) &&
       (audioSpec.channelCount.get(numChannels) && numChannels > 0) &&
       (audioSpec.sampleRate.get(sampleRate) && sampleRate > 0)) {
@@ -266,7 +272,7 @@ bool AudioBlockReader::audioContentFromAudioSpec(
     }
     audioSpec.sampleCount.get(sampleCount);
     audioContentBlock = ContentBlock(
-        AudioFormat::PCM, sampleFormat, numChannels, sampleFrameStride, sampleRate, sampleCount);
+        audioFormat, sampleFormat, numChannels, sampleFrameStride, sampleRate, sampleCount);
     return true;
   }
   return false;

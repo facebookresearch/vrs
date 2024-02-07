@@ -120,6 +120,8 @@ class VideoFrameSpec : public AutoDataLayout {
   AutoDataLayoutEnd end;
 };
 
+/// DataLayout convention name for the audio format (see vrs::AudioFormat).
+constexpr const char* kAudioFormat = "audio_format";
 /// DataLayout convention name for the audio sample format (see vrs::AudioSampleFormat).
 constexpr const char* kAudioSampleFormat = "audio_sample_format";
 /// DataLayout convention name for the padded number of bytes per sample.
@@ -137,11 +139,13 @@ constexpr const char* kAudioSampleCount = "audio_sample_count";
 /// a DataLayout block, which is either before the audio content block in the same record,
 /// or in the last Configuration record. Note that once a configuration *location* is found,
 /// the next time around, the same *location* will be used again.
+/// AudioFormat is optional for legacy reasons, and is assumed to be AudioFormat::PCM when missing.
 ///
 /// Note that the values used are *not* static, so that if the configuration changes,
 /// the latest value is used, without having to search each time we have a new image block.
 class AudioSpec : public AutoDataLayout {
  public:
+  DataPieceEnum<AudioFormat, uint8_t> audioFormat{kAudioFormat}; ///< optional
   DataPieceEnum<AudioSampleFormat, uint8_t> sampleType{kAudioSampleFormat};
   DataPieceValue<uint8_t> sampleStride{kAudioSampleStride};
   DataPieceValue<uint8_t> channelCount{kAudioChannelCount};
