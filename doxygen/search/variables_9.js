@@ -1,10 +1,8 @@
 var searchData=
 [
-  ['reader_1565',['reader',['../structvrs_1_1_current_record.html#a5a0fb3e2f03d9f2770e9ec566d16a0fc',1,'vrs::CurrentRecord']]],
-  ['recordableinstanceid_1566',['recordableInstanceId',['../structvrs_1_1_file_format_1_1_record_header.html#a6cdce4ced107ad68f6322378fa718cdb',1,'vrs::FileFormat::RecordHeader']]],
-  ['recordabletypeid_1567',['recordableTypeId',['../structvrs_1_1_file_format_1_1_record_header.html#ae72ecbcb6ff93f5d41bb53568ca07e24',1,'vrs::FileFormat::RecordHeader']]],
-  ['recordheadersize_1568',['recordHeaderSize',['../structvrs_1_1_file_format_1_1_file_header.html#aa43f495918f8ecd03bd61149460fde04',1,'vrs::FileFormat::FileHeader']]],
-  ['recordsize_1569',['recordSize',['../structvrs_1_1_file_format_1_1_record_header.html#ade5b9bb779c048471004b9e56a9b6c17',1,'vrs::FileFormat::RecordHeader::recordSize()'],['../structvrs_1_1_current_record.html#a3e76ae69fc31663d41bd9531aa91f163',1,'vrs::CurrentRecord::recordSize()']]],
-  ['recordtype_1570',['recordType',['../structvrs_1_1_file_format_1_1_record_header.html#a3b274afbf7ac599d8693267b02f2d4c2',1,'vrs::FileFormat::RecordHeader::recordType()'],['../structvrs_1_1_index_record_1_1_record_info.html#a64280c04dff3b0d0c850428592bcd43f',1,'vrs::IndexRecord::RecordInfo::recordType()']]],
-  ['required_1571',['required',['../structvrs_1_1_json_format_profile_spec.html#a4852a7925d1cf7c6915f355252ac6802',1,'vrs::JsonFormatProfileSpec']]]
+  ['prettyjson_1567',['prettyJson',['../structvrs_1_1_json_format_profile_spec.html#ac956c4dc8cd47f0dd7d9cc091cd3ea65',1,'vrs::JsonFormatProfileSpec']]],
+  ['previousrecordsize_1568',['previousRecordSize',['../structvrs_1_1_file_format_1_1_record_header.html#a1f286c194800be0006fa8c4904026d53',1,'vrs::FileFormat::RecordHeader']]],
+  ['properties_1569',['properties',['../structvrs_1_1_json_format_profile_spec.html#ae1c71f2ee9b45bb0fe2da10bb614a4bf',1,'vrs::JsonFormatProfileSpec']]],
+  ['publicnames_1570',['publicNames',['../structvrs_1_1_json_format_profile_spec.html#a875f410006a2682b3a5f4bd1de586fda',1,'vrs::JsonFormatProfileSpec']]],
+  ['purgethreaddata_5f_1571',['purgeThreadData_',['../classvrs_1_1_record_file_writer.html#a625e8d8842c54f6c6b95242f3ef705a5',1,'vrs::RecordFileWriter']]]
 ];

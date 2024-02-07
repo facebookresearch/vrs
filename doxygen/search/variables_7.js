@@ -1,4 +1,7 @@
 var searchData=
 [
-  ['name_1559',['name',['../structvrs_1_1_json_format_profile_spec.html#a9acfdcc4f9c465e9d3ae42e27889bd2b',1,'vrs::JsonFormatProfileSpec']]]
+  ['magicheader1_1562',['magicHeader1',['../structvrs_1_1_file_format_1_1_file_header.html#a504e7470a5bd84919148b55e32dce4ec',1,'vrs::FileFormat::FileHeader']]],
+  ['magicheader2_1563',['magicHeader2',['../structvrs_1_1_file_format_1_1_file_header.html#a0d5f02da01fafd72a0459239bc7daa85',1,'vrs::FileFormat::FileHeader']]],
+  ['magicheader3_1564',['magicHeader3',['../structvrs_1_1_file_format_1_1_file_header.html#a296e4b71d574fcefba5d52738c32f743',1,'vrs::FileFormat::FileHeader']]],
+  ['mappeddatalayout_5f_1565',['mappedDataLayout_',['../classvrs_1_1_data_layout.html#af07462306150f59648155162db10c7bb',1,'vrs::DataLayout']]]
 ];

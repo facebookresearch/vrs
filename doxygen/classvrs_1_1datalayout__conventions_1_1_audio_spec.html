@@ -92,6 +92,10 @@ Inheritance diagram for vrs::datalayout_conventions::AudioSpec:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
+<tr class="memitem:a9cb506e6cd67bc8f6995f9002402c050"><td class="memItemLeft" align="right" valign="top"><a id="a9cb506e6cd67bc8f6995f9002402c050"></a>
+<a class="el" href="classvrs_1_1_data_piece_enum.html">DataPieceEnum</a>&lt; <a class="el" href="namespacevrs.html#add2bb21a732f1a1a425cb65c9cb69a03">AudioFormat</a>, uint8_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1datalayout__conventions_1_1_audio_spec.html#a9cb506e6cd67bc8f6995f9002402c050">audioFormat</a> {<a class="el" href="namespacevrs_1_1datalayout__conventions.html#a45f69a94ac1fbc81a6a880fff724b338">kAudioFormat</a>}</td></tr>
+<tr class="memdesc:a9cb506e6cd67bc8f6995f9002402c050"><td class="mdescLeft">&#160;</td><td class="mdescRight">optional <br /></td></tr>
+<tr class="separator:a9cb506e6cd67bc8f6995f9002402c050"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a01de03082d7c3fa0eaa40a87350c98d6"><td class="memItemLeft" align="right" valign="top"><a id="a01de03082d7c3fa0eaa40a87350c98d6"></a>
 <a class="el" href="classvrs_1_1_data_piece_enum.html">DataPieceEnum</a>&lt; <a class="el" href="namespacevrs.html#a52303127bf307e1191fcb9b2ee2841d4">AudioSampleFormat</a>, uint8_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>sampleType</b> {<a class="el" href="namespacevrs_1_1datalayout__conventions.html#abc22f351dc37d0e23f0edb8f8600ce17">kAudioSampleFormat</a>}</td></tr>
 <tr class="separator:a01de03082d7c3fa0eaa40a87350c98d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -274,7 +278,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> definitions use to describe what's in an audio content block. </p>
-<p>These names and types are a convention that enables us to find audio block spec within a <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> block, which is either before the audio content block in the same record, or in the last Configuration record. Note that once a configuration <em>location</em> is found, the next time around, the same <em>location</em> will be used again.</p>
+<p>These names and types are a convention that enables us to find audio block spec within a <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> block, which is either before the audio content block in the same record, or in the last Configuration record. Note that once a configuration <em>location</em> is found, the next time around, the same <em>location</em> will be used again. AudioFormat is optional for legacy reasons, and is assumed to be <a class="el" href="namespacevrs.html#add2bb21a732f1a1a425cb65c9cb69a03a1088fbc901dc88b6c18085220cc33de9" title="Raw PCM audio data.">AudioFormat::PCM</a> when missing.</p>
 <p>Note that the values used are <em>not</em> static, so that if the configuration changes, the latest value is used, without having to search each time we have a new image block. </p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>vrs/<a class="el" href="_data_layout_conventions_8h_source.html">DataLayoutConventions.h</a></li>
