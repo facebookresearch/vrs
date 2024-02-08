@@ -93,7 +93,8 @@ string vrs::os::getOsFingerPrint() {
 #if _MSC_VER < 1900
 
   dwVersion = GetVersion();
-  Get the Windows version.dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
+  // Get the Windows version.
+  dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
   dwMinorVersion = (DWORD)(HIBYTE(LOWORD(dwVersion)));
 
   // Get the build number.
