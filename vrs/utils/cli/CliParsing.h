@@ -45,7 +45,7 @@ bool parseCopyOptions(
     const string& arg,
     int& argn,
     int argc,
-    char** argv,
+    std::vector<std::string> argv,
     int& outStatusCode,
     CopyOptions& copyOptions);
 /// Print copy options help
@@ -72,7 +72,7 @@ bool parseTagOverrideOptions(
     const string& arg,
     int& argn,
     int argc,
-    char** argv,
+    std::vector<std::string> argv,
     int& outStatusCode,
     CopyOptions& copyOptions);
 /// Print tag override help
@@ -101,7 +101,7 @@ bool parseTimeAndStreamFilters(
     const string& arg,
     int& argn,
     int argc,
-    char** argv,
+    std::vector<std::string> argv,
     int& outStatusCode,
     FilteredFileReader& filteredReader,
     RecordFilterParams& outFilters);
@@ -129,7 +129,7 @@ bool parseDecimationOptions(
     const string& arg,
     int& argn,
     int argc,
-    char** argv,
+    std::vector<std::string> argv,
     int& outStatusCode,
     RecordFilterParams& outFilters);
 /// Print decimation options help

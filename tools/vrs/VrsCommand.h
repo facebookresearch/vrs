@@ -61,7 +61,7 @@ enum class Command {
 struct VrsCommand {
   VrsCommand();
 
-  bool parseCommand(const std::string& appName, const char* cmdName);
+  bool parseCommand(const std::string& appName, const std::string cmdName);
 
   /// Parse a "logical" command line argument, which may have one or more parts.
   /// @param appName: Name of the application binary for error messages
@@ -78,8 +78,12 @@ struct VrsCommand {
   /// On the other hand, if the argument and possible sub-arguments were valid,
   /// outStatusCode is unchanged (presumably, it's still set to EXIT_SUCCESS),
   /// and the next argument parameter to parse is at argn + 1.
-  bool
-  parseArgument(const std::string& appName, int& argn, int argc, char** argv, int& outStatusCode);
+  bool parseArgument(
+      const std::string& appName,
+      int& argn,
+      int argc,
+      std::vector<std::string> argv,
+      int& outStatusCode);
 
   /// Handle a parameter not recognized by parseArgument and potential additional parsing.
   /// Unrecognized arguments are expected to be additional file paths for merge operations.

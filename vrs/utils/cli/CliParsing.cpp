@@ -38,7 +38,7 @@ bool parseCopyOptions(
     const string& arg,
     int& argn,
     int argc,
-    char** argv,
+    std::vector<std::string> argv,
     int& outStatusCode,
     CopyOptions& copyOptions) {
   if (arg == "--no-progress") {
@@ -116,7 +116,7 @@ bool parseTagOverrideOptions(
     const string& arg,
     int& argn,
     int argc,
-    char** argv,
+    std::vector<std::string> argv,
     int& outStatusCode,
     CopyOptions& copyOptions) {
   if (arg == "--file-tag") {
@@ -174,7 +174,7 @@ bool parseTimeAndStreamFilters(
     const string& arg,
     int& argn,
     int argc,
-    char** argv,
+    std::vector<std::string> argv,
     int& outStatusCode,
     FilteredFileReader& filteredReader,
     RecordFilterParams& outFilters) {
@@ -214,7 +214,7 @@ bool parseTimeAndStreamFilters(
     if (argn + 2 < argc) {
       try {
         filteredReader.filter.minTime = stod(argv[++argn]);
-        filteredReader.filter.relativeMinTime = isSigned(argv[argn]);
+        filteredReader.filter.relativeMinTime = isSigned(argv[argn].c_str());
         filteredReader.filter.maxTime = stod(argv[++argn]);
         filteredReader.filter.aroundTime = true;
       } catch (logic_error&) {
@@ -286,7 +286,7 @@ bool parseDecimationOptions(
     const string& arg,
     int& argn,
     int argc,
-    char** argv,
+    std::vector<std::string> argv,
     int& outStatusCode,
     RecordFilterParams& outFilters) {
   if (arg == "--decimate") {

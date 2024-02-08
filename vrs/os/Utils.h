@@ -34,6 +34,11 @@
 namespace vrs {
 namespace os {
 
+#if IS_WINDOWS_PLATFORM()
+std::wstring osUtf8ToWstring(const std::string& utf8String);
+std::string osWstringtoUtf8(const std::wstring& wstring);
+#endif // IS_WINDOWS_PLATFORM()
+
 /// FILE helpers
 std::FILE* fileOpen(const std::string& path, const char* modes);
 int fileClose(std::FILE* file);

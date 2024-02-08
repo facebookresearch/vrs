@@ -293,8 +293,8 @@ VrsCommand::VrsCommand() {
   }
 }
 
-bool VrsCommand::parseCommand(const std::string& appName, const char* cmdName) {
-  cmd = CommandConverter::toEnum(cmdName);
+bool VrsCommand::parseCommand(const std::string& appName, const std::string cmdName) {
+  cmd = CommandConverter::toEnum(cmdName.c_str());
   if (cmd != Command::None) {
     return XR_VERIFY(getCommandSpec(cmd).cmd == cmd);
   }
@@ -310,7 +310,7 @@ bool VrsCommand::parseArgument(
     const string& appName,
     int& argn,
     int argc,
-    char** argv,
+    std::vector<std::string> argv,
     int& outStatusCode) {
   string arg = argv[argn];
   if (arg == "-to" || arg == "--to") {

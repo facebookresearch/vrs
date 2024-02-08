@@ -18,11 +18,39 @@
 
 #include <iostream>
 
+#include <Windows.h>
 #include <vrs/os/Utils.h>
+
+namespace {
+
+inline std::vector<std::string> compute_win32_argv() {
+  std::vector<std::string> result;
+  int argc = 0;
+
+  auto deleter = [](wchar_t** ptr) { LocalFree(ptr); };
+  // NOLINTBEGIN(*-avoid-c-arrays)
+  auto wargv = std::unique_ptr<wchar_t*[], decltype(deleter)>(
+      CommandLineToArgvW(GetCommandLineW(), &argc), deleter);
+  // NOLINTEND(*-avoid-c-arrays)
+
+  if (wargv == nullptr) {
+    throw std::runtime_error(
+        "CommandLineToArgvW failed with code " + std::to_string(GetLastError()));
+  }
+
+  result.reserve(static_cast<size_t>(argc));
+  for (size_t i = 0; i < static_cast<size_t>(argc); ++i) {
+    result.push_back(vrs::os::osWstringtoUtf8(wargv[i]));
+  }
+
+  return result;
+}
+} // namespace
 
 using namespace std;
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv_old) {
+  auto argv = compute_win32_argv();
   const string& appName = vrs::os::getFilename(argv[0]);
   if (argc == 1) {
     printHelp(appName);
