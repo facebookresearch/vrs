@@ -21,6 +21,7 @@
 
 #include <vrs/RecordFormatStreamPlayer.h>
 #include <vrs/helpers/JobQueue.h>
+#include <vrs/utils/AudioBlock.h>
 
 enum class FileReaderState;
 
@@ -34,27 +35,10 @@ using ::vrs::DataLayout;
 using ::vrs::RecordFormatStreamPlayer;
 using ::vrs::StreamId;
 using ::vrs::StreamPlayer;
+using ::vrs::utils::AudioBlock;
 
 class AudioPlayer : public QObject, public RecordFormatStreamPlayer {
   Q_OBJECT
-
-  struct AudioJob {
-    AudioJob() = default;
-    AudioJob(std::vector<uint8_t>&& samples, uint32_t frameCount, uint32_t frameSize)
-        : samples{std::move(samples)}, frameCount{frameCount}, frameSize{frameSize} {}
-    AudioJob(AudioJob&& job) noexcept
-        : samples{std::move(job.samples)}, frameCount{job.frameCount}, frameSize{job.frameSize} {}
-
-    AudioJob& operator=(AudioJob&& job) noexcept {
-      samples = std::move(job.samples);
-      frameCount = job.frameCount;
-      frameSize = job.frameSize;
-      return *this;
-    }
-    std::vector<uint8_t> samples;
-    uint32_t frameCount{};
-    uint32_t frameSize{};
-  };
 
  public:
   explicit AudioPlayer(QObject* parent = nullptr);
@@ -63,7 +47,7 @@ class AudioPlayer : public QObject, public RecordFormatStreamPlayer {
   bool onDataLayoutRead(const CurrentRecord&, size_t blockIndex, DataLayout&) override;
   bool onAudioRead(const CurrentRecord&, size_t blockIndex, const ContentBlock&) override;
 
-  void setupAudioOutput(const ContentBlock& contentBlock);
+  void setupAudioOutput(const vrs::AudioContentBlockSpec& audioSpec);
 
  signals:
 
@@ -74,9 +58,10 @@ class AudioPlayer : public QObject, public RecordFormatStreamPlayer {
   void playbackThread();
 
   PaStream* paStream_ = nullptr;
-  bool failedInit_ = false;
   int channelCount_ = 0;
-  vrs::JobQueueWithThread<AudioJob> playbackQueue_;
+  vrs::AudioSampleFormat sampleFormat_ = vrs::AudioSampleFormat::UNDEFINED;
+  bool failedInit_ = false;
+  vrs::JobQueueWithThread<AudioBlock> playbackQueue_;
 };
 
 } // namespace vrsp

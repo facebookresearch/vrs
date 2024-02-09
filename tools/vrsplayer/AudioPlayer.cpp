@@ -55,55 +55,44 @@ bool vrsp::AudioPlayer::onDataLayoutRead(const CurrentRecord&, size_t, DataLayou
 
 bool AudioPlayer::onAudioRead(const CurrentRecord& record, size_t blkIdx, const ContentBlock& cb) {
   // XR_LOGI("Audio block: {:.3f} {}", record.timestamp, contentBlock.asString());
-  vector<uint8_t> buffer(cb.getBlockSize());
-  if (record.reader->read(buffer) == 0) {
+  AudioBlock audioBlock;
+  if (audioBlock.readBlock(record.reader, cb)) {
+    if (cb.audio().getAudioFormat() != AudioFormat::PCM) {
+      return true; // we read the audio, but we don't actually support it in vrsplayer (yet!)
+    }
     if (!failedInit_) {
       const auto& audio = cb.audio();
       if (paStream_ == nullptr) {
         // the first time around, we just setup the device & the clock, but we don't play anything
         // The first data read happens when we load the file, so we don't want to hear it!
-        setupAudioOutput(cb);
+        setupAudioOutput(audio);
         fmt::print(
             "Found '{} - {}': {}, {}\n",
             record.streamId.getNumericName(),
             record.streamId.getTypeName(),
             getCurrentRecordFormatReader()->recordFormat.asString(),
             audio.asString());
-      } else if (VideoTime::getPlaybackSpeed() <= 1) {
-        uint32_t sampleCount = audio.getSampleCount();
-        uint32_t srcChannelCount = audio.getChannelCount();
-        uint8_t bytesPerSample = audio.getBytesPerSample();
-        if (channelCount_ == srcChannelCount) {
-          playbackQueue_.sendJob(AudioJob(std::move(buffer), sampleCount, bytesPerSample));
-        } else {
-          const uint8_t* src = reinterpret_cast<const uint8_t*>(buffer.data());
-          uint8_t* dst = reinterpret_cast<uint8_t*>(buffer.data());
-          for (uint32_t sample = 0; sample < sampleCount; ++sample) {
-            memcpy(dst, src, channelCount_ * bytesPerSample);
-            src += srcChannelCount * bytesPerSample;
-            dst += channelCount_ * bytesPerSample;
-          }
-          playbackQueue_.sendJob(AudioJob(std::move(buffer), sampleCount, bytesPerSample));
-        }
+      } else if (
+          VideoTime::getPlaybackSpeed() <= 1 && sampleFormat_ == audio.getSampleFormat() &&
+          audio.getSampleCount() >= channelCount_) {
+        playbackQueue_.sendJob(std::move(audioBlock));
       }
     }
-    return true;
   }
-  return false;
+  return true;
 }
 
-void AudioPlayer::setupAudioOutput(const ContentBlock& contentBlock) {
-  const auto& audio = contentBlock.audio();
-
+void AudioPlayer::setupAudioOutput(const AudioContentBlockSpec& audioSpec) {
   PaDeviceIndex defaultOutpuDeviceIndex = Pa_GetDefaultOutputDevice();
   const PaDeviceInfo* info = Pa_GetDeviceInfo(defaultOutpuDeviceIndex);
-  channelCount_ = min<int>(audio.getChannelCount(), info->maxOutputChannels);
+  sampleFormat_ = audioSpec.getSampleFormat();
+  channelCount_ = min<int>(audioSpec.getChannelCount(), info->maxOutputChannels);
 
   PaStreamParameters output;
   output.device = defaultOutpuDeviceIndex;
   output.channelCount = channelCount_;
   output.sampleFormat = paCustomFormat;
-  switch (audio.getSampleFormat()) {
+  switch (sampleFormat_) {
     case AudioSampleFormat::S8:
       output.sampleFormat = paInt8;
       break;
@@ -148,18 +137,18 @@ void AudioPlayer::setupAudioOutput(const ContentBlock& contentBlock) {
       failedInit_ = true;
       XR_LOGE(
           "Audio sample format {} not supported. Audio sample conversion required.",
-          contentBlock.asString());
+          audioSpec.asString());
       return;
   }
   output.hostApiSpecificStreamInfo = nullptr;
   output.suggestedLatency = (info != nullptr) ? info->defaultLowOutputLatency : 0;
 
-  PaError status =
-      Pa_OpenStream(&paStream_, nullptr, &output, audio.getSampleRate(), 0, 0, nullptr, nullptr);
+  PaError status = Pa_OpenStream(
+      &paStream_, nullptr, &output, audioSpec.getSampleRate(), 0, 0, nullptr, nullptr);
   if (status == paNoError && XR_VERIFY(paStream_ != nullptr)) {
     status = Pa_StartStream(paStream_);
     if (XR_VERIFY(status == paNoError)) {
-      XR_LOGI("Audio output '{}' configured for {}!", info->name, contentBlock.asString());
+      XR_LOGI("Audio output '{}' configured for {}!", info->name, audioSpec.asString());
       VideoTime::setTimeAudioStreamSource(paStream_);
       playbackQueue_.startThread(&AudioPlayer::playbackThread, this);
     } else {
@@ -174,7 +163,7 @@ void AudioPlayer::setupAudioOutput(const ContentBlock& contentBlock) {
     paStream_ = nullptr;
   }
   if (failedInit_) {
-    XR_LOGE("Failed to initialize audio device for {}", contentBlock.asString());
+    XR_LOGE("Failed to initialize audio device for {}", audioSpec.asString());
   }
 }
 
@@ -185,19 +174,40 @@ void AudioPlayer::mediaStateChanged(FileReaderState state) {
 }
 
 void AudioPlayer::playbackThread() {
-  AudioJob job;
-  while (playbackQueue_.waitForJob(job)) {
-    uint32_t playedFrames = 0;
-    while (playedFrames < job.frameCount) {
-      uint32_t frameBatchSize = min<uint32_t>(job.frameCount - playedFrames, 512);
-      if (job.frameCount - playedFrames - frameBatchSize < 64) {
-        frameBatchSize = job.frameCount - playedFrames;
+  AudioBlock block;
+  while (playbackQueue_.waitForJob(block)) {
+    uint32_t frameCount = block.getSampleCount();
+    uint8_t frameStride = block.getSpec().getSampleFrameStride();
+    uint8_t paFrameStride = channelCount_ * block.getSpec().getBytesPerSample();
+
+    uint32_t framesPlayed = 0;
+    while (framesPlayed < frameCount) {
+      uint32_t frameBatchSize = min<uint32_t>(frameCount - framesPlayed, 512);
+      if (frameCount - framesPlayed - frameBatchSize < 64) {
+        frameBatchSize = frameCount - framesPlayed; // avoid tiny batches
       }
-      Pa_WriteStream(
-          paStream_,
-          job.samples.data() + playedFrames * job.frameSize * channelCount_,
-          frameBatchSize);
-      playedFrames += frameBatchSize;
+      const uint8_t* src = block.rdata() + framesPlayed * frameStride;
+      if (paFrameStride == frameStride) {
+        Pa_WriteStream(paStream_, src, frameBatchSize);
+      } else {
+        // either we play fewer channels than provided, or frames are padded, we need to compact
+        uint8_t* dst = const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(block.rdata()));
+        uint32_t sample = 0;
+        while (dst + paFrameStride > src && sample < frameBatchSize) {
+          memmove(dst, src, paFrameStride); // more expensive, but safe in case of overlap
+          src += frameStride;
+          dst += paFrameStride;
+          sample++;
+        }
+        while (sample < frameBatchSize) {
+          memcpy(dst, src, paFrameStride);
+          src += frameStride;
+          dst += paFrameStride;
+          sample++;
+        }
+        Pa_WriteStream(paStream_, block.rdata(), frameBatchSize);
+      }
+      framesPlayed += frameBatchSize;
     }
   }
 }

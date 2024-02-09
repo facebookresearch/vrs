@@ -25,6 +25,7 @@
 #include <vrs/RecordFileReader.h>
 #include <vrs/RecordFormatStreamPlayer.h>
 #include <vrs/os/Utils.h>
+#include <vrs/utils/AudioBlock.h>
 
 #include "SharedDefinitions.h"
 
@@ -95,16 +96,24 @@ class ImageStreamPlayer : public RecordFormatStreamPlayer {
 class AudioStreamPlayer : public RecordFormatStreamPlayer {
  public:
   bool onAudioRead(const CurrentRecord& record, size_t blockIdx, const ContentBlock& cb) override {
-    // the audio data was not read yet. Allocate/reuse your own buffers.
-    if (XR_VERIFY(cb.getBlockSize() != ContentBlock::kSizeUnknown)) {
-      XR_CHECK(cb.audio().getSampleCount() == kAudioBlockSize);
-      vector<int16_t> audioData(cb.audio().getSampleCount());
-      // actually read the audio data
-      if (XR_VERIFY(record.reader->read(audioData) == 0)) {
-        // use audio data. In this sample code, we verify that the data matches the expected pattern
-        for (size_t k = 0; k < kAudioBlockSize; k++) {
-          XR_CHECK(audioData[k] == static_cast<int16_t>(audioBlockIndex * kAudioBlockSize + k));
-        }
+    const auto& audioSpec = cb.audio();
+    // for this test, we verify that the content block is exactly as expected
+    XR_CHECK(
+        audioSpec ==
+        AudioContentBlockSpec(
+            AudioFormat::PCM,
+            AudioSampleFormat::S16_LE,
+            kNumChannels,
+            0,
+            kSampleRate,
+            kAudioBlockSize));
+    // the audio data was not read yet. Use your own buffers.
+    utils::AudioBlock audio;
+    if (XR_VERIFY(audio.readBlock(record.reader, cb))) {
+      const auto* audioData = reinterpret_cast<const uint16_t*>(audio.rdata());
+      // use audio data. In this sample code, we verify that the data matches the expected pattern
+      for (size_t k = 0; k < kAudioBlockSize; k++) {
+        XR_CHECK(audioData[k] == static_cast<int16_t>(audioBlockIndex * kAudioBlockSize + k));
       }
       audioBlockIndex++;
     }

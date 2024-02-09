@@ -77,4 +77,12 @@ class Throttler {
     XR_LOGW(__VA_ARGS__);                                      \
   }
 
+#define THROTTLED_VERIFY(THROTTLED_OBJECT_PTR, VERIFY_CONDITION)                          \
+  [&](bool _throttled_condition) {                                                        \
+    if (!_throttled_condition && getThrottler().report(__LINE__, THROTTLED_OBJECT_PTR)) { \
+      XR_LOGW("Verify '{}' failed: ", #VERIFY_CONDITION);                                 \
+    }                                                                                     \
+    return _throttled_condition;                                                          \
+  }(VERIFY_CONDITION)
+
 } // namespace vrs::utils
