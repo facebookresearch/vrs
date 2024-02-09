@@ -117,6 +117,14 @@ class PixelFrame {
   uint8_t* wdata() {
     return frameBytes_.data();
   }
+  template <class T>
+  inline const T* data(size_t byte_offset = 0) const {
+    return reinterpret_cast<const T*>(frameBytes_.data() + byte_offset);
+  }
+  template <class T>
+  inline T* data(size_t byte_offset = 0) {
+    return reinterpret_cast<T*>(frameBytes_.data() + byte_offset);
+  }
   size_t size() const {
     return frameBytes_.size();
   }

@@ -633,7 +633,7 @@ bool PixelFrame::normalizeFrame(shared_ptr<PixelFrame>& normalizedFrame, bool gr
               normalizedFrame->wdata(), rdata(), getWidth(), getHeight(), getStride())) {
         return false;
       }
-      uint16_t* ptr = reinterpret_cast<uint16_t*>(normalizedFrame->wdata());
+      uint16_t* ptr = normalizedFrame->data<uint16_t>();
       const uint32_t pixelCount = getWidth() * getHeight() * componentCount;
       for (uint32_t i = 0; i < pixelCount; ++i) {
         ptr[i] <<= bitsToShift;
@@ -706,15 +706,15 @@ bool PixelFrame::normalizeFrame(shared_ptr<PixelFrame>& normalizedFrame, bool gr
     }
   } else if (format == PixelFormat::GREY16 && bitsToShift > 0) {
     // 12/10 bit pixel scaling to 16 bit
-    const uint16_t* srcPtr = reinterpret_cast<const uint16_t*>(rdata());
-    uint16_t* outPtr = reinterpret_cast<uint16_t*>(normalizedFrame->wdata());
+    const uint16_t* srcPtr = data<uint16_t>();
+    uint16_t* outPtr = normalizedFrame->data<uint16_t>();
     const uint32_t pixelCount = getWidth() * getHeight() * componentCount;
     for (uint32_t i = 0; i < pixelCount; ++i) {
       outPtr[i] = static_cast<uint16_t>(srcPtr[i] << bitsToShift);
     }
   } else if (XR_VERIFY(this->size() == 2 * normalizedFrame->size())) {
     // 16/12/10 bit pixel reduction to 8 bit
-    const uint16_t* srcPtr = reinterpret_cast<const uint16_t*>(rdata());
+    const uint16_t* srcPtr = data<uint16_t>();
     uint8_t* outPtr = normalizedFrame->wdata();
     const uint32_t pixelCount = getWidth() * getHeight() * componentCount;
     for (uint32_t i = 0; i < pixelCount; ++i) {
