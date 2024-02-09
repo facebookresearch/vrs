@@ -367,30 +367,27 @@ class AudioContentBlockSpec {
   /// Get the number of bytes for this content block, or ContentBlock::kSizeUnknown.
   size_t getBlockSize() const;
 
+  /// Assuming PCM, get the number of bytes for this content block, or ContentBlock::kSizeUnknown.
+  size_t getPcmBlockSize() const;
+
   /// Default copy assignment
   AudioContentBlockSpec& operator=(const AudioContentBlockSpec&) = default;
 
   /// Compare two audio block spec.
   bool operator==(const AudioContentBlockSpec& rhs) const {
-    auto tie = [](const AudioContentBlockSpec& s) {
-      return std::tie(
-          s.sampleFormat_,
-          s.channelCount_,
-          s.sampleFrameStride_,
-          s.sampleFrameCount_,
-          s.sampleFrameRate_);
-    };
-    return tie(*this) == tie(rhs);
+    return audioFormat_ == rhs.audioFormat_ && sampleFormat_ == rhs.sampleFormat_ &&
+        channelCount_ == rhs.channelCount_ &&
+        getSampleFrameStride() == rhs.getSampleFrameStride() &&
+        sampleFrameCount_ == rhs.sampleFrameCount_ && sampleFrameRate_ == rhs.sampleFrameRate_;
   }
   bool operator!=(const AudioContentBlockSpec& rhs) const {
     return !operator==(rhs);
   }
   /// Tell if two audio block have identical audio formats.
   bool isCompatibleWith(const AudioContentBlockSpec& rhs) const {
-    auto tie = [](const AudioContentBlockSpec& s) {
-      return std::tie(s.sampleFormat_, s.channelCount_, s.sampleFrameRate_);
-    };
-    return tie(*this) == tie(rhs);
+    return sampleFormat_ == rhs.sampleFormat_ && channelCount_ == rhs.channelCount_ &&
+        getSampleFrameStride() == rhs.getSampleFrameStride() &&
+        sampleFrameRate_ == rhs.sampleFrameRate_;
   }
   /// Get audio format.
   AudioFormat getAudioFormat() const {

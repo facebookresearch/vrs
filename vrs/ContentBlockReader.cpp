@@ -262,11 +262,11 @@ bool AudioBlockReader::audioContentFromAudioSpec(
     uint32_t sampleSizeInBytes =
         AudioContentBlockSpec::getBytesPerSample(sampleFormat) * numChannels;
     // If sampleStride field is set, perform a sanity check based on the format. Assume that any
-    // meaningful alignment of a sample won't be longer than additional 2 bytes per channel e.g. if
-    // uint16_t samples is stored in uint32_t for some reason
-    if (audioSpec.sampleStride.get(sampleFrameStride) &&
+    // meaningful alignment of a sample won't be longer than additional 3 bytes per channel e.g. if
+    // uint8_t samples is stored in uint32_t for some reason
+    if (audioSpec.sampleStride.get(sampleFrameStride) && audioFormat == AudioFormat::PCM &&
         (sampleFrameStride < sampleSizeInBytes ||
-         sampleFrameStride > sampleSizeInBytes + numChannels * 2)) {
+         sampleFrameStride > sampleSizeInBytes + numChannels * 3)) {
       // has invalid block align
       return false;
     }

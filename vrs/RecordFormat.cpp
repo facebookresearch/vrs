@@ -679,8 +679,7 @@ AudioContentBlockSpec::AudioContentBlockSpec(
       sampleFrameRate_{sampleFrameRate},
       sampleFrameCount_{sampleFrameCount} {
   XR_VERIFY(audioFormat != AudioFormat::UNDEFINED);
-  XR_VERIFY(sampleFormat != AudioSampleFormat::UNDEFINED);
-  XR_VERIFY(sampleFrameStride_ == 0 || sampleFrameStride_ * 8 >= getBitsPerSample() * channelCount);
+  XR_VERIFY(sampleFrameStride_ == 0 || sampleFrameStride_ >= getBytesPerSample() * channelCount);
 }
 
 AudioContentBlockSpec::AudioContentBlockSpec(const string& formatStr) {
@@ -774,8 +773,13 @@ string AudioContentBlockSpec::asString() const {
 }
 
 size_t AudioContentBlockSpec::getBlockSize() const {
-  if (sampleFormat_ != AudioSampleFormat::UNDEFINED && channelCount_ > 0 && sampleFrameCount_ > 0) {
-    return getSampleFrameStride() * sampleFrameCount_;
+  return audioFormat_ == AudioFormat::PCM ? getPcmBlockSize() : ContentBlock::kSizeUnknown;
+}
+
+size_t AudioContentBlockSpec::getPcmBlockSize() const {
+  uint8_t stride = getSampleFrameStride();
+  if (stride > 0 && sampleFrameCount_ > 0) {
+    return stride * sampleFrameCount_;
   }
   return ContentBlock::kSizeUnknown;
 }

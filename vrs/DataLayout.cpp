@@ -1047,6 +1047,18 @@ void printValue<datalayout_conventions::ImageSpecType>(
   }
 }
 
+template <>
+void printValue<uint8_t>(ostream& out, const uint8_t& value, const string& label) {
+  using namespace special_chars;
+  if (label == datalayout_conventions::kAudioFormat) {
+    out << toString(static_cast<AudioFormat>(value)) << " (" << value << ")";
+  } else if (label == datalayout_conventions::kAudioSampleFormat) {
+    out << toString(static_cast<AudioSampleFormat>(value)) << " (" << value << ")";
+  } else {
+    out << value;
+  }
+}
+
 template <typename T>
 void DataPieceValue<T>::print(ostream& out, const string& indent) const {
   out << indent << getLabel() << " (" << getElementTypeName() << ") @ ";

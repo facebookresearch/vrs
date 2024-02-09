@@ -399,59 +399,57 @@ TEST_F(RecordFormatTest, testBlockFormat) {
   EXPECT_EQ(full.audio().getSampleFrameStride(), 16);
   EXPECT_EQ(full.audio().getSampleCount(), 100);
 
-  ContentBlock direct("audio/pcm/float64be/channels=2/rate=32000/samples=100/stride=16");
+  ContentBlock direct("audio/pcm/float64be/channels=2/rate=32000/samples=100/stride=0");
   EXPECT_EQ(direct.getContentType(), ContentType::AUDIO);
   EXPECT_EQ(direct.getBlockSize(), 100 * 8 * 2);
-  EXPECT_EQ(direct.audio().getAudioFormat(), AudioFormat::PCM);
-  EXPECT_EQ(direct.audio().getSampleFormat(), AudioSampleFormat::F64_BE);
-  EXPECT_EQ(direct.audio().getSampleRate(), 32000);
-  EXPECT_EQ(direct.audio().getChannelCount(), 2);
   EXPECT_EQ(direct.audio().getBitsPerSample(), 64);
   EXPECT_EQ(direct.audio().isLittleEndian(), false);
   EXPECT_EQ(direct.audio().getSampleFrameStride(), 16);
-  EXPECT_EQ(direct.audio().getSampleCount(), 100);
+  EXPECT_EQ(
+      direct.audio(),
+      AudioContentBlockSpec(AudioFormat::PCM, AudioSampleFormat::F64_BE, 2, 0, 32000, 100));
 
   ContentBlock exotic("audio/pcm/int24be/channels=3/rate=12345");
   EXPECT_EQ(exotic.getContentType(), ContentType::AUDIO);
   EXPECT_EQ(exotic.getBlockSize(), ContentBlock::kSizeUnknown);
-  EXPECT_EQ(exotic.audio().getAudioFormat(), AudioFormat::PCM);
-  EXPECT_EQ(exotic.audio().getSampleRate(), 12345);
-  EXPECT_EQ(exotic.audio().getChannelCount(), 3);
   EXPECT_EQ(exotic.audio().getBitsPerSample(), 24);
   EXPECT_EQ(exotic.audio().getSampleFrameStride(), 9);
+  EXPECT_EQ(
+      exotic.audio(),
+      AudioContentBlockSpec(AudioFormat::PCM, AudioSampleFormat::S24_BE, 3, 0, 12345, 0));
 
   ContentBlock telco("audio/pcm/uint8mulaw/channels=1/rate=8000/samples=800");
   EXPECT_EQ(telco.getContentType(), ContentType::AUDIO);
   EXPECT_EQ(telco.getBlockSize(), 800 * 1);
-  EXPECT_EQ(telco.audio().getAudioFormat(), AudioFormat::PCM);
-  EXPECT_EQ(telco.audio().getSampleFormat(), AudioSampleFormat::MU_LAW);
-  EXPECT_EQ(telco.audio().getSampleRate(), 8000);
-  EXPECT_EQ(telco.audio().getChannelCount(), 1);
   EXPECT_EQ(telco.audio().getBitsPerSample(), 8);
   EXPECT_EQ(telco.audio().getSampleFrameStride(), 1);
+  EXPECT_EQ(
+      telco.audio(),
+      AudioContentBlockSpec(AudioFormat::PCM, AudioSampleFormat::MU_LAW, 1, 0, 8000, 800));
 
   FORMAT_EQUAL(ContentBlock(ContentType::AUDIO), "audio");
   FORMAT_EQUAL(
       ContentBlock(AudioFormat::PCM, AudioSampleFormat::F64_BE, 2, 16, 32000, 100),
       "audio/pcm/float64be/channels=2/rate=32000/samples=100");
-  FORMAT_EQUAL(ContentBlock(ContentType::CUSTOM), "custom");
-  FORMAT_EQUAL(ContentBlock(ContentType::CUSTOM, 20), "custom/size=20");
 
   ContentBlock opus("audio/opus");
   EXPECT_EQ(opus.getContentType(), ContentType::AUDIO);
-  EXPECT_EQ(opus.audio().getAudioFormat(), AudioFormat::OPUS);
+  EXPECT_EQ(opus.getBlockSize(), ContentBlock::kSizeUnknown);
+  EXPECT_EQ(opus.audio().getPcmBlockSize(), ContentBlock::kSizeUnknown);
+  EXPECT_EQ(opus.audio(), AudioContentBlockSpec(AudioFormat::OPUS, AudioSampleFormat::UNDEFINED));
 
   ContentBlock opusFull("audio/opus/float64be/channels=2/rate=32000/samples=100/stride=16");
   EXPECT_EQ(opusFull.getContentType(), ContentType::AUDIO);
-  EXPECT_EQ(opusFull.getBlockSize(), 100 * 8 * 2);
-  EXPECT_EQ(opusFull.audio().getAudioFormat(), AudioFormat::OPUS);
-  EXPECT_EQ(opusFull.audio().getSampleFormat(), AudioSampleFormat::F64_BE);
-  EXPECT_EQ(opusFull.audio().getSampleRate(), 32000);
-  EXPECT_EQ(opusFull.audio().getChannelCount(), 2);
-  EXPECT_EQ(opusFull.audio().getBitsPerSample(), 64);
+  EXPECT_EQ(opusFull.getBlockSize(), ContentBlock::kSizeUnknown);
+  EXPECT_EQ(opusFull.audio().getPcmBlockSize(), 100 * 8 * 2);
   EXPECT_EQ(opusFull.audio().isLittleEndian(), false);
   EXPECT_EQ(opusFull.audio().getSampleFrameStride(), 16);
-  EXPECT_EQ(opusFull.audio().getSampleCount(), 100);
+  EXPECT_EQ(
+      opusFull.audio(),
+      AudioContentBlockSpec(AudioFormat::OPUS, AudioSampleFormat::F64_BE, 2, 0, 32000, 100));
+
+  FORMAT_EQUAL(ContentBlock(ContentType::CUSTOM), "custom");
+  FORMAT_EQUAL(ContentBlock(ContentType::CUSTOM, 20), "custom/size=20");
 }
 
 TEST_F(RecordFormatTest, testBadStride) {
