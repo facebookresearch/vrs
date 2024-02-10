@@ -18,6 +18,7 @@ target_link_libraries(sample_playback_app
     vrslib
     vrs_logging
     vrs_os
+    vrs_utils
 )
 
 add_executable(sample_recording_app "SampleRecordingApp.cpp")
