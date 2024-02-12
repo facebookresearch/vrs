@@ -110,7 +110,7 @@ class AudioStreamPlayer : public RecordFormatStreamPlayer {
     // the audio data was not read yet. Use your own buffers.
     utils::AudioBlock audio;
     if (XR_VERIFY(audio.readBlock(record.reader, cb))) {
-      const auto* audioData = reinterpret_cast<const uint16_t*>(audio.rdata());
+      const auto* audioData = audio.data<uint16_t>();
       // use audio data. In this sample code, we verify that the data matches the expected pattern
       for (size_t k = 0; k < kAudioBlockSize; k++) {
         XR_CHECK(audioData[k] == static_cast<int16_t>(audioBlockIndex * kAudioBlockSize + k));

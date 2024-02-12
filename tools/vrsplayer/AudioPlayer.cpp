@@ -16,8 +16,6 @@
 
 #include "AudioPlayer.h"
 
-#include <vector>
-
 #include <portaudio.h>
 
 #define DEFAULT_LOG_CHANNEL "AudioPlayer"
@@ -74,7 +72,7 @@ bool AudioPlayer::onAudioRead(const CurrentRecord& record, size_t blkIdx, const 
             audio.asString());
       } else if (
           VideoTime::getPlaybackSpeed() <= 1 && sampleFormat_ == audio.getSampleFormat() &&
-          audio.getSampleCount() >= channelCount_) {
+          audio.getChannelCount() >= channelCount_ && audioBlock.getSampleCount() > 0) {
         playbackQueue_.sendJob(std::move(audioBlock));
       }
     }
@@ -191,7 +189,7 @@ void AudioPlayer::playbackThread() {
         Pa_WriteStream(paStream_, src, frameBatchSize);
       } else {
         // either we play fewer channels than provided, or frames are padded, we need to compact
-        uint8_t* dst = const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(block.rdata()));
+        uint8_t* dst = block.data<uint8_t>();
         uint32_t sample = 0;
         while (dst + paFrameStride > src && sample < frameBatchSize) {
           memmove(dst, src, paFrameStride); // more expensive, but safe in case of overlap

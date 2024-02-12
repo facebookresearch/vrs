@@ -32,7 +32,7 @@ class AudioBlock {
   AudioBlock(AudioBlock&& other) noexcept = default;
   AudioBlock(const AudioContentBlockSpec& spec, vector<uint8_t>&& frameBytes);
   explicit AudioBlock(const AudioContentBlockSpec& spec);
-  explicit AudioBlock(
+  AudioBlock(
       AudioFormat audioFormat,
       AudioSampleFormat sampleFormat,
       uint8_t channelCount = 0,
@@ -84,6 +84,9 @@ class AudioBlock {
   uint32_t getSampleCount() const {
     return audioSpec_.getSampleCount();
   }
+  void setSampleCount(uint32_t sampleCount) {
+    audioSpec_.setSampleCount(sampleCount);
+  }
 
   vector<uint8_t>& getBuffer() {
     return audioBytes_;
@@ -93,6 +96,14 @@ class AudioBlock {
   }
   uint8_t* wdata() {
     return audioBytes_.data();
+  }
+  template <class T>
+  const T* data(size_t byte_offset = 0) const {
+    return reinterpret_cast<const T*>(audioBytes_.data() + byte_offset);
+  }
+  template <class T>
+  T* data(size_t byte_offset = 0) {
+    return reinterpret_cast<T*>(audioBytes_.data() + byte_offset);
   }
   size_t size() const {
     return audioBytes_.size();
@@ -109,6 +120,8 @@ class AudioBlock {
   bool readBlock(RecordReader* reader, const ContentBlock& cb);
 
  private:
+  void allocateBytes();
+
   AudioContentBlockSpec audioSpec_;
   vector<uint8_t> audioBytes_;
 };

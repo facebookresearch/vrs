@@ -78,7 +78,7 @@ int AudioExtractor::createWavFile(
     format = 7;
   }
 
-  uint32_t bytesPerSample = (audioBlock.getBitsPerSample() + 7) / 8;
+  uint32_t bytesPerSample = audioBlock.getBytesPerSample();
   writeHeader(fileHeader.data() + 20, htole16(format)); // audio format, write in little endian
   writeHeader(
       fileHeader.data() + 22,
@@ -111,8 +111,7 @@ int AudioExtractor::writeWavAudioData(
     const AudioContentBlockSpec& audioBlock,
     const std::vector<uint8_t>& audio) {
   uint32_t srcOffset = 0;
-  uint32_t bytesPerSampleBlock =
-      (audioBlock.getBitsPerSample() + 7) / 8 * audioBlock.getChannelCount();
+  uint32_t bytesPerSampleBlock = audioBlock.getBytesPerSample() * audioBlock.getChannelCount();
   uint32_t srcStride = audioBlock.getSampleFrameStride();
   uint32_t totalSamples = audioBlock.getSampleCount();
   for (uint32_t i = 0; i < totalSamples; ++i) {

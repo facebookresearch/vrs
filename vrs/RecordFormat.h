@@ -429,6 +429,10 @@ class AudioContentBlockSpec {
   uint32_t getSampleCount() const {
     return sampleFrameCount_;
   }
+  /// Set the number of audio sample frames in the content block.
+  void setSampleCount(uint32_t sampleCount) {
+    sampleFrameCount_ = sampleCount;
+  }
   /// Tell if the audio sample format is fully defined.
   /// For instance, PCM audio data when we have enough details: sample format & channel count.
   bool isSampleBlockFormatDefined() const {
@@ -520,6 +524,7 @@ class ContentBlock {
   /// Very generic audio block description.
   // NOLINTNEXTLINE(hicpp-explicit-conversions)
   ContentBlock(AudioFormat audioFormat, uint8_t channelCount = 0);
+  ContentBlock(const AudioContentBlockSpec& audioSpec, size_t size);
 
   /// Audio block description.
   ContentBlock(

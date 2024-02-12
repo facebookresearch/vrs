@@ -16,8 +16,6 @@
 
 #include "AudioBlock.h"
 
-#include <cstring>
-
 #define DEFAULT_LOG_CHANNEL "AudioBlock"
 #include <logging/Checks.h>
 #include <logging/Log.h>
@@ -46,12 +44,20 @@ AudioBlock::AudioBlock(const AudioContentBlockSpec& spec, vector<uint8_t>&& fram
   THROTTLED_VERIFY(nullptr, size == ContentBlock::kSizeUnknown || size == audioBytes_.size());
 }
 
-void AudioBlock::init(const AudioContentBlockSpec& spec) {
-  audioSpec_ = spec;
+AudioBlock::AudioBlock(const AudioContentBlockSpec& spec) : audioSpec_{spec} {
+  allocateBytes();
+}
+
+void AudioBlock::allocateBytes() {
   size_t size = audioSpec_.getBlockSize();
   if (size != ContentBlock::kSizeUnknown) {
     audioBytes_.resize(size);
   }
+}
+
+void AudioBlock::init(const AudioContentBlockSpec& spec) {
+  audioSpec_ = spec;
+  allocateBytes();
 }
 
 void AudioBlock::init(const AudioContentBlockSpec& spec, vector<uint8_t>&& frameBytes) {

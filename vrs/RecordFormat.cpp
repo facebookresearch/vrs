@@ -914,6 +914,9 @@ ContentBlock::ContentBlock(
 ContentBlock::ContentBlock(AudioFormat audioFormat, uint8_t channelCount)
     : contentType_{ContentType::AUDIO}, audioSpec_{audioFormat, channelCount} {}
 
+ContentBlock::ContentBlock(const AudioContentBlockSpec& audioSpec, size_t size)
+    : contentType_{ContentType::AUDIO}, size_{size}, audioSpec_{audioSpec} {}
+
 ContentBlock::ContentBlock(
     AudioFormat audioFormat,
     AudioSampleFormat sampleFormat,
