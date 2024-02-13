@@ -114,6 +114,9 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:a0da2c17d8e0eb692c3e31b352f76756d inherit pro_methods_classvrs_1_1_content_block_reader"><td class="memItemLeft" align="right" valign="top"><a id="a0da2c17d8e0eb692c3e31b352f76756d"></a>
 size_t&#160;</td><td class="memItemRight" valign="bottom"><b>findContentBlockSize</b> (const <a class="el" href="structvrs_1_1_current_record.html">CurrentRecord</a> &amp;record, <a class="el" href="classvrs_1_1_record_format_stream_player.html">RecordFormatStreamPlayer</a> &amp;player)</td></tr>
 <tr class="separator:a0da2c17d8e0eb692c3e31b352f76756d inherit pro_methods_classvrs_1_1_content_block_reader"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad89bd1e1b884bc02e219fa9fb6ce60a6 inherit pro_methods_classvrs_1_1_content_block_reader"><td class="memItemLeft" align="right" valign="top"><a id="ad89bd1e1b884bc02e219fa9fb6ce60a6"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>findAudioSampleCount</b> (const <a class="el" href="structvrs_1_1_current_record.html">CurrentRecord</a> &amp;record, <a class="el" href="classvrs_1_1_record_format_stream_player.html">RecordFormatStreamPlayer</a> &amp;player)</td></tr>
+<tr class="separator:ad89bd1e1b884bc02e219fa9fb6ce60a6 inherit pro_methods_classvrs_1_1_content_block_reader"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_attribs_classvrs_1_1_content_block_reader"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classvrs_1_1_content_block_reader')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classvrs_1_1_content_block_reader.html">vrs::ContentBlockReader</a></td></tr>
 <tr class="memitem:a5b843f2d2caca18719bb90593b1007c9 inherit pro_attribs_classvrs_1_1_content_block_reader"><td class="memItemLeft" align="right" valign="top"><a id="a5b843f2d2caca18719bb90593b1007c9"></a>
 const <a class="el" href="classvrs_1_1_record_format.html">RecordFormat</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>recordFormat_</b></td></tr>
@@ -124,6 +127,9 @@ const size_t&#160;</td><td class="memItemRight" valign="bottom"><b>blockIndex_</
 <tr class="memitem:ad0b5770c6a1fe5456be29e9ba22acfcf inherit pro_attribs_classvrs_1_1_content_block_reader"><td class="memItemLeft" align="right" valign="top"><a id="ad0b5770c6a1fe5456be29e9ba22acfcf"></a>
 unique_ptr&lt; <a class="el" href="classvrs_1_1datalayout__conventions_1_1_next_content_block_size_spec.html">datalayout_conventions::NextContentBlockSizeSpec</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>contentBlockSizeSpec_</b></td></tr>
 <tr class="separator:ad0b5770c6a1fe5456be29e9ba22acfcf inherit pro_attribs_classvrs_1_1_content_block_reader"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a61fee964d8142180693ce5dae22c9943 inherit pro_attribs_classvrs_1_1_content_block_reader"><td class="memItemLeft" align="right" valign="top"><a id="a61fee964d8142180693ce5dae22c9943"></a>
+unique_ptr&lt; <a class="el" href="classvrs_1_1datalayout__conventions_1_1_next_audio_content_block_sample_count_spec.html">datalayout_conventions::NextAudioContentBlockSampleCountSpec</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>sampleCountSpec_</b></td></tr>
+<tr class="separator:a61fee964d8142180693ce5dae22c9943 inherit pro_attribs_classvrs_1_1_content_block_reader"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Specialized version of <a class="el" href="classvrs_1_1_content_block_reader.html" title="Abstract class to handle the interpretation of a record format&#39;s content block.">ContentBlockReader</a> to handle an empty content block. </p>
