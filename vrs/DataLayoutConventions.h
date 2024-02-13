@@ -155,6 +155,14 @@ class AudioSpec : public AutoDataLayout {
   AutoDataLayoutEnd end;
 };
 
+/// DataLayout only containing the number of audio samples in the audio content block following.
+class NextAudioContentBlockSampleCountSpec : public AutoDataLayout {
+ public:
+  DataPieceValue<uint32_t> sampleCount{kAudioSampleCount};
+
+  AutoDataLayoutEnd end;
+};
+
 } // namespace datalayout_conventions
 
 // Previous name to help transition.

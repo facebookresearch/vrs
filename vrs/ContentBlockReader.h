@@ -59,10 +59,12 @@ class ContentBlockReader {
   ContentBlockReader(const RecordFormat& recordFormat, size_t blockIndex)
       : recordFormat_(recordFormat), blockIndex_(blockIndex) {}
   size_t findContentBlockSize(const CurrentRecord& record, RecordFormatStreamPlayer& player);
+  uint32_t findAudioSampleCount(const CurrentRecord& record, RecordFormatStreamPlayer& player);
 
   const RecordFormat& recordFormat_;
   const size_t blockIndex_;
   unique_ptr<datalayout_conventions::NextContentBlockSizeSpec> contentBlockSizeSpec_;
+  unique_ptr<datalayout_conventions::NextAudioContentBlockSampleCountSpec> sampleCountSpec_;
 };
 
 /// \brief Specialized version of ContentBlockReader to handle content blocks containing an image.
@@ -93,7 +95,10 @@ class AudioBlockReader : public ContentBlockReader {
 
  protected:
   bool readAudioContentBlock(const CurrentRecord&, RecordFormatStreamPlayer&, const ContentBlock&);
-  static bool audioContentFromAudioSpec(const datalayout_conventions::AudioSpec&, ContentBlock&);
+  static bool audioContentFromAudioSpec(
+      const datalayout_conventions::AudioSpec&,
+      uint32_t foundSampleCount,
+      ContentBlock& outAudioContentBlock);
   bool findAudioSpec(
       const CurrentRecord&,
       RecordFormatStreamPlayer&,

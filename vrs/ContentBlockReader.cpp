@@ -144,6 +144,30 @@ size_t ContentBlockReader::findContentBlockSize(
   return recordFormat_.getBlockSize(blockIndex_, record.reader->getUnreadBytes());
 }
 
+uint32_t ContentBlockReader::findAudioSampleCount(
+    const CurrentRecord& record,
+    RecordFormatStreamPlayer& player) {
+  uint32_t sampleCount = 0;
+  // Have we successfully mapped the datalayout already?
+  if (sampleCountSpec_ && sampleCountSpec_->isMapped() &&
+      sampleCountSpec_->sampleCount.get(sampleCount)) {
+    return sampleCount;
+  }
+  // Try to find the info in the datalayout before this block, but only try once
+  if (blockIndex_ > 0 && !sampleCountSpec_) {
+    sampleCountSpec_ = make_unique<datalayout_conventions::NextAudioContentBlockSampleCountSpec>();
+    const size_t index = blockIndex_ - 1;
+    RecordFormatReader* reader = player.getCurrentRecordFormatReader();
+    if (reader->recordFormat.getContentBlock(index).getContentType() == ContentType::DATA_LAYOUT) {
+      if (mapToBlockLayout(reader, index, *sampleCountSpec_) &&
+          sampleCountSpec_->sampleCount.get(sampleCount)) {
+        return sampleCount;
+      }
+    }
+  }
+  return 0; // we did not find anything
+}
+
 bool AudioBlockReader::readAudioContentBlock(
     const CurrentRecord& record,
     RecordFormatStreamPlayer& player,
@@ -151,8 +175,12 @@ bool AudioBlockReader::readAudioContentBlock(
   const AudioContentBlockSpec& audioContent = contentBlock.audio();
   size_t remainingBlockSize =
       recordFormat_.getBlockSize(blockIndex_, record.reader->getUnreadBytes());
-  size_t sampleCount = audioContent.getSampleCount();
-  if (sampleCount == 0) {
+  if (audioContent.getAudioFormat() != AudioFormat::PCM) {
+    if (remainingBlockSize != ContentBlock::kSizeUnknown) {
+      return player.onAudioRead(
+          record, blockIndex_, ContentBlock(contentBlock.audio(), remainingBlockSize));
+    }
+  } else if (audioContent.getSampleCount() == 0) {
     if (remainingBlockSize != ContentBlock::kSizeUnknown) {
       if (remainingBlockSize > 0 && audioContent.getAudioFormat() == AudioFormat::PCM) {
         // The sample count is undefined, but we can to do the math,
@@ -173,10 +201,10 @@ bool AudioBlockReader::readAudioContentBlock(
         }
       }
       return player.onAudioRead(
-          record, blockIndex_, ContentBlock(contentBlock, remainingBlockSize));
+          record, blockIndex_, ContentBlock(contentBlock.audio(), remainingBlockSize));
     }
   } else {
-    size_t expectedSize = sampleCount * audioContent.getSampleFrameStride();
+    size_t expectedSize = audioContent.getSampleCount() * audioContent.getSampleFrameStride();
     // if we have redundant size information, validate our values
     if (remainingBlockSize == ContentBlock::kSizeUnknown || remainingBlockSize == expectedSize) {
       return player.onAudioRead(record, blockIndex_, contentBlock);
@@ -186,7 +214,10 @@ bool AudioBlockReader::readAudioContentBlock(
         "Non-matching audio block size, got {} bytes, expected {} bytes.",
         remainingBlockSize,
         expectedSize);
+    return player.onUnsupportedBlock(record, blockIndex_, contentBlock);
   }
+  THROTTLED_LOGW(
+      record.fileReader, "Can't figure out audio content block {}", audioContent.asString());
   return player.onUnsupportedBlock(record, blockIndex_, contentBlock);
 }
 
@@ -241,7 +272,8 @@ bool AudioBlockReader::findAudioSpec(
 
 bool AudioBlockReader::audioContentFromAudioSpec(
     const datalayout_conventions::AudioSpec& audioSpec,
-    ContentBlock& audioContentBlock) {
+    uint32_t foundSampleCount,
+    ContentBlock& outAudioContentBlock) {
   AudioFormat audioFormat = AudioFormat::UNDEFINED;
   AudioSampleFormat sampleFormat = AudioSampleFormat::UNDEFINED;
   uint8_t numChannels = 0;
@@ -264,14 +296,15 @@ bool AudioBlockReader::audioContentFromAudioSpec(
     // If sampleStride field is set, perform a sanity check based on the format. Assume that any
     // meaningful alignment of a sample won't be longer than additional 3 bytes per channel e.g. if
     // uint8_t samples is stored in uint32_t for some reason
-    if (audioSpec.sampleStride.get(sampleFrameStride) && audioFormat == AudioFormat::PCM &&
+    if (audioSpec.sampleStride.get(sampleFrameStride) && sampleFrameStride > 0 &&
+        audioFormat == AudioFormat::PCM &&
         (sampleFrameStride < sampleSizeInBytes ||
          sampleFrameStride > sampleSizeInBytes + numChannels * 3)) {
       // has invalid block align
       return false;
     }
-    audioSpec.sampleCount.get(sampleCount);
-    audioContentBlock = ContentBlock(
+    sampleCount = (foundSampleCount > 0) ? foundSampleCount : audioSpec.sampleCount.get();
+    outAudioContentBlock = ContentBlock(
         audioFormat, sampleFormat, numChannels, sampleFrameStride, sampleRate, sampleCount);
     return true;
   }
@@ -287,7 +320,7 @@ bool AudioBlockReader::tryCurrentAudioSpec(
     bool& readNextBlock) {
   // try to use current audioSpec
   ContentBlock contentBlock;
-  if (audioContentFromAudioSpec(audioSpec_, contentBlock)) {
+  if (audioContentFromAudioSpec(audioSpec_, findAudioSampleCount(record, player), contentBlock)) {
     // try to interpret the rest of the record with the updated content block
     readNextBlock = readAudioContentBlock(record, player, contentBlock);
     return true;
