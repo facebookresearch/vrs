@@ -177,7 +177,7 @@ class RecordFormatStreamPlayer : public StreamPlayer {
       layoutCache[blockIndex].reset(expectedLayout);
       expectedLayout->mapLayout(layout);
     }
-    return *reinterpret_cast<T*>(layoutCache[blockIndex].get());
+    return reinterpret_cast<T&>(*layoutCache[blockIndex].get());
   }
 
   RecordFileReader* recordFileReader_{};

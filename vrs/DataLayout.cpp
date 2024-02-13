@@ -1409,7 +1409,7 @@ bool DataPieceVector<T>::isSame(const DataPiece* rhs) const {
   if (!DataPiece::isSame(rhs)) {
     return false;
   }
-  const DataPieceVector<T>& other = *reinterpret_cast<const DataPieceVector<T>*>(rhs);
+  const DataPieceVector<T>& other = reinterpret_cast<const DataPieceVector<T>&>(*rhs);
   return vrs::isSame(this->defaultValues_, other.defaultValues_);
 }
 
@@ -1629,7 +1629,7 @@ bool DataPieceString::isSame(const DataPiece* rhs) const {
   if (!DataPiece::isSame(rhs)) {
     return false;
   }
-  const DataPieceString& other = *reinterpret_cast<const DataPieceString*>(rhs);
+  const DataPieceString& other = reinterpret_cast<const DataPieceString&>(*rhs);
   return defaultString_ == other.defaultString_;
 }
 
