@@ -62,6 +62,7 @@ class AudioPlayer : public QObject, public RecordFormatStreamPlayer {
   vrs::AudioSampleFormat sampleFormat_ = vrs::AudioSampleFormat::UNDEFINED;
   bool failedInit_ = false;
   vrs::JobQueueWithThread<AudioBlock> playbackQueue_;
+  vrs::utils::AudioDecompressionHandler opusHandler_;
 };
 
 } // namespace vrsp

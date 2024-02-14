@@ -91,4 +91,22 @@ bool AudioBlock::readBlock(RecordReader* reader, const ContentBlock& cb) {
   return THROTTLED_VERIFY(reader->getRef(), reader->read(audioBytes_.data(), blockSize) == 0);
 }
 
+bool AudioBlock::decompressAudio(AudioDecompressionHandler& handler) {
+  switch (audioSpec_.getAudioFormat()) {
+    case AudioFormat::PCM:
+      return true;
+    case AudioFormat::OPUS: {
+      AudioBlock decodedBlock;
+      if (opusDecompress(handler, decodedBlock)) {
+        *this = std::move(decodedBlock);
+        return true;
+      }
+      return false;
+    }
+    default:
+      return false;
+  }
+  return false;
+}
+
 } // namespace vrs::utils

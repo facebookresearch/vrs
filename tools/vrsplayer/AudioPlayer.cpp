@@ -55,9 +55,6 @@ bool AudioPlayer::onAudioRead(const CurrentRecord& record, size_t blkIdx, const 
   // XR_LOGI("Audio block: {:.3f} {}", record.timestamp, contentBlock.asString());
   AudioBlock audioBlock;
   if (audioBlock.readBlock(record.reader, cb)) {
-    if (cb.audio().getAudioFormat() != AudioFormat::PCM) {
-      return true; // we read the audio, but we don't actually support it in vrsplayer (yet!)
-    }
     if (!failedInit_) {
       const auto& audio = cb.audio();
       if (paStream_ == nullptr) {
@@ -174,6 +171,14 @@ void AudioPlayer::mediaStateChanged(FileReaderState state) {
 void AudioPlayer::playbackThread() {
   AudioBlock block;
   while (playbackQueue_.waitForJob(block)) {
+    if (block.getAudioFormat() == AudioFormat::OPUS) {
+      if (!block.decompressAudio(opusHandler_)) {
+        continue;
+      }
+    }
+    if (block.getAudioFormat() != AudioFormat::PCM) {
+      continue;
+    }
     uint32_t frameCount = block.getSampleCount();
     uint8_t frameStride = block.getSpec().getSampleFrameStride();
     uint8_t paFrameStride = channelCount_ * block.getSpec().getBytesPerSample();
