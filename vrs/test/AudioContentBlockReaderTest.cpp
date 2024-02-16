@@ -78,7 +78,15 @@ enum class LayoutStyle {
   Classic = 1, // Spec in config record, sample count in data record
   NoSize, // Spec in config record, no sample count in data record
   FullSpecData, // Nothing in config record, full spec in data record
-  OpusStereo, // Opus compression
+  OpusStereo, // Opus compression, with sample count specification
+  OpusStereoNoSampleCount, // Opus compression without sample count specification
+};
+
+class NextContentBlockAudioSampleCountSpec : public AutoDataLayout {
+ public:
+  DataPieceValue<uint32_t> sampleCount{kAudioSampleCount};
+
+  AutoDataLayoutEnd end;
 };
 
 class AudioStream : public Recordable {
@@ -104,6 +112,10 @@ class AudioStream : public Recordable {
         addRecordFormat(
             Record::Type::DATA, 1, data_.getContentBlock() + ContentType::AUDIO, {&data_});
         break;
+      case LayoutStyle::OpusStereoNoSampleCount:
+        addRecordFormat(Record::Type::CONFIGURATION, 1, config_.getContentBlock(), {&config_});
+        addRecordFormat(Record::Type::DATA, 1, ContentType::AUDIO, {});
+        break;
     }
   }
   const Record* createConfigurationRecord() override {
@@ -120,6 +132,10 @@ class AudioStream : public Recordable {
         return nullptr;
         break;
       case LayoutStyle::OpusStereo:
+        config_.audioFormat.set(AudioFormat::OPUS);
+        return createRecord(getTimestampSec(), Record::Type::CONFIGURATION, 1, DataSource(config_));
+        break;
+      case LayoutStyle::OpusStereoNoSampleCount:
         config_.audioFormat.set(AudioFormat::OPUS);
         return createRecord(getTimestampSec(), Record::Type::CONFIGURATION, 1, DataSource(config_));
         break;
@@ -154,7 +170,8 @@ class AudioStream : public Recordable {
             1,
             DataSource(config_, DataSourceChunk(first, size)));
         break;
-      case LayoutStyle::OpusStereo: {
+      case LayoutStyle::OpusStereo:
+      case LayoutStyle::OpusStereoNoSampleCount: {
         if (compressionHandler_.encoder == nullptr) {
           compressionHandler_.create(
               {AudioFormat::OPUS, AudioSampleFormat::S16_LE, kChannels, 0, kSampleRate});
@@ -171,12 +188,20 @@ class AudioStream : public Recordable {
         int result = compressionHandler_.compress(
             first, fullRecordSize_, opusData_.data(), opusData_.size());
         if (XR_VERIFY(result > 0)) {
-          data_.sampleCount.set(fullRecordSize_);
-          createRecord(
-              getTimestampSec(),
-              Record::Type::DATA,
-              1,
-              DataSource(data_, DataSourceChunk(opusData_.data(), result)));
+          if (style_ == LayoutStyle::OpusStereo) {
+            data_.sampleCount.set(fullRecordSize_);
+            createRecord(
+                getTimestampSec(),
+                Record::Type::DATA,
+                1,
+                DataSource(data_, DataSourceChunk(opusData_.data(), result)));
+          } else {
+            createRecord(
+                getTimestampSec(),
+                Record::Type::DATA,
+                1,
+                DataSource(DataSourceChunk(opusData_.data(), result)));
+          }
         }
       } break;
     }
@@ -185,7 +210,7 @@ class AudioStream : public Recordable {
   void createAllRecords() {
     createConfigurationRecord();
     createStateRecord();
-    if (style_ == LayoutStyle::OpusStereo) {
+    if (style_ == LayoutStyle::OpusStereo || style_ == LayoutStyle::OpusStereoNoSampleCount) {
       // We must use blocks of a specific size (Opus limitation)
       while (sampleCount_ < kSampleCount) {
         createDataRecords(min<uint32_t>(fullRecordSize_, kSampleCount - sampleCount_));
@@ -208,7 +233,7 @@ class AudioStream : public Recordable {
   const LayoutStyle style_;
   const uint32_t fullRecordSize_;
   AudioSpec config_;
-  NextAudioContentBlockSampleCountSpec data_;
+  NextContentBlockAudioSampleCountSpec data_;
   uint64_t sampleCount_ = 0;
   utils::AudioCompressionHandler compressionHandler_;
   vector<uint8_t> opusData_;
@@ -334,6 +359,22 @@ TEST_F(AudioContentBlockReaderTest, testOpusStereo) {
 
   EXPECT_EQ(analytics.configDatalayoutCount, 1);
   EXPECT_EQ(analytics.dataDatalayoutCount, kBlockCount);
+  EXPECT_EQ(analytics.audioBlockCount, kBlockCount);
+  // we padded the blocks to have the required block size, so we may have more samples
+  EXPECT_EQ(analytics.audioSampleCount, kBlockCount * kBlockSampleSize);
+  EXPECT_EQ(analytics.unsupportedCount, 0);
+}
+
+TEST_F(AudioContentBlockReaderTest, testOpusStereoNoSampleCount) {
+  ASSERT_GT(getAudioSamples().size(), 100000);
+
+  const uint32_t kBlockSampleSize = 480; // 10 ms @ 48 kHz
+  const uint32_t kBlockCount = (kTotalSampleCount + kBlockSampleSize - 1) / kBlockSampleSize;
+
+  Analytics analytics = runTest(TEST_NAME, LayoutStyle::OpusStereoNoSampleCount, kBlockSampleSize);
+
+  EXPECT_EQ(analytics.configDatalayoutCount, 1);
+  EXPECT_EQ(analytics.dataDatalayoutCount, 0);
   EXPECT_EQ(analytics.audioBlockCount, kBlockCount);
   // we padded the blocks to have the required block size, so we may have more samples
   EXPECT_EQ(analytics.audioSampleCount, kBlockCount * kBlockSampleSize);

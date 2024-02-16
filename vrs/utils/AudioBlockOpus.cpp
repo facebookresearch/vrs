@@ -62,19 +62,25 @@ bool AudioBlock::opusDecompress(AudioDecompressionHandler& handler, AudioBlock& 
     handler.decoderSpec = audioSpec_;
   }
 
+  uint32_t sampleCount = getSampleCount();
+  // if we don't know the sample count, use the maximum possible according to the Opus spec: 120 ms
+  if (sampleCount == 0) {
+    sampleCount = getSampleRate() * 120 / 1000;
+  }
+
   outAudioBlock.init(
       AudioFormat::PCM,
       AudioSampleFormat::S16_LE,
       getChannelCount(),
       0,
       getSampleRate(),
-      getSampleCount());
+      sampleCount);
   opus_int32 result = opus_decode(
       handler.decoder,
       data<unsigned char>(),
       audioBytes_.size(),
       outAudioBlock.data<opus_int16>(),
-      getSampleCount(),
+      sampleCount,
       0);
   if (result > 0) {
     outAudioBlock.setSampleCount(result);

@@ -26,18 +26,6 @@ namespace vrs {
 /// Name and type conventions used to map ContentBlockReader needs to DataLayout data
 namespace datalayout_conventions {
 
-/// Convention to specify the size of the content block following
-constexpr const char* kNextContentBlockSize = "next_content_block_size";
-using ContentBlockSizeType = uint32_t;
-
-/// DataLayout only containing the size of the content block following.
-class NextContentBlockSizeSpec : public AutoDataLayout {
- public:
-  DataPieceValue<ContentBlockSizeType> nextContentBlockSize{kNextContentBlockSize};
-
-  AutoDataLayoutEnd end;
-};
-
 /// DataLayout convention name for the image width.
 constexpr const char* kImageWidth = "image_width";
 /// DataLayout convention name for the image height.
@@ -130,7 +118,7 @@ constexpr const char* kAudioSampleStride = "audio_sample_stride";
 constexpr const char* kAudioChannelCount = "audio_channel_count";
 /// DataLayout convention name for the sample rate (samples per seconde).
 constexpr const char* kAudioSampleRate = "audio_sample_rate";
-/// DataLayout convention name for the number of samples in the content block.
+/// DataLayout convention name for a count of audio sample frames.
 constexpr const char* kAudioSampleCount = "audio_sample_count";
 
 /// \brief DataLayout definitions use to describe what's in an audio content block.
@@ -155,10 +143,15 @@ class AudioSpec : public AutoDataLayout {
   AutoDataLayoutEnd end;
 };
 
-/// DataLayout only containing the number of audio samples in the audio content block following.
-class NextAudioContentBlockSampleCountSpec : public AutoDataLayout {
+/// DataLayout convention to specify the size of the content block following
+constexpr const char* kNextContentBlockSize = "next_content_block_size";
+using ContentBlockSizeType = uint32_t;
+
+/// Optional values specifying the content block following the DataLayout.
+class NextContentBlockSpec : public AutoDataLayout {
  public:
-  DataPieceValue<uint32_t> sampleCount{kAudioSampleCount};
+  DataPieceValue<ContentBlockSizeType> nextContentBlockSize{kNextContentBlockSize};
+  DataPieceValue<uint32_t> nextAudioContentBlockSampleCount{kAudioSampleCount};
 
   AutoDataLayoutEnd end;
 };
