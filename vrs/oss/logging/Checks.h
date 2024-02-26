@@ -47,7 +47,7 @@ void logAndAbort(const char* condition, const std::string& message = {});
 
 #define XR_CHECK_LE(val1, val2, ...) XR_CHECK((val1) <= (val2), ##__VA_ARGS__)
 
-#define XR_CHECK_LT(val1, val2, ...) XR_CHECK((val1) < (val2, ##__VA_ARGS__)
+#define XR_CHECK_LT(val1, val2, ...) XR_CHECK((val1) < (val2), ##__VA_ARGS__)
 
 #define XR_CHECK_NOTNULL(val, ...) XR_CHECK((val) != nullptr, ##__VA_ARGS__)
 
