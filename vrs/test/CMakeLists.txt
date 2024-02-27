@@ -17,9 +17,11 @@ enable_testing()
 add_executable(testedtool testedtool/testedtool.cpp)
 
 add_library(vrs_test_helpers
-  helpers/TestProcess.cpp
   helpers/VRSTestsHelpers.cpp
 )
+if (NOT CMAKE_HOST_WIN32)
+  target_sources(vrs_test_helpers PUBLIC helpers/TestProcess.cpp)
+endif()
 target_link_libraries(vrs_test_helpers
   PUBLIC
     vrslib
@@ -44,8 +46,10 @@ add_executable(test_vrslib
   RecordFormatTest.cpp
   RecordManagerTest.cpp
   RecordTest.cpp
-  TestProcessTest.cpp
 )
+if (NOT CMAKE_HOST_WIN32)
+  target_sources(test_vrslib PUBLIC TestProcessTest.cpp)
+endif()
 target_link_libraries(test_vrslib
   PUBLIC
     vrslib
@@ -55,6 +59,7 @@ target_link_libraries(test_vrslib
 )
 add_dependencies(test_vrslib testedtool)
 target_compile_definitions(test_vrslib PUBLIC GTEST_BUILD)
+target_link_options(test_vrslib PUBLIC $<$<CXX_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
 
 add_executable(test_vrslib_file_tests
   file_tests/ChunkedFileTest.cpp
@@ -71,6 +76,7 @@ target_link_libraries(test_vrslib_file_tests
     GTest::Main
 )
 target_compile_definitions(test_vrslib_file_tests PUBLIC GTEST_BUILD)
+target_link_options(test_vrslib_file_tests PUBLIC $<$<CXX_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
 
 gtest_discover_tests(test_vrslib)
 gtest_discover_tests(test_vrslib_file_tests)

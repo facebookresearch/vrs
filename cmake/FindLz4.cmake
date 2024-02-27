@@ -20,7 +20,7 @@
 # Lz4_FOUND - True if Lz4 found.
 
 find_path(Lz4_INCLUDE_DIRS NAMES lz4.h)
-find_library(Lz4_LIBRARIES NAMES lz4)
+find_library(Lz4_LIBRARIES NAMES lz4 liblz4)
 mark_as_advanced(Lz4_LIBRARIES Lz4_INCLUDE_DIRS)
 
 include(FindPackageHandleStandardArgs)
