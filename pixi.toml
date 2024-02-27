@@ -17,7 +17,7 @@ channels = ["conda-forge"]
 description = "VRS is a file format optimized to record & playback streams of sensor data, such as images, audio samples, and any other discrete sensors (IMU, temperature, etc), stored in per-device streams of timestamped records."
 homepage = "https://github.com/facebookresearch/vrs"
 license = "Apache-2.0"
-platforms = ["linux-64", "osx-arm64", "osx-64"]
+platforms = ["linux-64", "osx-arm64", "osx-64", "win-64"]
 readme = "README.md"
 repository = "https://github.com/facebookresearch/vrs"
 version = "1.1.0"
@@ -32,6 +32,13 @@ build = { cmd = "cmake --build build --config Release --target all", depends_on 
     "prepare",
 ] }
 test = {cmd = "cd build; ctest -j --rerun-failed --output-on-failure ", depends_on = ["build"] }
+
+[target.win-64.tasks] # Deal with windows specifics (prepare and build)
+cmake-generator = "cmake --help"
+prepare = "cmake -G 'Visual Studio 16 2019' -B build -S . -DCMAKE_BUILD_TYPE=Release"
+build = { cmd = "cmake --build build --config Release  -- /m", depends_on = [
+    "prepare",
+] }
 
 [build-dependencies]
 cmake = "3.27.6"

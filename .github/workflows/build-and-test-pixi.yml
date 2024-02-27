@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, macos-14] # macos-14 is macSilicon
+        os: [macos-latest, macos-14, ubuntu-latest, windows-2019] # macos-14 is macSilicon
     steps:
       - name : Setup repo
         uses: actions/checkout@v2

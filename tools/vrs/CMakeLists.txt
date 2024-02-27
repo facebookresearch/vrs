@@ -38,10 +38,12 @@ if (UNIT_TESTS)
 
   add_executable(test_vrscli
     VrsCommand.cpp
-    test/VrsAppTest.cpp
     test/VrsProcess.h
     test/VrsCommandTest.cpp
   )
+  if (NOT CMAKE_HOST_WIN32)
+    target_sources(test_vrscli PUBLIC test/VrsAppTest.cpp)
+  endif()
   target_include_directories(test_vrscli
     PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR}/..
@@ -56,6 +58,7 @@ if (UNIT_TESTS)
       GTest::Main
   )
   add_dependencies(test_vrscli vrs)
+  target_link_options(test_vrscli PUBLIC $<$<CXX_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
 
   gtest_discover_tests(test_vrscli)
 endif()
