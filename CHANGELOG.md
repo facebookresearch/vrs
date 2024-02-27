@@ -9,25 +9,25 @@ triggering a new version number.
 
 ## Version 1.1.0 (August 4, 2023)
 
-- Version bump after cummulative changes.
+- Version bump after cumulative changes.
 - Removed dependency on Cereal, using Rapidjson directly instead.
 - Added support for Ubuntu 22.04.
 
 ### Version 1.0.4 (February 2, 2023)
 
-- Version bump after cummulative changes.
+- Version bump after cumulative changes.
 
 ### Version 1.0.3 (December 27, 2022)
 
-- Version bump after cummulative changes.
+- Version bump after cumulative changes.
 
 ### Version 1.0.2 (December 12, 2022)
 
-- Version bump after cummulative changes.
+- Version bump after cumulative changes.
 
 ### Version 1.0.1 (December 8, 2022)
 
-- Version bump after cummulative changes.
+- Version bump after cumulative changes.
 
 ## Version 1.0 (December 16, 2021)
 
