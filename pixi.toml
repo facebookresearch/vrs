@@ -1,0 +1,50 @@
+# Pixi is a package management tool for developers.
+# Before running a task, pixi ensures that all listed dependencies are installed first.
+#
+# Pixi is not required for VRS, but it is a convenient way to:
+# - install the dependencies required for VRS
+# - compile VRS and run its unit test
+# in an isolated environment.
+#
+# https://pixi.sh/
+#
+# Use `pixi task list` to list the available tasks,
+# and `pixi run build` to compile VRS.
+
+[project]
+name = "vrs"
+channels = ["conda-forge"]
+description = "VRS is a file format optimized to record & playback streams of sensor data, such as images, audio samples, and any other discrete sensors (IMU, temperature, etc), stored in per-device streams of timestamped records."
+homepage = "https://github.com/facebookresearch/vrs"
+license = "Apache-2.0"
+platforms = ["linux-64", "osx-arm64", "osx-64"]
+readme = "README.md"
+repository = "https://github.com/facebookresearch/vrs"
+version = "1.1.0"
+
+
+[tasks]
+# Note: extra CLI argument after `pixi run TASK` are passed to the task cmd.
+clean = { cmd = "rm -rf build" }
+print-env = { cmd = "echo $PATH" }
+prepare = "cmake -G 'Ninja' -B build -S . -DCMAKE_BUILD_TYPE=Release"
+build = { cmd = "cmake --build build --config Release --target all", depends_on = [
+    "prepare",
+] }
+test = {cmd = "cd build; ctest -j --rerun-failed --output-on-failure ", depends_on = ["build"] }
+
+[build-dependencies]
+cmake = "3.27.6"
+cxx-compiler = "1.6.0.*"
+ninja = "1.11.1"
+
+[dependencies]
+boost = "1.84.0.*"
+fmt = "10.1.1.*"
+gtest = "1.14.0"
+libjpeg-turbo = "2.1.4.*"
+libpng = "1.6.39.*"
+lz4 = "4.3.2.*"
+portaudio = "19.6.0.*"
+xxhash = "0.8.2"
+zlib = "1.2.13.*"
