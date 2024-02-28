@@ -32,6 +32,7 @@ build = { cmd = "cmake --build build --config Release --target all", depends_on 
     "prepare",
 ] }
 test = {cmd = "cd build; ctest -j --rerun-failed --output-on-failure ", depends_on = ["build"] }
+vrs = { cmd = "build/tools/vrs/vrs", depends_on = ["build"]}
 
 [target.win-64.tasks] # Deal with windows specifics (prepare and build)
 cmake-generator = "cmake --help"
@@ -39,6 +40,7 @@ prepare = "cmake -G 'Visual Studio 16 2019' -B build -S . -DCMAKE_BUILD_TYPE=Rel
 build = { cmd = "cmake --build build --config Release  -- /m", depends_on = [
     "prepare",
 ] }
+vrs = { cmd = "build/tools/vrs/Release/vrs", depends_on = ["build"]}
 
 [build-dependencies]
 cmake = "3.27.6"

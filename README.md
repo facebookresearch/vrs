@@ -67,8 +67,9 @@ some package system, such as [Brew](https://brew.sh/) on macOS, or
 [apt](<https://en.wikipedia.org/wiki/APT_(software)>) on Ubuntu, and then use
 cmake to build & test. VRS supports many other platforms such as Windows,
 Android, iOS and other flavors of Linux, but we currently only provide
-instructions for macOS and Ubuntu. You can also build VRS in a container and
-avoid installing any library on your system.
+instructions for macOS, Ubuntu and Windows. You can also build VRS in a
+container or isolated environment and avoid installing any library on your
+system.
 
 ## Instructions (macOS and Ubuntu and container)
 
@@ -165,13 +166,6 @@ int main() {
 
 ```
 
-## Windows Support
-
-We don’t have equivalent instructions for Windows.
-[vcpkg](https://vcpkg.io/en/index.html) looks like a promising package manager
-for Windows, but the cmake build system needs more massaging to work.\
-Contributions welcome! :-)
-
 ## Container build & Usage
 
 - Build VRS in a container and use it on your local data:
@@ -181,6 +175,33 @@ cd <path_to_vrs_folder>
 podman/docker build . -t vrs
 podman/docker run -it --volume <your_local_data>:/data vrs:latest
 ```
+
+## Build and run using Pixi - macOS/Linux/Windows - experimental
+
+_You can build VRS in isolation using [pixi](https://pixi.sh/) on and for your
+local platform (Linux, macOS Intel/Silicon, Windows with VisualStudio 2019)
+using the exact same command lines. Pixi is a convenient package and environment
+manager that simplifies the logic to compile and run projects by defining
+dependencies and tasks in a single pixi.toml file for all platforms._
+
+- install
+  [pixi following the instructions from its website](https://pixi.sh/latest/#installation).
+- compile VRS and run its unit tests (using the defined pixi tasks). Pixi will
+  collect the dependencies for your platform, run cmake, compile and run the
+  unit tests:
+  ```
+  pixi run test
+  ```
+- run the vrs CLI tool in the isolated environment:
+  ```
+  pixi run vrs
+  pixi run vrs <i.e. test.vrs> # command line parameters will be forwarded to pixi
+  ```
+- run vrs CLI tool in the manually launch `pixi` environment:
+  ```
+  pixi shell
+  ./build/tools/vrs/vrs
+  ```
 
 # Sample Code
 
