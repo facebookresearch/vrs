@@ -1141,6 +1141,9 @@ size_t getCountPerLine(const T& value) {
   ss << FORMAT(value, ss);
   return max<size_t>(1, 96 / (ss.str().size() + 1));
 }
+
+const size_t kPrintCompactMaxVectorValues = 400; // arbitrary
+
 } // namespace
 
 template <typename T>
@@ -1369,7 +1372,7 @@ void DataPieceVector<T>::printCompact(ostream& out, const string& indent) const 
   vector<T> values;
   get(values);
   const size_t kCountPerLine = values.empty() ? 1 : getCountPerLine<T>(values.front());
-  for (size_t k = 0; k < values.size(); k++) {
+  for (size_t k = 0; k < min<size_t>(kPrintCompactMaxVectorValues, values.size()); k++) {
     if (k % kCountPerLine == 0 && values.size() > kCountPerLine) {
       out << "\n" << indent << "    ";
     } else {
@@ -1377,6 +1380,11 @@ void DataPieceVector<T>::printCompact(ostream& out, const string& indent) const 
     }
     using namespace special_chars;
     out << FORMAT(values[k], out);
+  }
+  if (values.size() > kPrintCompactMaxVectorValues) {
+    out << "\n"
+        << indent << "    ...and " << values.size() - kPrintCompactMaxVectorValues
+        << " more values.";
   }
   if (getOffset() == DataLayout::kNotFound) {
     out << "<unavailable>";
@@ -1390,13 +1398,18 @@ void DataPieceVector<string>::printCompact(ostream& out, const string& indent) c
   out << indent << getLabel() << ": ";
   vector<string> values;
   get(values);
-  for (size_t k = 0; k < values.size(); k++) {
+  for (size_t k = 0; k < min<size_t>(kPrintCompactMaxVectorValues, values.size()); k++) {
     if (k % kCountPerLine == 0 && values.size() > kCountPerLine) {
       out << "\n" << indent << "    ";
     } else {
       out << ' ';
     }
     out << '"' << compactString(values[k]) << '"';
+  }
+  if (values.size() > kPrintCompactMaxVectorValues) {
+    out << "\n"
+        << indent << "    ...and " << values.size() - kPrintCompactMaxVectorValues
+        << " more values.";
   }
   if (getOffset() == DataLayout::kNotFound) {
     out << "<unavailable>";

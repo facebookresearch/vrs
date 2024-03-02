@@ -21,7 +21,6 @@
 
 #include <cstring>
 
-#include <algorithm>
 #include <map>
 #include <ostream>
 
