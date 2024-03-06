@@ -16,6 +16,7 @@
 
 #include "FilterCopy.h"
 
+#include <algorithm>
 #include <array>
 #include <iomanip>
 #include <iostream>
