@@ -40,11 +40,10 @@
 
 #ifdef JXL_IS_AVAILABLE
 
-/// About Jpeg-XL support
-/// This code requires Jpeg-XL v0.7 (won't compile with v0.61)
+/// About jpeg-xl support
+/// This code requires jpeg-xl v0.10
 /// Jpeg-XL is support is still considered experimental, as the API still changes in breaking ways,
 /// which is why support is disabled by default in VRS OSS.
-/// As of Sep 23, 2022, get jpg-xl from https://github.com/libjxl and use the v0.7.x branch
 
 #include <vrs/helpers/MemBuffer.h>
 
@@ -101,9 +100,6 @@ JxlEncoder* getThreadJxlEncoder() {
 }
 
 inline float percent_to_butteraugli_distance(float quality) {
-  // Make quality behave more like jpg's quality setting accoding to MS-SSIM. Very empirical.
-  float to100 = 100 - quality;
-  quality = 100 - to100 / 4;
   // Quality calculation inspired by cjxl.cc
   // Extended to work meaningfully between 99.99 and 99.999, so with quality = 99.999,
   // the file size is now getting close to that of lossless.
@@ -172,7 +168,7 @@ bool PixelFrame::readJxlFrame(const vector<uint8_t>& jxlBuf, bool decodePixels) 
       case JXL_DEC_COLOR_ENCODING: {
         JxlColorEncoding colorEncoding;
         DEC_CHECK(JxlDecoderGetColorAsEncodedProfile(
-            dec, &format, JXL_COLOR_PROFILE_TARGET_ORIGINAL, &colorEncoding));
+            dec, JXL_COLOR_PROFILE_TARGET_ORIGINAL, &colorEncoding));
         DEC_CHECK(JxlDecoderSetPreferredColorProfile(dec, &colorEncoding));
       } break;
 
