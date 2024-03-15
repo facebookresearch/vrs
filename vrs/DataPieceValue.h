@@ -35,11 +35,12 @@ using std::unique_ptr;
 /// DataPiece for a single value of type T. The value is stored in DataLayout's fixed size buffer.
 template <typename T>
 class DataPieceValue : public DataPiece {
- public:
   static_assert(
       !std::is_same<T, bool>::value,
       "DataPieceValue does not support bool. Use vrs::Bool instead");
+  static_assert(std::is_trivially_copyable<T>::value, "DataPieceValue only supports POD types.");
 
+ public:
   /// @param label: Name for the DataPiece.
   explicit DataPieceValue(const string& label)
       : DataPiece(label, DataPieceType::Value, sizeof(T)) {}

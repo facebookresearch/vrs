@@ -37,6 +37,8 @@ using std::vector;
 /// The size of the array is defined at construction and may not change.
 template <typename T>
 class DataPieceArray : public DataPiece {
+  static_assert(std::is_trivially_copyable<T>::value, "DataPieceArray only supports POD types.");
+
  public:
   /// @param label: Name for the DataPiece.
   /// @param count: Number of elements in the fixes size-array.
