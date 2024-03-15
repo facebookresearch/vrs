@@ -69,10 +69,8 @@ class PixelFrame {
       : PixelFrame(ImageContentBlockSpec(pf, w, h, stride)) {}
 
   void init(const ImageContentBlockSpec& spec);
-  inline void init(PixelFormat pf, uint32_t w, uint32_t h, uint32_t stride = 0) {
-    init(ImageContentBlockSpec(pf, w, h, stride));
-  }
   void init(const ImageContentBlockSpec& spec, vector<uint8_t>&& frameBytes);
+  void init(PixelFormat pf, uint32_t w, uint32_t h, uint32_t stride = 0, uint32_t stride2 = 0);
 
   static void init(shared_ptr<PixelFrame>& inOutFrame, const ImageContentBlockSpec& spec);
   static inline void init(

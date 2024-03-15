@@ -211,6 +211,14 @@ void PixelFrame::init(const ImageContentBlockSpec& spec, vector<uint8_t>&& frame
   frameBytes_ = std::move(frameBytes);
 }
 
+void PixelFrame::init(PixelFormat pf, uint32_t w, uint32_t h, uint32_t stride, uint32_t stride2) {
+  imageSpec_ = {pf, w, h, stride, stride2};
+  size_t size = imageSpec_.getRawImageSize();
+  if (size != ContentBlock::kSizeUnknown) {
+    frameBytes_.resize(size);
+  }
+}
+
 void PixelFrame::init(shared_ptr<PixelFrame>& inOutFrame, const ImageContentBlockSpec& spec) {
   if (!inOutFrame) {
     inOutFrame = make_shared<PixelFrame>(spec);
