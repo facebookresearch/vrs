@@ -71,34 +71,6 @@ using namespace std;
 
 namespace {
 
-template <class T>
-T& getThreadObject() {
-  static mutex sMutex;
-  unique_lock<mutex> locker(sMutex);
-  static map<thread::id, T> sObjects;
-  return sObjects[this_thread::get_id()];
-}
-
-JxlDecoder* getThreadJxlDecoder() {
-  auto& decoder = getThreadObject<JxlDecoderPtr>();
-  if (decoder) {
-    JxlDecoderReset(decoder.get());
-  } else {
-    decoder = JxlDecoderMake(nullptr);
-  }
-  return decoder.get();
-}
-
-JxlEncoder* getThreadJxlEncoder() {
-  auto& encoder = getThreadObject<JxlEncoderPtr>();
-  if (encoder) {
-    JxlEncoderReset(encoder.get());
-  } else {
-    encoder = JxlEncoderMake(nullptr);
-  }
-  return encoder.get();
-}
-
 inline float percent_to_butteraugli_distance(float quality) {
   // Quality calculation inspired by cjxl.cc
   // Extended to work meaningfully between 99.99 and 99.999, so with quality = 99.999,
@@ -137,7 +109,8 @@ bool PixelFrame::readJxlFrame(RecordReader* reader, uint32_t sizeBytes) {
 
 bool PixelFrame::readJxlFrame(const vector<uint8_t>& jxlBuf, bool decodePixels) {
 #ifdef JXL_IS_AVAILABLE
-  JxlDecoder* dec = getThreadJxlDecoder();
+  JxlDecoderPtr decoder = JxlDecoderMake(nullptr);
+  JxlDecoder* dec = decoder.get();
   if (!XR_VERIFY(dec != nullptr)) {
     return false;
   }
@@ -285,7 +258,8 @@ bool PixelFrame::jxlCompress(
   const float butteraugli =
       options.jxlQualityIsButteraugliDistance ? quality : percent_to_butteraugli_distance(quality);
 
-  JxlEncoder* enc = getThreadJxlEncoder();
+  JxlEncoderPtr encoder = JxlEncoderMake(nullptr);
+  JxlEncoder* enc = encoder.get();
   if (!XR_VERIFY(enc != nullptr)) {
     return false;
   }
