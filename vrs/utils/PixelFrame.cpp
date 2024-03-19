@@ -732,6 +732,39 @@ bool PixelFrame::normalizeFrame(shared_ptr<PixelFrame>& normalizedFrame, bool gr
   return true;
 }
 
+bool PixelFrame::psnrCompare(const PixelFrame& other, double& outPsnr) {
+  if (!XR_VERIFY(getPixelFormat() == other.getPixelFormat()) ||
+      !XR_VERIFY(getPixelFormat() == PixelFormat::RGB8 || getPixelFormat() == PixelFormat::GREY8) ||
+      !XR_VERIFY(getWidth() == other.getWidth()) || !XR_VERIFY(getHeight() == other.getHeight())) {
+    return false;
+  }
+  uint64_t err = 0;
+  outPsnr = 100;
+  uint32_t count = 0;
+  const uint8_t* p1 = this->rdata();
+  const uint8_t* p2 = other.rdata();
+  for (uint32_t plane = 0; plane < imageSpec_.getPlaneCount(); ++plane) {
+    uint32_t stride1 = imageSpec_.getPlaneStride(plane);
+    uint32_t stride2 = other.imageSpec_.getPlaneStride(plane);
+    uint32_t width = (plane == 0) ? imageSpec_.getDefaultStride() : imageSpec_.getDefaultStride2();
+    uint32_t height = imageSpec_.getPlaneHeight(plane);
+    for (uint32_t h = 0; h < height; ++h) {
+      for (uint32_t w = 0; w < width; ++w) {
+        int32_t d = static_cast<int32_t>(p1[w]) - p2[w];
+        err += d * d;
+      }
+      p1 += stride1;
+      p2 += stride2;
+    }
+    count += width * height;
+  }
+  if (err > 0) {
+    double derr = static_cast<double>(err) / count;
+    outPsnr = 10 * log10(255ll * 255 / derr);
+  }
+  return true;
+}
+
 #if IS_VRS_OSS_CODE()
 
 bool PixelFrame::normalizeToPixelFormat(
@@ -741,7 +774,7 @@ bool PixelFrame::normalizeToPixelFormat(
 }
 
 bool PixelFrame::msssimCompare(const PixelFrame& other, double& msssim) {
-  THROTTLED_LOGW(nullptr, "PixelFrame::ssimCompare has no open source implementation");
+  THROTTLED_LOGW(nullptr, "PixelFrame::msssimCompare() has no open source implementation");
   return false;
 }
 
