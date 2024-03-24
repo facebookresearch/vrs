@@ -41,6 +41,7 @@ using std::string;
 using JUtf8Encoding = vrs_rapidjson::UTF8<>;
 using JCrtAllocator = vrs_rapidjson::CrtAllocator;
 using JDocument = vrs_rapidjson::GenericDocument<JUtf8Encoding, JCrtAllocator>;
+using JMemberIterator = JDocument::MemberIterator;
 using JValue = vrs_rapidjson::GenericValue<JUtf8Encoding, JCrtAllocator>;
 using JStringRef = vrs_rapidjson::GenericStringRef<char>;
 
