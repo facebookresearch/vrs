@@ -163,6 +163,58 @@ TEST_F(StringsHelpersTester, humanReadableDurationTest) {
   EXPECT_EQ(humanReadableDuration(5000000000 * kYear), "1.577880000e+17s");
 }
 
+TEST_F(StringsHelpersTester, humanReadableFileSizeTest) {
+  using namespace vrs::helpers;
+  int64_t kB = 1024;
+  EXPECT_EQ(humanReadableFileSize(0), "0 B");
+  EXPECT_EQ(humanReadableFileSize(kB - 1), "1023 B");
+  EXPECT_EQ(humanReadableFileSize(kB), "1.00 KiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB - 1), "1023 KiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB), "1.00 MiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * 10 - 1), "9.99 MiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * 10), "10.0 MiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * 100 - 1), "99.9 MiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * 100), "100 MiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * kB - 1), "1023 MiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * kB), "1.00 GiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * kB * 9), "9.00 GiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * kB * 10 - 1), "9.99 GiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * kB * 10), "10.0 GiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * kB * 99), "99.0 GiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * kB * 100 - 1), "99.9 GiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * kB * 100), "100 GiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * kB * kB - 1), "1023 GiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * kB * kB), "1.00 TiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * kB * kB * 10 - 1), "9.99 TiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * kB * kB * 10), "10.0 TiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * kB * kB * 100 - 1), "99.9 TiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * kB * kB * 100), "100 TiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * kB * kB * kB - 1), "1023 TiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * kB * kB * kB), "1.00 PiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * kB * kB * kB * 10 - 1), "9.99 PiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * kB * kB * kB * 10), "10.0 PiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * kB * kB * kB * 100 - 1), "99.9 PiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * kB * kB * kB * 100), "100 PiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * kB * kB * kB * kB - 1), "1023 PiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * kB * kB * kB * kB), "1.00 EiB");
+  EXPECT_EQ(
+      humanReadableFileSize(kB * kB * kB * kB * kB * kB + kB * kB * kB * kB * kB * kB / 2),
+      "1.50 EiB");
+  EXPECT_EQ(
+      humanReadableFileSize(kB * kB * kB * kB * kB * kB + kB * kB * kB * kB * kB * kB / 100 * 99),
+      "1.99 EiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * kB * kB * kB * kB * 2), "2.00 EiB"); // 61 bits
+  EXPECT_EQ(humanReadableFileSize(kB * kB * kB * kB * kB * kB * 3), "3.00 EiB");
+  EXPECT_EQ(humanReadableFileSize(kB * kB * kB * kB * kB * kB * 4), "4.00 EiB"); // 62 bits
+  EXPECT_EQ(humanReadableFileSize(kB * kB * kB * kB * kB * kB * 7), "7.00 EiB");
+  // max limit with int64_t, or 63 bits
+  EXPECT_EQ(humanReadableFileSize(0x7fffffffffffffff), "7.99 EiB");
+
+  EXPECT_EQ(humanReadableFileSize(-(kB - 1)), "-1023 B");
+  EXPECT_EQ(humanReadableFileSize(-kB), "-1.00 KiB");
+  EXPECT_EQ(humanReadableFileSize(-kB * kB * kB), "-1.00 GiB");
+}
+
 TEST_F(StringsHelpersTester, getValueTest) {
   using namespace vrs::helpers;
   map<string, string> m = {

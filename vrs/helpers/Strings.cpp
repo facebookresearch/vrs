@@ -113,21 +113,37 @@ bool beforeFileName(const char* left, const char* right) {
 }
 
 string humanReadableFileSize(int64_t bytes) {
-  const int64_t unit = 1024;
-  if (bytes < unit) {
-    return to_string(bytes) + " B";
+  const char* sign = "";
+  if (bytes < 0) {
+    sign = "-";
+    bytes = -bytes;
   }
-  double exp = floor(log(bytes) / log(unit));
-  char pre = string("KMGTPE").at(static_cast<size_t>(exp - 1));
-  string str;
-  double r = bytes / pow(unit, exp);
-  if (r < 1000.) {
-    str = fmt::format("{:.2f} {}B", r, pre);
-  } else {
-    // avoid scientific notation switch for 1000-1023...
-    str = fmt::format("{} {}B", static_cast<int>(r), pre);
+  uint64_t ubytes = static_cast<uint64_t>(bytes);
+  const uint64_t kB = 1 << 10; // aka 1024
+  if (ubytes < kB) {
+    return fmt::format("{}{} B", sign, ubytes);
   }
-  return str;
+  const char* unitFactor = "KMGTPE";
+  const uint64_t unitFactorsLimit = strlen(unitFactor) - 1;
+  uint64_t factor = kB;
+  uint64_t e = 0;
+  while (e < unitFactorsLimit && ubytes >= (factor << 10)) {
+    e++;
+    factor <<= 10;
+  }
+  char pre = unitFactor[e];
+  uint64_t intPart = ubytes >> ((e + 1) * 10);
+  if (intPart >= 100) {
+    // avoid scientific notation switch for 100-1023...
+    return fmt::format("{}{} {}iB", sign, intPart, pre);
+  }
+  double rest = double((ubytes % factor) >> e * 10) / kB;
+  if (intPart >= 10) {
+    double r = intPart + floor(rest * 16) / 16; // prevent rounding up when there are too many 9s
+    return fmt::format("{}{:.1f} {}iB", sign, r, pre);
+  }
+  double r = intPart + floor(rest * 160) / 160; // prevent rounding up when there are too many 9s
+  return fmt::format("{}{:.2f} {}iB", sign, r, pre);
 }
 
 string humanReadableDuration(double seconds) {
