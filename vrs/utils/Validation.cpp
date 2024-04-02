@@ -168,7 +168,8 @@ bool iterateChecker(
     size_t& outDecodedRecords,
     bool& outNoError,
     ThrottledWriter* throttledWriter,
-    double& outDuration) {
+    double& outDuration,
+    double& outCpuTime) {
   outDecodedRecords = 0;
   outNoError = true;
   if (!reader.timeRangeValid()) {
@@ -177,6 +178,7 @@ bool iterateChecker(
     return false;
   }
   double beforeTime = os::getTimestampSec();
+  double beforeCpu = os::getTotalProcessCpuTime();
   reader.iterateAdvanced(
       [&outDecodedRecords, &outNoError](
           RecordFileReader& recordFileReader, const IndexRecord::RecordInfo& record) {
@@ -187,6 +189,7 @@ bool iterateChecker(
       throttledWriter);
   reader.reader.clearStreamPlayers();
   outDuration = os::getTimestampSec() - beforeTime;
+  outCpuTime = os::getTotalProcessCpuTime() - beforeCpu;
   return true;
 }
 
@@ -318,7 +321,9 @@ string decodeValidation(FilteredFileReader& filteredReader, const CopyOptions& c
   size_t readRecordCount = 0;
   bool noError = true;
   double timeSpent = 0;
-  if (!iterateChecker(filteredReader, readRecordCount, noError, &throttledWriter, timeSpent)) {
+  double cpuTime = 0;
+  if (!iterateChecker(
+          filteredReader, readRecordCount, noError, &throttledWriter, timeSpent, cpuTime)) {
     return "<invalid timerange>";
   }
   throttledWriter.closeFile();
@@ -334,10 +339,11 @@ string decodeValidation(FilteredFileReader& filteredReader, const CopyOptions& c
   }
   if (noError && decodeErrorCount == 0) {
     return fmt::format(
-        "Decoded {} records, {} images, in {}, no errors.",
+        "Decoded {} records, {} images, in {} wall clock time and {} CPU time, no errors.",
         decodedCount,
         imageCount,
-        helpers::humanReadableDuration(timeSpent));
+        helpers::humanReadableDuration(timeSpent),
+        helpers::humanReadableDuration(cpuTime));
   }
   return fmt::format(
       "Failure! Decoded {} records out of {}, {:.2f}% good.",
@@ -381,7 +387,9 @@ string checkRecords(
   size_t decodedCount = 0;
   bool noError = true;
   double timeSpent = 0;
-  if (!iterateChecker(filteredReader, decodedCount, noError, &throttledWriter, timeSpent)) {
+  double cpuTime = 0;
+  if (!iterateChecker(
+          filteredReader, decodedCount, noError, &throttledWriter, timeSpent, cpuTime)) {
     return "<invalid timerange>";
   }
   throttledWriter.closeFile();
@@ -791,7 +799,8 @@ bool compareVRSfiles(
   }
   size_t decodedCount = 0;
   double timeSpent = 0;
-  if (!iterateChecker(first, decodedCount, noError, &throttledWriter, timeSpent)) {
+  double cpuTime = 0;
+  if (!iterateChecker(first, decodedCount, noError, &throttledWriter, timeSpent, cpuTime)) {
     return false;
   }
   if (!noError) {
