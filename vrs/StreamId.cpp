@@ -58,6 +58,7 @@ const map<RecordableTypeId, const char*>& getRecordableTypeIdRegistry() {
     {RecordableTypeId::SlamCameraData, "Camera Data (SLAM)"},
     {RecordableTypeId::DisplayObserverCameraRecordableClass, "Display Observing Camera Class"},
     {RecordableTypeId::WorldObserverCameraRecordableClass, "World Observing Camera Class"},
+    {RecordableTypeId::DisparityCameraRecordableClass, "Disparity Camera Class"},
 
     /// << Microphones >>
     {RecordableTypeId::MonoAudioRecordableClass, "Mono Audio Class"},
@@ -89,6 +90,7 @@ const map<RecordableTypeId, const char*>& getRecordableTypeIdRegistry() {
     {RecordableTypeId::DiagnosticRecordableClass, "Diagnostic Data Class"},
     {RecordableTypeId::PerformanceRecordableClass, "Performance Data Class"},
     {RecordableTypeId::IlluminationRecordableClass, "Illumination Data Class"},
+    {RecordableTypeId::DisplayRecordableClass, "Display Data Class"},
 
     /// << External Signals >>
     {RecordableTypeId::SyncRecordableClass, "Sync Data Class"},

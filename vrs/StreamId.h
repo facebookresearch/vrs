@@ -83,6 +83,7 @@ enum class RecordableTypeId : uint16_t {
   RgbCameraRecordableClass = 214, ///< For color cameras.
   DisplayObserverCameraRecordableClass = 215, ///< For display observing cameras.
   WorldObserverCameraRecordableClass = 216, ///< For world observing cameras.
+  DisparityCameraRecordableClass = 217, ///< For disparity cameras.
 
   // << Microphones >>
   MonoAudioRecordableClass = 230, ///< For mono microphones.
@@ -111,6 +112,7 @@ enum class RecordableTypeId : uint16_t {
   DiagnosticRecordableClass = 263, ///< For diagnostic data streams.
   PerformanceRecordableClass = 264, ///< For performance data streams.
   IlluminationRecordableClass = 265, ///< For illumination data streams.
+  DisplayRecordableClass = 266, ///< For display buffer data streams.
 
   // << External Signals >>
   SyncRecordableClass = 280, ///< For synchronisation data streams.
