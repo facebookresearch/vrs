@@ -79,6 +79,7 @@ const map<RecordableTypeId, const char*>& getRecordableTypeIdRegistry() {
     {RecordableTypeId::CapacitiveTouchRecordableClass, "Capacitive Touch Data Class"},
     {RecordableTypeId::HeartRateRecordableClass, "Heart Rate Data Class"},
     {RecordableTypeId::CaloriesRecordableClass, "Calories Data Class"},
+    {RecordableTypeId::RadarRecordableClass, "Radar Data Class"},
 
     {RecordableTypeId::SlamImuData, "IMU Data (SLAM)"},
     {RecordableTypeId::SlamMagnetometerData, "Magnetometer Data (SLAM)"},
