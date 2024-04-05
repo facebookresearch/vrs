@@ -18,6 +18,7 @@
 
 #include <map>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <vrs/os/Platform.h>
@@ -72,13 +73,13 @@ std::string trim(const std::string& text, const char* whiteChars = " \t");
 /// @param text: the text to test
 /// @param prefix: the prefix to test
 /// @return True if text starts with prefix. Case insensitive.
-bool startsWith(const std::string& text, const std::string& prefix);
+bool startsWith(const std::string_view& text, const std::string_view& prefix);
 
 /// Tell if a text string ends with the provided suffix.
 /// @param text: the text to test
 /// @param prefix: the suffix to test
 /// @return True if text ends with suffix. Case insensitive.
-bool endsWith(const std::string& text, const std::string& suffix);
+bool endsWith(const std::string_view& text, const std::string_view& suffix);
 
 /// Replace all occurrences of a string within another string
 /// @param inOutString: the string to modify with the replacement(s)

@@ -51,15 +51,15 @@ string trim(const string& text, const char* whiteChars) {
   return text;
 }
 
-bool startsWith(const string& text, const string& prefix) {
+bool startsWith(const string_view& text, const string_view& prefix) {
   return text.length() >= prefix.length() &&
-      vrs::helpers::strncasecmp(text.c_str(), prefix.c_str(), prefix.length()) == 0;
+      vrs::helpers::strncasecmp(text.data(), prefix.data(), prefix.length()) == 0;
 }
 
-bool endsWith(const string& text, const string& suffix) {
+bool endsWith(const string_view& text, const string_view& suffix) {
   return text.length() >= suffix.length() &&
       vrs::helpers::strncasecmp(
-          text.c_str() + text.length() - suffix.length(), suffix.c_str(), suffix.length()) == 0;
+          text.data() + text.length() - suffix.length(), suffix.data(), suffix.length()) == 0;
 }
 
 inline bool isdigit(char c) {
