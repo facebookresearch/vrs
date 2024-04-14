@@ -84,9 +84,8 @@ void VideoTime::validateTime() {
       // audio time too slow
       title = "Slow Audio Device";
       msg << "The clock provided by the audio device named '" << getAudioDeviceName()
-          << "' doesn't appear to be going fast enough, "
-          << "since it's going only at about " << int(ratio * 100)
-          << "% of your system's clock speed.";
+          << "' doesn't appear to be going fast enough, " << "since it's going only at about "
+          << int(ratio * 100) << "% of your system's clock speed.";
       sAudioStream = nullptr;
       XR_LOGE("{}", msg.str());
     } else if (ratio < 1.05) {
@@ -96,8 +95,8 @@ void VideoTime::validateTime() {
       // audio time too fast
       title = "Fast Audio Device";
       msg << "The clock provided by the audio device named '" << getAudioDeviceName()
-          << "' appears to be too fast, "
-          << "since it's going at about " << int(ratio * 100) << "% of your system's clock speed.";
+          << "' appears to be too fast, " << "since it's going at about " << int(ratio * 100)
+          << "% of your system's clock speed.";
       sAudioStream = nullptr;
       XR_LOGE("{}", msg.str());
     }

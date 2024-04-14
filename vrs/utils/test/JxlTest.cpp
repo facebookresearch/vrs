@@ -193,7 +193,7 @@ void ComputeMeanNoramlizedAbsDiff(double* result, PixelFrame& a, PixelFrame& b) 
 struct JxlVerificationTest : testing::Test, public ::testing::WithParamInterface<PixelFormat> {};
 
 #ifdef JXL_IS_AVAILABLE
-//#define WRITE_TEST_PATTERN
+// #define WRITE_TEST_PATTERN
 TEST_P(JxlVerificationTest, checkRoundTrip) {
   PixelFormat format = GetParam();
 
