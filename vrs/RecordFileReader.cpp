@@ -205,7 +205,7 @@ int RecordFileReader::doOpenFile(
   });
   // log remote file handler names with success/failure status
   if (file_ && file_->isRemoteFileSystem()) {
-    OperationContext context{"RecordFileReader::doOpenFile", file_->getFileHandlerName()};
+    OperationContext context{"RecordFileReader::doOpenFile", fileSpec.getSourceLocation()};
     if (error != 0) {
       TelemetryLogger::error(context, errorCodeToMessageWithCode(error));
     } else {
