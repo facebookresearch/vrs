@@ -47,18 +47,23 @@ class AudioPlayer : public QObject, public RecordFormatStreamPlayer {
   bool onDataLayoutRead(const CurrentRecord&, size_t blockIndex, DataLayout&) override;
   bool onAudioRead(const CurrentRecord&, size_t blockIndex, const ContentBlock&) override;
 
-  void setupAudioOutput(const vrs::AudioContentBlockSpec& audioSpec);
+  int getAudioChannelCount() const {
+    return audioChannelCount_;
+  }
 
  signals:
+  void audioOutputInitialized(uint32_t audioChannelCount, uint32_t playbackChannelCount);
 
  public slots:
   void mediaStateChanged(FileReaderState state);
 
  private:
+  bool setupAudioOutput(const vrs::AudioContentBlockSpec& audioSpec);
   void playbackThread();
 
   PaStream* paStream_ = nullptr;
-  int channelCount_ = 0;
+  uint32_t audioChannelCount_ = 0;
+  uint32_t paChannelCount_ = 0;
   vrs::AudioSampleFormat sampleFormat_ = vrs::AudioSampleFormat::UNDEFINED;
   bool failedInit_ = false;
   vrs::JobQueueWithThread<AudioBlock> playbackQueue_;

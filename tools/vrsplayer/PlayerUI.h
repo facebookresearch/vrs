@@ -58,6 +58,13 @@ class PlayerUI : public QWidget {
     return fileReader_;
   }
 
+  QColor getOverlayColor() const {
+    return overlayColor_;
+  }
+  bool isSolidBackground() const {
+    return solidBackground_;
+  }
+
  signals:
   void overlaySettingChanged();
 
@@ -80,14 +87,8 @@ class PlayerUI : public QWidget {
   void deletePreset(const QString& preset);
   void reportError(const QString& errorTitle, const QString& errorMessage);
   void setOverlayColor(QColor color);
-  QColor getOverlayColor() const {
-    return overlayColor_;
-  }
   void adjustOverlayFontSize(int sizeChange);
   void setSolidBackground(bool solid);
-  bool isSolidBackground() const {
-    return solidBackground_;
-  }
   void adjustSpeed(int change);
 
  private slots:

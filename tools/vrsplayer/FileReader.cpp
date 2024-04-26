@@ -297,6 +297,7 @@ vector<FrameWidget*> FileReader::openFile(QVBoxLayout* videoFrames, QWidget* wid
     for (StreamId id : ids) {
       if (imageReaders_.find(id) == imageReaders_.end()) {
         bool mightContainImagesOrAudio = false;
+        bool audioConfigured = false;
         if (fileReader_->mightContainImages(id)) {
           FrameWidget* frame = new FrameWidget();
           frame->setTypeToShow(recordType_);
@@ -325,15 +326,24 @@ vector<FrameWidget*> FileReader::openFile(QVBoxLayout* videoFrames, QWidget* wid
           frame->setDeviceName(getDeviceName(id));
           frames.push_back(frame);
           mightContainImagesOrAudio = true;
-        } else if (fileReader_->mightContainAudio(id)) {
-          AudioPlayer* player = new AudioPlayer();
-          audioReaders_[id].reset(player);
-          fileReader_->setStreamPlayer(id, player);
-          connect(this, &FileReader::mediaStateChanged, player, &AudioPlayer::mediaStateChanged);
+        } else if (!audioConfigured && fileReader_->mightContainAudio(id)) {
+          auto player = make_unique<AudioPlayer>();
+          fileReader_->setStreamPlayer(id, player.get());
           readFirstRecord(id, Record::Type::CONFIGURATION);
           readFirstRecord(id, Record::Type::STATE);
           readFirstRecord(id, Record::Type::DATA);
-          mightContainImagesOrAudio = true;
+          if (player->getAudioChannelCount() > 0) {
+            audioConfigured = true;
+            connect(
+                this,
+                &FileReader::mediaStateChanged,
+                player.get(),
+                &AudioPlayer::mediaStateChanged);
+            audioReaders_[id] = std::move(player);
+            mightContainImagesOrAudio = true;
+          } else {
+            fileReader_->setStreamPlayer(id, nullptr);
+          }
         }
         if (mightContainImagesOrAudio) {
           // Update the time range we're interested in

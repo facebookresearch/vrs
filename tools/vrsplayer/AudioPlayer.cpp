@@ -60,16 +60,17 @@ bool AudioPlayer::onAudioRead(const CurrentRecord& record, size_t blkIdx, const 
       if (paStream_ == nullptr) {
         // the first time around, we just setup the device & the clock, but we don't play anything
         // The first data read happens when we load the file, so we don't want to hear it!
-        setupAudioOutput(audio);
-        fmt::print(
-            "Found '{} - {}': {}, {}\n",
-            record.streamId.getNumericName(),
-            record.streamId.getTypeName(),
-            getCurrentRecordFormatReader()->recordFormat.asString(),
-            audio.asString());
+        if (setupAudioOutput(audio)) {
+          fmt::print(
+              "Found '{} - {}': {}, {}\n",
+              record.streamId.getNumericName(),
+              record.streamId.getTypeName(),
+              getCurrentRecordFormatReader()->recordFormat.asString(),
+              audio.asString());
+        }
       } else if (
           VideoTime::getPlaybackSpeed() <= 1 && sampleFormat_ == audio.getSampleFormat() &&
-          audio.getChannelCount() >= channelCount_ && audioBlock.getSampleCount() > 0) {
+          audio.getChannelCount() >= paChannelCount_ && audioBlock.getSampleCount() > 0) {
         playbackQueue_.sendJob(std::move(audioBlock));
       }
     }
@@ -77,15 +78,16 @@ bool AudioPlayer::onAudioRead(const CurrentRecord& record, size_t blkIdx, const 
   return true;
 }
 
-void AudioPlayer::setupAudioOutput(const AudioContentBlockSpec& audioSpec) {
+bool AudioPlayer::setupAudioOutput(const AudioContentBlockSpec& audioSpec) {
   PaDeviceIndex defaultOutpuDeviceIndex = Pa_GetDefaultOutputDevice();
   const PaDeviceInfo* info = Pa_GetDeviceInfo(defaultOutpuDeviceIndex);
   sampleFormat_ = audioSpec.getSampleFormat();
-  channelCount_ = min<int>(audioSpec.getChannelCount(), info->maxOutputChannels);
+  audioChannelCount_ = audioSpec.getChannelCount();
+  paChannelCount_ = min<uint32_t>(audioSpec.getChannelCount(), info->maxOutputChannels);
 
   PaStreamParameters output;
   output.device = defaultOutpuDeviceIndex;
-  output.channelCount = channelCount_;
+  output.channelCount = paChannelCount_;
   output.sampleFormat = paCustomFormat;
   switch (sampleFormat_) {
     case AudioSampleFormat::S8:
@@ -133,7 +135,7 @@ void AudioPlayer::setupAudioOutput(const AudioContentBlockSpec& audioSpec) {
       XR_LOGE(
           "Audio sample format {} not supported. Audio sample conversion required.",
           audioSpec.asString());
-      return;
+      return false;
   }
   output.hostApiSpecificStreamInfo = nullptr;
   output.suggestedLatency = (info != nullptr) ? info->defaultLowOutputLatency : 0;
@@ -143,7 +145,10 @@ void AudioPlayer::setupAudioOutput(const AudioContentBlockSpec& audioSpec) {
   if (status == paNoError && XR_VERIFY(paStream_ != nullptr)) {
     status = Pa_StartStream(paStream_);
     if (XR_VERIFY(status == paNoError)) {
-      XR_LOGI("Audio output '{}' configured for {}!", info->name, audioSpec.asString());
+      string configuration = (paChannelCount_ == 1) ? "Mono"
+          : (paChannelCount_ == 2)                  ? "Stereo"
+                                                    : to_string(paChannelCount_) + " channels";
+      XR_LOGI("{} audio output '{}' initialized.", configuration, info->name);
       VideoTime::setTimeAudioStreamSource(paStream_);
       playbackQueue_.startThread(&AudioPlayer::playbackThread, this);
     } else {
@@ -159,7 +164,12 @@ void AudioPlayer::setupAudioOutput(const AudioContentBlockSpec& audioSpec) {
   }
   if (failedInit_) {
     XR_LOGE("Failed to initialize audio device for {}", audioSpec.asString());
+    audioChannelCount_ = 0;
+    paChannelCount_ = 0;
+    return false;
   }
+  emit audioOutputInitialized(audioChannelCount_, paChannelCount_);
+  return true;
 }
 
 void AudioPlayer::mediaStateChanged(FileReaderState state) {
@@ -181,7 +191,7 @@ void AudioPlayer::playbackThread() {
     }
     uint32_t frameCount = block.getSampleCount();
     uint8_t frameStride = block.getSpec().getSampleFrameStride();
-    uint8_t paFrameStride = channelCount_ * block.getSpec().getBytesPerSample();
+    uint8_t paFrameStride = paChannelCount_ * block.getSpec().getBytesPerSample();
 
     uint32_t framesPlayed = 0;
     while (framesPlayed < frameCount) {
