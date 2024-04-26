@@ -31,7 +31,7 @@ inline QKeySequence shortcut(int keyA, int keyB, int keyC = 0) {
   return {keyA + keyB + keyC};
 }
 
-PlayerWindow::PlayerWindow(QApplication& app) : QMainWindow(nullptr) {
+PlayerWindow::PlayerWindow(QApplication& app) : QMainWindow(nullptr), player_{this} {
   setCentralWidget(&player_);
   app.installEventFilter(&player_);
   createMenus();
@@ -112,6 +112,9 @@ void PlayerWindow::createMenus() {
   resetAction->setStatusTip("Reset all rotation and mirror settings.");
   connect(resetAction, &QAction::triggered, &player_, &vrsp::PlayerUI::resetOrientation);
   orientationMenu_->addAction(resetAction);
+
+  audioMenu_ = menuBar()->addMenu("Audio");
+  updateAudioMenu();
 }
 
 void PlayerWindow::moveEvent(QMoveEvent* event) {
@@ -223,6 +226,66 @@ void PlayerWindow::updateTextOverlayMenu() {
   solidBackground->setChecked(isSolid);
   solidBackground->setShortcut(shortcut(Qt::CTRL, Qt::Key_B));
   textOverlayMenu_->addAction(solidBackground);
+}
+
+void PlayerWindow::updateAudioMenu() {
+  audioMenu_->clear();
+  audioActions_.clear();
+  if (audioChannelCount_ == 0) {
+    QAction* noAudioAction = new QAction("No Playable Audio", this);
+    noAudioAction->setStatusTip("No playable audio stream found in this file.");
+    noAudioAction->setDisabled(true);
+    audioMenu_->addAction(noAudioAction);
+  } else {
+    QMenu* firstChannelMenu = audioMenu_->addMenu("Channels");
+    for (int channel = 0; channel < audioChannelCount_; channel++) {
+      bool stereoPair =
+          channel == firstAudioChannel_ && stereoNotMono_ && channel + 1 < audioChannelCount_;
+      unique_ptr<QAction> audioAction = stereoPair
+          ? make_unique<QAction>(
+                QString("Channels ") + QString::number(channel + 1) + '-' +
+                    QString::number(channel + 2),
+                this)
+          : make_unique<QAction>(QString("Channel ") + QString::number(channel + 1), this);
+      connect(audioAction.get(), &QAction::triggered, [this, channel]() {
+        firstAudioChannel_ = channel;
+        setStereo(stereoNotMono_);
+        emit player_.firstAudioChannelChanged(channel);
+      });
+      if (channel == firstAudioChannel_) {
+        audioAction->setCheckable(true);
+        audioAction->setChecked(true);
+      }
+      firstChannelMenu->addAction(audioAction.get());
+      audioActions_.emplace_back(std::move(audioAction));
+      if (stereoPair) {
+        channel++;
+      }
+    }
+    unique_ptr<QAction> stereoAction = make_unique<QAction>(QString("Stereo"), this);
+    connect(stereoAction.get(), &QAction::triggered, [this]() { setStereo(!stereoNotMono_); });
+    if (stereoNotMono_) {
+      stereoAction->setCheckable(true);
+      stereoAction->setChecked(true);
+    }
+    audioMenu_->addAction(stereoAction.get());
+    audioActions_.emplace_back(std::move(stereoAction));
+  }
+}
+
+void PlayerWindow::setAudioConfiguration(
+    uint32_t audioChannelCount,
+    uint32_t playbackChannelCount) {
+  audioChannelCount_ = audioChannelCount;
+  playbackChannelCount_ = playbackChannelCount;
+  setStereo(true);
+}
+
+void PlayerWindow::setStereo(bool stereo) {
+  stereoNotMono_ = stereo && playbackChannelCount_ > 1 && playbackChannelCount_ > 1 &&
+      firstAudioChannel_ + 1 < audioChannelCount_;
+  emit player_.stereoNotMonoChanged(stereoNotMono_);
+  updateAudioMenu();
 }
 
 void PlayerWindow::addColorAction(const QColor& overlay, const QColor& color, const char* cmdName) {

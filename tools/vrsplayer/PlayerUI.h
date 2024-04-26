@@ -42,10 +42,12 @@ namespace vrsp {
 
 using PathPreparer = std::function<QString(const QString&)>;
 
+class PlayerWindow;
+
 class PlayerUI : public QWidget {
   Q_OBJECT
  public:
-  explicit PlayerUI(QWidget* parent = nullptr);
+  explicit PlayerUI(PlayerWindow* playerWindow);
 
   void setPathPreparer(const PathPreparer& pathPreparer) {
     pathPreparer_ = pathPreparer;
@@ -57,6 +59,9 @@ class PlayerUI : public QWidget {
   FileReader& getFileReader() {
     return fileReader_;
   }
+  PlayerWindow* getPlayerWindow() const {
+    return playerWindow_;
+  }
 
   QColor getOverlayColor() const {
     return overlayColor_;
@@ -67,6 +72,8 @@ class PlayerUI : public QWidget {
 
  signals:
   void overlaySettingChanged();
+  void firstAudioChannelChanged(uint32_t firstAudioChannel);
+  void stereoNotMonoChanged(bool stereoNotMono);
 
  public slots:
   void openFileChooser();
@@ -101,6 +108,7 @@ class PlayerUI : public QWidget {
   bool eventFilter(QObject* obj, QEvent* event) override;
 
  private:
+  PlayerWindow* playerWindow_;
   QSettings settings_;
   QColor overlayColor_{Qt::yellow};
   int fontSize_{14};

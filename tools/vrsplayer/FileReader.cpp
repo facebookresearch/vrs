@@ -52,7 +52,7 @@
 #include <vrs/utils/RecordFileInfo.h>
 
 #include "AudioPlayer.h"
-#include "PlayerUI.h"
+#include "PlayerWindow.h"
 
 #define FIXED_3 fixed << setprecision(3)
 
@@ -146,6 +146,7 @@ void FileReader::closeFile() {
     fileConfig_.reset();
   }
   unique_lock<recursive_mutex> guard{mutex_};
+  playerUi_->getPlayerWindow()->setAudioConfiguration(0, 0);
   fileReader_.reset();
   imageReaders_.clear();
   audioReaders_.clear();
@@ -329,6 +330,21 @@ vector<FrameWidget*> FileReader::openFile(QVBoxLayout* videoFrames, QWidget* wid
         } else if (!audioConfigured && fileReader_->mightContainAudio(id)) {
           auto player = make_unique<AudioPlayer>();
           fileReader_->setStreamPlayer(id, player.get());
+          connect(
+              player.get(),
+              &AudioPlayer::audioOutputInitialized,
+              playerUi_->getPlayerWindow(),
+              &PlayerWindow::setAudioConfiguration);
+          connect(
+              playerUi_,
+              &PlayerUI::firstAudioChannelChanged,
+              player.get(),
+              &AudioPlayer::firstAudioChannelChanged);
+          connect(
+              playerUi_,
+              &PlayerUI::stereoNotMonoChanged,
+              player.get(),
+              &AudioPlayer::stereoNotMonoChanged);
           readFirstRecord(id, Record::Type::CONFIGURATION);
           readFirstRecord(id, Record::Type::STATE);
           readFirstRecord(id, Record::Type::DATA);

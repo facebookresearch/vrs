@@ -93,8 +93,12 @@ class JumpSlider : public QSlider {
 
 } // namespace
 
-PlayerUI::PlayerUI(QWidget* parent)
-    : QWidget(parent), time_(nullptr), positionSlider_(nullptr), statusLabel_(nullptr) {
+PlayerUI::PlayerUI(PlayerWindow* playerWindow)
+    : QWidget(nullptr),
+      playerWindow_{playerWindow},
+      time_{nullptr},
+      positionSlider_{nullptr},
+      statusLabel_{nullptr} {
   fileReader_.setPlayerUi(this);
   VideoTime::setPlayerUI(this);
   QAbstractButton* openPathButton = new QPushButton(tr("Open..."));

@@ -46,6 +46,7 @@ class PlayerWindow : public QMainWindow {
   void moveEvent(QMoveEvent* event) override;
 
  signals:
+  void audioSelectionChanged(uint32_t firstChannel, bool stereo);
 
  public slots:
   void updateLayoutMenu(
@@ -55,6 +56,9 @@ class PlayerWindow : public QMainWindow {
       const QVariantMap& presets,
       const QVariant& currentPreset);
   void updateTextOverlayMenu();
+  void updateAudioMenu();
+  void setAudioConfiguration(uint32_t audioChannelCount, uint32_t playbackChannelCount);
+  void setStereo(bool stereo);
 
  private:
   void addColorAction(const QColor& overlay, const QColor& color, const char* cmdName);
@@ -62,10 +66,16 @@ class PlayerWindow : public QMainWindow {
  private:
   PlayerUI player_;
   QMenu* fileMenu_{};
-  QMenu* layoutMenu_{};
-  QMenu* orientationMenu_{};
   QMenu* textOverlayMenu_{};
+  QMenu* layoutMenu_{};
   std::vector<std::unique_ptr<QAction>> layoutActions_;
+  QMenu* orientationMenu_{};
+  QMenu* audioMenu_{};
+  std::vector<std::unique_ptr<QAction>> audioActions_;
+  uint32_t audioChannelCount_{};
+  uint32_t playbackChannelCount_{};
+  uint32_t firstAudioChannel_{};
+  bool stereoNotMono_{true};
 };
 
 } // namespace vrsp
