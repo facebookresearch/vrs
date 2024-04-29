@@ -172,7 +172,7 @@ class FileReader : public QObject {
   void sanitizeVisibleStreams(bool reset = false);
   QVariant configurationAsVariant();
   void applyConfiguration(const QVariant& config);
-  void layoutConfigChanged();
+  void configChanged();
   void restoreDefaultConfig();
   int readRecordIfNeeded(const vrs::IndexRecord::RecordInfo& record, size_t recordIndex, bool log);
   QString getInitialSaveLocation();

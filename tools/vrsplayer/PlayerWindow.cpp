@@ -21,10 +21,23 @@
 #include <qmessagebox.h>
 
 #include <vrs/FileHandler.h>
+#include <vrs/helpers/EnumStringConverter.h>
 #include <vrs/os/Platform.h>
 
 using namespace vrsp;
 using namespace std;
+
+namespace {
+const char* sAudioModeNames[] = {"mono", "stereo-auto", "stereo-manual"};
+
+struct AudioModeConverter : public EnumStringConverter<
+                                AudioMode,
+                                sAudioModeNames,
+                                COUNT_OF(sAudioModeNames),
+                                AudioMode::autoStereo,
+                                AudioMode::autoStereo,
+                                true> {};
+} // namespace
 
 inline QKeySequence shortcut(int keyA, int keyB, int keyC = 0) {
   return {keyA + keyB + keyC};
@@ -38,7 +51,7 @@ PlayerWindow::PlayerWindow(QApplication& app) : QMainWindow(nullptr), player_{th
       &player_.getFileReader(),
       &FileReader::updateLayoutMenu,
       this,
-      &PlayerWindow::updateLayoutMenu);
+      &PlayerWindow::updateLayoutAndPresetMenu);
   connect(&player_, &PlayerUI ::overlaySettingChanged, this, &PlayerWindow::updateTextOverlayMenu);
   setWindowFlags(windowFlags() | Qt::CustomizeWindowHint | Qt::WindowMinMaxButtonsHint);
 }
@@ -105,14 +118,9 @@ void PlayerWindow::createMenus() {
   updateTextOverlayMenu();
 
   layoutMenu_ = menuBar()->addMenu("Layout");
-
-  orientationMenu_ = menuBar()->addMenu("Orientation");
-  QAction* resetAction = new QAction("Reset All Orientation Settings", this);
-  resetAction->setStatusTip("Reset all rotation and mirror settings.");
-  connect(resetAction, &QAction::triggered, &player_, &vrsp::PlayerUI::resetOrientation);
-  orientationMenu_->addAction(resetAction);
-
   audioMenu_ = menuBar()->addMenu("Audio");
+  presetMenu_ = menuBar()->addMenu("Presets");
+
   updateAudioMenu();
 }
 
@@ -121,26 +129,62 @@ void PlayerWindow::moveEvent(QMoveEvent* event) {
   QMainWindow::moveEvent(event);
 }
 
-void PlayerWindow::updateLayoutMenu(
+string PlayerWindow::getAudioMode() const {
+  return AudioModeConverter::toString(audioMode_);
+}
+
+void PlayerWindow::restoreAudioSelection(
+    const string& audioMode,
+    uint32_t leftAudioChannel,
+    uint32_t rightAudioChannel) {
+  leftAudioChannel_ = min<uint32_t>(leftAudioChannel, audioChannelCount_);
+  rightAudioChannel_ = min<uint32_t>(rightAudioChannel, audioChannelCount_);
+  setAudioMode(AudioModeConverter::toEnum(audioMode));
+}
+
+void PlayerWindow::updateLayoutAndPresetMenu(
     int frameCount,
     int visibleCount,
     int maxPerRowCount,
     const QVariantMap& presets,
     const QVariant& currentPreset) {
   layoutMenu_->clear();
-  layoutActions_.clear();
+  layoutActionsAndPreset_.clear();
   if (visibleCount < frameCount) {
     unique_ptr<QAction> layoutAction = make_unique<QAction>(QString("Show All Streams"), this);
     connect(layoutAction.get(), &QAction::triggered, [this]() { player_.showAllStreams(); });
     layoutMenu_->addAction(layoutAction.get());
-    layoutActions_.emplace_back(std::move(layoutAction));
+    layoutActionsAndPreset_.emplace_back(std::move(layoutAction));
     unique_ptr<QAction> toggleAction =
         make_unique<QAction>(QString("Toggle Visible Streams"), this);
     connect(toggleAction.get(), &QAction::triggered, [this]() { player_.toggleVisibleStreams(); });
     layoutMenu_->addAction(toggleAction.get());
-    layoutActions_.emplace_back(std::move(toggleAction));
+    layoutActionsAndPreset_.emplace_back(std::move(toggleAction));
     layoutMenu_->addSeparator();
   }
+  for (int layout = 1; layout <= visibleCount; layout++) {
+    unique_ptr<QAction> layoutAction = make_unique<QAction>(
+        QString("Layout Frames ") + QString::number(layout) + 'x' +
+            QString::number((visibleCount + layout - 1) / layout),
+        this);
+    connect(
+        layoutAction.get(), &QAction::triggered, [this, layout]() { player_.relayout(layout); });
+    if (layout == maxPerRowCount) {
+      layoutAction->setCheckable(true);
+      layoutAction->setChecked(true);
+    }
+    layoutMenu_->addAction(layoutAction.get());
+    layoutActionsAndPreset_.emplace_back(std::move(layoutAction));
+  }
+  layoutMenu_->addSeparator();
+  unique_ptr<QAction> resetAction = make_unique<QAction>("Reset All Orientation Settings", this);
+  resetAction->setStatusTip("Reset all rotation and mirror settings.");
+  connect(resetAction.get(), &QAction::triggered, &player_, &vrsp::PlayerUI::resetOrientation);
+  layoutMenu_->addAction(resetAction.get());
+  layoutActionsAndPreset_.emplace_back(std::move(resetAction));
+
+  // Preset menu
+  presetMenu_->clear();
   set<QString> deleteKeys;
   int number = 0;
   for (const auto& key : presets.keys()) {
@@ -157,11 +201,11 @@ void PlayerWindow::updateLayoutMenu(
       recallAction->setShortcut(shortcut(Qt::CTRL, static_cast<int>(Qt::Key_0) + number));
     }
     connect(recallAction.get(), &QAction::triggered, [this, key]() { player_.recallPreset(key); });
-    layoutMenu_->addAction(recallAction.get());
-    layoutActions_.emplace_back(std::move(recallAction));
+    presetMenu_->addAction(recallAction.get());
+    layoutActionsAndPreset_.emplace_back(std::move(recallAction));
   }
   if (!presets.empty()) {
-    layoutMenu_->addSeparator();
+    presetMenu_->addSeparator();
   }
   if (!deleteKeys.empty()) {
     for (const auto& key : deleteKeys) {
@@ -169,29 +213,14 @@ void PlayerWindow::updateLayoutMenu(
       deleteAction = make_unique<QAction>(QString("Delete Preset '" + key + "'"), this);
       connect(
           deleteAction.get(), &QAction::triggered, [this, key]() { player_.deletePreset(key); });
-      layoutMenu_->addAction(deleteAction.get());
-      layoutActions_.emplace_back(std::move(deleteAction));
+      presetMenu_->addAction(deleteAction.get());
+      layoutActionsAndPreset_.emplace_back(std::move(deleteAction));
     }
   } else {
     unique_ptr<QAction> saveAction = make_unique<QAction>(QString("Save Preset"), this);
     connect(saveAction.get(), &QAction::triggered, [this]() { player_.savePreset(); });
-    layoutMenu_->addAction(saveAction.get());
-    layoutActions_.emplace_back(std::move(saveAction));
-  }
-  layoutMenu_->addSeparator();
-  for (int layout = 1; layout <= visibleCount; layout++) {
-    unique_ptr<QAction> layoutAction = make_unique<QAction>(
-        QString("Layout Frames ") + QString::number(layout) + 'x' +
-            QString::number((visibleCount + layout - 1) / layout),
-        this);
-    connect(
-        layoutAction.get(), &QAction::triggered, [this, layout]() { player_.relayout(layout); });
-    if (layout == maxPerRowCount) {
-      layoutAction->setCheckable(true);
-      layoutAction->setChecked(true);
-    }
-    layoutMenu_->addAction(layoutAction.get());
-    layoutActions_.emplace_back(std::move(layoutAction));
+    presetMenu_->addAction(saveAction.get());
+    layoutActionsAndPreset_.emplace_back(std::move(saveAction));
   }
 }
 
@@ -231,11 +260,12 @@ void PlayerWindow::updateAudioMenu() {
   audioMenu_->clear();
   audioActions_.clear();
   if (audioChannelCount_ == 0 || playbackChannelCount_ == 0) {
-    QAction* noAudioAction = new QAction(
+    auto noAudioAction = make_unique<QAction>(
         audioChannelCount_ == 0 ? "No Playable Audio" : "No Audio Playback Device", this);
     noAudioAction->setStatusTip("No playable audio stream found in this file.");
     noAudioAction->setDisabled(true);
-    audioMenu_->addAction(noAudioAction);
+    audioMenu_->addAction(noAudioAction.get());
+    audioActions_.push_back(std::move(noAudioAction));
   } else {
     auto addAudioMode = [this](AudioMode mode, const char* name) {
       unique_ptr<QAction> action = make_unique<QAction>(QString(name), this);

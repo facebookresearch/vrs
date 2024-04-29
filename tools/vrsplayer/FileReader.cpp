@@ -75,6 +75,9 @@ QString kVisibleStreams("visible_streams");
 QString kDefaultPreset("Default"); // name shown in the UI
 QString kLastConfiguration("last_configuration");
 QString kLayoutPresets("layout_presets");
+QString kAudioMode("audio_mode");
+QString kLeftAudioChannel("left_audio_channel");
+QString kRightAudioChannel("right_audio_channel");
 
 class FlagKeeper {
  public:
@@ -335,11 +338,14 @@ vector<FrameWidget*> FileReader::openFile(QVBoxLayout* videoFrames, QWidget* wid
               &AudioPlayer::audioOutputInitialized,
               playerUi_->getPlayerWindow(),
               &PlayerWindow::setAudioConfiguration);
+          AudioPlayer* playerPtr = player.get();
           connect(
               playerUi_,
               &PlayerUI::selectedAudioChannelsChanged,
-              player.get(),
-              &AudioPlayer::selectedAudioChannelsChanged);
+              [this, playerPtr](uint32_t leftAudioChannel, uint32_t rightAudioChannel) {
+                playerPtr->selectedAudioChannelsChanged(leftAudioChannel, rightAudioChannel);
+                configChanged();
+              });
           readFirstRecord(id, Record::Type::CONFIGURATION);
           readFirstRecord(id, Record::Type::STATE);
           readFirstRecord(id, Record::Type::DATA);
@@ -689,6 +695,11 @@ QVariant FileReader::configurationAsVariant() {
     values[flippedName(streamName)] = reader.second->getWidget()->getFlipped();
   }
   values[kLastMaxPerRow] = lastMaxPerRow_;
+  PlayerWindow* pw = playerUi_->getPlayerWindow();
+  values[kAudioMode] = QString(pw->getAudioMode().c_str());
+  auto channels = pw->getSelectedChannels();
+  values[kLeftAudioChannel] = int(channels.first);
+  values[kRightAudioChannel] = int(channels.second);
   return QJsonDocument(values).toVariant();
 }
 
@@ -714,6 +725,11 @@ void FileReader::applyConfiguration(const QVariant& variant) {
     reader.second->getWidget()->setFlipped(config[flippedName(streamName)].toBool());
   }
   lastMaxPerRow_ = config[kLastMaxPerRow].toInt();
+  string audioMode = config[kAudioMode].toString().toStdString();
+  if (!audioMode.empty()) {
+    playerUi_->getPlayerWindow()->restoreAudioSelection(
+        audioMode, config[kLeftAudioChannel].toInt(), config[kRightAudioChannel].toInt());
+  }
 }
 
 void FileReader::play() {
@@ -1121,7 +1137,7 @@ QString FileReader::getInitialSaveLocation() {
 
 void FileReader::savePreset(const QString& preset) {
   layoutPresets_[preset] = configurationAsVariant();
-  layoutConfigChanged();
+  configChanged();
 }
 
 void FileReader::recallPreset(const QString& preset) {
@@ -1135,7 +1151,7 @@ void FileReader::recallPreset(const QString& preset) {
 
 void FileReader::deletePreset(const QString& preset) {
   layoutPresets_.erase(layoutPresets_.find(preset));
-  layoutConfigChanged();
+  configChanged();
 }
 
 void FileReader::relayout() {
@@ -1161,10 +1177,10 @@ void FileReader::layoutFrames(QVBoxLayout* videoFrames, QWidget* parent, int max
       innerHlayout = nullptr;
     }
   }
-  layoutConfigChanged();
+  configChanged();
 }
 
-void FileReader::layoutConfigChanged() {
+void FileReader::configChanged() {
   emit updateLayoutMenu(
       getImageCount(),
       visibleStreams_.size(),

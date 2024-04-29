@@ -17,6 +17,7 @@
 #pragma once
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include <QAction>
@@ -49,8 +50,18 @@ class PlayerWindow : public QMainWindow {
   }
   void moveEvent(QMoveEvent* event) override;
 
+  string getAudioMode() const;
+  std::pair<uint32_t, uint32_t> getSelectedChannels() const {
+    return std::pair<uint32_t, uint32_t>(leftAudioChannel_, rightAudioChannel_);
+  }
+
+  void restoreAudioSelection(
+      const string& audioMode,
+      uint32_t leftAudioChannel,
+      uint32_t rightAudioChannel);
+
  public slots:
-  void updateLayoutMenu(
+  void updateLayoutAndPresetMenu(
       int frameCount,
       int visibleCount,
       int maxPerRowCount,
@@ -69,9 +80,9 @@ class PlayerWindow : public QMainWindow {
   QMenu* fileMenu_{};
   QMenu* textOverlayMenu_{};
   QMenu* layoutMenu_{};
-  std::vector<std::unique_ptr<QAction>> layoutActions_;
-  QMenu* orientationMenu_{};
+  QMenu* presetMenu_{};
   QMenu* audioMenu_{};
+  std::vector<std::unique_ptr<QAction>> layoutActionsAndPreset_;
   std::vector<std::unique_ptr<QAction>> audioActions_;
   uint32_t audioChannelCount_{};
   uint32_t playbackChannelCount_{};
