@@ -28,10 +28,14 @@
 
 namespace vrsp {
 
+enum class AudioMode {
+  mono = 0, // same audio channel sent to all output channels
+  autoStereo = 1, // successive audio channels sent as left-right stereo pair
+  manualStereo = 2, // arbitrary channels selected to be sent as stereo pair
+};
+
 class PlayerWindow : public QMainWindow {
-  Q_OBJECT
- public:
-  explicit PlayerWindow(QApplication& app);
+  Q_OBJECT public : explicit PlayerWindow(QApplication& app);
 
   int processCommandLine(QCommandLineParser& parser);
 
@@ -45,9 +49,6 @@ class PlayerWindow : public QMainWindow {
   }
   void moveEvent(QMoveEvent* event) override;
 
- signals:
-  void audioSelectionChanged(uint32_t firstChannel, bool stereo);
-
  public slots:
   void updateLayoutMenu(
       int frameCount,
@@ -58,7 +59,7 @@ class PlayerWindow : public QMainWindow {
   void updateTextOverlayMenu();
   void updateAudioMenu();
   void setAudioConfiguration(uint32_t audioChannelCount, uint32_t playbackChannelCount);
-  void setStereo(bool stereo);
+  void setAudioMode(AudioMode audioMode);
 
  private:
   void addColorAction(const QColor& overlay, const QColor& color, const char* cmdName);
@@ -74,8 +75,9 @@ class PlayerWindow : public QMainWindow {
   std::vector<std::unique_ptr<QAction>> audioActions_;
   uint32_t audioChannelCount_{};
   uint32_t playbackChannelCount_{};
-  uint32_t firstAudioChannel_{};
-  bool stereoNotMono_{true};
+  uint32_t leftAudioChannel_{};
+  uint32_t rightAudioChannel_{};
+  AudioMode audioMode_{AudioMode::autoStereo};
 };
 
 } // namespace vrsp

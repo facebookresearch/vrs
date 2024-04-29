@@ -72,8 +72,7 @@ class PlayerUI : public QWidget {
 
  signals:
   void overlaySettingChanged();
-  void firstAudioChannelChanged(uint32_t firstAudioChannel);
-  void stereoNotMonoChanged(bool stereoNotMono);
+  void selectedAudioChannelsChanged(uint32_t leftAudioChannel, uint32_t rightAudioChannel);
 
  public slots:
   void openFileChooser();

@@ -178,12 +178,11 @@ void AudioPlayer::mediaStateChanged(FileReaderState state) {
   }
 }
 
-void AudioPlayer::firstAudioChannelChanged(uint32_t firstAudioChannel) {
-  firstAudioChannel_ = firstAudioChannel;
-}
-
-void AudioPlayer::stereoNotMonoChanged(bool stereoNotMono) {
-  stereoNotMono_ = stereoNotMono;
+void AudioPlayer::selectedAudioChannelsChanged(
+    uint32_t leftAudioChannel,
+    uint32_t rightAudioChannel) {
+  leftAudioChannel_ = leftAudioChannel;
+  rightAudioChannel_ = rightAudioChannel;
 }
 
 void AudioPlayer::playbackThread() {
@@ -202,10 +201,13 @@ void AudioPlayer::playbackThread() {
     uint8_t bytesPerSample = block.getSpec().getBytesPerSample();
     uint8_t paFrameStride = paChannelCount_ * bytesPerSample;
 
-    const uint32_t firstAudioChannel = firstAudioChannel_;
-    const bool stereo = stereoNotMono_;
+    const uint32_t firstAudioChannel = leftAudioChannel_;
+    const uint32_t secondAudioChannel = rightAudioChannel_;
 
-    bool monoToStereo = paChannelCount_ > 1 && !stereo;
+    bool sequential = paChannelCount_ < 2 || secondAudioChannel == firstAudioChannel + 1;
+    const uint32_t srcOffset1 = firstAudioChannel * bytesPerSample;
+    const uint32_t srcOffset2 = secondAudioChannel * bytesPerSample;
+    vector<uint8_t> safeBuffer;
 
     uint32_t framesPlayed = 0;
     while (framesPlayed < frameCount) {
@@ -213,26 +215,19 @@ void AudioPlayer::playbackThread() {
       if (frameCount - framesPlayed - frameBatchSize < 64) {
         frameBatchSize = frameCount - framesPlayed; // avoid tiny batches
       }
-      const uint8_t* src =
-          block.rdata() + framesPlayed * frameStride + firstAudioChannel * bytesPerSample;
-      if (monoToStereo) {
-        uint8_t* dst = block.data<uint8_t>();
+      const uint8_t* src = block.rdata() + framesPlayed * frameStride;
+      if (!sequential) {
+        safeBuffer.resize(paFrameStride * frameBatchSize);
+        uint8_t* dst = safeBuffer.data();
         uint32_t sample = 0;
-        while (dst + paFrameStride > src && sample < frameBatchSize) {
-          memmove(dst, src, bytesPerSample); // more expensive, but safe in case of overlap
-          memmove(dst + bytesPerSample, src, bytesPerSample);
-          src += frameStride;
-          dst += paFrameStride;
-          sample++;
-        }
         while (sample < frameBatchSize) {
-          memcpy(dst, src, bytesPerSample);
-          memcpy(dst + bytesPerSample, src, bytesPerSample);
+          memcpy(dst, src + srcOffset1, bytesPerSample);
+          memcpy(dst + bytesPerSample, src + srcOffset2, bytesPerSample);
           src += frameStride;
           dst += paFrameStride;
           sample++;
         }
-        Pa_WriteStream(paStream_, block.rdata(), frameBatchSize);
+        Pa_WriteStream(paStream_, safeBuffer.data(), frameBatchSize);
       } else {
         if (paFrameStride == frameStride) {
           Pa_WriteStream(paStream_, src, frameBatchSize);
@@ -240,14 +235,14 @@ void AudioPlayer::playbackThread() {
           // either we play fewer channels than provided, or frames are padded, we need to compact
           uint8_t* dst = block.data<uint8_t>();
           uint32_t sample = 0;
-          while (dst + paFrameStride > src && sample < frameBatchSize) {
-            memmove(dst, src, paFrameStride); // more expensive, but safe in case of overlap
+          while (dst + paFrameStride >= src + frameStride && sample < frameBatchSize) {
+            memmove(dst, src + srcOffset1, paFrameStride); // more expensive, but safe
             src += frameStride;
             dst += paFrameStride;
             sample++;
           }
           while (sample < frameBatchSize) {
-            memcpy(dst, src, paFrameStride);
+            memcpy(dst, src + srcOffset1, paFrameStride);
             src += frameStride;
             dst += paFrameStride;
             sample++;

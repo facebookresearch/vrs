@@ -337,14 +337,9 @@ vector<FrameWidget*> FileReader::openFile(QVBoxLayout* videoFrames, QWidget* wid
               &PlayerWindow::setAudioConfiguration);
           connect(
               playerUi_,
-              &PlayerUI::firstAudioChannelChanged,
+              &PlayerUI::selectedAudioChannelsChanged,
               player.get(),
-              &AudioPlayer::firstAudioChannelChanged);
-          connect(
-              playerUi_,
-              &PlayerUI::stereoNotMonoChanged,
-              player.get(),
-              &AudioPlayer::stereoNotMonoChanged);
+              &AudioPlayer::selectedAudioChannelsChanged);
           readFirstRecord(id, Record::Type::CONFIGURATION);
           readFirstRecord(id, Record::Type::STATE);
           readFirstRecord(id, Record::Type::DATA);

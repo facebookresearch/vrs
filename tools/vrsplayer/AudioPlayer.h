@@ -56,8 +56,7 @@ class AudioPlayer : public QObject, public RecordFormatStreamPlayer {
 
  public slots:
   void mediaStateChanged(FileReaderState state);
-  void firstAudioChannelChanged(uint32_t firstAudioChannel);
-  void stereoNotMonoChanged(bool stereoNotMono);
+  void selectedAudioChannelsChanged(uint32_t leftAudioChannel, uint32_t rightAudioChannel);
 
  private:
   bool setupAudioOutput(const vrs::AudioContentBlockSpec& audioSpec);
@@ -66,8 +65,8 @@ class AudioPlayer : public QObject, public RecordFormatStreamPlayer {
   PaStream* paStream_{};
   uint32_t audioChannelCount_{};
   uint32_t paChannelCount_{};
-  uint32_t firstAudioChannel_{};
-  bool stereoNotMono_{true};
+  uint32_t leftAudioChannel_{};
+  uint32_t rightAudioChannel_{};
   vrs::AudioSampleFormat sampleFormat_{vrs::AudioSampleFormat::UNDEFINED};
   bool failedInit_{};
   vrs::JobQueueWithThread<AudioBlock> playbackQueue_;

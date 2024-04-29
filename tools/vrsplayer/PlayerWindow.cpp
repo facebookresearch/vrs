@@ -20,9 +20,8 @@
 #include <qmenubar.h>
 #include <qmessagebox.h>
 
-#include <vrs/os/Platform.h>
-
 #include <vrs/FileHandler.h>
+#include <vrs/os/Platform.h>
 
 using namespace vrsp;
 using namespace std;
@@ -231,16 +230,36 @@ void PlayerWindow::updateTextOverlayMenu() {
 void PlayerWindow::updateAudioMenu() {
   audioMenu_->clear();
   audioActions_.clear();
-  if (audioChannelCount_ == 0) {
-    QAction* noAudioAction = new QAction("No Playable Audio", this);
+  if (audioChannelCount_ == 0 || playbackChannelCount_ == 0) {
+    QAction* noAudioAction = new QAction(
+        audioChannelCount_ == 0 ? "No Playable Audio" : "No Audio Playback Device", this);
     noAudioAction->setStatusTip("No playable audio stream found in this file.");
     noAudioAction->setDisabled(true);
     audioMenu_->addAction(noAudioAction);
   } else {
-    QMenu* firstChannelMenu = audioMenu_->addMenu("Channels");
+    auto addAudioMode = [this](AudioMode mode, const char* name) {
+      unique_ptr<QAction> action = make_unique<QAction>(QString(name), this);
+      connect(action.get(), &QAction::triggered, [this, mode]() { setAudioMode(mode); });
+      if (audioMode_ == mode) {
+        action->setCheckable(true);
+        action->setChecked(true);
+      } else if (mode != AudioMode::mono && (audioChannelCount_ < 2 || playbackChannelCount_ < 2)) {
+        action->setEnabled(false);
+      }
+      audioMenu_->addAction(action.get());
+      audioActions_.emplace_back(std::move(action));
+    };
+    addAudioMode(AudioMode::mono, "Mono");
+    addAudioMode(AudioMode::autoStereo, "Stereo - Auto Channel Pairing");
+    addAudioMode(AudioMode::manualStereo, "Stereo - Manual Channel Pairing");
+    audioMenu_->addSeparator();
+    bool stereo =
+        audioMode_ != AudioMode::mono && audioChannelCount_ > 1 && playbackChannelCount_ > 1;
+    QMenu* firstChannelMenu = audioMenu_->addMenu(
+        stereo ? audioMode_ == AudioMode::autoStereo ? "Stereo Pair" : "Left Channel" : "Channel");
     for (int channel = 0; channel < audioChannelCount_; channel++) {
-      bool stereoPair =
-          channel == firstAudioChannel_ && stereoNotMono_ && channel + 1 < audioChannelCount_;
+      bool stereoPair = audioMode_ == AudioMode::autoStereo && channel == leftAudioChannel_ &&
+          channel + 1 == rightAudioChannel_;
       unique_ptr<QAction> audioAction = stereoPair
           ? make_unique<QAction>(
                 QString("Channels ") + QString::number(channel + 1) + '-' +
@@ -248,11 +267,10 @@ void PlayerWindow::updateAudioMenu() {
                 this)
           : make_unique<QAction>(QString("Channel ") + QString::number(channel + 1), this);
       connect(audioAction.get(), &QAction::triggered, [this, channel]() {
-        firstAudioChannel_ = channel;
-        setStereo(stereoNotMono_);
-        emit player_.firstAudioChannelChanged(channel);
+        leftAudioChannel_ = channel;
+        setAudioMode(audioMode_);
       });
-      if (channel == firstAudioChannel_) {
+      if (channel == leftAudioChannel_) {
         audioAction->setCheckable(true);
         audioAction->setChecked(true);
       }
@@ -262,14 +280,23 @@ void PlayerWindow::updateAudioMenu() {
         channel++;
       }
     }
-    unique_ptr<QAction> stereoAction = make_unique<QAction>(QString("Stereo"), this);
-    connect(stereoAction.get(), &QAction::triggered, [this]() { setStereo(!stereoNotMono_); });
-    if (stereoNotMono_) {
-      stereoAction->setCheckable(true);
-      stereoAction->setChecked(true);
+    if (audioMode_ == AudioMode::manualStereo) {
+      QMenu* secondChannelMenu = audioMenu_->addMenu("Right Channel");
+      for (int channel = 0; channel < audioChannelCount_; channel++) {
+        unique_ptr<QAction> audioAction =
+            make_unique<QAction>(QString("Channel ") + QString::number(channel + 1), this);
+        connect(audioAction.get(), &QAction::triggered, [this, channel]() {
+          rightAudioChannel_ = channel;
+          setAudioMode(audioMode_);
+        });
+        if (channel == rightAudioChannel_) {
+          audioAction->setCheckable(true);
+          audioAction->setChecked(true);
+        }
+        secondChannelMenu->addAction(audioAction.get());
+        audioActions_.emplace_back(std::move(audioAction));
+      }
     }
-    audioMenu_->addAction(stereoAction.get());
-    audioActions_.emplace_back(std::move(stereoAction));
   }
 }
 
@@ -278,13 +305,35 @@ void PlayerWindow::setAudioConfiguration(
     uint32_t playbackChannelCount) {
   audioChannelCount_ = audioChannelCount;
   playbackChannelCount_ = playbackChannelCount;
-  setStereo(true);
+  setAudioMode(AudioMode::autoStereo);
 }
 
-void PlayerWindow::setStereo(bool stereo) {
-  stereoNotMono_ = stereo && playbackChannelCount_ > 1 && playbackChannelCount_ > 1 &&
-      firstAudioChannel_ + 1 < audioChannelCount_;
-  emit player_.stereoNotMonoChanged(stereoNotMono_);
+void PlayerWindow::setAudioMode(AudioMode audioMode) {
+  if (audioChannelCount_ < 2 || playbackChannelCount_ < 2) {
+    audioMode = AudioMode::mono;
+  }
+  audioMode_ = audioMode;
+  if (leftAudioChannel_ >= audioChannelCount_) {
+    leftAudioChannel_ = 0;
+  }
+  switch (audioMode_) {
+    case AudioMode::mono:
+      rightAudioChannel_ = leftAudioChannel_;
+      break;
+
+    case AudioMode::autoStereo:
+      if (leftAudioChannel_ + 1 >= audioChannelCount_) {
+        leftAudioChannel_--;
+      }
+      rightAudioChannel_ = leftAudioChannel_ + 1;
+      break;
+
+    case AudioMode::manualStereo:
+      // Nothing to do
+      break;
+  }
+
+  emit player_.selectedAudioChannelsChanged(leftAudioChannel_, rightAudioChannel_);
   updateAudioMenu();
 }
 
