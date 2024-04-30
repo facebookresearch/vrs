@@ -147,6 +147,7 @@ class FileReader : public QObject {
   void savePreset(const QString& preset);
   void recallPreset(const QString& preset);
   void deletePreset(const QString& preset);
+  void selectedAudioChannelsChanged(uint32_t leftAudioChannel, uint32_t rightAudioChannel);
 
  private:
   int timeToPosition(double time) const;

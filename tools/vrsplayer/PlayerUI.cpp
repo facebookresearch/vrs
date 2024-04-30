@@ -100,6 +100,11 @@ PlayerUI::PlayerUI(PlayerWindow* playerWindow)
       positionSlider_{nullptr},
       statusLabel_{nullptr} {
   fileReader_.setPlayerUi(this);
+  connect(
+      this,
+      &PlayerUI::selectedAudioChannelsChanged,
+      &fileReader_,
+      &FileReader::selectedAudioChannelsChanged);
   VideoTime::setPlayerUI(this);
   QAbstractButton* openPathButton = new QPushButton(tr("Open..."));
   connect(openPathButton, &QAbstractButton::clicked, this, &PlayerUI::openPathChooser);

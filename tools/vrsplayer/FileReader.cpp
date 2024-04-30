@@ -338,14 +338,11 @@ vector<FrameWidget*> FileReader::openFile(QVBoxLayout* videoFrames, QWidget* wid
               &AudioPlayer::audioOutputInitialized,
               playerUi_->getPlayerWindow(),
               &PlayerWindow::setAudioConfiguration);
-          AudioPlayer* playerPtr = player.get();
           connect(
               playerUi_,
               &PlayerUI::selectedAudioChannelsChanged,
-              [this, playerPtr](uint32_t leftAudioChannel, uint32_t rightAudioChannel) {
-                playerPtr->selectedAudioChannelsChanged(leftAudioChannel, rightAudioChannel);
-                configChanged();
-              });
+              player.get(),
+              &AudioPlayer::selectedAudioChannelsChanged);
           readFirstRecord(id, Record::Type::CONFIGURATION);
           readFirstRecord(id, Record::Type::STATE);
           readFirstRecord(id, Record::Type::DATA);
@@ -1154,6 +1151,14 @@ void FileReader::deletePreset(const QString& preset) {
   configChanged();
 }
 
+void FileReader::selectedAudioChannelsChanged(
+    uint32_t leftAudioChannel,
+    uint32_t rightAudioChannel) {
+  if (fileReader_ && !audioReaders_.empty()) {
+    configChanged();
+  }
+}
+
 void FileReader::relayout() {
   if (videoFrames_ != nullptr) {
     layoutFrames(videoFrames_, playerUi_, lastMaxPerRow_);
@@ -1210,6 +1215,8 @@ void FileReader::restoreDefaultConfig() {
   }
 }
 
+#define DEBUG_CONFIG false
+
 void FileReader::saveConfiguration() {
   if (fileReader_ == nullptr || fileConfig_ == nullptr) {
     return;
@@ -1218,9 +1225,11 @@ void FileReader::saveConfiguration() {
   fileConfig_->setValue(kLastConfiguration, configurationAsVariant());
   fileConfig_->setValue(kLayoutPresets, layoutPresets_);
   fileConfig_->sync();
-  //  QJsonDocument configJson(QJsonDocument::fromVariant(fileConfig_->value(kLastConfiguration)));
-  //  QByteArray config = configJson.toJson();
-  //  XR_LOGI("Saved config: {}", string(config.constData(), config.size()));
+  if (DEBUG_CONFIG) {
+    QJsonDocument configJson(QJsonDocument::fromVariant(fileConfig_->value(kLastConfiguration)));
+    QByteArray config = configJson.toJson();
+    XR_LOGI("Saved config: {}", string(config.constData(), config.size()));
+  }
 }
 
 void FileReader::loadConfiguration() {
@@ -1241,11 +1250,13 @@ void FileReader::loadConfiguration() {
   }
   fileConfig_ = make_unique<QSettings>("VRSplayer", ss.str().c_str());
   layoutPresets_ = fileConfig_->value(kLayoutPresets).toMap();
-  //  for (auto key : layoutPresets_.keys()) {
-  //    QJsonDocument jdoc = QJsonDocument::fromVariant(layoutPresets_[key]);
-  //    QByteArray config = jdoc.toJson();
-  //    XR_LOGI("\nPreset {}: {}", key.toStdString(), string(config.constData(), config.size()));
-  //  }
+  if (DEBUG_CONFIG) {
+    for (auto key : layoutPresets_.keys()) {
+      QJsonDocument jdoc = QJsonDocument::fromVariant(layoutPresets_[key]);
+      QByteArray config = jdoc.toJson();
+      XR_LOGI("\nPreset {}: {}", key.toStdString(), string(config.constData(), config.size()));
+    }
+  }
 }
 
 static int rawTimeToPosition(double time) {
