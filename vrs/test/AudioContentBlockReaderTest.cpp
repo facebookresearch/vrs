@@ -47,6 +47,8 @@ const uint32_t kWavHeaderSize = 44;
 
 const uint32_t kSampleRate = 48000;
 const uint8_t kChannels = 2;
+const uint8_t kStereoPairCount = 1;
+
 uint32_t kSampleCount = 0;
 
 const vector<uint16_t>& getAudioSamples() {
@@ -133,10 +135,12 @@ class AudioStream : public Recordable {
         break;
       case LayoutStyle::OpusStereo:
         config_.audioFormat.set(AudioFormat::OPUS);
+        config_.stereoPairCount.set(kStereoPairCount);
         return createRecord(getTimestampSec(), Record::Type::CONFIGURATION, 1, DataSource(config_));
         break;
       case LayoutStyle::OpusStereoNoSampleCount:
         config_.audioFormat.set(AudioFormat::OPUS);
+        config_.stereoPairCount.set(kStereoPairCount);
         return createRecord(getTimestampSec(), Record::Type::CONFIGURATION, 1, DataSource(config_));
         break;
     }
@@ -174,7 +178,13 @@ class AudioStream : public Recordable {
       case LayoutStyle::OpusStereoNoSampleCount: {
         if (compressionHandler_.encoder == nullptr) {
           compressionHandler_.create(
-              {AudioFormat::OPUS, AudioSampleFormat::S16_LE, kChannels, 0, kSampleRate});
+              {AudioFormat::OPUS,
+               AudioSampleFormat::S16_LE,
+               kChannels,
+               0,
+               kSampleRate,
+               0,
+               kStereoPairCount});
           opusData_.resize(4096 * kChannels);
         }
         // Opus isn't very flexible: it can only process specific sizes, so we might need to padd!

@@ -283,8 +283,18 @@ bool AudioBlockReader::audioContentFromAudioSpec(
     if (!audioSpec_.sampleCount.get(sampleCount) || sampleCount == 0) {
       sampleCount = findAudioSampleCount(record, player);
     }
+
+    uint8_t stereoPairCount = 0;
+    audioSpec_.stereoPairCount.get(stereoPairCount);
+
     outAudioContentBlock = ContentBlock(
-        audioFormat, sampleFormat, numChannels, sampleFrameStride, sampleRate, sampleCount);
+        audioFormat,
+        sampleFormat,
+        numChannels,
+        sampleFrameStride,
+        sampleRate,
+        sampleCount,
+        stereoPairCount);
     return true;
   }
   return false;

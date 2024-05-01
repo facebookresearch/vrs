@@ -18,6 +18,7 @@
 
 #ifdef OPUS_IS_AVAILABLE
 #include <opus.h>
+#include <opus_multistream.h>
 #endif
 
 #define DEFAULT_LOG_CHANNEL "AudioBlockOpus"
@@ -49,12 +50,44 @@ bool AudioBlock::opusDecompress(AudioDecompressionHandler& handler, AudioBlock& 
     return false;
   }
   if (handler.decoder != nullptr && !handler.decoderSpec.isCompatibleWith(audioSpec_)) {
-    opus_decoder_destroy(handler.decoder);
+    opus_multistream_decoder_destroy(handler.decoder);
     handler.decoder = nullptr;
   }
+
   if (handler.decoder == nullptr) {
     int error = 0;
-    handler.decoder = opus_decoder_create(getSampleRate(), getChannelCount(), &error);
+
+    uint32_t totalAudioChannel = getChannelCount();
+    if (totalAudioChannel > 255 || totalAudioChannel == 0) {
+      XR_LOGW("Invalid channel count of {}", totalAudioChannel);
+      return false;
+    }
+
+    uint32_t totalCoupledAudioChannel = 2 * getStereoPairCount();
+    if (totalAudioChannel < totalCoupledAudioChannel) {
+      XR_LOGW(
+          "Invalid channel count of {} and stereo channel count of {}",
+          totalAudioChannel,
+          totalCoupledAudioChannel);
+      return false;
+    }
+
+    uint32_t totalMonoChannel = totalAudioChannel - totalCoupledAudioChannel;
+    uint32_t totalAudioStreamCount = totalMonoChannel + getStereoPairCount();
+
+    vector<uint8_t> mapping(getChannelCount());
+    for (uint32_t i = 0; i < totalCoupledAudioChannel + totalMonoChannel; ++i) {
+      mapping[i] = i;
+    }
+
+    handler.decoder = opus_multistream_decoder_create(
+        getSampleRate(),
+        getChannelCount(),
+        totalAudioStreamCount,
+        getStereoPairCount(),
+        mapping.data(),
+        &error);
+
     if (error != OPUS_OK || handler.decoder == nullptr) {
       XR_LOGW("Couldn't create Opus decoder. Error {}: {}", error, opus_strerror(error));
       return false;
@@ -75,7 +108,7 @@ bool AudioBlock::opusDecompress(AudioDecompressionHandler& handler, AudioBlock& 
       0,
       getSampleRate(),
       sampleCount);
-  opus_int32 result = opus_decode(
+  opus_int32 result = opus_multistream_decode(
       handler.decoder,
       data<unsigned char>(),
       audioBytes_.size(),
@@ -93,29 +126,61 @@ bool AudioBlock::opusDecompress(AudioDecompressionHandler& handler, AudioBlock& 
 
 AudioDecompressionHandler::~AudioDecompressionHandler() {
   if (decoder != nullptr) {
-    opus_decoder_destroy(decoder);
+    opus_multistream_decoder_destroy(decoder);
   }
 }
 
 bool AudioCompressionHandler::create(const AudioContentBlockSpec& spec) {
   if (encoder != nullptr) {
-    opus_encoder_destroy(encoder);
+    opus_multistream_encoder_destroy(encoder);
     encoder = nullptr;
   }
   if (!XR_VERIFY(supportedSampleRate(spec.getSampleRate()))) {
     return false;
   }
   int error = 0;
-  encoder = opus_encoder_create(
-      spec.getSampleRate(), spec.getChannelCount(), OPUS_APPLICATION_AUDIO, &error);
+
+  uint32_t totalAudioChannel = spec.getChannelCount();
+  if (totalAudioChannel > 255 || totalAudioChannel == 0) {
+    XR_LOGW("Invalid channel count of {}", totalAudioChannel);
+    return false;
+  }
+
+  uint32_t totalCoupledAudioChannel = 2 * spec.getStereoPairCount();
+  if (totalAudioChannel < totalCoupledAudioChannel) {
+    XR_LOGW(
+        "Invalid channel count of {} and stereo channel count of {}",
+        totalAudioChannel,
+        totalCoupledAudioChannel);
+    return false;
+  }
+
+  uint32_t totalMonoChannel = totalAudioChannel - totalCoupledAudioChannel;
+  uint32_t totalAudioStreamCount = totalMonoChannel + spec.getStereoPairCount();
+
+  vector<uint8_t> mapping(spec.getChannelCount());
+
+  for (uint32_t i = 0; i < totalCoupledAudioChannel + totalMonoChannel; ++i) {
+    mapping[i] = i;
+  }
+
+  encoder = opus_multistream_encoder_create(
+      spec.getSampleRate(),
+      spec.getChannelCount(),
+      totalAudioStreamCount,
+      spec.getStereoPairCount(),
+      mapping.data(),
+      OPUS_APPLICATION_AUDIO,
+      &error);
+
   if (error != OPUS_OK || encoder == nullptr) {
     XR_LOGW("Couldn't create Opus encoder. Error {}: {}", error, opus_strerror(error));
     return false;
   }
   encoderSpec = spec;
-  XR_VERIFY(opus_encoder_ctl(encoder, OPUS_SET_BITRATE(96000)) == OPUS_OK);
-  XR_VERIFY(opus_encoder_ctl(encoder, OPUS_SET_SIGNAL(OPUS_SIGNAL_MUSIC)) == OPUS_OK);
-  XR_VERIFY(opus_encoder_ctl(encoder, OPUS_SET_VBR(1)) == OPUS_OK);
+  XR_VERIFY(opus_multistream_encoder_ctl(encoder, OPUS_SET_BITRATE(96000)) == OPUS_OK);
+  XR_VERIFY(opus_multistream_encoder_ctl(encoder, OPUS_SET_SIGNAL(OPUS_SIGNAL_MUSIC)) == OPUS_OK);
+  XR_VERIFY(opus_multistream_encoder_ctl(encoder, OPUS_SET_VBR(1)) == OPUS_OK);
   return true;
 }
 
@@ -124,13 +189,13 @@ int AudioCompressionHandler::compress(
     uint32_t sampleCount,
     void* outOpusBytes,
     size_t maxBytes) {
-  return opus_encode(
+  return opus_multistream_encode(
       encoder, (opus_int16*)samples, sampleCount, (unsigned char*)outOpusBytes, maxBytes);
 }
 
 AudioCompressionHandler::~AudioCompressionHandler() {
   if (encoder != nullptr) {
-    opus_encoder_destroy(encoder);
+    opus_multistream_encoder_destroy(encoder);
   }
 }
 

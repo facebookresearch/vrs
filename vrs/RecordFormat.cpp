@@ -671,15 +671,18 @@ AudioContentBlockSpec::AudioContentBlockSpec(
     uint8_t channelCount,
     uint8_t sampleFrameStride,
     uint32_t sampleFrameRate,
-    uint32_t sampleFrameCount)
+    uint32_t sampleFrameCount,
+    uint8_t stereoPairCount)
     : audioFormat_{audioFormat},
       sampleFormat_{sampleFormat},
       sampleFrameStride_{sampleFrameStride},
       channelCount_{channelCount},
       sampleFrameRate_{sampleFrameRate},
-      sampleFrameCount_{sampleFrameCount} {
+      sampleFrameCount_{sampleFrameCount},
+      stereoPairCount_{stereoPairCount} {
   XR_VERIFY(audioFormat != AudioFormat::UNDEFINED);
   XR_VERIFY(sampleFrameStride_ == 0 || sampleFrameStride_ >= getBytesPerSample() * channelCount);
+  XR_VERIFY(channelCount >= stereoPairCount * 2);
 }
 
 AudioContentBlockSpec::AudioContentBlockSpec(const string& formatStr) {
@@ -923,7 +926,8 @@ ContentBlock::ContentBlock(
     uint8_t numChannels,
     uint8_t sampleFrameStride,
     uint32_t sampleRate,
-    uint32_t sampleCount)
+    uint32_t sampleCount,
+    uint8_t stereoPairCount)
     : contentType_(ContentType::AUDIO),
       audioSpec_(
           audioFormat,
@@ -931,7 +935,8 @@ ContentBlock::ContentBlock(
           numChannels,
           sampleFrameStride,
           sampleRate,
-          sampleCount) {}
+          sampleCount,
+          stereoPairCount) {}
 
 ContentBlock::ContentBlock(ContentType type, size_t size) : contentType_(type), size_(size) {
   switch (contentType_) {

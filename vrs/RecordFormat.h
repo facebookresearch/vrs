@@ -348,7 +348,8 @@ class AudioContentBlockSpec {
       uint8_t channelCount = 0,
       uint8_t sampleFrameStride = 0,
       uint32_t sampleFrameRate = 0,
-      uint32_t sampleFrameCount = 0);
+      uint32_t sampleFrameCount = 0,
+      uint8_t stereoPairCount = 0);
 
   /// Constructor used for factory construction.
   /// @internal
@@ -433,6 +434,11 @@ class AudioContentBlockSpec {
   void setSampleCount(uint32_t sampleCount) {
     sampleFrameCount_ = sampleCount;
   }
+
+  uint8_t getStereoPairCount() const {
+    return stereoPairCount_;
+  }
+
   /// Tell if the audio sample format is fully defined.
   /// For instance, PCM audio data when we have enough details: sample format & channel count.
   bool isSampleBlockFormatDefined() const {
@@ -466,6 +472,7 @@ class AudioContentBlockSpec {
   uint8_t channelCount_{};
   uint32_t sampleFrameRate_{};
   uint32_t sampleFrameCount_{};
+  uint8_t stereoPairCount_{};
 };
 
 /// \brief Specification of a VRS record content block.
@@ -533,7 +540,8 @@ class ContentBlock {
       uint8_t numChannels = 0,
       uint8_t sampleFrameStride = 0,
       uint32_t sampleRate = 0,
-      uint32_t sampleCount = 0);
+      uint32_t sampleCount = 0,
+      uint8_t stereoPairCount = 0);
 
   /// Default copy constructor
   ContentBlock(const ContentBlock&) = default;

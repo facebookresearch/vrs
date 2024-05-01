@@ -21,15 +21,15 @@
 #include <vrs/RecordFormat.h>
 #include <vrs/RecordReaders.h>
 
-using OpusEncoder = struct OpusEncoder;
-using OpusDecoder = struct OpusDecoder;
+using OpusMSEncoder = struct OpusMSEncoder;
+using OpusMSDecoder = struct OpusMSDecoder;
 
 namespace vrs::utils {
 
 using std::vector;
 
 struct AudioCompressionHandler {
-  OpusEncoder* encoder{};
+  OpusMSEncoder* encoder{};
   AudioContentBlockSpec encoderSpec;
 
   bool create(const AudioContentBlockSpec& spec);
@@ -39,7 +39,7 @@ struct AudioCompressionHandler {
 };
 
 struct AudioDecompressionHandler {
-  OpusDecoder* decoder{};
+  OpusMSDecoder* decoder{};
   AudioContentBlockSpec decoderSpec;
 
   ~AudioDecompressionHandler();
@@ -98,6 +98,11 @@ class AudioBlock {
   uint32_t getSampleRate() const {
     return audioSpec_.getSampleRate();
   }
+
+  uint8_t getStereoPairCount() const {
+    return audioSpec_.getStereoPairCount();
+  }
+
   uint8_t getSampleFrameStride() const {
     return audioSpec_.getSampleFrameStride();
   }

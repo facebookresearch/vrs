@@ -120,6 +120,8 @@ constexpr const char* kAudioChannelCount = "audio_channel_count";
 constexpr const char* kAudioSampleRate = "audio_sample_rate";
 /// DataLayout convention name for a count of audio sample frames.
 constexpr const char* kAudioSampleCount = "audio_sample_count";
+/// DataLayout convention name for a count of audio coupled stream count.
+constexpr const char* kAudioStereoPairCount = "audio_stereo_pair_count";
 
 /// \brief DataLayout definitions use to describe what's in an audio content block.
 ///
@@ -139,6 +141,7 @@ class AudioSpec : public AutoDataLayout {
   DataPieceValue<uint8_t> channelCount{kAudioChannelCount};
   DataPieceValue<uint32_t> sampleRate{kAudioSampleRate};
   DataPieceValue<uint32_t> sampleCount{kAudioSampleCount};
+  DataPieceValue<uint8_t> stereoPairCount{kAudioStereoPairCount};
 
   AutoDataLayoutEnd end;
 };
