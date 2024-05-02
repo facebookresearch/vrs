@@ -8,10 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout-repo-content
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: setup-python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
 
@@ -41,7 +41,7 @@ jobs:
         with:
           repository: ${{ github.repository }}
       - name: checkout-repo-content
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Create release
         if: needs.get-current-version.outputs.current_tag != steps.get-latest-tag.outputs.release
