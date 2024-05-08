@@ -16,6 +16,7 @@
 
 #include <cstdio>
 
+#include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -41,41 +42,50 @@ using namespace vrs;
 using namespace vrs::datalayout_conventions;
 
 namespace {
-const string kVrsFilesDir = coretech::getTestDataDir() + "/VRS_Files/";
-const string kWavFile = kVrsFilesDir + "audio_int16_48k.wav";
-const uint32_t kWavHeaderSize = 44;
 
-const uint32_t kSampleRate = 48000;
-const uint8_t kChannels = 2;
-const uint8_t kStereoPairCount = 1;
-
-uint32_t kSampleCount = 0;
-
-const vector<uint16_t>& getAudioSamples() {
-  static vector<uint16_t> samples;
-  if (!samples.empty()) {
-    return samples;
-  }
-  DiskFile file;
-  size_t fileSize = os::getFileSize(kWavFile);
-  if (XR_VERIFY(fileSize > kWavHeaderSize) && XR_VERIFY(file.open(kWavFile) == 0)) {
-    samples.resize(fileSize);
-    if (XR_VERIFY(file.read(samples.data(), kWavHeaderSize) == 0) &&
-        XR_VERIFY(file.read(samples.data(), fileSize - kWavHeaderSize) == 0)) {
-      samples.resize(fileSize - kWavHeaderSize);
-    } else {
-      samples.clear();
+struct AudioData {
+ public:
+  AudioData(uint32_t sampleRate, uint8_t channels, uint8_t stereoPairCount, const string& wavFile)
+      : wavFile(wavFile),
+        sampleRate(sampleRate),
+        channels(channels),
+        stereoPairCount(stereoPairCount) {
+    // Read the WAV file, and store the samples in a vector.
+    const string vrsFilesDir = coretech::getTestDataDir() + "/VRS_Files/";
+    const string absFilePath = vrsFilesDir + wavFile;
+    const uint32_t wavHeaderSize = 44;
+    DiskFile file;
+    size_t fileSize = os::getFileSize(absFilePath);
+    if (XR_VERIFY(fileSize > wavHeaderSize) && XR_VERIFY(file.open(absFilePath) == 0)) {
+      samples.resize(fileSize);
+      if (XR_VERIFY(file.read(samples.data(), wavHeaderSize) == 0) &&
+          XR_VERIFY(file.read(samples.data(), fileSize - wavHeaderSize) == 0)) {
+        samples.resize(fileSize - wavHeaderSize);
+      } else {
+        samples.clear();
+      }
     }
+    sampleCount = samples.size() / (sizeof(int16_t) * channels);
   }
-  kSampleCount = samples.size() / (sizeof(int16_t) * kChannels);
-  return samples;
-}
+  const string wavFile;
+  vector<uint16_t> samples;
+  const uint32_t sampleRate;
+  const uint8_t channels;
+  const uint8_t stereoPairCount;
+  uint32_t sampleCount;
+};
 } // namespace
 
-struct AudioContentBlockReaderTest : testing::Test {};
+struct AudioContentBlockReaderTest : testing::Test {
+ protected:
+  AudioContentBlockReaderTest()
+      : stereoAudio(48000, 2, 1, "audio_int16_48k.wav"),
+        multiAudio(48000, 5, 2, "audio_int16_48k_5ch.wav") {}
+  const AudioData stereoAudio;
+  const AudioData multiAudio;
+};
 
 namespace {
-
 enum class LayoutStyle {
   Classic = 1, // Spec in config record, sample count in data record
   NoSize, // Spec in config record, no sample count in data record
@@ -93,8 +103,11 @@ class NextContentBlockAudioSampleCountSpec : public AutoDataLayout {
 
 class AudioStream : public Recordable {
  public:
-  AudioStream(LayoutStyle style, uint32_t fullRecordSize)
-      : Recordable(RecordableTypeId::AudioStream), style_{style}, fullRecordSize_{fullRecordSize} {
+  AudioStream(LayoutStyle style, uint32_t fullRecordSize, const AudioData& ipAudioData)
+      : Recordable(RecordableTypeId::AudioStream),
+        style_{style},
+        fullRecordSize_{fullRecordSize},
+        ipAudioData_{ipAudioData} {
     switch (style_) {
       case LayoutStyle::Classic:
         addRecordFormat(Record::Type::CONFIGURATION, 1, config_.getContentBlock(), {&config_});
@@ -123,8 +136,8 @@ class AudioStream : public Recordable {
   const Record* createConfigurationRecord() override {
     config_.audioFormat.set(AudioFormat::PCM);
     config_.sampleType.set(AudioSampleFormat::S16_LE);
-    config_.channelCount.set(kChannels);
-    config_.sampleRate.set(kSampleRate);
+    config_.channelCount.set(ipAudioData_.channels);
+    config_.sampleRate.set(ipAudioData_.sampleRate);
     switch (style_) {
       case LayoutStyle::Classic:
       case LayoutStyle::NoSize:
@@ -135,12 +148,12 @@ class AudioStream : public Recordable {
         break;
       case LayoutStyle::OpusStereo:
         config_.audioFormat.set(AudioFormat::OPUS);
-        config_.stereoPairCount.set(kStereoPairCount);
+        config_.stereoPairCount.set(ipAudioData_.stereoPairCount);
         return createRecord(getTimestampSec(), Record::Type::CONFIGURATION, 1, DataSource(config_));
         break;
       case LayoutStyle::OpusStereoNoSampleCount:
         config_.audioFormat.set(AudioFormat::OPUS);
-        config_.stereoPairCount.set(kStereoPairCount);
+        config_.stereoPairCount.set(ipAudioData_.stereoPairCount);
         return createRecord(getTimestampSec(), Record::Type::CONFIGURATION, 1, DataSource(config_));
         break;
     }
@@ -150,9 +163,9 @@ class AudioStream : public Recordable {
     return createRecord(getTimestampSec(), Record::Type::STATE, 1);
   }
   void createDataRecords(uint32_t sampleCount) {
-    const vector<uint16_t>& samples = getAudioSamples();
-    const uint16_t* first = samples.data() + sampleCount_ * kChannels;
-    size_t size = sampleCount * kChannels * sizeof(int16_t);
+    const vector<uint16_t>& samples = ipAudioData_.samples;
+    const uint16_t* first = samples.data() + sampleCount_ * ipAudioData_.channels;
+    size_t size = sampleCount * ipAudioData_.channels * sizeof(int16_t);
     switch (style_) {
       case LayoutStyle::Classic:
         data_.sampleCount.set(sampleCount);
@@ -180,17 +193,17 @@ class AudioStream : public Recordable {
           compressionHandler_.create(
               {AudioFormat::OPUS,
                AudioSampleFormat::S16_LE,
-               kChannels,
+               ipAudioData_.channels,
                0,
-               kSampleRate,
+               ipAudioData_.sampleRate,
                0,
-               kStereoPairCount});
-          opusData_.resize(4096 * kChannels);
+               ipAudioData_.stereoPairCount});
+          opusData_.resize(4096 * ipAudioData_.channels);
         }
         // Opus isn't very flexible: it can only process specific sizes, so we might need to padd!
         vector<uint16_t> paddedSamples;
         if (sampleCount < fullRecordSize_) {
-          paddedSamples.resize(fullRecordSize_ * kChannels, 0);
+          paddedSamples.resize(fullRecordSize_ * ipAudioData_.channels, 0);
           memcpy(paddedSamples.data(), first, size);
           first = paddedSamples.data();
           size = paddedSamples.size() * sizeof(int16_t);
@@ -222,21 +235,21 @@ class AudioStream : public Recordable {
     createStateRecord();
     if (style_ == LayoutStyle::OpusStereo || style_ == LayoutStyle::OpusStereoNoSampleCount) {
       // We must use blocks of a specific size (Opus limitation)
-      while (sampleCount_ < kSampleCount) {
-        createDataRecords(min<uint32_t>(fullRecordSize_, kSampleCount - sampleCount_));
+      while (sampleCount_ < ipAudioData_.sampleCount) {
+        createDataRecords(min<uint32_t>(fullRecordSize_, ipAudioData_.sampleCount - sampleCount_));
       }
     } else {
       // Use blocks of different sizes, to exercise the system!
       uint32_t variation = 0;
-      while (sampleCount_ < kSampleCount) {
+      while (sampleCount_ < ipAudioData_.sampleCount) {
         createDataRecords(min<uint32_t>(
             fullRecordSize_ + (style_ == LayoutStyle::OpusStereo ? 0 : variation++),
-            kSampleCount - sampleCount_));
+            ipAudioData_.sampleCount - sampleCount_));
       }
     }
   }
   double getTimestampSec() const {
-    return sampleCount_ / double(kSampleRate);
+    return sampleCount_ / double(ipAudioData_.sampleRate);
   }
 
  private:
@@ -247,15 +260,16 @@ class AudioStream : public Recordable {
   uint64_t sampleCount_ = 0;
   utils::AudioCompressionHandler compressionHandler_;
   vector<uint8_t> opusData_;
+  const AudioData& ipAudioData_;
 };
 
 struct Analytics {
   uint32_t configDatalayoutCount = 0;
   uint32_t dataDatalayoutCount = 0;
-
   uint32_t audioBlockCount = 0;
   uint32_t audioSampleCount = 0;
-
+  uint8_t channels = 0;
+  uint32_t sampleRate = 0;
   uint32_t unsupportedCount = 0;
 };
 
@@ -275,8 +289,8 @@ class AnalyticsPlayer : public RecordFormatStreamPlayer {
     if (audioBlock.readBlock(record.reader, cb) &&
         XR_VERIFY(audioBlock.decompressAudio(decompressor_))) {
       analytics_.audioSampleCount += audioBlock.getSampleCount();
-      EXPECT_EQ(audioBlock.getSampleRate(), kSampleRate);
-      EXPECT_EQ(audioBlock.getChannelCount(), kChannels);
+      EXPECT_EQ(audioBlock.getSampleRate(), analytics_.sampleRate);
+      EXPECT_EQ(audioBlock.getChannelCount(), analytics_.channels);
     }
     return true;
   }
@@ -289,15 +303,25 @@ class AnalyticsPlayer : public RecordFormatStreamPlayer {
     return analytics_;
   }
 
+  void setAnalyticsSampleRate(uint32_t sampleRate) {
+    analytics_.sampleRate = sampleRate;
+  }
+
+  void setAnalyticsChannels(uint8_t channels) {
+    analytics_.channels = channels;
+  }
+
  private:
   Analytics analytics_;
   utils::AudioDecompressionHandler decompressor_;
 };
 
-Analytics readAudioVRSFile(const string& path) {
+Analytics readAudioVRSFile(const string& path, const AudioData& ipAudioData) {
   AnalyticsPlayer player;
   RecordFileReader reader;
   reader.openFile(path);
+  player.setAnalyticsChannels(ipAudioData.channels);
+  player.setAnalyticsSampleRate(ipAudioData.sampleRate);
   for (auto id : reader.getStreams()) {
     reader.setStreamPlayer(id, &player);
   }
@@ -305,16 +329,17 @@ Analytics readAudioVRSFile(const string& path) {
   return player.getAnalytics();
 }
 
-Analytics runTest(const char* name, LayoutStyle style, uint32_t sampleCount) {
+Analytics
+runTest(const char* name, LayoutStyle style, uint32_t sampleCount, const AudioData& ipAudioData) {
   const string testPath = os::getTempFolder() + name + ".vrs";
 
   RecordFileWriter fileWriter;
-  AudioStream audioStream(style, sampleCount);
+  AudioStream audioStream(style, sampleCount, ipAudioData);
   fileWriter.addRecordable(&audioStream);
   audioStream.createAllRecords();
   EXPECT_EQ(fileWriter.writeToFile(testPath), 0);
 
-  return readAudioVRSFile(testPath);
+  return readAudioVRSFile(testPath, ipAudioData);
 }
 
 } // namespace
@@ -324,9 +349,9 @@ Analytics runTest(const char* name, LayoutStyle style, uint32_t sampleCount) {
 const uint32_t kTotalSampleCount = 60743;
 
 TEST_F(AudioContentBlockReaderTest, testClassicAudio) {
-  ASSERT_GT(getAudioSamples().size(), 100000);
+  ASSERT_GT(stereoAudio.samples.size(), 100000);
 
-  Analytics analytics = runTest(TEST_NAME, LayoutStyle::Classic, 480);
+  Analytics analytics = runTest(TEST_NAME, LayoutStyle::Classic, 480, stereoAudio);
 
   EXPECT_EQ(analytics.configDatalayoutCount, 1);
   EXPECT_EQ(analytics.dataDatalayoutCount, analytics.audioBlockCount);
@@ -336,9 +361,9 @@ TEST_F(AudioContentBlockReaderTest, testClassicAudio) {
 }
 
 TEST_F(AudioContentBlockReaderTest, testNoSize) {
-  ASSERT_GT(getAudioSamples().size(), 100000);
+  ASSERT_GT(stereoAudio.samples.size(), 100000);
 
-  Analytics analytics = runTest(TEST_NAME, LayoutStyle::NoSize, 256);
+  Analytics analytics = runTest(TEST_NAME, LayoutStyle::NoSize, 256, stereoAudio);
 
   EXPECT_EQ(analytics.configDatalayoutCount, 1);
   EXPECT_EQ(analytics.dataDatalayoutCount, 0);
@@ -348,9 +373,9 @@ TEST_F(AudioContentBlockReaderTest, testNoSize) {
 }
 
 TEST_F(AudioContentBlockReaderTest, testFullSpecData) {
-  ASSERT_GT(getAudioSamples().size(), 100000);
+  ASSERT_GT(stereoAudio.samples.size(), 100000);
 
-  Analytics analytics = runTest(TEST_NAME, LayoutStyle::FullSpecData, 256);
+  Analytics analytics = runTest(TEST_NAME, LayoutStyle::FullSpecData, 256, stereoAudio);
 
   EXPECT_EQ(analytics.configDatalayoutCount, 0);
   EXPECT_EQ(analytics.dataDatalayoutCount, analytics.audioBlockCount);
@@ -360,12 +385,12 @@ TEST_F(AudioContentBlockReaderTest, testFullSpecData) {
 }
 
 TEST_F(AudioContentBlockReaderTest, testOpusStereo) {
-  ASSERT_GT(getAudioSamples().size(), 100000);
+  ASSERT_GT(stereoAudio.samples.size(), 100000);
 
   const uint32_t kBlockSampleSize = 480; // 10 ms @ 48 kHz
   const uint32_t kBlockCount = (kTotalSampleCount + kBlockSampleSize - 1) / kBlockSampleSize;
 
-  Analytics analytics = runTest(TEST_NAME, LayoutStyle::OpusStereo, kBlockSampleSize);
+  Analytics analytics = runTest(TEST_NAME, LayoutStyle::OpusStereo, kBlockSampleSize, stereoAudio);
 
   EXPECT_EQ(analytics.configDatalayoutCount, 1);
   EXPECT_EQ(analytics.dataDatalayoutCount, kBlockCount);
@@ -376,17 +401,34 @@ TEST_F(AudioContentBlockReaderTest, testOpusStereo) {
 }
 
 TEST_F(AudioContentBlockReaderTest, testOpusStereoNoSampleCount) {
-  ASSERT_GT(getAudioSamples().size(), 100000);
+  ASSERT_GT(stereoAudio.samples.size(), 100000);
 
   const uint32_t kBlockSampleSize = 480; // 10 ms @ 48 kHz
   const uint32_t kBlockCount = (kTotalSampleCount + kBlockSampleSize - 1) / kBlockSampleSize;
 
-  Analytics analytics = runTest(TEST_NAME, LayoutStyle::OpusStereoNoSampleCount, kBlockSampleSize);
+  Analytics analytics =
+      runTest(TEST_NAME, LayoutStyle::OpusStereoNoSampleCount, kBlockSampleSize, stereoAudio);
 
   EXPECT_EQ(analytics.configDatalayoutCount, 1);
   EXPECT_EQ(analytics.dataDatalayoutCount, 0);
   EXPECT_EQ(analytics.audioBlockCount, kBlockCount);
   // we padded the blocks to have the required block size, so we may have more samples
+  EXPECT_EQ(analytics.audioSampleCount, kBlockCount * kBlockSampleSize);
+  EXPECT_EQ(analytics.unsupportedCount, 0);
+}
+
+TEST_F(AudioContentBlockReaderTest, testOpusMultiChannel) {
+  ASSERT_GT(multiAudio.samples.size(), 100000);
+
+  const uint32_t kBlockSampleSize = 480; // 10 ms @ 48 kHz
+  const uint32_t kBlockCount = (kTotalSampleCount + kBlockSampleSize - 1) / kBlockSampleSize;
+
+  Analytics analytics = runTest(TEST_NAME, LayoutStyle::OpusStereo, kBlockSampleSize, multiAudio);
+
+  EXPECT_EQ(analytics.configDatalayoutCount, 1);
+  EXPECT_EQ(analytics.dataDatalayoutCount, kBlockCount);
+  EXPECT_EQ(analytics.audioBlockCount, kBlockCount);
+  //  we padded the blocks to have the required block size, so we may have more samples
   EXPECT_EQ(analytics.audioSampleCount, kBlockCount * kBlockSampleSize);
   EXPECT_EQ(analytics.unsupportedCount, 0);
 }
