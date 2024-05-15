@@ -26,6 +26,7 @@
     "@mdx-js/react": "^1.6.21",
     "@svgr/webpack": "^5.5.0",
     "@types/react": "^16.8.0",
+    "axios": "^0.28.0",
     "clsx": "^1.1.1",
     "docusaurus-plugin-internaldocs-fb": "1.16.2",
     "file-loader": "^6.2.0",
@@ -50,8 +51,7 @@
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "eslint-plugin-react": "^7.21.5",
     "eslint-plugin-react-hooks": "^4.2.0",
-    "prettier": "2.8.8",
-    "stylelint": "^13.2.1"
+    "prettier": "2.8.8"
   },
   "browserslist": {
     "production": [
