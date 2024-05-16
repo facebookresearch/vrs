@@ -7,6 +7,12 @@ be covered.
 Note that fixes and minor improvements are rolling in regularly without
 triggering a new version number.
 
+## Version 1.2.0 (May 15, 2024)
+
+- Version bump after cumulative changes.
+- Reworked vrsplayer audio support, with arbitrary audio stream selection.
+- Opus audio compression support.
+
 ## Version 1.1.0 (August 4, 2023)
 
 - Version bump after cumulative changes.
