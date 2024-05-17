@@ -94,6 +94,8 @@ Inheritance diagram for vrs::WriteFileHandler:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:af5271bfd7ee63339b86b4e94ad213a08"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_write_file_handler.html#af5271bfd7ee63339b86b4e94ad213a08">create</a> (const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;spec)</td></tr>
+<tr class="separator:af5271bfd7ee63339b86b4e94ad213a08"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a91518076bc2908a1a4b21aace0fe79cf"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_write_file_handler.html#a91518076bc2908a1a4b21aace0fe79cf">create</a> (const string &amp;newFilePath)=0</td></tr>
 <tr class="separator:a91518076bc2908a1a4b21aace0fe79cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aff0f64ed8b7ada9f6e0a2c55d3fd3a59"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_write_file_handler.html#aff0f64ed8b7ada9f6e0a2c55d3fd3a59">createSplitFile</a> (const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;spec, const string &amp;initialFilePath)</td></tr>
@@ -208,10 +210,12 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>CacheStatsCallbackFu
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The <a class="el" href="classvrs_1_1_write_file_handler.html" title="The WriteFileHandler interface adds write operations to the FileHandler interface.">WriteFileHandler</a> interface adds write operations to the <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> interface. </p>
-<p>There are two types of <a class="el" href="classvrs_1_1_write_file_handler.html" title="The WriteFileHandler interface adds write operations to the FileHandler interface.">WriteFileHandler</a> implementations. They might be able to:</p><ul>
-<li>create files, which which case the <a class="el" href="classvrs_1_1_write_file_handler.html#a91518076bc2908a1a4b21aace0fe79cf">create()</a> API should be implemented.</li>
-<li>modify an existing file, in which case <a class="el" href="classvrs_1_1_write_file_handler.html#a92afff70611d619395c027f01de60c6e">reopenForUpdates()</a> gives write access. Some class of cloud storage are immutable, hence the important distinction. VRS' <a class="el" href="classvrs_1_1_disk_file.html" title="FileHandler implementation for disk files, with chunked file support.">DiskFile</a> offers the most comprehensive implementation, because it is designed to fit all the needs of advanced VRS file creations, with chunking, but it should be perfectly usable on its own. On the other hand, network <a class="el" href="classvrs_1_1_write_file_handler.html" title="The WriteFileHandler interface adds write operations to the FileHandler interface.">WriteFileHandler</a> implementations might have very specific behaviors designed to accommodate the specificities of the network storage they implement. In particular, they might have specific behaviors to handle VRS file creation in the cloud, which requires the first part of the file to be edited last (and probably uploaded last too). Therefore, network <a class="el" href="classvrs_1_1_write_file_handler.html" title="The WriteFileHandler interface adds write operations to the FileHandler interface.">WriteFileHandler</a> implementations might not be usable for anything else than VRS file creation. </li>
+<p>There are two classes of <a class="el" href="classvrs_1_1_write_file_handler.html" title="The WriteFileHandler interface adds write operations to the FileHandler interface.">WriteFileHandler</a> implementations:</p><ul>
+<li>the ones that can edit data already written, whether editing a previously created file, or while creating a new one, as typically possible with local files,</li>
+<li>the immutable kind, which don't allow for overwriting parts of the file already written. They can append content, maybe concatenate chunks, but not modify previously written content. That's a typical restriction for cloud storage systems.</li>
 </ul>
+<p>VRS' <a class="el" href="classvrs_1_1_disk_file.html" title="FileHandler implementation for disk files, with chunked file support.">DiskFile</a> offers the most comprehensive implementation, because it is designed to fit all the needs of advanced VRS file creations, with chunking, but it can be used with non-VRS files.</p>
+<p>On the other hand, network <a class="el" href="classvrs_1_1_write_file_handler.html" title="The WriteFileHandler interface adds write operations to the FileHandler interface.">WriteFileHandler</a> implementations often have very specific behaviors designed to accommodate the specificities of the network storage they implement. These implementation details should ideally be abstracted, but in order to optimize cloud VRS file creation, the abstraction is compromised, and cloud <a class="el" href="classvrs_1_1_write_file_handler.html" title="The WriteFileHandler interface adds write operations to the FileHandler interface.">WriteFileHandler</a> implementations are not easily reusable for other applications that VRS. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="acc15477a0e4cac5307cd4d97ba9f94c9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#acc15477a0e4cac5307cd4d97ba9f94c9">&#9670;&nbsp;</a></span>addChunk()</h2>
@@ -241,8 +245,35 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>CacheStatsCallbackFu
 
 </div>
 </div>
+<a id="af5271bfd7ee63339b86b4e94ad213a08"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af5271bfd7ee63339b86b4e94ad213a08">&#9670;&nbsp;</a></span>create() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual int vrs::WriteFileHandler::create </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;&#160;</td>
+          <td class="paramname"><em>spec</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Create a new file for writing, using a spec. The path of the file to create is expected to be in the first chunk. Optional URI parameters might be provided in the spec' extras. </p>
+
+</div>
+</div>
 <a id="a91518076bc2908a1a4b21aace0fe79cf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a91518076bc2908a1a4b21aace0fe79cf">&#9670;&nbsp;</a></span>create()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a91518076bc2908a1a4b21aace0fe79cf">&#9670;&nbsp;</a></span>create() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
