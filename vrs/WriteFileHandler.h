@@ -25,21 +25,31 @@ using std::vector;
 
 /// \brief The WriteFileHandler interface adds write operations to the FileHandler interface.
 ///
-/// There are two types of WriteFileHandler implementations. They might be able to:
-/// - create files, which which case the create() API should be implemented.
-/// - modify an existing file, in which case reopenForUpdates() gives write access.
-/// Some class of cloud storage are immutable, hence the important distinction.
+/// There are two classes of WriteFileHandler implementations:
+///  - the ones that can edit data already written, whether editing a previously created file, or
+///  while creating a new one, as typically possible with local files,
+///  - the immutable kind, which don't allow for overwriting parts of the file already written.
+///  They can append content, maybe concatenate chunks, but not modify previously written content.
+///  That's a typical restriction for cloud storage systems.
+///
 /// VRS' DiskFile offers the most comprehensive implementation, because it is designed to fit all
-/// the needs of advanced VRS file creations, with chunking, but it should be perfectly usable
-/// on its own. On the other hand, network WriteFileHandler implementations might have very specific
-/// behaviors designed to accommodate the specificities of the network storage they implement.
-/// In particular, they might have specific behaviors to handle VRS file creation in the cloud,
-/// which requires the first part of the file to be edited last (and probably uploaded last too).
-/// Therefore, network WriteFileHandler implementations might not be usable for anything else than
-/// VRS file creation.
+/// the needs of advanced VRS file creations, with chunking, but it can be used with non-VRS files.
+///
+/// On the other hand, network WriteFileHandler implementations often have very specific behaviors
+/// designed to accommodate the specificities of the network storage they implement. These
+/// implementation details should ideally be abstracted, but in order to optimize cloud VRS file
+/// creation, the abstraction is compromised, and cloud WriteFileHandler implementations are not
+/// easily reusable for other applications that VRS.
 class WriteFileHandler : public FileHandler {
  public:
   WriteFileHandler() = default;
+
+  /// Create a new file for writing, using a spec.
+  /// The path of the file to create is expected to be in the first chunk.
+  /// Optional URI parameters might be provided in the spec' extras.
+  virtual int create(const FileSpec& spec) {
+    return spec.chunks.empty() ? INVALID_FILE_SPEC : create(spec.chunks.front());
+  }
 
   /// Create a new file for writing.
   /// @param newFilePath: a disk path to create the file.

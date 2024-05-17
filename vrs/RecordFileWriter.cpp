@@ -825,7 +825,7 @@ int RecordFileWriter::createFile(const string& filePath, bool splitHead) {
   }
 
   WriteFileHandler& head = splitHead ? indexRecordWriter_.initSplitHead() : *file_;
-  error = head.create(spec.chunks.front());
+  error = head.create(spec);
   if (error != 0) {
     if (!splitHead && filePath == spec.chunks.front()) {
       XR_LOGE("Failed to create '{}': {}, {}", filePath, error, errorCodeToMessage(error));
