@@ -16,8 +16,8 @@
 
 #include "StreamId.h"
 
-#include <map>
 #include <string>
+#include <unordered_map>
 
 #include <fmt/format.h>
 
@@ -27,8 +27,8 @@ namespace vrs {
 
 namespace {
 
-const map<RecordableTypeId, const char*>& getRecordableTypeIdRegistry() {
-  static const map<RecordableTypeId, const char*> sRegistry = {
+const unordered_map<RecordableTypeId, const char*>& getRecordableTypeIdRegistry() {
+  static const unordered_map<RecordableTypeId, const char*> sRegistry = {
       {RecordableTypeId::Undefined, "Undefined"},
       {RecordableTypeId::VRSIndex, "VRS Index"}, // should probably not happen
       {RecordableTypeId::VRSDescription, "VRS Description"}, // should probably not happen
@@ -189,7 +189,7 @@ StreamId fromNumericNameWithSeparator(const string& numericName, uint8_t separat
 } // namespace
 
 string toString(RecordableTypeId typeId) {
-  const map<RecordableTypeId, const char*>& registry = getRecordableTypeIdRegistry();
+  const unordered_map<RecordableTypeId, const char*>& registry = getRecordableTypeIdRegistry();
   auto iter = registry.find(typeId);
   if (iter != registry.end()) {
     return iter->second;
@@ -198,7 +198,7 @@ string toString(RecordableTypeId typeId) {
 }
 
 bool StreamId::isKnownTypeId(RecordableTypeId typeId) {
-  const map<RecordableTypeId, const char*>& registry = getRecordableTypeIdRegistry();
+  const unordered_map<RecordableTypeId, const char*>& registry = getRecordableTypeIdRegistry();
   return registry.find(typeId) != registry.end();
 }
 
