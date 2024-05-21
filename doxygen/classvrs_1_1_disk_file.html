@@ -68,7 +68,6 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
@@ -96,11 +95,6 @@ Inheritance diagram for vrs::DiskFile:</div>
   </map>
 </div></div>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvrs_1_1_disk_file_1_1_chunk.html">Chunk</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:af56c173b5db639ca9bd78eb002072e5f"><td class="memItemLeft" align="right" valign="top"><a id="af56c173b5db639ca9bd78eb002072e5f"></a>
@@ -316,12 +310,12 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:aba3c36f1ac6f3b46cfe257dd281da767"><td class="memItemLeft" align="right" valign="top"><a id="aba3c36f1ac6f3b46cfe257dd281da767"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>checkChunks</b> (const vector&lt; string &gt; &amp;chunks)</td></tr>
 <tr class="separator:aba3c36f1ac6f3b46cfe257dd281da767"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a51f2ae7b5f377e56b0f0aed08a38f558"><td class="memItemLeft" align="right" valign="top"><a id="a51f2ae7b5f377e56b0f0aed08a38f558"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>openChunk</b> (<a class="el" href="structvrs_1_1_disk_file_1_1_chunk.html">Chunk</a> *chunk)</td></tr>
-<tr class="separator:a51f2ae7b5f377e56b0f0aed08a38f558"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a384f65ad5a9071d29c06698a7e58b668"><td class="memItemLeft" align="right" valign="top"><a id="a384f65ad5a9071d29c06698a7e58b668"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>closeChunk</b> (<a class="el" href="structvrs_1_1_disk_file_1_1_chunk.html">Chunk</a> *chunk)</td></tr>
-<tr class="separator:a384f65ad5a9071d29c06698a7e58b668"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f23826d2e73bde503f523c848631232"><td class="memItemLeft" align="right" valign="top"><a id="a7f23826d2e73bde503f523c848631232"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>openChunk</b> (<a class="el" href="classvrs_1_1_disk_file_chunk.html">DiskFileChunk</a> *chunk)</td></tr>
+<tr class="separator:a7f23826d2e73bde503f523c848631232"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed86844fc60870f71b9e63d5c02f556f"><td class="memItemLeft" align="right" valign="top"><a id="aed86844fc60870f71b9e63d5c02f556f"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>closeChunk</b> (<a class="el" href="classvrs_1_1_disk_file_chunk.html">DiskFileChunk</a> *chunk)</td></tr>
+<tr class="separator:aed86844fc60870f71b9e63d5c02f556f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac05be80aa69388e44a657518b9f0924c"><td class="memItemLeft" align="right" valign="top"><a id="ac05be80aa69388e44a657518b9f0924c"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>addChunk</b> (const string &amp;chunkFilePath)</td></tr>
 <tr class="separator:ac05be80aa69388e44a657518b9f0924c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -334,12 +328,15 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>trySetPosInCurrentChu
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:a382ab61be3f1c4736020f3ba87835af4"><td class="memItemLeft" align="right" valign="top"><a id="a382ab61be3f1c4736020f3ba87835af4"></a>
-vector&lt; <a class="el" href="structvrs_1_1_disk_file_1_1_chunk.html">Chunk</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>chunks_</b></td></tr>
-<tr class="separator:a382ab61be3f1c4736020f3ba87835af4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae405d6fb7f4b24ce92cb3d66b2770ac6"><td class="memItemLeft" align="right" valign="top"><a id="ae405d6fb7f4b24ce92cb3d66b2770ac6"></a>
-<a class="el" href="structvrs_1_1_disk_file_1_1_chunk.html">Chunk</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>currentChunk_</b> {}</td></tr>
-<tr class="separator:ae405d6fb7f4b24ce92cb3d66b2770ac6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa6c1f431c530ec2bc0aa18bb3b38c7b1"><td class="memItemLeft" align="right" valign="top"><a id="aa6c1f431c530ec2bc0aa18bb3b38c7b1"></a>
+map&lt; string, string &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>options_</b></td></tr>
+<tr class="separator:aa6c1f431c530ec2bc0aa18bb3b38c7b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe2b4ae826b33946f6b9c83280e5d865"><td class="memItemLeft" align="right" valign="top"><a id="afe2b4ae826b33946f6b9c83280e5d865"></a>
+vector&lt; <a class="el" href="classvrs_1_1_disk_file_chunk.html">DiskFileChunk</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>chunks_</b></td></tr>
+<tr class="separator:afe2b4ae826b33946f6b9c83280e5d865"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a994f919056ea01b13c4342eeb175e9b1"><td class="memItemLeft" align="right" valign="top"><a id="a994f919056ea01b13c4342eeb175e9b1"></a>
+<a class="el" href="classvrs_1_1_disk_file_chunk.html">DiskFileChunk</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>currentChunk_</b> {}</td></tr>
+<tr class="separator:a994f919056ea01b13c4342eeb175e9b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1cc72dc60b8ae8cb728f680707e3edc0"><td class="memItemLeft" align="right" valign="top"><a id="a1cc72dc60b8ae8cb728f680707e3edc0"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>filesOpenCount_</b> {}</td></tr>
 <tr class="separator:a1cc72dc60b8ae8cb728f680707e3edc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
