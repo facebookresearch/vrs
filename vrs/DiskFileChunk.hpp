@@ -42,7 +42,7 @@ class DiskFileChunk {
   ~DiskFileChunk() {
     close();
   }
-  int create(const string& newPath) {
+  int create(const string& newPath, const map<string, string>& options) {
     close();
     file_ = os::fileOpen(newPath, "wb");
     if (file_ == nullptr) {
@@ -58,7 +58,7 @@ class DiskFileChunk {
     return SUCCESS;
 #endif
   }
-  int open(bool readOnly) {
+  int open(bool readOnly, const map<string, string>& options) {
     if (file_ != nullptr) {
       os::fileClose(file_);
     }

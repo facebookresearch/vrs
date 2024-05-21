@@ -73,6 +73,7 @@ int DiskFile::close() {
 #ifdef GTEST_BUILD
   EXPECT_EQ(filesOpenCount_, 0);
 #endif
+  options_.clear();
   chunks_.clear();
   currentChunk_ = nullptr;
   filesOpenCount_ = 0;
@@ -86,8 +87,10 @@ int DiskFile::openSpec(const FileSpec& fileSpec) {
   if (!fileSpec.fileHandlerName.empty() && !fileSpec.isDiskFile()) {
     return FILE_HANDLER_MISMATCH;
   }
+  options_ = fileSpec.extras;
   if (checkChunks(fileSpec.chunks) != 0 || openChunk(chunks_.data()) != 0) {
     chunks_.clear();
+    options_.clear();
   }
   return lastError_;
 }
@@ -322,7 +325,7 @@ int DiskFile::openChunk(DiskFileChunk* chunk) {
     chunk->rewind();
     lastError_ = 0;
   } else {
-    lastError_ = chunk->open(readOnly_);
+    lastError_ = chunk->open(readOnly_, options_);
     if (lastError_ == 0) {
       if (filesOpenCount_++ > kMaxFilesOpenCount && currentChunk_ != nullptr) {
         closeChunk(currentChunk_);
@@ -362,7 +365,7 @@ int DiskFile::addChunk(const string& chunkFilePath) {
     return DISKFILE_INVALID_STATE;
   }
   DiskFileChunk newChunk;
-  lastError_ = newChunk.create(chunkFilePath);
+  lastError_ = newChunk.create(chunkFilePath, options_);
   if (lastError_ != SUCCESS) {
     return lastError_;
   }

@@ -158,6 +158,7 @@ class DiskFile : public WriteFileHandler {
   }
   bool trySetPosInCurrentChunk(int64_t offset);
 
+  map<string, string> options_; // optional options provided in openSpec
   vector<DiskFileChunk> chunks_; // all the chunks, when a VRS file is opened.
   DiskFileChunk* currentChunk_{}; // always points to the current chunk within chunks_.
   int filesOpenCount_{};
