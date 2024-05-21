@@ -74,8 +74,9 @@ class DiskFileChunk {
   int flush() {
     return ::fflush(file_) != 0 ? errno : SUCCESS;
   }
-  int64_t tell() const {
-    return os::fileTell(file_);
+  int tell(int64_t& outFilepos) const {
+    outFilepos = os::fileTell(file_);
+    return outFilepos < 0 ? errno : SUCCESS;
   }
   int seek(int64_t pos, int origin) {
     return os::fileSeek(file_, pos, origin) != 0 ? errno : SUCCESS;

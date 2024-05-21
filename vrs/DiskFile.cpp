@@ -116,7 +116,10 @@ void DiskFile::forgetFurtherChunks(int64_t fileSize) {
 }
 
 int DiskFile::skipForward(int64_t offset) {
-  int64_t chunkPos = currentChunk_->tell();
+  int64_t chunkPos{};
+  if ((lastError_ = currentChunk_->tell(chunkPos)) != 0) {
+    return lastError_;
+  }
   if (chunkPos + offset < currentChunk_->getSize()) {
     lastError_ = currentChunk_->seek(offset, SEEK_CUR);
     return lastError_;
@@ -262,7 +265,11 @@ int DiskFile::overwrite(const void* buffer, size_t length) {
   do {
     size_t requestSize = (length > lastRWSize_) ? length - lastRWSize_ : 0;
     if (!isLastChunk()) {
-      int64_t maxRequest = max<int64_t>(currentChunk_->getSize() - currentChunk_->tell(), 0);
+      int64_t pos{};
+      if ((lastError_ = currentChunk_->tell(pos)) != 0) {
+        return lastError_;
+      }
+      int64_t maxRequest = max<int64_t>(currentChunk_->getSize() - pos, 0);
       requestSize = min<size_t>(requestSize, static_cast<size_t>(maxRequest));
     }
     size_t writtenSize{};
@@ -283,9 +290,9 @@ int DiskFile::truncate() {
     lastError_ = DISKFILE_READ_ONLY;
     return lastError_;
   }
-  int64_t chunkSize = currentChunk_->tell();
-  lastError_ = currentChunk_->truncate(chunkSize);
-  if (lastError_ == 0) {
+  int64_t chunkSize{};
+  if ((lastError_ = currentChunk_->tell(chunkSize)) == 0 &&
+      (lastError_ = currentChunk_->truncate(chunkSize)) == 0) {
     // update the following chunks' offset
     size_t chunkIndex = static_cast<size_t>(currentChunk_ - chunks_.data());
     int64_t nextChunkOffset = currentChunk_->getOffset() + currentChunk_->getSize();
@@ -372,9 +379,12 @@ int DiskFile::addChunk(const string& chunkFilePath) {
   filesOpenCount_++;
   int64_t chunkOffset = 0;
   if (currentChunk_ != nullptr && currentChunk_->isOpened()) {
-    currentChunk_->setSize(currentChunk_->tell());
-    lastError_ = currentChunk_->flush();
-    if (lastError_ != 0 || currentChunk_->getSize() < 0) {
+    int64_t pos{};
+    if ((lastError_ = currentChunk_->tell(pos)) != 0) {
+      return lastError_;
+    }
+    currentChunk_->setSize(pos);
+    if ((lastError_ = currentChunk_->flush()) != 0) {
       // We're s***d: the last chunk is messed up, no point in trying to use the new one
       newChunk.close();
       os::remove(chunkFilePath);
@@ -400,11 +410,15 @@ int DiskFile::addChunk(const string& chunkFilePath) {
 }
 
 int64_t DiskFile::getPos() const {
-  return currentChunk_->getOffset() + currentChunk_->tell();
+  int64_t pos{};
+  IF_ERROR_LOG(currentChunk_->tell(pos));
+  return currentChunk_->getOffset() + pos;
 }
 
 int64_t DiskFile::getChunkPos() const {
-  return currentChunk_->tell();
+  int64_t pos{};
+  IF_ERROR_LOG(currentChunk_->tell(pos));
+  return pos;
 }
 
 int DiskFile::getChunkRange(int64_t& outChunkOffset, int64_t& outChunkSize) const {
