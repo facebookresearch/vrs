@@ -18,6 +18,7 @@
 
 #include <cstdio>
 
+#include "DiskFileChunk.hpp"
 #include "WriteFileHandler.h"
 
 namespace vrs {
@@ -29,17 +30,6 @@ using std::vector;
 class DiskFile : public WriteFileHandler {
  public:
   static const std::string& staticName();
-
-  struct Chunk {
-    FILE* file; // may be nullptr or not, but must be set when currentChunk_ points here!
-    string path; // path of this chunk
-    int64_t offset; // offset of this chunk in the file
-    int64_t size; // size of the chunk
-
-    bool contains(int64_t fileOffset) const {
-      return fileOffset >= offset && fileOffset < offset + size;
-    }
-  };
 
   DiskFile() = default;
   ~DiskFile() override;
@@ -160,16 +150,16 @@ class DiskFile : public WriteFileHandler {
 
  protected:
   int checkChunks(const vector<string>& chunks);
-  int openChunk(Chunk* chunk);
-  int closeChunk(Chunk* chunk);
+  int openChunk(DiskFileChunk* chunk);
+  int closeChunk(DiskFileChunk* chunk);
   int addChunk(const string& chunkFilePath);
   bool isLastChunk() const {
     return currentChunk_ == &chunks_.back();
   }
   bool trySetPosInCurrentChunk(int64_t offset);
 
-  vector<Chunk> chunks_; // all the chunks, when a VRS file is opened.
-  Chunk* currentChunk_{}; // if a file is opened, **always** points to a valid chunk within chunks_.
+  vector<DiskFileChunk> chunks_; // all the chunks, when a VRS file is opened.
+  DiskFileChunk* currentChunk_{}; // always points to the current chunk within chunks_.
   int filesOpenCount_{};
 
   size_t lastRWSize_{};

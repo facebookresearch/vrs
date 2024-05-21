@@ -16,8 +16,6 @@
 
 #include "DiskFile.h"
 
-#include <cerrno>
-
 #include <algorithm>
 #include <utility>
 
@@ -64,15 +62,8 @@ const string& DiskFile::getFileHandlerName() const {
 int DiskFile::close() {
   lastError_ = 0;
   for (auto& chunk : chunks_) {
-    if (chunk.file != nullptr) {
-      int error = 0;
-      if (!readOnly_) {
-        error = ::fflush(chunk.file);
-        if (error != 0 && lastError_ == 0) {
-          lastError_ = error;
-        }
-      }
-      error = os::fileClose(chunk.file);
+    if (chunk.isOpened()) {
+      int error = chunk.close();
       if (error != 0 && lastError_ == 0) {
         lastError_ = error;
       }
@@ -115,31 +106,31 @@ void DiskFile::forgetFurtherChunks(int64_t fileSize) {
   size_t currentIndex = static_cast<size_t>(currentChunk_ - chunks_.data());
   size_t minChunkCount = currentIndex + 1;
   // forget any chunk past our read location & given file size
-  while (chunks_.size() > minChunkCount && chunks_.back().offset >= fileSize) {
+  while (chunks_.size() > minChunkCount && chunks_.back().getOffset() >= fileSize) {
     chunks_.pop_back();
   }
   currentChunk_ = chunks_.data() + currentIndex; // in case resize re-allocated the vector
 }
 
 int DiskFile::skipForward(int64_t offset) {
-  int64_t chunkPos = os::fileTell(currentChunk_->file);
-  if (chunkPos + offset < currentChunk_->size) {
-    lastError_ = os::fileSeek(currentChunk_->file, offset, SEEK_CUR);
+  int64_t chunkPos = currentChunk_->tell();
+  if (chunkPos + offset < currentChunk_->getSize()) {
+    lastError_ = currentChunk_->seek(offset, SEEK_CUR);
     return lastError_;
   }
-  return setPos(currentChunk_->offset + chunkPos + offset);
+  return setPos(currentChunk_->getOffset() + chunkPos + offset);
 }
 
 int DiskFile::setPos(int64_t offset) {
   if (trySetPosInCurrentChunk(offset)) {
     return lastError_;
   }
-  Chunk* lastChunk = &chunks_.back();
-  Chunk* chunk = currentChunk_;
-  if (offset < chunk->offset) {
+  DiskFileChunk* lastChunk = &chunks_.back();
+  DiskFileChunk* chunk = currentChunk_;
+  if (offset < chunk->getOffset()) {
     chunk = &chunks_.front();
   }
-  while (chunk < lastChunk && offset >= chunk->offset + chunk->size) {
+  while (chunk < lastChunk && offset >= chunk->getOffset() + chunk->getSize()) {
     chunk++;
   }
   if (chunk != currentChunk_ && (openChunk(chunk) != 0 || trySetPosInCurrentChunk(offset))) {
@@ -155,9 +146,9 @@ int DiskFile::setPos(int64_t offset) {
 bool DiskFile::trySetPosInCurrentChunk(int64_t offset) {
   if (currentChunk_->contains(offset) ||
       (currentChunk_ == &chunks_.back() &&
-       (readOnly_ ? offset == currentChunk_->offset + currentChunk_->size
-                  : offset >= currentChunk_->offset))) {
-    lastError_ = os::fileSeek(currentChunk_->file, offset - currentChunk_->offset, SEEK_SET);
+       (readOnly_ ? offset == currentChunk_->getOffset() + currentChunk_->getSize()
+                  : offset >= currentChunk_->getOffset()))) {
+    lastError_ = currentChunk_->seek(offset - currentChunk_->getOffset(), SEEK_SET);
     return true;
   }
   return false;
@@ -167,15 +158,15 @@ int64_t DiskFile::getTotalSize() const {
   if (chunks_.empty()) {
     return 0;
   }
-  const Chunk& lastChunk = chunks_.back();
-  return lastChunk.offset + lastChunk.size;
+  const DiskFileChunk& lastChunk = chunks_.back();
+  return lastChunk.getOffset() + lastChunk.getSize();
 }
 
 vector<pair<string, int64_t>> DiskFile::getFileChunks() const {
   vector<pair<string, int64_t>> chunks;
   chunks.reserve(chunks_.size());
-  for (const Chunk& chunk : chunks_) {
-    chunks.emplace_back(chunk.path, chunk.size);
+  for (const DiskFileChunk& chunk : chunks_) {
+    chunks.emplace_back(chunk.getPath(), chunk.getSize());
   }
   return chunks;
 }
@@ -188,18 +179,16 @@ int DiskFile::read(void* buffer, size_t length) {
   }
   do {
     size_t requestSize = length - lastRWSize_;
-    size_t readSize =
-        ::fread(static_cast<char*>(buffer) + lastRWSize_, 1, requestSize, currentChunk_->file);
+    size_t readSize{};
+    lastError_ =
+        currentChunk_->read(static_cast<char*>(buffer) + lastRWSize_, requestSize, readSize);
     lastRWSize_ += readSize;
     if (readSize == requestSize) {
-      return 0; // success!
+      return lastError_;
     }
-    if (feof(currentChunk_->file) == 0 || isLastChunk()) {
-      // give up
-      if (ferror(currentChunk_->file) != 0) {
-        lastError_ = errno;
-      } else {
-        // Make sure that if we did not read enough bytes, we flag it
+    if (currentChunk_->eof() == 0 || isLastChunk()) {
+      // give up and make sure that if we did not read enough bytes, we flag it
+      if (lastError_ == 0) {
         lastError_ = DISKFILE_NOT_ENOUGH_DATA;
       }
       return lastError_;
@@ -208,7 +197,7 @@ int DiskFile::read(void* buffer, size_t length) {
     if (openChunk(currentChunk_ + 1) != 0) {
       return lastError_; // we can't open the next chunk
     }
-    lastError_ = os::fileSeek(currentChunk_->file, 0, SEEK_SET);
+    lastError_ = currentChunk_->seek(0, SEEK_SET);
   } while (lastError_ == 0);
   return lastError_;
 }
@@ -253,14 +242,7 @@ int DiskFile::write(const void* buffer, size_t length) {
   if (length == 0) {
     return lastError_;
   }
-  lastRWSize_ = ::fwrite(static_cast<const char*>(buffer), 1, length, currentChunk_->file);
-  if (lastRWSize_ != length) {
-    if (ferror(currentChunk_->file) != 0) {
-      lastError_ = errno;
-    } else {
-      lastError_ = DISKFILE_PARTIAL_WRITE_ERROR;
-    }
-  }
+  lastError_ = currentChunk_->write(buffer, length, lastRWSize_);
   return lastError_;
 }
 
@@ -277,22 +259,15 @@ int DiskFile::overwrite(const void* buffer, size_t length) {
   do {
     size_t requestSize = (length > lastRWSize_) ? length - lastRWSize_ : 0;
     if (!isLastChunk()) {
-      int64_t maxRequest = max<int64_t>(currentChunk_->size - os::fileTell(currentChunk_->file), 0);
+      int64_t maxRequest = max<int64_t>(currentChunk_->getSize() - currentChunk_->tell(), 0);
       requestSize = min<size_t>(requestSize, static_cast<size_t>(maxRequest));
     }
-    size_t writtenSize = ::fwrite(
-        static_cast<const char*>(buffer) + lastRWSize_, 1, requestSize, currentChunk_->file);
+    size_t writtenSize{};
+    lastError_ = currentChunk_->write(
+        static_cast<const char*>(buffer) + lastRWSize_, requestSize, writtenSize);
     lastRWSize_ += writtenSize;
-    if (writtenSize != requestSize) {
-      if (ferror(currentChunk_->file) != 0) {
-        lastError_ = errno;
-      } else {
-        lastError_ = DISKFILE_PARTIAL_WRITE_ERROR;
-      }
+    if (lastRWSize_ == length || lastError_ != 0) {
       return lastError_;
-    }
-    if (lastRWSize_ == length) {
-      return 0; // success!
     }
     // we reached the end of a chunk, but we have more to write in the next one
     openChunk(currentChunk_ + 1);
@@ -305,16 +280,15 @@ int DiskFile::truncate() {
     lastError_ = DISKFILE_READ_ONLY;
     return lastError_;
   }
-  int64_t chunkSize = os::fileTell(currentChunk_->file);
-  lastError_ = os::fileSetSize(currentChunk_->file, chunkSize);
+  int64_t chunkSize = currentChunk_->tell();
+  lastError_ = currentChunk_->truncate(chunkSize);
   if (lastError_ == 0) {
-    // update the current chunk's size, and all the following chunks' offset
-    currentChunk_->size = chunkSize;
+    // update the following chunks' offset
     size_t chunkIndex = static_cast<size_t>(currentChunk_ - chunks_.data());
-    int64_t nextChunkOffset = currentChunk_->offset + currentChunk_->size;
+    int64_t nextChunkOffset = currentChunk_->getOffset() + currentChunk_->getSize();
     while (++chunkIndex < chunks_.size()) {
-      chunks_[chunkIndex].offset = nextChunkOffset;
-      nextChunkOffset += chunks_[chunkIndex].size;
+      chunks_[chunkIndex].setOffset(nextChunkOffset);
+      nextChunkOffset += chunks_[chunkIndex].getSize();
     }
   }
   return lastError_;
@@ -325,7 +299,7 @@ int DiskFile::getLastError() const {
 }
 
 bool DiskFile::isEof() const {
-  return isLastChunk() && feof(currentChunk_->file) != 0;
+  return isLastChunk() && currentChunk_->eof() != 0;
 }
 
 int DiskFile::checkChunks(const vector<string>& chunks) {
@@ -336,28 +310,24 @@ int DiskFile::checkChunks(const vector<string>& chunks) {
       lastError_ = DISKFILE_FILE_NOT_FOUND;
       break;
     }
-    chunks_.push_back({nullptr, path, offset, chunkSize});
+    chunks_.emplace_back(path, offset, chunkSize);
     offset += chunkSize;
   }
   return lastError_;
 }
 
-int DiskFile::openChunk(Chunk* chunk) {
-  if (chunk->file != nullptr) {
+int DiskFile::openChunk(DiskFileChunk* chunk) {
+  if (chunk->isOpened()) {
     currentChunk_ = chunk;
-    ::rewind(chunk->file);
+    chunk->rewind();
     lastError_ = 0;
   } else {
-    FILE* newFile_ = os::fileOpen(chunk->path, readOnly_ ? "rb" : "rb+");
-    if (newFile_ != nullptr) {
+    lastError_ = chunk->open(readOnly_);
+    if (lastError_ == 0) {
       if (filesOpenCount_++ > kMaxFilesOpenCount && currentChunk_ != nullptr) {
         closeChunk(currentChunk_);
       }
       currentChunk_ = chunk;
-      currentChunk_->file = newFile_;
-      lastError_ = 0;
-    } else {
-      lastError_ = errno;
     }
   }
   return lastError_;
@@ -367,7 +337,7 @@ int DiskFile::addChunk() {
   if (chunks_.empty()) {
     return DISKFILE_NOT_OPEN;
   }
-  string newChunkPath = chunks_.front().path;
+  string newChunkPath = chunks_.front().getPath();
   // if the first file ends with "_1", the second chunk is numbered "_2", etc.
   if (helpers::endsWith(newChunkPath, "_1")) {
     newChunkPath.pop_back();
@@ -378,11 +348,10 @@ int DiskFile::addChunk() {
   return addChunk(newChunkPath);
 }
 
-int DiskFile::closeChunk(DiskFile::Chunk* chunk) {
+int DiskFile::closeChunk(DiskFileChunk* chunk) {
   int error = 0;
-  if (chunk->file != nullptr) {
-    error = os::fileClose(chunk->file);
-    chunk->file = nullptr;
+  if (chunk->isOpened()) {
+    error = chunk->close();
     filesOpenCount_--;
   }
   return error;
@@ -392,23 +361,19 @@ int DiskFile::addChunk(const string& chunkFilePath) {
   if (!chunks_.empty() && !isLastChunk()) {
     return DISKFILE_INVALID_STATE;
   }
-  FILE* newFile = os::fileOpen(chunkFilePath, "wb");
-  if (newFile == nullptr) {
-    lastError_ = errno;
+  DiskFileChunk newChunk;
+  lastError_ = newChunk.create(chunkFilePath);
+  if (lastError_ != SUCCESS) {
     return lastError_;
   }
-#if IS_ANDROID_PLATFORM()
-  const size_t kBufferingSize = 128 * 1024;
-  IF_ERROR_LOG(setvbuf(newFile, nullptr, _IOFBF, kBufferingSize));
-#endif
   filesOpenCount_++;
   int64_t chunkOffset = 0;
-  if (currentChunk_ != nullptr && currentChunk_->file != nullptr) {
-    currentChunk_->size = os::fileTell(currentChunk_->file);
-    lastError_ = ::fflush(currentChunk_->file);
-    if (lastError_ != 0 || currentChunk_->size < 0) {
+  if (currentChunk_ != nullptr && currentChunk_->isOpened()) {
+    currentChunk_->setSize(currentChunk_->tell());
+    lastError_ = currentChunk_->flush();
+    if (lastError_ != 0 || currentChunk_->getSize() < 0) {
       // We're s***d: the last chunk is messed up, no point in trying to use the new one
-      os::fileClose(newFile);
+      newChunk.close();
       os::remove(chunkFilePath);
       return lastError_;
     }
@@ -418,35 +383,36 @@ int DiskFile::addChunk(const string& chunkFilePath) {
       XR_VERIFY(
           error == 0,
           "Error closing '{}': {}, {}",
-          currentChunk_->path,
+          currentChunk_->getPath(),
           error,
           errorCodeToMessage(error));
     }
-    chunkOffset = currentChunk_->offset + currentChunk_->size;
+    chunkOffset = currentChunk_->getOffset() + currentChunk_->getSize();
   }
-  chunks_.push_back({newFile, chunkFilePath, chunkOffset, 0});
+  newChunk.setOffset(chunkOffset);
+  chunks_.push_back(std::move(newChunk));
   currentChunk_ = &chunks_.back();
   lastError_ = 0;
   return 0;
 }
 
 int64_t DiskFile::getPos() const {
-  return currentChunk_->offset + os::fileTell(currentChunk_->file);
+  return currentChunk_->getOffset() + currentChunk_->tell();
 }
 
 int64_t DiskFile::getChunkPos() const {
-  return os::fileTell(currentChunk_->file);
+  return currentChunk_->tell();
 }
 
 int DiskFile::getChunkRange(int64_t& outChunkOffset, int64_t& outChunkSize) const {
   if (currentChunk_ != nullptr) {
-    Chunk* chunk = currentChunk_;
+    DiskFileChunk* chunk = currentChunk_;
     // if we're at the edge of a chunk, return the following chunk
-    if (getChunkPos() == chunk->size && !isLastChunk()) {
+    if (getChunkPos() == chunk->getSize() && !isLastChunk()) {
       chunk++;
     }
-    outChunkOffset = chunk->offset;
-    outChunkSize = chunk->size;
+    outChunkOffset = chunk->getOffset();
+    outChunkSize = chunk->getSize();
     return 0;
   }
   return DISKFILE_NOT_OPEN;
@@ -456,7 +422,7 @@ bool DiskFile::getCurrentChunk(string& outChunkPath, size_t& outChunkIndex) cons
   if (currentChunk_ == nullptr) {
     return false;
   }
-  outChunkPath = currentChunk_->path;
+  outChunkPath = currentChunk_->getPath();
   outChunkIndex = static_cast<size_t>(currentChunk_ - chunks_.data());
   return true;
 }
@@ -579,10 +545,10 @@ int AtomicDiskFile::create(const std::string& newFilePath) {
 }
 
 int AtomicDiskFile::close() {
-  if (chunks_.empty() || finalName_.empty() || finalName_ == chunks_.front().path) {
+  if (chunks_.empty() || finalName_.empty() || finalName_ == chunks_.front().getPath()) {
     return DiskFile::close();
   }
-  string currentName = chunks_.front().path;
+  string currentName = chunks_.front().getPath();
   IF_ERROR_RETURN(DiskFile::close());
   int retry = 3;
   int status = 0;
@@ -598,7 +564,7 @@ void AtomicDiskFile::abort() {
     vector<string> chunkPaths;
     chunkPaths.reserve(chunks_.size());
     for (const auto& chunk : chunks_) {
-      chunkPaths.emplace_back(chunk.path);
+      chunkPaths.emplace_back(chunk.getPath());
     }
     DiskFile::close();
     for (const string& path : chunkPaths) {
