@@ -20,6 +20,7 @@
 #include <cstdio>
 
 #include <vrs/FileHandler.h>
+#include <vrs/os/CompilerAttributes.h>
 #include <vrs/os/Utils.h>
 
 namespace vrs {
@@ -42,7 +43,7 @@ class DiskFileChunk {
   ~DiskFileChunk() {
     close();
   }
-  int create(const string& newPath, const map<string, string>& options) {
+  int create(const string& newPath, MAYBE_UNUSED const map<string, string>& options) {
     close();
     file_ = os::fileOpen(newPath, "wb");
     if (file_ == nullptr) {
@@ -58,7 +59,7 @@ class DiskFileChunk {
     return SUCCESS;
 #endif
   }
-  int open(bool readOnly, const map<string, string>& options) {
+  int open(bool readOnly, MAYBE_UNUSED const map<string, string>& options) {
     if (file_ != nullptr) {
       os::fileClose(file_);
     }
