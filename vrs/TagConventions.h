@@ -138,6 +138,25 @@ namespace tag_conventions {
   // * Fill it with the right intensity target when using dynamic exposure
   constexpr const char* kDynamicExposureTarget = "iot_dynamic_exposure_target";
 
+// Stream semantic conventions
+
+  /// Tag name to hint how to normalize a stream's images
+  constexpr const char* kImageSemantic = "image_semantic";
+
+    /// Possible values for kImageSemantic
+    constexpr const char* kImageSemanticCamera = "image_semantic_camera"; ///< Regular camera
+    constexpr const char* kImageSemanticDepth = "image_semantic_depth"; ///< Depth camera
+    constexpr const char* kImageSemanticObjectClassSegmentation =
+        "image_semantic_object_class_segmentation"; ///< Object class segmentation
+    constexpr const char* kImageSemanticObjectIdSegmentation =
+        "image_semantic_object_id_segmentation"; ///< Object ID segmentation
+
+  /// When kImageSemantic == kImageSemanticDepth
+  /// Tag names to provide depth range values. float values expected as string.
+  /// Hint for depth image rendering, actual value range may be smaller *or* larger.
+  constexpr const char* kRenderDepthImagesRangeMin = "render_depth_images_range_min";
+  constexpr const char* kRenderDepthImagesRangeMax = "render_depth_images_range_max";
+
 // Helper functions
   /// Convert a set of string tags to json.
   /// @param tags: A set of string tags.
