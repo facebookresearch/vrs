@@ -931,6 +931,29 @@ PixelFrame::getStreamNormalizeOptions(RecordFileReader& reader, StreamId id, Pix
       return NormalizeOptions(ImageSemantic::Camera);
     }
   }
+  /// Legacy streams handling, using RecordableTypeId as proxy
+  switch (id.getTypeId()) {
+    case RecordableTypeId::DepthCameraRecordableClass:
+    case RecordableTypeId::RgbCameraRecordableClass:
+    case RecordableTypeId::GroundTruthRecordableClass:
+      if (format == PixelFormat::DEPTH32F) {
+        return {ImageSemantic::Depth, kDefaultDepthMin, kDefaultDepthMax};
+      } else if (format == PixelFormat::GREY16) {
+        const string& flavor = reader.getFlavor(id);
+        if (!flavor.empty()) {
+          // Yes, the flavor names are counter intuitive, but...
+          if (flavor.find("SegmentationObjectID") != string::npos) {
+            return NormalizeOptions(ImageSemantic::ObjectClassSegmentation);
+          } else if (flavor.find("SegmentationInstanceID") != string::npos) {
+            return NormalizeOptions(ImageSemantic::ObjectIdSegmentation);
+          }
+        }
+        return NormalizeOptions(ImageSemantic::ObjectIdSegmentation);
+      }
+      break;
+    default:
+      break;
+  }
   return NormalizeOptions(ImageSemantic::Camera);
 }
 
