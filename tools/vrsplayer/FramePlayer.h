@@ -93,6 +93,7 @@ class FramePlayer : public QObject, public VideoRecordFormatStreamPlayer {
   std::mutex frameMutex_;
   vector<shared_ptr<PixelFrame>> inputFrames_;
   vector<shared_ptr<PixelFrame>> convertedframes_;
+  vrs::utils::NormalizeOptions normalizeOptions_;
   bool needsConvertedFrame_{false};
   vrs::ImageFormat imageFormat_{vrs::ImageFormat::UNDEFINED};
   StreamId id_;

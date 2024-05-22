@@ -18,13 +18,16 @@
 
 #include <cstring>
 
-#include <atomic>
+#include <algorithm>
+#include <random>
 
 #define DEFAULT_LOG_CHANNEL "PixelFrame"
 #include <logging/Checks.h>
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/RecordFileReader.h>
+#include <vrs/TagConventions.h>
 #include <vrs/helpers/FileMacros.h>
 #include <vrs/helpers/Throttler.h>
 #include <vrs/utils/BufferRecordReader.hpp>
@@ -42,7 +45,7 @@ utils::Throttler& getThrottler() {
 
 const uint8_t kNaNPixel = 0;
 
-/// normalize floating point pixels to grey8
+/// normalize float or double to grey8, with dynamic range calculation
 template <class Float>
 void normalizeBuffer(const uint8_t* pixelPtr, uint8_t* outPtr, uint32_t pixelCount) {
   const Float* srcPtr = reinterpret_cast<const Float*>(pixelPtr);
@@ -84,6 +87,25 @@ void normalizeBuffer(const uint8_t* pixelPtr, uint8_t* outPtr, uint32_t pixelCou
         outPtr[pixelIndex] = static_cast<uint8_t>((pixel - min) * factor);
       }
     }
+  }
+}
+
+/// normalize float to grey8, with interpolation for provided range, which values might exceed
+void normalizeBufferWithRange(
+    const uint8_t* pixelPtr,
+    uint8_t* outPtr,
+    uint32_t pixelCount,
+    float min,
+    float max) {
+  const float* srcPtr = reinterpret_cast<const float*>(pixelPtr);
+  const float factor = numeric_limits<uint8_t>::max() / (max - min);
+  for (uint32_t pixelIndex = 0; pixelIndex < pixelCount; ++pixelIndex) {
+    const float pixel = srcPtr[pixelIndex];
+    outPtr[pixelIndex] = isnan(pixel)
+        ? kNaNPixel
+        : (pixel <= min       ? 0
+               : pixel >= max ? 255
+                              : static_cast<uint8_t>((pixel - min) * factor));
   }
 }
 
@@ -412,18 +434,29 @@ bool PixelFrame::readRawFrame(
 void PixelFrame::normalizeFrame(
     const shared_ptr<PixelFrame>& sourceFrame,
     shared_ptr<PixelFrame>& outFrame,
-    bool grey16supported) {
-  if (!sourceFrame->normalizeFrame(outFrame, grey16supported)) {
+    bool grey16supported,
+    const NormalizeOptions& options) {
+  if (!sourceFrame->normalizeFrame(outFrame, grey16supported, options)) {
     outFrame = sourceFrame;
   }
 }
 
 PixelFormat PixelFrame::getNormalizedPixelFormat(
     PixelFormat sourcePixelFormat,
-    bool grey16supported) {
-  return ImageContentBlockSpec::getChannelCountPerPixel(sourcePixelFormat) > 1 ? PixelFormat::RGB8
-      : grey16supported                                                        ? PixelFormat::GREY16
-                                                                               : PixelFormat::GREY8;
+    bool grey16supported,
+    const NormalizeOptions& options) {
+  PixelFormat format = sourcePixelFormat;
+  if ((options.semantic == ImageSemantic::ObjectClassSegmentation ||
+       options.semantic == ImageSemantic::ObjectIdSegmentation) &&
+      sourcePixelFormat == PixelFormat::GREY16) {
+    format = PixelFormat::RGB8;
+  } else {
+    format = ImageContentBlockSpec::getChannelCountPerPixel(sourcePixelFormat) > 1
+        ? PixelFormat::RGB8
+        : grey16supported ? PixelFormat::GREY16
+                          : PixelFormat::GREY8;
+  }
+  return format;
 }
 
 bool PixelFrame::inplaceRgbaToRgb() {
@@ -478,20 +511,51 @@ inline uint8_t clipToUint8(int value) {
   return value < 0 ? 0 : (value > 255 ? 255 : static_cast<uint8_t>(value));
 }
 
-bool PixelFrame::normalizeFrame(shared_ptr<PixelFrame>& normalizedFrame, bool grey16supported)
-    const {
+bool PixelFrame::normalizeFrame(
+    shared_ptr<PixelFrame>& normalizedFrame,
+    bool grey16supported,
+    const NormalizeOptions& options) const {
   uint16_t bitsToShift = 0;
   uint32_t componentCount = 0;
   PixelFormat srcFormat = imageSpec_.getPixelFormat();
   // See if we can convert to something simple enough using Ocean
-  PixelFormat targetPixelFormat = getNormalizedPixelFormat(srcFormat, grey16supported);
+  PixelFormat targetPixelFormat = getNormalizedPixelFormat(srcFormat, grey16supported, options);
   if (srcFormat == targetPixelFormat) {
     return false;
   }
   if (normalizedFrame.get() == this) {
     normalizedFrame.reset();
   }
-  if (normalizeToPixelFormat(normalizedFrame, targetPixelFormat)) {
+  if (options.semantic == ImageSemantic::Depth && getPixelFormat() == PixelFormat::DEPTH32F &&
+      targetPixelFormat == PixelFormat::GREY8) {
+    if (options.min < options.max) {
+      init(normalizedFrame, targetPixelFormat, getWidth(), getHeight());
+      normalizeBufferWithRange(
+          rdata(), normalizedFrame->wdata(), getWidth() * getHeight(), options.min, options.max);
+      return true;
+    }
+  } else if (
+      (options.semantic == ImageSemantic::ObjectClassSegmentation ||
+       options.semantic == ImageSemantic::ObjectIdSegmentation) &&
+      getPixelFormat() == PixelFormat::GREY16 && targetPixelFormat == PixelFormat::RGB8) {
+    init(normalizedFrame, targetPixelFormat, getWidth(), getHeight());
+    const vector<RGBColor>& colors = options.semantic == ImageSemantic::ObjectClassSegmentation
+        ? getGetObjectClassSegmentationColors()
+        : getGetObjectIdSegmentationColors();
+    if (colors.size() >= (1UL << 16)) {
+      uint32_t srcStride = getStride();
+      uint32_t dstStride = normalizedFrame->getStride();
+      for (uint32_t h = 0; h < getHeight(); ++h) {
+        const uint16_t* srcLine = data<uint16_t>(srcStride * h);
+        RGBColor* dstLine = normalizedFrame->data<RGBColor>(dstStride * h);
+        for (uint32_t w = 0; w < getWidth(); ++w) {
+          dstLine[w] = colors[srcLine[w]];
+        }
+      }
+      return true;
+    }
+  }
+  if (normalizeToPixelFormat(normalizedFrame, targetPixelFormat, options)) {
     return true;
   }
   PixelFormat format = srcFormat;
@@ -765,11 +829,117 @@ bool PixelFrame::psnrCompare(const PixelFrame& other, double& outPsnr) {
   return true;
 }
 
+inline uint8_t pToColor(uint32_t p, uint32_t parts) {
+  return p > 0 ? p * (256 / parts) - 1 : 0;
+}
+
+// We want colors to be the same everywhere, so we need the same random numbers everywhere!
+static uint32_t simple_random() {
+  static uint32_t state{716172701};
+  state = state * 1664525u + 1013904223u;
+  return state;
+}
+
+// ...and the same shuffle algorithm. Fisher–Yates shuffle
+static void shuffle(PixelFrame::RGBColor* colors, uint32_t count) {
+  for (uint32_t i = count - 1; i >= 1; --i) {
+    uint32_t j = simple_random() % (i + 1);
+    swap(colors[i], colors[j]);
+  }
+}
+
+/// This code builds a set of colors in successive batches, each with the most distinct colors
+/// available, except for straight black & white.
+/// The first batch doesn't split RGB bytes, giving us 2^3 - 2 colors (less black & white)
+/// The second batch splits each RGB byte in 2 parts, giving us 3^3 - 8 colors: 25 colors total.
+/// The third batch splits each RGB byte in 4 parts: 5^3 - 3^3 colors: 123 colors total.
+/// The 4th batch splits each RGB byte in 8 parts: 9^3 - 5^3 colors: 727 colors total.
+/// The 5th batch splits each RGB byte in 16 parts: 17^3 - 9^3 colors: 4911 colors total.
+/// The 6th batch splits each RGB byte in 32 parts: 33^3 - 17^3 colors: 35935 colors total.
+/// We randomize each batch, so colors are mixed up as much as possible.
+/// In total, we generate 17^3 - black & white, or 35935 colors, which should be enough!
+static vector<PixelFrame::RGBColor> makeObjectIdSegmentationColors() {
+  const uint16_t lastBatch = 6;
+  vector<PixelFrame::RGBColor> colors;
+  size_t maxSize = 1 << 16;
+  colors.reserve(maxSize);
+  uint32_t parts = 1;
+  for (uint32_t batch = 1; batch <= lastBatch; ++batch, parts *= 2) {
+    uint32_t previousSize = colors.size();
+    uint32_t values = parts + 1;
+    for (uint32_t r = 0; r < values; ++r) {
+      uint8_t rv = pToColor(r, parts);
+      for (uint32_t g = 0; g < values; ++g) {
+        uint8_t gv = pToColor(g, parts);
+        for (uint32_t b = 0; b < values; ++b) {
+          if ((r & 1) + (g & 1) + (b & 1) != 0) {
+            uint8_t bv = pToColor(b, parts);
+            colors.emplace_back(rv, gv, bv);
+          }
+        }
+      }
+    }
+    if (previousSize == 0) {
+      colors.pop_back(); // remove white (black was already skipped!)
+      shuffle(colors.data(), colors.size());
+    } else {
+      shuffle(colors.data() + previousSize, colors.size() - previousSize);
+    }
+  }
+  colors.resize(maxSize);
+  return colors;
+}
+
+const vector<PixelFrame::RGBColor>& PixelFrame::getGetObjectIdSegmentationColors() {
+  static const vector<PixelFrame::RGBColor> sColors = makeObjectIdSegmentationColors();
+  return sColors;
+}
+
+const vector<PixelFrame::RGBColor>& PixelFrame::getGetObjectClassSegmentationColors() {
+  return getGetObjectIdSegmentationColors();
+}
+
+static float asFloat(const string& strFloat, float defaultValue) {
+  if (strFloat.empty()) {
+    return defaultValue;
+  }
+  try {
+    return stod(strFloat);
+  } catch (logic_error&) {
+    return defaultValue;
+  }
+}
+
+static const float kDefaultDepthMin = 0;
+static const float kDefaultDepthMax = 6;
+
+NormalizeOptions
+PixelFrame::getStreamNormalizeOptions(RecordFileReader& reader, StreamId id, PixelFormat format) {
+  string imageSemantic = reader.getTag(id, tag_conventions::kImageSemantic);
+  if (!imageSemantic.empty()) {
+    if (imageSemantic == tag_conventions::kImageSemanticObjectClassSegmentation) {
+      return NormalizeOptions(ImageSemantic::ObjectClassSegmentation);
+    } else if (imageSemantic == tag_conventions::kImageSemanticObjectIdSegmentation) {
+      return NormalizeOptions(ImageSemantic::ObjectIdSegmentation);
+    } else if (imageSemantic == tag_conventions::kImageSemanticDepth) {
+      float min =
+          asFloat(reader.getTag(tag_conventions::kRenderDepthImagesRangeMin), kDefaultDepthMin);
+      float max =
+          asFloat(reader.getTag(tag_conventions::kRenderDepthImagesRangeMax), kDefaultDepthMax);
+      return {ImageSemantic::Depth, min, max};
+    } else if (imageSemantic == tag_conventions::kImageSemanticCamera) {
+      return NormalizeOptions(ImageSemantic::Camera);
+    }
+  }
+  return NormalizeOptions(ImageSemantic::Camera);
+}
+
 #if IS_VRS_OSS_CODE()
 
 bool PixelFrame::normalizeToPixelFormat(
     shared_ptr<PixelFrame>& convertedFrame,
-    PixelFormat targetPixelFormat) const {
+    PixelFormat targetPixelFormat,
+    const NormalizeOptions& options) const {
   return false;
 }
 

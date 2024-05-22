@@ -96,6 +96,10 @@ bool FramePlayer::onImageRead(
   }
   // Processing was not sent in the background, complete here!
   if (firstImage_) {
+    if (frameValid) {
+      normalizeOptions_ = PixelFrame::getStreamNormalizeOptions(
+          *record.fileReader, record.streamId, frame->getPixelFormat());
+    }
     fmt::print(
         "Found '{} - {}': {}, {}",
         record.streamId.getNumericName(),
@@ -141,7 +145,7 @@ void FramePlayer::convertFrame(shared_ptr<PixelFrame>& frame) {
     makeBlankFrame(frame);
   } else {
     shared_ptr<PixelFrame> convertedFrame = needsConvertedFrame_ ? getFrame(false) : nullptr;
-    PixelFrame::normalizeFrame(frame, convertedFrame, false);
+    PixelFrame::normalizeFrame(frame, convertedFrame, false, normalizeOptions_);
     needsConvertedFrame_ = (frame != convertedFrame); // for next time!
     if (needsConvertedFrame_) {
       recycle(frame, true);
@@ -231,7 +235,7 @@ bool FramePlayer::saveFrame(
     shared_ptr<PixelFrame> frame;
     if (PixelFrame::readRawFrame(frame, record.reader, spec)) {
       shared_ptr<PixelFrame> normalizedFrame;
-      PixelFrame::normalizeFrame(frame, normalizedFrame, true);
+      PixelFrame::normalizeFrame(frame, normalizedFrame, true, normalizeOptions_);
       if (normalizedFrame->writeAsPng(saveNextFramePath_) == 0) {
         XR_LOGI("Saved raw frame as '{}'", saveNextFramePath_);
       }

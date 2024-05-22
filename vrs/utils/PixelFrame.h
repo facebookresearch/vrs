@@ -23,6 +23,7 @@
 #include <QtCore/QSize>
 #endif
 
+#include <vrs/ForwardDefinitions.h>
 #include <vrs/RecordFormat.h>
 #include <vrs/RecordReaders.h>
 #include <vrs/utils/DecoderFactory.h>
@@ -48,6 +49,25 @@ struct CompressionOptions {
   /// Valid values are, from faster to slower speed: 1:lightning 2:thunder 3:falcon
   /// 4:cheetah 5:hare 6:wombat 7:squirrel 8:kitten 9:tortoise.
   int jxlEffort{3};
+};
+
+enum class ImageSemantic : uint16_t {
+  Undefined,
+  Camera, ///< Visual data (regular image)
+  ObjectClassSegmentation, ///< Segmentation data, one value per object class.
+  ObjectIdSegmentation, ///< Segmentation data, one value per object instance.
+  Depth, ///< Depth information
+};
+
+struct NormalizeOptions {
+  NormalizeOptions() = default;
+  explicit NormalizeOptions(ImageSemantic semantic) : semantic{semantic} {}
+  NormalizeOptions(ImageSemantic semantic, float min, float max)
+      : semantic{semantic}, min{min}, max{max} {}
+
+  ImageSemantic semantic{ImageSemantic::Undefined};
+  float min{0};
+  float max{0};
 };
 
 /// Helper class to read & convert images read using RecordFormat into simpler, but maybe degraded,
@@ -273,13 +293,20 @@ class PixelFrame {
   static void normalizeFrame(
       const shared_ptr<PixelFrame>& sourceFrame,
       shared_ptr<PixelFrame>& outFrame,
-      bool grey16supported);
+      bool grey16supported,
+      const NormalizeOptions& options = {});
 
   /// Convert the internal frame to a simpler format, if necessary.
   /// Returns false if the frame could not be converted, or the format doesn't need conversion.
-  bool normalizeFrame(shared_ptr<PixelFrame>& normalizedFrame, bool grey16supported) const;
+  bool normalizeFrame(
+      shared_ptr<PixelFrame>& normalizedFrame,
+      bool grey16supported,
+      const NormalizeOptions& options = {}) const;
 
-  static PixelFormat getNormalizedPixelFormat(PixelFormat sourcePixelFormat, bool grey16supported);
+  static PixelFormat getNormalizedPixelFormat(
+      PixelFormat sourcePixelFormat,
+      bool grey16supported,
+      const NormalizeOptions& options = {});
 
   /// Conversion in place from RGBA to RGB (no memory allocation)
   /// @return True if the conversion was performed, false if source wasn't an RGBA frame.
@@ -304,14 +331,27 @@ class PixelFrame {
   /// supported (grey8 or rgb8), and the comparison succeeded.
   bool msssimCompare(const PixelFrame& other, double& msssim);
 
+  static NormalizeOptions
+  getStreamNormalizeOptions(RecordFileReader& reader, StreamId id, PixelFormat format);
+
+  struct RGBColor {
+    RGBColor() = default;
+    RGBColor(uint8_t r, uint8_t g, uint8_t b) : r{r}, g{g}, b{b} {}
+    uint8_t r{}, g{}, b{};
+  };
+  static const vector<RGBColor>& getGetObjectIdSegmentationColors();
+  static const vector<RGBColor>& getGetObjectClassSegmentationColors();
+
  private:
   /// Conversion from an external buffer
   /// @param convertedFrame: frame to convert to. May not be allocated yet.
   /// @param targetPixelFormat: pixel format to target. Expect GREY8, GREY16 and RGB8 to work.
   /// @return True if the conversion happened, otherwise, the buffer is left in an undefined state.
   /// Note that the actual conversion format is set in imageSpec_, and it could be different...
-  bool normalizeToPixelFormat(shared_ptr<PixelFrame>& outFrame, PixelFormat targetPixelFormat)
-      const;
+  bool normalizeToPixelFormat(
+      shared_ptr<PixelFrame>& outFrame,
+      PixelFormat targetPixelFormat,
+      const NormalizeOptions& options) const;
 
  private:
   ImageContentBlockSpec imageSpec_;
