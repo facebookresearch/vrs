@@ -934,6 +934,7 @@ PixelFrame::getStreamNormalizeOptions(RecordFileReader& reader, StreamId id, Pix
   /// Legacy streams handling, using RecordableTypeId as proxy
   switch (id.getTypeId()) {
     case RecordableTypeId::DepthCameraRecordableClass:
+    case RecordableTypeId::GroundTruthDepthRecordableClass:
     case RecordableTypeId::RgbCameraRecordableClass:
     case RecordableTypeId::GroundTruthRecordableClass:
       if (format == PixelFormat::DEPTH32F) {
