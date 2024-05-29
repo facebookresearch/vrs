@@ -19,7 +19,6 @@
 #include <cstring>
 
 #include <algorithm>
-#include <random>
 
 #define DEFAULT_LOG_CHANNEL "PixelFrame"
 #include <logging/Checks.h>
@@ -835,7 +834,7 @@ inline uint8_t pToColor(uint32_t p, uint32_t parts) {
 
 // We want colors to be the same everywhere, so we need the same random numbers everywhere!
 static uint32_t simple_random() {
-  static uint32_t state{716172701};
+  static uint32_t state{716172700};
   state = state * 1664525u + 1013904223u;
   return state;
 }
@@ -850,19 +849,22 @@ static void shuffle(PixelFrame::RGBColor* colors, uint32_t count) {
 
 /// This code builds a set of colors in successive batches, each with the most distinct colors
 /// available, except for straight black & white.
-/// The first batch doesn't split RGB bytes, giving us 2^3 - 2 colors (less black & white)
+/// 0 is black, and 0xffff is white, guaranteed.
+/// The first batch doesn't split RGB bytes, giving us 2^3 - 1 colors (white excluded)
 /// The second batch splits each RGB byte in 2 parts, giving us 3^3 - 8 colors: 25 colors total.
 /// The third batch splits each RGB byte in 4 parts: 5^3 - 3^3 colors: 123 colors total.
 /// The 4th batch splits each RGB byte in 8 parts: 9^3 - 5^3 colors: 727 colors total.
 /// The 5th batch splits each RGB byte in 16 parts: 17^3 - 9^3 colors: 4911 colors total.
 /// The 6th batch splits each RGB byte in 32 parts: 33^3 - 17^3 colors: 35935 colors total.
 /// We randomize each batch, so colors are mixed up as much as possible.
-/// In total, we generate 17^3 - black & white, or 35935 colors, which should be enough!
+/// In total, we generate 17^3 - white, or 35936 colors, which should be enough!
+/// All the remaining values are black.
 static vector<PixelFrame::RGBColor> makeObjectIdSegmentationColors() {
   const uint16_t lastBatch = 6;
   vector<PixelFrame::RGBColor> colors;
-  size_t maxSize = 1 << 16;
-  colors.reserve(maxSize);
+  constexpr size_t kMaxSize = 1 << 16;
+  colors.reserve(kMaxSize);
+  colors.emplace_back(0, 0, 0);
   uint32_t parts = 1;
   for (uint32_t batch = 1; batch <= lastBatch; ++batch, parts *= 2) {
     uint32_t previousSize = colors.size();
@@ -879,14 +881,13 @@ static vector<PixelFrame::RGBColor> makeObjectIdSegmentationColors() {
         }
       }
     }
-    if (previousSize == 0) {
-      colors.pop_back(); // remove white (black was already skipped!)
-      shuffle(colors.data(), colors.size());
-    } else {
-      shuffle(colors.data() + previousSize, colors.size() - previousSize);
+    if (previousSize == 1) {
+      colors.pop_back(); // remove white
     }
+    shuffle(colors.data() + previousSize, colors.size() - previousSize);
   }
-  colors.resize(maxSize);
+  colors.resize(kMaxSize);
+  colors[kMaxSize - 1] = PixelFrame::RGBColor(255, 255, 255); // white
   return colors;
 }
 

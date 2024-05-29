@@ -166,3 +166,16 @@ TEST_F(PixelFrameTest, writeReadPng) {
     reader.readAllRecords();
   }
 }
+
+using RGBColor = vrs::utils::PixelFrame::RGBColor;
+
+inline bool equal(const RGBColor& left, const RGBColor& right) {
+  return left.b == right.b && left.g == right.g && left.r == right.r;
+}
+
+TEST_F(PixelFrameTest, colorTableTest) {
+  const vector<RGBColor>& colors = PixelFrame::getGetObjectIdSegmentationColors();
+  ASSERT_GT(colors.size(), 0xffff);
+  EXPECT_TRUE(equal(colors[0], RGBColor()));
+  EXPECT_TRUE(equal(colors[0xffff], RGBColor(255, 255, 255)));
+}
