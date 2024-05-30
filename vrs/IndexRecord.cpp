@@ -41,6 +41,10 @@ using namespace vrs::IndexRecord;
 
 const uint32_t kMaxBatchSize = 100000;
 
+// Maximum number of records in a single index record. To avoid a potentially corrupt file that
+// requests too much memory, we limit the maximum record count to this arbitrarily large number.
+constexpr size_t kMaxRecordCount = 500000000;
+
 // Compression presets, in increasingly tighter settings, starting with NONE, which will be only
 // used when there are too few index entries for compression to reasonably work...
 #if IS_ANDROID_PLATFORM()
@@ -351,6 +355,10 @@ int IndexRecord::Reader::readClassicIndexRecord(
   uint32_t recordCount = recordCountRaw.get();
   const size_t indexSize = indexRecordPayloadSize - preludeSize;
   if (recordCount > 0) {
+    if (recordCount > kMaxRecordCount) {
+      XR_LOGE("Too many records in index ({} > {}). Corrupt index?", recordCount, kMaxRecordCount);
+      return INDEX_RECORD_ERROR;
+    }
     vector<DiskRecordInfo> recordStructs(recordCount);
     int status = 0;
     if (uncompressedSize > 0) {
@@ -480,6 +488,10 @@ int IndexRecord::Reader::readSplitIndexRecord(
       XR_LOGW("No index data to read.");
     }
     return 0;
+  } else if (maxRecordInfoCount > kMaxRecordCount) {
+    XR_LOGE(
+        "Too many records in index ({} > {}). Corrupt index?", maxRecordInfoCount, kMaxRecordCount);
+    return INDEX_RECORD_ERROR;
   }
   vector<DiskRecordInfo> recordStructs(maxRecordInfoCount);
   if (uncompressedSize == 0) { // not compressed
