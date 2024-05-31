@@ -71,41 +71,23 @@ string vrs::os::getOsFingerPrint() {
   string osFingerprintString;
   struct utsname linuxNames;
   if (uname(&linuxNames) == 0) {
-    osFingerprintString = linuxNames.sysname;
-    osFingerprintString += " ";
-    osFingerprintString += linuxNames.release;
-    osFingerprintString += ", ";
-    osFingerprintString += linuxNames.machine;
-    osFingerprintString += ", ";
-    osFingerprintString += linuxNames.version;
+    osFingerprintString = fmt::format(
+        "{} {}, {}, {}",
+        linuxNames.sysname,
+        linuxNames.release,
+        linuxNames.machine,
+        linuxNames.version);
   } else {
     osFingerprintString = "Linux version: <Unknown>";
   }
   return osFingerprintString;
 
 #elif IS_WINDOWS_PLATFORM()
-  DWORD dwVersion = 0;
-  DWORD dwMajorVersion = 0;
-  DWORD dwMinorVersion = 0;
-  DWORD dwBuild = 0;
-  dwVersion = GetVersion();
-
-  // Get the Windows version.
-  dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
-  dwMinorVersion = (DWORD)(HIBYTE(LOWORD(dwVersion)));
-
-  // Get the build number.
-  if (dwVersion < 0x80000000) {
-    dwBuild = (DWORD)(HIWORD(dwVersion));
-  }
-  string osFingerprintString;
-  osFingerprintString = "Windows ";
-  osFingerprintString += to_string(dwMajorVersion);
-  osFingerprintString += ".";
-  osFingerprintString += to_string(dwMinorVersion);
-  osFingerprintString += ", build #";
-  osFingerprintString += to_string(dwBuild);
-  return osFingerprintString;
+  DWORD dwVersion = GetVersion();
+  DWORD dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
+  DWORD dwMinorVersion = (DWORD)(HIBYTE(LOWORD(dwVersion)));
+  DWORD dwBuild = (dwVersion < 0x80000000) ? (DWORD)(HIWORD(dwVersion)) : 0;
+  return fmt::format("Windows {}.{}, build #{}", dwMajorVersion, dwMinorVersion, dwBuild);
 
 #else
   XR_LOGW("OS fingerprint not implemented for this OS.");
