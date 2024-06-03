@@ -283,9 +283,9 @@ TEST_F(SimpleFileHandlerTest, openFileWithJsonPath) {
 
 TEST_F(SimpleFileHandlerTest, openFileWithJsonPathForExistingFiles) {
   vrs::RecordFileReader file;
-  string kChunkedFile = coretech::getTestDataDir() + "/VRS_Files/chunks.vrs";
-  string kChunkedFile2 = coretech::getTestDataDir() + "/VRS_Files/chunks.vrs_1";
-  string kChunkedFile3 = coretech::getTestDataDir() + "/VRS_Files/chunks.vrs_2";
+  string kChunkedFile = os::pathJoin(coretech::getTestDataDir(), "VRS_Files/chunks.vrs");
+  string kChunkedFile2 = os::pathJoin(coretech::getTestDataDir(), "VRS_Files/chunks.vrs_1");
+  string kChunkedFile3 = os::pathJoin(coretech::getTestDataDir(), "VRS_Files/chunks.vrs_2");
   const string jsonPath = FileSpec({kChunkedFile, kChunkedFile2, kChunkedFile3}).toJson();
   ASSERT_EQ(file.openFile(jsonPath), 0);
   EXPECT_EQ(file.getRecordCount(), 306); // number of records if all chunks are found

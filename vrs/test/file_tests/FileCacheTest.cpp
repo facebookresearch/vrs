@@ -141,7 +141,7 @@ void createRecordsThreadTask(ThreadParam* param) {
 }
 
 TEST_F(FileCacheTest, detailsTest) {
-  string kTestFile = string(coretech::getTestDataDir()) + "/VRS_Files/sample_file.vrs";
+  string kTestFile = os::pathJoin(coretech::getTestDataDir(), "VRS_Files/sample_file.vrs");
   const string cacheFile = os::getTempFolder() + "detailsTest.vrsi";
   RecordFileReader reader;
   ASSERT_EQ(reader.openFile(kTestFile), 0);
@@ -163,7 +163,7 @@ TEST_F(FileCacheTest, detailsTest) {
 }
 
 TEST_F(FileCacheTest, memoryVrsFileTest) {
-  string kTestFile = string(coretech::getTestDataDir()) + "/VRS_Files/sample_file.vrs";
+  string kTestFile = os::pathJoin(coretech::getTestDataDir(), "VRS_Files/sample_file.vrs");
 
   vector<uint8_t> vrsfile;
   DiskFile file;

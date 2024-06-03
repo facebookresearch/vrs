@@ -31,8 +31,8 @@ using namespace vrs;
 
 namespace {
 struct GetRecordTester : testing::Test {
-  string kTestFile = string(coretech::getTestDataDir()) + "/VRS_Files/sample_file.vrs";
-  string kTestFile2 = string(coretech::getTestDataDir()) + "/VRS_Files/simulated.vrs";
+  string kTestFile = os::pathJoin(coretech::getTestDataDir(), "VRS_Files/sample_file.vrs");
+  string kTestFile2 = os::pathJoin(coretech::getTestDataDir(), "VRS_Files/simulated.vrs");
 };
 } // namespace
 

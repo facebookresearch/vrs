@@ -101,7 +101,7 @@ struct VrsAppTest : testing::Test {};
 
 TEST_F(VrsAppTest, ANDROID_DISABLED(VrsAppTest)) {
   VrsProcess vrs;
-  const string kChunkedFile = getTestDataDir() + "/VRS_Files/chunks.vrs";
+  const string kChunkedFile = os::pathJoin(getTestDataDir(), "VRS_Files/chunks.vrs");
   const string outputFile = os::getTempFolder() + "VrsAppTest.vrs";
 
   // test copying the chunked file into a single file
@@ -126,7 +126,7 @@ TEST_F(VrsAppTest, ANDROID_DISABLED(VrsAppTest)) {
 
 TEST_F(VrsAppTest, ANDROID_DISABLED(limitedVrsAppTest)) {
   VrsProcess vrs;
-  const string kChunkedFile = getTestDataDir() + "/VRS_Files/simulated.vrs";
+  const string kChunkedFile = os::pathJoin(getTestDataDir(), "VRS_Files/simulated.vrs");
   const string outputFile = os::getTempFolder() + "limitedVrsAppTest.vrs";
 
   vector<string> args = {
@@ -174,7 +174,7 @@ static void checkTag(const map<string, string>& tags, const string& name, const 
 
 TEST_F(VrsAppTest, ANDROID_DISABLED(copyWithTags)) {
   VrsProcess vrs;
-  const string inputFile = getTestDataDir() + "/VRS_Files/simulated.vrs";
+  const string inputFile = os::pathJoin(getTestDataDir(), "VRS_Files/simulated.vrs");
   const string outputFile = os::getTempFolder() + "copyWithTags.vrs";
 
   // test copying a piece of file (to be faster), and add tags.
@@ -201,8 +201,8 @@ TEST_F(VrsAppTest, ANDROID_DISABLED(copyWithTags)) {
 
 TEST_F(VrsAppTest, ANDROID_DISABLED(merge2FilesTest)) {
   VrsProcess vrs;
-  const string kFirstFile = getTestDataDir() + "/VRS_Files/simulated.vrs";
-  const string kSecondFile = getTestDataDir() + "/VRS_Files/simulated2.vrs";
+  const string kFirstFile = os::pathJoin(getTestDataDir(), "VRS_Files/simulated.vrs");
+  const string kSecondFile = os::pathJoin(getTestDataDir(), "VRS_Files/simulated2.vrs");
   const string outputFile = os::getTempFolder() + "merge2FilesTest.vrs";
 
   // test merging two files into a single file, keeping streams separate
@@ -231,8 +231,8 @@ TEST_F(VrsAppTest, ANDROID_DISABLED(merge2FilesTest)) {
 
 TEST_F(VrsAppTest, ANDROID_DISABLED(fuseTest)) {
   VrsProcess vrs;
-  const string kFirstFile = getTestDataDir() + "/VRS_Files/simulated.vrs";
-  const string kSecondFile = getTestDataDir() + "/VRS_Files/simulated2.vrs";
+  const string kFirstFile = os::pathJoin(getTestDataDir(), "VRS_Files/simulated.vrs");
+  const string kSecondFile = os::pathJoin(getTestDataDir(), "VRS_Files/simulated2.vrs");
   const string outputFile = os::getTempFolder() + "fuseTest.vrs";
 
   // test merging two files into a single file, merging streams with the same RecordableTypeId
@@ -259,8 +259,8 @@ TEST_F(VrsAppTest, ANDROID_DISABLED(fuseTest)) {
 
 TEST_F(VrsAppTest, ANDROID_DISABLED(mergeRecordablesFilterTest)) {
   VrsProcess vrs;
-  const string kFirstFile = getTestDataDir() + "/VRS_Files/simulated.vrs";
-  const string kSecondFile = getTestDataDir() + "/VRS_Files/simulated2.vrs";
+  const string kFirstFile = os::pathJoin(getTestDataDir(), "VRS_Files/simulated.vrs");
+  const string kSecondFile = os::pathJoin(getTestDataDir(), "VRS_Files/simulated2.vrs");
   const string outputFile = os::getTempFolder() + "mergeRecordablesFilterTest.vrs";
 
   // test merging two files into a single file, filtering specific recordables
@@ -280,8 +280,8 @@ TEST_F(VrsAppTest, ANDROID_DISABLED(mergeRecordablesFilterTest)) {
 
 TEST_F(VrsAppTest, ANDROID_DISABLED(mergeTimeFilterTest)) {
   VrsProcess vrs;
-  const string kFirstFile = getTestDataDir() + "/VRS_Files/simulated.vrs";
-  const string kSecondFile = getTestDataDir() + "/VRS_Files/simulated2.vrs";
+  const string kFirstFile = os::pathJoin(getTestDataDir(), "VRS_Files/simulated.vrs");
+  const string kSecondFile = os::pathJoin(getTestDataDir(), "VRS_Files/simulated2.vrs");
   const string outputFile = os::getTempFolder() + "mergeTimeFilterTest.vrs";
 
   // test merging two files into a single file, filtering specific recordables
@@ -306,7 +306,7 @@ TEST_F(VrsAppTest, ANDROID_DISABLED(mergeTimeFilterTest)) {
 
 TEST_F(VrsAppTest, ANDROID_DISABLED(chunkAndMergeTest)) {
   VrsProcess vrs;
-  const string kOriginal = getTestDataDir() + "/VRS_Files/simulated.vrs";
+  const string kOriginal = os::pathJoin(getTestDataDir(), "VRS_Files/simulated.vrs");
   const string kPart1 = os::getTempFolder() + "chunk1.vrs";
   const string kPart2 = os::getTempFolder() + "chunk2.vrs";
   const string kMerged = os::getTempFolder() + "chunkAndMergeTest.vrs";
@@ -324,7 +324,7 @@ TEST_F(VrsAppTest, ANDROID_DISABLED(chunkAndMergeTest)) {
 
 TEST_F(VrsAppTest, ANDROID_DISABLED(decimateTest)) {
   VrsProcess vrs;
-  const string inputFile = getTestDataDir() + "/VRS_Files/simulated.vrs";
+  const string inputFile = os::pathJoin(getTestDataDir(), "VRS_Files/simulated.vrs");
   const string outputFile = os::getTempFolder() + "decimateTest.vrs";
 
   EXPECT_TRUE(vrs.start(
@@ -353,7 +353,7 @@ TEST_F(VrsAppTest, ANDROID_DISABLED(decimateTest)) {
 
 TEST_F(VrsAppTest, ANDROID_DISABLED(relativeRangeTest)) {
   VrsProcess vrs;
-  const string inputFile = getTestDataDir() + "/VRS_Files/simulated.vrs";
+  const string inputFile = os::pathJoin(getTestDataDir(), "VRS_Files/simulated.vrs");
   const string outputFile = os::getTempFolder() + "relativeRangeTest.vrs";
 
   // Copy a sub-range of data records, while keeping the config & state records,
@@ -388,21 +388,21 @@ TEST_F(VrsAppTest, ANDROID_DISABLED(relativeRangeTest)) {
 
 TEST_F(VrsAppTest, ANDROID_DISABLED(syntaxErrorTest)) {
   VrsProcess vrs;
-  const string kFirstFile = getTestDataDir() + "/VRS_Files/simulated.vrs";
+  const string kFirstFile = os::pathJoin(getTestDataDir(), "VRS_Files/simulated.vrs");
   EXPECT_TRUE(vrs.start(kFirstFile + " -not-a-command"));
   ASSERT_NE(vrs.runProcess(), 0);
 }
 
 TEST_F(VrsAppTest, ANDROID_DISABLED(noErrorTest)) {
   VrsProcess vrs;
-  const string kFirstFile = getTestDataDir() + "/VRS_Files/not-a-file.vrs";
+  const string kFirstFile = os::pathJoin(getTestDataDir(), "VRS_Files/not-a-file.vrs");
   EXPECT_TRUE(vrs.start(kFirstFile));
   ASSERT_NE(vrs.runProcess(), 0);
 }
 
 TEST_F(VrsAppTest, ANDROID_DISABLED(badFileErrorTest)) {
   VrsProcess vrs;
-  const string kFirstFile = getTestDataDir() + "/VRS_Files/simulated.vrs";
+  const string kFirstFile = os::pathJoin(getTestDataDir(), "VRS_Files/simulated.vrs");
   const string outputFile = os::getTempFolder() + "bad-file-!*:/";
   EXPECT_TRUE(vrs.start(kFirstFile + " -c " + outputFile));
   ASSERT_NE(vrs.runProcess(), 0);

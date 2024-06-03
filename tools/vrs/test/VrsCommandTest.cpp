@@ -25,6 +25,7 @@
 #include <vrs/VrsCommand.h>
 
 using namespace std;
+using namespace vrs;
 using namespace vrs::utils;
 using namespace vrscli;
 
@@ -59,9 +60,9 @@ bool parse(VrsCommand& command, vector<string>& args, int& argn, int& outStatusC
 TEST_F(VrsCommandTest, miscCommands) {
   int argn = 1;
   int statusCode = EXIT_SUCCESS;
-  const string inputFile = getTestDataDir() + "/VRS_Files/simulated.vrs";
-  const string inputFile2 = getTestDataDir() + "/VRS_Files/sample_file.vrs";
-  const string outputFile = getTestDataDir() + "/VRS_Files/some_output.vrs";
+  const string inputFile = os::pathJoin(getTestDataDir(), "VRS_Files/simulated.vrs");
+  const string inputFile2 = os::pathJoin(getTestDataDir(), "VRS_Files/sample_file.vrs");
+  const string outputFile = os::pathJoin(getTestDataDir(), "VRS_Files/some_output.vrs");
 
   {
     vector<string> args = {"vrs", "check", inputFile};
@@ -196,7 +197,7 @@ TEST_F(VrsCommandTest, miscCommands) {
 }
 
 TEST_F(VrsCommandTest, ArgTestsGood) {
-  const string inputFile = getTestDataDir() + "/VRS_Files/simulated.vrs";
+  const string inputFile = os::pathJoin(getTestDataDir(), "VRS_Files/simulated.vrs");
 
   int argn = 1;
   int statusCode = EXIT_SUCCESS;
@@ -249,7 +250,7 @@ TEST_F(VrsCommandTest, ArgTestsGood) {
 }
 
 TEST_F(VrsCommandTest, ArgTestsBad) {
-  const string inputFile = getTestDataDir() + "/VRS_Files/sample_file.vrs";
+  const string inputFile = os::pathJoin(getTestDataDir(), "VRS_Files/sample_file.vrs");
 
   int argn = 1;
   int statusCode = EXIT_SUCCESS;

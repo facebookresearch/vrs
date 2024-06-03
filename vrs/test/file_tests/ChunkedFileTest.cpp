@@ -57,10 +57,10 @@ int addPies(DiskFile& file, const string& path) {
 } // namespace
 
 struct ChunkedFileTester : testing::Test {
-  string kChunkedFile = getTestDataDir() + "/VRS_Files/chunks.vrs";
-  string kChunkedFile2 = getTestDataDir() + "/VRS_Files/chunks.vrs_1";
-  string kChunkedFile3 = getTestDataDir() + "/VRS_Files/chunks.vrs_2";
-  string kMissingFile = getTestDataDir() + "/VRS_Files/does_not_exist.vrs";
+  string kChunkedFile = os::pathJoin(getTestDataDir(), "VRS_Files/chunks.vrs");
+  string kChunkedFile2 = os::pathJoin(getTestDataDir(), "VRS_Files/chunks.vrs_1");
+  string kChunkedFile3 = os::pathJoin(getTestDataDir(), "VRS_Files/chunks.vrs_2");
+  string kMissingFile = os::pathJoin(getTestDataDir(), "VRS_Files/does_not_exist.vrs");
 };
 
 static const char* kChunkedFileStreamSignature =
