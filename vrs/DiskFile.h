@@ -46,7 +46,7 @@ class DiskFile : public WriteFileHandler {
   bool isOpened() const override;
 
   /// Create a new file
-  int create(const string& newFilePath) override;
+  int create(const string& newFilePath, const map<string, string>& options = {}) override;
   /// Call this method to forget any chunk beyond this file size.
   void forgetFurtherChunks(int64_t fileSize) override;
   /// Get the total size of all the chunks considered.
@@ -158,7 +158,7 @@ class DiskFile : public WriteFileHandler {
   }
   bool trySetPosInCurrentChunk(int64_t offset);
 
-  map<string, string> options_; // optional options provided in openSpec
+  map<string, string> options_; // optional options provided in openSpec or createFile
   vector<DiskFileChunk> chunks_; // all the chunks, when a VRS file is opened.
   DiskFileChunk* currentChunk_{}; // always points to the current chunk within chunks_.
   int filesOpenCount_{};
@@ -187,7 +187,7 @@ class AtomicDiskFile : public DiskFile {
  public:
   ~AtomicDiskFile() override;
 
-  int create(const string& newFilePath) override;
+  int create(const string& newFilePath, const map<string, string>& options = {}) override;
   int close() override;
 
   void abort();

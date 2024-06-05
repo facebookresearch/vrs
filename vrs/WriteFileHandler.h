@@ -48,13 +48,14 @@ class WriteFileHandler : public FileHandler {
   /// The path of the file to create is expected to be in the first chunk.
   /// Optional URI parameters might be provided in the spec' extras.
   virtual int create(const FileSpec& spec) {
-    return spec.chunks.empty() ? INVALID_FILE_SPEC : create(spec.chunks.front());
+    return spec.chunks.empty() ? INVALID_FILE_SPEC : create(spec.chunks.front(), spec.extras);
   }
 
   /// Create a new file for writing.
   /// @param newFilePath: a disk path to create the file.
+  /// @param options: optional parameters to pass when creating the file.
   /// @return A status code, 0 meaning success.
-  virtual int create(const string& newFilePath) = 0;
+  virtual int create(const string& newFilePath, const map<string, string>& options = {}) = 0;
 
   /// Create a new file for writing, in split-head file mode, the body part.
   /// @param spec: spec as converted already from initialFilePath, if that helps.
@@ -63,9 +64,9 @@ class WriteFileHandler : public FileHandler {
   virtual int createSplitFile(const FileSpec& spec, const string& initialFilePath) {
     // create the (first) user record chunk
     if (spec.chunks.size() == 1) {
-      return create(spec.chunks.front() + "_1");
+      return create(spec.chunks.front() + "_1", spec.extras);
     } else {
-      return create(initialFilePath);
+      return create(initialFilePath, spec.extras);
     }
   }
 

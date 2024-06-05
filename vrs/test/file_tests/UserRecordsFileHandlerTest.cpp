@@ -53,7 +53,7 @@ class UserRecordsFileHandler : public WriteFileHandler {
 
   /// Minimal implementations needed for a custom WriteFileHandler used for data writes only
   /// It can only write forward, no seek operations, no read back
-  int create(const string& newFilePath) override {
+  int create(const string& newFilePath, const map<string, string>& /* options = {} */) override {
     if (file_ != nullptr) {
       return FILE_ALREADY_OPEN;
     }

@@ -99,9 +99,10 @@ bool DiskFile::isOpened() const {
   return currentChunk_ != nullptr;
 }
 
-int DiskFile::create(const string& newFilePath) {
+int DiskFile::create(const string& newFilePath, const map<string, string>& options) {
   close();
   readOnly_ = false;
+  options_ = options;
   return addChunk(newFilePath);
 }
 
@@ -556,9 +557,9 @@ AtomicDiskFile::~AtomicDiskFile() {
   AtomicDiskFile::close(); // overrides not available in constructors & destructors
 }
 
-int AtomicDiskFile::create(const std::string& newFilePath) {
+int AtomicDiskFile::create(const std::string& newFilePath, const map<string, string>& options) {
   finalName_ = newFilePath;
-  return DiskFile::create(os::getUniquePath(finalName_, 10));
+  return DiskFile::create(os::getUniquePath(finalName_, 10), options);
 }
 
 int AtomicDiskFile::close() {
