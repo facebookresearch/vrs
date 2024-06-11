@@ -1,10 +1,11 @@
 var searchData=
 [
-  ['hasallrequiredpieces_397',['hasAllRequiredPieces',['../classvrs_1_1_data_layout.html#a175a4330636088850d075e9a384c3b04',1,'vrs::DataLayout']]],
-  ['hasallrequiredpieces_5f_398',['hasAllRequiredPieces_',['../classvrs_1_1_data_layout.html#a876ccbe0a33909ca31813035554efd83',1,'vrs::DataLayout']]],
-  ['haschunksizes_399',['hasChunkSizes',['../structvrs_1_1_file_spec.html#a17b5807f5f3def17aeac1a05984f3f67',1,'vrs::FileSpec']]],
-  ['hasdefault_400',['hasDefault',['../classvrs_1_1_data_piece_string.html#afc620cfbc461929bbc1b5ef0730a334f',1,'vrs::DataPieceString']]],
-  ['hasextra_401',['hasExtra',['../structvrs_1_1_file_spec.html#a93232d93b5cb5b7af177c1360891f2d1',1,'vrs::FileSpec']]],
-  ['hasfixedsize_402',['hasFixedSize',['../classvrs_1_1_data_piece.html#a8217deb9ab7b27954cf5d1104a31996c',1,'vrs::DataPiece']]],
-  ['hasindex_403',['hasIndex',['../classvrs_1_1_record_file_reader.html#a5a97a396f125c4fe2e1d23549d55492c',1,'vrs::RecordFileReader']]]
+  ['hasallrequiredpieces_398',['hasAllRequiredPieces',['../classvrs_1_1_data_layout.html#a175a4330636088850d075e9a384c3b04',1,'vrs::DataLayout']]],
+  ['hasallrequiredpieces_5f_399',['hasAllRequiredPieces_',['../classvrs_1_1_data_layout.html#a876ccbe0a33909ca31813035554efd83',1,'vrs::DataLayout']]],
+  ['haschunksizes_400',['hasChunkSizes',['../structvrs_1_1_file_spec.html#a17b5807f5f3def17aeac1a05984f3f67',1,'vrs::FileSpec']]],
+  ['hasdefault_401',['hasDefault',['../classvrs_1_1_data_piece_string.html#afc620cfbc461929bbc1b5ef0730a334f',1,'vrs::DataPieceString']]],
+  ['hasextra_402',['hasExtra',['../structvrs_1_1_file_spec.html#a93232d93b5cb5b7af177c1360891f2d1',1,'vrs::FileSpec']]],
+  ['hasfixedsize_403',['hasFixedSize',['../classvrs_1_1_data_piece.html#a8217deb9ab7b27954cf5d1104a31996c',1,'vrs::DataPiece']]],
+  ['hasindex_404',['hasIndex',['../classvrs_1_1_record_file_reader.html#a5a97a396f125c4fe2e1d23549d55492c',1,'vrs::RecordFileReader']]],
+  ['heartraterecordableclass_405',['HeartRateRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5aa1028cd5ac562131a22ebf8dea35498c',1,'vrs']]]
 ];

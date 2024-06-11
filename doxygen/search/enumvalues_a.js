@@ -1,8 +1,7 @@
 var searchData=
 [
-  ['lastrecordableclassid_1730',['LastRecordableClassId',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a378c157d28ccf4d29f392288c25dc6df',1,'vrs']]],
-  ['lidarrecordableclass_1731',['LidarRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a1dd1632febe7b2145c58a6fa0ac56673',1,'vrs']]],
-  ['lz4_1732',['Lz4',['../namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2fa56c8337568e62301ca0fb81adc631f1b',1,'vrs']]],
-  ['lz4fast_1733',['Lz4Fast',['../namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7ba981e12fe6dbad219590b0546f411adc1',1,'vrs']]],
-  ['lz4tight_1734',['Lz4Tight',['../namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7ba094c8cb4ef8c5578d075bd7dc031ac33',1,'vrs']]]
+  ['kclassicindexformatversion_1732',['kClassicIndexFormatVersion',['../namespacevrs_1_1_index_record.html#a8ca099f36190a9f08ae3d19bebc71671ab28824077978bf41681086a642e53efd',1,'vrs::IndexRecord']]],
+  ['kdescriptionformatversion_1733',['kDescriptionFormatVersion',['../namespacevrs_1_1_description_record.html#a43b5fdf518005a25a9300c6fc5d41bb0a83c89251bd04913f46ad9e53171cec89',1,'vrs::DescriptionRecord']]],
+  ['klegacydescriptionformatversion_1734',['kLegacyDescriptionFormatVersion',['../namespacevrs_1_1_description_record.html#a43b5fdf518005a25a9300c6fc5d41bb0a6052169f815fdcfffc094e1c7adcd2f3',1,'vrs::DescriptionRecord']]],
+  ['ksplitindexformatversion_1735',['kSplitIndexFormatVersion',['../namespacevrs_1_1_index_record.html#a8ca099f36190a9f08ae3d19bebc71671a3cc61d0fb6b2901ad01b0cfa88fb92ac',1,'vrs::IndexRecord']]]
 ];

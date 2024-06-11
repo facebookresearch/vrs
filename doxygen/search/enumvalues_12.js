@@ -1,18 +1,8 @@
 var searchData=
 [
-  ['u16_5fbe_1802',['U16_BE',['../namespacevrs.html#a52303127bf307e1191fcb9b2ee2841d4a3f9c3da6315c9105fefc306997f7410f',1,'vrs']]],
-  ['u16_5fle_1803',['U16_LE',['../namespacevrs.html#a52303127bf307e1191fcb9b2ee2841d4aed96e984b023d2eb4e0512b76edd94b9',1,'vrs']]],
-  ['u24_5fbe_1804',['U24_BE',['../namespacevrs.html#a52303127bf307e1191fcb9b2ee2841d4a9a08be45ae18c7f5445f0a6929d26f0a',1,'vrs']]],
-  ['u24_5fle_1805',['U24_LE',['../namespacevrs.html#a52303127bf307e1191fcb9b2ee2841d4ace861acec61a43d0968955779bf764bb',1,'vrs']]],
-  ['u32_5fbe_1806',['U32_BE',['../namespacevrs.html#a52303127bf307e1191fcb9b2ee2841d4a4b1c04bb88241d484c88b9ee78a36774',1,'vrs']]],
-  ['u32_5fle_1807',['U32_LE',['../namespacevrs.html#a52303127bf307e1191fcb9b2ee2841d4a0c1b0283c557ef4f80fc6b907d2a71b8',1,'vrs']]],
-  ['u8_1808',['U8',['../namespacevrs.html#a52303127bf307e1191fcb9b2ee2841d4a6669348b484e3008dca2bfa8e85e40b5',1,'vrs']]],
-  ['undefined_1809',['UNDEFINED',['../namespacevrs.html#add2bb21a732f1a1a425cb65c9cb69a03a0db45d2a4141101bdfe48e3314cfbca3',1,'vrs']]],
-  ['undefined_1810',['Undefined',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5aec0fc0100c4fc1ce4eea230c3dc10360',1,'vrs::Undefined()'],['../namespacevrs.html#afb0b040e753b40173e69f247afa430a2aec0fc0100c4fc1ce4eea230c3dc10360',1,'vrs::Undefined()'],['../namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7baec0fc0100c4fc1ce4eea230c3dc10360',1,'vrs::Undefined()']]],
-  ['undefined_1811',['UNDEFINED',['../namespacevrs.html#a52303127bf307e1191fcb9b2ee2841d4a0db45d2a4141101bdfe48e3314cfbca3',1,'vrs::UNDEFINED()'],['../classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2cea0db45d2a4141101bdfe48e3314cfbca3',1,'vrs::Record::UNDEFINED()'],['../namespacevrs.html#a0fbbb88591f21313dd46736fba5a7aa5a0db45d2a4141101bdfe48e3314cfbca3',1,'vrs::UNDEFINED()'],['../namespacevrs.html#a7e8db761dcf6ba474ce112c82babb6c3a0db45d2a4141101bdfe48e3314cfbca3',1,'vrs::UNDEFINED()']]],
-  ['unittest1_1812',['UnitTest1',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5af0cf646be82c38dfedcd57e266247eb8',1,'vrs']]],
-  ['unittest2_1813',['UnitTest2',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a9fcebce7c0416116fc553c5914da7d7c',1,'vrs']]],
-  ['unittestrecordableclass_1814',['UnitTestRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5ad07e5ad74acdea9a8a863780f9a35732',1,'vrs']]],
-  ['upwardcamerarecordableclass_1815',['UpwardCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5aa9cf522251916598aa9f21e404e65ae9',1,'vrs']]],
-  ['usbrecordableclass_1816',['UsbRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a4713c063a77df4ba2f93810d469a818c',1,'vrs']]]
+  ['tags_1805',['TAGS',['../classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2cea4819dc9f2283ad2dac18ec754438428b',1,'vrs::Record']]],
+  ['temperaturerecordableclass_1806',['TemperatureRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a5ea8876ed2f272736d0f29f8c08553ea',1,'vrs']]],
+  ['textinputrecordableclass_1807',['TextInputRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5af6fcc70c3c172221f6e974e3fdccc3d9',1,'vrs']]],
+  ['timerecordableclass_1808',['TimeRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a9e52b3b00f9ebed2b1b13f9fc47b15d8',1,'vrs']]],
+  ['touchinputrecordableclass_1809',['TouchInputRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5aabaa257caebfd3c1b2df551ce051c148',1,'vrs']]]
 ];
