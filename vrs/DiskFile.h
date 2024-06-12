@@ -18,7 +18,6 @@
 
 #include <cstdio>
 
-#include "DiskFileChunk.hpp"
 #include "WriteFileHandler.h"
 
 namespace vrs {
@@ -26,12 +25,14 @@ namespace vrs {
 using std::string;
 using std::vector;
 
+class DiskFileChunk;
+
 /// FileHandler implementation for disk files, with chunked file support.
 class DiskFile : public WriteFileHandler {
  public:
   static const std::string& staticName();
 
-  DiskFile() = default;
+  DiskFile();
   ~DiskFile() override;
 
   /// Make a new DiskFile object, with a default state.
@@ -153,13 +154,11 @@ class DiskFile : public WriteFileHandler {
   int openChunk(DiskFileChunk* chunk);
   int closeChunk(DiskFileChunk* chunk);
   int addChunk(const string& chunkFilePath);
-  bool isLastChunk() const {
-    return currentChunk_ == &chunks_.back();
-  }
+  bool isLastChunk() const;
   bool trySetPosInCurrentChunk(int64_t offset);
 
   map<string, string> options_; // optional options provided in openSpec or createFile
-  vector<DiskFileChunk> chunks_; // all the chunks, when a VRS file is opened.
+  std::unique_ptr<vector<DiskFileChunk>> chunks_; // all the chunks, when a VRS file is opened.
   DiskFileChunk* currentChunk_{}; // always points to the current chunk within chunks_.
   int filesOpenCount_{};
 

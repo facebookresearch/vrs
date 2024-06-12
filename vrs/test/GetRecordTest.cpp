@@ -25,6 +25,7 @@
 #include <vrs/IndexRecord.h>
 #include <vrs/RecordFileReader.h>
 #include <vrs/StreamId.h>
+#include <vrs/os/Utils.h>
 
 using namespace std;
 using namespace vrs;
