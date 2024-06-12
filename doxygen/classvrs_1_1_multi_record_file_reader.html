@@ -156,6 +156,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a554b6e66413becf3f052ca074440e329"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aacca4fb96e7495cbe98fede2f301eb16"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#aacca4fb96e7495cbe98fede2f301eb16">readRecord</a> (const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> &amp;recordInfo)</td></tr>
 <tr class="separator:aacca4fb96e7495cbe98fede2f301eb16"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a437f20bf1635f99f7128dc7142b41282"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#a437f20bf1635f99f7128dc7142b41282">readRecord</a> (const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> &amp;recordInfo, <a class="el" href="classvrs_1_1_stream_player.html">StreamPlayer</a> *player, bool setupPlayer)</td></tr>
+<tr class="separator:a437f20bf1635f99f7128dc7142b41282"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b59a8b0be71cf99c84c806ab998c822"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#a3b59a8b0be71cf99c84c806ab998c822">setCachingStrategy</a> (<a class="el" href="namespacevrs.html#acb1b4358038394407db2b2dc6200afae">CachingStrategy</a> cachingStrategy)</td></tr>
 <tr class="separator:a3b59a8b0be71cf99c84c806ab998c822"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adca088a2b7060e463b7cbd4b06309efc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacevrs.html#acb1b4358038394407db2b2dc6200afae">CachingStrategy</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#adca088a2b7060e463b7cbd4b06309efc">getCachingStrategy</a> () const</td></tr>
@@ -1509,7 +1511,7 @@ Static Public Attributes</h2></td></tr>
 </div>
 </div>
 <a id="aacca4fb96e7495cbe98fede2f301eb16"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aacca4fb96e7495cbe98fede2f301eb16">&#9670;&nbsp;</a></span>readRecord()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aacca4fb96e7495cbe98fede2f301eb16">&#9670;&nbsp;</a></span>readRecord() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1530,6 +1532,48 @@ Static Public Attributes</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>0 on success, or a non-zero error code. If there is no <a class="el" href="classvrs_1_1_stream_player.html" title="Class designed to receive record data when reading a VRS file.">StreamPlayer</a> hooked up for the stream, no read operation is done and 0 is returned. </dd></dl>
+
+</div>
+</div>
+<a id="a437f20bf1635f99f7128dc7142b41282"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a437f20bf1635f99f7128dc7142b41282">&#9670;&nbsp;</a></span>readRecord() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int vrs::MultiRecordFileReader::readRecord </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> &amp;&#160;</td>
+          <td class="paramname"><em>recordInfo</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classvrs_1_1_stream_player.html">StreamPlayer</a> *&#160;</td>
+          <td class="paramname"><em>player</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>setupPlayer</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Read a record with a specific stream player. Attention! Unlike the <a class="el" href="classvrs_1_1_record_file_reader.html" title="The class to read VRS files.">RecordFileReader</a> version of this API, do not read different streams with the same stream player, or you might get unexpected results. Stream players should not be used with different <a class="el" href="classvrs_1_1_record_file_reader.html" title="The class to read VRS files.">RecordFileReader</a> objects, which this class might do. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">recordInfo</td><td>RecordInfo reference of the record to read. </td></tr>
+    <tr><td class="paramname">setupPlayer</td><td>tell if the player should be initialized through its onAttachedToFileReader callback. This must happen at least once per player, the first time around. This operation can be expensive, so this should be done only once. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 on success, or a non-zero error code. </dd></dl>
 
 </div>
 </div>
