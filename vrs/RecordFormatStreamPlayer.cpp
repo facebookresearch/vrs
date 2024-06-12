@@ -40,6 +40,11 @@ bool RecordFormatStreamPlayer::onUnsupportedBlock(
 }
 
 void RecordFormatStreamPlayer::onAttachedToFileReader(RecordFileReader& fileReader, StreamId id) {
+  if (recordFileReader_ != nullptr && recordFileReader_ != &fileReader) {
+    XR_LOGW(
+        "This RecordFormatStreamPlayer object was already attached to a different file, "
+        "from which it loaded RecordFormat definitions. This might have unexpected consequences.");
+  }
   recordFileReader_ = &fileReader;
   RecordFormatMap recordFormats;
   fileReader.getRecordFormats(id, recordFormats);

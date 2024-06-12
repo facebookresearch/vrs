@@ -281,6 +281,17 @@ class MultiRecordFileReader {
   /// returned.
   int readRecord(const IndexRecord::RecordInfo& recordInfo);
 
+  /// Read a record with a specific stream player.
+  /// Attention! Unlike the RecordFileReader version of this API, do not read different streams
+  /// with the same stream player, or you might get unexpected results. Stream players should not be
+  /// used with different RecordFileReader objects, which this class might do.
+  /// @param recordInfo: RecordInfo reference of the record to read.
+  /// @param setupPlayer: tell if the player shoudl be initialized through its
+  /// onAttachedToFileReader callback. This must happen at least once per player, the first time
+  /// around. This operation can be expensive, so this should be done only once.
+  /// @return 0 on success, or a non-zero error code.
+  int readRecord(const IndexRecord::RecordInfo& recordInfo, StreamPlayer* player, bool setupPlayer);
+
   /// Set Caching strategy for all the underlying file handlers.
   /// This should be called *after* opening the files, as open might replace the file handler.
   /// @param cachingStrategy: Caching strategy desired.

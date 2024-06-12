@@ -32,6 +32,7 @@
 #include <vrs/ErrorCode.h>
 #include <vrs/MultiRecordFileReader.h>
 #include <vrs/RecordFileWriter.h>
+#include <vrs/RecordFormatStreamPlayer.h>
 #include <vrs/StreamId.h>
 #include <vrs/StreamPlayer.h>
 #include <vrs/TagConventions.h>
@@ -221,6 +222,19 @@ class TestStreamPlayer : public StreamPlayer {
   uint32_t recordsProcessedCount = 0;
 };
 
+class RecordFormatTestStreamPlayer : public RecordFormatStreamPlayer {
+ public:
+  bool onDataLayoutRead(const CurrentRecord& record, size_t idx, DataLayout& dl) override {
+    if (record.recordType == Record::Type::DATA) {
+      const auto& d = getExpectedLayout<MyMetadata>(dl, idx);
+      EXPECT_TRUE(d.sensorValue.isAvailable());
+      counter++;
+    }
+    return true;
+  }
+  int counter{};
+};
+
 class MultiRecordFileReaderTest : public testing::Test {};
 
 TEST_F(MultiRecordFileReaderTest, invalidFilePaths) {
@@ -379,6 +393,19 @@ TEST_F(MultiRecordFileReaderTest, multiFile) {
       << "When the given RecordableTypeId does not match with any streams, no "
          "records should be processed.";
   reader.readFirstConfigurationRecordsForType(stream0.getTypeId(), &allStreamsPlayer2);
+  // validate reading records with provided stream player
+  auto testStreams = reader.getStreams(kTestRecordableTypeId);
+  for (auto id : testStreams) {
+    RecordFormatTestStreamPlayer rfStreamPlayer;
+    bool first = true;
+    for (size_t index = 0; index < 3; ++index) {
+      const IndexRecord::RecordInfo* record = reader.getRecord(id, index);
+      ASSERT_NE(record, nullptr);
+      reader.readRecord(*record, &rfStreamPlayer, first);
+      first = false;
+    }
+    EXPECT_EQ(rfStreamPlayer.counter, 3);
+  }
   ASSERT_EQ(reader.getStreams().size(), allStreamsPlayer2.getRecordsProcessedCount());
   // Validate close
   ASSERT_EQ(SUCCESS, reader.close());

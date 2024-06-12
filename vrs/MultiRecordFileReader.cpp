@@ -27,6 +27,7 @@
 #include <vrs/MultiRecordFileReader.h>
 #include <vrs/RecordFileReader.h>
 #include <vrs/StreamId.h>
+#include <vrs/StreamPlayer.h>
 #include <vrs/TagConventions.h>
 #include <vrs/helpers/FileMacros.h>
 
@@ -440,6 +441,25 @@ int MultiRecordFileReader::readRecord(const IndexRecord::RecordInfo& recordInfo)
     return INVALID_PARAMETER;
   }
   return reader->readRecord(recordInfo);
+}
+
+int MultiRecordFileReader::readRecord(
+    const IndexRecord::RecordInfo& recordInfo,
+    StreamPlayer* player,
+    bool setupPlayer) {
+  if (!isOpened_) {
+    XR_LOGE("No file open");
+    return NO_FILE_OPEN;
+  }
+  RecordFileReader* reader = getReader(&recordInfo);
+  if (reader == nullptr) {
+    XR_LOGE("Invalid recordInfo");
+    return INVALID_PARAMETER;
+  }
+  if (setupPlayer) {
+    player->onAttachedToFileReader(*reader, recordInfo.streamId);
+  }
+  return reader->readRecord(recordInfo, player);
 }
 
 bool MultiRecordFileReader::setCachingStrategy(CachingStrategy cachingStrategy) {
