@@ -155,8 +155,14 @@ class RecordFileReader {
   /// @param recordInfo: RecordInfo reference of the record to read.
   /// @param streamPlayer: StreamPlayer object to use for this operation only. The default stream
   /// player that might have been setup using setStreamPlayer() will not receive any callback.
+  /// @param setupPlayer: tell if the player should be initialized through its
+  /// onAttachedToFileReader callback. This must happen at least once per player and per stream,
+  /// the first time around. This operation can be expensive, so this should be done only once.
   /// @return 0 on success or if streamPlayer is null, or a non-zero error code.
-  int readRecord(const IndexRecord::RecordInfo& recordInfo, StreamPlayer* streamPlayer);
+  int readRecord(
+      const IndexRecord::RecordInfo& recordInfo,
+      StreamPlayer* streamPlayer,
+      bool setupPlayer = false);
 
   /// Read all the records of an open file. Call closeFile() when you're done.
   /// Guaranties that records are read sorted by timestamp.

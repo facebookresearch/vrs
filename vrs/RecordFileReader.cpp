@@ -819,8 +819,7 @@ bool RecordFileReader::readConfigRecords(
       if (streamPlayer == nullptr) {
         status = readRecord(*configRecord);
       } else {
-        streamPlayer->onAttachedToFileReader(*this, configRecord->streamId);
-        status = readRecord(*configRecord, streamPlayer);
+        status = readRecord(*configRecord, streamPlayer, true);
       }
       allGood = (status == 0) && allGood;
     }
@@ -1024,12 +1023,13 @@ bool RecordFileReader::isRecordAvailableOrPrefetch(const IndexRecord::RecordInfo
 int RecordFileReader::readRecord(const IndexRecord::RecordInfo& recordInfo) {
   map<StreamId, StreamPlayer*>::iterator iter = streamPlayers_.find(recordInfo.streamId);
   StreamPlayer* streamPlayer = (iter == streamPlayers_.end()) ? nullptr : iter->second;
-  return readRecord(recordInfo, streamPlayer);
+  return readRecord(recordInfo, streamPlayer, false);
 }
 
 int RecordFileReader::readRecord(
     const IndexRecord::RecordInfo& recordInfo,
-    StreamPlayer* streamPlayer) {
+    StreamPlayer* streamPlayer,
+    bool setupPlayer) {
   if (!file_->isOpened()) {
     XR_LOGE("No file open");
     return NO_FILE_OPEN;
@@ -1040,6 +1040,9 @@ int RecordFileReader::readRecord(
   // since it's gone, we can save ourselves potentially quite a few fseek and fread operations.
   if (streamPlayer == nullptr) {
     return 0;
+  }
+  if (setupPlayer) {
+    streamPlayer->onAttachedToFileReader(*this, recordInfo.streamId);
   }
   IF_ERROR_LOG_AND_RETURN(file_->setPos(recordInfo.fileOffset));
   if (recordHeaderSize_ < sizeof(FileFormat::RecordHeader)) {

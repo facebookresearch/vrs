@@ -59,11 +59,12 @@ class DataLayoutReader : public RecordFormatStreamPlayer {
   /// @return A pointer to the DataLayout of type requested, or nullptr, if no match was found.
   const T* read(const IndexRecord::RecordInfo& recordInfo) {
     datalayoutRead_ = nullptr;
+    bool setupPlayer = false;
     // Explicit registration is required once when calling readRecord with a specific player object
     if (attachedTo_.insert(recordInfo.streamId).second) {
-      onAttachedToFileReader(fileReader_, recordInfo.streamId);
+      setupPlayer = true;
     }
-    fileReader_.readRecord(recordInfo, this);
+    fileReader_.readRecord(recordInfo, this, setupPlayer);
     return datalayoutRead_;
   }
 

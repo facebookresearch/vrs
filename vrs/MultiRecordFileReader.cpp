@@ -456,10 +456,7 @@ int MultiRecordFileReader::readRecord(
     XR_LOGE("Invalid recordInfo");
     return INVALID_PARAMETER;
   }
-  if (setupPlayer) {
-    player->onAttachedToFileReader(*reader, recordInfo.streamId);
-  }
-  return reader->readRecord(recordInfo, player);
+  return reader->readRecord(recordInfo, player, setupPlayer);
 }
 
 bool MultiRecordFileReader::setCachingStrategy(CachingStrategy cachingStrategy) {

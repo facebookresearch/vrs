@@ -286,7 +286,7 @@ class MultiRecordFileReader {
   /// with the same stream player, or you might get unexpected results. Stream players should not be
   /// used with different RecordFileReader objects, which this class might do.
   /// @param recordInfo: RecordInfo reference of the record to read.
-  /// @param setupPlayer: tell if the player shoudl be initialized through its
+  /// @param setupPlayer: tell if the player should be initialized through its
   /// onAttachedToFileReader callback. This must happen at least once per player, the first time
   /// around. This operation can be expensive, so this should be done only once.
   /// @return 0 on success, or a non-zero error code.
