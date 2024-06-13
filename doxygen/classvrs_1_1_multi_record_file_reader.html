@@ -164,6 +164,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:adca088a2b7060e463b7cbd4b06309efc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a64a7f1918e2a599e9b2cdc3d4349451c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#a64a7f1918e2a599e9b2cdc3d4349451c">prefetchRecordSequence</a> (const vector&lt; const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> * &gt; &amp;records, bool clearSequence=true)</td></tr>
 <tr class="separator:a64a7f1918e2a599e9b2cdc3d4349451c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a335628545d95143a04d74f3fb6cd87ca"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#a335628545d95143a04d74f3fb6cd87ca">isRecordAvailableOrPrefetch</a> (const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> &amp;record) const</td></tr>
+<tr class="separator:a335628545d95143a04d74f3fb6cd87ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a36c8eec112569f67ebb9a213f61178d9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#a36c8eec112569f67ebb9a213f61178d9">purgeFileCache</a> ()</td></tr>
 <tr class="separator:a36c8eec112569f67ebb9a213f61178d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6722cc31e14463ee340c6fcb783358f7"><td class="memItemLeft" align="right" valign="top">const map&lt; string, string &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#a6722cc31e14463ee340c6fcb783358f7">getTags</a> () const</td></tr>
@@ -1226,6 +1228,31 @@ Static Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Tell if files are being read. Must be true for most operations. </p><dl class="section return"><dt>Returns</dt><dd>True if the file is opened. </dd></dl>
+
+</div>
+</div>
+<a id="a335628545d95143a04d74f3fb6cd87ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a335628545d95143a04d74f3fb6cd87ca">&#9670;&nbsp;</a></span>isRecordAvailableOrPrefetch()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool vrs::MultiRecordFileReader::isRecordAvailableOrPrefetch </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> &amp;&#160;</td>
+          <td class="paramname"><em>record</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Check if a file record is available for immediate loading (e.g. on disk or in-cache). If not, begin background prefetching at the requested frame (but do not wait for results). </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">recordInfo</td><td>RecordInfo reference of the record to read. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if available, false if unavailable (e.g. would require a network fetch). </dd></dl>
 
 </div>
 </div>
