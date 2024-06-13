@@ -19,8 +19,8 @@
 #include <utility>
 
 #define DEFAULT_LOG_CHANNEL "MultiRecordFileReader"
-#include <logging/Checks.h>
 #include <logging/Log.h>
+#include <logging/Verify.h>
 
 #include <vrs/ErrorCode.h>
 #include <vrs/IndexRecord.h>
@@ -500,6 +500,15 @@ bool MultiRecordFileReader::prefetchRecordSequence(
     }
   }
   return true;
+}
+
+bool MultiRecordFileReader::isRecordAvailableOrPrefetch(
+    const IndexRecord::RecordInfo& record) const {
+  if (!isOpened_) {
+    return false;
+  }
+  RecordFileReader* reader = getReader(&record);
+  return XR_VERIFY(reader != nullptr) ? reader->isRecordAvailableOrPrefetch(record) : false;
 }
 
 bool MultiRecordFileReader::purgeFileCache() {

@@ -322,6 +322,12 @@ class MultiRecordFileReader {
       const vector<const IndexRecord::RecordInfo*>& records,
       bool clearSequence = true);
 
+  /// Check if a file record is available for immediate loading (e.g. on disk or in-cache).
+  /// If not, begin background prefetching at the requested frame (but do not wait for results).
+  /// @param recordInfo: RecordInfo reference of the record to read.
+  /// @return true if available, false if unavailable (e.g. would require a network fetch).
+  bool isRecordAvailableOrPrefetch(const IndexRecord::RecordInfo& record) const;
+
   /// If the underlying file handler caches data on reads, purge its caches to free memory.
   /// Sets the caching strategy to Passive, and clears any pending read sequence.
   /// @return True if all the underlying caches were purged, false if they weren't for some reason.
