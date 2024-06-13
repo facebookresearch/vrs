@@ -265,7 +265,7 @@ void FramePlayer::imageJobsThreadActivity() {
     }
     shared_ptr<PixelFrame>& frame = *job;
     bool frameValid = false;
-    vrs::ImageFormat imageFormat = frame->getSpec().getImageFormat();
+    vrs::ImageFormat imageFormat = frame->getImageFormat();
     if (imageFormat == vrs::ImageFormat::RAW) {
       frameValid = (frame != nullptr);
     } else if (imageFormat == vrs::ImageFormat::VIDEO) {

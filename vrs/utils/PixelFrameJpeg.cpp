@@ -43,7 +43,6 @@ bool PixelFrame::readJpegFrame(RecordReader* reader, uint32_t sizeBytes) {
 static bool
 readJpegFrameHelper(PixelFrame& frame, struct jpeg_decompress_struct& cinfo, bool decodePixels) {
   jpeg_read_header(&cinfo, TRUE);
-  jpeg_start_decompress(&cinfo);
   if (cinfo.num_components == 1) {
     cinfo.out_color_space = JCS_GRAYSCALE;
     frame.init(PixelFormat::GREY8, cinfo.image_width, cinfo.image_height);
@@ -53,13 +52,14 @@ readJpegFrameHelper(PixelFrame& frame, struct jpeg_decompress_struct& cinfo, boo
   }
   if (decodePixels) {
     // decompress row by row
+    jpeg_start_decompress(&cinfo);
     uint8_t* rowPtr = frame.wdata();
     while (cinfo.output_scanline < cinfo.output_height) {
       jpeg_read_scanlines(&cinfo, &rowPtr, 1);
       rowPtr += frame.getSpec().getStride();
     }
+    jpeg_finish_decompress(&cinfo);
   }
-  jpeg_finish_decompress(&cinfo);
   jpeg_destroy_decompress(&cinfo);
   return true;
 }

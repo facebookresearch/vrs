@@ -113,6 +113,9 @@ class PixelFrame {
   const ImageContentBlockSpec& getSpec() const {
     return imageSpec_;
   }
+  ImageFormat getImageFormat() const {
+    return imageSpec_.getImageFormat();
+  }
   PixelFormat getPixelFormat() const {
     return imageSpec_.getPixelFormat();
   }
@@ -122,8 +125,23 @@ class PixelFrame {
   uint32_t getHeight() const {
     return imageSpec_.getHeight();
   }
-  size_t getStride() const {
+  uint32_t getStride() const {
     return imageSpec_.getStride();
+  }
+  uint32_t getDefaultStride() const {
+    return imageSpec_.getDefaultStride();
+  }
+  uint32_t getPlaneStride(uint32_t planeIndex) const {
+    return imageSpec_.getPlaneStride(planeIndex);
+  }
+  uint32_t getPlaneHeight(uint32_t planeIndex) const {
+    return imageSpec_.getPlaneHeight(planeIndex);
+  }
+  uint8_t getChannelCountPerPixel() const {
+    return imageSpec_.getChannelCountPerPixel();
+  }
+  size_t getBytesPerPixel() const {
+    return imageSpec_.getBytesPerPixel();
   }
 
   vector<uint8_t>& getBuffer() {

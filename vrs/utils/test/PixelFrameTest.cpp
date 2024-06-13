@@ -37,6 +37,7 @@ using coretech::getTestDataDir;
 
 struct PixelFrameTest : testing::Test {
   string kTestFilePath = os::pathJoin(getTestDataDir(), "VRS_Files/sample_raw_pixel_formats.vrs");
+  string kJpegTestFilePath = os::pathJoin(getTestDataDir(), "computer_vision/eileen_128x128.jpg");
 };
 
 class ImagePlayer : public RecordFormatStreamPlayer {
@@ -179,3 +180,20 @@ TEST_F(PixelFrameTest, colorTableTest) {
   EXPECT_TRUE(equal(colors[0], RGBColor()));
   EXPECT_TRUE(equal(colors[0xffff], RGBColor(255, 255, 255)));
 }
+
+#if IS_VRS_FB_INTERNAL()
+TEST_F(PixelFrameTest, jpegTest) {
+  PixelFrame frame;
+  ASSERT_TRUE(frame.readJpegFrameFromFile(kJpegTestFilePath, true));
+  EXPECT_EQ(frame.size(), 49152);
+  EXPECT_EQ(frame.data<uint64_t>()[0], 4198000490383812399);
+  EXPECT_EQ(frame.data<uint64_t>()[2500], 8221608522182776091);
+  EXPECT_EQ(frame.data<uint64_t>()[49152 / 8 - 1], 1099511693312);
+  PixelFrame frame2;
+  ASSERT_TRUE(frame2.readJpegFrameFromFile(kJpegTestFilePath, false));
+  EXPECT_EQ(frame2.size(), frame.size());
+  ASSERT_EQ(frame.getSpec(), frame2.getSpec());
+  frame.blankFrame();
+  EXPECT_EQ(frame.getBuffer(), frame2.getBuffer());
+}
+#endif
