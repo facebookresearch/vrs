@@ -1017,7 +1017,7 @@ bool RecordFileReader::isRecordAvailableOrPrefetch(const IndexRecord::RecordInfo
     return false;
   }
   uint32_t recordSize = recordHeader.recordSize.get();
-  return file_->isAvailableOrPrefetch(recordSize);
+  return file_->isAvailableOrPrefetch(recordSize - sizeof(recordHeader));
 }
 
 int RecordFileReader::readRecord(const IndexRecord::RecordInfo& recordInfo) {
