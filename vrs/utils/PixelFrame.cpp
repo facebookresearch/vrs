@@ -19,6 +19,7 @@
 #include <cstring>
 
 #include <algorithm>
+#include <unordered_set>
 
 #define DEFAULT_LOG_CHANNEL "PixelFrame"
 #include <logging/Checks.h>
@@ -191,6 +192,19 @@ void normalizeRGBXfloatToRGB8(
     }
   }
 }
+
+mutex& getUsedColorsMutex() {
+  static mutex sMutex;
+  return sMutex;
+}
+set<uint16_t>& getUsedClassColors() {
+  static set<uint16_t> sUsedClassColors;
+  return sUsedClassColors;
+}
+set<uint16_t>& getusedObjectColors() {
+  static set<uint16_t> sUsedObjectColors;
+  return sUsedObjectColors;
+};
 
 } // namespace
 
@@ -538,18 +552,30 @@ bool PixelFrame::normalizeFrame(
        options.semantic == ImageSemantic::ObjectIdSegmentation) &&
       getPixelFormat() == PixelFormat::GREY16 && targetPixelFormat == PixelFormat::RGB8) {
     init(normalizedFrame, targetPixelFormat, getWidth(), getHeight());
-    const vector<RGBColor>& colors = options.semantic == ImageSemantic::ObjectClassSegmentation
-        ? getGetObjectClassSegmentationColors()
-        : getGetObjectIdSegmentationColors();
+    bool classSegmentation = options.semantic == ImageSemantic::ObjectClassSegmentation;
+    const vector<RGBColor>& colors = classSegmentation ? getGetObjectClassSegmentationColors()
+                                                       : getGetObjectIdSegmentationColors();
     if (colors.size() >= (1UL << 16)) {
+      unordered_set<uint16_t> usedColors;
+      uint16_t lastColor = 0xffff;
       uint32_t srcStride = getStride();
       uint32_t dstStride = normalizedFrame->getStride();
       for (uint32_t h = 0; h < getHeight(); ++h) {
         const uint16_t* srcLine = data<uint16_t>(srcStride * h);
         RGBColor* dstLine = normalizedFrame->data<RGBColor>(dstStride * h);
         for (uint32_t w = 0; w < getWidth(); ++w) {
-          dstLine[w] = colors[srcLine[w]];
+          uint16_t color = srcLine[w];
+          dstLine[w] = colors[color];
+          if (color != lastColor) {
+            usedColors.insert(color);
+            lastColor = color;
+          }
         }
+      }
+      unique_lock<mutex> lock(getUsedColorsMutex());
+      auto& sListedColors = classSegmentation ? ::getUsedClassColors() : ::getusedObjectColors();
+      for (uint16_t color : usedColors) {
+        sListedColors.insert(color);
       }
       return true;
     }
@@ -900,6 +926,67 @@ const vector<PixelFrame::RGBColor>& PixelFrame::getGetObjectClassSegmentationCol
   return getGetObjectIdSegmentationColors();
 }
 
+static bool printSegColors(
+    const set<uint16_t>& usedColors,
+    const vector<PixelFrame::RGBColor>& colors,
+    bool classSegmentation) {
+  if (usedColors.empty()) {
+    return false;
+  }
+  fmt::print("{} Segmentation Colors\n", classSegmentation ? "Class/Category" : "Object");
+  vector<uint16_t> sortedColors(usedColors.size());
+  uint32_t index = 0;
+  for (uint16_t colorIndex : usedColors) {
+    sortedColors[index++] = colorIndex;
+  }
+  string line;
+  line.reserve(300);
+  const uint32_t kMaxColumnIndex = classSegmentation ? 4 : 8;
+  const uint32_t rows = (usedColors.size() + kMaxColumnIndex - 1) / kMaxColumnIndex;
+  for (uint32_t row = 0; row < rows; ++row) {
+    for (uint16_t column = 0; column < kMaxColumnIndex; ++column) {
+      uint32_t colorIndex = rows * column + row;
+      if (colorIndex < sortedColors.size()) {
+        uint32_t color = sortedColors[colorIndex];
+        PixelFrame::RGBColor c = colors[color];
+        if (classSegmentation) {
+          const char* className = PixelFrame::getSegmentationClassName(color);
+          line.append(fmt::format(
+              "{:>3} \x1b[48;2;{};{};{}m      \x1b[0m {:<25}", color, c.r, c.g, c.b, className));
+        } else {
+          line.append(fmt::format("\x1b[48;2;{};{};{}m      \x1b[0m {:<7}", c.r, c.g, c.b, color));
+        }
+      }
+    }
+    fmt::print("{}\n", line);
+    line.clear();
+  }
+  fmt::print("\n");
+  fflush(stdout);
+  return true;
+}
+
+void PixelFrame::printSegmentationColors() {
+  set<uint16_t> usedClassColors;
+  set<uint16_t> usedObjectColors;
+  {
+    unique_lock<mutex> lock(getUsedColorsMutex());
+    usedClassColors = getUsedClassColors();
+    usedObjectColors = getusedObjectColors();
+  }
+  bool printed = printSegColors(usedClassColors, getGetObjectClassSegmentationColors(), true);
+  printed |= printSegColors(usedObjectColors, getGetObjectIdSegmentationColors(), false);
+  if (!printed) {
+    fmt::print("No segmentation colors used.\n");
+  }
+}
+
+void PixelFrame::clearSegmentationColors() {
+  unique_lock<mutex> lock(getUsedColorsMutex());
+  getUsedClassColors().clear();
+  getusedObjectColors().clear();
+}
+
 static float asFloat(const string& strFloat, float defaultValue) {
   if (strFloat.empty()) {
     return defaultValue;
@@ -971,6 +1058,10 @@ bool PixelFrame::normalizeToPixelFormat(
 bool PixelFrame::msssimCompare(const PixelFrame& other, double& msssim) {
   THROTTLED_LOGW(nullptr, "PixelFrame::msssimCompare() has no open source implementation");
   return false;
+}
+
+const char* PixelFrame::getSegmentationClassName(uint16_t classIndex) {
+  return "???";
 }
 
 #endif // !IS_VRS_OSS_CODE()

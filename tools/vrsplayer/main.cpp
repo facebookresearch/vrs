@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-#include <array>
-
 #include <qapplication.h>
 #include <qdir.h>
 

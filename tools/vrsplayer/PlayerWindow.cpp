@@ -109,6 +109,17 @@ void PlayerWindow::createMenus() {
   connect(saveFrames, &QAction::triggered, &player_, &vrsp::PlayerUI::saveFrames);
   fileMenu_->addAction(saveFrames);
 
+  fileMenu_->addSeparator();
+  QAction* printSegmentationColors = new QAction("Print Segmentation Colors", this);
+  printSegmentationColors->setShortcut(shortcut(Qt::CTRL, Qt::Key_P));
+  printSegmentationColors->setStatusTip("Print Segmentation Colors");
+  connect(
+      printSegmentationColors,
+      &QAction::triggered,
+      &player_,
+      &vrsp::PlayerUI::printSegmentationColors);
+  fileMenu_->addAction(printSegmentationColors);
+
 #if !IS_MAC_PLATFORM()
   fileMenu_->addSeparator();
   fileMenu_->addAction(aboutAction);

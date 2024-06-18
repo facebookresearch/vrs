@@ -96,6 +96,7 @@ class PlayerUI : public QWidget {
   void adjustOverlayFontSize(int sizeChange);
   void setSolidBackground(bool solid);
   void adjustSpeed(int change);
+  static void printSegmentationColors();
 
  private slots:
   void mediaStateChanged(FileReaderState state);

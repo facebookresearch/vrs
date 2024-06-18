@@ -431,6 +431,7 @@ vector<FrameWidget*> FileReader::openFile(QVBoxLayout* videoFrames, QWidget* wid
   time_.setTime(startTime_);
   nextRecord_ = firstDataRecordIndex_;
   lastReadRecords_.clear();
+  PixelFrame::clearSegmentationColors();
   emit mediaStateChanged(FileReaderState::Paused);
   return frames;
 }

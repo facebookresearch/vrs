@@ -360,6 +360,13 @@ class PixelFrame {
   static const vector<RGBColor>& getGetObjectIdSegmentationColors();
   static const vector<RGBColor>& getGetObjectClassSegmentationColors();
 
+  /// Get the name of a particular segmentation class from its index
+  static const char* getSegmentationClassName(uint16_t classIndex);
+  /// Print the segmentation colors used since the last reset, with color samples
+  static void printSegmentationColors();
+  /// Clear the segmentation colors seen so far (loading a new file?)
+  static void clearSegmentationColors();
+
  private:
   /// Conversion from an external buffer
   /// @param convertedFrame: frame to convert to. May not be allocated yet.

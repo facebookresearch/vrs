@@ -534,4 +534,8 @@ bool PlayerUI::eventFilter(QObject* obj, QEvent* event) {
   return fileReader_.eventFilter(obj, event);
 }
 
+void PlayerUI::printSegmentationColors() {
+  PixelFrame::printSegmentationColors();
+}
+
 } // namespace vrsp
