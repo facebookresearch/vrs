@@ -16,6 +16,7 @@
 
 #include "FileHandler.h"
 
+#include <cctype>
 #include <cstring>
 
 #include <tuple>
@@ -451,6 +452,18 @@ int FileSpec::urldecode(const string& in, string& out) {
     out += c;
   }
   return 0;
+}
+
+void FileSpec::setExtra(const string& name, const string& value) {
+  extras[name] = value;
+}
+
+void FileSpec::setExtra(const string& name, const char* value) {
+  extras[name] = value;
+}
+
+void FileSpec::setExtra(const string& name, bool value) {
+  extras[name] = value ? "1" : "0";
 }
 
 } // namespace vrs

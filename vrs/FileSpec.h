@@ -123,8 +123,13 @@ struct FileSpec {
   static int decodeQuery(const string& query, string& outKey, string& outValue);
   static int urldecode(const string& in, string& out);
 
+  void setExtra(const string& name, const string& value);
+  void setExtra(const string& name, const char* value);
+  void setExtra(const string& name, bool value);
   template <typename T>
-  void setExtra(const string& name, const T& value);
+  void setExtra(const string& name, T value) {
+    extras[name] = std::to_string(value);
+  }
 
   /// Unset an extra parameter
   void unsetExtra(const string& name);
@@ -137,18 +142,4 @@ struct FileSpec {
   map<string, string> extras;
 };
 
-template <>
-inline void FileSpec::setExtra(const string& name, const string& value) {
-  extras[name] = value;
-}
-
-template <>
-inline void FileSpec::setExtra(const string& name, const bool& value) {
-  extras[name] = value ? "1" : "0";
-}
-
-template <typename T>
-inline void FileSpec::setExtra(const string& name, const T& value) {
-  extras[name] = std::to_string(value);
-}
 } // namespace vrs
