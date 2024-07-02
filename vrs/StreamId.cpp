@@ -140,6 +140,7 @@ const unordered_map<RecordableTypeId, const char*>& getRecordableTypeIdRegistry(
       {RecordableTypeId::SensorVarianceBiasRecordableClass, "Sensor Variance/Bias Data Class"},
       {RecordableTypeId::AnchorRecordableClass, "Anchor Data Class"},
       {RecordableTypeId::SegmentationRecordableClass, "Segmentation Data Class"},
+      {RecordableTypeId::TextRecordableClass, "Text Data Class"},
 
       /// << Annotations >>
       {RecordableTypeId::AnnotationRecordableClass, "Annotation Data Class"},

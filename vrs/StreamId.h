@@ -161,6 +161,7 @@ enum class RecordableTypeId : uint16_t {
   SensorVarianceBiasRecordableClass = 378, ///< For sensor variance/bias results.
   AnchorRecordableClass = 379, ///< For anchor data streams (i.e. spatial persistence anchors).
   SegmentationRecordableClass = 380, ///< For segmentation data streams.
+  TextRecordableClass = 381, ///< For result data streams stored as text.
 
   // << Annotations >>
   AnnotationRecordableClass = 400, ///< For annotation streams.
