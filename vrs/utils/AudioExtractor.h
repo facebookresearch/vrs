@@ -18,6 +18,7 @@
 
 #include <vrs/DiskFile.h>
 #include <vrs/RecordFormatStreamPlayer.h>
+#include <vrs/utils/AudioBlock.h>
 
 namespace vrs::utils {
 
@@ -59,12 +60,11 @@ class AudioExtractor : public RecordFormatStreamPlayer {
   AudioContentBlockSpec currentAudioContentBlockSpec_;
   // output stream of wav file currently being written
   DiskFile currentWavFile_;
-  // temp audio buffer to hold segment of audio to be written to file
-  vector<uint8_t> audio_;
   // For validation: start timestamp of the audio segment
   double segmentStartTimestamp_ = 0;
   // For validation: count of audio samples previously processed since the start of the segment
   uint64_t segmentSamplesCount_ = 0;
+  utils::AudioDecompressionHandler decompressor_;
 };
 
 } // namespace vrs::utils

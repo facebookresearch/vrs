@@ -153,32 +153,36 @@ AudioExtractor::~AudioExtractor() {
   closeWavFile(currentWavFile_);
 }
 
-bool AudioExtractor::onAudioRead(
-    const CurrentRecord& record,
-    size_t,
-    const ContentBlock& audioBlock) {
-  audio_.resize(audioBlock.getBlockSize());
-  int readStatus = record.reader->read(audio_);
-  if (readStatus != 0) {
+bool AudioExtractor::onAudioRead(const CurrentRecord& record, size_t, const ContentBlock& cb) {
+  utils::AudioBlock audioBlock;
+  if (!audioBlock.readBlock(record.reader, cb)) {
     THROTTLED_LOGW(
         record.fileReader,
-        "{} - {} record @ {}: Failed read audio data ({}).",
+        "{} - {} record @ {}: Failed read audio data.",
         record.streamId.getNumericName(),
         toString(record.recordType),
-        record.timestamp,
-        errorCodeToMessage(readStatus));
+        record.timestamp);
     return false;
   }
+  if (!audioBlock.decompressAudio(decompressor_)) {
+    THROTTLED_LOGW(
+        record.fileReader,
+        "{} - {} record @ {}: Failed decode audio data.",
+        record.streamId.getNumericName(),
+        toString(record.recordType),
+        record.timestamp);
+  }
 
-  const AudioContentBlockSpec& audioBlockSpec = audioBlock.audio();
+  const AudioContentBlockSpec& audioBlockSpec = audioBlock.getSpec();
   if (audioBlockSpec.getAudioFormat() != AudioFormat::PCM) {
     cout << "Skipping non-PCM audio block\n";
     return true;
   }
 
+  vector<uint8_t>& audioBytes = audioBlock.getBuffer();
   const int64_t kMaxWavFileSize = 1LL << 32; // WAV can't handle files larger than 4 GiB.
   if (!currentAudioContentBlockSpec_.isCompatibleWith(audioBlockSpec) ||
-      currentWavFile_.getPos() + audio_.size() >= kMaxWavFileSize) {
+      currentWavFile_.getPos() + audioBytes.size() >= kMaxWavFileSize) {
     closeWavFile(currentWavFile_);
 
     VERIFY_SUCCESS(os::makeDirectories(folderPath_));
@@ -204,7 +208,7 @@ bool AudioExtractor::onAudioRead(
     segmentSamplesCount_ = 0;
   }
 
-  VERIFY_SUCCESS(writeWavAudioData(currentWavFile_, audioBlockSpec, audio_));
+  VERIFY_SUCCESS(writeWavAudioData(currentWavFile_, audioBlockSpec, audioBytes));
 
   // Time/sample counting validation
   if (segmentSamplesCount_ > 0) {
@@ -229,7 +233,7 @@ bool AudioExtractor::onAudioRead(
   } else {
     segmentStartTimestamp_ = record.timestamp;
   }
-  segmentSamplesCount_ += audioBlock.audio().getSampleCount();
+  segmentSamplesCount_ += audioBlock.getSampleCount();
 
   return true; // read next blocks, if any
 }
