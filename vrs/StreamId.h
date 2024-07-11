@@ -106,6 +106,7 @@ enum class RecordableTypeId : uint16_t {
   CaloriesRecordableClass = 252, ///< Calories data streams.
   RadarRecordableClass = 254, ///< Radar data streams.
   StepCountRecordableClass = 255, ///< Step count data streams.
+  ForceRecordableClass = 256, ///< Force data streams.
 
   // << Calibration, Setup, Diagnostic, etc >>
   CalibrationRecordableClass = 260, ///< For calibration data streams.
