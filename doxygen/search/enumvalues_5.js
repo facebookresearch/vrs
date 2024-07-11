@@ -6,5 +6,6 @@ var searchData=
   ['f64_5fle_1702',['F64_LE',['../namespacevrs.html#a52303127bf307e1191fcb9b2ee2841d4a4b5eb5a94b162fef03b6672349e65617',1,'vrs']]],
   ['facecamerarecordableclass_1703',['FaceCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a5ff92c773b8687f28d4ad32f0589bd20',1,'vrs']]],
   ['firstrecordableclassid_1704',['FirstRecordableClassId',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5ad366946ee7710480a215a81ba0e6c232',1,'vrs']]],
-  ['forwardcamerarecordableclass_1705',['ForwardCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5af964e078c2b87e047a9e2418038eb371',1,'vrs']]]
+  ['forcerecordableclass_1705',['ForceRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a421e251c03df48801484c082419fe26a',1,'vrs']]],
+  ['forwardcamerarecordableclass_1706',['ForwardCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5af964e078c2b87e047a9e2418038eb371',1,'vrs']]]
 ];
