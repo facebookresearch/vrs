@@ -179,10 +179,10 @@ bool RecordFileReader::isVrsFile(const string& filePath) {
 }
 
 // Log progress & bail, if user cancelled
-#define LOG_PROGRESS(operation__, error__, messageLamba__)           \
+#define LOG_PROGRESS(operation__, error__, messageLambda__)          \
   do {                                                               \
     openProgressLogger_->setDetailedProgress(file_->showProgress()); \
-    if (!openProgressLogger_->logNewStep(messageLamba__())) {        \
+    if (!openProgressLogger_->logNewStep(messageLambda__())) {       \
       closeFile();                                                   \
       XR_LOGW("Open cancelled");                                     \
       return OPERATION_CANCELLED;                                    \

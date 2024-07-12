@@ -234,7 +234,7 @@ class DataLayout {
   vector<int8_t>& getFixedData() {
     return fixedData_;
   }
-  /// To access the buffer for variable-size DataPices. No need for a const version.
+  /// To access the buffer for variable-size DataPieces. No need for a const version.
   /// @internal
   vector<int8_t>& getVarData() {
     return varData_;
@@ -582,7 +582,7 @@ class ManualDataLayout : public DataLayout {
 };
 
 /// \brief Helper class to include DataLayout structs containing a set of DataPieceXXX and
-/// DataLayoutStruct while preserving the required unicity of the field names. Embedded DataPiece
+/// DataLayoutStruct while preserving the required uniqueness of the field names. Embedded DataPiece
 /// objects will have a name automatically prefixed with the name of the DataLayoutStruct, with a
 /// '/' in between.
 ///
@@ -632,7 +632,7 @@ struct DataLayoutStruct {
   }
 
 /// \brief Helper class to include DataLayout structs containing a sliced array of DataPieceXXX and
-/// DataLayoutStruct while preserving the required unicity of the field names. Embedded DataPiece
+/// DataLayoutStruct while preserving the required uniqueness of the field names. Embedded DataPiece
 /// objects will have a name automatically prefixed with the name of the DataLayoutStruct, with a
 /// '/0'... /Size-1' in between.
 ///

@@ -67,7 +67,8 @@ void FileHeader::init(uint32_t magic1, uint32_t magic2, uint32_t magic3, uint32_
   // Most nanosecond implementations don't return values with nanosecond precision,
   // so we override the 30 lsb (~1s) with random bits.
   // creationId is now an approximate number of ns since Unix EPOCH, with 30 bits guaranteed random.
-  // Note: this is not perfect unicity, but good enough to avoid collisions in a local file cache.
+  // Note: this is not perfect uniqueness, but good enough to avoid collisions in a local file
+  // cache.
   random_device rd;
   mt19937_64 engine(rd());
   uniform_int_distribution<uint32_t> distribution;
@@ -253,7 +254,7 @@ bool printVRSFileInternals(FileHandler& file) {
           fileHeader.fileHeaderSize.get() + descriptionRecordHeader.recordSize.get();
       cout << "anticipated at " << indexRecordOffset << ", after the description record.\n";
     } else {
-      cout << "NOT after the decription record. Not great for streaming.\n";
+      cout << "NOT after the description record. Not great for streaming.\n";
     }
   }
 

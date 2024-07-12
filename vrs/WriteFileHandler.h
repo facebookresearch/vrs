@@ -87,7 +87,7 @@ class WriteFileHandler : public FileHandler {
   /// @param buffer: a pointer to the data bytes to write.
   /// @param length: the number of bytes to write.
   /// @return A status code, 0 meaning success.
-  /// In case of error, you can use getLastRWSize() to know how many bytes were really writen.
+  /// In case of error, you can use getLastRWSize() to know how many bytes were really written.
   virtual int write(const void* buffer, size_t length) = 0;
   /// Helper for trivially copyable objects.
   template <typename T, std::enable_if_t<std::is_trivially_copyable<T>::value, int> = 0>

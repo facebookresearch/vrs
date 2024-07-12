@@ -78,7 +78,7 @@ struct FileSpec {
   // "filename":"file.vrs"}.
   string toJson() const;
 
-  /// Parse the uri field already set, overwritting other fields on success.
+  /// Parse the uri field already set, overwriting other fields on success.
   int parseUri();
 
   /// Tell if we have chunks and all of them has a file size.
