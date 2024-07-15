@@ -117,7 +117,7 @@ bool PixelFrame::readJxlFrame(const vector<uint8_t>& jxlBuf, bool decodePixels) 
 
   size_t hw_threads = JxlThreadParallelRunnerDefaultNumWorkerThreads();
   JxlThreadParallelRunnerPtr runner_fixed =
-      JxlThreadParallelRunnerMake(nullptr, std::min<size_t>(hw_threads, 16));
+      JxlThreadParallelRunnerMake(nullptr, std::min<size_t>(hw_threads, 8));
   DEC_CHECK(JxlDecoderSetParallelRunner(dec, JxlThreadParallelRunner, runner_fixed.get()));
 
   DEC_CHECK(JxlDecoderSubscribeEvents(
@@ -270,11 +270,11 @@ bool PixelFrame::jxlCompress(
     // default: only use multithreading if the image is large enough (very arbitrary cutoff limits)
     uint32_t pixelCount = pixelSpec.getWidth() * pixelSpec.getHeight();
     if (pixelCount >= 4000 * 4000) {
-      maxThreads = 16;
-    } else if (pixelCount >= 2000 * 2000) {
       maxThreads = 8;
-    } else if (pixelCount >= 1024 * 768) {
+    } else if (pixelCount >= 2000 * 2000) {
       maxThreads = 4;
+    } else if (pixelCount >= 1024 * 768) {
+      maxThreads = 2;
     } else {
       maxThreads = 1;
     }
