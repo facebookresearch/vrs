@@ -62,6 +62,7 @@ var searchData=
   ['disparitycamerarecordableclass_163',['DisparityCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a2c4d3978e5822776894a283e6ddf9f1f',1,'vrs']]],
   ['displayobservercamerarecordableclass_164',['DisplayObserverCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5af72adc94cf96525939e58be4712a2ae8',1,'vrs']]],
   ['displayrecordableclass_165',['DisplayRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a0c7ec518a11e2d65058025033de26896',1,'vrs']]],
-  ['domainerrorcode_166',['domainErrorCode',['../namespacevrs.html#af8f48850a81dd113f904cd3d4ccfd50c',1,'vrs::domainErrorCode(ErrorDomain errorDomain, int64_t errorCode, const char *errorMessage)'],['../namespacevrs.html#a60e81ad2cbd310d1ed9a254abdb914e2',1,'vrs::domainErrorCode(ErrorDomain errorDomain, T errorCode, const char *errorMessage)']]],
-  ['downwardcamerarecordableclass_167',['DownwardCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5ab79d21580765888097a635fede6fc338',1,'vrs']]]
+  ['distancerecordableclass_166',['DistanceRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a9c00a9a5feb99214ab2cffba803d4b52',1,'vrs']]],
+  ['domainerrorcode_167',['domainErrorCode',['../namespacevrs.html#af8f48850a81dd113f904cd3d4ccfd50c',1,'vrs::domainErrorCode(ErrorDomain errorDomain, int64_t errorCode, const char *errorMessage)'],['../namespacevrs.html#a60e81ad2cbd310d1ed9a254abdb914e2',1,'vrs::domainErrorCode(ErrorDomain errorDomain, T errorCode, const char *errorMessage)']]],
+  ['downwardcamerarecordableclass_168',['DownwardCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5ab79d21580765888097a635fede6fc338',1,'vrs']]]
 ];
