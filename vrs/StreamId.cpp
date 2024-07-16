@@ -82,6 +82,7 @@ const unordered_map<RecordableTypeId, const char*>& getRecordableTypeIdRegistry(
       {RecordableTypeId::RadarRecordableClass, "Radar Data Class"},
       {RecordableTypeId::StepCountRecordableClass, "Step Count Data Class"},
       {RecordableTypeId::ForceRecordableClass, "Force Data Class"},
+      {RecordableTypeId::DistanceRecordableClass, "Distance Data Class"},
 
       {RecordableTypeId::SlamImuData, "IMU Data (SLAM)"},
       {RecordableTypeId::SlamMagnetometerData, "Magnetometer Data (SLAM)"},
