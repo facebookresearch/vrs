@@ -140,16 +140,22 @@ class Compressor {
 
   /// Really deallocate the buffer's memory (clear() doesn't do that)
   void clear() {
-    std::vector<uint8_t> blank;
+    std::vector<uninitialized_byte> blank;
     buffer_.swap(blank);
   }
 
   static bool shouldTryToCompress(CompressionPreset preset, size_t size);
 
+  struct uninitialized_byte final {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, modernize-use-equals-default)
+    uninitialized_byte() {} // do not use '= default' as it will initialize byte!
+    uint8_t byte;
+  };
+
  private:
   class CompressorImpl;
   std::unique_ptr<CompressorImpl> impl_;
-  std::vector<uint8_t> buffer_;
+  std::vector<uninitialized_byte> buffer_;
 };
 
 } // namespace vrs
