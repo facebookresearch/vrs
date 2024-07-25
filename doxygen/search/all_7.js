@@ -7,5 +7,6 @@ var searchData=
   ['hasextra_405',['hasExtra',['../structvrs_1_1_file_spec.html#a93232d93b5cb5b7af177c1360891f2d1',1,'vrs::FileSpec']]],
   ['hasfixedsize_406',['hasFixedSize',['../classvrs_1_1_data_piece.html#a8217deb9ab7b27954cf5d1104a31996c',1,'vrs::DataPiece']]],
   ['hasindex_407',['hasIndex',['../classvrs_1_1_record_file_reader.html#a5a97a396f125c4fe2e1d23549d55492c',1,'vrs::RecordFileReader']]],
-  ['heartraterecordableclass_408',['HeartRateRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5aa1028cd5ac562131a22ebf8dea35498c',1,'vrs']]]
+  ['headingrecordableclass_408',['HeadingRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5aa26fa58b342d0cfbf75c56e3f858716d',1,'vrs']]],
+  ['heartraterecordableclass_409',['HeartRateRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5aa1028cd5ac562131a22ebf8dea35498c',1,'vrs']]]
 ];
