@@ -110,6 +110,7 @@ enum class RecordableTypeId : uint16_t {
   ForceRecordableClass = 256, ///< Force data streams.
   DistanceRecordableClass = 257, ///< Distance data streams.
   ActiveMinutesRecordableClass = 258, ///< Active minutes data streams.
+  HeadingRecordableClass = 259, ///< Heading data streams.
 
   // << Calibration, Setup, Diagnostic, etc >>
   CalibrationRecordableClass = 260, ///< For calibration data streams.
