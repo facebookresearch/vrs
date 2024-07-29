@@ -133,3 +133,19 @@
 #define IS_VRS_OSS_TARGET_PLATFORM() 0
 
 #endif
+
+#if defined(__i386__) || defined(__x86_64__)
+#define IS_X86_PLATFORM() 1
+#else
+#define IS_X86_PLATFORM() 0
+#endif
+
+#if defined(__arm__) || defined(__aarch64__) || defined(__thumb__)
+#define IS_ARM_PLATFORM() 1
+#else
+#define IS_ARM_PLATFORM() 0
+#endif
+
+#if IS_X86_PLATFORM() && IS_ARM_PLATFORM()
+#error "Invalid dual-arch platform detected"
+#endif
