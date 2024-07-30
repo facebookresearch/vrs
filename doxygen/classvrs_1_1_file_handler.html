@@ -87,10 +87,10 @@ Inheritance diagram for vrs::FileHandler:</div>
  <div class="center">
   <img src="classvrs_1_1_file_handler.png" usemap="#vrs::FileHandler_map" alt=""/>
   <map id="vrs::FileHandler_map" name="vrs::FileHandler_map">
-<area href="classvrs_1_1_file_delegator.html" title="Class to abstract the delegate file open operation for VRS file." alt="vrs::FileDelegator" shape="rect" coords="0,0,131,24"/>
-<area href="classvrs_1_1_write_file_handler.html" title="The WriteFileHandler interface adds write operations to the FileHandler interface." alt="vrs::WriteFileHandler" shape="rect" coords="0,112,131,136"/>
-<area href="classvrs_1_1_disk_file.html" title="FileHandler implementation for disk files, with chunked file support." alt="vrs::DiskFile" shape="rect" coords="0,168,131,192"/>
-<area href="classvrs_1_1_atomic_disk_file.html" alt="vrs::AtomicDiskFile" shape="rect" coords="0,224,131,248"/>
+<area href="classvrs_1_1_file_delegator.html" title="Class to abstract the delegate file open operation for VRS file." alt="vrs::FileDelegator" shape="rect" coords="0,0,169,24"/>
+<area href="classvrs_1_1_write_file_handler.html" title="The WriteFileHandler interface adds write operations to the FileHandler interface." alt="vrs::WriteFileHandler" shape="rect" coords="0,112,169,136"/>
+<area href="classvrs_1_1_disk_file_t.html" title="FileHandler implementation for disk files, with chunked file support." alt="vrs::DiskFileT&lt; FileChunk &gt;" shape="rect" coords="0,168,169,192"/>
+<area href="classvrs_1_1_atomic_disk_file.html" alt="vrs::AtomicDiskFile" shape="rect" coords="0,224,169,248"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -212,7 +212,7 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div><div class="memdoc">
 <p>Close the file &amp; free all the held resources, even if an error occurs. </p><dl class="section return"><dt>Returns</dt><dd>A status code for first error while closing, or 0, meaning success. </dd></dl>
 
-<p>Implemented in <a class="el" href="classvrs_1_1_atomic_disk_file.html#a0d9a0ead2a2bef7b8e6865aa6c8794a9">vrs::AtomicDiskFile</a>, and <a class="el" href="classvrs_1_1_disk_file.html#afedf0b9e57c8cb8e09bd87f48ac15cda">vrs::DiskFile</a>.</p>
+<p>Implemented in <a class="el" href="classvrs_1_1_atomic_disk_file.html#a0d9a0ead2a2bef7b8e6865aa6c8794a9">vrs::AtomicDiskFile</a>, and <a class="el" href="classvrs_1_1_disk_file_t.html#a0e417839a3458a28b044736c332112d6">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
 
 </div>
 </div>
@@ -312,7 +312,7 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div><div class="memdoc">
 <p>Get position in the current chunk. </p><dl class="section return"><dt>Returns</dt><dd>The current position in the current chunk. </dd></dl>
 
-<p>Implemented in <a class="el" href="classvrs_1_1_disk_file.html#a294205807c30b67c79eecbce74bdb26a">vrs::DiskFile</a>.</p>
+<p>Implemented in <a class="el" href="classvrs_1_1_disk_file_t.html#a8a346c1ec887d83e7e29685e7fa7fe13">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
 
 </div>
 </div>
@@ -358,7 +358,7 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A status of 0 if the request succeeded, or some error code (no file is open...) </dd></dl>
 
-<p>Implemented in <a class="el" href="classvrs_1_1_disk_file.html#aeec0649010166ff80a9de977bb3c2561">vrs::DiskFile</a>.</p>
+<p>Implemented in <a class="el" href="classvrs_1_1_disk_file_t.html#afdf2ff75c33f4a7f4637a25ebafb4a49">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
 
 </div>
 </div>
@@ -386,7 +386,7 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div><div class="memdoc">
 <p>Get the list of chunks, path + size. </p><dl class="section return"><dt>Returns</dt><dd>A succession of path-size pairs. </dd></dl>
 
-<p>Implemented in <a class="el" href="classvrs_1_1_disk_file.html#a1f03242e66ef683e47ebfc95769bca90">vrs::DiskFile</a>.</p>
+<p>Implemented in <a class="el" href="classvrs_1_1_disk_file_t.html#aeafe76f680270ecfa38dcd4b8869009d">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
 
 </div>
 </div>
@@ -414,7 +414,7 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div><div class="memdoc">
 <p>Get the last error code. </p><dl class="section return"><dt>Returns</dt><dd>A status code, 0 meaning success. </dd></dl>
 
-<p>Implemented in <a class="el" href="classvrs_1_1_disk_file.html#aad151c4f4688af18eded934b8da2d928">vrs::DiskFile</a>.</p>
+<p>Implemented in <a class="el" href="classvrs_1_1_disk_file_t.html#a6c5ae58cc8b2da70e397ae52edaa4ffb">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
 
 </div>
 </div>
@@ -442,7 +442,7 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div><div class="memdoc">
 <p>Get the number of bytes actually moved during the last read or write operation. </p><dl class="section return"><dt>Returns</dt><dd>The number of bytes last read or written during the last read or write call. </dd></dl>
 
-<p>Implemented in <a class="el" href="classvrs_1_1_disk_file.html#aec5add6a86d4c56b140e8e525fa6338a">vrs::DiskFile</a>.</p>
+<p>Implemented in <a class="el" href="classvrs_1_1_disk_file_t.html#ad155db5d5d3fe5285ddcb2aee5b6328d">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
 
 </div>
 </div>
@@ -470,7 +470,7 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div><div class="memdoc">
 <p>Get the absolute position in the file, in a chunk aware way. </p><dl class="section return"><dt>Returns</dt><dd>The absolute position in the file, including all previous chunks. </dd></dl>
 
-<p>Implemented in <a class="el" href="classvrs_1_1_disk_file.html#a367b4a7e8e5f243437fec2ff7e62aaad">vrs::DiskFile</a>.</p>
+<p>Implemented in <a class="el" href="classvrs_1_1_disk_file_t.html#ad0d09bf1522a31e4bde4a3c7d8dc2af6">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
 
 </div>
 </div>
@@ -498,7 +498,7 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div><div class="memdoc">
 <p>Get the total size of all the chunks considered. </p><dl class="section return"><dt>Returns</dt><dd>The total size of the open file, or 0. </dd></dl>
 
-<p>Implemented in <a class="el" href="classvrs_1_1_disk_file.html#a308ccab65456063e1d62c0f21911574b">vrs::DiskFile</a>.</p>
+<p>Implemented in <a class="el" href="classvrs_1_1_disk_file_t.html#a6c15fe9b8607de09125d9dbeb368a607">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
 
 </div>
 </div>
@@ -559,7 +559,7 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div><div class="memdoc">
 <p>Tell if we are at the end of the last chunk. </p><dl class="section return"><dt>Returns</dt><dd>True if the read/write pointer is past the last byte of the file. </dd></dl>
 
-<p>Implemented in <a class="el" href="classvrs_1_1_disk_file.html#a0305182ce19d502d559721ea8244dd6d">vrs::DiskFile</a>.</p>
+<p>Implemented in <a class="el" href="classvrs_1_1_disk_file_t.html#a5b59cde880a5f5c9c90766a36c43db79">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
 
 </div>
 </div>
@@ -587,7 +587,7 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div><div class="memdoc">
 <p>Tell if a file is actually open. </p><dl class="section return"><dt>Returns</dt><dd>True if a file is currently open. </dd></dl>
 
-<p>Implemented in <a class="el" href="classvrs_1_1_disk_file.html#af6553f8060d18c59d83019ccc3a49b8f">vrs::DiskFile</a>.</p>
+<p>Implemented in <a class="el" href="classvrs_1_1_disk_file_t.html#a8d2b271cd3b4e4b8b715f1435e174473">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
 
 </div>
 </div>
@@ -615,7 +615,7 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div><div class="memdoc">
 <p>Find out if the file is currently open in read-only mode. </p><dl class="section return"><dt>Returns</dt><dd>True if the file is currently open in read-only mode. Undefined if no file is open. </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classvrs_1_1_write_file_handler.html#a92ad4b6d2cfaa9ceeb9424e49973e9b8">vrs::WriteFileHandler</a>, and <a class="el" href="classvrs_1_1_disk_file.html#a8977e1b77bfba8a212141f1ccabad968">vrs::DiskFile</a>.</p>
+<p>Reimplemented in <a class="el" href="classvrs_1_1_write_file_handler.html#a92ad4b6d2cfaa9ceeb9424e49973e9b8">vrs::WriteFileHandler</a>, and <a class="el" href="classvrs_1_1_disk_file_t.html#ae6af25461ccaee83e1a7387210563311">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
 
 </div>
 </div>
@@ -643,7 +643,7 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div><div class="memdoc">
 <p>Tell if the file handler is handling remote data, that might need caching for instance. Because most custom file systems implementation are not local FS, defaults to true! </p>
 
-<p>Reimplemented in <a class="el" href="classvrs_1_1_disk_file.html#af2b62173cc2bee882633569886bc2b19">vrs::DiskFile</a>.</p>
+<p>Reimplemented in <a class="el" href="classvrs_1_1_disk_file_t.html#ad54a270e44916ec092120a3e48e8b026">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
 
 </div>
 </div>
@@ -671,7 +671,7 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div><div class="memdoc">
 <p>Make a new instance of the concrete class implementing this interface in its default state, no matter what this object's state is, so that we can access more files using the same method. </p><dl class="section return"><dt>Returns</dt><dd>A new object of the concrete type, ready to be used to open a new file. </dd></dl>
 
-<p>Implemented in <a class="el" href="classvrs_1_1_disk_file.html#af56c173b5db639ca9bd78eb002072e5f">vrs::DiskFile</a>.</p>
+<p>Implemented in <a class="el" href="classvrs_1_1_disk_file_t.html#a72a7d7606866e169ac1f2de182f87e01">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
 
 </div>
 </div>
@@ -739,7 +739,7 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A status code, 0 meaning success. </dd></dl>
 
-<p>Implemented in <a class="el" href="classvrs_1_1_disk_file.html#a7c88fc23d4c557d0b5f0adc81c4b1ca5">vrs::DiskFile</a>.</p>
+<p>Implemented in <a class="el" href="classvrs_1_1_disk_file_t.html#a67d91cd298016f7af4d39bb6f9ef14a1">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
 
 </div>
 </div>
@@ -859,7 +859,7 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A status code, 0 meaning success and length bytes were successfully read. </dd></dl>
 
-<p>Implemented in <a class="el" href="classvrs_1_1_disk_file.html#aea9bef4df2e0ef20fdc9e00a10537019">vrs::DiskFile</a>.</p>
+<p>Implemented in <a class="el" href="classvrs_1_1_disk_file_t.html#ac48d2da9f56e2fe3653a8cea28c3fde1">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
 
 </div>
 </div>
@@ -927,7 +927,7 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A status code, 0 meaning success. </dd></dl>
 
-<p>Implemented in <a class="el" href="classvrs_1_1_disk_file.html#ac1c09ff9f9eb7af43dc856886de7ade2">vrs::DiskFile</a>.</p>
+<p>Implemented in <a class="el" href="classvrs_1_1_disk_file_t.html#acd2ce3f9b4711cc263a4ea5d23bcd4fc">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
 
 </div>
 </div>
@@ -962,7 +962,7 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A status code, 0 meaning success. </dd></dl>
 
-<p>Implemented in <a class="el" href="classvrs_1_1_disk_file.html#ab940a3bbfcd90bb85ac7d10352338ddb">vrs::DiskFile</a>.</p>
+<p>Implemented in <a class="el" href="classvrs_1_1_disk_file_t.html#ad52fbf650b868e0d2db8ac865c470c95">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
 
 </div>
 </div>

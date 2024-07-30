@@ -104,6 +104,14 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvrs_1_1_async_file_descriptor.html">AsyncFileDescriptor</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_aligned_buffer.html">AlignedBuffer</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_async_buffer.html">AsyncBuffer</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_async_disk_file_chunk.html">AsyncDiskFileChunk</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_compressor.html">Compressor</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper class to compress data using lz4 or zstd presets.  <a href="classvrs_1_1_compressor.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -206,8 +214,8 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_decompressor.html">Decompressor</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classvrs_1_1_decompressor.html" title="Decompressor helper class, to decompresses data at a target location.">Decompressor</a> helper class, to decompresses data at a target location.  <a href="classvrs_1_1_decompressor.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_disk_file.html">DiskFile</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> implementation for disk files, with chunked file support.  <a href="classvrs_1_1_disk_file.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_disk_file_t.html">DiskFileT</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> implementation for disk files, with chunked file support.  <a href="classvrs_1_1_disk_file_t.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_atomic_disk_file.html">AtomicDiskFile</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -341,6 +349,9 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
+<tr class="memitem:ab0a2e6fd9c3c7d95b9c2716b7bec6344"><td class="memItemLeft" align="right" valign="top"><a id="ab0a2e6fd9c3c7d95b9c2716b7bec6344"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>AsyncHandle</b> = <a class="el" href="structvrs_1_1_async_file_descriptor.html">AsyncFileDescriptor</a></td></tr>
+<tr class="separator:ab0a2e6fd9c3c7d95b9c2716b7bec6344"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a26c3dfc6cb75d7869e0c3a9498574101"><td class="memItemLeft" align="right" valign="top"><a id="a26c3dfc6cb75d7869e0c3a9498574101"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs.html#a26c3dfc6cb75d7869e0c3a9498574101">Point2Dd</a> = <a class="el" href="structvrs_1_1_point_n_d.html">PointND</a>&lt; double, 2 &gt;</td></tr>
 <tr class="memdesc:a26c3dfc6cb75d7869e0c3a9498574101"><td class="mdescLeft">&#160;</td><td class="mdescRight">2D double point class. <br /></td></tr>
@@ -413,6 +424,9 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="nam
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs.html#ae543bb254d8fbf76ecab8e9c15118f2d">Matrix4Di</a> = <a class="el" href="structvrs_1_1_matrix_n_d.html">MatrixND</a>&lt; int32_t, 4 &gt;</td></tr>
 <tr class="memdesc:ae543bb254d8fbf76ecab8e9c15118f2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">4D int32_t matrix class. <br /></td></tr>
 <tr class="separator:ae543bb254d8fbf76ecab8e9c15118f2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afaf41da73e6cff8399c0a75a0f412f9c"><td class="memItemLeft" align="right" valign="top"><a id="afaf41da73e6cff8399c0a75a0f412f9c"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>DiskFile</b> = <a class="el" href="classvrs_1_1_disk_file_t.html">DiskFileT</a>&lt; <a class="el" href="classvrs_1_1_disk_file_chunk.html">DiskFileChunk</a> &gt;</td></tr>
+<tr class="separator:afaf41da73e6cff8399c0a75a0f412f9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a142c4b247fe86fb372c27f77d46e96b4"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs.html#a142c4b247fe86fb372c27f77d46e96b4">InitCreatedThreadCallback</a> = std::function&lt; void(std::thread &amp;, <a class="el" href="namespacevrs.html#ac78cdeb41c8573010548993b9d2f00c6">ThreadRole</a>, int)&gt;</td></tr>
 <tr class="separator:a142c4b247fe86fb372c27f77d46e96b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a04d155e698e82b4cd67ec9312fadefb0"><td class="memItemLeft" align="right" valign="top"><a id="a04d155e698e82b4cd67ec9312fadefb0"></a>

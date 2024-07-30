@@ -85,10 +85,10 @@ Inheritance diagram for vrs::WriteFileHandler:</div>
  <div class="center">
   <img src="classvrs_1_1_write_file_handler.png" usemap="#vrs::WriteFileHandler_map" alt=""/>
   <map id="vrs::WriteFileHandler_map" name="vrs::WriteFileHandler_map">
-<area href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,..." alt="vrs::FileHandler" shape="rect" coords="0,56,131,80"/>
-<area href="classvrs_1_1_file_delegator.html" title="Class to abstract the delegate file open operation for VRS file." alt="vrs::FileDelegator" shape="rect" coords="0,0,131,24"/>
-<area href="classvrs_1_1_disk_file.html" title="FileHandler implementation for disk files, with chunked file support." alt="vrs::DiskFile" shape="rect" coords="0,168,131,192"/>
-<area href="classvrs_1_1_atomic_disk_file.html" alt="vrs::AtomicDiskFile" shape="rect" coords="0,224,131,248"/>
+<area href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,..." alt="vrs::FileHandler" shape="rect" coords="0,56,169,80"/>
+<area href="classvrs_1_1_file_delegator.html" title="Class to abstract the delegate file open operation for VRS file." alt="vrs::FileDelegator" shape="rect" coords="0,0,169,24"/>
+<area href="classvrs_1_1_disk_file_t.html" title="FileHandler implementation for disk files, with chunked file support." alt="vrs::DiskFileT&lt; FileChunk &gt;" shape="rect" coords="0,168,169,192"/>
+<area href="classvrs_1_1_atomic_disk_file.html" alt="vrs::AtomicDiskFile" shape="rect" coords="0,224,169,248"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -214,7 +214,7 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>CacheStatsCallbackFu
 <li>the ones that can edit data already written, whether editing a previously created file, or while creating a new one, as typically possible with local files,</li>
 <li>the immutable kind, which don't allow for overwriting parts of the file already written. They can append content, maybe concatenate chunks, but not modify previously written content. That's a typical restriction for cloud storage systems.</li>
 </ul>
-<p>VRS' <a class="el" href="classvrs_1_1_disk_file.html" title="FileHandler implementation for disk files, with chunked file support.">DiskFile</a> offers the most comprehensive implementation, because it is designed to fit all the needs of advanced VRS file creations, with chunking, but it can be used with non-VRS files.</p>
+<p>VRS' DiskFile offers the most comprehensive implementation, because it is designed to fit all the needs of advanced VRS file creations, with chunking, but it can be used with non-VRS files.</p>
 <p>On the other hand, network <a class="el" href="classvrs_1_1_write_file_handler.html" title="The WriteFileHandler interface adds write operations to the FileHandler interface.">WriteFileHandler</a> implementations often have very specific behaviors designed to accommodate the specificities of the network storage they implement. These implementation details should ideally be abstracted, but in order to optimize cloud VRS file creation, the abstraction is compromised, and cloud <a class="el" href="classvrs_1_1_write_file_handler.html" title="The WriteFileHandler interface adds write operations to the FileHandler interface.">WriteFileHandler</a> implementations are not easily reusable for other applications that VRS. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="acc15477a0e4cac5307cd4d97ba9f94c9"></a>
@@ -241,7 +241,7 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>CacheStatsCallbackFu
 </div><div class="memdoc">
 <p>Append a new chunk to the current file, when in writing to disk. The next write will happen at the beginning of the new chunk. </p><dl class="section return"><dt>Returns</dt><dd>A status code, 0 meaning success. </dd></dl>
 
-<p>Implemented in <a class="el" href="classvrs_1_1_disk_file.html#a5ad9ab38d517612d3a162bfb2b938f3c">vrs::DiskFile</a>.</p>
+<p>Implemented in <a class="el" href="classvrs_1_1_disk_file_t.html#abac5192bf096be66db2973f7c86fbec0">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
 
 </div>
 </div>
@@ -314,7 +314,7 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>CacheStatsCallbackFu
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A status code, 0 meaning success. </dd></dl>
 
-<p>Implemented in <a class="el" href="classvrs_1_1_atomic_disk_file.html#aaa5c0b64056378956b2247e7829de713">vrs::AtomicDiskFile</a>, and <a class="el" href="classvrs_1_1_disk_file.html#aff42827004827f30eb9738636463cd89">vrs::DiskFile</a>.</p>
+<p>Implemented in <a class="el" href="classvrs_1_1_atomic_disk_file.html#aaa5c0b64056378956b2247e7829de713">vrs::AtomicDiskFile</a>, and <a class="el" href="classvrs_1_1_disk_file_t.html#a32e9a8b2fadd2a8d9bd9753082b853bb">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
 
 </div>
 </div>
@@ -388,7 +388,7 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>CacheStatsCallbackFu
 
 <p>Reimplemented from <a class="el" href="classvrs_1_1_file_handler.html#afe53e88b396758690f2c8754bcb39556">vrs::FileHandler</a>.</p>
 
-<p>Implemented in <a class="el" href="classvrs_1_1_disk_file.html#a8977e1b77bfba8a212141f1ccabad968">vrs::DiskFile</a>.</p>
+<p>Implemented in <a class="el" href="classvrs_1_1_disk_file_t.html#ae6af25461ccaee83e1a7387210563311">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
 
 </div>
 </div>
@@ -434,7 +434,7 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>CacheStatsCallbackFu
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A status code, 0 meaning success. </dd></dl>
 
-<p>Implemented in <a class="el" href="classvrs_1_1_disk_file.html#a87b7c5bdc509698d1b7faf37214ce36c">vrs::DiskFile</a>.</p>
+<p>Implemented in <a class="el" href="classvrs_1_1_disk_file_t.html#ace8dc62447a9b273bdd17cdcb84d7078">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
 
 </div>
 </div>
@@ -462,7 +462,7 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>CacheStatsCallbackFu
 </div><div class="memdoc">
 <p>Switch from read-only to read-write mode. Reopen the same file for modification writes. </p><dl class="section return"><dt>Returns</dt><dd>A status code, 0 meaning success. </dd></dl>
 
-<p>Implemented in <a class="el" href="classvrs_1_1_disk_file.html#adcc8e79676ffc203c120423677f97da8">vrs::DiskFile</a>.</p>
+<p>Implemented in <a class="el" href="classvrs_1_1_disk_file_t.html#a95f6f67231f2ee449813db732f68e927">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
 
 </div>
 </div>
@@ -490,7 +490,7 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>CacheStatsCallbackFu
 </div><div class="memdoc">
 <p>Tell if modifying files is supported by this <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> implementation. </p><dl class="section return"><dt>Returns</dt><dd>True if file modification and creation is supported. </dd></dl>
 
-<p>Implemented in <a class="el" href="classvrs_1_1_disk_file.html#a00014804fa261de4ed03e536fd76ae62">vrs::DiskFile</a>.</p>
+<p>Implemented in <a class="el" href="classvrs_1_1_disk_file_t.html#aa7b075e8c3b836915d1cac5f79594522">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
 
 </div>
 </div>
@@ -518,7 +518,7 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>CacheStatsCallbackFu
 </div><div class="memdoc">
 <p>Truncate chunk to the current file position. Use with care. </p><dl class="section return"><dt>Returns</dt><dd>A status code, 0 meaning success. </dd></dl>
 
-<p>Implemented in <a class="el" href="classvrs_1_1_disk_file.html#a26300494328e0caa7ba7d18d40dd0a74">vrs::DiskFile</a>.</p>
+<p>Implemented in <a class="el" href="classvrs_1_1_disk_file_t.html#a913a5a3dc08e6b92b767d0f935d155e5">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
 
 </div>
 </div>
@@ -564,7 +564,7 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>CacheStatsCallbackFu
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A status code, 0 meaning success. In case of error, you can use <a class="el" href="classvrs_1_1_file_handler.html#ac1c2ac008404ab6a71f5b41a13c187e8">getLastRWSize()</a> to know how many bytes were really written. </dd></dl>
 
-<p>Implemented in <a class="el" href="classvrs_1_1_disk_file.html#ad3456c97225c0a150587e6f4a9cc1d80">vrs::DiskFile</a>.</p>
+<p>Implemented in <a class="el" href="classvrs_1_1_disk_file_t.html#a658dd362aa98bbe33920af26f3cc39c8">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
 
 </div>
 </div>
