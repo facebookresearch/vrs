@@ -23,6 +23,7 @@
 
 #include <portability/Filesystem.h>
 
+#include <vrs/DiskFile.h>
 #include <vrs/RecordFileReader.h>
 #include <vrs/os/Utils.h>
 
@@ -88,6 +89,68 @@ TEST_F(DeviceSimulator, singleThread) {
 
   deleteChunkedFile(testPath);
 }
+
+#if VRS_ASYNC_DISKFILE_SUPPORTED()
+TEST_F(DeviceSimulator, singleThreadAsync) {
+  const string testPath = os::getTempFolder() + "SingleThreadAsync.vrs";
+
+  CreateParams t(testPath, kLongFileConfig);
+  t.useAsyncDiskFile();
+  EXPECT_EQ(singleThreadCreateRecords(t), 0);
+
+  checkRecordCountAndIndex(CheckParams(testPath, kLongFileConfig).setJumpbackCount(1));
+
+  deleteChunkedFile(testPath);
+}
+
+TEST_F(DeviceSimulator, multiThreadAsyncAioDirect) {
+  const string testPath = os::getTempFolder() + "MultiThreadAsyncAioDirect.vrs";
+
+  CreateParams t(testPath, kVeryLongFileConfig);
+  t.useAsyncDiskFile("ioengine=aio").setTestOptions(0);
+  EXPECT_EQ(threadedCreateRecords(t), 0);
+
+  checkRecordCountAndIndex(CheckParams(testPath, kVeryLongFileConfig).setJumpbackCount(1));
+
+  deleteChunkedFile(testPath);
+}
+
+TEST_F(DeviceSimulator, multiThreadAsyncAioNotDirect) {
+  const string testPath = os::getTempFolder() + "MultiThreadAsyncAioNotDirect.vrs";
+
+  CreateParams t(testPath, kVeryLongFileConfig);
+  t.useAsyncDiskFile("ioengine=aio&direct=false").setTestOptions(0);
+  EXPECT_EQ(threadedCreateRecords(t), 0);
+
+  checkRecordCountAndIndex(CheckParams(testPath, kVeryLongFileConfig).setJumpbackCount(1));
+
+  deleteChunkedFile(testPath);
+}
+
+TEST_F(DeviceSimulator, multiThreadAsyncSync) {
+  const string testPath = os::getTempFolder() + "MultiThreadAsyncSync.vrs";
+
+  CreateParams t(testPath, kVeryLongFileConfig);
+  t.useAsyncDiskFile("ioengine=sync").setTestOptions(0);
+  EXPECT_EQ(threadedCreateRecords(t), 0);
+
+  checkRecordCountAndIndex(CheckParams(testPath, kVeryLongFileConfig).setJumpbackCount(1));
+
+  deleteChunkedFile(testPath);
+}
+
+TEST_F(DeviceSimulator, multiThreadAsyncPsync) {
+  const string testPath = os::getTempFolder() + "MultiThreadAsyncPsync.vrs";
+
+  CreateParams t(testPath, kVeryLongFileConfig);
+  t.useAsyncDiskFile("ioengine=psync").setTestOptions(0);
+  EXPECT_EQ(threadedCreateRecords(t), 0);
+
+  checkRecordCountAndIndex(CheckParams(testPath, kVeryLongFileConfig).setJumpbackCount(1));
+
+  deleteChunkedFile(testPath);
+}
+#endif
 
 TEST_F(DeviceSimulator, preallocateIndex) {
   const string testPath = os::getTempFolder() + "PreallocateTest.vrs";

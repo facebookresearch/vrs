@@ -60,7 +60,11 @@ bool FileSpec::empty() const {
 }
 
 bool FileSpec::isDiskFile() const {
-  return fileHandlerName.empty() || fileHandlerName == DiskFile::staticName();
+  return fileHandlerName.empty() || fileHandlerName == DiskFile::staticName()
+#if VRS_ASYNC_DISKFILE_SUPPORTED()
+      || fileHandlerName == AsyncDiskFile::staticName()
+#endif
+      ;
 }
 
 int FileSpec::parseUri(

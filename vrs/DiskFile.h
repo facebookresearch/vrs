@@ -18,6 +18,8 @@
 
 #include <cstdio>
 
+#include <vrs/os/Platform.h>
+
 #include "WriteFileHandler.h"
 
 namespace vrs {
@@ -28,12 +30,13 @@ using std::vector;
 class DiskFileChunk;
 
 /// FileHandler implementation for disk files, with chunked file support.
-class DiskFile : public WriteFileHandler {
+template <class FileChunk>
+class DiskFileT : public WriteFileHandler {
  public:
   static const std::string& staticName();
 
-  DiskFile();
-  ~DiskFile() override;
+  DiskFileT();
+  ~DiskFileT() override;
 
   /// Make a new DiskFile object, with a default state.
   std::unique_ptr<FileHandler> makeNew() const override;
@@ -147,25 +150,38 @@ class DiskFile : public WriteFileHandler {
   /// @return A status code, 0 for success.
   static int writeTextFile(const string& path, const string& text);
 
-  int parseUri(FileSpec& intOutFileSpec, size_t colonIndex) const override;
+  int parseUri(FileSpec& inOutFileSpec, size_t colonIndex) const override;
 
  protected:
   int checkChunks(const vector<string>& chunks);
-  int openChunk(DiskFileChunk* chunk);
-  int closeChunk(DiskFileChunk* chunk);
+  int openChunk(FileChunk* chunk);
+  int closeChunk(FileChunk* chunk);
   int addChunk(const string& chunkFilePath);
   bool isLastChunk() const;
   bool trySetPosInCurrentChunk(int64_t offset);
 
   map<string, string> options_; // optional options provided in openSpec or createFile
-  std::unique_ptr<vector<DiskFileChunk>> chunks_; // all the chunks, when a VRS file is opened.
-  DiskFileChunk* currentChunk_{}; // always points to the current chunk within chunks_.
+  std::unique_ptr<vector<FileChunk>> chunks_; // all the chunks, when a VRS file is opened.
+  FileChunk* currentChunk_{}; // always points to the current chunk within chunks_.
   int filesOpenCount_{};
 
   size_t lastRWSize_{};
   int lastError_{};
   bool readOnly_{true};
 };
+
+using DiskFile = DiskFileT<DiskFileChunk>;
+
+#if (IS_LINUX_PLATFORM() && IS_X86_PLATFORM()) || (IS_WINDOWS_PLATFORM() && !defined(__clang__))
+#define VRS_ASYNC_DISKFILE_SUPPORTED() true
+
+class AsyncDiskFileChunk;
+using AsyncDiskFile = DiskFileT<AsyncDiskFileChunk>;
+
+#else
+#define VRS_ASYNC_DISKFILE_SUPPORTED() false
+
+#endif
 
 /// Helper class to create a new file with better chances that the content won't be clobbered by
 /// another process creating a file with the same name at the same time.

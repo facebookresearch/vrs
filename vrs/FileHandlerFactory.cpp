@@ -34,6 +34,9 @@ FileHandlerFactory& FileHandlerFactory::getInstance() {
 
 FileHandlerFactory::FileHandlerFactory() {
   registerFileHandler(make_unique<DiskFile>());
+#if VRS_ASYNC_DISKFILE_SUPPORTED()
+  registerFileHandler(make_unique<AsyncDiskFile>());
+#endif
 }
 
 int FileHandlerFactory::delegateOpen(const string& path, unique_ptr<FileHandler>& outNewDelegate) {

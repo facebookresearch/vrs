@@ -91,6 +91,7 @@ struct FileConfig {
 
 const FileConfig kClassicFileConfig(30, 100);
 const FileConfig kLongFileConfig(30, 20000);
+const FileConfig kVeryLongFileConfig(90, 60000);
 
 /// Parameterization of the VRS file creation, so we can simulate a wide variety of cases.
 struct CreateParams {
@@ -101,7 +102,7 @@ struct CreateParams {
       : path{_path}, fileConfig{_fileConfig} {}
 
   // Required params
-  const string& path;
+  string path;
   const FileConfig& fileConfig;
 
   // Setters for readability
@@ -130,6 +131,14 @@ struct CreateParams {
     customCreateFileFunction = _customCreateFileFunction;
     return *this;
   }
+  CreateParams& useAsyncDiskFile(const char* asyncOptions = "") {
+    path = "asyncdiskfile:" + path;
+    if (asyncOptions && *asyncOptions != 0) {
+      path = path + "?" + asyncOptions;
+    }
+    return *this;
+  }
+
   static string getCameraStreamTag(uint32_t cameraIndex) {
     return fmt::format("camera_{}", cameraIndex);
   }

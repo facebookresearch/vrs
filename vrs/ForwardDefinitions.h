@@ -52,6 +52,10 @@ struct FileSpec;
 class FileDelegator;
 class FileHandler;
 class WriteFileHandler;
-class DiskFile;
+
+class DiskFileChunk;
+template <class FileChunk>
+class DiskFileT;
+using DiskFile = DiskFileT<DiskFileChunk>;
 
 } // namespace vrs

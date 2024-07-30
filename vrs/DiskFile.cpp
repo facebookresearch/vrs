@@ -33,11 +33,14 @@
 #include <vrs/os/Platform.h>
 #include <vrs/os/Utils.h>
 
-#include "Compressor.h"
-#include "Decompressor.h"
-#include "ErrorCode.h"
+#include <vrs/Compressor.h>
+#include <vrs/Decompressor.h>
+#include <vrs/DiskFileChunk.hpp>
+#include <vrs/ErrorCode.h>
 
-#include "DiskFileChunk.hpp"
+#if VRS_ASYNC_DISKFILE_SUPPORTED()
+#include <vrs/AsyncDiskFileChunk.hpp>
+#endif
 
 using namespace std;
 
@@ -45,26 +48,26 @@ namespace vrs {
 
 constexpr int kMaxFilesOpenCount = 2;
 
-const string& DiskFile::staticName() {
-  static const string sDiskFileHandlerName = "diskfile";
-  return sDiskFileHandlerName;
+template <class FileChunk>
+DiskFileT<FileChunk>::DiskFileT() : chunks_(std::make_unique<std::vector<FileChunk>>()) {}
+
+template <class FileChunk>
+DiskFileT<FileChunk>::~DiskFileT() {
+  DiskFileT<FileChunk>::close(); // overrides not available in constructors & destructors
 }
 
-DiskFile::DiskFile() : chunks_(std::make_unique<std::vector<DiskFileChunk>>()) {}
-
-DiskFile::~DiskFile() {
-  DiskFile::close(); // overrides not available in constructors & destructors
+template <class FileChunk>
+unique_ptr<FileHandler> DiskFileT<FileChunk>::makeNew() const {
+  return make_unique<DiskFileT>();
 }
 
-unique_ptr<FileHandler> DiskFile::makeNew() const {
-  return make_unique<DiskFile>();
-}
-
-const string& DiskFile::getFileHandlerName() const {
+template <class FileChunk>
+const string& DiskFileT<FileChunk>::getFileHandlerName() const {
   return staticName();
 }
 
-int DiskFile::close() {
+template <class FileChunk>
+int DiskFileT<FileChunk>::close() {
   lastError_ = 0;
   for (auto& chunk : *chunks_) {
     if (chunk.isOpened()) {
@@ -86,7 +89,8 @@ int DiskFile::close() {
   return lastError_;
 }
 
-int DiskFile::openSpec(const FileSpec& fileSpec) {
+template <class FileChunk>
+int DiskFileT<FileChunk>::openSpec(const FileSpec& fileSpec) {
   close();
   readOnly_ = true;
   if (!fileSpec.fileHandlerName.empty() && !fileSpec.isDiskFile()) {
@@ -100,18 +104,21 @@ int DiskFile::openSpec(const FileSpec& fileSpec) {
   return lastError_;
 }
 
-bool DiskFile::isOpened() const {
+template <class FileChunk>
+bool DiskFileT<FileChunk>::isOpened() const {
   return currentChunk_ != nullptr;
 }
 
-int DiskFile::create(const string& newFilePath, const map<string, string>& options) {
+template <class FileChunk>
+int DiskFileT<FileChunk>::create(const string& newFilePath, const map<string, string>& options) {
   close();
   readOnly_ = false;
   options_ = options;
   return addChunk(newFilePath);
 }
 
-void DiskFile::forgetFurtherChunks(int64_t fileSize) {
+template <class FileChunk>
+void DiskFileT<FileChunk>::forgetFurtherChunks(int64_t fileSize) {
   size_t currentIndex = static_cast<size_t>(currentChunk_ - chunks_->data());
   size_t minChunkCount = currentIndex + 1;
   // forget any chunk past our read location & given file size
@@ -121,7 +128,8 @@ void DiskFile::forgetFurtherChunks(int64_t fileSize) {
   currentChunk_ = chunks_->data() + currentIndex; // in case resize re-allocated the vector
 }
 
-int DiskFile::skipForward(int64_t offset) {
+template <class FileChunk>
+int DiskFileT<FileChunk>::skipForward(int64_t offset) {
   int64_t chunkPos{};
   if ((lastError_ = currentChunk_->tell(chunkPos)) != 0) {
     return lastError_;
@@ -133,12 +141,13 @@ int DiskFile::skipForward(int64_t offset) {
   return setPos(currentChunk_->getOffset() + chunkPos + offset);
 }
 
-int DiskFile::setPos(int64_t offset) {
+template <class FileChunk>
+int DiskFileT<FileChunk>::setPos(int64_t offset) {
   if (trySetPosInCurrentChunk(offset)) {
     return lastError_;
   }
-  DiskFileChunk* lastChunk = &chunks_->back();
-  DiskFileChunk* chunk = currentChunk_;
+  FileChunk* lastChunk = &chunks_->back();
+  FileChunk* chunk = currentChunk_;
   if (offset < chunk->getOffset()) {
     chunk = &chunks_->front();
   }
@@ -155,7 +164,8 @@ int DiskFile::setPos(int64_t offset) {
 // Try to set position within the current chunk.
 // Returns false is chunk isn't the right one, otherwise,
 // calls file seek in current chunk, sets lastError_ accordingly, and always returns true.
-bool DiskFile::trySetPosInCurrentChunk(int64_t offset) {
+template <class FileChunk>
+bool DiskFileT<FileChunk>::trySetPosInCurrentChunk(int64_t offset) {
   if (currentChunk_->contains(offset) ||
       (currentChunk_ == &chunks_->back() &&
        (readOnly_ ? offset == currentChunk_->getOffset() + currentChunk_->getSize()
@@ -166,24 +176,27 @@ bool DiskFile::trySetPosInCurrentChunk(int64_t offset) {
   return false;
 }
 
-int64_t DiskFile::getTotalSize() const {
+template <class FileChunk>
+int64_t DiskFileT<FileChunk>::getTotalSize() const {
   if (chunks_->empty()) {
     return 0;
   }
-  const DiskFileChunk& lastChunk = chunks_->back();
+  const FileChunk& lastChunk = chunks_->back();
   return lastChunk.getOffset() + lastChunk.getSize();
 }
 
-vector<pair<string, int64_t>> DiskFile::getFileChunks() const {
+template <class FileChunk>
+vector<pair<string, int64_t>> DiskFileT<FileChunk>::getFileChunks() const {
   vector<pair<string, int64_t>> chunks;
   chunks.reserve(chunks_->size());
-  for (const DiskFileChunk& chunk : *chunks_) {
+  for (const FileChunk& chunk : *chunks_) {
     chunks.emplace_back(chunk.getPath(), chunk.getSize());
   }
   return chunks;
 }
 
-int DiskFile::read(void* buffer, size_t length) {
+template <class FileChunk>
+int DiskFileT<FileChunk>::read(void* buffer, size_t length) {
   lastRWSize_ = 0;
   lastError_ = 0;
   if (length == 0) {
@@ -214,15 +227,18 @@ int DiskFile::read(void* buffer, size_t length) {
   return lastError_;
 }
 
-size_t DiskFile::getLastRWSize() const {
+template <class FileChunk>
+size_t DiskFileT<FileChunk>::getLastRWSize() const {
   return lastRWSize_;
 }
 
-bool DiskFile::reopenForUpdatesSupported() const {
+template <class FileChunk>
+bool DiskFileT<FileChunk>::reopenForUpdatesSupported() const {
   return true;
 }
 
-int DiskFile::reopenForUpdates() {
+template <class FileChunk>
+int DiskFileT<FileChunk>::reopenForUpdates() {
   if (!isOpened()) {
     return DISKFILE_NOT_OPEN;
   }
@@ -238,11 +254,13 @@ int DiskFile::reopenForUpdates() {
   return 0;
 }
 
-bool DiskFile::isReadOnly() const {
+template <class FileChunk>
+bool DiskFileT<FileChunk>::isReadOnly() const {
   return readOnly_;
 }
 
-int DiskFile::write(const void* buffer, size_t length) {
+template <class FileChunk>
+int DiskFileT<FileChunk>::write(const void* buffer, size_t length) {
   lastRWSize_ = 0;
   if (!isOpened()) {
     return DISKFILE_NOT_OPEN;
@@ -258,7 +276,8 @@ int DiskFile::write(const void* buffer, size_t length) {
   return lastError_;
 }
 
-int DiskFile::overwrite(const void* buffer, size_t length) {
+template <class FileChunk>
+int DiskFileT<FileChunk>::overwrite(const void* buffer, size_t length) {
   lastRWSize_ = 0;
   if (readOnly_) {
     lastError_ = DISKFILE_READ_ONLY;
@@ -291,7 +310,8 @@ int DiskFile::overwrite(const void* buffer, size_t length) {
   return lastError_; // we could not open the next chunk
 }
 
-int DiskFile::truncate() {
+template <class FileChunk>
+int DiskFileT<FileChunk>::truncate() {
   if (readOnly_) {
     lastError_ = DISKFILE_READ_ONLY;
     return lastError_;
@@ -310,15 +330,18 @@ int DiskFile::truncate() {
   return lastError_;
 }
 
-int DiskFile::getLastError() const {
+template <class FileChunk>
+int DiskFileT<FileChunk>::getLastError() const {
   return lastError_;
 }
 
-bool DiskFile::isEof() const {
+template <class FileChunk>
+bool DiskFileT<FileChunk>::isEof() const {
   return isLastChunk() && currentChunk_->eof() != 0;
 }
 
-int DiskFile::checkChunks(const vector<string>& chunks) {
+template <class FileChunk>
+int DiskFileT<FileChunk>::checkChunks(const vector<string>& chunks) {
   int64_t offset = 0;
   for (const string& path : chunks) {
     int64_t chunkSize = os::getFileSize(path);
@@ -332,7 +355,8 @@ int DiskFile::checkChunks(const vector<string>& chunks) {
   return lastError_;
 }
 
-int DiskFile::openChunk(DiskFileChunk* chunk) {
+template <class FileChunk>
+int DiskFileT<FileChunk>::openChunk(FileChunk* chunk) {
   if (chunk->isOpened()) {
     currentChunk_ = chunk;
     chunk->rewind();
@@ -349,7 +373,8 @@ int DiskFile::openChunk(DiskFileChunk* chunk) {
   return lastError_;
 }
 
-int DiskFile::addChunk() {
+template <class FileChunk>
+int DiskFileT<FileChunk>::addChunk() {
   if (chunks_->empty()) {
     return DISKFILE_NOT_OPEN;
   }
@@ -364,7 +389,8 @@ int DiskFile::addChunk() {
   return addChunk(newChunkPath);
 }
 
-int DiskFile::closeChunk(DiskFileChunk* chunk) {
+template <class FileChunk>
+int DiskFileT<FileChunk>::closeChunk(FileChunk* chunk) {
   int error = 0;
   if (chunk->isOpened()) {
     error = chunk->close();
@@ -373,11 +399,12 @@ int DiskFile::closeChunk(DiskFileChunk* chunk) {
   return error;
 }
 
-int DiskFile::addChunk(const string& chunkFilePath) {
+template <class FileChunk>
+int DiskFileT<FileChunk>::addChunk(const string& chunkFilePath) {
   if (!chunks_->empty() && !isLastChunk()) {
     return DISKFILE_INVALID_STATE;
   }
-  DiskFileChunk newChunk;
+  FileChunk newChunk;
   lastError_ = newChunk.create(chunkFilePath, options_);
   if (lastError_ != SUCCESS) {
     return lastError_;
@@ -415,25 +442,29 @@ int DiskFile::addChunk(const string& chunkFilePath) {
   return 0;
 }
 
-bool DiskFile::isLastChunk() const {
+template <class FileChunk>
+bool DiskFileT<FileChunk>::isLastChunk() const {
   return currentChunk_ == &chunks_->back();
 }
 
-int64_t DiskFile::getPos() const {
+template <class FileChunk>
+int64_t DiskFileT<FileChunk>::getPos() const {
   int64_t pos{};
   IF_ERROR_LOG(currentChunk_->tell(pos));
   return currentChunk_->getOffset() + pos;
 }
 
-int64_t DiskFile::getChunkPos() const {
+template <class FileChunk>
+int64_t DiskFileT<FileChunk>::getChunkPos() const {
   int64_t pos{};
   IF_ERROR_LOG(currentChunk_->tell(pos));
   return pos;
 }
 
-int DiskFile::getChunkRange(int64_t& outChunkOffset, int64_t& outChunkSize) const {
+template <class FileChunk>
+int DiskFileT<FileChunk>::getChunkRange(int64_t& outChunkOffset, int64_t& outChunkSize) const {
   if (currentChunk_ != nullptr) {
-    DiskFileChunk* chunk = currentChunk_;
+    FileChunk* chunk = currentChunk_;
     // if we're at the edge of a chunk, return the following chunk
     if (getChunkPos() == chunk->getSize() && !isLastChunk()) {
       chunk++;
@@ -445,7 +476,8 @@ int DiskFile::getChunkRange(int64_t& outChunkOffset, int64_t& outChunkSize) cons
   return DISKFILE_NOT_OPEN;
 }
 
-bool DiskFile::getCurrentChunk(string& outChunkPath, size_t& outChunkIndex) const {
+template <class FileChunk>
+bool DiskFileT<FileChunk>::getCurrentChunk(string& outChunkPath, size_t& outChunkIndex) const {
   if (currentChunk_ == nullptr) {
     return false;
   }
@@ -454,11 +486,13 @@ bool DiskFile::getCurrentChunk(string& outChunkPath, size_t& outChunkIndex) cons
   return true;
 }
 
-bool DiskFile::isRemoteFileSystem() const {
+template <class FileChunk>
+bool DiskFileT<FileChunk>::isRemoteFileSystem() const {
   return false;
 }
 
-int DiskFile::writeZstdFile(const string& path, const void* data, size_t dataSize) {
+template <class FileChunk>
+int DiskFileT<FileChunk>::writeZstdFile(const string& path, const void* data, size_t dataSize) {
   AtomicDiskFile file;
   IF_ERROR_LOG_AND_RETURN(file.create(path));
   if (dataSize > 0) {
@@ -472,7 +506,8 @@ int DiskFile::writeZstdFile(const string& path, const void* data, size_t dataSiz
   return SUCCESS;
 }
 
-int DiskFile::writeZstdFile(const string& path, const string& string) {
+template <class FileChunk>
+int DiskFileT<FileChunk>::writeZstdFile(const string& path, const string& string) {
   return writeZstdFile(path, string.data(), string.size());
 }
 
@@ -497,16 +532,19 @@ int readZstdFileTemplate(const string& path, T& outContent) {
 }
 } // namespace
 
-int DiskFile::readZstdFile(const string& path, vector<char>& outContent) {
+template <class FileChunk>
+int DiskFileT<FileChunk>::readZstdFile(const string& path, vector<char>& outContent) {
   return readZstdFileTemplate(path, outContent);
 }
 
-int DiskFile::readZstdFile(const string& path, string& outString) {
+template <class FileChunk>
+int DiskFileT<FileChunk>::readZstdFile(const string& path, string& outString) {
   return readZstdFileTemplate(path, outString);
 }
 
-int DiskFile::readZstdFile(const string& path, void* data, size_t dataSize) {
-  DiskFile file;
+template <class FileChunk>
+int DiskFileT<FileChunk>::readZstdFile(const string& path, void* data, size_t dataSize) {
+  DiskFileT file;
   IF_ERROR_LOG_AND_RETURN(file.open(path));
   int64_t fileSize = file.getTotalSize();
   if (fileSize <= 0) {
@@ -523,8 +561,9 @@ int DiskFile::readZstdFile(const string& path, void* data, size_t dataSize) {
   return maxReadSize == 0 ? SUCCESS : FAILURE;
 }
 
-string DiskFile::readTextFile(const std::string& path) {
-  DiskFile file;
+template <class FileChunk>
+string DiskFileT<FileChunk>::readTextFile(const std::string& path) {
+  DiskFileT file;
   if (file.open(path) == 0) {
     int64_t size = file.getTotalSize();
     const int64_t kMaxReasonableTextFileSize = 50 * 1024 * 1024; // 50 MB is a huge text file...
@@ -538,14 +577,16 @@ string DiskFile::readTextFile(const std::string& path) {
   return {};
 }
 
-int DiskFile::writeTextFile(const std::string& path, const std::string& text) {
-  DiskFile file;
+template <class FileChunk>
+int DiskFileT<FileChunk>::writeTextFile(const std::string& path, const std::string& text) {
+  DiskFileT file;
   IF_ERROR_LOG_AND_RETURN(file.create(path));
   IF_ERROR_LOG_AND_RETURN(file.write(text.data(), text.size()));
   return file.close();
 }
 
-int DiskFile::parseUri(FileSpec& inOutFileSpec, size_t /*colonIndex*/) const {
+template <class FileChunk>
+int DiskFileT<FileChunk>::parseUri(FileSpec& inOutFileSpec, size_t /*colonIndex*/) const {
   string scheme;
   string path;
   map<string, string> queryParams;
@@ -561,6 +602,26 @@ int DiskFile::parseUri(FileSpec& inOutFileSpec, size_t /*colonIndex*/) const {
 
   return SUCCESS;
 }
+
+template <>
+const string& DiskFileT<DiskFileChunk>::staticName() {
+  static const string sDiskFileHandlerName = "diskfile";
+  return sDiskFileHandlerName;
+}
+
+template class DiskFileT<DiskFileChunk>; // force instantiation of all methods
+
+#if VRS_ASYNC_DISKFILE_SUPPORTED()
+
+template <>
+const string& DiskFileT<AsyncDiskFileChunk>::staticName() {
+  static const string sAsyncDiskFileHandlerName = "asyncdiskfile";
+  return sAsyncDiskFileHandlerName;
+}
+
+template class DiskFileT<AsyncDiskFileChunk>; // force instantiation of all methods
+
+#endif
 
 AtomicDiskFile::~AtomicDiskFile() {
   AtomicDiskFile::close(); // overrides not available in constructors & destructors
