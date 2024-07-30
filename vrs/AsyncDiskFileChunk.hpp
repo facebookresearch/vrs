@@ -27,6 +27,7 @@
 #include <unistd.h>
 #endif
 
+#include <atomic>
 #include <condition_variable>
 #include <deque>
 #include <functional>
@@ -468,7 +469,7 @@ class AlignedBuffer {
     if (size_ >= capacity) {
       throw std::runtime_error("buffer is already at capacity");
     }
-    auto tocopy = std::min(size, capacity - size_);
+    size_t tocopy = std::min<size_t>(size, capacity - size_);
     memcpy(bdata() + size_, buffer, tocopy);
     size_ += tocopy;
 
@@ -784,7 +785,7 @@ class AsyncDiskFileChunk {
         use_directio_ && (current_buffer_ == nullptr || current_buffer_->empty()) &&
         (file_position_ % offset_align_) != 0) {
       // Write as much as we need to in order to hit offset_align_, then fill the buffers
-      towrite = std::min(count, offset_align_ - (file_position_ % offset_align_));
+      towrite = std::min<size_t>(count, offset_align_ - (file_position_ % offset_align_));
     } // Otherwise writes can be aligned to anything, write nothing synchronously here
 
     if (towrite != 0) {
@@ -1268,9 +1269,9 @@ class AsyncDiskFileChunk {
       // the assumption that the underlying write() calls will fail if they're bad values.
 
       uint64_t temp_u64 = 0;
-      mem_align_ =
-          std::max(mem_align_, helpers::getUInt64(options, "mem_align", temp_u64) ? temp_u64 : 04);
-      offset_align_ = std::max(
+      mem_align_ = std::max<size_t>(
+          mem_align_, helpers::getUInt64(options, "mem_align", temp_u64) ? temp_u64 : 04);
+      offset_align_ = std::max<size_t>(
           offset_align_, helpers::getUInt64(options, "offset_align", temp_u64) ? temp_u64 : 04);
 
       // The defaults below might not be optimal for your rig.

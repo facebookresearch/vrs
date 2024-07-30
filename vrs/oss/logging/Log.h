@@ -20,10 +20,6 @@
 
 #include <fmt/core.h>
 
-#ifndef DEFAULT_LOG_CHANNEL
-#error "DEFAULT_LOG_CHANNEL must be defined before including <logging/Log.h>"
-#endif // DEFAULT_LOG_CHANNEL
-
 namespace vrs {
 namespace logging {
 
@@ -52,6 +48,7 @@ void log_every_n_seconds(
 } // namespace logging
 } // namespace vrs
 
+#ifdef DEFAULT_LOG_CHANNEL
 #define XR_LOG_DEFAULT(level, ...) log(level, DEFAULT_LOG_CHANNEL, fmt::format(__VA_ARGS__))
 #define XR_LOG_EVERY_N_SEC_DEFAULT(level, nseconds, ...) \
   log_every_n_seconds(                                   \
@@ -70,3 +67,11 @@ void log_every_n_seconds(
   XR_LOG_EVERY_N_SEC_DEFAULT(vrs::logging::Level::Warning, nseconds, __VA_ARGS__)
 #define XR_LOGE_EVERY_N_SEC(nseconds, ...) \
   XR_LOG_EVERY_N_SEC_DEFAULT(vrs::logging::Level::Error, nseconds, __VA_ARGS__)
+#endif
+
+#define XR_LOG_CHANNEL(level, channel, ...) log(level, channel, fmt::format(__VA_ARGS__))
+
+#define XR_LOGCD(CHANNEL, ...) XR_LOG_CHANNEL(vrs::logging::Level::Debug, CHANNEL, __VA_ARGS__)
+#define XR_LOGCI(CHANNEL, ...) XR_LOG_CHANNEL(vrs::logging::Level::Info, CHANNEL, __VA_ARGS__)
+#define XR_LOGCW(CHANNEL, ...) XR_LOG_CHANNEL(vrs::logging::Level::Warning, CHANNEL, __VA_ARGS__)
+#define XR_LOGCE(CHANNEL, ...) XR_LOG_CHANNEL(vrs::logging::Level::Error, CHANNEL, __VA_ARGS__)
