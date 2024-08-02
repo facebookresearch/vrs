@@ -978,7 +978,9 @@ void RecordFileWriter::writeOneRecord(
   if (timestamp > rwd.newest) {
     rwd.newest = timestamp;
   }
-  if (rwd.currentChunkSize > 0 && rwd.currentChunkSize + record->getSize() >= maxChunkSize_) {
+  size_t recordDiskSize =
+      sizeof(FileFormat::RecordHeader) + (compressedSize > 0 ? compressedSize : record->getSize());
+  if (rwd.currentChunkSize > 0 && rwd.currentChunkSize + recordDiskSize >= maxChunkSize_) {
     NewChunkNotifier newChunkNotifier(*file_, newChunkHandler_);
     // AddChunk() preserves the current chunk on error.
     XR_VERIFY(

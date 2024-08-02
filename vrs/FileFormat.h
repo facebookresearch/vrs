@@ -201,6 +201,18 @@ struct RecordHeader {
     this->compressionType.set(static_cast<uint8_t>(type));
   }
 
+  /// Initialize this header, for use as a regular record.
+  /// Same parameters as the constructor.
+  void initHeader(
+      Record::Type recordType,
+      StreamId streamId,
+      double timestamp,
+      uint32_t formatVersion,
+      CompressionType compressionType,
+      uint32_t previousRecordSize,
+      uint32_t recordSize,
+      uint32_t uncompressedSize);
+
   /// Initialize this header, for use as an index record.
   /// @param formatVersion: Record format version for this index record.
   /// @param indexSize: Payload size of the index record (without header).

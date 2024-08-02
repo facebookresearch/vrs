@@ -88,8 +88,11 @@ class Compressor {
   /// @param data: Pointer to the data to compress.
   /// @param dataSize: Number of bytes in the buffer to compress.
   /// @param preset: Compression preset to use.
+  /// @param headerSpace: Number of bytes to reserve at the beginning of the buffer for a header
+  /// initialized manually later.
   /// @return The number of bytes of compressed data, or 0 in case of failure.
-  uint32_t compress(const void* data, size_t dataSize, CompressionPreset preset);
+  uint32_t
+  compress(const void* data, size_t dataSize, CompressionPreset preset, size_t headerSpace = 0);
 
   /// Frame compression APIs, with streaming to a file.
   /// Write to a file a block of data (a "frame") to be compressed. That data will be logically self
@@ -135,6 +138,11 @@ class Compressor {
   /// @return Pointer to the compressed data.
   const void* getData() const {
     return buffer_.data();
+  }
+  /// Get the space reserved for a header.
+  template <class HeaderType>
+  HeaderType* getHeader() {
+    return reinterpret_cast<HeaderType*>(buffer_.data());
   }
   CompressionType getCompressionType() const;
 

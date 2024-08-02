@@ -22,6 +22,7 @@
 
 #include "Compressor.h"
 #include "DataSource.h"
+#include "FileFormat.h"
 
 using namespace std;
 
@@ -59,7 +60,7 @@ Record* RecordManager::createRecord(
   // Step 1: find a record to reuse, if there is any
   Record* record = nullptr;
   unique_lock<mutex> guard{mutex_};
-  const size_t dataSize = data.getDataSize();
+  const size_t dataSize = sizeof(FileFormat::RecordHeader) + data.getDataSize();
   const size_t maxSize = getAcceptableOverCapacity(dataSize);
   // reuse the most recently inserted records first, as they're less likely to have been swapped out
   // of memory

@@ -28,7 +28,6 @@ namespace vrs {
 class DataSource;
 class Compressor;
 class RecordManager;
-class FileHandler;
 
 /// Type of compression. Used in VRS record headers, so never modify the values.
 enum class CompressionType : uint8_t {
@@ -68,6 +67,9 @@ enum class CompressionType : uint8_t {
 /// Data records are used to capture the actual sensor data. Devices are expected to create Data
 /// records whenever data is received from some kind of device driver, or arbitrarily in the
 /// case of synthetic data.
+///
+/// Records and compressed Records have space for a RecordHeader allocated before their data,
+/// so records can be written in a single write operation.
 ///
 /// See Recordable::createRecord() to see how to create records.
 class Record final {
@@ -131,7 +133,7 @@ class Record final {
 
   /// Get the record's payload size, uncompressed.
   size_t getSize() const {
-    return bufferUsedSize_;
+    return usedBufferSize_;
   }
 
   /// Get the record's record type.
@@ -160,7 +162,7 @@ class Record final {
   Type recordType_{};
   uint32_t formatVersion_{};
   std::vector<uninitialized_byte> buffer_;
-  size_t bufferUsedSize_{};
+  size_t usedBufferSize_{};
   uint64_t creationOrder_{};
 
   RecordManager& recordManager_;

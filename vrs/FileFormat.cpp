@@ -152,6 +152,26 @@ RecordHeader::RecordHeader(
   this->uncompressedSize.set(uncompressedSize);
 }
 
+void RecordHeader::initHeader(
+    Record::Type _recordType,
+    StreamId _streamId,
+    double _timestamp,
+    uint32_t _formatVersion,
+    CompressionType _compressionType,
+    uint32_t _previousRecordSize,
+    uint32_t _recordSize,
+    uint32_t _uncompressedSize) {
+  this->recordSize.set(_recordSize);
+  this->previousRecordSize.set(_previousRecordSize);
+  this->recordableTypeId.set(static_cast<int32_t>(_streamId.getTypeId()));
+  this->formatVersion.set(_formatVersion);
+  this->timestamp.set(_timestamp);
+  this->recordableInstanceId.set(_streamId.getInstanceId());
+  setRecordType(_recordType);
+  setCompressionType(_compressionType);
+  this->uncompressedSize.set(_uncompressedSize);
+}
+
 void RecordHeader::initIndexHeader(
     uint32_t _formatVersion,
     uint32_t indexSize,

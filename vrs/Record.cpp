@@ -29,6 +29,10 @@
 
 using namespace std;
 
+namespace {
+constexpr size_t kRecordHeaderSize = sizeof(vrs::FileFormat::RecordHeader);
+}
+
 namespace vrs {
 
 namespace {
@@ -65,30 +69,33 @@ void Record::set(
     uint32_t formatVersion,
     const DataSource& data,
     uint64_t creationOrder) {
-  this->timestamp_ = timestamp;
-  this->recordType_ = type;
-  this->formatVersion_ = formatVersion;
-  bufferUsedSize_ = data.getDataSize();
-  if (bufferUsedSize_ > 0) {
-    // only resize if we have to
-    if (buffer_.size() < bufferUsedSize_) {
-      // If we're going to reallocate our buffer, then ask for a bit more right away...
-      if (bufferUsedSize_ > buffer_.capacity()) {
-        buffer_.resize(0); // make sure we don't copy existing data for no reason!
-      }
-      buffer_.resize(bufferUsedSize_);
+  timestamp_ = timestamp;
+  recordType_ = type;
+  formatVersion_ = formatVersion;
+  usedBufferSize_ = data.getDataSize();
+  uint64_t allocateSize = kRecordHeaderSize + usedBufferSize_;
+  // only resize if we have to
+  if (buffer_.size() < allocateSize) {
+    // If we're going to reallocate our buffer, then ask for a bit more right away...
+    if (allocateSize > buffer_.capacity()) {
+      buffer_.resize(0); // make sure we don't copy existing data for no reason!
     }
-    data.copyTo(&buffer_[0].byte);
+    buffer_.resize(allocateSize);
   }
-  this->creationOrder_ = creationOrder;
+  data.copyTo(&buffer_.data()->byte + kRecordHeaderSize);
+  creationOrder_ = creationOrder;
 }
 
 bool Record::shouldTryToCompress() const {
-  return Compressor::shouldTryToCompress(recordManager_.getCompression(), bufferUsedSize_);
+  return Compressor::shouldTryToCompress(recordManager_.getCompression(), usedBufferSize_);
 }
 
 uint32_t Record::compressRecord(Compressor& compressor) {
-  return compressor.compress(buffer_.data(), bufferUsedSize_, recordManager_.getCompression());
+  return compressor.compress(
+      buffer_.data() + kRecordHeaderSize,
+      usedBufferSize_,
+      recordManager_.getCompression(),
+      kRecordHeaderSize);
 }
 
 int Record::writeRecord(
@@ -99,8 +106,9 @@ int Record::writeRecord(
     uint32_t compressedSize) {
   CompressionType compressionType = compressor.getCompressionType();
   if (compressionType != CompressionType::None && compressedSize > 0) {
-    uint32_t recordSize = static_cast<uint32_t>(sizeof(FileFormat::RecordHeader) + compressedSize);
-    FileFormat::RecordHeader recordHeader(
+    uint32_t recordSize = static_cast<uint32_t>(kRecordHeaderSize + compressedSize);
+    auto* header = compressor.getHeader<FileFormat::RecordHeader>();
+    header->initHeader(
         getRecordType(),
         streamId,
         timestamp_,
@@ -108,13 +116,13 @@ int Record::writeRecord(
         compressionType,
         inOutRecordSize,
         recordSize,
-        static_cast<uint32_t>(bufferUsedSize_));
-    WRITE_OR_LOG_AND_RETURN(file, &recordHeader, sizeof(recordHeader));
-    WRITE_OR_LOG_AND_RETURN(file, compressor.getData(), compressedSize);
+        static_cast<uint32_t>(usedBufferSize_));
+    WRITE_OR_LOG_AND_RETURN(file, header, recordSize);
     inOutRecordSize = recordSize;
   } else {
-    uint32_t recordSize = static_cast<uint32_t>(sizeof(FileFormat::RecordHeader) + bufferUsedSize_);
-    FileFormat::RecordHeader recordHeader(
+    uint32_t recordSize = static_cast<uint32_t>(kRecordHeaderSize + usedBufferSize_);
+    auto* header = reinterpret_cast<FileFormat::RecordHeader*>(buffer_.data());
+    header->initHeader(
         getRecordType(),
         streamId,
         timestamp_,
@@ -123,8 +131,7 @@ int Record::writeRecord(
         inOutRecordSize,
         recordSize,
         0);
-    WRITE_OR_LOG_AND_RETURN(file, &recordHeader, sizeof(recordHeader));
-    WRITE_OR_LOG_AND_RETURN(file, buffer_.data(), bufferUsedSize_);
+    WRITE_OR_LOG_AND_RETURN(file, header, recordSize);
     inOutRecordSize = recordSize;
   }
   return 0;
