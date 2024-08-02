@@ -52,16 +52,7 @@ class JobQueue {
     }
     double limit = os::getTimestampSec() + waitTime;
     std::unique_lock<std::mutex> locker(mutex_);
-    double actualWaitTime = 0;
-    while (!hasEnded_ && queue_.empty() && (actualWaitTime = limit - os::getTimestampSec()) >= 0) {
-      condition_.wait_for(locker, std::chrono::duration<double>(actualWaitTime));
-    }
-    if (hasEnded_ || queue_.empty()) {
-      return false;
-    }
-    outValue = std::move(queue_.front());
-    queue_.pop_front();
-    return true;
+    return waitForJobLocked(outValue, locker, limit);
   }
   /// Wait for a job until one is available, or the queue was ended
   bool waitForJob(T& outValue) {
@@ -81,6 +72,25 @@ class JobQueue {
     outValue = std::move(queue_.front());
     queue_.pop_front();
     return true;
+  }
+  bool waitForJobs(std::deque<T>& jobs, double waitTime) {
+    jobs.clear();
+    if (waitTime > 0) {
+      waitTime += os::getTimestampSec();
+    }
+    std::unique_lock<std::mutex> locker(mutex_);
+    if (!queue_.empty()) {
+      jobs.swap(queue_);
+      return true;
+    }
+    if (waitTime > 0) {
+      jobs.resize(1);
+      if (waitForJobLocked(jobs.front(), locker, waitTime)) {
+        return true;
+      }
+      jobs.clear();
+    }
+    return false;
   }
   void wakeAll() {
     std::unique_lock<std::mutex> locker(mutex_);
@@ -120,6 +130,21 @@ class JobQueue {
   size_t getQueueSize() const {
     std::unique_lock<std::mutex> locker(mutex_);
     return queue_.size();
+  }
+
+ protected:
+  bool waitForJobLocked(T& outValue, std::unique_lock<std::mutex>& locker, double limitTime) {
+    double actualWaitTime = 0;
+    while (!hasEnded_ && queue_.empty() &&
+           (actualWaitTime = limitTime - os::getTimestampSec()) >= 0) {
+      condition_.wait_for(locker, std::chrono::duration<double>(actualWaitTime));
+    }
+    if (hasEnded_ || queue_.empty()) {
+      return false;
+    }
+    outValue = std::move(queue_.front());
+    queue_.pop_front();
+    return true;
   }
 
  private:

@@ -1056,6 +1056,7 @@ int RecordFileWriter::writeRecordsMultiThread(
   deque<SortRecord> writeQueue; // we need to preserve the order when writing data out!
   map<SortRecord, CompressionJob*> compressionResults;
   RecordWriterData rwd(*file_, lastError);
+  deque<CompressionJob*> results; // to avoid allocation at every iteration
 
   while (!recordsToCompress.empty() || !writeQueue.empty() || !compressionResults.empty()) {
     double waitTime = 10;
@@ -1100,16 +1101,16 @@ int RecordFileWriter::writeRecordsMultiThread(
       waitTime = 0;
     }
     // Check if we have a results to process
-    CompressionJob* job = nullptr;
-    while (compressionThreadsData.resultsQueue.waitForJob(job, waitTime)) {
-      compressionResults.emplace(job->getSortRecord(), job);
-      waitTime = 0;
+    if (compressionThreadsData.resultsQueue.waitForJobs(results, waitTime)) {
+      for (CompressionJob* job : results) {
+        compressionResults.emplace(job->getSortRecord(), job);
+      }
     }
     // Grab any new record ready to write, to feed our background threads ASAP
     autoCollectRecords(true);
-    size_t previousCount = recordsToCompress.size();
+    size_t previousSize = recordsToCompress.size();
     if (addRecordsReadyToWrite(recordsToCompress)) {
-      recordsToWriteCount += recordsToCompress.size() - previousCount;
+      recordsToWriteCount += recordsToCompress.size() - previousSize;
     }
   }
 
