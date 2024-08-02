@@ -92,8 +92,8 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a777e071b6f8093abaea014c2615da505"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_compressor.html#a777e071b6f8093abaea014c2615da505">compress</a> (const void *data, size_t dataSize, <a class="el" href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7b">CompressionPreset</a> preset)</td></tr>
-<tr class="separator:a777e071b6f8093abaea014c2615da505"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f3392bca10173a48683fd94fa4e1f87"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_compressor.html#a0f3392bca10173a48683fd94fa4e1f87">compress</a> (const void *data, size_t dataSize, <a class="el" href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7b">CompressionPreset</a> preset, size_t headerSpace=0)</td></tr>
+<tr class="separator:a0f3392bca10173a48683fd94fa4e1f87"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7e33c50e89e9ec077838c21d2f608b25"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_compressor.html#a7e33c50e89e9ec077838c21d2f608b25">startFrame</a> (size_t frameSize, <a class="el" href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7b">CompressionPreset</a> zstdPreset, uint32_t &amp;outSize)</td></tr>
 <tr class="separator:a7e33c50e89e9ec077838c21d2f608b25"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9210b6c2c1205e2ad6292ed1f5835dbb"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_compressor.html#a9210b6c2c1205e2ad6292ed1f5835dbb">addFrameData</a> (<a class="el" href="classvrs_1_1_write_file_handler.html">WriteFileHandler</a> &amp;file, const void *data, size_t dataSize, uint32_t &amp;inOutCompressedSize, size_t maxCompressedSize=0)</td></tr>
@@ -102,6 +102,11 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a9f661dc89e73af8a08af5ec6088303b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abe5afb3511ea2ede7b73354b237d70a5"><td class="memItemLeft" align="right" valign="top">const void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_compressor.html#abe5afb3511ea2ede7b73354b237d70a5">getData</a> () const</td></tr>
 <tr class="separator:abe5afb3511ea2ede7b73354b237d70a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac39727f9b1a0bc472f4dc587cbbeb314"><td class="memTemplParams" colspan="2"><a id="ac39727f9b1a0bc472f4dc587cbbeb314"></a>
+template&lt;class HeaderType &gt; </td></tr>
+<tr class="memitem:ac39727f9b1a0bc472f4dc587cbbeb314"><td class="memTemplItemLeft" align="right" valign="top">HeaderType *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classvrs_1_1_compressor.html#ac39727f9b1a0bc472f4dc587cbbeb314">getHeader</a> ()</td></tr>
+<tr class="memdesc:ac39727f9b1a0bc472f4dc587cbbeb314"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the space reserved for a header. <br /></td></tr>
+<tr class="separator:ac39727f9b1a0bc472f4dc587cbbeb314"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5a48717a464327cb3ecff499fcac81a4"><td class="memItemLeft" align="right" valign="top"><a id="a5a48717a464327cb3ecff499fcac81a4"></a>
 <a class="el" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getCompressionType</b> () const</td></tr>
 <tr class="separator:a5a48717a464327cb3ecff499fcac81a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -183,8 +188,8 @@ static const size_t&#160;</td><td class="memItemRight" valign="bottom"><b>kMinBy
 
 </div>
 </div>
-<a id="a777e071b6f8093abaea014c2615da505"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a777e071b6f8093abaea014c2615da505">&#9670;&nbsp;</a></span>compress()</h2>
+<a id="a0f3392bca10173a48683fd94fa4e1f87"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f3392bca10173a48683fd94fa4e1f87">&#9670;&nbsp;</a></span>compress()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -205,7 +210,13 @@ static const size_t&#160;</td><td class="memItemRight" valign="bottom"><b>kMinBy
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7b">CompressionPreset</a>&#160;</td>
-          <td class="paramname"><em>preset</em>&#160;</td>
+          <td class="paramname"><em>preset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>headerSpace</em> = <code>0</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -219,6 +230,7 @@ static const size_t&#160;</td><td class="memItemRight" valign="bottom"><b>kMinBy
     <tr><td class="paramname">data</td><td>Pointer to the data to compress. </td></tr>
     <tr><td class="paramname">dataSize</td><td>Number of bytes in the buffer to compress. </td></tr>
     <tr><td class="paramname">preset</td><td>Compression preset to use. </td></tr>
+    <tr><td class="paramname">headerSpace</td><td>Number of bytes to reserve at the beginning of the buffer for a header initialized manually later. </td></tr>
   </table>
   </dd>
 </dl>
@@ -291,7 +303,7 @@ static const size_t&#160;</td><td class="memItemRight" valign="bottom"><b>kMinBy
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Get the compressed data after compression. The size to consider was returned by <a class="el" href="classvrs_1_1_compressor.html#a777e071b6f8093abaea014c2615da505">compress()</a>. </p><dl class="section return"><dt>Returns</dt><dd>Pointer to the compressed data. </dd></dl>
+<p>Get the compressed data after compression. The size to consider was returned by <a class="el" href="classvrs_1_1_compressor.html#a0f3392bca10173a48683fd94fa4e1f87">compress()</a>. </p><dl class="section return"><dt>Returns</dt><dd>Pointer to the compressed data. </dd></dl>
 
 </div>
 </div>

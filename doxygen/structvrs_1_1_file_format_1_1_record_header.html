@@ -100,6 +100,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:afa2c8379f3018df13dee5ac3bdc8b2d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a360ffd918fee83f36c4e4aaaa87f1be5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvrs_1_1_file_format_1_1_record_header.html#a360ffd918fee83f36c4e4aaaa87f1be5">setCompressionType</a> (<a class="el" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a> type)</td></tr>
 <tr class="separator:a360ffd918fee83f36c4e4aaaa87f1be5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d30fbaed8edce0d88a682dcb1fb787b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvrs_1_1_file_format_1_1_record_header.html#a3d30fbaed8edce0d88a682dcb1fb787b">initHeader</a> (<a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> <a class="el" href="structvrs_1_1_file_format_1_1_record_header.html#a3b274afbf7ac599d8693267b02f2d4c2">recordType</a>, <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a> streamId, double <a class="el" href="structvrs_1_1_file_format_1_1_record_header.html#a314de8fe422f6b88cdcb699b3762582a">timestamp</a>, uint32_t <a class="el" href="structvrs_1_1_file_format_1_1_record_header.html#ad55150fbc80c9d77155ba284c2adae77">formatVersion</a>, <a class="el" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a> <a class="el" href="structvrs_1_1_file_format_1_1_record_header.html#a4903cc50c350bb780ea4545ee2f505cf">compressionType</a>, uint32_t <a class="el" href="structvrs_1_1_file_format_1_1_record_header.html#a1f286c194800be0006fa8c4904026d53">previousRecordSize</a>, uint32_t <a class="el" href="structvrs_1_1_file_format_1_1_record_header.html#ade5b9bb779c048471004b9e56a9b6c17">recordSize</a>, uint32_t <a class="el" href="structvrs_1_1_file_format_1_1_record_header.html#a63a46235c317c521c246b702165a006e">uncompressedSize</a>)</td></tr>
+<tr class="separator:a3d30fbaed8edce0d88a682dcb1fb787b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae412387528bd72c14b83221bfcad7e7c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvrs_1_1_file_format_1_1_record_header.html#ae412387528bd72c14b83221bfcad7e7c">initIndexHeader</a> (uint32_t <a class="el" href="structvrs_1_1_file_format_1_1_record_header.html#ad55150fbc80c9d77155ba284c2adae77">formatVersion</a>, uint32_t indexSize, uint32_t <a class="el" href="structvrs_1_1_file_format_1_1_record_header.html#a1f286c194800be0006fa8c4904026d53">previousRecordSize</a>, <a class="el" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a> <a class="el" href="structvrs_1_1_file_format_1_1_record_header.html#a4903cc50c350bb780ea4545ee2f505cf">compressionType</a>)</td></tr>
 <tr class="separator:ae412387528bd72c14b83221bfcad7e7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a496f6173b9a291e8684582d07e2ef5ab"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvrs_1_1_file_format_1_1_record_header.html#a496f6173b9a291e8684582d07e2ef5ab">initDescriptionHeader</a> (uint32_t <a class="el" href="structvrs_1_1_file_format_1_1_record_header.html#ad55150fbc80c9d77155ba284c2adae77">formatVersion</a>, uint32_t descriptionRecordSize, uint32_t <a class="el" href="structvrs_1_1_file_format_1_1_record_header.html#a1f286c194800be0006fa8c4904026d53">previousRecordSize</a>)</td></tr>
@@ -290,6 +292,71 @@ Public Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="a3d30fbaed8edce0d88a682dcb1fb787b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3d30fbaed8edce0d88a682dcb1fb787b">&#9670;&nbsp;</a></span>initHeader()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void vrs::FileFormat::RecordHeader::initHeader </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a>&#160;</td>
+          <td class="paramname"><em>recordType</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>&#160;</td>
+          <td class="paramname"><em>streamId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>timestamp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>formatVersion</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a>&#160;</td>
+          <td class="paramname"><em>compressionType</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>previousRecordSize</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>recordSize</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uncompressedSize</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Initialize this header, for use as a regular record. Same parameters as the constructor. </p>
 
 </div>
 </div>
