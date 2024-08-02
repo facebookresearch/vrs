@@ -79,7 +79,7 @@ system.
   [Brew’s web site](https://brew.sh/).
 - install tools & libraries:
   ```
-  brew install cmake git ninja ccache boost fmt libpng jpeg-turbo lz4 zstd xxhash glog googletest
+  brew install cmake git ninja ccache boost fmt libpng jpeg-turbo libjpeg-dev lz4 zstd xxhash glog googletest
   brew install qt5 portaudio pybind11
   brew install node doxygen
   ```
