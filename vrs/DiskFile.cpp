@@ -592,11 +592,15 @@ int DiskFileT<FileChunk>::parseUri(FileSpec& inOutFileSpec, size_t /*colonIndex*
   map<string, string> queryParams;
   IF_ERROR_RETURN(FileSpec::parseUri(inOutFileSpec.uri, scheme, path, queryParams));
 
-  if (!XR_VERIFY(scheme == getFileHandlerName())) {
-    return FILE_HANDLER_MISMATCH;
+  if (scheme.empty()) {
+    inOutFileSpec.fileHandlerName = getFileHandlerName();
+  } else {
+    if (!XR_VERIFY(scheme == getFileHandlerName())) {
+      return FILE_HANDLER_MISMATCH;
+    }
+    inOutFileSpec.fileHandlerName = std::move(scheme);
   }
 
-  inOutFileSpec.fileHandlerName = getFileHandlerName();
   inOutFileSpec.chunks = {path};
   inOutFileSpec.extras = std::move(queryParams);
 

@@ -22,7 +22,7 @@
 
 using namespace std;
 
-struct FileHandlerJsonTest : testing::Test {
+struct FileHandlerTest : testing::Test {
   const string kJSONPathWithChunks = "{\"chunks\": [\"file1\", \"file2\"]}";
   const string kJSONPathWithSingleChunk = "{\"chunks\": [\"file1\"]}";
   const string kJSONPathWithChunksAndFileHandle =
@@ -48,9 +48,11 @@ struct FileHandlerJsonTest : testing::Test {
   const string kUriPathWithInvalidQuery = "mystorage:test/path/file.vrs?key1=";
   const string kUriPathWithInvalidQuery2 = "mystorage:test/path/file.vrs?=val1";
   const string kUriWithEncodedPath = "mystorage:test%2Fpath%2Ffile.vrs";
+  const string kUriWithoutScheme1 = "test/path/file.vrs?key1=val1";
+  const string kUriWithoutScheme2 = "/disk/test/path/file.vrs?key1=val%201&key2=val2";
 };
 
-TEST_F(FileHandlerJsonTest, JSONPathWithChunks) {
+TEST_F(FileHandlerTest, JSONPathWithChunks) {
   vrs::FileSpec spec;
   EXPECT_TRUE(spec.fromJson(kJSONPathWithChunks));
   EXPECT_EQ(spec.chunks.size(), 2);
@@ -58,13 +60,14 @@ TEST_F(FileHandlerJsonTest, JSONPathWithChunks) {
   EXPECT_EQ(spec.chunks[1], "file2");
 }
 
-TEST_F(FileHandlerJsonTest, JSONPathWithSingleChunk) {
+TEST_F(FileHandlerTest, JSONPathWithSingleChunk) {
   vrs::FileSpec spec;
   EXPECT_TRUE(spec.fromJson(kJSONPathWithSingleChunk));
   EXPECT_EQ(spec.chunks.size(), 1);
   EXPECT_EQ(spec.chunks[0], "file1");
 }
-TEST_F(FileHandlerJsonTest, JSONPathWithChunksAndFileHandle) {
+
+TEST_F(FileHandlerTest, JSONPathWithChunksAndFileHandle) {
   vrs::FileSpec spec;
   EXPECT_TRUE(spec.fromJson(kJSONPathWithChunksAndFileHandle));
   EXPECT_EQ(spec.chunks.size(), 2);
@@ -72,7 +75,8 @@ TEST_F(FileHandlerJsonTest, JSONPathWithChunksAndFileHandle) {
   EXPECT_EQ(spec.chunks[1], "file2");
   EXPECT_EQ(spec.fileHandlerName, "mystorage");
 }
-TEST_F(FileHandlerJsonTest, JSONPathWithChunksAndFileName) {
+
+TEST_F(FileHandlerTest, JSONPathWithChunksAndFileName) {
   vrs::FileSpec spec;
   EXPECT_TRUE(spec.fromJson(kJSONPathWithChunksAndFileName));
   EXPECT_EQ(spec.chunks.size(), 2);
@@ -81,7 +85,7 @@ TEST_F(FileHandlerJsonTest, JSONPathWithChunksAndFileName) {
   EXPECT_EQ(spec.fileName, "sample.vrs");
 }
 
-TEST_F(FileHandlerJsonTest, JSONPathWithExtraField) {
+TEST_F(FileHandlerTest, JSONPathWithExtraField) {
   vrs::FileSpec spec;
   EXPECT_TRUE(spec.fromJson(kJSONPathWithSingleExtraField));
   EXPECT_EQ(spec.chunks.size(), 2);
@@ -98,7 +102,7 @@ TEST_F(FileHandlerJsonTest, JSONPathWithExtraField) {
   EXPECT_EQ(spec.extras["extra1"], "extra1");
 }
 
-TEST_F(FileHandlerJsonTest, JSONPathWithChunksAndFileSizes) {
+TEST_F(FileHandlerTest, JSONPathWithChunksAndFileSizes) {
   vrs::FileSpec spec;
   EXPECT_TRUE(spec.fromJson(kJSONPathWithChunksAndFileSizes));
   EXPECT_EQ(spec.chunks.size(), 2);
@@ -108,13 +112,13 @@ TEST_F(FileHandlerJsonTest, JSONPathWithChunksAndFileSizes) {
   EXPECT_EQ(spec.chunkSizes[1], 67890);
 }
 
-TEST_F(FileHandlerJsonTest, NonJSONPath) {
+TEST_F(FileHandlerTest, NonJSONPath) {
   vrs::FileSpec spec;
   EXPECT_FALSE(spec.fromJson(kNonJSONPath));
 }
 
-TEST_F(FileHandlerJsonTest, ParseURI) {
-  map<string, string> m;
+TEST_F(FileHandlerTest, ParseURI) {
+  map<string, string> m, expected;
   string fileHandlerName;
   string path;
   EXPECT_EQ(
@@ -154,9 +158,21 @@ TEST_F(FileHandlerJsonTest, ParseURI) {
   EXPECT_EQ(path, "test/path/file.vrs");
   EXPECT_EQ(fileHandlerName, "mystorage");
   EXPECT_TRUE(m.empty());
+
+  EXPECT_EQ(vrs::FileSpec::parseUri(kUriWithoutScheme1, fileHandlerName, path, m), 0);
+  EXPECT_EQ(path, "test/path/file.vrs");
+  EXPECT_TRUE(fileHandlerName.empty());
+  expected = {{"key1", "val1"}};
+  EXPECT_EQ(m, expected);
+
+  EXPECT_EQ(vrs::FileSpec::parseUri(kUriWithoutScheme2, fileHandlerName, path, m), 0);
+  EXPECT_EQ(path, "/disk/test/path/file.vrs");
+  EXPECT_TRUE(fileHandlerName.empty());
+  expected = {{"key1", "val 1"}, {"key2", "val2"}};
+  EXPECT_EQ(m, expected);
 }
 
-TEST_F(FileHandlerJsonTest, DecodeUrlQuery) {
+TEST_F(FileHandlerTest, DecodeUrlQuery) {
   const string kURLQuery = "testkey=42";
   const string kURLQueryWithEncode = "testkey=value%3D%23%2F42";
   const string kURLQueryWithEncodeAndSpace = "test%20key=value%3D42";
@@ -186,7 +202,7 @@ TEST_F(FileHandlerJsonTest, DecodeUrlQuery) {
       vrs::INVALID_URI_VALUE);
 }
 
-TEST_F(FileHandlerJsonTest, SetAndGetExtras) {
+TEST_F(FileHandlerTest, SetAndGetExtras) {
   vrs::FileSpec spec;
 
   const string kString = "42";

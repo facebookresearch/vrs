@@ -556,4 +556,37 @@ TEST_F(SimpleFileHandlerTest, pathJsonUriParse) {
   json = "{\"chunks\":[\"" PATH "\"],\"storage\":\"nfs\",\"source_uri\":\"" URIQ "\",\"q\":\"1\"}";
   EXPECT_EQ(spec.toJson(), json);
   EXPECT_EQ(spec.getEasyPath(), URIQ);
+
+#define PATH_PARAM PATH "?p1=val&p2=otherval"
+  EXPECT_EQ(spec.fromPathJsonUri(PATH_PARAM), 0);
+  EXPECT_EQ(spec.uri, PATH_PARAM);
+  EXPECT_EQ(spec.fileHandlerName, "diskfile");
+  chunks = {PATH};
+  EXPECT_EQ(spec.chunks, chunks);
+  EXPECT_TRUE(spec.chunkSizes.empty());
+  EXPECT_EQ(spec.fileName, "");
+  EXPECT_FALSE(spec.hasChunkSizes());
+  EXPECT_EQ(spec.getFileSize(), -1);
+  EXPECT_EQ(spec.getSourceLocation(), "diskfile");
+  json =
+      "{\"chunks\":[\"//domain/folder/dir/file.ext\"],\"storage\":\"diskfile\",\"source_uri\":\"//d"
+      "omain/folder/dir/file.ext?p1=val&p2=otherval\",\"p1\":\"val\",\"p2\":\"otherval\"}";
+  EXPECT_EQ(spec.toJson(), json);
+  EXPECT_EQ(spec.getEasyPath(), PATH_PARAM);
+
+  // Windows. :-(
+#define WINDOWS_PATH "\\\\?\\D:\\folder\\dir\\file.ext"
+  EXPECT_EQ(spec.fromPathJsonUri(WINDOWS_PATH), 0);
+  EXPECT_TRUE(spec.uri.empty());
+  EXPECT_EQ(spec.fileHandlerName, "diskfile");
+  chunks = {WINDOWS_PATH};
+  EXPECT_EQ(spec.chunks, chunks);
+  EXPECT_TRUE(spec.chunkSizes.empty());
+  EXPECT_EQ(spec.fileName, "");
+  EXPECT_FALSE(spec.hasChunkSizes());
+  EXPECT_EQ(spec.getFileSize(), -1);
+  EXPECT_EQ(spec.getSourceLocation(), "diskfile");
+  json = "{\"chunks\":[\"\\\\\\\\?\\\\D:\\\\folder\\\\dir\\\\file.ext\"],\"storage\":\"diskfile\"}";
+  EXPECT_EQ(spec.toJson(), json);
+  EXPECT_EQ(spec.getEasyPath(), WINDOWS_PATH);
 }

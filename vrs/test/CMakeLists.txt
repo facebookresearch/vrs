@@ -37,7 +37,7 @@ add_executable(test_vrslib
   ErrorCodeTest.cpp
   TelemetryLoggerTest.cpp
   FileHandlerFactoryTest.cpp
-  FileHandlerJsonTest.cpp
+  FileHandlerTest.cpp
   FrameCompressionTest.cpp
   GetRecordTest.cpp
   MultiRecordFileReaderTest.cpp

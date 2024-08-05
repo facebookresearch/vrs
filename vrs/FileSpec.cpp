@@ -157,12 +157,25 @@ int FileSpec::fromPathJsonUri(const string& pathJsonUri, const string& defaultFi
     isUri = (p == 0) ? isalpha(c) : isalnum(c) || c == '.' || c == '-' || c == '+' || c == '_';
   }
   if (!isUri) {
-    chunks = {pathJsonUri};
+    // Check if there might be URI parameter in the path, and try to parse it that way.
+    auto uriParams = pathJsonUri.find('?');
+    bool hasParams = uriParams != string::npos && uriParams > 1 &&
+        isalpha(static_cast<unsigned char>(pathJsonUri[uriParams + 1])) &&
+        pathJsonUri.find('=', uriParams + 2) != string::npos;
     fileHandlerName =
         defaultFileHandlerName.empty() ? DiskFile::staticName() : defaultFileHandlerName;
+    if (hasParams) {
+      uri = pathJsonUri;
+      if (FileHandlerFactory::getInstance().parseUri(*this, 0) == SUCCESS) {
+        return SUCCESS;
+      }
+      uri.clear();
+    }
+    chunks = {pathJsonUri};
     return SUCCESS;
+  } else {
+    fileHandlerName = pathJsonUri.substr(0, colon);
   }
-  fileHandlerName = pathJsonUri.substr(0, colon);
   uri = pathJsonUri;
 
   // give a chance to a file handler named after the uri scheme, if any, to parse the uri.
