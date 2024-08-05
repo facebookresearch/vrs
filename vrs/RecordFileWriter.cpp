@@ -863,6 +863,7 @@ int RecordFileWriter::createFile(const string& filePath, bool splitHead) {
   } else {
     indexRecordWriter_.useClassicIndexRecord();
   }
+  sortRecords_ = spec.getExtraAsBool("sort_records", true);
 
   return 0;
 }
@@ -1082,7 +1083,9 @@ int RecordFileWriter::writeRecordsMultiThread(
     map<SortRecord, CompressionJob*>::iterator resultsIter;
     // process completed compression job
     if (!writeQueue.empty() &&
-        (resultsIter = compressionResults.find(writeQueue.front())) != compressionResults.end()) {
+        (resultsIter =
+             (sortRecords_ ? compressionResults.find(writeQueue.front())
+                           : compressionResults.begin())) != compressionResults.end()) {
       Record* record = resultsIter->first.record;
       CompressionJob* job = resultsIter->second;
       if (rwd.getError() != 0) {

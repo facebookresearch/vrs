@@ -321,6 +321,7 @@ class RecordFileWriter {
   unique_ptr<NewChunkHandler> newChunkHandler_;
   FileFormat::FileHeader fileHeader_;
   uint32_t lastRecordSize_{};
+  bool sortRecords_{true}; // should records be sorted? Don't only for best IO throughput.
   bool skipFinalizeIndexRecords_ = false; // for unit testing only!
   unique_ptr<deque<IndexRecord::DiskRecordInfo>> preliminaryIndex_;
   IndexRecord::Writer indexRecordWriter_;
