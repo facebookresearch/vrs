@@ -314,7 +314,11 @@ vector<Recordable*> RecordFileWriter::getRecordables() const {
 }
 
 void RecordFileWriter::setCompressionThreadPoolSize(size_t size) {
-  compressionThreadPoolSize_ = min<size_t>(size, thread::hardware_concurrency());
+  size_t maxThreads = thread::hardware_concurrency();
+  if (maxThreads > 4) {
+    maxThreads--; // healthier for the rest of the system while not impacting compression perf much
+  }
+  compressionThreadPoolSize_ = min<size_t>(size, maxThreads);
 }
 
 void RecordFileWriter::setInitCreatedThreadCallback(
@@ -1060,7 +1064,7 @@ int RecordFileWriter::writeRecordsMultiThread(
   deque<CompressionJob*> results; // to avoid allocation at every iteration
 
   while (!recordsToCompress.empty() || !writeQueue.empty() || !compressionResults.empty()) {
-    double waitTime = 10;
+    double waitTime = 0.05;
     // See if we can find a new compressor for that job
     while (!recordsToCompress.empty() && !availableJobs.empty()) {
       SortRecord nextRecord = *recordsToCompress.begin();

@@ -90,7 +90,7 @@ class DawnCamera : public Recordable {
       : Recordable(RecordableTypeId::SampleDeviceRecordableClass, kCameraFlavor[index]),
         cameraIndex_(index),
         fileConfig_{fileConfig} {
-    setCompression(CompressionPreset::Default);
+    setCompression(CompressionPreset::Lz4Fast);
     addRecordFormat(Record::Type::DATA, 1, frameData_.getContentBlock(), {&frameData_});
   }
 

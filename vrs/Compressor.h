@@ -41,6 +41,7 @@ enum class CompressionPreset {
   Lz4Fast, ///< Fast compression speed, very fast decompression, not great compression ratio.
   Lz4Tight, ///< Slower compression speed, very fast decompression, better compression ratio.
 
+  ZstdFaster,
   ZstdFast,
   ZstdLight,
   ZstdMedium,
@@ -54,13 +55,13 @@ enum class CompressionPreset {
   FirstLz4Preset = Lz4Fast,
   LastLz4Preset = Lz4Tight,
 
-  FirstZstdPreset = ZstdFast,
+  FirstZstdPreset = ZstdFaster,
   LastZstdPreset = ZstdMax,
 
   CompressedFirst = Lz4Fast,
   CompressedLast = ZstdMax,
 
-  Default = Lz4Fast ///< Default preset
+  Default = ZstdFaster ///< Default preset
 
 }; // namespace vrs
 

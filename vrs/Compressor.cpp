@@ -39,7 +39,8 @@ namespace {
 using namespace std;
 using namespace vrs;
 
-map<CompressionPreset, int> sZstdPresets = {
+const map<CompressionPreset, int> sZstdPresets = {
+    {CompressionPreset::ZstdFaster, -1},
     {CompressionPreset::ZstdFast, 1},
     {CompressionPreset::ZstdLight, 3},
     {CompressionPreset::ZstdMedium, 7},
@@ -51,7 +52,7 @@ map<CompressionPreset, int> sZstdPresets = {
 static_assert(
     static_cast<uint32_t>(CompressionPreset::LastZstdPreset) -
             static_cast<uint32_t>(CompressionPreset::FirstZstdPreset) + 1 ==
-        7, // Number of zstd presets defined in sZstdPreset
+        8, // Number of zstd presets defined in sZstdPreset
     "Missing sZstdPreset constant definition");
 
 const map<CompressionPreset, const char*> sPresetNames = {
@@ -59,6 +60,7 @@ const map<CompressionPreset, const char*> sPresetNames = {
     {CompressionPreset::Undefined, "undefined"},
     {CompressionPreset::Lz4Fast, "lz4-fast"},
     {CompressionPreset::Lz4Tight, "lz4-tight"},
+    {CompressionPreset::ZstdFaster, "zstd-faster"},
     {CompressionPreset::ZstdFast, "zstd-fast"},
     {CompressionPreset::ZstdLight, "zstd-light"},
     {CompressionPreset::ZstdMedium, "zstd-medium"},
@@ -67,8 +69,18 @@ const map<CompressionPreset, const char*> sPresetNames = {
     {CompressionPreset::ZstdTight, "zstd-tight"},
     {CompressionPreset::ZstdMax, "zstd-max"}};
 
-const char* sCompressionPresetNames[] =
-    {"none", "fast", "tight", "zfast", "zlight", "zmedium", "zheavy", "zhigh", "ztight", "zmax"};
+const char* sCompressionPresetNames[] = {
+    "none",
+    "fast",
+    "tight",
+    "zfaster",
+    "zfast",
+    "zlight",
+    "zmedium",
+    "zheavy",
+    "zhigh",
+    "ztight",
+    "zmax"};
 struct CompressionPresetConverter : public EnumStringConverter<
                                         CompressionPreset,
                                         sCompressionPresetNames,
@@ -80,6 +92,14 @@ struct CompressionPresetConverter : public EnumStringConverter<
       COUNT_OF(sCompressionPresetNames) == enumCount<CompressionPreset>(),
       "Missing CompressionPreset name definitions");
 };
+
+int zstdPresetToCompressionLevel(CompressionPreset preset) {
+  auto iter = sZstdPresets.find(preset);
+  if (iter == sZstdPresets.end()) {
+    return ZSTD_defaultCLevel();
+  }
+  return iter->second;
+}
 
 } // namespace
 
@@ -101,6 +121,7 @@ CompressionPreset toEnum<CompressionPreset>(const string& name) {
     zresult = operation__;                                                               \
     if (ZSTD_isError(zresult)) {                                                         \
       XR_LOGE("{} failed: {}, {}", #operation__, zresult, ZSTD_getErrorName(zresult));   \
+      ZSTD_CCtx_reset(zstdContext_, ZSTD_reset_session_and_parameters);                  \
       return domainErrorCode(                                                            \
           ErrorDomain::ZstdCompressionErrorDomain, zresult, ZSTD_getErrorName(zresult)); \
     }                                                                                    \
@@ -150,7 +171,6 @@ class Compressor::CompressorImpl {
       size_t dataSize,
       CompressionPreset preset,
       size_t headerSpace) {
-    int compressionLevel = sZstdPresets[preset];
     size_t maxCompressedSize = ZSTD_compressBound(dataSize);
     // increase our internal buffer size if necessary
     if (buffer.size() < headerSpace + maxCompressedSize) {
@@ -160,13 +180,13 @@ class Compressor::CompressorImpl {
     if (zstdContext_ == nullptr) {
       zstdContext_ = ZSTD_createCCtx();
     }
-    size_t result = ZSTD_compressCCtx(
-        zstdContext_,
-        buffer.data() + headerSpace,
-        maxCompressedSize,
-        data,
-        dataSize,
-        compressionLevel);
+    size_t zresult = 0;
+    IF_ZCOMP_ERROR_LOG_AND_RETURN(ZSTD_CCtx_reset(zstdContext_, ZSTD_reset_session_only));
+    IF_ZCOMP_ERROR_LOG_AND_RETURN(ZSTD_CCtx_setParameter(
+        zstdContext_, ZSTD_c_compressionLevel, zstdPresetToCompressionLevel(preset)));
+    IF_ZCOMP_ERROR_LOG_AND_RETURN(ZSTD_CCtx_setPledgedSrcSize(zstdContext_, dataSize));
+    size_t result = ZSTD_compress2(
+        zstdContext_, buffer.data() + headerSpace, maxCompressedSize, data, dataSize);
     if (ZSTD_isError(result)) {
       XR_LOGE("Compression error {}", ZSTD_getErrorName(result));
       compressionType_ = CompressionType::None;
@@ -184,10 +204,9 @@ class Compressor::CompressorImpl {
     if (zstdContext_ == nullptr) {
       zstdContext_ = ZSTD_createCCtx();
     }
-    int compressionLevel = sZstdPresets[zstdPreset];
     size_t zresult = 0;
-    IF_ZCOMP_ERROR_LOG_AND_RETURN(
-        ZSTD_CCtx_setParameter(zstdContext_, ZSTD_c_compressionLevel, compressionLevel));
+    IF_ZCOMP_ERROR_LOG_AND_RETURN(ZSTD_CCtx_setParameter(
+        zstdContext_, ZSTD_c_compressionLevel, zstdPresetToCompressionLevel(zstdPreset)));
     IF_ZCOMP_ERROR_LOG_AND_RETURN(ZSTD_CCtx_setPledgedSrcSize(zstdContext_, dataSize));
     return 0;
   }
@@ -249,7 +268,7 @@ string toPrettyName(CompressionPreset preset) {
     name = string("Preset index #") + to_string(static_cast<int>(preset));
   }
   if (preset >= CompressionPreset::FirstZstdPreset && preset <= CompressionPreset::LastZstdPreset) {
-    name += "(" + to_string(sZstdPresets[preset]) + ")";
+    name += "(" + to_string(zstdPresetToCompressionLevel(preset)) + ")";
   }
   return name;
 }
