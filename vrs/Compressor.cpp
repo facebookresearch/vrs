@@ -96,7 +96,7 @@ struct CompressionPresetConverter : public EnumStringConverter<
 int zstdPresetToCompressionLevel(CompressionPreset preset) {
   auto iter = sZstdPresets.find(preset);
   if (iter == sZstdPresets.end()) {
-    return ZSTD_defaultCLevel();
+    return ZSTD_CLEVEL_DEFAULT;
   }
   return iter->second;
 }
