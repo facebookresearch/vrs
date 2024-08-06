@@ -79,6 +79,7 @@ const unordered_map<RecordableTypeId, const char*>& getRecordableTypeIdRegistry(
       {RecordableTypeId::CapacitiveTouchRecordableClass, "Capacitive Touch Data Class"},
       {RecordableTypeId::HeartRateRecordableClass, "Heart Rate Data Class"},
       {RecordableTypeId::CaloriesRecordableClass, "Calories Data Class"},
+      {RecordableTypeId::CsaRecordableClass, "Current Sense Amplifier (CSA) Data Class"},
       {RecordableTypeId::RadarRecordableClass, "Radar Data Class"},
       {RecordableTypeId::StepCountRecordableClass, "Step Count Data Class"},
       {RecordableTypeId::ForceRecordableClass, "Force Data Class"},

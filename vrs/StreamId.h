@@ -105,6 +105,7 @@ enum class RecordableTypeId : uint16_t {
   CapacitiveTouchRecordableClass = 250, ///< For capacitive touch data streams.
   HeartRateRecordableClass = 251, ///< Heart rate data streams.
   CaloriesRecordableClass = 252, ///< Calories data streams.
+  CsaRecordableClass = 253, ///< CSA data streams.
   RadarRecordableClass = 254, ///< Radar data streams.
   StepCountRecordableClass = 255, ///< Step count data streams.
   ForceRecordableClass = 256, ///< Force data streams.
