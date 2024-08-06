@@ -20,6 +20,7 @@
 #include <cstdio>
 
 #include <vrs/FileHandler.h>
+#include <vrs/helpers/Strings.h>
 #include <vrs/os/CompilerAttributes.h>
 #include <vrs/os/Utils.h>
 
@@ -52,6 +53,10 @@ class DiskFileChunk {
     path_ = newPath;
     offset_ = 0;
     size_ = 0;
+    uint64_t bufferSize = 0;
+    if (helpers::getUInt64(options, "io_buffer_size", bufferSize)) {
+      return setvbuf(file_, nullptr, bufferSize == 0 ? _IONBF : _IOFBF, bufferSize);
+    }
 #if IS_ANDROID_PLATFORM()
     const size_t kBufferingSize = 128 * 1024;
     return setvbuf(file_, nullptr, _IOFBF, kBufferingSize);
