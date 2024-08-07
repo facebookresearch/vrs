@@ -100,7 +100,7 @@ int filterCopy(
   if (copyResult == 0) {
     // Init tracker progress early, to be sure we track the background thread queue size
     filteredReader.preRollConfigAndState(); // make sure to copy most recent config & state records
-    throttledWriter.initTimeRange(startTimestamp, endTimestamp);
+    throttledWriter.initTimeRange(startTimestamp, endTimestamp, &filteredReader.reader);
     filteredReader.iterateAdvanced(&throttledWriter);
     for (auto& filter : filters) {
       filter->flush();

@@ -40,10 +40,11 @@ class ThrottledWriter {
   /// @return The RecordFileWriter used to write the output file.
   RecordFileWriter& getWriter();
 
-  /// Set the range of timestamps expected, to track progress on the time range.
+  /// Set the range of timestamps expected, to track operation progress.
   /// @param minTimestamp: earliest timestamp of the operation
   /// @param maxTimestamp: latest timestamp of the operation
-  void initTimeRange(double minTimestamp, double maxTimestamp);
+  /// @param reader: the source file reader, which might allow us to track progress more precisely
+  void initTimeRange(double minTimestamp, double maxTimestamp, RecordFileReader* reader = nullptr);
 
   /// Called when a record is read, which can allow you to slow down decoding by adding a mere sleep
   /// in the callback itself. This is the main use case of this callback, as data is queued for
@@ -81,6 +82,9 @@ class ThrottledWriter {
   int32_t percent_ = 0;
   double minTimestamp_ = 0;
   double duration_ = 0;
+  RecordFileReader* reader_ = nullptr;
+  uint32_t minIndex_ = 0;
+  uint32_t indexRange_ = 0;
 };
 
 /// Default handling of file creation & closing, offering customization opportunities

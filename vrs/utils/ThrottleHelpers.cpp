@@ -19,6 +19,7 @@
 #include <iomanip>
 #include <iostream>
 
+#include <vrs/RecordFileReader.h>
 #include <vrs/helpers/Strings.h>
 #include <vrs/os/Time.h>
 
@@ -73,9 +74,24 @@ RecordFileWriter& ThrottledWriter::getWriter() {
   return writer_;
 }
 
-void ThrottledWriter::initTimeRange(double minTimestamp, double maxTimestamp) {
+void ThrottledWriter::initTimeRange(double minTimestamp, double maxTimestamp, RecordFileReader* r) {
   minTimestamp_ = minTimestamp;
   duration_ = maxTimestamp - minTimestamp;
+  reader_ = r;
+  if (reader_ != nullptr && minTimestamp < maxTimestamp) {
+    auto* minRecord = reader_->getRecordByTime(minTimestamp);
+    if (minRecord != nullptr) {
+      minIndex_ = reader_->getRecordIndex(minRecord);
+      auto* maxRecord = reader_->getRecordByTime(maxTimestamp);
+      uint32_t maxIndex =
+          (maxRecord != nullptr) ? reader_->getRecordIndex(maxRecord) : reader_->getRecordCount();
+      indexRange_ = maxIndex - minIndex_;
+    } else {
+      indexRange_ = 0;
+    }
+  } else {
+    indexRange_ = 0;
+  }
 }
 
 void ThrottledWriter::onRecordDecoded(double timestamp, double writeGraceWindow) {
@@ -102,9 +118,18 @@ void ThrottledWriter::onRecordDecoded(double timestamp, double writeGraceWindow)
   if (showProgress()) {
     double now = os::getTimestampSec();
     if (now >= nextUpdateTime_) {
-      double progress = duration_ > 0.0001 ? (timestamp - minTimestamp_) / duration_ : 1.;
-      // timestamp ranges only include data records, but config & state records might be beyond
-      percent_ = max<int32_t>(static_cast<int32_t>(progress * 100), 0);
+      // timestamp range only includes data records, and config & state records might be beyond
+      if (reader_ == nullptr || indexRange_ == 0) {
+        double progress = duration_ > 0.0001 ? (timestamp - minTimestamp_) / duration_ : 1.;
+        percent_ = static_cast<int32_t>(progress * 100);
+      } else {
+        auto* record = reader_->getRecordByTime(timestamp);
+        uint32_t index = std::max<uint32_t>(
+            record != nullptr ? reader_->getRecordIndex(record) : reader_->getRecordCount(),
+            minIndex_);
+        percent_ = (100 * (index - minIndex_)) / indexRange_;
+      }
+      percent_ = max<int32_t>(percent_, 0);
       percent_ = min<int32_t>(percent_, 100);
       printPercentAndQueueSize(writer_.getBackgroundThreadQueueByteSize(), false);
       nextUpdateTime_ = now + kRefreshDelaySec;

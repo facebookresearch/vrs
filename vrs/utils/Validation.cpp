@@ -316,7 +316,7 @@ string decodeValidation(FilteredFileReader& filteredReader, const CopyOptions& c
   filteredReader.preRollConfigAndState(); // make sure to copy most recent config & state records
 
   ThrottledWriter throttledWriter(copyOptions);
-  throttledWriter.initTimeRange(startTimestamp, endTimestamp);
+  throttledWriter.initTimeRange(startTimestamp, endTimestamp, &filteredReader.reader);
 
   size_t readRecordCount = 0;
   bool noError = true;
@@ -382,7 +382,7 @@ string checkRecords(
   filteredReader.preRollConfigAndState(); // make sure to copy most recent config & state records
 
   ThrottledWriter throttledWriter(copyOptions);
-  throttledWriter.initTimeRange(startTimestamp, endTimestamp);
+  throttledWriter.initTimeRange(startTimestamp, endTimestamp, &filteredReader.reader);
 
   size_t decodedCount = 0;
   bool noError = true;
@@ -755,7 +755,7 @@ bool compareVRSfiles(
   first.preRollConfigAndState(); // make sure to copy most recent config & state records
 
   ThrottledWriter throttledWriter(copyOptions);
-  throttledWriter.initTimeRange(startTimestamp, endTimestamp);
+  throttledWriter.initTimeRange(startTimestamp, endTimestamp, &first.reader);
 
   map<StreamId, StreamId> idMap;
   if (!buildIdMap(first, second, idMap)) {
