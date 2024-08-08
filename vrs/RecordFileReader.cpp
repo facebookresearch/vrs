@@ -43,6 +43,30 @@
 
 using namespace std;
 
+namespace {
+
+using namespace vrs;
+
+bool before(Record::Type lhs, Record::Type rhs) {
+  if (lhs == Record::Type::CONFIGURATION && rhs == Record::Type::STATE) {
+    return true;
+  } else if (lhs == Record::Type::STATE && rhs == Record::Type::CONFIGURATION) {
+    return false;
+  }
+  return static_cast<int>(lhs) < static_cast<int>(rhs);
+}
+
+bool fullRecordCompare(const IndexRecord::RecordInfo& lhs, const IndexRecord::RecordInfo& rhs) {
+  return lhs.timestamp < rhs.timestamp ||
+      (lhs.timestamp <= rhs.timestamp &&
+       (lhs.streamId < rhs.streamId ||
+        (lhs.streamId == rhs.streamId &&
+         (before(lhs.recordType, rhs.recordType) ||
+          (lhs.recordType == rhs.recordType && lhs.fileOffset < rhs.fileOffset)))));
+}
+
+} // namespace
+
 namespace vrs {
 
 StreamPlayer::~StreamPlayer() = default;
@@ -310,6 +334,9 @@ int RecordFileReader::doOpenFile(
     for (const auto& record : recordIndex_) {
       streamRecordCounts_[record.streamId][record.recordType]++;
     }
+  }
+  if (error == 0 && fileSpec.getExtraAsBool("sort_records", false)) {
+    sort(recordIndex_.begin(), recordIndex_.end(), fullRecordCompare);
   }
   return error;
 }
