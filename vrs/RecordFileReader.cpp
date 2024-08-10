@@ -1174,7 +1174,13 @@ int RecordFileReader::readRecord(
       error = reader->read(dataReference, readSize);
       if (error != 0) {
         reader->finish();
-        XR_LOGE("Read failed: {}", errorCodeToMessageWithCode(error));
+        XR_LOGE(
+            "Reading {} record #{} failed. Stream {} @ {:.3f}: {}",
+            toString(recordInfo.recordType),
+            getRecordIndex(&recordInfo),
+            recordInfo.streamId.getNumericName(),
+            recordInfo.timestamp,
+            errorCodeToMessageWithCode(error));
         return error;
       }
     }
