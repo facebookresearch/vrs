@@ -10,33 +10,29 @@ on:
 jobs:
   build_docs_job:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.9]
+
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+
+    - uses: actions/setup-node@v4
+      with:
+          node-version: 18
+          cache: yarn
+          cache-dependency-path: ./website/yarn.lock
+
     - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get upgrade
-        sudo apt-get install -o Acquire::Retries=5 \
-              cmake ninja-build ccache libgtest-dev libfmt-dev \
-              libturbojpeg-dev libpng-dev \
-              liblz4-dev libzstd-dev libxxhash-dev \
-              libboost-system-dev libboost-filesystem-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev \
-              qtbase5-dev portaudio19-dev doxygen
+      run: sudo apt-get install doxygen
+
     - name: Build the Website
+      working-directory: website
       run: |
-        cd website
-        yarn install
+        yarn install --frozen-lockfile
         yarn run build
-      id: build
-    - name: Get output time
-      run: echo "The time was ${{ steps.build.outputs.time }}"
+
     - name: Deploy
       if: ${{ github.event_name == 'push' }}
-      uses: JamesIves/github-pages-deploy-action@releases/v3
+      uses: JamesIves/github-pages-deploy-action@releases/v4
       with:
           ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages # The branch the action should deploy to.
