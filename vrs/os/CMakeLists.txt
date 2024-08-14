@@ -32,9 +32,8 @@ target_link_libraries(vrs_os
     vrs_logging
     Boost::system
     Boost::filesystem
-    Boost::thread
-    Boost::chrono
     Boost::date_time
+    Threads::Threads
 )
 target_compile_definitions(vrs_os INTERFACE OSS_BUILD_MODE)
 
