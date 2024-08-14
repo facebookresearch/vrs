@@ -20,11 +20,10 @@ endif()
 find_package(Boost REQUIRED
   COMPONENTS
     filesystem
-    chrono
     date_time
     system
-    thread
 )
+find_package(Threads REQUIRED)
 find_package(FmtLib REQUIRED)
 find_package(RapidjsonLib REQUIRED)
 find_package(Lz4 REQUIRED)

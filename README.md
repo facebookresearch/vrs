@@ -94,7 +94,7 @@ therefore not supported._
   ```
   sudo apt-get install cmake git ninja-build ccache libgtest-dev libfmt-dev libturbojpeg-dev libpng-dev
   sudo apt-get install liblz4-dev libzstd-dev libxxhash-dev
-  sudo apt-get install libboost-system-dev libboost-filesystem-dev libboost-thread-dev libboost-chrono-dev libboost-date-time-dev
+  sudo apt-get install libboost-system-dev libboost-filesystem-dev libboost-date-time-dev
   sudo apt-get install qtbase5-dev portaudio19-dev
   sudo apt-get install npm doxygen
   ```
