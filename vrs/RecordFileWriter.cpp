@@ -806,7 +806,8 @@ int RecordFileWriter::createFile(const string& filePath, bool splitHead) {
     return error;
   }
 
-  if (!spec.isDiskFile()) {
+  if (file_->getFileHandlerName() == DiskFile::staticName() &&
+      spec.fileHandlerName != DiskFile::staticName()) {
     unique_ptr<WriteFileHandler> writeFile{dynamic_cast<WriteFileHandler*>(
         FileHandlerFactory::getInstance().getFileHandler(spec.fileHandlerName).release())};
     if (!writeFile) {
