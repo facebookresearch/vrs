@@ -124,6 +124,17 @@ bool getUInt64(
     const std::string& field,
     uint64_t& outValue);
 
+/// Helper to get a field of a string map interpreted as an uint64_t, with potential unit,
+/// such as KB, MB, GB, TB, EB...
+/// @param m: the map to search.
+/// @param field: the name of the field.
+/// @param outByteSize: on exit, set to the value retrieved, or 0.
+/// @return True if the field was found and outByteSize was set.
+bool getByteSize(
+    const std::map<std::string, std::string>& m,
+    const std::string& field,
+    uint64_t& outByteSize);
+
 /// Helper to get a field of a string map interpreted as a double.
 /// @param m: the map to search.
 /// @param field: the name of the field.
@@ -136,6 +147,11 @@ bool getDouble(
 
 // reads an uint32_t value, moves the string pointer & returns true on success
 bool readUInt32(const char*& str, uint32_t& outValue);
+
+// Reads a number of bytes with optional KB, MB, GB, TB, EB suffixes
+// Returns true on success, false on failure, setting outByteSize to 0.
+// Note: ignores unrecognized suffixes.
+bool readByteSize(const std::string& strSize, uint64_t& outByteSize);
 
 /// Helper method to print a file size in a human readable way,
 /// using B, KB, MB, GB, TB...

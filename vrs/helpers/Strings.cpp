@@ -344,6 +344,15 @@ bool getUInt64(const map<string, string>& m, const string& field, uint64_t& outV
   return false;
 }
 
+bool getByteSize(
+    const std::map<std::string, std::string>& m,
+    const std::string& field,
+    uint64_t& outByteSize) {
+  outByteSize = 0;
+  const auto iter = m.find(field);
+  return iter != m.end() && readByteSize(iter->second, outByteSize);
+}
+
 bool getDouble(const map<string, string>& m, const string& field, double& outValue) {
   const auto iter = m.find(field);
   if (iter != m.end() && !iter->second.empty()) {
@@ -369,6 +378,52 @@ bool readUInt32(const char*& str, uint32_t& outValue) {
   outValue = static_cast<uint32_t>(readInt);
 
   str = newStr;
+  return true;
+}
+
+inline char safetolower(char c) {
+  return tolower(static_cast<unsigned char>(c));
+}
+
+inline char safeisdigit(char c) {
+  return isdigit(static_cast<unsigned char>(c));
+}
+
+// Interpret strings with units such as "5KB" or "23mb"
+bool readByteSize(const string& strSize, uint64_t& outByteSize) {
+  if (strSize.empty()) {
+    outByteSize = 0;
+    return false;
+  }
+  uint64_t factor = 1;
+  if (strSize.size() > 2 && safetolower(strSize.back()) == 'b' &&
+      safeisdigit(strSize[strSize.size() - 3])) {
+    switch (safetolower(strSize[strSize.size() - 2])) {
+      case 'e':
+        factor <<= 50;
+        break;
+      case 't':
+        factor <<= 40;
+        break;
+      case 'g':
+        factor <<= 30;
+        break;
+      case 'm':
+        factor <<= 20;
+        break;
+      case 'k':
+        factor <<= 10;
+        break;
+      default:
+        break;
+    }
+  }
+  try {
+    outByteSize = stoull(strSize) * factor;
+  } catch (logic_error&) {
+    outByteSize = 0;
+    return false;
+  }
   return true;
 }
 

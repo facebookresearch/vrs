@@ -228,6 +228,14 @@ TEST_F(StringsHelpersTester, getValueTest) {
       {"uint64_neg", "-1"},
       {"double", "-3.5"},
       {"double_bad", "abc"},
+      {"1234", "1234"},
+      {"1KB", "1KB"},
+      {"1mb", "1mb"},
+      {"13TB", "13TB"},
+      {"123GB", "123GB"},
+      {"5EB", "5EB"},
+      {"empty", ""},
+      {"1B", "1B"},
   };
   bool boolValue = false;
   EXPECT_TRUE(getBool(m, "bool_true", boolValue));
@@ -261,6 +269,26 @@ TEST_F(StringsHelpersTester, getValueTest) {
   EXPECT_TRUE(getDouble(m, "double", doubleValue));
   EXPECT_EQ(doubleValue, -3.5);
   EXPECT_FALSE(getDouble(m, "double_bad", doubleValue));
+
+  uint64_t byteSize = 0;
+  EXPECT_TRUE(getByteSize(m, "1234", byteSize));
+  EXPECT_EQ(byteSize, 1234);
+  EXPECT_TRUE(getByteSize(m, "1KB", byteSize));
+  EXPECT_EQ(byteSize, 1024);
+  EXPECT_TRUE(getByteSize(m, "1mb", byteSize));
+  EXPECT_EQ(byteSize, 1024 * 1024);
+  EXPECT_TRUE(getByteSize(m, "13TB", byteSize));
+  EXPECT_EQ(byteSize, 13ULL * 1024 * 1024 * 1024 * 1024);
+  EXPECT_TRUE(getByteSize(m, "123GB", byteSize));
+  EXPECT_EQ(byteSize, 123ULL * 1024 * 1024 * 1024);
+  EXPECT_TRUE(getByteSize(m, "5EB", byteSize));
+  EXPECT_EQ(byteSize, 5ULL * 1024 * 1024 * 1024 * 1024 * 1024);
+  EXPECT_FALSE(getByteSize(m, "nobytesize", byteSize));
+  EXPECT_EQ(byteSize, 0);
+  EXPECT_FALSE(getByteSize(m, "empty", byteSize));
+  EXPECT_EQ(byteSize, 0);
+  EXPECT_TRUE(getByteSize(m, "1B", byteSize));
+  EXPECT_EQ(byteSize, 1);
 }
 
 TEST_F(StringsHelpersTester, humanReadableTimestampTest) {
