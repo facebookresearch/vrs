@@ -38,6 +38,7 @@
 #include <logging/Log.h>
 
 #include <vrs/ErrorCode.h>
+#include <vrs/helpers/EnumStringConverter.h>
 #include <vrs/helpers/FileMacros.h>
 #include <vrs/helpers/Strings.h>
 #include <vrs/os/Platform.h>
@@ -1183,10 +1184,19 @@ class AsyncDiskFileChunk {
   }
 
   int init_parameters(const std::map<std::string, std::string>& options) {
+    static const char* sIoEngineTypes[] = {"sync", "aio", "psync"};
+    struct IoEngineTypeConverter : public EnumStringConverter<
+                                       IoEngine,
+                                       sIoEngineTypes,
+                                       COUNT_OF(sIoEngineTypes),
+                                       IoEngine::AIO,
+                                       IoEngine::AIO,
+                                       true> {};
+
     // The VRS_DISKFILECHUNKASYNC_* options are primarily used for running the test suite with
     // different default IO configurations
-    use_directio_ = true;
-    if (!helpers::getBool(options, "direct", use_directio_)) {
+    if (!helpers::getBool(options, "direct", use_directio_) &&
+        !helpers::getBool(options, "directio", use_directio_)) {
       use_directio_ = true;
     }
 
@@ -1201,23 +1211,10 @@ class AsyncDiskFileChunk {
       ioengine_ = IoEngine::AIO; // default, unless overridden
       auto it = options.find("ioengine");
       if (it != options.end()) {
-        const std::string& ioengine = it->second;
-
         // ioengine names here have been chosen to correspond to the `fio` program's `ioengine` as
         // closely as possible, except `sync`, which acts like the basic DiskFileChunk.hpp, which
         // synchronously writes the buffer to disk write away, no buffering in this class.
-        if (ioengine == "sync") {
-          ioengine_ = IoEngine::Sync;
-        } else if (ioengine == "aio") {
-          ioengine_ = IoEngine::AIO;
-        } else if (ioengine == "psync") {
-          ioengine_ = IoEngine::PSync;
-        } else {
-          XR_LOGCE(
-              VRS_DISKFILECHUNK,
-              "Unrecognized ioengine={} requested, using default engine",
-              ioengine);
-        }
+        ioengine_ = IoEngineTypeConverter::toEnum(it->second);
       }
     }
 #endif
@@ -1230,14 +1227,20 @@ class AsyncDiskFileChunk {
       buffer_size_ = 0;
       num_buffers_ = 0;
       iodepth_ = 0;
+      XR_LOGCI(
+          VRS_DISKFILECHUNK,
+          "asyncdiskfile configuration: IO Engine={} DirectIO={} (no internal buffers)",
+          IoEngineTypeConverter::toString(ioengine_),
+          use_directio_);
       return SUCCESS;
     }
 
     if (use_directio_) {
       supported_flags_ |= O_DIRECT;
     }
-    mem_align_ = 512;
-    offset_align_ = 512;
+
+    mem_align_ = 4 * 1024;
+    offset_align_ = 4 * 1024;
 
 #ifdef STATX_DIOALIGN
     // Current kernel versions deployed around Meta don't have statx. Rely on the defaults/users
@@ -1259,53 +1262,67 @@ class AsyncDiskFileChunk {
             mem_align_,
             offset_align_);
       }
-#endif
 
       if (0 == mem_align_ || 0 == offset_align_) {
         XR_LOGCE(VRS_DISKFILECHUNK, "failed to get alignment info");
         return DISKFILE_NOT_OPEN;
       }
+#endif
 
       // Allow overrides, but don't bother checking that they are powers of two or anything, on
       // the assumption that the underlying write() calls will fail if they're bad values.
 
       uint64_t temp_u64 = 0;
-      mem_align_ = std::max<size_t>(
-          mem_align_, helpers::getUInt64(options, "mem_align", temp_u64) ? temp_u64 : 04);
-      offset_align_ = std::max<size_t>(
-          offset_align_, helpers::getUInt64(options, "offset_align", temp_u64) ? temp_u64 : 04);
+      mem_align_ = helpers::getByteSize(options, "mem_align", temp_u64) ? temp_u64 : mem_align_;
+      mem_align_ = std::clamp<size_t>(mem_align_, 1, 16 * 1024);
+      offset_align_ =
+          helpers::getByteSize(options, "offset_align", temp_u64) ? temp_u64 : offset_align_;
+      offset_align_ = std::clamp<size_t>(offset_align_, 1, 16 * 1024);
 
       // The defaults below might not be optimal for your rig.
       // They can still be overwritten with the parameter names below from the input URI.
-      // fio testing showed each worker using 32M buffers for non-pre-allocated disk was pretty
+      // fio testing showed each worker using 32MB buffers for non-pre-allocated disk was pretty
       // good. Avoids using more than 128 outstanding IO requests at a time, beyond which IO calls
       // were blocking.
 
       buffer_size_ =
-          helpers::getUInt64(options, "buffer_size", temp_u64) ? temp_u64 : 32 * 1024 * 1024;
+          helpers::getByteSize(options, "buffer_size", temp_u64) ? temp_u64 : 32 * 1024 * 1024;
+      buffer_size_ = std::clamp<size_t>(buffer_size_, 512, 512 * 1024 * 1024);
       num_buffers_ = helpers::getUInt64(options, "buffer_count", temp_u64) ? temp_u64 : 4;
-
-      // fio testing showed that we really only need to keep a couple of these
-      // at a time
-      iodepth_ = helpers::getUInt64(options, "iodepth", temp_u64) ? temp_u64 : num_buffers_;
+      num_buffers_ = std::clamp<size_t>(num_buffers_, 1, 512);
 
       if (ioengine_ == IoEngine::PSync && num_buffers_ > 1) {
-        XR_LOGCD(
+        XR_LOGCW(
             VRS_DISKFILECHUNK,
-            "selected ioengine can only make use of a single buffer, not {}",
+            "The psync ioengine can only make use of a single buffer, not {}.",
             num_buffers_);
         num_buffers_ = 1;
       }
 
+      // fio testing showed that we really only need to keep a couple of these at a time
+      iodepth_ = helpers::getUInt64(options, "iodepth", temp_u64) ? temp_u64 : num_buffers_;
+      iodepth_ = std::clamp<size_t>(iodepth_, 1, 512);
+
       if ((buffer_size_ % offset_align_ != 0) || (buffer_size_ % mem_align_ != 0)) {
         XR_LOGCE(
             VRS_DISKFILECHUNK,
-            "buffer_size={} doesn't confirm to offset_align={} or mem_align={}",
-            buffer_size_,
-            offset_align_,
-            mem_align_);
+            "buffer_size={} doesn't conform to offset_align={} or mem_align={}",
+            helpers::humanReadableFileSize(buffer_size_),
+            helpers::humanReadableFileSize(offset_align_),
+            helpers::humanReadableFileSize(mem_align_));
         return DISKFILE_INVALID_STATE;
       }
+      XR_LOGCI(
+          VRS_DISKFILECHUNK,
+          "asyncdiskfile configuration: IOEngine={} DirectIO={} iodepth={} buffer_count={} "
+          "buffer_size={} offset_align={} mem_align={}",
+          IoEngineTypeConverter::toString(ioengine_),
+          use_directio_,
+          iodepth_,
+          num_buffers_,
+          helpers::humanReadableFileSize(buffer_size_),
+          helpers::humanReadableFileSize(offset_align_),
+          helpers::humanReadableFileSize(mem_align_));
       return SUCCESS;
     }
 
