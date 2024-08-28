@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
+#ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES // needed for M_PI definition on Windows
+#endif
 #include <cmath>
 
 #include <vector>
