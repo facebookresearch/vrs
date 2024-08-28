@@ -261,8 +261,8 @@ TEST_F(StringsHelpersTester, getValueTest) {
   uint64_t uint64Value = 0;
   EXPECT_TRUE(getUInt64(m, "uint64", uint64Value));
   EXPECT_EQ(uint64Value, 1234567890);
-  EXPECT_TRUE(getUInt64(m, "uint64_neg", uint64Value));
-  EXPECT_EQ(uint64Value, 0xffffffffffffffff);
+  EXPECT_FALSE(getUInt64(m, "uint64_neg", uint64Value));
+  EXPECT_EQ(uint64Value, 0);
   EXPECT_FALSE(getUInt64(m, "nouint64", uint64Value));
 
   double doubleValue = 0;
@@ -339,6 +339,21 @@ TEST_F(StringsHelpersTester, readUnsignedInt32) {
 
   const char* strWord = "vrs";
   EXPECT_EQ(readUInt32(strWord, outInt), false);
+}
+
+TEST_F(StringsHelpersTester, readUInt64) {
+  using namespace vrs::helpers;
+  uint64_t value = 0;
+  EXPECT_TRUE(readUInt64("123", value));
+  EXPECT_EQ(value, 123);
+  EXPECT_TRUE(readUInt64("18446744073709551615", value));
+  EXPECT_EQ(value, 18446744073709551615ULL);
+  EXPECT_FALSE(readUInt64("18446744073709551616", value)); // bigger than max uint64_t
+  EXPECT_EQ(value, 0);
+
+  EXPECT_FALSE(readUInt64("-1", value));
+  EXPECT_FALSE(readUInt64("123vrs", value));
+  EXPECT_FALSE(readUInt64("vrs", value));
 }
 
 TEST_F(StringsHelpersTester, replaceAllTest) {

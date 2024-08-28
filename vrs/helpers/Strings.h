@@ -148,6 +148,12 @@ bool getDouble(
 // reads an uint32_t value, moves the string pointer & returns true on success
 bool readUInt32(const char*& str, uint32_t& outValue);
 
+/// Helper method to parse a string containing an uint64 value strictly.
+/// @param str: the string that needs to be parsed.
+/// @param outValue: the parsed value.
+/// @return True if the string was parsed successfully and the string was a number only.
+bool readUInt64(const std::string& str, uint64_t& outValue);
+
 // Reads a number of bytes with optional KB, MB, GB, TB, EB suffixes
 // Returns true on success, false on failure, setting outByteSize to 0.
 // Note: ignores unrecognized suffixes.
@@ -189,7 +195,8 @@ std::string make_printable(const std::string& str);
 /// @param tokens: the collection of strings after the split.
 /// @param skipEmpty: if true, won't return empty tokens
 /// @param trimChars: if specified, characters to trim for each token
-void split(
+/// @return The number of tokens extracted.
+size_t split(
     const std::string& inputString,
     char delimiter,
     std::vector<std::string>& tokens,

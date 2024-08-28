@@ -333,15 +333,7 @@ bool getInt64(const map<string, string>& m, const string& field, int64_t& outVal
 
 bool getUInt64(const map<string, string>& m, const string& field, uint64_t& outValue) {
   const auto iter = m.find(field);
-  if (iter != m.end() && !iter->second.empty()) {
-    try {
-      outValue = stoull(iter->second);
-      return true;
-    } catch (logic_error&) {
-      /* do nothing */
-    }
-  }
-  return false;
+  return iter != m.end() && readUInt64(iter->second, outValue);
 }
 
 bool getByteSize(
@@ -395,35 +387,40 @@ bool readByteSize(const string& strSize, uint64_t& outByteSize) {
     outByteSize = 0;
     return false;
   }
-  uint64_t factor = 1;
-  if (strSize.size() > 2 && safetolower(strSize.back()) == 'b' &&
-      safeisdigit(strSize[strSize.size() - 3])) {
-    switch (safetolower(strSize[strSize.size() - 2])) {
-      case 'e':
-        factor <<= 50;
-        break;
-      case 't':
-        factor <<= 40;
-        break;
-      case 'g':
-        factor <<= 30;
-        break;
-      case 'm':
-        factor <<= 20;
-        break;
-      case 'k':
-        factor <<= 10;
-        break;
-      default:
-        break;
-    }
+  char* next = nullptr;
+  outByteSize = std::strtoull(strSize.c_str(), &next, 10);
+  if (*next == 0) {
+    return true;
   }
-  try {
-    outByteSize = stoull(strSize) * factor;
-  } catch (logic_error&) {
-    outByteSize = 0;
+  uint64_t factor = 1;
+  switch (safetolower(*next)) {
+    case 'e':
+      factor <<= 50;
+      break;
+    case 't':
+      factor <<= 40;
+      break;
+    case 'g':
+      factor <<= 30;
+      break;
+    case 'm':
+      factor <<= 20;
+      break;
+    case 'k':
+      factor <<= 10;
+      break;
+    case 'b':
+      if (next[1] == 0) {
+        return true;
+      }
+      break;
+    default:
+      break;
+  }
+  if (factor == 1 || safetolower(next[1]) != 'b' || next[2] != 0) {
     return false;
   }
+  outByteSize *= factor;
   return true;
 }
 
@@ -440,7 +437,7 @@ bool replaceAll(string& inOutString, const string& token, const string& replacem
   return replaced;
 }
 
-void split(
+size_t split(
     const std::string& inputString,
     char delimiter,
     std::vector<std::string>& tokens,
@@ -457,6 +454,19 @@ void split(
       tokens.push_back(item);
     }
   }
+  return tokens.size();
+}
+
+bool readUInt64(const std::string& str, uint64_t& outValue) {
+  if (!str.empty() && safeisdigit(str.front())) {
+    char* next = nullptr;
+    outValue = std::strtoull(str.c_str(), &next, 10);
+    if (*next == 0 && (outValue != ULLONG_MAX || errno == 0)) {
+      return true;
+    }
+  }
+  outValue = 0;
+  return false;
 }
 
 } // namespace helpers
