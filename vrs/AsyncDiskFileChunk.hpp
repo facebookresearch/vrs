@@ -172,30 +172,30 @@ struct AsyncWindowsHandle {
       return readNotWrite ? DISKFILE_NOT_ENOUGH_DATA : DISKFILE_PARTIAL_WRITE_ERROR;
     }
 
-    OVERLAPPED ov;
-
-    ov.hEvent = 0;
+    // N.B. this does not create an hEvent for the OVERLAPPED structure, instead using the file
+    // handle. This is only a valid thing to do if there are NO other IO operations occuring during
+    // this one. The calls to flushWriteBuffer() before calling this ensures this is the case.
+    OVERLAPPED ov = {};
     ov.Offset = (DWORD)offset;
     ov.OffsetHigh = (DWORD)(offset >> 32);
 
+    DWORD dwNumberOfBytesTransferred = 0;
+    bool success = false;
     if (readNotWrite) {
-      if (ReadFile(h_, buf, dwToXfer, nullptr, &ov)) {
-        return SUCCESS;
-      }
+      success = ReadFile(h_, buf, dwToXfer, &dwNumberOfBytesTransferred, &ov);
     } else {
-      if (WriteFile(h_, buf, dwToXfer, nullptr, &ov)) {
-        return SUCCESS;
+      success = WriteFile(h_, buf, dwToXfer, &dwNumberOfBytesTransferred, &ov);
+    }
+
+    if (!success) {
+      int error = GetLastError();
+      if (error != ERROR_IO_PENDING) {
+        return error;
       }
-    }
 
-    int error = GetLastError();
-    if (error != ERROR_IO_PENDING) {
-      return error;
-    }
-
-    DWORD dwNumberOfBytesTransferred;
-    if (!GetOverlappedResult(h_, &ov, &dwNumberOfBytesTransferred, TRUE)) {
-      return GetLastError();
+      if (!GetOverlappedResult(h_, &ov, &dwNumberOfBytesTransferred, TRUE)) {
+        return GetLastError();
+      }
     }
 
     outSize = dwNumberOfBytesTransferred;

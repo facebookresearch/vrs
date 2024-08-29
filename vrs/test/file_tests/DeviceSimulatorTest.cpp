@@ -25,7 +25,6 @@
 
 #include <vrs/DiskFile.h>
 #include <vrs/RecordFileReader.h>
-#include <vrs/os/Platform.h>
 #include <vrs/os/Utils.h>
 
 #include <vrs/test/helpers/VRSTestsHelpers.h>
@@ -128,7 +127,6 @@ TEST_F(DeviceSimulator, multiThreadAsyncAioNotDirect) {
   deleteChunkedFile(testPath);
 }
 
-#if IS_VRS_FB_INTERNAL() || !IS_WINDOWS_PLATFORM() // avoid OSS/Windows
 TEST_F(DeviceSimulator, multiThreadAsyncSync) {
   const string testPath = os::getTempFolder() + "MultiThreadAsyncSync.vrs";
 
@@ -140,7 +138,6 @@ TEST_F(DeviceSimulator, multiThreadAsyncSync) {
 
   deleteChunkedFile(testPath);
 }
-#endif
 
 TEST_F(DeviceSimulator, multiThreadAsyncPsync) {
   const string testPath = os::getTempFolder() + "MultiThreadAsyncPsync.vrs";
