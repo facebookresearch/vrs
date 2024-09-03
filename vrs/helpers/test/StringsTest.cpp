@@ -398,22 +398,18 @@ TEST_F(StringsHelpersTester, splitTest) {
   EXPECT_EQ(actualTokens, expectedTokens);
 
   expectedTokens = {str};
-  actualTokens.clear();
   helpers::split(str, '_', actualTokens);
   EXPECT_EQ(actualTokens, expectedTokens);
 
-  actualTokens.clear();
   str = "hello elle is cool lol. le bol de lait";
   expectedTokens = {"he", "", "o e", "", "e is coo", " ", "o", ". ", "e bo", " de ", "ait"};
   helpers::split(str, 'l', actualTokens);
   EXPECT_EQ(actualTokens, expectedTokens);
 
-  actualTokens.clear();
   expectedTokens = {"he", "o e", "e is coo", " ", "o", ". ", "e bo", " de ", "ait"};
   helpers::split(str, 'l', actualTokens, true);
   EXPECT_EQ(actualTokens, expectedTokens);
 
-  actualTokens.clear();
   expectedTokens = {"he", "o e", "e is coo", "o", ".", "e bo", "de", "ait"};
   helpers::split(str, 'l', actualTokens, true, " ");
   EXPECT_EQ(actualTokens, expectedTokens);

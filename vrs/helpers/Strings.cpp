@@ -440,9 +440,10 @@ bool replaceAll(string& inOutString, const string& token, const string& replacem
 size_t split(
     const std::string& inputString,
     char delimiter,
-    std::vector<std::string>& tokens,
+    std::vector<std::string>& outTokens,
     bool skipEmpty,
     const char* trimChars) {
+  outTokens.clear();
   std::stringstream ss(inputString);
   std::string item;
 
@@ -451,10 +452,10 @@ size_t split(
       item = helpers::trim(item, trimChars);
     }
     if (!(item.empty() && skipEmpty)) {
-      tokens.push_back(item);
+      outTokens.push_back(item);
     }
   }
-  return tokens.size();
+  return outTokens.size();
 }
 
 bool readUInt64(const std::string& str, uint64_t& outValue) {
