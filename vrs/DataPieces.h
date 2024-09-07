@@ -228,7 +228,7 @@ template <>
 inline const string& getTypeName<string>() {
   static const string sName("string");
   return sName;
-};
+}
 
 /// \brief Template to represent some POD object without memory alignment.
 ///
