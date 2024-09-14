@@ -39,6 +39,7 @@ if (QT_FOUND)
       Qt${QT_VERSION_MAJOR}::Gui
       Qt${QT_VERSION_MAJOR}::Widgets
       vrs_logging
+      Threads::Threads
   )
 
   install(TARGETS vrsplayer EXPORT VRSLibTargets

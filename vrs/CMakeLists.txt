@@ -30,9 +30,14 @@ target_link_libraries(vrslib
     vrs_logging
     vrs_os
     vrs_utils_xxhash
+)
+target_link_libraries(vrslib
+  PRIVATE
     Lz4::Lz4
     Zstd::Zstd
 )
+
+target_link_libraries (vrslib PUBLIC $<$<PLATFORM_ID:Linux>:rt>)
 
 install(TARGETS vrslib EXPORT VRSLibTargets
   LIBRARY DESTINATION lib
