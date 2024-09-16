@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
   QCoreApplication::setApplicationName("VRSplayer");
   QCoreApplication::setOrganizationName("Meta Reality Labs");
   QGuiApplication::setApplicationDisplayName(QCoreApplication::applicationName());
-  QCoreApplication::setApplicationVersion("v2.2.0");
+  QCoreApplication::setApplicationVersion("v2.3.0");
 
   QCommandLineParser parser;
   parser.setApplicationDescription("VRSplayer");

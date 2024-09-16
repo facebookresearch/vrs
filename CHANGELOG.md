@@ -7,6 +7,12 @@ be covered.
 Note that fixes and minor improvements are rolling in regularly without
 triggering a new version number.
 
+## Version 1.3.0 (Sep 16, 2024)
+
+- Version bump after cumulative changes.
+- Various fix related to support upstream version of third party libraries.
+- Improved support for Windows MSVC.
+
 ## Version 1.2.0 (May 15, 2024)
 
 - Version bump after cumulative changes.
