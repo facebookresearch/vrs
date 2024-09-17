@@ -7,7 +7,7 @@ import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
 
 VRS is a file format optimized to record and playback streams of sensor data, such as images, audio, and other discrete sensors (IMU, temperature, etc.), that are stored in per-device streams of time-stamped records.
 
-VRS was first created to record images and sensor data produced by early prototypes of the [Meta Quest device](https://store.facebook.com/quest/products/quest-2), to develop the device’s positional tracking system known as [Oculus Insight](https://ai.facebook.com/blog/powered-by-ai-oculus-insight/), [Meta Quest 2's hand tracking](https://store.facebook.com/help/quest/articles/headsets-and-accessories/controllers-and-hand-tracking/hand-tracking-quest-2/), and more to come.
+VRS was first created to record images and sensor data produced by early prototypes of the [Meta Quest device](https://store.facebook.com/quest/products/quest-2), to develop the device’s positional tracking system known as [Oculus Insight](https://ai.facebook.com/blog/powered-by-ai-oculus-insight/), [Meta Quest 2's hand tracking](https://www.meta.com/help/quest/articles/headsets-and-accessories/controllers-and-hand-tracking/hand-tracking/), and more to come.
 
 [Project Aria](https://about.facebook.com/realitylabs/projectaria/) records its data as VRS files.
 
