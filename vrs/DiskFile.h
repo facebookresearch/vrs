@@ -172,7 +172,7 @@ class DiskFileT : public WriteFileHandler {
 
 using DiskFile = DiskFileT<DiskFileChunk>;
 
-#if (IS_LINUX_PLATFORM() && IS_X86_PLATFORM()) || (IS_WINDOWS_PLATFORM())
+#if (IS_LINUX_PLATFORM() && IS_X86_PLATFORM()) || (IS_WINDOWS_PLATFORM() && IS_VRS_FB_INTERNAL())
 #define VRS_ASYNC_DISKFILE_SUPPORTED() true
 
 class AsyncDiskFileChunk;
