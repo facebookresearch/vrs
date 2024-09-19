@@ -29,6 +29,7 @@ using std::is_pointer;
 using std::vector;
 
 class DataLayout;
+class WriteFileHandler;
 
 /// \brief Class referencing a DataLayout object, and abstracting the interactions for DataSource.
 ///
@@ -230,6 +231,25 @@ class DataSource {
   const DataSourceChunk& chunk2_{kEmptyDataSourceChunk};
   const DataSourceChunk& chunk3_{kEmptyDataSourceChunk};
   const size_t size_;
+};
+
+/// \brief Class to hold data that is written directly in the file at the end of a record.
+/// Record data held by DataSource is copied in an internal buffer when the record is created, so it
+/// might be compressed, and the source buffers, including datalayouts, reused/modified, without
+/// risk of corrupting the record's data, at the expense of a memory copy.
+/// By using DirectWriteRecordData, you can avoid that copy, with the following limitations:
+/// - that data is written at the end of the record, after the data provided using a DataSource
+/// object. If you want to assemble your DataContentBlocks differently, you need to own that logic.
+/// - none of record's data can be compressed by VRS, leading to potentially much larger files.
+class DirectWriteRecordData {
+ public:
+  virtual ~DirectWriteRecordData() = default;
+
+  /// Get the total amount of data that will be written to disk. This value may not change.
+  virtual size_t getDataSize() const = 0;
+
+  /// @param file: File to write the data to.
+  virtual int write(WriteFileHandler& file) const = 0;
 };
 
 } // namespace vrs

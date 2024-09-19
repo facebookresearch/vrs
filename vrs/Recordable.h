@@ -18,6 +18,7 @@
 
 #include <functional>
 #include <map>
+#include <memory>
 #include <mutex>
 #include <utility>
 
@@ -31,8 +32,6 @@ namespace vrs {
 using std::map;
 using std::string;
 using std::vector;
-
-class DataSource;
 
 /// Container for a stream's tags, both user and VRS controlled.
 struct StreamTags {
@@ -239,12 +238,12 @@ class Recordable {
   static void resetNewInstanceIds();
 
  protected:
-  /// Create a new record for this recordable. That's the only client API to do so.
+  /// Create a new record for this recordable. That's the preferred API to create records.
   ///
   /// When the call returns:
   ///  - a record has been created and is fully owned and managed by the recordable's RecordManager,
   ///  despite returning a pointer to it.
-  ///  - the data referenced by DataSource has fully been copied in the record, so that the caller
+  ///  - the DataSource referenced by data has fully been copied in the record, so that the caller
   ///  is immediately entirely free to reuse or delete the source data as desired.
   ///
   /// @param timestampSec: Timestamp of the record. *All the records of all the recordables*
@@ -271,6 +270,40 @@ class Recordable {
     return createRecordDelegate_
         ? createRecordDelegate_(getStreamId(), timestampSec, recordType, formatVersion, data)
         : recordManager_.createRecord(timestampSec, recordType, formatVersion, data);
+  }
+  /// Create a record which last part will be written directly to the file when the record is
+  /// written to disk, therefore bypassing the record creation memory copy for that part.
+  /// This API is designed for high bandwidth live recording situations, when we must avoid the
+  /// record creation's memory copy to achieve the required performance.
+  ///
+  /// Note: using a DirectWriteRecordData object prevents that record from being compressed by VRS,
+  /// since that data is written directly to the file, hence the name of the API.
+  ///
+  /// When the call returns:
+  ///  - a record has been created and is fully owned and managed by the recordable's RecordManager,
+  ///  despite returning a pointer to it.
+  ///  - the data referenced by the DataSource has been fully copied in the record's internal
+  ///  buffer, so that the caller can free or modify that source data immediately.
+  ///  You probably want to use that DataSource to save the DataLayout part of the record.
+  ///  - the directWriteRecordData object will be owned by the record until it can be used to write
+  ///  its data directly at the end of the record, and deleted only then.
+  ///  Use that object to write the heavy payload of your record, such as the raw image data.
+  ///  directWriteRecordData's data MUST live long enough for the record to be written.
+  /// @param timestamp: Timestamp of the record, in seconds.
+  /// @param type: Type of the record.
+  /// @param formatVersion: Version number of the format of the record, so that when the record is
+  /// read, the data can be interpreted appropriately.
+  /// @param data: A DataSource that points to the payload to copy in the record immediately.
+  /// @param directWriteRecordData: data to write directly in the file at the end of the record.
+  /// @return A pointer to the record created.
+  const Record* createUncompressedRecord(
+      double timestampSec,
+      Record::Type recordType,
+      uint32_t formatVersion,
+      const DataSource& data,
+      std::unique_ptr<DirectWriteRecordData>&& directWriteRecordData) {
+    return recordManager_.createUncompressedRecord(
+        timestampSec, recordType, formatVersion, data, std::move(directWriteRecordData));
   }
 
   /// When direct edits of VRS tags is convenient (record filters)

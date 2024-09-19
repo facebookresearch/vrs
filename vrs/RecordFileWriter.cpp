@@ -1028,7 +1028,8 @@ int RecordFileWriter::writeRecordsSingleThread(SortedRecords& records, int lastE
       rwd.skippedRecords++;
       record->recycle();
     } else {
-      uint32_t compressedSize = record->compressRecord(compressor);
+      uint32_t compressedSize =
+          record->shouldTryToCompress() ? record->compressRecord(compressor) : 0;
       if (compressedSize > 0) {
         rwd.compressedRecords++;
       }

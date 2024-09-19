@@ -43,6 +43,8 @@ void DataLayoutChunk::fillAndAdvanceBuffer(uint8_t*& buffer) const {
   }
 }
 
+DataSourceChunk::DataSourceChunk(const void* _data, size_t _size) : data_{_data}, size_{_size} {}
+
 void DataSourceChunk::fillAndAdvanceBuffer(uint8_t*& buffer) const {
   if (size_ > 0) {
     memcpy(buffer, data_, size_);
@@ -127,7 +129,6 @@ DataSource::DataSource(
       chunk2_{secondChunk},
       chunk3_(thirdChunk),
       size_{getChunksSize()} {}
-DataSourceChunk::DataSourceChunk(const void* _data, size_t _size) : data_{_data}, size_{_size} {}
 
 void DataSource::copyTo(uint8_t* buffer) const {
   dataLayout1_.fillAndAdvanceBuffer(buffer);

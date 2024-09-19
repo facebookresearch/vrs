@@ -59,7 +59,12 @@ Record::Type toEnum<>(const string& name) {
 
 const double Record::kMaxTimestamp = numeric_limits<double>::max();
 
+Record::Record(RecordManager& recordManager) : recordManager_(recordManager) {}
+
+Record::~Record() = default;
+
 void Record::recycle() {
+  directWriteRecordData_.reset();
   recordManager_.recycle(this);
 }
 
@@ -84,10 +89,17 @@ void Record::set(
   }
   data.copyTo(&buffer_.data()->byte + kRecordHeaderSize);
   creationOrder_ = creationOrder;
+  directWriteRecordData_.reset();
+}
+
+void Record::addDirectWriteRecordData(std::unique_ptr<DirectWriteRecordData>&& directWriteData) {
+  directWriteRecordData_ = std::move(directWriteData);
+  usedBufferSize_ += directWriteRecordData_->getDataSize();
 }
 
 bool Record::shouldTryToCompress() const {
-  return Compressor::shouldTryToCompress(recordManager_.getCompression(), usedBufferSize_);
+  return !directWriteRecordData_ &&
+      Compressor::shouldTryToCompress(recordManager_.getCompression(), usedBufferSize_);
 }
 
 uint32_t Record::compressRecord(Compressor& compressor) {
@@ -131,7 +143,13 @@ int Record::writeRecord(
         inOutRecordSize,
         recordSize,
         0);
-    WRITE_OR_LOG_AND_RETURN(file, header, recordSize);
+    if (directWriteRecordData_) {
+      WRITE_OR_LOG_AND_RETURN(file, header, recordSize - directWriteRecordData_->getDataSize());
+      IF_ERROR_RETURN(directWriteRecordData_->write(file));
+      directWriteRecordData_.reset();
+    } else {
+      WRITE_OR_LOG_AND_RETURN(file, header, recordSize);
+    }
     inOutRecordSize = recordSize;
   }
   return 0;

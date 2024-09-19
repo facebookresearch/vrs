@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include <vrs/helpers/EnumTemplates.hpp>
@@ -26,6 +27,7 @@
 namespace vrs {
 
 class DataSource;
+class DirectWriteRecordData;
 class Compressor;
 class RecordManager;
 
@@ -103,6 +105,9 @@ class Record final {
       const DataSource& data,
       uint64_t creationOrder);
 
+  /// Add some data to write directly at the end of the record when it's written to disk.
+  void addDirectWriteRecordData(std::unique_ptr<DirectWriteRecordData>&& directWriteRecordData);
+
   /// Tell if an attempt should be made to compress the record.
   /// If compression can't reduce the size of the record, then the record is written uncompressed.
   /// @internal
@@ -155,8 +160,8 @@ class Record final {
   friend class RecordManager;
 
   /// Records are created & deleted exclusively by a Recordable's RecordManager.
-  explicit Record(RecordManager& recordManager) : recordManager_(recordManager) {}
-  ~Record() = default;
+  explicit Record(RecordManager& recordManager);
+  ~Record();
 
   double timestamp_{};
   Type recordType_{};
@@ -164,6 +169,7 @@ class Record final {
   std::vector<uninitialized_byte> buffer_;
   size_t usedBufferSize_{};
   uint64_t creationOrder_{};
+  std::unique_ptr<DirectWriteRecordData> directWriteRecordData_;
 
   RecordManager& recordManager_;
 };

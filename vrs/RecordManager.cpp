@@ -113,6 +113,17 @@ Record* RecordManager::createRecord(
   return record;
 }
 
+Record* RecordManager::createUncompressedRecord(
+    double timestamp,
+    Record::Type type,
+    uint32_t formatVersion,
+    const DataSource& data,
+    std::unique_ptr<DirectWriteRecordData>&& directWriteData) {
+  Record* record = createRecord(timestamp, type, formatVersion, data);
+  record->addDirectWriteRecordData(std::move(directWriteData));
+  return record;
+}
+
 uint32_t RecordManager::purgeOldRecords(double oldestTimestamp, bool recycleBuffers) {
   uint32_t count = 0;
   unique_lock<mutex> guard{mutex_};

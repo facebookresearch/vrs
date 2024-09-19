@@ -17,6 +17,7 @@
 #pragma once
 
 #include <list>
+#include <memory>
 #include <mutex>
 
 #include "ForwardDefinitions.h"
@@ -49,9 +50,27 @@ class RecordManager {
   /// @param type: Type of the record.
   /// @param formatVersion: Version number of the format of the record, so that when the record is
   /// read, the data can be interpreted appropriately.
+  /// @param data: A DataSource that points to the payload to copy in the record.
   /// @return A pointer to the record created.
   Record*
   createRecord(double timestamp, Record::Type type, uint32_t formatVersion, const DataSource& data);
+
+  /// Create & hold a record using the given parameters. RecordManager is responsible for deleting
+  /// the record. Copies the data referenced by the first DataSource, and takes ownership of
+  /// directWriteData, which will be used to write the last part of the record directly in the file.
+  /// @param timestamp: Timestamp of the record, in seconds.
+  /// @param type: Type of the record.
+  /// @param formatVersion: Version number of the format of the record, so that when the record is
+  /// read, the data can be interpreted appropriately.
+  /// @param data: A DataSource that points to the payload to copy in the record immediately.
+  /// @param directWriteData: data to write directly in the file at the end of the record.
+  /// @return A pointer to the record created.
+  Record* createUncompressedRecord(
+      double timestamp,
+      Record::Type type,
+      uint32_t formatVersion,
+      const DataSource& data,
+      std::unique_ptr<DirectWriteRecordData>&& directWriteData);
 
   /// Recycle or delete buffers older than a time.
   /// @param oldestTimestamp: Max timestamp of the records to purge.
