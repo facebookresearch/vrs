@@ -160,6 +160,8 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:a822a517531c5c44b21db59cde04eda09"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac7e5c232cb3bccacdc7d6478471a8fae"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classvrs_1_1_record.html">Record</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_recordable.html#ac7e5c232cb3bccacdc7d6478471a8fae">createRecord</a> (double timestampSec, <a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> recordType, uint32_t formatVersion, const <a class="el" href="classvrs_1_1_data_source.html">DataSource</a> &amp;data=<a class="el" href="classvrs_1_1_data_source.html">DataSource</a>())</td></tr>
 <tr class="separator:ac7e5c232cb3bccacdc7d6478471a8fae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acec2bb9263f28bdb82671fa95c62389e"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classvrs_1_1_record.html">Record</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_recordable.html#acec2bb9263f28bdb82671fa95c62389e">createUncompressedRecord</a> (double timestampSec, <a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> recordType, uint32_t formatVersion, const <a class="el" href="classvrs_1_1_data_source.html">DataSource</a> &amp;data, std::unique_ptr&lt; <a class="el" href="classvrs_1_1_direct_write_record_data.html">DirectWriteRecordData</a> &gt; &amp;&amp;directWriteRecordData)</td></tr>
+<tr class="separator:acec2bb9263f28bdb82671fa95c62389e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab3bb0193bde832910fff0765bb952b82"><td class="memItemLeft" align="right" valign="top"><a id="ab3bb0193bde832910fff0765bb952b82"></a>
 map&lt; string, string &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_recordable.html#ab3bb0193bde832910fff0765bb952b82">getVRSTags</a> ()</td></tr>
 <tr class="memdesc:ab3bb0193bde832910fff0765bb952b82"><td class="mdescLeft">&#160;</td><td class="mdescRight">When direct edits of VRS tags is convenient (record filters) <br /></td></tr>
@@ -408,10 +410,10 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>RecordFileWriter</b>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Create a new record for this recordable. That's the only client API to do so.</p>
+<p>Create a new record for this recordable. That's the preferred API to create records.</p>
 <p>When the call returns:</p><ul>
 <li>a record has been created and is fully owned and managed by the recordable's <a class="el" href="classvrs_1_1_record_manager.html" title="VRS internal class to manage the records of a specific Recordable after their creation.">RecordManager</a>, despite returning a pointer to it.</li>
-<li>the data referenced by <a class="el" href="classvrs_1_1_data_source.html" title="A class referencing data to be captured in a record at creation.">DataSource</a> has fully been copied in the record, so that the caller is immediately entirely free to reuse or delete the source data as desired.</li>
+<li>the <a class="el" href="classvrs_1_1_data_source.html" title="A class referencing data to be captured in a record at creation.">DataSource</a> referenced by data has fully been copied in the record, so that the caller is immediately entirely free to reuse or delete the source data as desired.</li>
 </ul>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -452,6 +454,78 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>RecordFileWriter</b>
 <p>State records should not to be confused with the configuration of the device. A position tracking algorithm probably has a state: the last position it determined, which will be used to calculate the next state when the next data come in. State data typically changes as data flows, according to that data. A camera probably has no state, but probably has a configuration. The <a class="el" href="classvrs_1_1_record_file_writer.html" title="The class to create VRS files.">RecordFileWriter</a> will call this method to make sure a configuration record is captured, when a record file is created asynchronously. </p>
 
 <p>Implemented in <a class="el" href="classvrs__sample__code_1_1_my_camera_recordable.html#acd688fab2813d1bff8f69a8dea9ed26c">vrs_sample_code::MyCameraRecordable</a>, <a class="el" href="classvrs__sample__code_1_1_recordable_demo.html#adb58d290e062d513cc1a49587a0821c1">vrs_sample_code::RecordableDemo</a>, <a class="el" href="classvrs__sample__apps_1_1_motion_stream.html#a070a682055119d32062a2ea26f29201f">vrs_sample_apps::MotionStream</a>, <a class="el" href="classvrs__sample__apps_1_1_audio_stream.html#a1743020026c88855fbbdbe0603f56183">vrs_sample_apps::AudioStream</a>, and <a class="el" href="classvrs__sample__apps_1_1_image_stream.html#ac0237d990a362e83a0092615e30c2026">vrs_sample_apps::ImageStream</a>.</p>
+
+</div>
+</div>
+<a id="acec2bb9263f28bdb82671fa95c62389e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acec2bb9263f28bdb82671fa95c62389e">&#9670;&nbsp;</a></span>createUncompressedRecord()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classvrs_1_1_record.html">Record</a>* vrs::Recordable::createUncompressedRecord </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>timestampSec</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a>&#160;</td>
+          <td class="paramname"><em>recordType</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>formatVersion</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classvrs_1_1_data_source.html">DataSource</a> &amp;&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::unique_ptr&lt; <a class="el" href="classvrs_1_1_direct_write_record_data.html">DirectWriteRecordData</a> &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"><em>directWriteRecordData</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Create a record which last part will be written directly to the file when the record is written to disk, therefore bypassing the record creation memory copy for that part. This API is designed for high bandwidth live recording situations, when we must avoid the record creation's memory copy to achieve the required performance.</p>
+<p>Note: using a <a class="el" href="classvrs_1_1_direct_write_record_data.html" title="Class to hold data that is written directly in the file at the end of a record. Record data held by D...">DirectWriteRecordData</a> object prevents that record from being compressed by VRS, since that data is written directly to the file, hence the name of the API.</p>
+<p>When the call returns:</p><ul>
+<li>a record has been created and is fully owned and managed by the recordable's <a class="el" href="classvrs_1_1_record_manager.html" title="VRS internal class to manage the records of a specific Recordable after their creation.">RecordManager</a>, despite returning a pointer to it.</li>
+<li>the data referenced by the <a class="el" href="classvrs_1_1_data_source.html" title="A class referencing data to be captured in a record at creation.">DataSource</a> has been fully copied in the record's internal buffer, so that the caller can free or modify that source data immediately. You probably want to use that <a class="el" href="classvrs_1_1_data_source.html" title="A class referencing data to be captured in a record at creation.">DataSource</a> to save the <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> part of the record.</li>
+<li>the directWriteRecordData object will be owned by the record until it can be used to write its data directly at the end of the record, and deleted only then. Use that object to write the heavy payload of your record, such as the raw image data. directWriteRecordData's data MUST live long enough for the record to be written. <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timestamp</td><td>Timestamp of the record, in seconds. </td></tr>
+    <tr><td class="paramname">type</td><td>Type of the record. </td></tr>
+    <tr><td class="paramname">formatVersion</td><td>Version number of the format of the record, so that when the record is read, the data can be interpreted appropriately. </td></tr>
+    <tr><td class="paramname">data</td><td>A <a class="el" href="classvrs_1_1_data_source.html" title="A class referencing data to be captured in a record at creation.">DataSource</a> that points to the payload to copy in the record immediately. </td></tr>
+    <tr><td class="paramname">directWriteRecordData</td><td>data to write directly in the file at the end of the record. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A pointer to the record created. </dd></dl>
+</li>
+</ul>
 
 </div>
 </div>
