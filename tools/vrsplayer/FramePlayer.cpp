@@ -99,6 +99,7 @@ bool FramePlayer::onImageRead(
     if (frameValid) {
       normalizeOptions_ = PixelFrame::getStreamNormalizeOptions(
           *record.fileReader, record.streamId, frame->getPixelFormat());
+      normalizeOptions_.speedOverPrecision = frame->getWidth() * frame->getHeight() >= 4000 * 4000;
     }
     fmt::print(
         "Found '{} - {}': {}, {}",
@@ -235,7 +236,10 @@ bool FramePlayer::saveFrame(
     shared_ptr<PixelFrame> frame;
     if (PixelFrame::readRawFrame(frame, record.reader, spec)) {
       shared_ptr<PixelFrame> normalizedFrame;
+      bool speedOverPrecision = normalizeOptions_.speedOverPrecision;
+      normalizeOptions_.speedOverPrecision = false;
       PixelFrame::normalizeFrame(frame, normalizedFrame, true, normalizeOptions_);
+      normalizeOptions_.speedOverPrecision = speedOverPrecision;
       if (normalizedFrame->writeAsPng(saveNextFramePath_) == 0) {
         XR_LOGI("Saved raw frame as '{}'", saveNextFramePath_);
       }

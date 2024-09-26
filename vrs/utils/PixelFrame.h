@@ -66,6 +66,7 @@ struct NormalizeOptions {
       : semantic{semantic}, min{min}, max{max} {}
 
   ImageSemantic semantic{ImageSemantic::Undefined};
+  bool speedOverPrecision{false}; // prefer speed (for display?) or precision (to save to disk?)
   float min{0};
   float max{0};
 };
@@ -73,13 +74,12 @@ struct NormalizeOptions {
 /// Helper class to read & convert images read using RecordFormat into simpler, but maybe degraded,
 /// pixel buffer, that can easily be displayed, or saved to disk as jpg or png.
 ///
-/// Here are the "conversions" performed overall:
+/// Here are some of the "normalizations" performed:
 /// - GREY10, GREY12 and GREY16 to GREY8, by pixel depth reduction.
 /// - RGB10 and RGB12 to RGB8, by pixel depth reduction.
 /// - YUV_I420_SPLIT and YUY2 to RGB8, by conversion.
 /// - DEPTH32F and SCALAR64F to GREY8, by normalization.
 ///
-/// RGB32F is not currently not supported.
 class PixelFrame {
  public:
   PixelFrame() = default;
