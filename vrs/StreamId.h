@@ -168,6 +168,7 @@ enum class RecordableTypeId : uint16_t {
   AnchorRecordableClass = 379, ///< For anchor data streams (i.e. spatial persistence anchors).
   SegmentationRecordableClass = 380, ///< For segmentation data streams.
   TextRecordableClass = 381, ///< For result data streams stored as text.
+  EMGGestureRecordableClass = 382, ///< For EMG gesture data streams.
 
   // << Annotations >>
   AnnotationRecordableClass = 400, ///< For annotation streams.

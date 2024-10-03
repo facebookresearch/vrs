@@ -76,6 +76,7 @@ const unordered_map<RecordableTypeId, const char*>& getRecordableTypeIdRegistry(
       {RecordableTypeId::BarometerRecordableClass, "Barometer Data Class"},
       {RecordableTypeId::PhotoplethysmogramRecordableClass, "Photoplethysmogram (PPG) Data Class"},
       {RecordableTypeId::EMGRecordableClass, "Electromyography (EMG) Data Class"},
+      {RecordableTypeId::EMGGestureRecordableClass, "Electromyography (EMG) Gesture Data Class"},
       {RecordableTypeId::CapacitiveTouchRecordableClass, "Capacitive Touch Data Class"},
       {RecordableTypeId::HeartRateRecordableClass, "Heart Rate Data Class"},
       {RecordableTypeId::CaloriesRecordableClass, "Calories Data Class"},
