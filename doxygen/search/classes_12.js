@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['writefilehandler_1083',['WriteFileHandler',['../classvrs_1_1_write_file_handler.html',1,'vrs']]],
-  ['writer_1084',['Writer',['../classvrs_1_1_index_record_1_1_writer.html',1,'vrs::IndexRecord']]],
-  ['writerthreaddata_1085',['WriterThreadData',['../structvrs_1_1_record_file_writer___1_1_writer_thread_data.html',1,'vrs::RecordFileWriter_']]]
+  ['writefilehandler_1084',['WriteFileHandler',['../classvrs_1_1_write_file_handler.html',1,'vrs']]],
+  ['writer_1085',['Writer',['../classvrs_1_1_index_record_1_1_writer.html',1,'vrs::IndexRecord']]],
+  ['writerthreaddata_1086',['WriterThreadData',['../structvrs_1_1_record_file_writer___1_1_writer_thread_data.html',1,'vrs::RecordFileWriter_']]]
 ];
