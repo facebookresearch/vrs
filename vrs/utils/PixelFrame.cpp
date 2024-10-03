@@ -839,17 +839,18 @@ bool PixelFrame::psnrCompare(const PixelFrame& other, double& outPsnr) {
   for (uint32_t plane = 0; plane < imageSpec_.getPlaneCount(); ++plane) {
     uint32_t stride1 = imageSpec_.getPlaneStride(plane);
     uint32_t stride2 = other.imageSpec_.getPlaneStride(plane);
-    uint32_t width = (plane == 0) ? imageSpec_.getDefaultStride() : imageSpec_.getDefaultStride2();
+    // number of bytes to compare in this plane. For RGB, it's 3 bytes per pixel, for GREY8 it's 1
+    uint32_t bytes = (plane == 0) ? imageSpec_.getDefaultStride() : imageSpec_.getDefaultStride2();
     uint32_t height = imageSpec_.getPlaneHeight(plane);
     for (uint32_t h = 0; h < height; ++h) {
-      for (uint32_t w = 0; w < width; ++w) {
+      for (uint32_t w = 0; w < bytes; ++w) {
         int32_t d = static_cast<int32_t>(p1[w]) - p2[w];
         err += d * d;
       }
       p1 += stride1;
       p2 += stride2;
     }
-    count += width * height;
+    count += bytes * height;
   }
   if (err > 0) {
     double derr = static_cast<double>(err) / count;
