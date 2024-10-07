@@ -319,7 +319,7 @@ bool PixelFrame::jxlCompress(
   ENC_CHECK(JxlEncoderSetBasicInfo(enc, &basic_info));
 
   JxlColorEncoding color_encoding = {};
-  JxlColorEncodingSetToLinearSRGB(&color_encoding, basic_info.num_color_channels < 2);
+  JxlColorEncodingSetToSRGB(&color_encoding, basic_info.num_color_channels < 2);
   ENC_CHECK(JxlEncoderSetColorEncoding(enc, &color_encoding));
 
   JxlEncoderFrameSettings* settings = JxlEncoderFrameSettingsCreate(enc, nullptr);
