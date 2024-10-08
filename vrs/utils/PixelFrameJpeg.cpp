@@ -110,6 +110,15 @@ bool PixelFrame::jpgCompress(
     const vector<uint8_t>& pixels,
     vector<uint8_t>& outBuffer,
     uint32_t quality) {
+  return jpgCompress(pixelSpec, pixels.data(), outBuffer, quality);
+}
+
+/// Replace with a function accepting a std::span
+bool PixelFrame::jpgCompress(
+    const ImageContentBlockSpec& pixelSpec,
+    const uint8_t* pixels,
+    vector<uint8_t>& outBuffer,
+    uint32_t quality) {
   if (!XR_VERIFY(pixelSpec.getImageFormat() == ImageFormat::RAW) ||
       !XR_VERIFY(
           pixelSpec.getPixelFormat() == PixelFormat::RGB8 ||
@@ -119,14 +128,13 @@ bool PixelFrame::jpgCompress(
   const bool isGrey8 = (pixelSpec.getChannelCountPerPixel() == 1);
   long unsigned int jpegDataSize = 0;
   unsigned char* jpegData = nullptr;
-  const uint8_t* input = pixels.data();
 
   tjhandle _jpegCompressor = tjInitCompress();
 
   if (!XR_VERIFY(
           tjCompress2(
               _jpegCompressor,
-              input,
+              pixels,
               pixelSpec.getWidth(),
               pixelSpec.getStride(),
               pixelSpec.getHeight(),

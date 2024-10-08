@@ -239,6 +239,13 @@ class PixelFrame {
       vector<uint8_t>& outBuffer,
       uint32_t quality);
 
+  /// Same as previous version, with an external pixel buffer.
+  static bool jpgCompress(
+      const ImageContentBlockSpec& pixelSpec,
+      const uint8_t* pixels,
+      vector<uint8_t>& outBuffer,
+      uint32_t quality);
+
   /// Read a JPEG-XL encoded frame into the internal buffer.
   /// @return True if the frame type is supported & the frame was read.
   /// Returns false, if no decoder was installed, or the data couldn't be decoded correctly.
