@@ -93,6 +93,8 @@ Inheritance diagram for vrs::UncompressedRecordReader:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ab04d262adae10e2afcdbe14f7a7b36f7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_uncompressed_record_reader.html#ab04d262adae10e2afcdbe14f7a7b36f7">read</a> (<a class="el" href="classvrs_1_1_data_reference.html">DataReference</a> &amp;destination, uint32_t &amp;outReadSize) override</td></tr>
 <tr class="separator:ab04d262adae10e2afcdbe14f7a7b36f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b45e5a10cd82ef0002db4229f350491"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_uncompressed_record_reader.html#a1b45e5a10cd82ef0002db4229f350491">isCompressed</a> () const override</td></tr>
+<tr class="separator:a1b45e5a10cd82ef0002db4229f350491"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classvrs_1_1_record_reader"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classvrs_1_1_record_reader')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classvrs_1_1_record_reader.html">vrs::RecordReader</a></td></tr>
 <tr class="memitem:a5d29dedbcc6b0b61f57ba90099827359 inherit pub_methods_classvrs_1_1_record_reader"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classvrs_1_1_record_reader.html">RecordReader</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_reader.html#a5d29dedbcc6b0b61f57ba90099827359">init</a> (<a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &amp;file, uint32_t diskSize, uint32_t expandedSize)</td></tr>
 <tr class="separator:a5d29dedbcc6b0b61f57ba90099827359 inherit pub_methods_classvrs_1_1_record_reader"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -107,8 +109,9 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="separator:a77bfc50a32119498e9bf4050dec9e177 inherit pub_methods_classvrs_1_1_record_reader"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a91e155656e805d40136350369472637b inherit pub_methods_classvrs_1_1_record_reader"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_reader.html#a91e155656e805d40136350369472637b">getUnreadBytes</a> () const</td></tr>
 <tr class="separator:a91e155656e805d40136350369472637b inherit pub_methods_classvrs_1_1_record_reader"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a72133a4788c6af16f4d1268a6eee5b3f inherit pub_methods_classvrs_1_1_record_reader"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_reader.html#a72133a4788c6af16f4d1268a6eee5b3f">looksCompressed</a> () const</td></tr>
-<tr class="separator:a72133a4788c6af16f4d1268a6eee5b3f inherit pub_methods_classvrs_1_1_record_reader"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d559e8ade31f41a49a58550615eedbb inherit pub_methods_classvrs_1_1_record_reader"><td class="memItemLeft" align="right" valign="top"><a id="a8d559e8ade31f41a49a58550615eedbb"></a>
+int64_t&#160;</td><td class="memItemRight" valign="bottom"><b>getFileOffset</b> () const</td></tr>
+<tr class="separator:a8d559e8ade31f41a49a58550615eedbb inherit pub_methods_classvrs_1_1_record_reader"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3a3f5646aac619ad2a80085be49cdfdb inherit pub_methods_classvrs_1_1_record_reader"><td class="memItemLeft" align="right" valign="top"><a id="a3a3f5646aac619ad2a80085be49cdfdb"></a>
 const void *&#160;</td><td class="memItemRight" valign="bottom"><b>getRef</b> () const</td></tr>
 <tr class="separator:a3a3f5646aac619ad2a80085be49cdfdb inherit pub_methods_classvrs_1_1_record_reader"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -129,6 +132,34 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>remainingUncompre
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classvrs_1_1_record_reader.html" title="Abstract VRS internal helper class to read &amp; (if necessary) uncompress records.">RecordReader</a> specialized to read uncompressed records. For VRS internal usage only. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a1b45e5a10cd82ef0002db4229f350491"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b45e5a10cd82ef0002db4229f350491">&#9670;&nbsp;</a></span>isCompressed()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool vrs::UncompressedRecordReader::isCompressed </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Tell if the record was compressed. </p><dl class="section return"><dt>Returns</dt><dd>True if the record was compressed. </dd></dl>
+
+<p>Implements <a class="el" href="classvrs_1_1_record_reader.html#abf4d44b621f8603567995bb78c512cf9">vrs::RecordReader</a>.</p>
+
+</div>
+</div>
 <a id="ab04d262adae10e2afcdbe14f7a7b36f7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab04d262adae10e2afcdbe14f7a7b36f7">&#9670;&nbsp;</a></span>read()</h2>
 

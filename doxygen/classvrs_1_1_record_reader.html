@@ -108,8 +108,11 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="separator:a77bfc50a32119498e9bf4050dec9e177"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a91e155656e805d40136350369472637b"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_reader.html#a91e155656e805d40136350369472637b">getUnreadBytes</a> () const</td></tr>
 <tr class="separator:a91e155656e805d40136350369472637b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a72133a4788c6af16f4d1268a6eee5b3f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_reader.html#a72133a4788c6af16f4d1268a6eee5b3f">looksCompressed</a> () const</td></tr>
-<tr class="separator:a72133a4788c6af16f4d1268a6eee5b3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d559e8ade31f41a49a58550615eedbb"><td class="memItemLeft" align="right" valign="top"><a id="a8d559e8ade31f41a49a58550615eedbb"></a>
+int64_t&#160;</td><td class="memItemRight" valign="bottom"><b>getFileOffset</b> () const</td></tr>
+<tr class="separator:a8d559e8ade31f41a49a58550615eedbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf4d44b621f8603567995bb78c512cf9"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_reader.html#abf4d44b621f8603567995bb78c512cf9">isCompressed</a> () const =0</td></tr>
+<tr class="separator:abf4d44b621f8603567995bb78c512cf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3a3f5646aac619ad2a80085be49cdfdb"><td class="memItemLeft" align="right" valign="top"><a id="a3a3f5646aac619ad2a80085be49cdfdb"></a>
 const void *&#160;</td><td class="memItemRight" valign="bottom"><b>getRef</b> () const</td></tr>
 <tr class="separator:a3a3f5646aac619ad2a80085be49cdfdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -198,8 +201,8 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>remainingUncompre
 
 </div>
 </div>
-<a id="a72133a4788c6af16f4d1268a6eee5b3f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a72133a4788c6af16f4d1268a6eee5b3f">&#9670;&nbsp;</a></span>looksCompressed()</h2>
+<a id="abf4d44b621f8603567995bb78c512cf9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf4d44b621f8603567995bb78c512cf9">&#9670;&nbsp;</a></span>isCompressed()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -208,7 +211,7 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>remainingUncompre
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool vrs::RecordReader::looksCompressed </td>
+          <td class="memname">virtual bool vrs::RecordReader::isCompressed </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -216,11 +219,13 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>remainingUncompre
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Tell if the record was compressed. It's named "looksCompressed" rather than "isCompressed", because this method must be called early enough when a record is played back to be accurate. Call this method from <a class="el" href="classvrs_1_1_stream_player.html#a1ba098935311a3764ba1087d77341ad0">StreamPlayer::processRecordHeader()</a> to tell for sure. </p><dl class="section return"><dt>Returns</dt><dd>True if the record looks like it was compressed. </dd></dl>
+<p>Tell if the record was compressed. </p><dl class="section return"><dt>Returns</dt><dd>True if the record was compressed. </dd></dl>
+
+<p>Implemented in <a class="el" href="classvrs_1_1_compressed_record_reader.html#a6eb4c8d01453f7692be4dbe55cbca9e6">vrs::CompressedRecordReader</a>, and <a class="el" href="classvrs_1_1_uncompressed_record_reader.html#a1b45e5a10cd82ef0002db4229f350491">vrs::UncompressedRecordReader</a>.</p>
 
 </div>
 </div>
