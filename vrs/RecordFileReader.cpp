@@ -492,6 +492,31 @@ int RecordFileReader::clearStreamPlayers() {
   return 0;
 }
 
+const vector<int64_t>& RecordFileReader::getRecordBoundaries() const {
+  if (recordBoundaries_.empty()) {
+    // records are not always perfectly sorted, so we can't tell easily where they end.
+    // The best guess, is the offset of the first record, after the current record...
+    // yep, that's a bit expensive, but we have few options...
+    recordBoundaries_.reserve(recordIndex_.size() + 1);
+    int64_t lastOffset = 0;
+    bool sortNeeded = false;
+    for (const auto& r : recordIndex_) {
+      recordBoundaries_.emplace_back(r.fileOffset);
+      if (r.fileOffset < lastOffset) {
+        sortNeeded = true;
+      }
+      lastOffset = r.fileOffset;
+    }
+    int64_t fileSize = file_->getTotalSize();
+    recordBoundaries_.emplace_back(
+        endOfUserRecordsOffset_ < fileSize ? endOfUserRecordsOffset_ : fileSize);
+    if (sortNeeded || recordBoundaries_.back() < lastOffset) {
+      sort(recordBoundaries_.begin(), recordBoundaries_.end());
+    }
+  }
+  return recordBoundaries_;
+}
+
 bool RecordFileReader::prefetchRecordSequence(
     const vector<const IndexRecord::RecordInfo*>& records,
     bool clearSequence) {
@@ -499,26 +524,8 @@ bool RecordFileReader::prefetchRecordSequence(
       !file_->isRemoteFileSystem()) {
     return false; // don't even try for local file systems!
   }
-  // records are not always perfectly sorted, so we can't tell easily where they end.
-  // The best guess, is the offset of the first record, after the current record...
-  // yep, that's a bit expensive, but we have few options...
-  vector<int64_t> recordBoundaries;
-  recordBoundaries.reserve(recordIndex_.size() + 1);
-  int64_t lastOffset = 0;
-  bool sortNeeded = false;
-  for (const auto& r : recordIndex_) {
-    recordBoundaries.emplace_back(r.fileOffset);
-    if (r.fileOffset < lastOffset) {
-      sortNeeded = true;
-    }
-    lastOffset = r.fileOffset;
-  }
+  const vector<int64_t>& recordBoundaries = getRecordBoundaries();
   int64_t fileSize = file_->getTotalSize();
-  recordBoundaries.emplace_back(
-      endOfUserRecordsOffset_ < fileSize ? endOfUserRecordsOffset_ : fileSize);
-  if (sortNeeded || recordBoundaries.back() < lastOffset) {
-    sort(recordBoundaries.begin(), recordBoundaries.end());
-  }
   vector<pair<size_t, size_t>> segments;
   segments.reserve(records.size());
   for (const IndexRecord::RecordInfo* record : records) {

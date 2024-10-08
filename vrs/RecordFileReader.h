@@ -482,6 +482,10 @@ class RecordFileReader {
   uint32_t getRecordFormats(StreamId streamId, RecordFormatMap& outFormats) const;
   std::unique_ptr<DataLayout> getDataLayout(StreamId streamId, const ContentBlockId& blockId) const;
 
+  /// The offset of each record + the end of the file, sorted.
+  /// Useful to know where records end without reading the record.
+  const vector<int64_t>& getRecordBoundaries() const;
+
   /// Option to control logging when opening a file.
   /// @param progressLogger: a logger implementation, or nullptr, to disable logging.
   void setOpenProgressLogger(ProgressLogger* progressLogger);
@@ -581,6 +585,7 @@ class RecordFileReader {
   ProgressLogger* openProgressLogger_{&defaultProgressLogger_};
   unique_ptr<std::thread> detailsSaveThread_;
   mutable map<StreamId, vector<const IndexRecord::RecordInfo*>> streamIndex_;
+  mutable vector<int64_t> recordBoundaries_;
   // Location of the last record searched for a specific stream & record type
   // The pair: index of the record for the type (query), index of the record in the stream (result)
   mutable map<pair<StreamId, Record::Type>, pair<uint32_t, size_t>> lastRequest_;
