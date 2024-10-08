@@ -152,6 +152,10 @@ class BufferReader : public RecordReader {
     return status;
   }
 
+  bool isCompressed() const override {
+    return false;
+  }
+
  protected:
   BufferFileHandler bufferReader_;
 };

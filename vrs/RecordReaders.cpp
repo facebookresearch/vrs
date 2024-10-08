@@ -46,6 +46,10 @@ RecordReader* RecordReader::init(FileHandler& file, uint32_t diskSize, uint32_t 
   return this;
 }
 
+int64_t RecordReader::getFileOffset() const {
+  return file_->getPos();
+}
+
 int UncompressedRecordReader::read(DataReference& destination, uint32_t& outReadSize) {
   outReadSize = 0;
   if (remainingUncompressedSize_ < destination.getSize()) {

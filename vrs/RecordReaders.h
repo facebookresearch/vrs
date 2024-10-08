@@ -79,13 +79,11 @@ class RecordReader {
     return remainingUncompressedSize_;
   }
 
-  /// Tell if the record was compressed. It's named "looksCompressed" rather than "isCompressed",
-  /// because this method must be called early enough when a record is played back to be accurate.
-  /// Call this method from StreamPlayer::processRecordHeader() to tell for sure.
-  /// @return True if the record looks like it was compressed.
-  bool looksCompressed() const {
-    return remainingDiskBytes_ != remainingUncompressedSize_;
-  }
+  int64_t getFileOffset() const;
+
+  /// Tell if the record was compressed.
+  /// @return True if the record was compressed.
+  [[nodiscard]] virtual bool isCompressed() const = 0;
 
   // for warning/error throttling only
   const void* getRef() const {
@@ -103,6 +101,9 @@ class RecordReader {
 class UncompressedRecordReader : public RecordReader {
  public:
   int read(DataReference& destination, uint32_t& outReadSize) override;
+  bool isCompressed() const override {
+    return false;
+  }
 };
 
 /// \brief RecordReader specialized to read compressed records. For VRS internal usage only.
@@ -112,6 +113,9 @@ class CompressedRecordReader : public RecordReader {
   void initCompressionType(CompressionType compressionType);
   int read(DataReference& destination, uint32_t& outReadSize) override;
   void finish() override;
+  bool isCompressed() const override {
+    return true;
+  }
 
  private:
   int read(void* dest, uint32_t destSize, uint32_t overallSize, uint32_t& outReadSize);

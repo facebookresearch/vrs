@@ -297,7 +297,7 @@ class OtherStreamPlayer : public RecordFormatStreamPlayer {
   }
   bool processRecordHeader(const CurrentRecord& record, DataReference& outDataReference) override {
     if (record.recordType == Record::Type::DATA) {
-      if (record.reader->looksCompressed()) {
+      if (record.reader->isCompressed()) {
         usesCompression = true;
       }
     }
@@ -574,7 +574,7 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
 
   bool processRecordHeader(const CurrentRecord& record, DataReference& outDataReference) override {
     if (record.recordType == Record::Type::DATA) {
-      if (record.reader->looksCompressed()) {
+      if (record.reader->isCompressed()) {
         usesCompression = true;
       }
     }
