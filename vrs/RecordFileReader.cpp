@@ -507,10 +507,8 @@ const vector<int64_t>& RecordFileReader::getRecordBoundaries() const {
       }
       lastOffset = r.fileOffset;
     }
-    int64_t fileSize = file_->getTotalSize();
-    recordBoundaries_.emplace_back(
-        endOfUserRecordsOffset_ < fileSize ? endOfUserRecordsOffset_ : fileSize);
-    if (sortNeeded || recordBoundaries_.back() < lastOffset) {
+    recordBoundaries_.emplace_back(endOfUserRecordsOffset_);
+    if (sortNeeded) {
       sort(recordBoundaries_.begin(), recordBoundaries_.end());
     }
   }

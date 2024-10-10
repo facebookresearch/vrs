@@ -111,20 +111,9 @@ void FileHeader::enableFrontIndexRecordSupport() {
 
 int64_t FileHeader::getEndOfUserRecordsOffset(int64_t fileSize) const {
   if (looksLikeAVRSFile()) {
-    switch (fileFormatVersion.get()) {
-      case kOriginalFileFormatVersion:
-        // index record always in the back, firstUserRecordOffset is 0
-        if (indexRecordOffset.get() > 0) {
-          return min<int64_t>(fileSize, indexRecordOffset.get());
-        }
-        break;
-      case kFrontIndexFileFormatVersion:
-      case kZstdFormatVersion:
-        // index maybe before or after the user records, and firstUserRecordOffset should be valid.
-        if (indexRecordOffset.get() > 0 && indexRecordOffset.get() > firstUserRecordOffset.get()) {
-          return min<int64_t>(fileSize, indexRecordOffset.get());
-        }
-        break;
+    // index maybe before or after the user records
+    if (indexRecordOffset.get() > firstUserRecordOffset.get()) {
+      return min<int64_t>(fileSize, indexRecordOffset.get());
     }
   }
   return fileSize;
