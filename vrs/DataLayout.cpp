@@ -492,12 +492,6 @@ static DataPieceFactory::Registerer<DataPieceVector<string>> Registerer_DataPiec
 static DataPieceFactory::Registerer<DataPieceStringMap<string>> Registerer_DataPieceStringMap(
     makePieceName(DataPieceType::StringMap, "string"));
 
-#define STR(x) #x
-#define XSTR(x) STR(x)
-#define REGISTER_TEMPLATE(TEMPLATE_CLASS, TEMPLATE_TYPE)                            \
-  static vrs::internal::DataPieceFactory::Registerer<TEMPLATE_CLASS<TEMPLATE_TYPE>> \
-      Registerer_##TEMPLATE_CLASS##_##TEMPLATE_TYPE(STR(TEMPLATE_CLASS), STR(TEMPLATE_TYPE));
-
 } // namespace internal
 
 template <typename T>
@@ -724,35 +718,6 @@ size_t DataLayout::getAvailableVarDataPiecesCount() const {
   }
   return count;
 }
-
-#define DEFINE_FIND_DATA_PIECE(T)                                                                 \
-  template const DataPieceValue<T>* DataLayout::findDataPieceValue<T>(const string& label) const; \
-  template DataPieceValue<T>* DataLayout::findDataPieceValue<T>(const string& label);             \
-  template const DataPieceArray<T>* DataLayout::findDataPieceArray(                               \
-      const string& label, size_t arraySize) const;                                               \
-  template DataPieceArray<T>* DataLayout::findDataPieceArray(                                     \
-      const string& label, size_t arraySize);                                                     \
-  template const DataPieceVector<T>* DataLayout::findDataPieceVector(const string& label) const;  \
-  template DataPieceVector<T>* DataLayout::findDataPieceVector(const string& label);              \
-  template const DataPieceStringMap<T>* DataLayout::findDataPieceStringMap(const string& label)   \
-      const;                                                                                      \
-  template DataPieceStringMap<T>* DataLayout::findDataPieceStringMap(const string& label);
-
-#define DEFINE_DATA_PIECE_TYPE(x)          \
-  template <>                              \
-  const string& getTypeName<x>() {         \
-    static const string sName = XSTR(x);   \
-    return sName;                          \
-  }                                        \
-  REGISTER_TEMPLATE(DataPieceValue, x)     \
-  REGISTER_TEMPLATE(DataPieceArray, x)     \
-  REGISTER_TEMPLATE(DataPieceVector, x)    \
-  REGISTER_TEMPLATE(DataPieceStringMap, x) \
-  DEFINE_FIND_DATA_PIECE(x)
-
-// Define & generate the code for each POD type supported.
-#define POD_MACRO DEFINE_DATA_PIECE_TYPE
-#include <vrs/helpers/PODMacro.inc>
 
 bool DataPiece::isSame(const DataPiece* rhs) const {
   return isMatch(*rhs) && isRequired() == rhs->isRequired() && vrs::isSame(tags_, rhs->tags_);
@@ -1768,5 +1733,44 @@ JsonFormatProfileSpec::JsonFormatProfileSpec(JsonFormatProfile profile) {
     required = false;
   }
 }
+
+#define STR(x) #x
+#define XSTR(x) STR(x)
+#define REGISTER_TEMPLATE(TEMPLATE_CLASS, TEMPLATE_TYPE)                            \
+  static vrs::internal::DataPieceFactory::Registerer<TEMPLATE_CLASS<TEMPLATE_TYPE>> \
+      Registerer_##TEMPLATE_CLASS##_##TEMPLATE_TYPE(STR(TEMPLATE_CLASS), STR(TEMPLATE_TYPE));
+
+#define DEFINE_FIND_DATA_PIECE(T)                                                                 \
+  template const DataPieceValue<T>* DataLayout::findDataPieceValue<T>(const string& label) const; \
+  template DataPieceValue<T>* DataLayout::findDataPieceValue<T>(const string& label);             \
+  template const DataPieceArray<T>* DataLayout::findDataPieceArray(                               \
+      const string& label, size_t arraySize) const;                                               \
+  template DataPieceArray<T>* DataLayout::findDataPieceArray(                                     \
+      const string& label, size_t arraySize);                                                     \
+  template const DataPieceVector<T>* DataLayout::findDataPieceVector(const string& label) const;  \
+  template DataPieceVector<T>* DataLayout::findDataPieceVector(const string& label);              \
+  template const DataPieceStringMap<T>* DataLayout::findDataPieceStringMap(const string& label)   \
+      const;                                                                                      \
+  template DataPieceStringMap<T>* DataLayout::findDataPieceStringMap(const string& label);
+
+#define DEFINE_DATA_PIECE_TYPE(x)          \
+  template <>                              \
+  const string& getTypeName<x>() {         \
+    static const string sName = XSTR(x);   \
+    return sName;                          \
+  }                                        \
+  REGISTER_TEMPLATE(DataPieceValue, x)     \
+  REGISTER_TEMPLATE(DataPieceArray, x)     \
+  REGISTER_TEMPLATE(DataPieceVector, x)    \
+  REGISTER_TEMPLATE(DataPieceStringMap, x) \
+  DEFINE_FIND_DATA_PIECE(x)                \
+  template class DataPieceValue<x>;        \
+  template class DataPieceArray<x>;        \
+  template class DataPieceVector<x>;       \
+  template class DataPieceStringMap<x>;
+
+// Define & generate the code for each POD type supported.
+#define POD_MACRO DEFINE_DATA_PIECE_TYPE
+#include <vrs/helpers/PODMacro.inc>
 
 } // namespace vrs
