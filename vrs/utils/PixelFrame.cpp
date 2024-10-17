@@ -22,7 +22,6 @@
 #include <unordered_set>
 
 #define DEFAULT_LOG_CHANNEL "PixelFrame"
-#include <logging/Checks.h>
 #include <logging/Log.h>
 #include <logging/Verify.h>
 

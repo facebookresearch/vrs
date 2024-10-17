@@ -32,7 +32,6 @@
 #endif
 
 #define DEFAULT_LOG_CHANNEL "PixelFrameJxl"
-#include <logging/Checks.h>
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
