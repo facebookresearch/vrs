@@ -150,10 +150,8 @@ constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"><a cla
 constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs_1_1datalayout__conventions.html#abc22f351dc37d0e23f0edb8f8600ce17">kAudioSampleFormat</a> = &quot;audio_sample_format&quot;</td></tr>
 <tr class="memdesc:abc22f351dc37d0e23f0edb8f8600ce17"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> convention name for the audio sample format (see <a class="el" href="namespacevrs.html#a52303127bf307e1191fcb9b2ee2841d4" title="Audio sample format, when the audio type is AudioFormat::PCM.">vrs::AudioSampleFormat</a>). <br /></td></tr>
 <tr class="separator:abc22f351dc37d0e23f0edb8f8600ce17"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a06fa8bb6eceb9d8076c08c9d18628a18"><td class="memItemLeft" align="right" valign="top"><a id="a06fa8bb6eceb9d8076c08c9d18628a18"></a>
-constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs_1_1datalayout__conventions.html#a06fa8bb6eceb9d8076c08c9d18628a18">kAudioSampleStride</a> = &quot;audio_sample_stride&quot;</td></tr>
-<tr class="memdesc:a06fa8bb6eceb9d8076c08c9d18628a18"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> convention name for the padded number of bytes per sample. <br /></td></tr>
-<tr class="separator:a06fa8bb6eceb9d8076c08c9d18628a18"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc129fbb5854ca0cc9a17ba0d463a054"><td class="memItemLeft" align="right" valign="top">constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs_1_1datalayout__conventions.html#adc129fbb5854ca0cc9a17ba0d463a054">kAudioSampleFrameStride</a> = &quot;audio_sample_stride&quot;</td></tr>
+<tr class="separator:adc129fbb5854ca0cc9a17ba0d463a054"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a534fe290fbe2e16c369094c153449f66"><td class="memItemLeft" align="right" valign="top"><a id="a534fe290fbe2e16c369094c153449f66"></a>
 constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs_1_1datalayout__conventions.html#a534fe290fbe2e16c369094c153449f66">kAudioChannelCount</a> = &quot;audio_channel_count&quot;</td></tr>
 <tr class="memdesc:a534fe290fbe2e16c369094c153449f66"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> convention name for the audio channel count: mono = 1, stereo = 2, etc. <br /></td></tr>
@@ -178,6 +176,29 @@ constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"><a cla
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Name and type conventions used to map <a class="el" href="classvrs_1_1_content_block_reader.html" title="Abstract class to handle the interpretation of a record format&#39;s content block.">ContentBlockReader</a> needs to <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> data. </p>
 </div><h2 class="groupheader">Variable Documentation</h2>
+<a id="adc129fbb5854ca0cc9a17ba0d463a054"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adc129fbb5854ca0cc9a17ba0d463a054">&#9670;&nbsp;</a></span>kAudioSampleFrameStride</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr const char* vrs::datalayout_conventions::kAudioSampleFrameStride = &quot;audio_sample_stride&quot;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p><a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> convention name for the padded number of bytes per sample frame. A sample frame is made of kAudioChannelCount synchronous audio channel samples. </p>
+
+</div>
+</div>
 <a id="a00c5a2cd0aba9a10343ff43b671e6fc3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a00c5a2cd0aba9a10343ff43b671e6fc3">&#9670;&nbsp;</a></span>kImageBytesPerPixel</h2>
 
