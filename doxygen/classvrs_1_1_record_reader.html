@@ -106,13 +106,15 @@ Public Member Functions</h2></td></tr>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_reader.html#a77bfc50a32119498e9bf4050dec9e177">finish</a> ()</td></tr>
 <tr class="memdesc:a77bfc50a32119498e9bf4050dec9e177"><td class="mdescLeft">&#160;</td><td class="mdescRight">Discard any unread data. <br /></td></tr>
 <tr class="separator:a77bfc50a32119498e9bf4050dec9e177"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a6c92b97bb4e9ec953cc3a21732b0e4"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_reader.html#a5a6c92b97bb4e9ec953cc3a21732b0e4">getUnreadDiskBytes</a> () const</td></tr>
+<tr class="separator:a5a6c92b97bb4e9ec953cc3a21732b0e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a91e155656e805d40136350369472637b"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_reader.html#a91e155656e805d40136350369472637b">getUnreadBytes</a> () const</td></tr>
 <tr class="separator:a91e155656e805d40136350369472637b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8d559e8ade31f41a49a58550615eedbb"><td class="memItemLeft" align="right" valign="top"><a id="a8d559e8ade31f41a49a58550615eedbb"></a>
 int64_t&#160;</td><td class="memItemRight" valign="bottom"><b>getFileOffset</b> () const</td></tr>
 <tr class="separator:a8d559e8ade31f41a49a58550615eedbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abf4d44b621f8603567995bb78c512cf9"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_reader.html#abf4d44b621f8603567995bb78c512cf9">isCompressed</a> () const =0</td></tr>
-<tr class="separator:abf4d44b621f8603567995bb78c512cf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab463166d0f799a3846b889a8fb3dce66"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_reader.html#ab463166d0f799a3846b889a8fb3dce66">getCompressionType</a> () const =0</td></tr>
+<tr class="separator:ab463166d0f799a3846b889a8fb3dce66"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3a3f5646aac619ad2a80085be49cdfdb"><td class="memItemLeft" align="right" valign="top"><a id="a3a3f5646aac619ad2a80085be49cdfdb"></a>
 const void *&#160;</td><td class="memItemRight" valign="bottom"><b>getRef</b> () const</td></tr>
 <tr class="separator:a3a3f5646aac619ad2a80085be49cdfdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -132,6 +134,34 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>remainingUncompre
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Abstract VRS internal helper class to read &amp; (if necessary) uncompress records. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="ab463166d0f799a3846b889a8fb3dce66"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab463166d0f799a3846b889a8fb3dce66">&#9670;&nbsp;</a></span>getCompressionType()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a> vrs::RecordReader::getCompressionType </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Tell if/how the record was compressed. </p><dl class="section return"><dt>Returns</dt><dd>The compression type. </dd></dl>
+
+<p>Implemented in <a class="el" href="classvrs_1_1_compressed_record_reader.html#aff51ab9ce586ce0f1368992c059f2fa5">vrs::CompressedRecordReader</a>, and <a class="el" href="classvrs_1_1_uncompressed_record_reader.html#aafd385c6721828e4ce90ed8ba53afa31">vrs::UncompressedRecordReader</a>.</p>
+
+</div>
+</div>
 <a id="a91e155656e805d40136350369472637b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a91e155656e805d40136350369472637b">&#9670;&nbsp;</a></span>getUnreadBytes()</h2>
 
@@ -155,6 +185,32 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>remainingUncompre
 </table>
 </div><div class="memdoc">
 <p>Tell how many bytes of record data haven't been read/consumed yet. </p><dl class="section return"><dt>Returns</dt><dd>Number of unread bytes (uncompressed). </dd></dl>
+
+</div>
+</div>
+<a id="a5a6c92b97bb4e9ec953cc3a21732b0e4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a6c92b97bb4e9ec953cc3a21732b0e4">&#9670;&nbsp;</a></span>getUnreadDiskBytes()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t vrs::RecordReader::getUnreadDiskBytes </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Tell how many disk bytes of record data haven't been read/consumed yet. </p><dl class="section return"><dt>Returns</dt><dd>Number of unread disk bytes. </dd></dl>
 
 </div>
 </div>
@@ -198,34 +254,6 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>remainingUncompre
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Pointer to the reader. </dd></dl>
-
-</div>
-</div>
-<a id="abf4d44b621f8603567995bb78c512cf9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abf4d44b621f8603567995bb78c512cf9">&#9670;&nbsp;</a></span>isCompressed()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual bool vrs::RecordReader::isCompressed </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Tell if the record was compressed. </p><dl class="section return"><dt>Returns</dt><dd>True if the record was compressed. </dd></dl>
-
-<p>Implemented in <a class="el" href="classvrs_1_1_compressed_record_reader.html#a6eb4c8d01453f7692be4dbe55cbca9e6">vrs::CompressedRecordReader</a>, and <a class="el" href="classvrs_1_1_uncompressed_record_reader.html#a1b45e5a10cd82ef0002db4229f350491">vrs::UncompressedRecordReader</a>.</p>
 
 </div>
 </div>

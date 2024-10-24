@@ -566,6 +566,7 @@ Enumerations</h2></td></tr>
 <tr class="memitem:ac167a592f5255abc1a276d8ed0b96f2f"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a> : uint8_t { <a class="el" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2fa6adf97f83acf6453d4a6a4b1070f3754">None</a> = 0
 , <a class="el" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2fa56c8337568e62301ca0fb81adc631f1b">Lz4</a>
 , <a class="el" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2fa0c8468c9ff2f38e853335e1e40ade4c3">Zstd</a>
+, <b>COUNT</b>
  }</td></tr>
 <tr class="memdesc:ac167a592f5255abc1a276d8ed0b96f2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of compression. Used in VRS record headers, so never modify the values.  <a href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">More...</a><br /></td></tr>
 <tr class="separator:ac167a592f5255abc1a276d8ed0b96f2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -821,6 +822,13 @@ string&#160;</td><td class="memItemRight" valign="bottom"><b>toString</b> (<a cl
 template&lt;&gt; </td></tr>
 <tr class="memitem:a04084881e06b5e57c94f6a4027b7c780"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7b">CompressionPreset</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><b>toEnum&lt; CompressionPreset &gt;</b> (const string &amp;name)</td></tr>
 <tr class="separator:a04084881e06b5e57c94f6a4027b7c780"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed15644ecb73aa6aa93c5d27d0538731"><td class="memItemLeft" align="right" valign="top"><a id="aed15644ecb73aa6aa93c5d27d0538731"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>toString</b> (<a class="el" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a> compressionType)</td></tr>
+<tr class="separator:aed15644ecb73aa6aa93c5d27d0538731"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a002e2f9dea35508807505f1ae8b91b9f"><td class="memItemLeft" align="right" valign="top"><a id="a002e2f9dea35508807505f1ae8b91b9f"></a>
+template&lt;&gt; </td></tr>
+<tr class="memitem:a002e2f9dea35508807505f1ae8b91b9f"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><b>toEnum&lt; CompressionType &gt;</b> (const std::string &amp;compressionTypeName)</td></tr>
+<tr class="separator:a002e2f9dea35508807505f1ae8b91b9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a0d3174baf3fd60bae0d0291b3e7e63"><td class="memItemLeft" align="right" valign="top"><a id="a9a0d3174baf3fd60bae0d0291b3e7e63"></a>
 string&#160;</td><td class="memItemRight" valign="bottom"><b>toPrettyName</b> (<a class="el" href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7b">CompressionPreset</a> preset)</td></tr>
 <tr class="separator:a9a0d3174baf3fd60bae0d0291b3e7e63"><td class="memSeparator" colspan="2">&#160;</td></tr>
