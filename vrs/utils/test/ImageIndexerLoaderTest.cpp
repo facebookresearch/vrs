@@ -18,8 +18,11 @@
 
 #include <TestDataDir/TestDataDir.h>
 
+#include <vrs/FileHandlerFactory.h>
 #include <vrs/os/Utils.h>
 #include <vrs/utils/ImageIndexer.h>
+#include <vrs/utils/ImageLoader.h>
+#include <vrs/utils/xxhash/xxhash.h>
 
 using namespace std;
 using namespace vrs;
@@ -29,6 +32,43 @@ struct ImageIndexerLoaderTest : testing::Test {
   string kRgbFile = os::pathJoin(coretech::getTestDataDir(), "VRS_Files/rgb8.vrs");
   string kJpgFile = os::pathJoin(coretech::getTestDataDir(), "VRS_Files/jpg.vrs");
 };
+
+// Test the loadImage API reading from a file
+static int loadFrameFromFile(
+    FileHandler& file,
+    const DirectImageReference& image,
+    const string& format,
+    uint64_t hash) {
+  PixelFrame frame;
+  if (!loadImage(file, frame, image)) {
+    return 2;
+  }
+  EXPECT_EQ(frame.getSpec().asString(), format);
+  XXH64Digester digester;
+  digester.ingest(frame.getBuffer());
+  EXPECT_EQ(digester.digest(), hash);
+  return 0;
+}
+
+// Test the loadImage API reading from a memory buffer
+static int loadFrameFromMemory(
+    FileHandler& file,
+    const DirectImageReference& image,
+    const string& format,
+    uint64_t hash) {
+  vector<char> buffer(image.dataSize);
+  file.setPos(image.dataOffset);
+  EXPECT_EQ(file.read(buffer.data(), buffer.size()), 0);
+  PixelFrame frame;
+  if (!loadImage(buffer, frame, image)) {
+    return 2;
+  }
+  EXPECT_EQ(frame.getSpec().asString(), format);
+  XXH64Digester digester;
+  digester.ingest(frame.getBuffer());
+  EXPECT_EQ(digester.digest(), hash);
+  return 0;
+}
 
 TEST_F(ImageIndexerLoaderTest, ImageIndexerLoaderTest) {
   vector<DirectImageReference> readImages;
@@ -40,11 +80,20 @@ TEST_F(ImageIndexerLoaderTest, ImageIndexerLoaderTest) {
       {2108199, 2106944, format, CompressionType::Zstd, 52, 3760128},
       {4215175, 2106022, format, CompressionType::Zstd, 52, 3760128},
   };
-  EXPECT_EQ(readImages, expectedImages);
+  ASSERT_EQ(readImages, expectedImages);
+  unique_ptr<FileHandler> file;
+  ASSERT_EQ(FileHandlerFactory::getInstance().delegateOpen(kRgbFile, file), 0);
+  EXPECT_EQ(loadFrameFromFile(*file, readImages[0], format, 4114475262886596638ULL), 0);
+  EXPECT_EQ(loadFrameFromFile(*file, readImages[1], format, 16026781315276957005ULL), 0);
+  EXPECT_EQ(loadFrameFromFile(*file, readImages[2], format, 8098506684566711634ULL), 0);
+  EXPECT_EQ(loadFrameFromMemory(*file, readImages[1], format, 16026781315276957005ULL), 0);
 
   ASSERT_EQ(indexImages(kJpgFile, readImages), 0);
   expectedImages = {
       {6046, 1985655, "jpg", CompressionType::None, 0, 0},
   };
   EXPECT_EQ(readImages, expectedImages);
+  ASSERT_EQ(FileHandlerFactory::getInstance().delegateOpen(kJpgFile, file), 0);
+  EXPECT_EQ(loadFrameFromFile(*file, readImages[0], "jpg", 10323177114171200117ULL), 0);
+  EXPECT_EQ(loadFrameFromMemory(*file, readImages[0], "jpg", 10323177114171200117ULL), 0);
 }

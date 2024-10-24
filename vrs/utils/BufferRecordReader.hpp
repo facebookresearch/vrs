@@ -28,6 +28,9 @@ namespace vrs::utils {
 class BufferFileHandler : public FileHandler {
  public:
   BufferFileHandler() : fileHandlerName_{"BufferFileHandler"} {}
+  BufferFileHandler(const void* data, size_t length) : fileHandlerName_{"BufferFileHandler"} {
+    init(data, length);
+  }
   template <class T>
   explicit BufferFileHandler(const vector<T>& buffer) {
     init(buffer);
