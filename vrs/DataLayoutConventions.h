@@ -112,8 +112,9 @@ class VideoFrameSpec : public AutoDataLayout {
 constexpr const char* kAudioFormat = "audio_format";
 /// DataLayout convention name for the audio sample format (see vrs::AudioSampleFormat).
 constexpr const char* kAudioSampleFormat = "audio_sample_format";
-/// DataLayout convention name for the padded number of bytes per sample.
-constexpr const char* kAudioSampleStride = "audio_sample_stride";
+/// DataLayout convention name for the padded number of bytes per sample frame.
+/// A sample frame is made of kAudioChannelCount synchronous audio channel samples.
+constexpr const char* kAudioSampleFrameStride = "audio_sample_stride";
 /// DataLayout convention name for the audio channel count: mono = 1, stereo = 2, etc.
 constexpr const char* kAudioChannelCount = "audio_channel_count";
 /// DataLayout convention name for the sample rate (samples per seconde).
@@ -137,7 +138,7 @@ class AudioSpec : public AutoDataLayout {
  public:
   DataPieceEnum<AudioFormat, uint8_t> audioFormat{kAudioFormat}; ///< optional
   DataPieceEnum<AudioSampleFormat, uint8_t> sampleType{kAudioSampleFormat};
-  DataPieceValue<uint8_t> sampleStride{kAudioSampleStride};
+  DataPieceValue<uint8_t> sampleStride{kAudioSampleFrameStride};
   DataPieceValue<uint8_t> channelCount{kAudioChannelCount};
   DataPieceValue<uint32_t> sampleRate{kAudioSampleRate};
   DataPieceValue<uint32_t> sampleCount{kAudioSampleCount};
