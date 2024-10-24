@@ -19,6 +19,7 @@
 #include <memory>
 
 #include <vrs/FileHandler.h>
+#include <vrs/Record.h>
 #include <vrs/RecordReaders.h>
 
 namespace vrs::utils {
@@ -152,8 +153,8 @@ class BufferReader : public RecordReader {
     return status;
   }
 
-  bool isCompressed() const override {
-    return false;
+  CompressionType getCompressionType() const override {
+    return CompressionType::None;
   }
 
  protected:

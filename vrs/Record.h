@@ -36,6 +36,8 @@ enum class CompressionType : uint8_t {
   None = 0, ///< No compression.
   Lz4, ///< lz4 compression.
   Zstd, ///< zstd compression.
+
+  COUNT
 };
 
 /// \brief Essential VRS class holding a record's details and payload in memory during creation.

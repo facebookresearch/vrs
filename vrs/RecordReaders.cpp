@@ -25,6 +25,7 @@
 
 #include "ErrorCode.h"
 #include "FileHandler.h"
+#include "Record.h"
 
 namespace {
 
@@ -64,6 +65,10 @@ int UncompressedRecordReader::read(DataReference& destination, uint32_t& outRead
   remainingDiskBytes_ -= outReadSize;
   remainingUncompressedSize_ -= outReadSize;
   return error;
+}
+
+CompressionType UncompressedRecordReader::getCompressionType() const {
+  return CompressionType::None;
 }
 
 void CompressedRecordReader::initCompressionType(CompressionType compressionType) {
@@ -138,6 +143,10 @@ int CompressedRecordReader::read(
 void CompressedRecordReader::finish() {
   decompressor_.reset();
   RecordReader::finish();
+}
+
+CompressionType CompressedRecordReader::getCompressionType() const {
+  return decompressor_.getCompressionType();
 }
 
 } // namespace vrs

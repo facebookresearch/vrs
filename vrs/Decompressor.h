@@ -37,6 +37,10 @@ class Decompressor {
   ~Decompressor();
 
   void setCompressionType(CompressionType compressionType);
+  CompressionType getCompressionType() const {
+    return compressionType_;
+  }
+
   size_t getRecommendedInputBufferSize() const;
 
   /// Decompress a maximum of destinationSize bytes of data, at the pointed to destination,

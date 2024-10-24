@@ -63,13 +63,16 @@ enum class CompressionPreset {
 
   Default = ZstdFaster ///< Default preset
 
-}; // namespace vrs
+};
 
 std::string toPrettyName(CompressionPreset preset);
 std::string toString(CompressionPreset preset);
-
 template <>
 CompressionPreset toEnum<CompressionPreset>(const std::string& presetName);
+
+std::string toString(CompressionType compressionType);
+template <>
+CompressionType toEnum<CompressionType>(const std::string& compressionTypeName);
 
 /// \brief Helper class to compress data using lz4 or zstd presets.
 ///

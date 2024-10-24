@@ -93,6 +93,23 @@ struct CompressionPresetConverter : public EnumStringConverter<
       "Missing CompressionPreset name definitions");
 };
 
+const char* sCompressionTypeNames[] = {
+    "none",
+    "lz4",
+    "zstd",
+};
+struct CompressionTypeConverter : public EnumStringConverter<
+                                      CompressionType,
+                                      sCompressionTypeNames,
+                                      COUNT_OF(sCompressionTypeNames),
+                                      CompressionType::None,
+                                      CompressionType::None,
+                                      true> {
+  static_assert(
+      COUNT_OF(sCompressionTypeNames) == enumCount<CompressionType>(),
+      "Missing CompressionType name definitions");
+};
+
 int zstdPresetToCompressionLevel(CompressionPreset preset) {
   auto iter = sZstdPresets.find(preset);
   if (iter == sZstdPresets.end()) {
@@ -114,6 +131,15 @@ string toString(CompressionPreset preset) {
 template <>
 CompressionPreset toEnum<CompressionPreset>(const string& name) {
   return CompressionPresetConverter::toEnumNoCase(name);
+}
+
+std::string toString(CompressionType compressionType) {
+  return CompressionTypeConverter::toString(compressionType);
+}
+
+template <>
+CompressionType toEnum<CompressionType>(const std::string& compressionTypeName) {
+  return CompressionTypeConverter::toEnumNoCase(compressionTypeName);
 }
 
 #define IF_ZCOMP_ERROR_LOG_AND_RETURN(operation__)                                       \

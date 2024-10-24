@@ -73,6 +73,12 @@ class RecordReader {
   /// Discard any unread data.
   virtual void finish() {}
 
+  /// Tell how many disk bytes of record data haven't been read/consumed yet.
+  /// @return Number of unread disk bytes.
+  uint32_t getUnreadDiskBytes() const {
+    return remainingDiskBytes_;
+  }
+
   /// Tell how many bytes of record data haven't been read/consumed yet.
   /// @return Number of unread bytes (uncompressed).
   uint32_t getUnreadBytes() const {
@@ -81,9 +87,9 @@ class RecordReader {
 
   int64_t getFileOffset() const;
 
-  /// Tell if the record was compressed.
-  /// @return True if the record was compressed.
-  [[nodiscard]] virtual bool isCompressed() const = 0;
+  /// Tell if/how the record was compressed.
+  /// @return The compression type.
+  [[nodiscard]] virtual CompressionType getCompressionType() const = 0;
 
   // for warning/error throttling only
   const void* getRef() const {
@@ -101,9 +107,7 @@ class RecordReader {
 class UncompressedRecordReader : public RecordReader {
  public:
   int read(DataReference& destination, uint32_t& outReadSize) override;
-  bool isCompressed() const override {
-    return false;
-  }
+  CompressionType getCompressionType() const override;
 };
 
 /// \brief RecordReader specialized to read compressed records. For VRS internal usage only.
@@ -113,9 +117,7 @@ class CompressedRecordReader : public RecordReader {
   void initCompressionType(CompressionType compressionType);
   int read(DataReference& destination, uint32_t& outReadSize) override;
   void finish() override;
-  bool isCompressed() const override {
-    return true;
-  }
+  CompressionType getCompressionType() const override;
 
  private:
   int read(void* dest, uint32_t destSize, uint32_t overallSize, uint32_t& outReadSize);
