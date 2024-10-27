@@ -17,6 +17,7 @@
 #include <iostream>
 #include <limits>
 #include <type_traits>
+#include <algorithm>
 
 #include <gtest/gtest.h>
 

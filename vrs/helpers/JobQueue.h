@@ -23,6 +23,7 @@
 #include <memory>
 #include <mutex>
 #include <thread>
+#include <algorithm>
 
 #include <vrs/os/Time.h>
 
