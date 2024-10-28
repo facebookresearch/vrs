@@ -498,8 +498,7 @@ int VrsCommand::runCommands() {
       FileSpec spec;
       unique_ptr<FileHandler> file;
       if (RecordFileReader::vrsFilePathToFileSpec(filteredReader.getPathOrUri(), spec) != 0 ||
-          FileHandlerFactory::getInstance().delegateOpen(spec, file) != 0 ||
-          !FileFormat::printVRSFileInternals(*file)) {
+          !(file = FileHandler::makeOpen(spec)) || !FileFormat::printVRSFileInternals(*file)) {
         statusCode = EXIT_FAILURE;
       }
     } break;
@@ -624,11 +623,8 @@ int VrsCommand::doCopyMerge() {
 }
 
 bool VrsCommand::isRemoteFileSystem(const string& path) {
-  unique_ptr<FileHandler> filehandler;
-  if (FileHandlerFactory::getInstance().delegateOpen(path, filehandler) != SUCCESS) {
-    return false;
-  }
-  return filehandler->isRemoteFileSystem();
+  unique_ptr<FileHandler> filehandler = FileHandler::makeOpen(path);
+  return filehandler && filehandler->isRemoteFileSystem();
 }
 
 DecimationParams& VrsCommand::getDecimatorParams() {

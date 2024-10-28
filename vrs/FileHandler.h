@@ -84,6 +84,10 @@ class FileHandler : public FileDelegator {
 
   FileHandler() = default;
 
+  /// Open a file in read-only mode. Returns an open file handler, or nullptr on error.
+  static unique_ptr<FileHandler> makeOpen(const string& filePath);
+  static unique_ptr<FileHandler> makeOpen(const FileSpec& fileSpec);
+
   /// Make a new instance of the concrete class implementing this interface in its default state,
   /// no matter what this object's state is, so that we can access more files using the same method.
   /// @return A new object of the concrete type, ready to be used to open a new file.

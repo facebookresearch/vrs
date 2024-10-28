@@ -57,6 +57,26 @@ struct CachingStrategyConverter : public EnumStringConverter<
 
 namespace vrs {
 
+unique_ptr<FileHandler> FileHandler::makeOpen(const string& filePath) {
+  unique_ptr<FileHandler> delegate;
+  int status = FileHandlerFactory::getInstance().delegateOpen(filePath, delegate);
+  if (status != 0) {
+    XR_LOGE("Could not open '{}': {}", filePath, errorCodeToMessage(status));
+    return nullptr;
+  }
+  return delegate;
+}
+
+unique_ptr<FileHandler> FileHandler::makeOpen(const FileSpec& fileSpec) {
+  unique_ptr<FileHandler> delegate;
+  int status = FileHandlerFactory::getInstance().delegateOpen(fileSpec, delegate);
+  if (status != 0) {
+    XR_LOGE("Could not open '{}': {}", fileSpec.toPathJsonUri(), errorCodeToMessage(status));
+    return nullptr;
+  }
+  return delegate;
+}
+
 int FileHandler::open(const string& filePath) {
   FileSpec fileSpec;
   int status = fileSpec.fromPathJsonUri(filePath, getFileHandlerName());

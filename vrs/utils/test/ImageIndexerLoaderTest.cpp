@@ -18,7 +18,6 @@
 
 #include <TestDataDir/TestDataDir.h>
 
-#include <vrs/FileHandlerFactory.h>
 #include <vrs/os/Utils.h>
 #include <vrs/utils/ImageIndexer.h>
 #include <vrs/utils/ImageLoader.h>
@@ -81,8 +80,8 @@ TEST_F(ImageIndexerLoaderTest, ImageIndexerLoaderTest) {
       {4215175, 2106022, format, CompressionType::Zstd, 52, 3760128},
   };
   ASSERT_EQ(readImages, expectedImages);
-  unique_ptr<FileHandler> file;
-  ASSERT_EQ(FileHandlerFactory::getInstance().delegateOpen(kRgbFile, file), 0);
+  unique_ptr<FileHandler> file = FileHandler::makeOpen(kRgbFile);
+  ASSERT_NE(file, nullptr);
   EXPECT_EQ(loadFrameFromFile(*file, readImages[0], format, 4114475262886596638ULL), 0);
   EXPECT_EQ(loadFrameFromFile(*file, readImages[1], format, 16026781315276957005ULL), 0);
   EXPECT_EQ(loadFrameFromFile(*file, readImages[2], format, 8098506684566711634ULL), 0);
@@ -93,7 +92,7 @@ TEST_F(ImageIndexerLoaderTest, ImageIndexerLoaderTest) {
       {6046, 1985655, "jpg", CompressionType::None, 0, 0},
   };
   EXPECT_EQ(readImages, expectedImages);
-  ASSERT_EQ(FileHandlerFactory::getInstance().delegateOpen(kJpgFile, file), 0);
+  ASSERT_NE(file = FileHandler::makeOpen(kJpgFile), nullptr);
   EXPECT_EQ(loadFrameFromFile(*file, readImages[0], "jpg", 10323177114171200117ULL), 0);
   EXPECT_EQ(loadFrameFromMemory(*file, readImages[0], "jpg", 10323177114171200117ULL), 0);
 }

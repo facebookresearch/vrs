@@ -26,7 +26,6 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
-#include <vrs/FileHandlerFactory.h>
 #include <vrs/helpers/Rapidjson.hpp>
 #include <vrs/helpers/Strings.h>
 #include <vrs/helpers/Throttler.h>
@@ -493,8 +492,8 @@ string recordsChecksum(const string& path, bool showProgress) {
 string verbatimChecksum(const string& path, bool showProgress) {
   const char* kStatus = "Calculating ";
   const char* kReset = showProgress ? kResetCurrentLine : "";
-  unique_ptr<FileHandler> file;
-  if (FileHandlerFactory::getInstance().delegateOpen(path, file) != 0) {
+  unique_ptr<FileHandler> file = FileHandler::makeOpen(path);
+  if (!file) {
     return "<file open error>";
   }
   XXH64Digester digester;
