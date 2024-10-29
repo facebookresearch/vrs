@@ -28,7 +28,7 @@
     "@types/react": "^16.8.0",
     "axios": "^0.28.0",
     "clsx": "^1.1.1",
-    "docusaurus-plugin-internaldocs-fb": "1.16.2",
+    "docusaurus-plugin-internaldocs-fb": "1.18.5",
     "file-loader": "^6.2.0",
     "micromatch": "^4.0.8",
     "prism-react-renderer": "^1.2.1",
