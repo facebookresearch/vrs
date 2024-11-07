@@ -23,6 +23,8 @@
 #include <vrs/utils/ImageLoader.h>
 #include <vrs/utils/xxhash/xxhash.h>
 
+#if IS_VRS_FB_INTERNAL()
+
 using namespace std;
 using namespace vrs;
 using namespace vrs::utils;
@@ -96,3 +98,5 @@ TEST_F(ImageIndexerLoaderTest, ImageIndexerLoaderTest) {
   EXPECT_EQ(loadFrameFromFile(*file, readImages[0], "jpg", 10323177114171200117ULL), 0);
   EXPECT_EQ(loadFrameFromMemory(*file, readImages[0], "jpg", 10323177114171200117ULL), 0);
 }
+
+#endif
