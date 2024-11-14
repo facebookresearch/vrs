@@ -208,7 +208,13 @@ bool convertRaw10ToGrey10(
 
   const bool canVectorize = kHasSimdAcceleration && (contiguous || canFullyVectorizeRows);
 
-  if (canVectorize) {
+#if defined(__has_feature) && __has_feature(thread_sanitizer)
+  const bool tsan = true;
+#else
+  const bool tsan = false;
+#endif
+
+  if (canVectorize && !tsan) {
     convertVectorized(dst, src, widthInPixels, heightInPixels, strideInBytes, contiguous);
   } else {
     // Non-SIMD fallback
