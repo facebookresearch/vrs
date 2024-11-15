@@ -28,6 +28,14 @@
 
 #include <vrs/os/CompilerAttributes.h>
 
+#if defined(__SANITIZE_THREAD__)
+#define TSAN_ENABLED
+#elif defined(__has_feature)
+#if __has_feature(thread_sanitizer)
+#define TSAN_ENABLED
+#endif
+#endif
+
 namespace vrs::utils {
 
 // enforce local linkage
@@ -208,7 +216,7 @@ bool convertRaw10ToGrey10(
 
   const bool canVectorize = kHasSimdAcceleration && (contiguous || canFullyVectorizeRows);
 
-#if defined(__has_feature) && __has_feature(thread_sanitizer)
+#ifdef TSAN_ENABLED
   const bool tsan = true;
 #else
   const bool tsan = false;
