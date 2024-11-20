@@ -439,15 +439,23 @@ bool DataLayoutBlockReader::readBlock(
   // The size of the variable size buffer can be read from the var size index, so we read
   // the fixed size buffer first, extract the size of the var size data from the var size index,
   // so we can then read the var size buffer...
+  const size_t kMaxDataSize = 1024 * 1024 * 1024; // 1GB
   DataLayout& layout = *blockLayout_;
   vector<int8_t>& fixedData = layout.getFixedData();
-  fixedData.resize(layout.getFixedDataSizeNeeded());
+  size_t fixedDataSize = layout.getFixedDataSizeNeeded();
+  if (!XR_VERIFY(fixedDataSize <= kMaxDataSize)) {
+    return false;
+  }
+  fixedData.resize(fixedDataSize);
   vector<int8_t>& varData = layout.getVarData();
   int readBlockStatus = record.reader->read(fixedData);
   if (readBlockStatus == 0) {
-    size_t varLength = layout.getVarDataSizeFromIndex();
-    varData.resize(varLength);
-    if (varLength > 0) {
+    size_t varDataSize = layout.getVarDataSizeFromIndex();
+    if (!XR_VERIFY(varDataSize <= kMaxDataSize)) {
+      return false;
+    }
+    varData.resize(varDataSize);
+    if (varDataSize > 0) {
       readBlockStatus = record.reader->read(varData);
     }
   } else {
