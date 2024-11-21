@@ -232,6 +232,10 @@ struct RecordHeader {
       uint32_t formatVersion,
       uint32_t descriptionRecordSize,
       uint32_t previousRecordSize);
+
+  /// Do some surperficial sanity checks on the record header.
+  /// @return True if the header looks valid, false otherwise.
+  bool isSanityCheckOk() const;
 };
 
 #pragma pack(pop)

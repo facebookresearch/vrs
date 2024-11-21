@@ -1052,6 +1052,10 @@ bool RecordFileReader::isRecordAvailableOrPrefetch(const IndexRecord::RecordInfo
         errorCodeToMessageWithCode(error));
     return false;
   }
+  if (!recordHeader.isSanityCheckOk()) {
+    XR_LOGE("Record #{} Record header doesn't look right.", getRecordIndex(&recordInfo));
+    return false;
+  }
   uint32_t recordSize = recordHeader.recordSize.get();
   return file_->isAvailableOrPrefetch(recordSize - sizeof(recordHeader));
 }
@@ -1111,6 +1115,10 @@ int RecordFileReader::readRecord(
   }
 
   bool integrityCheck = true;
+  if (!recordHeader.isSanityCheckOk()) {
+    integrityCheck = false;
+    XR_LOGE("Record #{} sanity check failed.", static_cast<int>(&recordInfo - &getIndex()[0]));
+  }
   if (recordInfo.timestamp != recordHeader.timestamp.get()) {
     integrityCheck = false;
     XR_LOGE(

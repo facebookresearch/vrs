@@ -187,6 +187,28 @@ void RecordHeader::initDescriptionHeader(
   this->timestamp.set(Record::kMaxTimestamp);
 }
 
+bool RecordHeader::isSanityCheckOk() const {
+  if (!XR_VERIFY(recordSize.get() >= sizeof(RecordHeader)) ||
+      !XR_VERIFY(
+          previousRecordSize.get() == 0 || previousRecordSize.get() >= sizeof(RecordHeader))) {
+    return false;
+  }
+  if (!XR_VERIFY(recordType.get() > static_cast<uint8_t>(Record::Type::UNDEFINED)) ||
+      !XR_VERIFY(recordType.get() < static_cast<uint8_t>(Record::Type::COUNT))) {
+    return false;
+  }
+  if (uncompressedSize.get() > 0) {
+    if (!XR_VERIFY(uncompressedSize.get() >= recordSize.get() / 2)) {
+      return false;
+    }
+    if (!XR_VERIFY(compressionType.get() != static_cast<uint8_t>(CompressionType::None)) ||
+        !XR_VERIFY(compressionType.get() < static_cast<uint8_t>(CompressionType::COUNT))) {
+      return false;
+    }
+  }
+  return true;
+}
+
 RecordableTypeId readRecordableTypeId(const FileFormat::LittleEndian<int32_t>& recordableTypeId) {
   int32_t rawTypeId = recordableTypeId.get();
   // reinterpret ids for test & sample devices in their legacy space...

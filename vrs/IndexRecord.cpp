@@ -301,6 +301,10 @@ int IndexRecord::Reader::readRecord(
     XR_LOGE("Record size too small. Corrupt?");
     return INDEX_RECORD_ERROR;
   }
+  if (!recordHeader->isSanityCheckOk()) {
+    XR_LOGE("Record header sanity check failed. Corrupt?");
+    return INDEX_RECORD_ERROR;
+  }
   size_t indexByteSize = recordHeader->recordSize.get() - static_cast<uint32_t>(recordHeaderSize);
   if (recordHeader->formatVersion.get() == kClassicIndexFormatVersion) {
     return readClassicIndexRecord(
@@ -669,6 +673,11 @@ int IndexRecord::Reader::rebuildIndex(bool writeFixedIndex) {
           recordSize,
           recordHeaderSize);
       distrustLastRecord = true;
+      error = REINDEXING_ERROR;
+      break;
+    }
+    if (!recordHeader->isSanityCheckOk()) {
+      XR_LOGW("Reindexing: record #{} header sanity check failed.", index_.size());
       error = REINDEXING_ERROR;
       break;
     }
