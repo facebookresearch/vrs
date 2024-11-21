@@ -48,8 +48,9 @@ var searchData=
   ['isrequired_467',['isRequired',['../classvrs_1_1_data_piece.html#a19860d4c6b30c0702876954596d3391b',1,'vrs::DataPiece']]],
   ['issame_468',['isSame',['../classvrs_1_1_data_piece_vector.html#a71c120738cf76cca9060a991c6abd016',1,'vrs::DataPieceVector::isSame()'],['../classvrs_1_1_data_piece_value.html#a6814b6aadbe3be130f54bc63ab6abb19',1,'vrs::DataPieceValue::isSame()'],['../classvrs_1_1_data_piece_string_map.html#a9511730dec8e630422473b58ff9e8f92',1,'vrs::DataPieceStringMap::isSame()'],['../classvrs_1_1_data_piece_string.html#af859fd72b4d2804743e490ed1ec2de2a',1,'vrs::DataPieceString::isSame()'],['../classvrs_1_1_data_piece.html#a4e475db7ddf68a7ae0b9b54e229503f0',1,'vrs::DataPiece::isSame()'],['../classvrs_1_1_data_piece_array.html#ad9e508084cf9746c1d49d49c76b86629',1,'vrs::DataPieceArray::isSame()'],['../classvrs_1_1_data_layout.html#a8699303fb82de2f0f380fa7b09dcaafe',1,'vrs::DataLayout::isSame()']]],
   ['issampleblockformatdefined_469',['isSampleBlockFormatDefined',['../classvrs_1_1_audio_content_block_spec.html#a502ebad03cc6af8be363c041cd9cdc37',1,'vrs::AudioContentBlockSpec']]],
-  ['isvalid_470',['isValid',['../classvrs_1_1_stream_id.html#a611065420d3fec26556c0e1df316f4f3',1,'vrs::StreamId']]],
-  ['isvardataindexvalid_471',['isVarDataIndexValid',['../classvrs_1_1_data_layout.html#aa02e21cb0c063a1bd598f1de3731f28a',1,'vrs::DataLayout']]],
-  ['isvrsfile_472',['isVrsFile',['../classvrs_1_1_record_file_reader.html#a1fc82245fcc52a27bc2dc8810316d798',1,'vrs::RecordFileReader::isVrsFile(const FileSpec &amp;fileSpec)'],['../classvrs_1_1_record_file_reader.html#a12b4fb530ccc1076a1a342afdea7d6f0',1,'vrs::RecordFileReader::isVrsFile(const string &amp;filePath)']]],
-  ['iswriting_473',['isWriting',['../classvrs_1_1_record_file_writer.html#adf3a7ed71bdec9326a781aba2789828f',1,'vrs::RecordFileWriter']]]
+  ['issanitycheckok_470',['isSanityCheckOk',['../structvrs_1_1_file_format_1_1_record_header.html#ab0a77e99987a8ed4b74054c0efc21962',1,'vrs::FileFormat::RecordHeader']]],
+  ['isvalid_471',['isValid',['../classvrs_1_1_stream_id.html#a611065420d3fec26556c0e1df316f4f3',1,'vrs::StreamId']]],
+  ['isvardataindexvalid_472',['isVarDataIndexValid',['../classvrs_1_1_data_layout.html#aa02e21cb0c063a1bd598f1de3731f28a',1,'vrs::DataLayout']]],
+  ['isvrsfile_473',['isVrsFile',['../classvrs_1_1_record_file_reader.html#a12b4fb530ccc1076a1a342afdea7d6f0',1,'vrs::RecordFileReader::isVrsFile(const string &amp;filePath)'],['../classvrs_1_1_record_file_reader.html#a1fc82245fcc52a27bc2dc8810316d798',1,'vrs::RecordFileReader::isVrsFile(const FileSpec &amp;fileSpec)']]],
+  ['iswriting_474',['isWriting',['../classvrs_1_1_record_file_writer.html#adf3a7ed71bdec9326a781aba2789828f',1,'vrs::RecordFileWriter']]]
 ];
