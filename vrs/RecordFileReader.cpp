@@ -332,6 +332,10 @@ int RecordFileReader::doOpenFile(
     // count the records of each stream & type
     streamRecordCounts_.clear();
     for (const auto& record : recordIndex_) {
+      if (streamRecordCounts_.size() > 5000) {
+        XR_LOGE("Too many different stream IDs found in this file. Let's stop the carnage.");
+        return INDEX_RECORD_ERROR;
+      }
       streamRecordCounts_[record.streamId][record.recordType]++;
     }
   }
