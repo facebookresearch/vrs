@@ -20,6 +20,7 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/FileFormat.h>
 #include <vrs/helpers/FileMacros.h>
 #include <vrs/helpers/Throttler.h>
 #include <vrs/os/CompilerAttributes.h>
@@ -439,11 +440,12 @@ bool DataLayoutBlockReader::readBlock(
   // The size of the variable size buffer can be read from the var size index, so we read
   // the fixed size buffer first, extract the size of the var size data from the var size index,
   // so we can then read the var size buffer...
-  const size_t kMaxDataSize = 1024 * 1024 * 1024; // 1GB
+  const size_t kMaxFixedDataSize = 1024 * 1024 * 1024; // 1GB, arbitrary limit
+  const size_t kMaxRecordSize = 4 * 1024 * 1024 * 1024UL - sizeof(FileFormat::RecordHeader);
   DataLayout& layout = *blockLayout_;
   vector<int8_t>& fixedData = layout.getFixedData();
   size_t fixedDataSize = layout.getFixedDataSizeNeeded();
-  if (!XR_VERIFY(fixedDataSize <= kMaxDataSize)) {
+  if (!XR_VERIFY(fixedDataSize <= kMaxFixedDataSize)) {
     return false;
   }
   fixedData.resize(fixedDataSize);
@@ -451,7 +453,7 @@ bool DataLayoutBlockReader::readBlock(
   int readBlockStatus = record.reader->read(fixedData);
   if (readBlockStatus == 0) {
     size_t varDataSize = layout.getVarDataSizeFromIndex();
-    if (!XR_VERIFY(varDataSize <= kMaxDataSize)) {
+    if (!XR_VERIFY(fixedDataSize + varDataSize <= kMaxRecordSize)) {
       return false;
     }
     varData.resize(varDataSize);
