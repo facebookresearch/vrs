@@ -32,6 +32,7 @@
 #include <qscreen.h>
 #endif
 
+#include <fmt/format.h>
 #include <fmt/ranges.h>
 
 #define DEFAULT_LOG_CHANNEL "FrameWidget"
