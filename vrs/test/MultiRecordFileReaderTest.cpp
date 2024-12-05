@@ -20,6 +20,7 @@
 #include <string>
 
 #include <fmt/format.h>
+#include <fmt/ranges.h>
 #include <fmt/xchar.h>
 
 #include <gtest/gtest.h>
