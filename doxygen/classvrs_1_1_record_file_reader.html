@@ -177,6 +177,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:afc6bd308cd42c001931badafef1da65c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b30e9f882797610f5087b39b0533151"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a3b30e9f882797610f5087b39b0533151">getFirstDataRecordTime</a> () const</td></tr>
 <tr class="separator:a3b30e9f882797610f5087b39b0533151"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a2efa035d1dd0c60467735d72b40e32"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a3a2efa035d1dd0c60467735d72b40e32">getLastDataRecordTime</a> () const</td></tr>
+<tr class="separator:a3a2efa035d1dd0c60467735d72b40e32"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7851f34655359f9a6b202c5c336c091d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a7851f34655359f9a6b202c5c336c091d">readFirstConfigurationRecord</a> (<a class="el" href="classvrs_1_1_stream_id.html">StreamId</a> streamId, <a class="el" href="classvrs_1_1_stream_player.html">StreamPlayer</a> *streamPlayer=nullptr)</td></tr>
 <tr class="separator:a7851f34655359f9a6b202c5c336c091d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a61455e4da3366017413571d246a37eea"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a61455e4da3366017413571d246a37eea">readFirstConfigurationRecords</a> (<a class="el" href="classvrs_1_1_stream_player.html">StreamPlayer</a> *streamPlayer=nullptr)</td></tr>
@@ -413,6 +415,24 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The index of the file, with all the records. </dd></dl>
+
+</div>
+</div>
+<a id="a3a2efa035d1dd0c60467735d72b40e32"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a2efa035d1dd0c60467735d72b40e32">&#9670;&nbsp;</a></span>getLastDataRecordTime()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double vrs::RecordFileReader::getLastDataRecordTime </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Timestamp for the last data record in the whole file. </p><dl class="section return"><dt>Returns</dt><dd>The timestamp for the file data record, or 0, if the file contains no data record. </dd></dl>
 
 </div>
 </div>

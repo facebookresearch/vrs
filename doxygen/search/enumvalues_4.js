@@ -1,10 +1,10 @@
 var searchData=
 [
-  ['emggesturerecordableclass_1726',['EMGGestureRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a7c1fa55190604b6d08aae78a53c638e0',1,'vrs']]],
-  ['emgrecordableclass_1727',['EMGRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5ad1ee725ac80d43af263f6ce5ef79515f',1,'vrs']]],
-  ['empty_1728',['EMPTY',['../namespacevrs.html#ae73984aca85d0aa7b6f3406cd9f2f6eaaba2b45bdc11e2a4a6e86aab2ac693cbb',1,'vrs']]],
-  ['eventrecordableclass_1729',['EventRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a51b34261622abb0e084e161ec148fcca',1,'vrs']]],
-  ['externalcompact_1730',['ExternalCompact',['../namespacevrs.html#ab5a2876628d1cfe8288aa4d4b557d433a0e8d54de4c26fd67bd91dd4f295b47e1',1,'vrs']]],
-  ['externalpretty_1731',['ExternalPretty',['../namespacevrs.html#ab5a2876628d1cfe8288aa4d4b557d433a5b497216e012891fb7a93dcf072a8356',1,'vrs']]],
-  ['eyecamerarecordableclass_1732',['EyeCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5ad1cba9cdd661a9c56ebebb65f99137b3',1,'vrs']]]
+  ['emggesturerecordableclass_1728',['EMGGestureRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a7c1fa55190604b6d08aae78a53c638e0',1,'vrs']]],
+  ['emgrecordableclass_1729',['EMGRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5ad1ee725ac80d43af263f6ce5ef79515f',1,'vrs']]],
+  ['empty_1730',['EMPTY',['../namespacevrs.html#ae73984aca85d0aa7b6f3406cd9f2f6eaaba2b45bdc11e2a4a6e86aab2ac693cbb',1,'vrs']]],
+  ['eventrecordableclass_1731',['EventRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a51b34261622abb0e084e161ec148fcca',1,'vrs']]],
+  ['externalcompact_1732',['ExternalCompact',['../namespacevrs.html#ab5a2876628d1cfe8288aa4d4b557d433a0e8d54de4c26fd67bd91dd4f295b47e1',1,'vrs']]],
+  ['externalpretty_1733',['ExternalPretty',['../namespacevrs.html#ab5a2876628d1cfe8288aa4d4b557d433a5b497216e012891fb7a93dcf072a8356',1,'vrs']]],
+  ['eyecamerarecordableclass_1734',['EyeCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5ad1cba9cdd661a9c56ebebb65f99137b3',1,'vrs']]]
 ];
