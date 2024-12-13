@@ -843,6 +843,15 @@ double RecordFileReader::getFirstDataRecordTime() const {
   return 0; // no data record...
 }
 
+double RecordFileReader::getLastDataRecordTime() const {
+  for (auto iter = recordIndex_.rbegin(); iter != recordIndex_.rend(); ++iter) {
+    if (iter->recordType == Record::Type::DATA) {
+      return iter->timestamp;
+    }
+  }
+  return 0;
+}
+
 bool RecordFileReader::readConfigRecords(
     const set<const IndexRecord::RecordInfo*>& configRecords,
     StreamPlayer* streamPlayer) {

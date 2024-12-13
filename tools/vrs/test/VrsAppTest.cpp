@@ -300,6 +300,7 @@ TEST_F(VrsAppTest, ANDROID_DISABLED(mergeTimeFilterTest)) {
   // Data records are constrained by the +0.2 range
   EXPECT_NEAR(reader.getFirstDataRecordTime(), 2.002, 0.0001);
   EXPECT_NEAR(reader.getIndex().back().timestamp, 12.071, 0.0001);
+  EXPECT_NEAR(reader.getLastDataRecordTime(), 12.071, 0.0001);
 
   remove(outputFile.c_str());
 }

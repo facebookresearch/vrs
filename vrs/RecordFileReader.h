@@ -352,6 +352,10 @@ class RecordFileReader {
   /// @return The timestamp for the file data record, or 0, if the file contains no data record.
   double getFirstDataRecordTime() const;
 
+  /// Timestamp for the last data record in the whole file.
+  /// @return The timestamp for the file data record, or 0, if the file contains no data record.
+  double getLastDataRecordTime() const;
+
   /// Helper function: Read a stream's first configuration record.
   /// This might be necessary to properly read records containing image or audio blocks,
   /// if their configuration is defined in a configuration record using datalayout conventions.
