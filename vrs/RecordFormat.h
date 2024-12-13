@@ -192,7 +192,11 @@ class ImageContentBlockSpec {
   /// Clear/reset object to default values.
   void clear();
 
-  /// Convert to string, to store on disk & reconstruct later using factory constructor. @internal
+  /// Return base of format (no codec quality nor key frame info)
+  ImageContentBlockSpec core() const;
+
+  /// Convert to string, to store on disk & reconstruct later using factory constructor.
+  /// @internal
   string asString() const;
 
   /// Get the number of bytes for this content block, or ContentBlock::kSizeUnknown.

@@ -336,6 +336,17 @@ void ImageContentBlockSpec::clear() {
   codecQuality_ = kQualityUndefined;
 }
 
+ImageContentBlockSpec ImageContentBlockSpec::core() const {
+  return {
+      imageFormat_,
+      pixelFormat_,
+      width_,
+      height_,
+      stride_ > 0 && stride_ != getDefaultStride() ? stride_ : 0,
+      stride2_ > 0 && stride2_ != getDefaultStride2() ? stride2_ : 0,
+      codecName_};
+}
+
 bool ImageContentBlockSpec::operator==(const ImageContentBlockSpec& rhs) const {
   auto tie = [](const ImageContentBlockSpec& v) {
     return std::tie(
