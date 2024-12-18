@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['operationcontext_1045',['OperationContext',['../structvrs_1_1_operation_context.html',1,'vrs']]],
-  ['optionaldatapieces_1046',['OptionalDataPieces',['../classvrs_1_1_optional_data_pieces.html',1,'vrs']]]
+  ['operationcontext_1046',['OperationContext',['../structvrs_1_1_operation_context.html',1,'vrs']]],
+  ['optionaldatapieces_1047',['OptionalDataPieces',['../classvrs_1_1_optional_data_pieces.html',1,'vrs']]]
 ];
