@@ -44,6 +44,9 @@ class WriteFileHandler : public FileHandler {
  public:
   WriteFileHandler() = default;
 
+  /// Create a new WriteFileHandler from a name.
+  static unique_ptr<WriteFileHandler> make(const string& fileHandlerName);
+
   /// Create a new file for writing, using a spec.
   /// The path of the file to create is expected to be in the first chunk.
   /// Optional URI parameters might be provided in the spec' extras.

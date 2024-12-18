@@ -808,8 +808,7 @@ int RecordFileWriter::createFile(const string& filePath, bool splitHead) {
 
   if (file_->getFileHandlerName() == DiskFile::staticName() &&
       spec.fileHandlerName != DiskFile::staticName()) {
-    unique_ptr<WriteFileHandler> writeFile{dynamic_cast<WriteFileHandler*>(
-        FileHandlerFactory::getInstance().getFileHandler(spec.fileHandlerName).release())};
+    unique_ptr<WriteFileHandler> writeFile = WriteFileHandler::make(spec.fileHandlerName);
     if (!writeFile) {
       XR_LOGE("Found no WriteFileHandler named {}.", spec.fileHandlerName);
       return INVALID_FILE_SPEC;

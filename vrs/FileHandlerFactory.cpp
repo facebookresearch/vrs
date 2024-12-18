@@ -193,4 +193,10 @@ FileDelegator* FileHandlerFactory::getFileDelegator(const string& name) {
   return (delegator == fileDelegatorMap_.end()) ? nullptr : delegator->second.get();
 }
 
+unique_ptr<WriteFileHandler> WriteFileHandler::make(const string& fileHandlerName) {
+  unique_ptr<WriteFileHandler> file{dynamic_cast<WriteFileHandler*>(
+      FileHandlerFactory::getInstance().getFileHandler(fileHandlerName).release())};
+  return file;
+}
+
 } // namespace vrs
