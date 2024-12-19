@@ -219,6 +219,11 @@ class MultiRecordFileReader {
   /// @return Corresponding record if present or nullptr if the given index is invalid.
   const IndexRecord::RecordInfo* getRecord(uint32_t globalIndex) const;
 
+  /// Get a record's size in the global index.
+  /// @param globalIndex: Position in the global index to look up.
+  /// @return The size of the record on disk, all included, or 0 if the index is invalid.
+  uint32_t getRecordSize(uint32_t globalIndex) const;
+
   /// Find a specific record for a specific stream, regardless of type, by index number.
   /// @param streamId: UniqueStreamId of the record stream to consider.
   /// @param indexNumber: Index position (for streamId - not global index) of the record to look

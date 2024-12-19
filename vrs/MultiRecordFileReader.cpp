@@ -315,6 +315,24 @@ const IndexRecord::RecordInfo* MultiRecordFileReader::getRecord(uint32_t globalI
   return globalIndex < recordIndex_->size() ? (*recordIndex_)[globalIndex] : nullptr;
 }
 
+uint32_t MultiRecordFileReader::getRecordSize(uint32_t globalIndex) const {
+  if (!isOpened_) {
+    return 0;
+  }
+  if (hasSingleFile()) {
+    return readers_.front()->getRecordSize(globalIndex);
+  }
+  const IndexRecord::RecordInfo* record = getRecord(globalIndex);
+  if (record == nullptr) {
+    return 0;
+  }
+  auto reader = getReader(record);
+  if (reader == nullptr) {
+    return 0;
+  }
+  return reader->getRecordSize(reader->getRecordIndex(record));
+}
+
 const IndexRecord::RecordInfo* MultiRecordFileReader::getRecord(
     UniqueStreamId streamId,
     uint32_t indexNumber) const {

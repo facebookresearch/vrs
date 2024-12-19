@@ -44,6 +44,7 @@ enum class Details : uint32_t {
   StreamNames = 1 << 4,
   StreamTags = 1 << 5,
   StreamRecordCounts = 1 << 6,
+  StreamRecordSizes = 1 << 7,
 
   Overview = MainCounters,
   Counters = MainCounters | StreamRecordCounts,
@@ -60,7 +61,7 @@ inline Details operator|(const Details& lhs, const Details& rhs) {
 }
 
 /// Test than two sets of flags intersect (at least one flag is set in both sets)
-inline bool operator&&(const Details& lhs, const Details& rhs) {
+inline bool operator&(const Details& lhs, const Details& rhs) {
   return (static_cast<uint32_t>(lhs) & static_cast<uint32_t>(rhs)) != 0;
 }
 

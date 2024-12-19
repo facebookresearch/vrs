@@ -148,8 +148,15 @@ void overView(ostream& out, RecordFileReader& file, StreamId id, Details details
   if (!nowKnownAsName.empty()) {
     out << " (device now known as \"" << nowKnownAsName << "\")";
   }
+  if (details & Details::StreamRecordSizes) {
+    size_t size = 0;
+    for (const auto& record : index) {
+      size += file.getRecordSize(file.getRecordIndex(record));
+    }
+    out << ", " << humanReadableFileSize(size);
+  }
   out << ".\n";
-  if (details && Details::StreamTags) {
+  if (details & Details::StreamTags) {
     const StreamTags& tags = file.getTags(id);
     for (const auto& iter : tags.vrs) {
       stringstream ss;
@@ -163,7 +170,7 @@ void overView(ostream& out, RecordFileReader& file, StreamId id, Details details
     }
     printTags(out, tags.user);
   }
-  if (details && Details::StreamRecordCounts) {
+  if (details & Details::StreamRecordCounts) {
     RecordCounter configRecords, stateRecords, dataRecords;
     for (const auto& record : index) {
       switch (record->recordType) {
@@ -223,7 +230,7 @@ void printOverview(
     }
     out << "VRS file with " << chunks.size() << " chunks, " << humanReadableFileSize(totalSize)
         << " total";
-    if (details && Details::ChunkList) {
+    if (details & Details::ChunkList) {
       out << ":\n";
       for (size_t index = 0; index < chunks.size(); index++) {
         const pair<string, int64_t>& chunk = chunks[index];
@@ -241,7 +248,7 @@ void printOverview(
       recordCounter.count(&record);
     }
   }
-  if (details && Details::MainCounters) {
+  if (details & Details::MainCounters) {
     out << "Found ";
     printCountedName(out, streamIds.size(), "stream");
     out << ", ";
@@ -272,11 +279,11 @@ void printOverview(
     }
     out << ".\n";
   }
-  if (details && Details::ListFileTags) {
+  if (details & Details::ListFileTags) {
     const auto& tags = recordFile.getTags();
     printTags(out, tags);
   }
-  if (details && (Details::StreamNames | Details::StreamTags | Details::StreamRecordCounts)) {
+  if (details & (Details::StreamNames | Details::StreamTags | Details::StreamRecordCounts)) {
     for (auto id : streamIds) {
       overView(out, recordFile, id, details);
     }
@@ -314,33 +321,33 @@ static JsonValue devicesOverView(
     StreamId id,
     Details details,
     JsonDocument::AllocatorType& allocator) {
-  JsonValue recordData(kObjectType);
+  JsonValue streamData(kObjectType);
   const auto& index = file.getIndex(id);
 
-  if (details && Details::StreamNames) {
-    bool pub = details && Details::UsePublicNames;
+  if (details & Details::StreamNames) {
+    bool pub = details & Details::UsePublicNames;
     JsonValue recName = stringToJvalue(pub ? "device_name" : "recordable_name", allocator);
-    recordData.AddMember(recName, stringToJvalue(id.getTypeName(), allocator), allocator);
+    streamData.AddMember(recName, stringToJvalue(id.getTypeName(), allocator), allocator);
     JsonValue recTypId = stringToJvalue(pub ? "device_type_id" : "recordable_id", allocator);
-    recordData.AddMember(recTypId, static_cast<int>(id.getTypeId()), allocator);
+    streamData.AddMember(recTypId, static_cast<int>(id.getTypeId()), allocator);
     JsonValue recInstId = stringToJvalue(pub ? "device_instance_id" : "instance_id", allocator);
-    recordData.AddMember(recInstId, id.getInstanceId(), allocator);
+    streamData.AddMember(recInstId, id.getInstanceId(), allocator);
     const string& flavor = file.getFlavor(id);
     if (!flavor.empty()) {
       JsonValue recFlavor = stringToJvalue(pub ? "device_flavor" : "recordable_flavor", allocator);
-      recordData.AddMember(recFlavor, stringToJvalue(flavor, allocator), allocator);
+      streamData.AddMember(recFlavor, stringToJvalue(flavor, allocator), allocator);
     }
 
     const string& name = file.getOriginalRecordableTypeName(id);
     if (name != id.getTypeName()) {
-      recordData.AddMember(
+      streamData.AddMember(
           stringToJvalue(pub ? "device_original_name" : "recordable_original_name", allocator),
           stringToJvalue(name, allocator),
           allocator);
     }
   }
 
-  if (details && Details::StreamTags) {
+  if (details & Details::StreamTags) {
     const StreamTags& tags = file.getTags(id);
 
     JsonValue recordTags(kObjectType);
@@ -350,7 +357,7 @@ static JsonValue devicesOverView(
           stringToJvalue(make_printable(iter.second), allocator),
           allocator);
     }
-    recordData.AddMember(stringToJvalue("tags", allocator), recordTags, allocator);
+    streamData.AddMember(stringToJvalue("tags", allocator), recordTags, allocator);
 
     JsonValue VRStags(kObjectType);
     for (const auto& iter : tags.vrs) {
@@ -359,10 +366,10 @@ static JsonValue devicesOverView(
           stringToJvalue(make_printable(iter.second), allocator),
           allocator);
     }
-    recordData.AddMember(stringToJvalue("vrs_tag", allocator), VRStags, allocator);
+    streamData.AddMember(stringToJvalue("vrs_tag", allocator), VRStags, allocator);
   }
 
-  if (details && Details::StreamRecordCounts) {
+  if (details & Details::StreamRecordCounts) {
     RecordCounter configRecords, stateRecords, dataRecords;
     JsonValue configRecordsValue(kObjectType);
     JsonValue stateRecordsValue(kObjectType);
@@ -386,12 +393,21 @@ static JsonValue devicesOverView(
     addTimeFrameMembers(configRecordsValue, configRecords, allocator);
     addTimeFrameMembers(stateRecordsValue, stateRecords, allocator);
 
-    recordData.AddMember(stringToJvalue("configuration", allocator), configRecordsValue, allocator);
-    recordData.AddMember(stringToJvalue("state", allocator), stateRecordsValue, allocator);
-    recordData.AddMember(stringToJvalue("data", allocator), dataRecordsValue, allocator);
+    streamData.AddMember(stringToJvalue("configuration", allocator), configRecordsValue, allocator);
+    streamData.AddMember(stringToJvalue("state", allocator), stateRecordsValue, allocator);
+    streamData.AddMember(stringToJvalue("data", allocator), dataRecordsValue, allocator);
   }
 
-  return recordData;
+  if (details & Details::StreamRecordSizes) {
+    int64_t size = 0;
+    for (const auto& record : index) {
+      size += file.getRecordSize(file.getRecordIndex(record));
+    }
+    JsonValue streamSize = stringToJvalue("stream_size", allocator);
+    streamData.AddMember(streamSize, size, allocator);
+  }
+
+  return streamData;
 }
 
 string jsonOverview(const string& path, Details details) {
@@ -427,7 +443,7 @@ string jsonOverview(RecordFileReader& recordFile, const set<StreamId>& streams, 
   int64_t fileSize = 0;
   const vector<pair<string, int64_t>> chunks = recordFile.getFileChunks();
   const pair<string, int64_t>& file = chunks[0];
-  if (details && Details::Basics) {
+  if (details & Details::Basics) {
     doc.AddMember(
         stringToJvalue("file_name", allocator), stringToJvalue(file.first, allocator), allocator);
   }
@@ -439,7 +455,7 @@ string jsonOverview(RecordFileReader& recordFile, const set<StreamId>& streams, 
       fileSize += chunk.second;
     }
   }
-  if (details && Details::ChunkList) {
+  if (details & Details::ChunkList) {
     JsonValue fileChunks(kArrayType);
     fileChunks.Reserve(static_cast<SizeType>(chunks.size()), allocator);
     for (const auto& chunk : chunks) {
@@ -447,7 +463,7 @@ string jsonOverview(RecordFileReader& recordFile, const set<StreamId>& streams, 
     }
     doc.AddMember(stringToJvalue("file_chunks", allocator), fileChunks, allocator);
   }
-  if (details && Details::Basics) {
+  if (details & Details::Basics) {
     JsonValue fileSizeShortId = stringToJvalue("file_size_short", allocator);
     doc.AddMember(
         fileSizeShortId, stringToJvalue(humanReadableFileSize(fileSize), allocator), allocator);
@@ -455,7 +471,7 @@ string jsonOverview(RecordFileReader& recordFile, const set<StreamId>& streams, 
     doc.AddMember(fileSizeId, fileSize, allocator);
   }
 
-  if (details && Details::ListFileTags) {
+  if (details & Details::ListFileTags) {
     JsonValue recordTags(kObjectType);
     const auto& tags = recordFile.getTags();
     for (const auto& tag : tags) {
@@ -466,7 +482,7 @@ string jsonOverview(RecordFileReader& recordFile, const set<StreamId>& streams, 
     doc.AddMember(stringToJvalue("tags", allocator), recordTags, allocator);
   }
 
-  if (details && Details::MainCounters) {
+  if (details & Details::MainCounters) {
     JsonValue numOfDevices = stringToJvalue("number_of_devices", allocator);
     doc.AddMember(numOfDevices, static_cast<uint64_t>(streams.size()), allocator);
     size_t recordCount = 0;
@@ -496,7 +512,7 @@ string jsonOverview(RecordFileReader& recordFile, const set<StreamId>& streams, 
     }
   }
 
-  if (details && (Details::StreamNames | Details::StreamTags | Details::StreamRecordCounts)) {
+  if (details & (Details::StreamNames | Details::StreamTags | Details::StreamRecordCounts)) {
     JsonValue devices(kArrayType);
     for (auto id : streams) {
       devices.PushBack(devicesOverView(recordFile, id, details, allocator), allocator);

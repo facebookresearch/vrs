@@ -519,6 +519,20 @@ const vector<int64_t>& RecordFileReader::getRecordBoundaries() const {
   return recordBoundaries_;
 }
 
+uint32_t RecordFileReader::getRecordSize(uint32_t recordIndex) const {
+  if (recordIndex >= recordIndex_.size()) {
+    return 0;
+  }
+  const IndexRecord::RecordInfo& record = recordIndex_[recordIndex];
+  const vector<int64_t>& boundaries = getRecordBoundaries();
+  auto nextBoundary = upper_bound(boundaries.begin(), boundaries.end(), record.fileOffset);
+  if (!XR_VERIFY(nextBoundary != boundaries.end()) ||
+      !XR_VERIFY(*nextBoundary > record.fileOffset)) {
+    return 0;
+  }
+  return *nextBoundary - record.fileOffset;
+}
+
 bool RecordFileReader::prefetchRecordSequence(
     const vector<const IndexRecord::RecordInfo*>& records,
     bool clearSequence) {
@@ -901,7 +915,7 @@ bool RecordFileReader::getRecordFormat(
     Record::Type recordType,
     uint32_t formatVersion,
     RecordFormat& outFormat) const {
-  string formatStr = getTag(
+  const string& formatStr = getTag(
       getTags(streamId).vrs, RecordFormat::getRecordFormatTagName(recordType, formatVersion));
   if (formatStr.empty()) {
     outFormat = ContentType::CUSTOM;

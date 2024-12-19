@@ -348,6 +348,9 @@ class RecordFileReader {
   /// @return Index in the record's stream index, or getRecordCount() is record is nullptr.
   uint32_t getRecordStreamIndex(const IndexRecord::RecordInfo* record) const;
 
+  /// Get a record's disk size.
+  uint32_t getRecordSize(uint32_t recordIndex) const;
+
   /// Timestamp for the first data record in the whole file.
   /// @return The timestamp for the file data record, or 0, if the file contains no data record.
   double getFirstDataRecordTime() const;
@@ -486,10 +489,6 @@ class RecordFileReader {
   uint32_t getRecordFormats(StreamId streamId, RecordFormatMap& outFormats) const;
   std::unique_ptr<DataLayout> getDataLayout(StreamId streamId, const ContentBlockId& blockId) const;
 
-  /// The offset of each record + the end of the file, sorted.
-  /// Useful to know where records end without reading the record.
-  const vector<int64_t>& getRecordBoundaries() const;
-
   /// Option to control logging when opening a file.
   /// @param progressLogger: a logger implementation, or nullptr, to disable logging.
   void setOpenProgressLogger(ProgressLogger* progressLogger);
@@ -568,6 +567,9 @@ class RecordFileReader {
 
   static const string& getTag(const map<string, string>& tags, const string& name); ///< private
   bool mightContainContentTypeInDataRecord(StreamId streamId, ContentType type) const; ///< private
+
+  /// Record boundaries, in sequential order, but not necessarily in record order!
+  const vector<int64_t>& getRecordBoundaries() const; ///< private
 
   // Members to read an open VRS file
   std::unique_ptr<FileHandler> file_;

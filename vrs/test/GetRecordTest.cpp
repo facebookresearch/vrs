@@ -359,3 +359,18 @@ TEST_F(GetRecordTester, GetRecordForwardBackwardTest) {
     }
   }
 }
+
+TEST_F(GetRecordTester, GetRecordSizeTest) {
+  vrs::RecordFileReader file;
+  ASSERT_EQ(file.openFile(kTestFile2), 0);
+  const auto& index = file.getIndex();
+  map<StreamId, uint64_t> streamSizes;
+  for (const auto& record : index) {
+    streamSizes[record.streamId] += file.getRecordSize(file.getRecordIndex(&record));
+  }
+  map<StreamId, uint64_t> actualSizes = {
+      {StreamId(RecordableTypeId::RgbCameraRecordableClass, 1), 13522400},
+      {StreamId(RecordableTypeId::SlamCameraData, 1), 6106787},
+      {StreamId(RecordableTypeId::SlamImuData, 1), 1673048}};
+  EXPECT_EQ(streamSizes, actualSizes);
+}
