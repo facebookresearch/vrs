@@ -540,23 +540,12 @@ bool RecordFileReader::prefetchRecordSequence(
       !file_->isRemoteFileSystem()) {
     return false; // don't even try for local file systems!
   }
-  const vector<int64_t>& recordBoundaries = getRecordBoundaries();
-  int64_t fileSize = file_->getTotalSize();
   vector<pair<size_t, size_t>> segments;
   segments.reserve(records.size());
   for (const IndexRecord::RecordInfo* record : records) {
-    int64_t recordOffset = record->fileOffset;
-    if (XR_VERIFY(recordOffset < fileSize)) {
-      auto nextBoundary =
-          upper_bound(recordBoundaries.begin(), recordBoundaries.end(), recordOffset);
-      if (XR_VERIFY(nextBoundary != recordBoundaries.end())) {
-        int64_t nextRecordOffset = *nextBoundary;
-        if (XR_VERIFY(nextRecordOffset > recordOffset)) {
-          segments.emplace_back(
-              static_cast<size_t>(recordOffset),
-              static_cast<size_t>(nextRecordOffset - recordOffset - 1));
-        }
-      }
+    uint32_t recordSize = getRecordSize(record - recordIndex_.data());
+    if (XR_VERIFY(recordSize > 0)) {
+      segments.emplace_back(static_cast<size_t>(record->fileOffset), recordSize);
     }
   }
   return file_->prefetchReadSequence(segments, clearSequence);
