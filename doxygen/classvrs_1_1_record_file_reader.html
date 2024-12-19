@@ -175,6 +175,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a377791597b3de59d33e67b85848d41c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afc6bd308cd42c001931badafef1da65c"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#afc6bd308cd42c001931badafef1da65c">getRecordStreamIndex</a> (const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> *record) const</td></tr>
 <tr class="separator:afc6bd308cd42c001931badafef1da65c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e80fd1215323f6d9cefafb93984a456"><td class="memItemLeft" align="right" valign="top"><a id="a6e80fd1215323f6d9cefafb93984a456"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a6e80fd1215323f6d9cefafb93984a456">getRecordSize</a> (uint32_t recordIndex) const</td></tr>
+<tr class="memdesc:a6e80fd1215323f6d9cefafb93984a456"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a record's disk size. <br /></td></tr>
+<tr class="separator:a6e80fd1215323f6d9cefafb93984a456"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b30e9f882797610f5087b39b0533151"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a3b30e9f882797610f5087b39b0533151">getFirstDataRecordTime</a> () const</td></tr>
 <tr class="separator:a3b30e9f882797610f5087b39b0533151"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3a2efa035d1dd0c60467735d72b40e32"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a3a2efa035d1dd0c60467735d72b40e32">getLastDataRecordTime</a> () const</td></tr>
@@ -216,8 +220,6 @@ const map&lt; <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>, <a 
 <tr class="memitem:a5968d413f0e3e7ad69854c765c178afd"><td class="memItemLeft" align="right" valign="top"><a id="a5968d413f0e3e7ad69854c765c178afd"></a>
 std::unique_ptr&lt; <a class="el" href="classvrs_1_1_data_layout.html">DataLayout</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getDataLayout</b> (<a class="el" href="classvrs_1_1_stream_id.html">StreamId</a> streamId, const <a class="el" href="classvrs_1_1_content_block_id.html">ContentBlockId</a> &amp;blockId) const</td></tr>
 <tr class="separator:a5968d413f0e3e7ad69854c765c178afd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a118af3cd4f68131c22df6d2a91933628"><td class="memItemLeft" align="right" valign="top">const vector&lt; int64_t &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a118af3cd4f68131c22df6d2a91933628">getRecordBoundaries</a> () const</td></tr>
-<tr class="separator:a118af3cd4f68131c22df6d2a91933628"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a424ad10de5e63536f7f84338f76b08e6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a424ad10de5e63536f7f84338f76b08e6">setOpenProgressLogger</a> (<a class="el" href="classvrs_1_1_progress_logger.html">ProgressLogger</a> *progressLogger)</td></tr>
 <tr class="separator:a424ad10de5e63536f7f84338f76b08e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9ea8aa1242da01d7c84ebd7a5f6f52ae"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a9ea8aa1242da01d7c84ebd7a5f6f52ae">setCachingStrategy</a> (<a class="el" href="namespacevrs.html#acb1b4358038394407db2b2dc6200afae">CachingStrategy</a> cachingStrategy)</td></tr>
@@ -648,24 +650,6 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Pointer to the record info, or nullptr the index exceeds the total number of records. </dd></dl>
-
-</div>
-</div>
-<a id="a118af3cd4f68131c22df6d2a91933628"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a118af3cd4f68131c22df6d2a91933628">&#9670;&nbsp;</a></span>getRecordBoundaries()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const vector&lt; int64_t &gt; &amp; vrs::RecordFileReader::getRecordBoundaries </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>The offset of each record + the end of the file, sorted. Useful to know where records end without reading the record. </p>
 
 </div>
 </div>

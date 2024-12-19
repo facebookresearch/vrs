@@ -140,6 +140,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aaf6dbf733277c8645819646a1585f6e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa051712405a9bbc475dda3e5fd01a1c2"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#aa051712405a9bbc475dda3e5fd01a1c2">getRecord</a> (uint32_t globalIndex) const</td></tr>
 <tr class="separator:aa051712405a9bbc475dda3e5fd01a1c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a80187bea02fab3515c14a286fc09835a"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#a80187bea02fab3515c14a286fc09835a">getRecordSize</a> (uint32_t globalIndex) const</td></tr>
+<tr class="separator:a80187bea02fab3515c14a286fc09835a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a72f70cf40de6f5c1120c84c709fde6bc"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#a72f70cf40de6f5c1120c84c709fde6bc">getRecord</a> (<a class="el" href="classvrs_1_1_multi_record_file_reader.html#a95c324393b94d95ab8558c25d4c6a999">UniqueStreamId</a> streamId, uint32_t indexNumber) const</td></tr>
 <tr class="separator:a72f70cf40de6f5c1120c84c709fde6bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa152d4585a0e961077ca230a7c2fc3a0"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#aa152d4585a0e961077ca230a7c2fc3a0">getRecord</a> (<a class="el" href="classvrs_1_1_multi_record_file_reader.html#a95c324393b94d95ab8558c25d4c6a999">UniqueStreamId</a> streamId, <a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> recordType, uint32_t indexNumber) const</td></tr>
@@ -859,6 +861,31 @@ Static Public Attributes</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Index in the global index, or <a class="el" href="classvrs_1_1_multi_record_file_reader.html#afb934e64faefb7453ba01746b6285ea8">getRecordCount()</a> is record is nullptr or an invalid pointer. </dd></dl>
+
+</div>
+</div>
+<a id="a80187bea02fab3515c14a286fc09835a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a80187bea02fab3515c14a286fc09835a">&#9670;&nbsp;</a></span>getRecordSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t vrs::MultiRecordFileReader::getRecordSize </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>globalIndex</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get a record's size in the global index. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">globalIndex</td><td>Position in the global index to look up. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The size of the record on disk, all included, or 0 if the index is invalid. </dd></dl>
 
 </div>
 </div>
