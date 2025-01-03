@@ -34,6 +34,8 @@ namespace {
 struct GetRecordTester : testing::Test {
   string kTestFile = os::pathJoin(coretech::getTestDataDir(), "VRS_Files/sample_file.vrs");
   string kTestFile2 = os::pathJoin(coretech::getTestDataDir(), "VRS_Files/simulated.vrs");
+  string kTestFile3 = os::pathJoin(coretech::getTestDataDir(), "VRS_Files/chunks.vrs");
+  string kTestFile4 = os::pathJoin(coretech::getTestDataDir(), "VRS_Files/chunks-shuffled.vrs");
 };
 } // namespace
 
@@ -373,4 +375,25 @@ TEST_F(GetRecordTester, GetRecordSizeTest) {
       {StreamId(RecordableTypeId::SlamCameraData, 1), 6106787},
       {StreamId(RecordableTypeId::SlamImuData, 1), 1673048}};
   EXPECT_EQ(streamSizes, actualSizes);
+}
+
+static size_t testGetRecordSize(const string& filename) {
+  vrs::RecordFileReader file;
+  EXPECT_EQ(file.openFile(filename), 0);
+  file.buildRecordBoundaries(true);
+  size_t totalSize = 0;
+  for (uint32_t i = 0; i < file.getRecordCount(); i++) {
+    uint32_t recordSize = file.getRecordSize(i, true);
+    totalSize += recordSize;
+    EXPECT_EQ(file.getRecordSize(i, false), recordSize);
+  }
+  EXPECT_LT(totalSize, file.getTotalSourceSize());
+  return totalSize;
+}
+
+TEST_F(GetRecordTester, GetRecordLimitsTest) {
+  EXPECT_EQ(testGetRecordSize(kTestFile), 79955);
+  EXPECT_EQ(testGetRecordSize(kTestFile2), 21302235);
+  EXPECT_EQ(testGetRecordSize(kTestFile3), 79606);
+  EXPECT_EQ(testGetRecordSize(kTestFile4), 79612);
 }

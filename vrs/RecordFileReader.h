@@ -349,7 +349,11 @@ class RecordFileReader {
   uint32_t getRecordStreamIndex(const IndexRecord::RecordInfo* record) const;
 
   /// Get a record's disk size.
-  uint32_t getRecordSize(uint32_t recordIndex) const;
+  /// @param record: index of the record.
+  /// @param useBoundaries: if true, use the record's boundaries when available to compute the size.
+  /// For testing only: use the default value!
+  /// @return The record's size on disk, or 0 for invalid indexes.
+  uint32_t getRecordSize(uint32_t recordIndex, bool useBoundaries = true) const;
 
   /// Timestamp for the first data record in the whole file.
   /// @return The timestamp for the file data record, or 0, if the file contains no data record.
@@ -554,6 +558,8 @@ class RecordFileReader {
     uint32_t totalCount() const;
   };
 
+  void buildRecordBoundaries(bool boundariesAndLimits = false) const; ///< private, for testing only
+
  private:
   int doOpenFile(const FileSpec& fileSpec, bool autoWriteFixedIndex, bool checkSignatureOnly);
   int readFileHeader(const FileSpec& fileSpec, FileFormat::FileHeader& outFileHeader);
@@ -568,8 +574,9 @@ class RecordFileReader {
   static const string& getTag(const map<string, string>& tags, const string& name); ///< private
   bool mightContainContentTypeInDataRecord(StreamId streamId, ContentType type) const; ///< private
 
-  /// Record boundaries, in sequential order, but not necessarily in record order!
-  const vector<int64_t>& getRecordBoundaries() const; ///< private
+  int64_t getFollowingRecordOffset(uint32_t recordIndex, bool useBoundaries) const; ///< private
+  mutable vector<int64_t> recordBoundaries_; ///< private
+  mutable map<uint32_t, int64_t> recordLimits_; ///< private
 
   // Members to read an open VRS file
   std::unique_ptr<FileHandler> file_;
@@ -591,7 +598,6 @@ class RecordFileReader {
   ProgressLogger* openProgressLogger_{&defaultProgressLogger_};
   unique_ptr<std::thread> detailsSaveThread_;
   mutable map<StreamId, vector<const IndexRecord::RecordInfo*>> streamIndex_;
-  mutable vector<int64_t> recordBoundaries_;
   // Location of the last record searched for a specific stream & record type
   // The pair: index of the record for the type (query), index of the record in the stream (result)
   mutable map<pair<StreamId, Record::Type>, pair<uint32_t, size_t>> lastRequest_;

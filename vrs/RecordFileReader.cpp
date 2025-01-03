@@ -486,6 +486,8 @@ int RecordFileReader::closeFile() {
   openProgressLogger_ = &defaultProgressLogger_;
   streamIndex_.clear();
   streamRecordCounts_.clear();
+  recordBoundaries_.clear();
+  recordLimits_.clear();
   lastRequest_.clear();
   fileHasAnIndex_ = false;
   return result;
@@ -496,41 +498,92 @@ int RecordFileReader::clearStreamPlayers() {
   return 0;
 }
 
-const vector<int64_t>& RecordFileReader::getRecordBoundaries() const {
-  if (recordBoundaries_.empty()) {
-    // records are not always perfectly sorted, so we can't tell easily where they end.
-    // The best guess, is the offset of the first record, after the current record...
-    // yep, that's a bit expensive, but we have few options...
-    recordBoundaries_.reserve(recordIndex_.size() + 1);
-    int64_t lastOffset = 0;
-    bool sortNeeded = false;
-    for (const auto& r : recordIndex_) {
-      recordBoundaries_.emplace_back(r.fileOffset);
-      if (r.fileOffset < lastOffset) {
-        sortNeeded = true;
-      }
-      lastOffset = r.fileOffset;
+void RecordFileReader::buildRecordBoundaries(bool boundariesAndLimits) const {
+  if (recordIndex_.empty() || (!recordBoundaries_.empty() && !recordLimits_.empty()) ||
+      (!boundariesAndLimits && (!recordBoundaries_.empty() || !recordLimits_.empty()))) {
+    return;
+  }
+  int sortErrors = 0;
+  int64_t lastOffset = 0;
+  for (const auto& r : recordIndex_) {
+    if (r.fileOffset < lastOffset) {
+      sortErrors++;
     }
-    recordBoundaries_.emplace_back(endOfUserRecordsOffset_);
-    if (sortNeeded) {
-      sort(recordBoundaries_.begin(), recordBoundaries_.end());
+    lastOffset = r.fileOffset;
+  }
+  if (sortErrors == 0 && !boundariesAndLimits) {
+    // files are usually fully sorted, and we don't need much
+    recordLimits_[recordIndex_.size() - 1] = endOfUserRecordsOffset_;
+  } else {
+    vector<int64_t> boundaries;
+    boundaries.reserve(recordIndex_.size() + 1);
+    for (const auto& r : recordIndex_) {
+      boundaries.emplace_back(r.fileOffset);
+    }
+    boundaries.emplace_back(endOfUserRecordsOffset_);
+    sort(boundaries.begin(), boundaries.end());
+
+    // the array of boundaries can save memory if we have too many errors and the map is big
+    // We'll have to do a binary search for each record limit we need...
+    bool tooManyErrors = sortErrors > recordIndex_.size() / 10;
+
+    if (boundariesAndLimits || !tooManyErrors) {
+      recordLimits_.clear();
+      auto nextBoundary = boundaries.end();
+      for (size_t i = 0; i < recordIndex_.size(); ++i) {
+        if (nextBoundary == boundaries.end() || *nextBoundary != recordIndex_[i].fileOffset ||
+            ++nextBoundary == boundaries.end() || i == recordIndex_.size() - 1 ||
+            *nextBoundary != recordIndex_[i + 1].fileOffset) {
+          nextBoundary =
+              upper_bound(boundaries.begin(), boundaries.end(), recordIndex_[i].fileOffset);
+          if (!XR_VERIFY(nextBoundary != boundaries.end())) {
+            tooManyErrors = true;
+            recordLimits_.clear();
+            break;
+          }
+          if (i + 1 >= recordIndex_.size() || recordIndex_[i + 1].fileOffset != *nextBoundary) {
+            recordLimits_[i] = *nextBoundary;
+          }
+        }
+      }
+    }
+    if (boundariesAndLimits || tooManyErrors) {
+      recordBoundaries_ = std::move(boundaries);
     }
   }
-  return recordBoundaries_;
 }
 
-uint32_t RecordFileReader::getRecordSize(uint32_t recordIndex) const {
+int64_t RecordFileReader::getFollowingRecordOffset(uint32_t recordIndex, bool useBoundaries) const {
+  if (!XR_VERIFY(recordIndex < recordIndex_.size())) {
+    return 0;
+  }
+  if (recordBoundaries_.empty() && recordLimits_.empty()) {
+    buildRecordBoundaries(false);
+  }
+  if (useBoundaries && !recordBoundaries_.empty()) {
+    auto nextBoundary = upper_bound(
+        recordBoundaries_.begin(), recordBoundaries_.end(), recordIndex_[recordIndex].fileOffset);
+    if (XR_VERIFY(nextBoundary != recordBoundaries_.end())) {
+      return *nextBoundary;
+    }
+  }
+  auto nextIter = recordLimits_.find(recordIndex);
+  if (nextIter != recordLimits_.end()) {
+    return nextIter->second;
+  }
+  return XR_VERIFY(recordIndex < recordIndex_.size() - 1) ? recordIndex_[recordIndex + 1].fileOffset
+                                                          : endOfUserRecordsOffset_;
+}
+
+uint32_t RecordFileReader::getRecordSize(uint32_t recordIndex, bool useBoundaries) const {
   if (recordIndex >= recordIndex_.size()) {
     return 0;
   }
-  const IndexRecord::RecordInfo& record = recordIndex_[recordIndex];
-  const vector<int64_t>& boundaries = getRecordBoundaries();
-  auto nextBoundary = upper_bound(boundaries.begin(), boundaries.end(), record.fileOffset);
-  if (!XR_VERIFY(nextBoundary != boundaries.end()) ||
-      !XR_VERIFY(*nextBoundary > record.fileOffset)) {
-    return 0;
+  int64_t nextOffset = getFollowingRecordOffset(recordIndex, useBoundaries);
+  if (XR_VERIFY(nextOffset > recordIndex_[recordIndex].fileOffset)) {
+    return static_cast<uint32_t>(nextOffset - recordIndex_[recordIndex].fileOffset);
   }
-  return *nextBoundary - record.fileOffset;
+  return 0;
 }
 
 bool RecordFileReader::prefetchRecordSequence(
