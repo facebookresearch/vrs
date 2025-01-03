@@ -175,10 +175,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a377791597b3de59d33e67b85848d41c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afc6bd308cd42c001931badafef1da65c"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#afc6bd308cd42c001931badafef1da65c">getRecordStreamIndex</a> (const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> *record) const</td></tr>
 <tr class="separator:afc6bd308cd42c001931badafef1da65c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e80fd1215323f6d9cefafb93984a456"><td class="memItemLeft" align="right" valign="top"><a id="a6e80fd1215323f6d9cefafb93984a456"></a>
-uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a6e80fd1215323f6d9cefafb93984a456">getRecordSize</a> (uint32_t recordIndex) const</td></tr>
-<tr class="memdesc:a6e80fd1215323f6d9cefafb93984a456"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a record's disk size. <br /></td></tr>
-<tr class="separator:a6e80fd1215323f6d9cefafb93984a456"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b26264ff84a7f71f16974330a76b081"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a0b26264ff84a7f71f16974330a76b081">getRecordSize</a> (uint32_t recordIndex, bool useBoundaries=true) const</td></tr>
+<tr class="separator:a0b26264ff84a7f71f16974330a76b081"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b30e9f882797610f5087b39b0533151"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a3b30e9f882797610f5087b39b0533151">getFirstDataRecordTime</a> () const</td></tr>
 <tr class="separator:a3b30e9f882797610f5087b39b0533151"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3a2efa035d1dd0c60467735d72b40e32"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a3a2efa035d1dd0c60467735d72b40e32">getLastDataRecordTime</a> () const</td></tr>
@@ -237,6 +235,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="separator:abdc88304db2863c0ee09294e91c187dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac65bc014d94f6a18af61cc9f9ae09539"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#ac65bc014d94f6a18af61cc9f9ae09539">getFileHandler</a> () const</td></tr>
 <tr class="separator:ac65bc014d94f6a18af61cc9f9ae09539"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0dc3c414de9605ea725afdd605212f6b"><td class="memItemLeft" align="right" valign="top"><a id="a0dc3c414de9605ea725afdd605212f6b"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a0dc3c414de9605ea725afdd605212f6b">buildRecordBoundaries</a> (bool boundariesAndLimits=false) const</td></tr>
+<tr class="memdesc:a0dc3c414de9605ea725afdd605212f6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">private, for testing only <br /></td></tr>
+<tr class="separator:a0dc3c414de9605ea725afdd605212f6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -988,6 +990,42 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Index in the global index, or <a class="el" href="classvrs_1_1_record_file_reader.html#afbf4e571bbeb4b4b8405ca3e16cc5ddd">getRecordCount()</a> is record is nullptr. </dd></dl>
+
+</div>
+</div>
+<a id="a0b26264ff84a7f71f16974330a76b081"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0b26264ff84a7f71f16974330a76b081">&#9670;&nbsp;</a></span>getRecordSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t vrs::RecordFileReader::getRecordSize </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>recordIndex</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>useBoundaries</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get a record's disk size. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">record</td><td>index of the record. </td></tr>
+    <tr><td class="paramname">useBoundaries</td><td>if true, use the record's boundaries when available to compute the size. For testing only: use the default value! </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The record's size on disk, or 0 for invalid indexes. </dd></dl>
 
 </div>
 </div>

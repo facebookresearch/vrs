@@ -1,10 +1,10 @@
 var searchData=
 [
-  ['enablefrontindexrecordsupport_1172',['enableFrontIndexRecordSupport',['../structvrs_1_1_file_format_1_1_file_header.html#a0de96eb90d16c861e17820c7f7ec05bf',1,'vrs::FileFormat::FileHeader']]],
-  ['endframe_1173',['endFrame',['../classvrs_1_1_compressor.html#a9f661dc89e73af8a08af5ec6088303b2',1,'vrs::Compressor']]],
-  ['endlayout_1174',['endLayout',['../classvrs_1_1_manual_data_layout.html#a6463defc156ea5ac909bafa04be58b55',1,'vrs::ManualDataLayout']]],
-  ['error_1175',['error',['../classvrs_1_1_telemetry_logger.html#acf7f0886a08a2a79e2014b4ac1fa0fe5',1,'vrs::TelemetryLogger']]],
-  ['errorcodetomessage_1176',['errorCodeToMessage',['../namespacevrs.html#a7122beba91b5ac34b8c4aebd2c26cf0c',1,'vrs']]],
-  ['errorcodetomessagewithcode_1177',['errorCodeToMessageWithCode',['../namespacevrs.html#a7a5f29230c8013cd36049068852326e0',1,'vrs']]],
-  ['errordomaintoerrorcodestart_1178',['errorDomainToErrorCodeStart',['../namespacevrs.html#a157a15fd819db4643d72317a6ca3e129',1,'vrs']]]
+  ['enablefrontindexrecordsupport_1174',['enableFrontIndexRecordSupport',['../structvrs_1_1_file_format_1_1_file_header.html#a0de96eb90d16c861e17820c7f7ec05bf',1,'vrs::FileFormat::FileHeader']]],
+  ['endframe_1175',['endFrame',['../classvrs_1_1_compressor.html#a9f661dc89e73af8a08af5ec6088303b2',1,'vrs::Compressor']]],
+  ['endlayout_1176',['endLayout',['../classvrs_1_1_manual_data_layout.html#a6463defc156ea5ac909bafa04be58b55',1,'vrs::ManualDataLayout']]],
+  ['error_1177',['error',['../classvrs_1_1_telemetry_logger.html#acf7f0886a08a2a79e2014b4ac1fa0fe5',1,'vrs::TelemetryLogger']]],
+  ['errorcodetomessage_1178',['errorCodeToMessage',['../namespacevrs.html#a7122beba91b5ac34b8c4aebd2c26cf0c',1,'vrs']]],
+  ['errorcodetomessagewithcode_1179',['errorCodeToMessageWithCode',['../namespacevrs.html#a7a5f29230c8013cd36049068852326e0',1,'vrs']]],
+  ['errordomaintoerrorcodestart_1180',['errorDomainToErrorCodeStart',['../namespacevrs.html#a157a15fd819db4643d72317a6ca3e129',1,'vrs']]]
 ];
