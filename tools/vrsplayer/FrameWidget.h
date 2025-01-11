@@ -137,6 +137,10 @@ class FrameWidget : public QWidget {
   }
   void blank();
   void updateMinMaxSize();
+  void setCustomOverlayCallback(const std::function<void(QPainter&, QRect)>& callback) {
+    customOverlayCallback_ = callback;
+    setNeedsUpdate();
+  }
 
  signals:
   void orientationChanged();
@@ -166,6 +170,7 @@ class FrameWidget : public QWidget {
   int rotation_{0};
   bool flipped_{false};
   bool hasFrame_{false};
+  std::function<void(QPainter&, QRect)> customOverlayCallback_{nullptr};
 };
 
 } // namespace vrsp

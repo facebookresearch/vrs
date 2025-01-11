@@ -132,6 +132,12 @@ void FrameWidget::paintEvent(QPaintEvent* evt) {
     }
   } // mutex scope
 
+  if (customOverlayCallback_) {
+    painter.save();
+    customOverlayCallback_(painter, rect.adjusted(hOffset, vOffset, -hOffset, -vOffset));
+    painter.restore();
+  }
+
   // draw description overlay
   painter.setPen(overlayColor_);
   if (solidBackground_) {
