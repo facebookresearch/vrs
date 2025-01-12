@@ -25,7 +25,7 @@ jobs:
             sudo apt-get upgrade
             sudo apt-get install -o Acquire::Retries=5 \
               cmake git ninja-build libgtest-dev libfmt-dev \
-              libturbojpeg-dev libpng-dev \
+              libjpeg-dev libturbojpeg-dev libpng-dev \
               liblz4-dev libzstd-dev libxxhash-dev \
               libboost-system-dev libboost-filesystem-dev libboost-date-time-dev \
               qtbase5-dev portaudio19-dev

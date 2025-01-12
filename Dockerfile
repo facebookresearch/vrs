@@ -17,7 +17,7 @@ FROM ubuntu:jammy
 
 # Get dependencies
 RUN apt-get update && DEBIAN_FRONTEND="noninteractive" TZ="America/New_York" apt-get install -y tzdata
-RUN apt-get install -y git cmake ninja-build ccache libgtest-dev libfmt-dev libturbojpeg-dev\
+RUN apt-get install -y git cmake ninja-build ccache libgtest-dev libfmt-dev libjpeg-dev libturbojpeg-dev\
     libpng-dev liblz4-dev libzstd-dev libxxhash-dev\
     libboost-system-dev libboost-filesystem-dev libboost-date-time-dev\
     qtbase5-dev portaudio19-dev\

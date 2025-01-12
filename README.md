@@ -79,7 +79,7 @@ system.
   [Brew’s web site](https://brew.sh/).
 - install tools & libraries:
   ```
-  brew install cmake git ninja ccache boost fmt libpng jpeg-turbo libjpeg-dev lz4 zstd xxhash glog googletest
+  brew install cmake git ninja ccache boost fmt libpng jpeg jpeg-turbo lz4 zstd xxhash glog googletest
   brew install qt5 portaudio pybind11
   brew install node doxygen
   ```
@@ -92,7 +92,7 @@ therefore not supported._
 
 - install tools & libraries:
   ```
-  sudo apt-get install cmake git ninja-build ccache libgtest-dev libfmt-dev libturbojpeg-dev libpng-dev
+  sudo apt-get install cmake git ninja-build ccache libgtest-dev libfmt-dev libjpeg-dev libturbojpeg-dev libpng-dev
   sudo apt-get install liblz4-dev libzstd-dev libxxhash-dev
   sudo apt-get install libboost-system-dev libboost-filesystem-dev libboost-date-time-dev
   sudo apt-get install qtbase5-dev portaudio19-dev
