@@ -48,7 +48,7 @@ class FileCache {
   /// Look-up a file in the cache.
   /// @param filename: a filename for the object.
   /// @param outFilePath: a path to the object in the cache.
-  /// @return 0 if the file exists, and outFilePath has bee set.
+  /// @return 0 if the file exists, and outFilePath has been set.
   /// Returns FILE_NOT_FOUND if the file doesn't exist, and outFilePath has been set, for you to
   /// add the object in the cache at that location.
   /// Returns another error code and outFilePath isn't set, if some error occurred, and the object
