@@ -28,28 +28,25 @@ namespace vrs {
 unique_ptr<FileCache> FileCache::sFileCache;
 
 int FileCache::makeFileCache(const string& app, const string& parentFolder) {
-  string appName;
-#if !IS_WINDOWS_PLATFORM()
-  appName = '.'; // make folder invisible
-#endif
-  appName += app;
-
-  string mainFolder = parentFolder.empty() ? os::getHomeFolder() : parentFolder;
+  const string& mainFolderBase = parentFolder.empty() ? os::getHomeFolder() : parentFolder;
+  string mainFolder;
+  mainFolder.reserve(mainFolderBase.size() + app.size() + 3);
+  mainFolder.append(mainFolderBase);
   if (!mainFolder.empty() && mainFolder.back() != '/' && mainFolder.back() != '\\') {
     mainFolder += '/';
   }
+#if !IS_WINDOWS_PLATFORM()
+  mainFolder.append("."); // make folder invisible
+#endif
+  mainFolder.append(app).append("/");
   int error = 0;
-  if (!os::isDir(mainFolder) && (error = os::makeDir(mainFolder)) != 0) {
-    return error;
-  }
-  mainFolder += appName + '/';
-  if (!os::isDir(mainFolder) && (error = os::makeDir(mainFolder)) != 0) {
+  if (!os::isDir(mainFolder) && (error = os::makeDirectories(mainFolder)) != 0) {
     return error;
   }
 #if IS_WINDOWS_PLATFORM()
   os::hidePath(mainFolder);
 #endif
-  sFileCache.reset(new FileCache(mainFolder));
+  sFileCache.reset(new FileCache(std::move(mainFolder)));
   return 0;
 }
 
@@ -62,8 +59,12 @@ FileCache* FileCache::getFileCache() {
 }
 
 int FileCache::getFile(const string& domain, const string& filename, string& outFilePath) {
-  string folder = mainFolder_ + domain;
-  outFilePath = folder + '/' + filename;
+  string folder;
+  folder.reserve(mainFolder_.size() + domain.size());
+  folder.append(mainFolder_).append(domain);
+  outFilePath.clear();
+  outFilePath.reserve(folder.size() + filename.size() + 1);
+  outFilePath.append(folder).append("/").append(filename);
   if (os::isFile(outFilePath)) {
     return 0;
   }
@@ -75,11 +76,14 @@ int FileCache::getFile(const string& domain, const string& filename, string& out
 }
 
 int FileCache::getFile(const string& filename, string& outFilePath) {
-  outFilePath = mainFolder_ + filename;
+  outFilePath.clear();
+  outFilePath.reserve(mainFolder_.size() + filename.size());
+  outFilePath.append(mainFolder_).append(filename);
   if (os::isFile(outFilePath)) {
     return 0;
   }
   if (os::pathExists(outFilePath)) {
+    outFilePath.clear();
     return INVALID_DISK_DATA;
   }
   return FILE_NOT_FOUND;
