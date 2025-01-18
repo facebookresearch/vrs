@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['toenum_1537',['toEnum',['../namespacevrs.html#a7accfde5718a6a84e3b968810eaa1240',1,'vrs']]],
-  ['topathjsonuri_1538',['toPathJsonUri',['../structvrs_1_1_file_spec.html#a0c882064ae2b246ad3aee56b0cffe8a2',1,'vrs::FileSpec']]],
-  ['tostring_1539',['toString',['../namespacevrs.html#af87f451e56851c8a363092ef43203c94',1,'vrs::toString(Record::Type recordType)'],['../namespacevrs.html#a424beafadfa3efc3e78cee0816bdc9e0',1,'vrs::toString(AudioFormat audioFormat)'],['../namespacevrs.html#af2c341ef17cabec1913efbe4ba376385',1,'vrs::toString(AudioSampleFormat audioSampleFormat)'],['../namespacevrs.html#aceae789404e1ab5172198cfec03995c5',1,'vrs::toString(RecordableTypeId typeId)']]],
-  ['trackbackgroundthreadqueuebytesize_1540',['trackBackgroundThreadQueueByteSize',['../classvrs_1_1_record_file_writer.html#ae13cabd33d9e7b2b7f7a97d52c13291a',1,'vrs::RecordFileWriter']]],
-  ['truncate_1541',['truncate',['../classvrs_1_1_disk_file_t.html#a913a5a3dc08e6b92b767d0f935d155e5',1,'vrs::DiskFileT::truncate()'],['../classvrs_1_1_write_file_handler.html#a8cb33f91f322edd018ae548bfd77643f',1,'vrs::WriteFileHandler::truncate()']]],
-  ['typename_1542',['typeName',['../classvrs_1_1_record.html#a2b7323431f35d7dffea5d8fc42b62ac4',1,'vrs::Record']]]
+  ['toenum_0',['toenum',['../namespacevrs.html#af09a90d5d215bb0db442276ae0121eeb',1,'vrs::toEnum(const string &amp;name)'],['../namespacevrs.html#ab12754d25a80c112f9ae24826658e48b',1,'vrs::toEnum(const string &amp;name)'],['../namespacevrs.html#ab12754d25a80c112f9ae24826658e48b',1,'vrs::toEnum(const string &amp;name)'],['../namespacevrs.html#a933f7385d5966213602074b4df5c2a59',1,'vrs::toEnum(const string &amp;name)'],['../namespacevrs.html#ae32eddbaf04e30d062954dd8e61656b2',1,'vrs::toEnum(const string &amp;name)'],['../namespacevrs.html#ac78cc101e8f2f535704df8b95606d1de',1,'vrs::toEnum(const string &amp;name)'],['../namespacevrs.html#a7accfde5718a6a84e3b968810eaa1240',1,'vrs::toEnum(const string &amp;name)']]],
+  ['topathjsonuri_1',['toPathJsonUri',['../structvrs_1_1_file_spec.html#a0c882064ae2b246ad3aee56b0cffe8a2',1,'vrs::FileSpec']]],
+  ['tostring_2',['tostring',['../namespacevrs.html#af87f451e56851c8a363092ef43203c94',1,'vrs::toString(Record::Type recordType)'],['../namespacevrs.html#a424beafadfa3efc3e78cee0816bdc9e0',1,'vrs::toString(AudioFormat audioFormat)'],['../namespacevrs.html#af2c341ef17cabec1913efbe4ba376385',1,'vrs::toString(AudioSampleFormat audioSampleFormat)'],['../namespacevrs.html#aceae789404e1ab5172198cfec03995c5',1,'vrs::toString(RecordableTypeId typeId)']]],
+  ['trackbackgroundthreadqueuebytesize_3',['trackBackgroundThreadQueueByteSize',['../classvrs_1_1_record_file_writer.html#ae13cabd33d9e7b2b7f7a97d52c13291a',1,'vrs::RecordFileWriter']]],
+  ['truncate_4',['truncate',['../classvrs_1_1_disk_file_t.html#a913a5a3dc08e6b92b767d0f935d155e5',1,'vrs::DiskFileT::truncate()'],['../classvrs_1_1_write_file_handler.html#a8cb33f91f322edd018ae548bfd77643f',1,'vrs::WriteFileHandler::truncate()']]],
+  ['typename_5',['typeName',['../classvrs_1_1_record.html#a2b7323431f35d7dffea5d8fc42b62ac4',1,'vrs::Record']]]
 ];

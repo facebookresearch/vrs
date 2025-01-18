@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['what_20is_20in_20this_20folder_3f_1883',['What is in this folder?',['../md_sample_apps__read_me.html',1,'(Global Namespace)'],['../md_sample_code__read_me.html',1,'(Global Namespace)'],['../md_vrs__read_me.html',1,'(Global Namespace)']]]
+  ['folder_0',['folder',['../md_vrs_2_read_me.html',1,'What is in this folder?'],['../md_sample__code_2_read_me.html',1,'What is in this folder?'],['../md_sample__apps_2_read_me.html',1,'What is in this folder?']]]
 ];
