@@ -236,23 +236,21 @@ int RecordFileReader::doOpenFile(
       TelemetryLogger::info(context, "success");
     }
   }
-  if (error != 0 || file_->getTotalSize() < static_cast<int64_t>(sizeof(FileFormat::FileHeader))) {
-    if (error != 0) {
-      XR_LOGE(
-          "Could not open the file '{}': {}",
-          fileSpec.getEasyPath(),
-          errorCodeToMessageWithCode(error));
-    } else {
-      XR_LOGE(
-          "File '{}' is too small to be a valid VRS file ({} bytes).",
-          fileSpec.getEasyPath(),
-          file_->getTotalSize());
-      error = NOT_A_VRS_FILE;
-    }
-    if (!file_) {
-      file_ = make_unique<DiskFile>();
-    }
+  if (error != 0) {
+    XR_LOGE(
+        "Could not open the file '{}': {}",
+        fileSpec.getEasyPath(),
+        errorCodeToMessageWithCode(error));
+    closeFile();
     return error;
+  }
+  if (file_->getTotalSize() < static_cast<int64_t>(sizeof(FileFormat::FileHeader))) {
+    XR_LOGE(
+        "File '{}' is too small to be a valid VRS file ({} bytes).",
+        fileSpec.getEasyPath(),
+        file_->getTotalSize());
+    closeFile();
+    return NOT_A_VRS_FILE;
   }
   TemporaryCachingStrategy temporaryCachingStrategy(file_, CachingStrategy::Passive);
   FileFormat::FileHeader fileHeader;
@@ -474,7 +472,8 @@ int RecordFileReader::readFileDetails(
 }
 
 int RecordFileReader::closeFile() {
-  int result = file_->close();
+  int result = file_ ? file_->close() : 0;
+  file_ = make_unique<DiskFile>();
   if (detailsSaveThread_) {
     detailsSaveThread_->join();
     detailsSaveThread_.reset();
