@@ -254,7 +254,7 @@ int RecordFileReader::doOpenFile(
     }
     return error;
   }
-  TemporaryCachingStrategy temporaryCachingStrategy(*file_, CachingStrategy::Passive);
+  TemporaryCachingStrategy temporaryCachingStrategy(file_, CachingStrategy::Passive);
   FileFormat::FileHeader fileHeader;
   LOG_PROGRESS(readFileHeader(fileSpec, fileHeader), error, [&]() {
     string fileSize = helpers::humanReadableFileSize(file_->getTotalSize());

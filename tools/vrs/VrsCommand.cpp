@@ -498,7 +498,7 @@ int VrsCommand::runCommands() {
       FileSpec spec;
       unique_ptr<FileHandler> file;
       if (RecordFileReader::vrsFilePathToFileSpec(filteredReader.getPathOrUri(), spec) != 0 ||
-          !(file = FileHandler::makeOpen(spec)) || !FileFormat::printVRSFileInternals(*file)) {
+          !(file = FileHandler::makeOpen(spec)) || !FileFormat::printVRSFileInternals(file)) {
         statusCode = EXIT_FAILURE;
       }
     } break;

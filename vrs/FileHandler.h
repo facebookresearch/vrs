@@ -241,16 +241,22 @@ class FileHandler : public FileDelegator {
 /// Helper class to temporarily modify a FileHandler's caching strategy.
 class TemporaryCachingStrategy {
  public:
-  TemporaryCachingStrategy(FileHandler& handler, CachingStrategy temporaryStrategy)
-      : handler_{handler}, originalStrategy_{handler.getCachingStrategy()} {
-    handler_.setCachingStrategy(temporaryStrategy);
+  TemporaryCachingStrategy(unique_ptr<FileHandler>& handler, CachingStrategy temporaryStrategy)
+      : handler_{handler},
+        originalPtr_{handler_.get()},
+        originalStrategy_{handler->getCachingStrategy()} {
+    handler_->setCachingStrategy(temporaryStrategy);
   }
   ~TemporaryCachingStrategy() {
-    handler_.setCachingStrategy(originalStrategy_);
+    // only restore the original strategy if the handler hasn't been changed
+    if (originalPtr_ == handler_.get()) {
+      originalPtr_->setCachingStrategy(originalStrategy_);
+    }
   }
 
  private:
-  FileHandler& handler_;
+  unique_ptr<FileHandler>& handler_;
+  FileHandler* originalPtr_;
   CachingStrategy originalStrategy_;
 };
 

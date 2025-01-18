@@ -249,7 +249,7 @@ constexpr uint32_t fourCharCode(char a, char b, char c, char d) {
 
 /// Debug method to printout key internal details about a VRS file for debugging purposes.
 /// @return True if the file looks "good", false if anything doesn't look right.
-bool printVRSFileInternals(FileHandler& file);
+bool printVRSFileInternals(std::unique_ptr<FileHandler>& file);
 
 } // namespace FileFormat
 

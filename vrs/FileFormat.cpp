@@ -220,12 +220,12 @@ RecordableTypeId readRecordableTypeId(const FileFormat::LittleEndian<int32_t>& r
   return static_cast<RecordableTypeId>(rawTypeId);
 }
 
-bool printVRSFileInternals(FileHandler& file) {
+bool printVRSFileInternals(unique_ptr<FileHandler>& file) {
   using namespace std;
   TemporaryCachingStrategy temporaryCachingStrategy(file, CachingStrategy::Passive);
-  cout << "FileHandler: " << file.getFileHandlerName() << "\n";
+  cout << "FileHandler: " << file->getFileHandlerName() << "\n";
   FileFormat::FileHeader fileHeader;
-  int error = file.read(fileHeader);
+  int error = file->read(fileHeader);
   if (error != 0) {
     cerr << "Can't read file header, error #" << error << ": " << errorCodeToMessage(error) << "\n";
     return false;
@@ -270,8 +270,8 @@ bool printVRSFileInternals(FileHandler& file) {
 
   // Check description record header
   FileFormat::RecordHeader descriptionRecordHeader;
-  IF_ERROR_LOG(file.setPos(fileHeader.descriptionRecordOffset.get()));
-  IF_ERROR_LOG(file.read(descriptionRecordHeader));
+  IF_ERROR_LOG(file->setPos(fileHeader.descriptionRecordOffset.get()));
+  IF_ERROR_LOG(file->read(descriptionRecordHeader));
 
   cout << "Description record size: " << descriptionRecordHeader.recordSize.get() << " bytes.\n";
   int64_t indexRecordOffset = fileHeader.indexRecordOffset.get();
@@ -291,8 +291,8 @@ bool printVRSFileInternals(FileHandler& file) {
 
   // Check description record header
   FileFormat::RecordHeader indexRecordHeader;
-  IF_ERROR_LOG(file.setPos(indexRecordOffset));
-  IF_ERROR_LOG(file.read(indexRecordHeader));
+  IF_ERROR_LOG(file->setPos(indexRecordOffset));
+  IF_ERROR_LOG(file->read(indexRecordHeader));
 
   cout << "Index Record size: " << indexRecordHeader.recordSize.get() << " bytes.\n";
   if (indexRecordHeader.recordSize.get() == fileHeader.recordHeaderSize.get()) {
@@ -308,9 +308,9 @@ bool printVRSFileInternals(FileHandler& file) {
     cout << "Classic.\n";
   } else if (indexFormatVersion == vrs::IndexRecord::kSplitIndexFormatVersion) {
     cout << "Split File Head.\n";
-    int64_t currentPos = file.getPos();
+    int64_t currentPos = file->getPos();
     int64_t chunkStart{}, chunkSize{};
-    if (file.getChunkRange(chunkStart, chunkSize) == 0 &&
+    if (file->getChunkRange(chunkStart, chunkSize) == 0 &&
         XR_VERIFY(currentPos >= chunkStart && currentPos < chunkStart + chunkSize)) {
       int64_t nextChunkStart = chunkStart + chunkSize;
       if (chunkStart == 0) {
@@ -386,8 +386,8 @@ bool printVRSFileInternals(FileHandler& file) {
     returnValue = false;
   } else {
     FileFormat::RecordHeader firstUserRecord;
-    IF_ERROR_LOG(file.setPos(firstUserRecordOffset));
-    IF_ERROR_LOG(file.read(firstUserRecord));
+    IF_ERROR_LOG(file->setPos(firstUserRecordOffset));
+    IF_ERROR_LOG(file->read(firstUserRecord));
     cout << "Size of record before first user record: " << firstUserRecord.previousRecordSize.get()
          << " bytes.\n";
   }
