@@ -85,21 +85,32 @@ class PixelFrame {
   PixelFrame() = default;
   explicit PixelFrame(const ImageContentBlockSpec& spec);
   PixelFrame(const ImageContentBlockSpec& spec, vector<uint8_t>&& frameBytes);
-  PixelFrame(PixelFormat pf, uint32_t w, uint32_t h, uint32_t stride = 0)
-      : PixelFrame(ImageContentBlockSpec(pf, w, h, stride)) {}
+  PixelFrame(PixelFormat pf, uint32_t w, uint32_t h, uint32_t stride = 0);
 
   void init(const ImageContentBlockSpec& spec);
   void init(const ImageContentBlockSpec& spec, vector<uint8_t>&& frameBytes);
   void init(PixelFormat pf, uint32_t w, uint32_t h, uint32_t stride = 0, uint32_t stride2 = 0);
 
-  static void init(shared_ptr<PixelFrame>& inOutFrame, const ImageContentBlockSpec& spec);
-  static inline void init(
-      shared_ptr<PixelFrame>& inOutFrame,
-      PixelFormat pf,
-      uint32_t w,
-      uint32_t h,
-      uint32_t stride = 0) {
-    init(inOutFrame, {pf, w, h, stride});
+  // helpers to make sure the unique_ptr or shared_ptr is not nullptr
+  // and makes sure the frame is initialized with the given spec.
+  template <class T>
+  static inline PixelFrame& init(T& inOutFramePtr, const ImageContentBlockSpec& spec) {
+    if (!inOutFramePtr) {
+      inOutFramePtr.reset(new PixelFrame(spec));
+    } else {
+      inOutFramePtr->init(spec);
+    }
+    return *inOutFramePtr;
+  }
+  template <class T>
+  static inline PixelFrame&
+  init(T& inOutFramePtr, PixelFormat pf, uint32_t w, uint32_t h, uint32_t stride = 0) {
+    if (!inOutFramePtr) {
+      inOutFramePtr.reset(new PixelFrame(pf, w, h, stride));
+    } else {
+      inOutFramePtr->init(pf, w, h, stride);
+    }
+    return *inOutFramePtr;
   }
 
 #ifdef QOBJECT_H
@@ -174,14 +185,18 @@ class PixelFrame {
 
   /// Read a RAW, PNG, or JPEG encoded frame into the internal buffer.
   /// @return True if the frame type is supported & the frame was read.
-  static bool
-  readFrame(shared_ptr<PixelFrame>& frame, RecordReader* reader, const ContentBlock& cb);
+  template <class T>
+  static inline bool readFrame(T& framePtr, RecordReader* reader, const ContentBlock& cb) {
+    return init(framePtr, cb.image()).readFrame(reader, cb);
+  }
   bool readFrame(RecordReader* reader, const ContentBlock& cb);
 
   /// Read a record's image data, merely reading the disk data without any decompression.
   /// The resulting PixelFrame will have an unmodified ImageFormat (raw, jpg, png, jxl, video).
-  static bool
-  readDiskImageData(shared_ptr<PixelFrame>& frame, RecordReader* reader, const ContentBlock& cb);
+  template <class T>
+  static inline bool readDiskImageData(T& framePtr, RecordReader* reader, const ContentBlock& cb) {
+    return init(framePtr, cb.image()).readDiskImageData(reader, cb);
+  }
   bool readDiskImageData(RecordReader* reader, const ContentBlock& cb);
 
   /// From any ImageFormat, decompress the image to ImageFormat::RAW if necessary.
@@ -191,15 +206,15 @@ class PixelFrame {
 
   /// Read a RAW frame into the internal buffer.
   /// @return True if the frame type is supported & the frame was read.
+  template <class T>
+  static inline bool
+  readRawFrame(T& framePtr, RecordReader* reader, const ImageContentBlockSpec& inputImageSpec) {
+    return init(framePtr, inputImageSpec).readRawFrame(reader, inputImageSpec);
+  }
   bool readRawFrame(RecordReader* reader, const ImageContentBlockSpec& inputImageSpec);
 
   /// Decode compressed image data, except for video codec compression.
   bool readCompressedFrame(const vector<uint8_t>& pixels, ImageFormat imageFormat);
-
-  static bool readRawFrame(
-      shared_ptr<PixelFrame>& frame,
-      RecordReader* reader,
-      const ImageContentBlockSpec& inputImageSpec);
 
   /// Read a JPEG encoded frame into the internal buffer.
   /// @return True if the frame type is supported & the frame was read.
@@ -215,8 +230,10 @@ class PixelFrame {
   /// @return True if the frame type is supported & the frame was read.
   bool readJpegFrameFromFile(const string& path, bool decodePixels = true);
 
-  static bool
-  readJpegFrame(shared_ptr<PixelFrame>& frame, RecordReader* reader, uint32_t sizeBytes);
+  template <class T>
+  static inline bool readJpegFrame(T& framePtr, RecordReader* reader, uint32_t sizeBytes) {
+    return make(framePtr).readJpegFrame(reader, sizeBytes);
+  }
 
   /// Compress pixel frame to jpg. Supports ImageFormat::RAW and PixelFormat::RGB8 or GREY8 only.
   /// @param outBuffer: on exit, the jpg payload which can be saved as a .jpg file
@@ -293,7 +310,10 @@ class PixelFrame {
   /// @return True if the frame type is supported & the frame was read.
   bool readPngFrame(const vector<uint8_t>& pngBuffer, bool decodePixels = true);
 
-  static bool readPngFrame(shared_ptr<PixelFrame>& frame, RecordReader* reader, uint32_t sizeBytes);
+  template <class T>
+  static inline bool readPngFrame(T& framePtr, RecordReader* reader, uint32_t sizeBytes) {
+    return make(framePtr).readPngFrame(reader, sizeBytes);
+  }
 
   /// Save image as PNG
   /// @param path: path of the file to write, if no outBuffer is provided
@@ -324,9 +344,21 @@ class PixelFrame {
   /// Convert the internal frame to a simpler format, if necessary.
   /// Returns false if the frame could not be converted, or the format doesn't need conversion.
   bool normalizeFrame(
-      shared_ptr<PixelFrame>& normalizedFrame,
+      shared_ptr<PixelFrame>& outNormalizedFrame,
       bool grey16supported,
       const NormalizeOptions& options = {}) const;
+
+  /// Convert the internal frame to a simpler format, if necessary.
+  /// Returns false if the frame could not be converted, or the format doesn't need conversion.
+  /// @param outNormalizedFrame: on exit, the normalized frame. Input value is ignored.
+  /// @param grey16supported: true to allow PixelFormat::GREY16.
+  /// @param normalizedPixelFormat: the pixel format to target. Expects GREY8, GREY16 and RGB8.
+  /// Only valid for what getNormalizedPixelFormat() returns!
+  bool normalizeFrame(
+      PixelFrame& outNormalizedFrame,
+      bool grey16supported,
+      const NormalizeOptions& options = {},
+      PixelFormat normalizedPixelFormat = PixelFormat::UNDEFINED) const;
 
   static PixelFormat getNormalizedPixelFormat(
       PixelFormat sourcePixelFormat,
@@ -374,14 +406,24 @@ class PixelFrame {
   /// Clear the segmentation colors seen so far (loading a new file?)
   static void clearSegmentationColors();
 
+  // Helper to make sure a unique_ptr or shared_ptr is set to a valid PixelFrame,
+  // but doesn't guarantee the frame is initialized to any particular state.
+  template <class T>
+  static inline PixelFrame& make(T& inOutFramePtr) {
+    if (!inOutFramePtr) {
+      inOutFramePtr.reset(new PixelFrame());
+    }
+    return *inOutFramePtr;
+  }
+
  private:
   /// Conversion from an external buffer
-  /// @param convertedFrame: frame to convert to. May not be allocated yet.
+  /// @param outNormalizedFrame: on exit, converted frame when returning true.
   /// @param targetPixelFormat: pixel format to target. Expect GREY8, GREY16 and RGB8 to work.
   /// @return True if the conversion happened, otherwise, the buffer is left in an undefined state.
   /// Note that the actual conversion format is set in imageSpec_, and it could be different...
   bool normalizeToPixelFormat(
-      shared_ptr<PixelFrame>& outFrame,
+      PixelFrame& outNormalizedFrame,
       PixelFormat targetPixelFormat,
       const NormalizeOptions& options) const;
 
