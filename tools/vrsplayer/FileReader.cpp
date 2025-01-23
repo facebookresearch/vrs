@@ -144,6 +144,7 @@ bool FileReader::isAtEnd() const {
 
 void FileReader::closeFile() {
   stop();
+  setState(FileReaderState::NoMedia);
   if (fileConfig_) {
     saveConfiguration();
     fileConfig_.reset();

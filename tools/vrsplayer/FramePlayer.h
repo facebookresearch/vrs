@@ -51,7 +51,7 @@ using ::vrs::StreamPlayer;
 using ::vrs::utils::PixelFrame;
 using ::vrs::utils::VideoRecordFormatStreamPlayer;
 
-using ImageJob = shared_ptr<PixelFrame>;
+using ImageJob = unique_ptr<PixelFrame>;
 
 class FramePlayer : public QObject, public VideoRecordFormatStreamPlayer {
   Q_OBJECT
@@ -91,8 +91,7 @@ class FramePlayer : public QObject, public VideoRecordFormatStreamPlayer {
  private:
   std::mutex videoDecodingMutex_;
   std::mutex frameMutex_;
-  vector<shared_ptr<PixelFrame>> inputFrames_;
-  vector<shared_ptr<PixelFrame>> convertedframes_;
+  std::deque<unique_ptr<PixelFrame>> recycledFrames_;
   vrs::utils::NormalizeOptions normalizeOptions_;
   bool needsConvertedFrame_{false};
   vrs::ImageFormat imageFormat_{vrs::ImageFormat::UNDEFINED};
@@ -110,10 +109,10 @@ class FramePlayer : public QObject, public VideoRecordFormatStreamPlayer {
 
   vrs::JobQueueWithThread<std::unique_ptr<ImageJob>> imageJobs_;
 
-  void convertFrame(shared_ptr<PixelFrame>& frame);
-  static void makeBlankFrame(shared_ptr<PixelFrame>& frame);
-  shared_ptr<PixelFrame> getFrame(bool inputNotConvertedFrame);
-  void recycle(shared_ptr<PixelFrame>& frame, bool inputNotConvertedFrame);
+  void convertFrame(unique_ptr<PixelFrame>& frame);
+  static void makeBlankFrame(unique_ptr<PixelFrame>& frame);
+  unique_ptr<PixelFrame> getFrame(vrs::PixelFormat format);
+  void recycle(unique_ptr<PixelFrame>& frame);
   bool saveFrame(const CurrentRecord& record, const ContentBlock& contentBlock);
 };
 
