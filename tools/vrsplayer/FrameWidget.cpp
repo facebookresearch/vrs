@@ -71,6 +71,8 @@ FrameWidget::FrameWidget(QWidget* parent) {
   connect(this, &FrameWidget::customContextMenuRequested, this, &FrameWidget::ShowContextMenu);
 }
 
+FrameWidget::~FrameWidget() = default;
+
 void FrameWidget::paintEvent(QPaintEvent* evt) {
   QPainter painter(this);
   painter.setRenderHint(QPainter::Antialiasing);
@@ -176,7 +178,7 @@ int FrameWidget::heightForWidth(int w) const {
   return (w * size.height()) / size.width();
 }
 
-void FrameWidget::swapImage(shared_ptr<PixelFrame>& image) {
+void FrameWidget::swapImage(unique_ptr<PixelFrame>& image) {
   unique_lock<mutex> lock;
   imageFps_.newFrame();
   bool resize = image && image->qsize() != imageSize_;
@@ -198,17 +200,15 @@ int FrameWidget::saveImage(const std::string& path) {
 }
 
 void FrameWidget::updateMinMaxSize() {
-  if (image_) {
-    QSize size = getImageSize();
-    setMinimumSize(size.scaled(100, 100, Qt::KeepAspectRatio));
-    setBaseSize(size);
+  QSize size = getImageSize();
+  setMinimumSize(size.scaled(100, 100, Qt::KeepAspectRatio));
+  setBaseSize(size);
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
-    QSize screenSize = QApplication::desktop()->screenGeometry(this).size().operator*=(0.95);
+  QSize screenSize = QApplication::desktop()->screenGeometry(this).size().operator*=(0.95);
 #else
-    QSize screenSize = screen()->geometry().size() * 0.95;
+  QSize screenSize = screen()->geometry().size() * 0.95;
 #endif
-    setMaximumSize(size.scaled(screenSize, Qt::KeepAspectRatio));
-  }
+  setMaximumSize(size.scaled(screenSize, Qt::KeepAspectRatio));
 }
 
 void FrameWidget::ShowContextMenu(const QPoint& pos) {

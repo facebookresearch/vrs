@@ -37,8 +37,8 @@ class PixelFrame;
 namespace vrsp {
 
 using std::map;
-using std::shared_ptr;
 using std::string;
+using std::unique_ptr;
 using vrs::utils::PixelFrame;
 
 // Frame Per Second estimator class
@@ -78,6 +78,7 @@ class FrameWidget : public QWidget {
   Q_OBJECT
  public:
   explicit FrameWidget(QWidget* parent = nullptr);
+  ~FrameWidget() override;
 
   void paintEvent(QPaintEvent* evt) override;
   QSize sizeHint() const override;
@@ -116,7 +117,7 @@ class FrameWidget : public QWidget {
     return flipped_;
   }
 
-  void swapImage(shared_ptr<PixelFrame>& image);
+  void swapImage(unique_ptr<PixelFrame>& image);
   int saveImage(const string& path);
 
   void setTypeToShow(Record::Type type) {
@@ -154,7 +155,7 @@ class FrameWidget : public QWidget {
 
  private:
   std::mutex mutex_;
-  shared_ptr<PixelFrame> image_;
+  unique_ptr<PixelFrame> image_;
   string deviceTypeTag_;
   string deviceTypeConfig_;
   QSize imageSize_{640, 480};

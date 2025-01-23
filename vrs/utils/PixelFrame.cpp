@@ -1035,7 +1035,7 @@ PixelFrame::getStreamNormalizeOptions(RecordFileReader& reader, StreamId id, Pix
 #if IS_VRS_OSS_CODE()
 
 bool PixelFrame::normalizeToPixelFormat(
-    shared_ptr<PixelFrame>& convertedFrame,
+    PixelFrame& convertedFrame,
     PixelFormat targetPixelFormat,
     const NormalizeOptions& options) const {
   return false;
