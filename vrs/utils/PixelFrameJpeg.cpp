@@ -91,16 +91,6 @@ bool PixelFrame::readJpegFrameFromFile(const std::string& path, bool decodePixel
   return success;
 }
 
-bool PixelFrame::readJpegFrame(
-    shared_ptr<PixelFrame>& frame,
-    RecordReader* reader,
-    uint32_t sizeBytes) {
-  if (!frame) {
-    frame = make_shared<PixelFrame>();
-  }
-  return frame->readJpegFrame(reader, sizeBytes);
-}
-
 bool PixelFrame::jpgCompress(vector<uint8_t>& outBuffer, uint32_t quality) {
   return jpgCompress(imageSpec_, frameBytes_, outBuffer, quality);
 }

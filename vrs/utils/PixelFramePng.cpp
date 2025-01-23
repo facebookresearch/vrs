@@ -394,16 +394,6 @@ bool PixelFrame::readPngFrame(const vector<uint8_t>& pngBuffer, bool decodePixel
   return true;
 }
 
-bool PixelFrame::readPngFrame(
-    shared_ptr<PixelFrame>& frame,
-    RecordReader* reader,
-    uint32_t sizeBytes) {
-  if (!frame) {
-    frame = make_shared<PixelFrame>();
-  }
-  return frame->readPngFrame(reader, sizeBytes);
-}
-
 namespace {
 
 atomic<uint32_t> sAllocSize{128 * 1024};

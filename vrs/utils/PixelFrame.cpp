@@ -222,6 +222,14 @@ PixelFrame::PixelFrame(const ImageContentBlockSpec& spec)
   }
 }
 
+PixelFrame::PixelFrame(PixelFormat pf, uint32_t w, uint32_t h, uint32_t stride)
+    : imageSpec_{pf, w, h, stride, stride} {
+  size_t size = imageSpec_.getRawImageSize();
+  if (size != ContentBlock::kSizeUnknown) {
+    frameBytes_.resize(size);
+  }
+}
+
 PixelFrame::PixelFrame(const ImageContentBlockSpec& spec, vector<uint8_t>&& frameBytes)
     : imageSpec_{spec}, frameBytes_{std::move(frameBytes)} {}
 
@@ -250,14 +258,6 @@ void PixelFrame::init(PixelFormat pf, uint32_t w, uint32_t h, uint32_t stride, u
   size_t size = imageSpec_.getRawImageSize();
   if (size != ContentBlock::kSizeUnknown) {
     frameBytes_.resize(size);
-  }
-}
-
-void PixelFrame::init(shared_ptr<PixelFrame>& inOutFrame, const ImageContentBlockSpec& spec) {
-  if (!inOutFrame) {
-    inOutFrame = make_shared<PixelFrame>(spec);
-  } else {
-    inOutFrame->init(spec);
   }
 }
 
@@ -292,16 +292,6 @@ void PixelFrame::blankFrame() {
   }
 }
 
-bool PixelFrame::readFrame(
-    shared_ptr<PixelFrame>& frame,
-    RecordReader* reader,
-    const ContentBlock& cb) {
-  if (!frame) {
-    frame = make_shared<PixelFrame>();
-  }
-  return frame->readFrame(reader, cb);
-}
-
 bool PixelFrame::readFrame(RecordReader* reader, const ContentBlock& cb) {
   if (!XR_VERIFY(cb.getContentType() == ContentType::IMAGE)) {
     return false;
@@ -322,16 +312,6 @@ bool PixelFrame::readFrame(RecordReader* reader, const ContentBlock& cb) {
       return false;
   }
   return false;
-}
-
-bool PixelFrame::readDiskImageData(
-    shared_ptr<PixelFrame>& frame,
-    RecordReader* reader,
-    const ContentBlock& cb) {
-  if (!frame) {
-    frame = make_shared<PixelFrame>();
-  }
-  return frame->readDiskImageData(reader, cb);
 }
 
 bool PixelFrame::readDiskImageData(RecordReader* reader, const ContentBlock& cb) {
@@ -433,16 +413,6 @@ bool PixelFrame::readCompressedFrame(const std::vector<uint8_t>& pixels, ImageFo
   return false;
 }
 
-bool PixelFrame::readRawFrame(
-    shared_ptr<PixelFrame>& frame,
-    RecordReader* reader,
-    const ImageContentBlockSpec& inputImageSpec) {
-  if (!frame) {
-    frame = make_shared<PixelFrame>(inputImageSpec);
-  }
-  return frame->readRawFrame(reader, inputImageSpec);
-}
-
 void PixelFrame::normalizeFrame(
     const shared_ptr<PixelFrame>& sourceFrame,
     shared_ptr<PixelFrame>& outFrame,
@@ -528,33 +498,43 @@ inline uint8_t clipToUint8(int value) {
 }
 
 bool PixelFrame::normalizeFrame(
-    shared_ptr<PixelFrame>& normalizedFrame,
+    shared_ptr<PixelFrame>& outNormalizedFrame,
     bool grey16supported,
     const NormalizeOptions& options) const {
-  uint16_t bitsToShift = 0;
-  uint32_t componentCount = 0;
-  PixelFormat srcFormat = imageSpec_.getPixelFormat();
   // See if we can convert to something simple enough using Ocean
-  PixelFormat targetPixelFormat = getNormalizedPixelFormat(srcFormat, grey16supported, options);
-  if (srcFormat == targetPixelFormat) {
+  PixelFormat targetPixelFormat =
+      getNormalizedPixelFormat(imageSpec_.getPixelFormat(), grey16supported, options);
+  if (imageSpec_.getPixelFormat() == targetPixelFormat) {
     return false;
   }
-  if (normalizedFrame.get() == this) {
-    normalizedFrame.reset();
+  if (outNormalizedFrame.get() == this || !outNormalizedFrame) {
+    outNormalizedFrame = make_shared<PixelFrame>();
+  }
+  return normalizeFrame(*outNormalizedFrame, grey16supported, options, targetPixelFormat);
+}
+
+bool PixelFrame::normalizeFrame(
+    PixelFrame& outNormalizedFrame,
+    bool grey16supported,
+    const NormalizeOptions& options,
+    PixelFormat normalizedPixelFormat) const {
+  PixelFormat srcFormat = imageSpec_.getPixelFormat();
+  if (normalizedPixelFormat == PixelFormat::UNDEFINED) {
+    normalizedPixelFormat = getNormalizedPixelFormat(srcFormat, grey16supported, options);
   }
   if (options.semantic == ImageSemantic::Depth && getPixelFormat() == PixelFormat::DEPTH32F &&
-      targetPixelFormat == PixelFormat::GREY8) {
+      normalizedPixelFormat == PixelFormat::GREY8) {
     if (options.min < options.max) {
-      init(normalizedFrame, targetPixelFormat, getWidth(), getHeight());
+      outNormalizedFrame.init(normalizedPixelFormat, getWidth(), getHeight());
       normalizeBufferWithRange(
-          rdata(), normalizedFrame->wdata(), getWidth() * getHeight(), options.min, options.max);
+          rdata(), outNormalizedFrame.wdata(), getWidth() * getHeight(), options.min, options.max);
       return true;
     }
   } else if (
       (options.semantic == ImageSemantic::ObjectClassSegmentation ||
        options.semantic == ImageSemantic::ObjectIdSegmentation) &&
-      getPixelFormat() == PixelFormat::GREY16 && targetPixelFormat == PixelFormat::RGB8) {
-    init(normalizedFrame, targetPixelFormat, getWidth(), getHeight());
+      getPixelFormat() == PixelFormat::GREY16 && normalizedPixelFormat == PixelFormat::RGB8) {
+    outNormalizedFrame.init(normalizedPixelFormat, getWidth(), getHeight());
     bool classSegmentation = options.semantic == ImageSemantic::ObjectClassSegmentation;
     const vector<RGBColor>& colors = classSegmentation ? getGetObjectClassSegmentationColors()
                                                        : getGetObjectIdSegmentationColors();
@@ -562,10 +542,10 @@ bool PixelFrame::normalizeFrame(
       unordered_set<uint16_t> usedColors;
       uint16_t lastColor = 0xffff;
       uint32_t srcStride = getStride();
-      uint32_t dstStride = normalizedFrame->getStride();
+      uint32_t dstStride = outNormalizedFrame.getStride();
       for (uint32_t h = 0; h < getHeight(); ++h) {
         const uint16_t* srcLine = data<uint16_t>(srcStride * h);
-        RGBColor* dstLine = normalizedFrame->data<RGBColor>(dstStride * h);
+        RGBColor* dstLine = outNormalizedFrame.data<RGBColor>(dstStride * h);
         for (uint32_t w = 0; w < getWidth(); ++w) {
           uint16_t color = srcLine[w];
           dstLine[w] = colors[color];
@@ -583,10 +563,12 @@ bool PixelFrame::normalizeFrame(
       return true;
     }
   }
-  if (normalizeToPixelFormat(normalizedFrame, targetPixelFormat, options)) {
+  if (normalizeToPixelFormat(outNormalizedFrame, normalizedPixelFormat, options)) {
     return true;
   }
   PixelFormat format = srcFormat;
+  uint16_t bitsToShift = 0;
+  uint32_t componentCount = 0;
   switch (srcFormat) {
     case PixelFormat::YUV_I420_SPLIT:
     case PixelFormat::YUV_420_NV21:
@@ -595,9 +577,9 @@ bool PixelFrame::normalizeFrame(
       const uint32_t width = imageSpec_.getWidth();
       const uint32_t height = imageSpec_.getHeight();
       const uint32_t stride = imageSpec_.getStride();
-      init(normalizedFrame, PixelFormat::GREY8, width, height);
+      outNormalizedFrame.init(PixelFormat::GREY8, width, height);
       const uint8_t* src = rdata();
-      uint8_t* dst = normalizedFrame->wdata();
+      uint8_t* dst = outNormalizedFrame.wdata();
       for (uint32_t line = 0; line < height; line++) {
         memcpy(dst, src, width);
         src += stride;
@@ -691,11 +673,11 @@ bool PixelFrame::normalizeFrame(
   if (format == srcFormat) {
     return false; // no conversion needed or supported
   }
-  init(normalizedFrame, format, getWidth(), getHeight());
+  outNormalizedFrame.init(format, getWidth(), getHeight());
   if (srcFormat == PixelFormat::BGR8) {
     // swap R & B
     const uint8_t* srcPtr = rdata();
-    uint8_t* outPtr = normalizedFrame->wdata();
+    uint8_t* outPtr = outNormalizedFrame.wdata();
     const uint32_t pixelCount = getWidth() * getHeight();
     for (uint32_t i = 0; i < pixelCount; ++i) {
       outPtr[2] = srcPtr[0];
@@ -706,20 +688,20 @@ bool PixelFrame::normalizeFrame(
     }
   } else if (srcFormat == PixelFormat::RGB32F) {
     // normalize float pixels to rgb8
-    normalizeRGBXfloatToRGB8(rdata(), normalizedFrame->wdata(), getWidth() * getHeight(), 3);
+    normalizeRGBXfloatToRGB8(rdata(), outNormalizedFrame.wdata(), getWidth() * getHeight(), 3);
   } else if (srcFormat == PixelFormat::RGBA32F) {
     // normalize float pixels to rgb8, drop alpha channel
-    normalizeRGBXfloatToRGB8(rdata(), normalizedFrame->wdata(), getWidth() * getHeight(), 4);
+    normalizeRGBXfloatToRGB8(rdata(), outNormalizedFrame.wdata(), getWidth() * getHeight(), 4);
   } else if (srcFormat == PixelFormat::DEPTH32F) {
     // normalize float pixels to grey8
-    normalizeBuffer<float>(rdata(), normalizedFrame->wdata(), getWidth() * getHeight());
+    normalizeBuffer<float>(rdata(), outNormalizedFrame.wdata(), getWidth() * getHeight());
   } else if (srcFormat == PixelFormat::SCALAR64F) {
     // normalize double pixels to grey8
-    normalizeBuffer<double>(rdata(), normalizedFrame->wdata(), getWidth() * getHeight());
+    normalizeBuffer<double>(rdata(), outNormalizedFrame.wdata(), getWidth() * getHeight());
   } else if (srcFormat == PixelFormat::BAYER8_RGGB) {
     // display as grey8(copy) for now
     const uint8_t* srcPtr = rdata();
-    uint8_t* outPtr = normalizedFrame->wdata();
+    uint8_t* outPtr = outNormalizedFrame.wdata();
     const uint32_t pixelCount = getWidth() * getHeight() * componentCount;
     for (uint32_t i = 0; i < pixelCount; ++i) {
       outPtr[i] = srcPtr[i];
@@ -730,10 +712,10 @@ bool PixelFrame::normalizeFrame(
     if (format == PixelFormat::GREY16) {
       // Convert from RAW10 to GREY10 directly into the output buffer
       if (!convertRaw10ToGrey10(
-              normalizedFrame->wdata(), rdata(), getWidth(), getHeight(), getStride())) {
+              outNormalizedFrame.wdata(), rdata(), getWidth(), getHeight(), getStride())) {
         return false;
       }
-      uint16_t* ptr = normalizedFrame->data<uint16_t>();
+      uint16_t* ptr = outNormalizedFrame.data<uint16_t>();
       const uint32_t pixelCount = getWidth() * getHeight() * componentCount;
       for (uint32_t i = 0; i < pixelCount; ++i) {
         ptr[i] <<= bitsToShift;
@@ -743,8 +725,8 @@ bool PixelFrame::normalizeFrame(
       // convert to GREY8 by copying 4 bytes of msb data, and dropping the 5th of lsb data...
       const uint8_t* srcPtr = rdata();
       const size_t srcStride = getStride();
-      uint8_t* outPtr = normalizedFrame->wdata();
-      const size_t outStride = normalizedFrame->getStride();
+      uint8_t* outPtr = outNormalizedFrame.wdata();
+      const size_t outStride = outNormalizedFrame.getStride();
       const uint32_t width = getWidth();
       for (uint32_t h = 0; h < getHeight(); h++, srcPtr += srcStride, outPtr += outStride) {
         const uint8_t* lineSrcPtr = srcPtr;
@@ -765,8 +747,8 @@ bool PixelFrame::normalizeFrame(
     // This is a placeholder implementation that simply writes out the source data in R, G and B.
     const uint8_t* srcPtr = rdata();
     const size_t srcStride = getStride();
-    uint8_t* outPtr = normalizedFrame->wdata();
-    const size_t outStride = normalizedFrame->getStride();
+    uint8_t* outPtr = outNormalizedFrame.wdata();
+    const size_t outStride = outNormalizedFrame.getStride();
     const uint32_t width = getWidth();
     for (uint32_t h = 0; h < getHeight(); h++, srcPtr += srcStride, outPtr += outStride) {
       const uint8_t* lineSrcPtr = srcPtr;
@@ -781,8 +763,8 @@ bool PixelFrame::normalizeFrame(
     // Unoptimized default version of YUY2 to RGB8 conversion
     const uint8_t* srcPtr = rdata();
     const size_t srcStride = getStride();
-    uint8_t* outPtr = normalizedFrame->wdata();
-    const size_t outStride = normalizedFrame->getStride();
+    uint8_t* outPtr = outNormalizedFrame.wdata();
+    const size_t outStride = outNormalizedFrame.getStride();
     const uint32_t width = getWidth();
     for (uint32_t h = 0; h < getHeight(); h++, srcPtr += srcStride, outPtr += outStride) {
       const uint8_t* lineSrcPtr = srcPtr;
@@ -807,15 +789,15 @@ bool PixelFrame::normalizeFrame(
   } else if (format == PixelFormat::GREY16 && bitsToShift > 0) {
     // 12/10 bit pixel scaling to 16 bit
     const uint16_t* srcPtr = data<uint16_t>();
-    uint16_t* outPtr = normalizedFrame->data<uint16_t>();
+    uint16_t* outPtr = outNormalizedFrame.data<uint16_t>();
     const uint32_t pixelCount = getWidth() * getHeight() * componentCount;
     for (uint32_t i = 0; i < pixelCount; ++i) {
       outPtr[i] = static_cast<uint16_t>(srcPtr[i] << bitsToShift);
     }
-  } else if (XR_VERIFY(this->size() == 2 * normalizedFrame->size())) {
+  } else if (XR_VERIFY(this->size() == 2 * outNormalizedFrame.size())) {
     // 16/12/10 bit pixel reduction to 8 bit
     const uint16_t* srcPtr = data<uint16_t>();
-    uint8_t* outPtr = normalizedFrame->wdata();
+    uint8_t* outPtr = outNormalizedFrame.wdata();
     const uint32_t pixelCount = getWidth() * getHeight() * componentCount;
     for (uint32_t i = 0; i < pixelCount; ++i) {
       outPtr[i] = (srcPtr[i] >> bitsToShift) & 0xFF;
