@@ -22,9 +22,12 @@
 
 #define DEFAULT_LOG_CHANNEL "FramePlayer"
 #include <logging/Log.h>
+#include <logging/Verify.h>
 
 #include <vrs/DiskFile.h>
 #include <vrs/IndexRecord.h>
+
+#include "FileReader.h"
 
 namespace vrsp {
 
@@ -44,6 +47,9 @@ bool FramePlayer::onDataLayoutRead(
     const CurrentRecord& record,
     size_t blockIndex,
     DataLayout& layout) {
+  if (!XR_VERIFY(state_ != FileReaderState::NoMedia)) {
+    return false;
+  }
   ostringstream buffer;
   layout.printLayoutCompact(buffer);
   string text = buffer.str();
@@ -62,12 +68,15 @@ bool FramePlayer::onImageRead(
     const CurrentRecord& record,
     size_t /*blockIndex*/,
     const ContentBlock& contentBlock) {
+  if (!XR_VERIFY(state_ != FileReaderState::NoMedia)) {
+    return false;
+  }
   if (!saveNextFramePath_.empty()) {
     return saveFrame(record, contentBlock);
   }
   widget_->setDataFps(dataFps_.newFrame()); // fps counter for images read from file
   const auto& spec = contentBlock.image();
-  shared_ptr<PixelFrame> frame = getFrame(true);
+  unique_ptr<PixelFrame> frame = getFrame(spec.getPixelFormat());
   bool frameValid = false;
   imageFormat_ = spec.getImageFormat();
   if (imageFormat_ == vrs::ImageFormat::VIDEO) {
@@ -132,7 +141,7 @@ bool FramePlayer::onImageRead(
       widget_->swapImage(frame);
     }
   }
-  recycle(frame, !needsConvertedFrame_);
+  recycle(frame);
   return true; // read next blocks, if any
 }
 
@@ -141,44 +150,52 @@ void FramePlayer::setVisible(bool visible) {
   widget_->setVisible(visible_);
 }
 
-void FramePlayer::convertFrame(shared_ptr<PixelFrame>& frame) {
+void FramePlayer::convertFrame(unique_ptr<PixelFrame>& frame) {
   if (blankMode_) {
     makeBlankFrame(frame);
   } else {
-    shared_ptr<PixelFrame> convertedFrame = needsConvertedFrame_ ? getFrame(false) : nullptr;
-    PixelFrame::normalizeFrame(frame, convertedFrame, false, normalizeOptions_);
-    needsConvertedFrame_ = (frame != convertedFrame); // for next time!
+    unique_ptr<PixelFrame> convertedFrame =
+        needsConvertedFrame_ ? getFrame(frame->getPixelFormat()) : nullptr;
+    needsConvertedFrame_ =
+        frame->normalizeFrame(PixelFrame::make(convertedFrame), false, normalizeOptions_);
     if (needsConvertedFrame_) {
-      recycle(frame, true);
+      recycle(frame);
       frame = std::move(convertedFrame);
     }
   }
 }
 
-void FramePlayer::makeBlankFrame(shared_ptr<PixelFrame>& frame) {
+void FramePlayer::makeBlankFrame(unique_ptr<PixelFrame>& frame) {
   frame->init(vrs::PixelFormat::GREY8, frame->getWidth(), frame->getHeight());
   frame->blankFrame();
 }
 
-shared_ptr<PixelFrame> FramePlayer::getFrame(bool inputNotConvertedFrame) {
+unique_ptr<PixelFrame> FramePlayer::getFrame(vrs::PixelFormat format) {
   unique_lock<mutex> lock(frameMutex_);
-  vector<shared_ptr<PixelFrame>>& frames = inputNotConvertedFrame ? inputFrames_ : convertedframes_;
-  if (frames.empty()) {
+  if (recycledFrames_.empty()) {
     return nullptr;
   }
-  shared_ptr<PixelFrame> frame = std::move(frames.back());
-  frames.pop_back();
+  if (recycledFrames_.back()->getPixelFormat() == format) {
+    unique_ptr<PixelFrame> frame = std::move(recycledFrames_.back());
+    recycledFrames_.pop_back();
+    return frame;
+  }
+  unique_ptr<PixelFrame> frame = std::move(recycledFrames_.front());
+  recycledFrames_.pop_front();
   return frame;
 }
 
-void FramePlayer::recycle(shared_ptr<PixelFrame>& frame, bool inputNotConvertedFrame) {
+void FramePlayer::recycle(unique_ptr<PixelFrame>& frame) {
   if (frame) {
     {
       unique_lock<mutex> lock(frameMutex_);
-      vector<shared_ptr<PixelFrame>>& frames =
-          inputNotConvertedFrame ? inputFrames_ : convertedframes_;
-      if (frames.size() < 10) {
-        frames.emplace_back(std::move(frame));
+      if (recycledFrames_.size() < 10) {
+        if (recycledFrames_.empty() ||
+            recycledFrames_.back()->getPixelFormat() == frame->getPixelFormat()) {
+          recycledFrames_.emplace_back(std::move(frame));
+        } else {
+          recycledFrames_.emplace_front(std::move(frame));
+        }
       }
     }
     frame.reset();
@@ -267,7 +284,10 @@ void FramePlayer::imageJobsThreadActivity() {
     while (imageJobs_.getJob(job)) {
       ; // just skip!
     }
-    shared_ptr<PixelFrame>& frame = *job;
+    if (!XR_VERIFY(state_ != FileReaderState::NoMedia)) {
+      continue;
+    }
+    unique_ptr<PixelFrame>& frame = *job;
     bool frameValid = false;
     vrs::ImageFormat imageFormat = frame->getImageFormat();
     if (imageFormat == vrs::ImageFormat::RAW) {
@@ -283,7 +303,7 @@ void FramePlayer::imageJobsThreadActivity() {
       widget_->swapImage(frame);
     }
     if (imageFormat != vrs::ImageFormat::VIDEO) {
-      recycle(frame, !frameValid || !needsConvertedFrame_);
+      recycle(frame);
     }
   }
 }
