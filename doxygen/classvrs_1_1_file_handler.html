@@ -179,8 +179,8 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>setStatsCallb
 <tr class="memitem:a8d1a9e18368a77be359b1d23360c8ced" id="r_a8d1a9e18368a77be359b1d23360c8ced"><td class="memItemLeft" align="right" valign="top"><a id="a8d1a9e18368a77be359b1d23360c8ced" name="a8d1a9e18368a77be359b1d23360c8ced"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>isFileHandlerMatch</b> (const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;fileSpec) const</td></tr>
 <tr class="separator:a8d1a9e18368a77be359b1d23360c8ced"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aace0d5e85bc07729d92b88b8897ef4fd" id="r_aace0d5e85bc07729d92b88b8897ef4fd"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#aace0d5e85bc07729d92b88b8897ef4fd">isRemoteFileSystem</a> () const</td></tr>
-<tr class="separator:aace0d5e85bc07729d92b88b8897ef4fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c0ab7b8d4a9ba185aa84acd23974a22" id="r_a4c0ab7b8d4a9ba185aa84acd23974a22"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#a4c0ab7b8d4a9ba185aa84acd23974a22">isRemoteFileSystem</a> () const =0</td></tr>
+<tr class="separator:a4c0ab7b8d4a9ba185aa84acd23974a22"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9648c85d534485a206c519b931723ffd" id="r_a9648c85d534485a206c519b931723ffd"><td class="memItemLeft" align="right" valign="top"><a id="a9648c85d534485a206c519b931723ffd" name="a9648c85d534485a206c519b931723ffd"></a>
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>showProgress</b> () const</td></tr>
 <tr class="memdesc:a9648c85d534485a206c519b931723ffd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tell if the file handler is probably slow, and extra progress information might be useful. <br /></td></tr>
@@ -666,8 +666,8 @@ static unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHa
 
 </div>
 </div>
-<a id="aace0d5e85bc07729d92b88b8897ef4fd" name="aace0d5e85bc07729d92b88b8897ef4fd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aace0d5e85bc07729d92b88b8897ef4fd">&#9670;&#160;</a></span>isRemoteFileSystem()</h2>
+<a id="a4c0ab7b8d4a9ba185aa84acd23974a22" name="a4c0ab7b8d4a9ba185aa84acd23974a22"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c0ab7b8d4a9ba185aa84acd23974a22">&#9670;&#160;</a></span>isRemoteFileSystem()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -676,7 +676,7 @@ static unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHa
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool vrs::FileHandler::isRemoteFileSystem </td>
+          <td class="memname">virtual bool vrs::FileHandler::isRemoteFileSystem </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -684,13 +684,13 @@ static unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHa
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Tell if the file handler is handling remote data, that might need caching for instance. Because most custom file systems implementation are not local FS, defaults to true! </p>
+<p>Tell if the file handler is handling remote data. Readers might need caching. Writers might not support modifying written data (and require a split head). </p>
 
-<p>Reimplemented in <a class="el" href="classvrs_1_1_disk_file_t.html#ad54a270e44916ec092120a3e48e8b026">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classvrs_1_1_disk_file_t.html#ad54a270e44916ec092120a3e48e8b026">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
 
 </div>
 </div>

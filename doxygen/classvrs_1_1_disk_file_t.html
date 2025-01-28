@@ -911,9 +911,9 @@ template&lt;class FileChunk &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Tell if the file handler is handling remote data, that might need caching for instance. Because most custom file systems implementation are not local FS, defaults to true! </p>
+<p>Tell if the file handler is handling remote data. Readers might need caching. Writers might not support modifying written data (and require a split head). </p>
 
-<p>Reimplemented from <a class="el" href="classvrs_1_1_file_handler.html#aace0d5e85bc07729d92b88b8897ef4fd">vrs::FileHandler</a>.</p>
+<p>Implements <a class="el" href="classvrs_1_1_file_handler.html#a4c0ab7b8d4a9ba185aa84acd23974a22">vrs::FileHandler</a>.</p>
 
 </div>
 </div>
