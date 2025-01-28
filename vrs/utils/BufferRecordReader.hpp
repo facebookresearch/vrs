@@ -125,6 +125,9 @@ class BufferFileHandler : public FileHandler {
     outChunkSize = totalSize_;
     return 0;
   }
+  bool isRemoteFileSystem() const override {
+    return false;
+  }
 
  private:
   const string fileHandlerName_;

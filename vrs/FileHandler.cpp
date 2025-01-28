@@ -114,10 +114,6 @@ bool FileHandler::isReadOnly() const {
   return true;
 }
 
-bool FileHandler::isRemoteFileSystem() const {
-  return true; // everything but disk file is pretty much a remote file system...
-}
-
 bool FileHandler::isFileHandlerMatch(const FileSpec& fileSpec) const {
   return fileSpec.fileHandlerName.empty() || getFileHandlerName() == fileSpec.fileHandlerName;
 }
