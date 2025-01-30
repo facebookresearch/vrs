@@ -57,6 +57,11 @@ struct CachingStrategyConverter : public EnumStringConverter<
 
 namespace vrs {
 
+const string& FileHandler::getWriteFileHandlerName() const {
+  static const string kEmptryString;
+  return kEmptryString;
+}
+
 unique_ptr<FileHandler> FileHandler::makeOpen(const string& filePath) {
   unique_ptr<FileHandler> delegate;
   int status = FileHandlerFactory::getInstance().delegateOpen(filePath, delegate);
