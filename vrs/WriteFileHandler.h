@@ -73,6 +73,12 @@ class WriteFileHandler : public FileHandler {
     }
   }
 
+  /// When creating a split-head file, we may need to add a new chunk for the head file.
+  /// @param inOutSpec: file spec used for the file creation, that will be passed to a
+  /// DiskFile's create(inOutSpec) to create the head file,
+  /// and to createSplitFile(inOutSpec, options) to create the body file.
+  virtual void addSplitHead(FileSpec& inOutSpec) {}
+
   /// Tell if modifying files is supported by this FileHandler implementation.
   /// @return True if file modification and creation is supported.
   virtual bool reopenForUpdatesSupported() const = 0;

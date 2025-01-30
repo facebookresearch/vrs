@@ -814,13 +814,14 @@ int RecordFileWriter::createFile(const string& filePath, bool splitHead) {
       return INVALID_FILE_SPEC;
     }
     if (!writeFile->reopenForUpdatesSupported()) {
-      // If a custom FileHandler can't handle updates, the file needs a local file where to write
+      // If a custom FileHandler can't handle updates, we might need a local file where to write
       // the file's header, the description record, and index record, because that part needs to be
       // updated during file creation.
       // The rest of the file, which contains all the data records, can be written forward in one
       // pass, as it is being generated (no edits needed). In the upload case, the file's head will
-      // need be uploaded and prepended to the uploaded data, after the file is closed.
+      // need be uploaded and prepended to the uploaded data, when the file is closed.
       splitHead = true;
+      writeFile->addSplitHead(spec);
     }
     file_ = std::move(writeFile);
   } else if (spec.chunks.size() != 1) {
