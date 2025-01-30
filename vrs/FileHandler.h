@@ -93,6 +93,7 @@ class FileHandler : public FileDelegator {
   /// @return A new object of the concrete type, ready to be used to open a new file.
   virtual unique_ptr<FileHandler> makeNew() const = 0;
   virtual const string& getFileHandlerName() const = 0;
+  virtual const string& getWriteFileHandlerName() const; // maybe use another FileHandler for writes
 
   /// Open a file in read-only mode.
   /// @param filePath: a disk path, or anything that the particular module recognizes.

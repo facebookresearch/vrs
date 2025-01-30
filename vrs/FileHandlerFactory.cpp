@@ -194,8 +194,14 @@ FileDelegator* FileHandlerFactory::getFileDelegator(const string& name) {
 }
 
 unique_ptr<WriteFileHandler> WriteFileHandler::make(const string& fileHandlerName) {
-  unique_ptr<WriteFileHandler> file{dynamic_cast<WriteFileHandler*>(
-      FileHandlerFactory::getInstance().getFileHandler(fileHandlerName).release())};
+  auto handler = FileHandlerFactory::getInstance().getFileHandler(fileHandlerName);
+  if (handler) {
+    const string& writerName = handler->getWriteFileHandlerName();
+    if (!writerName.empty()) {
+      handler = FileHandlerFactory::getInstance().getFileHandler(writerName);
+    }
+  }
+  unique_ptr<WriteFileHandler> file{dynamic_cast<WriteFileHandler*>(handler.release())};
   return file;
 }
 
