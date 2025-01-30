@@ -108,6 +108,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aa8a6dce9aa800c50bc586d29235cac31"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aff0f64ed8b7ada9f6e0a2c55d3fd3a59" id="r_aff0f64ed8b7ada9f6e0a2c55d3fd3a59"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_write_file_handler.html#aff0f64ed8b7ada9f6e0a2c55d3fd3a59">createSplitFile</a> (const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;spec, const string &amp;initialFilePath)</td></tr>
 <tr class="separator:aff0f64ed8b7ada9f6e0a2c55d3fd3a59"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae63e7b7fbbda2b6fa8fef9d85ed5c59d" id="r_ae63e7b7fbbda2b6fa8fef9d85ed5c59d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_write_file_handler.html#ae63e7b7fbbda2b6fa8fef9d85ed5c59d">addSplitHead</a> (<a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;inOutSpec)</td></tr>
+<tr class="separator:ae63e7b7fbbda2b6fa8fef9d85ed5c59d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a42d388f28fa2202dc18ab52964d7990c" id="r_a42d388f28fa2202dc18ab52964d7990c"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_write_file_handler.html#a42d388f28fa2202dc18ab52964d7990c">reopenForUpdatesSupported</a> () const =0</td></tr>
 <tr class="separator:a42d388f28fa2202dc18ab52964d7990c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a92afff70611d619395c027f01de60c6e" id="r_a92afff70611d619395c027f01de60c6e"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_write_file_handler.html#a92afff70611d619395c027f01de60c6e">reopenForUpdates</a> ()=0</td></tr>
@@ -141,6 +143,9 @@ template&lt;typename T , std::enable_if_t&lt; std::is_trivially_copyable&lt; T &
 <tr class="memitem:a517b4a7e2cc00f6bd7b98d999e2e540a inherit pub_methods_classvrs_1_1_file_handler" id="r_a517b4a7e2cc00f6bd7b98d999e2e540a"><td class="memItemLeft" align="right" valign="top">
 virtual const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getFileHandlerName</b> () const =0</td></tr>
 <tr class="separator:a517b4a7e2cc00f6bd7b98d999e2e540a inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c300830a63c59616c95643d67660339 inherit pub_methods_classvrs_1_1_file_handler" id="r_a7c300830a63c59616c95643d67660339"><td class="memItemLeft" align="right" valign="top">
+virtual const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getWriteFileHandlerName</b> () const</td></tr>
+<tr class="separator:a7c300830a63c59616c95643d67660339 inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc8cce8cea6320affac819d063705d9b inherit pub_methods_classvrs_1_1_file_handler" id="r_acc8cce8cea6320affac819d063705d9b"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#acc8cce8cea6320affac819d063705d9b">open</a> (const string &amp;filePath)</td></tr>
 <tr class="separator:acc8cce8cea6320affac819d063705d9b inherit pub_methods_classvrs_1_1_file_handler"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaaafaf72028776e1868b6d69a1210902 inherit pub_methods_classvrs_1_1_file_handler" id="r_aaaafaf72028776e1868b6d69a1210902"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#aaaafaf72028776e1868b6d69a1210902">openSpec</a> (const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;fileSpec)=0</td></tr>
@@ -263,6 +268,38 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>CacheStatsCallbackFu
 <p>Append a new chunk to the current file, when in writing to disk. The next write will happen at the beginning of the new chunk. </p><dl class="section return"><dt>Returns</dt><dd>A status code, 0 meaning success. </dd></dl>
 
 <p>Implemented in <a class="el" href="classvrs_1_1_disk_file_t.html#abac5192bf096be66db2973f7c86fbec0">vrs::DiskFileT&lt; FileChunk &gt;</a>.</p>
+
+</div>
+</div>
+<a id="ae63e7b7fbbda2b6fa8fef9d85ed5c59d" name="ae63e7b7fbbda2b6fa8fef9d85ed5c59d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae63e7b7fbbda2b6fa8fef9d85ed5c59d">&#9670;&#160;</a></span>addSplitHead()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void vrs::WriteFileHandler::addSplitHead </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;&#160;</td>
+          <td class="paramname"><em>inOutSpec</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>When creating a split-head file, we may need to add a new chunk for the head file. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">inOutSpec</td><td>file spec used for the file creation, that will be passed to a DiskFile's create(inOutSpec) to create the head file, and to createSplitFile(inOutSpec, options) to create the body file. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
