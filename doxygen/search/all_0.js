@@ -17,7 +17,7 @@ var searchData=
   ['addrecordable_14',['addRecordable',['../classvrs_1_1_record_file_writer.html#aece09053cfb5ae3a9378db6e0ef9b180',1,'vrs::RecordFileWriter']]],
   ['addrecordformat_15',['addrecordformat',['../classvrs_1_1_recordable.html#aa801d89039dc4435461210f53e5c5c89',1,'vrs::Recordable::addRecordFormat()'],['../classvrs_1_1_record_format.html#a4bb88867e1f983ab46cf8cff83b4e69f',1,'vrs::RecordFormat::addRecordFormat()']]],
   ['addsoftwaredetails_16',['addSoftwareDetails',['../namespacevrs_1_1tag__conventions.html#a67ff625be83d2f948f1116fb04c51931',1,'vrs::tag_conventions']]],
-  ['addsplithead_17',['addSplitHead',['../classvrs_1_1_write_file_handler.html#ae63e7b7fbbda2b6fa8fef9d85ed5c59d',1,'vrs::WriteFileHandler']]],
+  ['addsplithead_17',['addSplitHead',['../classvrs_1_1_write_file_handler.html#a250b01c29f8923717e3e5b217ad7ff12',1,'vrs::WriteFileHandler']]],
   ['addtags_18',['addtags',['../classvrs_1_1_recordable.html#ac97c9ca729acf1dfe2673c114401c834',1,'vrs::Recordable::addTags(const map&lt; string, string &gt; &amp;newTags)'],['../classvrs_1_1_recordable.html#ae61b438be2513c28ad26dcd70f0fa193',1,'vrs::Recordable::addTags(const StreamTags &amp;tags)'],['../classvrs_1_1_record_file_writer.html#abb5d20c53fcd9e5c5bb309c0ace6e581',1,'vrs::RecordFileWriter::addTags()']]],
   ['addtagset_19',['addTagSet',['../namespacevrs_1_1tag__conventions.html#a476bbcbb15e95d2da63d23f91c9f76a1',1,'vrs::tag_conventions']]],
   ['adduniquesessionid_20',['addUniqueSessionId',['../namespacevrs_1_1tag__conventions.html#a3b2b814f54288677df0458c512ed432a',1,'vrs::tag_conventions']]],
