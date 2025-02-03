@@ -161,6 +161,9 @@ void PlayerWindow::updateLayoutAndPresetMenu(
     const QVariant& currentPreset) {
   layoutMenu_->clear();
   layoutActionsAndPreset_.clear();
+  if (player_.getFileReader().getState() == FileReaderState::NoMedia) {
+    return;
+  }
   if (visibleCount < frameCount) {
     unique_ptr<QAction> layoutAction = make_unique<QAction>(QString("Show All Streams"), this);
     connect(layoutAction.get(), &QAction::triggered, [this]() { player_.showAllStreams(); });
@@ -237,6 +240,9 @@ void PlayerWindow::updateLayoutAndPresetMenu(
 
 void PlayerWindow::updateTextOverlayMenu() {
   textOverlayMenu_->clear();
+  if (player_.getFileReader().getState() == FileReaderState::NoMedia) {
+    return;
+  }
   QColor color = player_.getOverlayColor();
   addColorAction(color, Qt::white, "Use White");
   addColorAction(color, Qt::black, "Use Black");
@@ -270,6 +276,9 @@ void PlayerWindow::updateTextOverlayMenu() {
 void PlayerWindow::updateAudioMenu() {
   audioMenu_->clear();
   audioActions_.clear();
+  if (player_.getFileReader().getState() == FileReaderState::NoMedia) {
+    return;
+  }
   if (audioChannelCount_ == 0 || playbackChannelCount_ == 0) {
     auto noAudioAction = make_unique<QAction>(
         audioChannelCount_ == 0 ? "No Playable Audio" : "No Audio Playback Device", this);

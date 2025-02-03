@@ -1303,7 +1303,6 @@ void FileReader::setState(FileReaderState newState) {
       time_.pause();
     }
   }
-  cout << "Video state: " << FileReaderStateConverter::toString(newState) << "\n";
   mediaStateChanged(state_);
 }
 
