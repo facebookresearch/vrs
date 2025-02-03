@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <memory>
 #include <string>
 
@@ -162,8 +163,7 @@ class TelemetryLogger {
 
   /// set logger and get back the previous one, making sure the assignment is performed
   /// before the previous logger is deleted.
-  static std::unique_ptr<TelemetryLogger> setLogger(
-      std::unique_ptr<TelemetryLogger>&& telemetryLogger);
+  static void setLogger(std::unique_ptr<TelemetryLogger>&& telemetryLogger);
 
   /// methods for clients to use without having to get an instance, etc
   static inline void error(
@@ -203,8 +203,15 @@ class TelemetryLogger {
   virtual void logTraffic(const OperationContext& operationContext, const TrafficEvent& event);
   virtual void flushEvents() {}
 
+  /// End telemetry: All background threads should be stopped, and all pending events should be
+  /// flushed, and further events should be ignored.
+  virtual void stop() {}
+
  private:
-  static std::unique_ptr<TelemetryLogger>& getInstance();
+  static std::atomic<TelemetryLogger*>& instance();
+  static inline TelemetryLogger* getInstance() {
+    return instance().load(std::memory_order_relaxed);
+  }
 };
 
 } // namespace vrs

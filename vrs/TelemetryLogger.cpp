@@ -16,6 +16,8 @@
 
 #include "TelemetryLogger.h"
 
+#include <vector>
+
 #define DEFAULT_LOG_CHANNEL "TelemetryLogger"
 #include <logging/Log.h>
 
@@ -26,11 +28,18 @@ using namespace std;
 
 namespace vrs {
 
-unique_ptr<TelemetryLogger> TelemetryLogger::setLogger(
-    unique_ptr<TelemetryLogger>&& telemetryLogger) {
-  unique_ptr<TelemetryLogger> previousLogger{std::move(getInstance())};
-  getInstance() = std::move(telemetryLogger);
-  return previousLogger;
+std::atomic<TelemetryLogger*>& TelemetryLogger::instance() {
+  static TelemetryLogger sDefaultLogger;
+  static std::atomic<TelemetryLogger*> sInstance{&sDefaultLogger};
+  return sInstance;
+}
+
+void TelemetryLogger::setLogger(unique_ptr<TelemetryLogger>&& telemetryLogger) {
+  static vector<unique_ptr<TelemetryLogger>> sLoggers;
+  TelemetryLogger* oldInstance = getInstance();
+  instance() = telemetryLogger.get();
+  sLoggers.emplace_back(std::move(telemetryLogger));
+  oldInstance->stop();
 }
 
 void TelemetryLogger::logEvent(LogEvent&& event) {
@@ -71,11 +80,6 @@ void TelemetryLogger::logTraffic(
       event.retryCount,
       event.errorCount,
       event.error429Count);
-}
-
-unique_ptr<TelemetryLogger>& TelemetryLogger::getInstance() {
-  static unique_ptr<TelemetryLogger> sInstance{make_unique<TelemetryLogger>()};
-  return sInstance;
 }
 
 TelemetryLogger::~TelemetryLogger() = default;
