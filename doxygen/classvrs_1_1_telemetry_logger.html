@@ -101,11 +101,13 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>logTraffic</b
 <tr class="memitem:aaf2e096102462c4a47911c3b6787ea57" id="r_aaf2e096102462c4a47911c3b6787ea57"><td class="memItemLeft" align="right" valign="top"><a id="aaf2e096102462c4a47911c3b6787ea57" name="aaf2e096102462c4a47911c3b6787ea57"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>flushEvents</b> ()</td></tr>
 <tr class="separator:aaf2e096102462c4a47911c3b6787ea57"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a430a748d3ceac9490884e92c3840c305" id="r_a430a748d3ceac9490884e92c3840c305"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_telemetry_logger.html#a430a748d3ceac9490884e92c3840c305">stop</a> ()</td></tr>
+<tr class="separator:a430a748d3ceac9490884e92c3840c305"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:abd31b687a6cc7f45242328ade4ff31b4" id="r_abd31b687a6cc7f45242328ade4ff31b4"><td class="memItemLeft" align="right" valign="top">static std::unique_ptr&lt; <a class="el" href="classvrs_1_1_telemetry_logger.html">TelemetryLogger</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_telemetry_logger.html#abd31b687a6cc7f45242328ade4ff31b4">setLogger</a> (std::unique_ptr&lt; <a class="el" href="classvrs_1_1_telemetry_logger.html">TelemetryLogger</a> &gt; &amp;&amp;telemetryLogger)</td></tr>
-<tr class="separator:abd31b687a6cc7f45242328ade4ff31b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5791a5e18d86c8578a566a95e8190bf" id="r_ad5791a5e18d86c8578a566a95e8190bf"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_telemetry_logger.html#ad5791a5e18d86c8578a566a95e8190bf">setLogger</a> (std::unique_ptr&lt; <a class="el" href="classvrs_1_1_telemetry_logger.html">TelemetryLogger</a> &gt; &amp;&amp;telemetryLogger)</td></tr>
+<tr class="separator:ad5791a5e18d86c8578a566a95e8190bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acf7f0886a08a2a79e2014b4ac1fa0fe5" id="r_acf7f0886a08a2a79e2014b4ac1fa0fe5"><td class="memItemLeft" align="right" valign="top"><a id="acf7f0886a08a2a79e2014b4ac1fa0fe5" name="acf7f0886a08a2a79e2014b4ac1fa0fe5"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>error</b> (const <a class="el" href="structvrs_1_1_operation_context.html">OperationContext</a> &amp;operationContext, const string &amp;message, const string &amp;serverMessage={})</td></tr>
 <tr class="memdesc:acf7f0886a08a2a79e2014b4ac1fa0fe5"><td class="mdescLeft">&#160;</td><td class="mdescRight">methods for clients to use without having to get an instance, etc <br /></td></tr>
@@ -142,8 +144,8 @@ static constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"
 <div class="textblock"><p><a class="el" href="classvrs_1_1_telemetry_logger.html" title="TelemetryLogger to report important events.">TelemetryLogger</a> to report important events. </p>
 <p>Telemetry building block infra to report events from VRS operations. The default implementation simply logs using XR_LOGI and XR_LOGE, XR_LOGW, but can easily be augmented to implement telemetry in a central database. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="abd31b687a6cc7f45242328ade4ff31b4" name="abd31b687a6cc7f45242328ade4ff31b4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abd31b687a6cc7f45242328ade4ff31b4">&#9670;&#160;</a></span>setLogger()</h2>
+<a id="ad5791a5e18d86c8578a566a95e8190bf" name="ad5791a5e18d86c8578a566a95e8190bf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad5791a5e18d86c8578a566a95e8190bf">&#9670;&#160;</a></span>setLogger()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -152,7 +154,7 @@ static constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">unique_ptr&lt; <a class="el" href="classvrs_1_1_telemetry_logger.html">TelemetryLogger</a> &gt; vrs::TelemetryLogger::setLogger </td>
+          <td class="memname">void vrs::TelemetryLogger::setLogger </td>
           <td>(</td>
           <td class="paramtype">std::unique_ptr&lt; <a class="el" href="classvrs_1_1_telemetry_logger.html">TelemetryLogger</a> &gt; &amp;&amp;&#160;</td>
           <td class="paramname"><em>telemetryLogger</em></td><td>)</td>
@@ -166,6 +168,32 @@ static constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"
 </table>
 </div><div class="memdoc">
 <p>set logger and get back the previous one, making sure the assignment is performed before the previous logger is deleted. </p>
+
+</div>
+</div>
+<a id="a430a748d3ceac9490884e92c3840c305" name="a430a748d3ceac9490884e92c3840c305"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a430a748d3ceac9490884e92c3840c305">&#9670;&#160;</a></span>stop()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void vrs::TelemetryLogger::stop </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>End telemetry: All background threads should be stopped, and all pending events should be flushed, and further events should be ignored. </p>
 
 </div>
 </div>
