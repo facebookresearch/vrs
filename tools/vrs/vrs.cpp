@@ -15,6 +15,7 @@
  */
 
 #include "VrsCommand.h"
+#include "SharedInit.hpp"
 
 #include <vrs/os/Utils.h>
 
@@ -22,6 +23,9 @@ using namespace std;
 using namespace vrscli;
 
 int main(int argc, char** argv) {
+  // Initialize
+  vrstool::SharedInit();
+
   const string& appName = vrs::os::getFilename(argv[0]);
   if (argc == 1) {
     printHelp(appName);

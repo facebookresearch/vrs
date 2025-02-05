@@ -22,6 +22,7 @@ target_link_libraries(vrs
   PRIVATE
     vrslib
     vrs_utils
+    vrs_utils_xprs
     vrs_utils_cli
     fmt::fmt
     PNG::PNG

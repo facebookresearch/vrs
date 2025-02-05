@@ -34,7 +34,7 @@ find_package(JPEG REQUIRED)
 find_package(TurboJpeg REQUIRED)
 
 # Set up requirements for XPRS decoding
-if (XPRS_DECODING)
+if (INCLUDE_XPRS)
   include(${CMAKE_MODULE_PATH}/SetupOcean.cmake)
 endif()
 

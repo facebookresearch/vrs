@@ -514,10 +514,10 @@ bool PixelFrame::normalizeFrame(
 }
 
 bool PixelFrame::normalizeFrame(
-    PixelFrame& outNormalizedFrame,
+    PixelFrame& normalizedFrame,
     bool grey16supported,
     const NormalizeOptions& options,
-    PixelFormat normalizedPixelFormat) const {
+    PixelFormat targetPixelFormat) const {
   PixelFormat srcFormat = imageSpec_.getPixelFormat();
   if (normalizedPixelFormat == PixelFormat::UNDEFINED) {
     normalizedPixelFormat = getNormalizedPixelFormat(srcFormat, grey16supported, options);

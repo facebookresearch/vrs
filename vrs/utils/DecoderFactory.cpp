@@ -70,6 +70,8 @@ unique_ptr<DecoderI> DecoderFactory::makeDecoder(
     const vector<uint8_t>& encodedFrame,
     void* outDecodedFrame,
     const ImageContentBlockSpec& outputImageSpec) {
+  // For testing only
+  XR_LOGI("--- --- debug: decoderMaker: has {} decoders", decoderMakers_.size());
   for (const DecoderMaker& decoderMaker : decoderMakers_) {
     unique_ptr<DecoderI> decoder = decoderMaker(encodedFrame, outDecodedFrame, outputImageSpec);
     if (decoder) {

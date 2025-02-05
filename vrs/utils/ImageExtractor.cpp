@@ -117,7 +117,20 @@ struct ImageJob {
 
   void saveAsPng() {
     shared_ptr<PixelFrame> normalFrame;
+    // For testing only
+    fmt::print(
+        "---- ---- debug: save frame information: image format {}, pixel format {}\n",
+        static_cast<int>(frame->getImageFormat()),
+        static_cast<int>(frame->getPixelFormat()));
+
+
     PixelFrame::normalizeFrame(frame, normalFrame, kSupportGrey16Export);
+
+    fmt::print(
+        "---- ---- debug: save pixel frame information: image format {}, pixel format {}\n",
+        static_cast<int>(normalFrame->getImageFormat()),
+        static_cast<int>(normalFrame->getPixelFormat()));
+
     fmt::print("Writing {}\n", path);
     normalFrame->writeAsPng(path);
   }
