@@ -16,6 +16,7 @@ add_subdirectory(helpers)
 add_subdirectory(os)
 add_subdirectory(oss)
 add_subdirectory(utils)
+add_subdirectory(xprs)
 
 file (GLOB VRS_SRCS *.cpp *.h *.hpp)
 add_library(vrslib ${VRS_SRCS})

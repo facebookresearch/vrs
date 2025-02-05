@@ -1,0 +1,40 @@
+# (c) Meta Platforms, Inc. and affiliates. Confidential and proprietary.
+
+load("@fbsource//arvr/libraries/vrs:vrs.bzl", "FBANDROID_COMPILER_FLAGS", "get_nosan_test_compatible_platform")
+load("//arvr/tools/build_defs:oxx.bzl", "oxx_static_library", "oxx_test")
+
+oncall("vrs")
+
+oxx_static_library(
+    name = "xprs",
+    srcs = glob(["*.cpp"]),
+    fbandroid_compiler_flags = FBANDROID_COMPILER_FLAGS,
+    public_include_directories = ["../../.."],
+    public_raw_headers = glob(["*.h"]),
+    visibility = ["PUBLIC"],
+    deps = [
+        "//arvr/libraries/logging:logging",
+        "//arvr/libraries/vrs/utils:utils",
+        "//arvr/libraries/vrs/vrs:vrs",
+        "//arvr/libraries/vrs/vrs/os:os",
+        "//arvr/libraries/vrs/vrs/utils/converters:raw10_to_grey10_converter",
+        "//arvr/projects/compression/xprs:xprs",
+        "//xplat/ocean/impl/ocean/base:base",
+        "//xplat/ocean/impl/ocean/cv:cv",
+    ],
+)
+
+oxx_test(
+    name = "unit_test_xprs",
+    srcs = glob(["test/*.cpp"]),
+    compatible_with = get_nosan_test_compatible_platform(),
+    oncall = "arvr_gaia",
+    visibility = ["PUBLIC"],
+    deps = [
+        "//arvr/libraries/logging:advanced_backend",
+        "//arvr/libraries/logging:logging",
+        "//arvr/libraries/vrs/utils/xprs:xprs",
+        "//arvr/libraries/vrs/vrs:vrs",
+        "//arvr/projects/xrtech/TestDataDir:TestDataDir",
+    ],
+)

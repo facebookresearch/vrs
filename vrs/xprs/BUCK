@@ -1,0 +1,261 @@
+# (c) Meta Platforms, Inc. and affiliates. Confidential and proprietary.
+
+load("@fbsource//tools/build_defs:fb_native_wrapper.bzl", "fb_native")
+load("//arvr/tools/build_defs:oxx.bzl", "oxx_static_library")
+load("//arvr/tools/build_defs:oxx_python.bzl", "oxx_python_extension")
+load(":helpers.bzl", "get_ffmpeg_dependencies_src", "get_muxer_ffmpeg_dependencies_src", "get_nv_codec_headers_preprocessor_flags")
+
+oncall("arvr_compression_research")
+
+SUPPORTED_PLATFORMS_SOURCES = [
+    "FFmpegDecode.cpp",
+    "FFmpegEncode.cpp",
+    "FFmpegUtils.cpp",
+    "xprsEncApi.cpp",
+    "xprsDecApi.cpp",
+    "xprsBase.cpp",
+    "xprsDecoder.cpp",
+    "xprsEncoder.cpp",
+    "xprsUtils.cpp",
+    "xprsMux.cpp",
+]
+
+SUPPORTED_PLATFORMS_SOURCES_NVCODEC = [
+    "nvDecoder.cpp",
+    "nvEncoder.cpp",
+    "cudaContextProvider.cpp",
+]
+
+fb_native.config_setting(
+    name = "linux-jetson-mode",
+    constraint_values = [
+        "ovr_config//os/constraints:linux",
+        "ovr_config//platform/jetson/constraints:jetson_36",
+    ],
+    visibility = ["PUBLIC"],
+)
+
+LINUX_ONLY_SOURCES = [
+    "SvtAv1Encoder.cpp",
+]
+
+SUPPORTED_PLATFORMS_HEADERS = [
+    "Codecs.h",
+    "Final.h",
+    "FFmpegDecode.h",
+    "FFmpegEncode.h",
+    "FFmpegUtils.h",
+    "SvtAv1Encoder.h",
+    "xprsDecoder.h",
+    "xprsUtils.h",
+    "InternalDecoder.h",
+    "InternalEncoder.h",
+    "nvDecoder.h",
+    "nvEncoder.h",
+    "cudaContextProvider.h",
+    "cudaUtils.h",
+]
+
+SUPPORTED_PLATFORMS_PUBLIC_HEADERS = [
+    "xprsEncoder.h",
+]
+
+SUPPORTED_PLATFORMS_DEPENDENCIES_PREBUILT = [
+    "//arvr/third-party/ffmpeg/ffmpeg_5_1:ffmpeg-network",
+    ":mp4mux",
+]
+
+SUPPORTED_PLATFORMS_DEPENDENCIES = [
+    ":mp4mux",
+] + select({
+    ":linux-cuda-arvr-mode": ["//arvr/third-party/nvcodec/Video_Codec_SDK_12.1.14:nvcodec-encode"],
+    "DEFAULT": [],
+}) + get_ffmpeg_dependencies_src()
+
+SUPPORTED_FBCODE_DEPENDENCIES = [
+    "third-party//ffmpeg-ref:avcodec",
+    "third-party//ffmpeg-ref:avutil",
+    "third-party//svt-av1:SvtAv1Enc",
+    ":mp4mux",
+]
+
+SUPPORTED_PLATFORMS_MUXER_SOURCES = [
+    "mux.cpp",
+]
+
+SUPPORTED_PLATFORMS_MUXER_HEADERS = [
+    "mux.h",
+]
+
+SUPPORTED_PLATFORMS_MUXER_DEPENDENCIES = get_muxer_ffmpeg_dependencies_src()
+
+SUPPORTED_PLATFORMS_MUXER_DEPENDENCIES_PREBUILT = [
+    "//arvr/third-party/ffmpeg/ffmpeg_5_1:libavformat-network",
+]
+
+fb_native.config_setting(
+    name = "linux-cuda-arvr-mode",
+    constraint_values = [
+        "ovr_config//build_mode/constraints:arvr_mode_enabled",
+        "ovr_config//cuda/constraints:has_cuda",
+        "ovr_config//os/constraints:linux",
+    ],
+    visibility = ["PUBLIC"],
+)
+
+oxx_static_library(
+    name = "mp4mux",
+    srcs = select({
+        "DEFAULT": [],
+        "ovr_config//os:linux": SUPPORTED_PLATFORMS_MUXER_SOURCES,
+        "ovr_config//os:macos": SUPPORTED_PLATFORMS_MUXER_SOURCES,
+        "ovr_config//os:windows": SUPPORTED_PLATFORMS_MUXER_SOURCES,
+    }),
+    fbcode_deps_override = [
+        "third-party//ffmpeg-ref:avformat",
+    ],
+    public_include_directories = [
+        ".",
+    ],
+    public_raw_headers = select({
+        "DEFAULT": [],
+        "ovr_config//os:linux": SUPPORTED_PLATFORMS_MUXER_HEADERS,
+        "ovr_config//os:macos": SUPPORTED_PLATFORMS_MUXER_HEADERS,
+        "ovr_config//os:windows": SUPPORTED_PLATFORMS_MUXER_HEADERS,
+    }),
+    visibility = ["PUBLIC"],
+    exported_deps = select({
+        "DEFAULT": [],
+        "ovr_config//os:linux-arm64": SUPPORTED_PLATFORMS_MUXER_DEPENDENCIES_PREBUILT,
+        "ovr_config//os:linux-x86_64": SUPPORTED_PLATFORMS_MUXER_DEPENDENCIES,
+        "ovr_config//os:macos": SUPPORTED_PLATFORMS_MUXER_DEPENDENCIES_PREBUILT,
+        "ovr_config//os:windows": SUPPORTED_PLATFORMS_MUXER_DEPENDENCIES_PREBUILT,
+        "ovr_config//runtime:fbcode-arm64": SUPPORTED_PLATFORMS_MUXER_DEPENDENCIES,
+        "ovr_config//runtime:jetson_36": SUPPORTED_PLATFORMS_MUXER_DEPENDENCIES_PREBUILT,
+    }),
+)
+
+oxx_static_library(
+    name = "xprs",
+    srcs = select({
+        ":linux-jetson-mode": SUPPORTED_PLATFORMS_SOURCES,
+        "DEFAULT": [
+            "xprsBase.cpp",
+            "xprsDecZero.cpp",
+            "xprsEncZero.cpp",
+        ],
+        "ovr_config//os:linux": SUPPORTED_PLATFORMS_SOURCES + LINUX_ONLY_SOURCES,
+        "ovr_config//os:macos": SUPPORTED_PLATFORMS_SOURCES,
+        "ovr_config//os:windows": SUPPORTED_PLATFORMS_SOURCES,
+        "ovr_config//runtime:anywhere-linux": SUPPORTED_PLATFORMS_SOURCES,
+    }) + select({
+        ":linux-cuda-arvr-mode": SUPPORTED_PLATFORMS_SOURCES_NVCODEC,
+        "DEFAULT": [],
+    }),
+
+    # Despite the `select()` in `exported_deps` the xplat macros still want to parse the
+    # 'ANDROID' tree for ffmpeg, which fails. Thus explicitly set the dependencies for fbandroid.
+    fbandroid_exported_deps_override = [],
+    fbcode_deps_override = SUPPORTED_FBCODE_DEPENDENCIES,
+    preprocessor_flags = select({
+        "DEFAULT": [],
+        "ovr_config//os:linux": ["-DHAS_SVTAV1=1"],
+        "ovr_config//runtime:anywhere-linux": ["-DHAS_SVTAV1=0"],
+    }) + select({
+        ":linux-cuda-arvr-mode": [
+            "-DWITH_NVCODEC=1",
+        ],
+        "DEFAULT": [],
+    }) + get_nv_codec_headers_preprocessor_flags(),
+    public_include_directories = [
+        ".",
+        "../",
+    ],
+    public_raw_headers = [
+        "xprs.h",
+    ] + select({
+        "DEFAULT": [],
+        "ovr_config//os:linux": SUPPORTED_PLATFORMS_PUBLIC_HEADERS,
+        "ovr_config//os:macos": SUPPORTED_PLATFORMS_PUBLIC_HEADERS,
+        "ovr_config//os:windows": SUPPORTED_PLATFORMS_PUBLIC_HEADERS,
+    }),
+    raw_headers = select({
+        "DEFAULT": [],
+        "ovr_config//os:linux": SUPPORTED_PLATFORMS_HEADERS,
+        "ovr_config//os:macos": SUPPORTED_PLATFORMS_HEADERS,
+        "ovr_config//os:windows": SUPPORTED_PLATFORMS_HEADERS,
+    }),
+    visibility = ["PUBLIC"],
+    exported_deps = select({
+        "DEFAULT": [],
+        "ovr_config//os:linux-arm64": SUPPORTED_PLATFORMS_DEPENDENCIES_PREBUILT,
+        "ovr_config//os:linux-x86_64": SUPPORTED_PLATFORMS_DEPENDENCIES,
+        "ovr_config//os:macos": SUPPORTED_PLATFORMS_DEPENDENCIES_PREBUILT,
+        "ovr_config//os:windows": SUPPORTED_PLATFORMS_DEPENDENCIES_PREBUILT,
+        "ovr_config//runtime:anywhere-linux": SUPPORTED_PLATFORMS_DEPENDENCIES_PREBUILT,
+        # nvidia jetson uses arm64 prebuilts
+        "ovr_config//runtime:jetson_36": SUPPORTED_PLATFORMS_DEPENDENCIES_PREBUILT,
+        # fbcode uses the `fbcode_exported_deps` deps above.
+        "ovr_config//toolchain/fb:fbcode-arm64": [],
+        "ovr_config//toolchain/fb:fbcode-x86_64": [],
+    }),
+)
+
+oxx_static_library(
+    name = "xprs_oss",
+    srcs = [
+        "FFmpegDecode.cpp",
+        "FFmpegUtils.cpp",
+        "xprsBase.cpp",
+        "xprsDecApi.cpp",
+        "xprsDecoder.cpp",
+        "xprsEncZero.cpp",
+        "xprsUtils.cpp",
+    ],
+    compatible_with = [
+        "ovr_config//os:linux",
+        "ovr_config//os:macos",
+        "ovr_config//os:windows",
+    ],
+    public_include_directories = [
+        "./",
+        "../",
+    ],
+    public_raw_headers = [
+        "xprs.h",
+    ],
+    raw_headers = [
+        "Codecs.h",
+        "FFmpegDecode.h",
+        "FFmpegUtils.h",
+        "Final.h",
+        "InternalDecoder.h",
+        "xprsDecoder.h",
+        "xprsUtils.h",
+    ],
+    visibility = ["PUBLIC"],
+    exported_deps = select({
+        "DEFAULT": [],
+        "ovr_config//os:linux-arm64": SUPPORTED_PLATFORMS_DEPENDENCIES_PREBUILT,
+        "ovr_config//os:linux-x86_64": SUPPORTED_PLATFORMS_DEPENDENCIES,
+        "ovr_config//os:macos": SUPPORTED_PLATFORMS_DEPENDENCIES_PREBUILT,
+        "ovr_config//os:windows": SUPPORTED_PLATFORMS_DEPENDENCIES_PREBUILT,
+        "ovr_config//runtime:anywhere-linux": SUPPORTED_PLATFORMS_DEPENDENCIES_PREBUILT,
+        # nvidia jetson uses arm64 prebuilts
+        "ovr_config//runtime:jetson_36": SUPPORTED_PLATFORMS_DEPENDENCIES_PREBUILT,
+        # fbcode uses the `fbcode_exported_deps` deps above.
+        "ovr_config//toolchain/fb:fbcode-arm64": [],
+        "ovr_config//toolchain/fb:fbcode-x86_64": [],
+    }),
+)
+
+oxx_python_extension(
+    name = "xprs_python_bindings",
+    srcs = ["Pybind11.cpp"],
+    module_name = "xprs_python_bindings",
+    visibility = ["PUBLIC"],
+    deps = [
+        ":xprs",
+        "//third-party/pybind11:pybind11",
+    ],
+)

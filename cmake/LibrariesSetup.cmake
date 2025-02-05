@@ -33,6 +33,11 @@ find_package(PNG REQUIRED)
 find_package(JPEG REQUIRED)
 find_package(TurboJpeg REQUIRED)
 
+# Set up requirements for XPRS decoding
+if (XPRS_DECODING)
+  include(${CMAKE_MODULE_PATH}/SetupOcean.cmake)
+endif()
+
 # Setup unit test infra, but only if unit tests are enabled
 if (UNIT_TESTS)
   enable_testing()

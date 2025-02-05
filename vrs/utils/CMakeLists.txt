@@ -16,6 +16,10 @@ add_subdirectory(converters)
 add_subdirectory(xxhash)
 add_subdirectory(cli)
 
+if (XPRS_DECODING)
+  add_subdirectory(xprs)
+endif()
+
 file (GLOB VRS_UTILS_SRCS *.cpp *.h *.hpp)
 # Remove fb-only source files (if there is still any lying around)
 file(GLOB VRS_UTILS_FB_SRCS *_fb.cpp *_fb.h)
@@ -29,6 +33,7 @@ target_link_libraries(vrs_utils
     vrslib
     vrs_helpers
     vrs_utils_converters
+    ocean
     fmt::fmt
     JPEG::JPEG
     PNG::PNG
@@ -48,6 +53,8 @@ install(TARGETS vrs_utils EXPORT VRSLibTargets
   RUNTIME DESTINATION bin
   INCLUDES DESTINATION include
 )
+
+
 
 if (UNIT_TESTS)
   enable_testing()
