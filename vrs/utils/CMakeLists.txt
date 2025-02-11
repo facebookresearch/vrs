@@ -16,7 +16,7 @@ add_subdirectory(converters)
 add_subdirectory(xxhash)
 add_subdirectory(cli)
 
-if (XPRS_DECODING)
+if (INCLUDE_XPRS)
   add_subdirectory(xprs)
 endif()
 
@@ -33,13 +33,15 @@ target_link_libraries(vrs_utils
     vrslib
     vrs_helpers
     vrs_utils_converters
-    ocean
     fmt::fmt
     JPEG::JPEG
     PNG::PNG
     TurboJpeg::TurboJpeg
     rapidjson::rapidjson
     vrs_logging
+    ocean_base
+    ocean_cv
+    ocean_math
 )
 target_include_directories(vrs_utils
   INTERFACE
@@ -47,12 +49,12 @@ target_include_directories(vrs_utils
     $<INSTALL_INTERFACE:include>
 )
 
-install(TARGETS vrs_utils EXPORT VRSLibTargets
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-  RUNTIME DESTINATION bin
-  INCLUDES DESTINATION include
-)
+#install(TARGETS vrs_utils EXPORT VRSLibTargets
+#  LIBRARY DESTINATION lib
+#  ARCHIVE DESTINATION lib
+#  RUNTIME DESTINATION bin
+#  INCLUDES DESTINATION include
+#)
 
 
 

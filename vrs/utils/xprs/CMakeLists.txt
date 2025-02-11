@@ -18,7 +18,9 @@ target_link_libraries(vrs_utils_xprs
   PUBLIC
     vrs_utils
   PRIVATE
-    ocean
+    ocean_base
+    ocean_cv
+    ocean_math
     vrs_logging
     vrs_os
     xprs
@@ -27,11 +29,12 @@ target_include_directories(vrs_utils_xprs
   PUBLIC
     $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-  PRIVATE ${ocean_SOURCE_DIR}/include
+  PRIVATE ${ocean_SOURCE_DIR}/impl
 )
-install(TARGETS vrs_utils_xprs EXPORT VRSLibTargets
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-  RUNTIME DESTINATION bin
-  INCLUDES DESTINATION include
-)
+
+#install(TARGETS vrs_utils_xprs EXPORT VRSLibTargets
+#  LIBRARY DESTINATION lib
+#  ARCHIVE DESTINATION lib
+#  RUNTIME DESTINATION bin
+#  INCLUDES DESTINATION include
+#)
