@@ -44,6 +44,7 @@ static constexpr int kImageWidth = 1280;
 static constexpr int kImageHeight = 720;
 static constexpr int kQuality = 95;
 
+namespace {
 void fill_in_row_jahne_rgb8(
     uint8_t* row,
     int width,
@@ -191,6 +192,8 @@ void ComputeMeanNoramlizedAbsDiff(double* result, PixelFrame& a, PixelFrame& b) 
 
   *result = sum / (a.getWidth() * a.getHeight());
 }
+
+} // namespace
 
 struct JxlVerificationTest : testing::Test, public ::testing::WithParamInterface<PixelFormat> {};
 
