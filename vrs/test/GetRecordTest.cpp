@@ -37,10 +37,9 @@ struct GetRecordTester : testing::Test {
   string kTestFile3 = os::pathJoin(coretech::getTestDataDir(), "VRS_Files/chunks.vrs");
   string kTestFile4 = os::pathJoin(coretech::getTestDataDir(), "VRS_Files/chunks-shuffled.vrs");
 };
-} // namespace
 
 // legacy implementation, without caching
-static const IndexRecord::RecordInfo* getRecord(
+const IndexRecord::RecordInfo* getRecord(
     vrs::RecordFileReader& file,
     StreamId streamId,
     Record::Type recordType,
@@ -58,8 +57,7 @@ static const IndexRecord::RecordInfo* getRecord(
   return nullptr;
 }
 
-inline void
-check(vrs::RecordFileReader& file, StreamId id, Record::Type type, uint32_t indexNumber) {
+void check(vrs::RecordFileReader& file, StreamId id, Record::Type type, uint32_t indexNumber) {
   // Compare the old method and the new method
   const IndexRecord::RecordInfo* ref = getRecord(file, id, type, indexNumber);
   EXPECT_EQ(ref, file.getRecord(id, type, indexNumber));
@@ -68,7 +66,7 @@ check(vrs::RecordFileReader& file, StreamId id, Record::Type type, uint32_t inde
   EXPECT_EQ(ref, file.getRecord(id, type, indexNumber));
 }
 
-static bool isCloserThan(
+bool isCloserThan(
     const IndexRecord::RecordInfo& closer,
     double timestamp,
     const IndexRecord::RecordInfo& farther) {
@@ -225,6 +223,8 @@ void checkIndex(vrs::RecordFileReader& file, uint32_t recordIndex) {
   r = file.getNearestRecordByTime(record.timestamp, 1e-6);
   EXPECT_NE(r, nullptr);
 }
+
+} // namespace
 
 TEST_F(GetRecordTester, GetRecordTest) {
   vrs::RecordFileReader file;

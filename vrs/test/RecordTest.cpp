@@ -231,7 +231,7 @@ TEST_F(RecordTester, indexSortTest) {
   checkIndexOrder(records);
 }
 
-void checkSortOrder(const vector<RecordFileWriter::SortRecord>& records) {
+static void checkSortOrder(const vector<RecordFileWriter::SortRecord>& records) {
   for (size_t first = 0; first < records.size(); first++) {
     for (size_t second = first + 1; second < records.size(); second++) {
       EXPECT_TRUE(records[first] < records[second]);

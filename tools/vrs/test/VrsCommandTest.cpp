@@ -34,7 +34,7 @@ using coretech::getTestDataDir;
 
 struct VrsCommandTest : testing::Test {};
 
-bool parse(VrsCommand& command, vector<string>& args, int& argn, int& outStatusCode) {
+static bool parse(VrsCommand& command, vector<string>& args, int& argn, int& outStatusCode) {
   argn = 0;
   outStatusCode = EXIT_SUCCESS;
   vector<char*> argvs(args.size());

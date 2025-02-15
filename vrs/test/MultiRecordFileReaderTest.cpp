@@ -107,6 +107,8 @@ class TestRecordable : public Recordable {
   MyMetadata metadata_;
 };
 
+namespace {
+
 struct VrsFileBuilder {
   explicit VrsFileBuilder(string path) : path_{std::move(path)} {
     XR_CHECK_FALSE(os::isFile(path_));
@@ -237,6 +239,8 @@ class RecordFormatTestStreamPlayer : public RecordFormatStreamPlayer {
   int counter{};
 };
 
+} // namespace
+
 class MultiRecordFileReaderTest : public testing::Test {};
 
 TEST_F(MultiRecordFileReaderTest, invalidFilePaths) {
@@ -285,6 +289,8 @@ TEST_F(MultiRecordFileReaderTest, relatedFiles) {
   removeFiles(unrelatedFilePaths);
 }
 
+namespace {
+
 vector<double> getNonDecreasingTimestamps(
     const size_t count,
     const double startTimestamp = 0,
@@ -298,6 +304,8 @@ vector<double> getNonDecreasingTimestamps(
   }
   return timestamps;
 }
+
+} // namespace
 
 TEST_F(MultiRecordFileReaderTest, multiFile) {
   const auto expectedTimestamps = getNonDecreasingTimestamps(50);

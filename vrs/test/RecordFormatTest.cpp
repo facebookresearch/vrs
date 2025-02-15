@@ -62,8 +62,6 @@ class TestRecordable : public Recordable {
   }
 };
 
-} // namespace
-
 #define FORMAT_EQUAL(_block_format, _cstring) \
   EXPECT_STREQ((_block_format).asString().c_str(), _cstring)
 
@@ -111,6 +109,8 @@ bool checkImageHeights(
       XR_VERIFY(spec.getPlaneHeight(2) == height2) &&
       XR_VERIFY(spec.getPlaneHeight(3) == height3) && XR_VERIFY(spec.getPlaneHeight(4) == 0);
 }
+
+} // namespace
 
 TEST_F(RecordFormatTest, testBlockFormat) {
   ContentBlock emptyString("");

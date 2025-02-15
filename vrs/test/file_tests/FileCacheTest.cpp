@@ -91,6 +91,8 @@ TEST_F(FileCacheTest, cacheDomainTest) {
   EXPECT_EQ(fcache->getFile(domain, "123.txt", location2), INVALID_DISK_DATA);
 }
 
+namespace {
+
 void verifyDetails(
     const string& cacheFile,
     const RecordFileReader& reader,
@@ -139,6 +141,8 @@ struct ThreadParam {
 void createRecordsThreadTask(ThreadParam* param) {
   testDetails(param->cacheFile, param->reader, param->hasIndex, true);
 }
+
+} // namespace
 
 TEST_F(FileCacheTest, detailsTest) {
   string kTestFile = os::pathJoin(coretech::getTestDataDir(), "VRS_Files/sample_file.vrs");

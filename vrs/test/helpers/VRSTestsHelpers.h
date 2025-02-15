@@ -84,14 +84,18 @@ struct FileConfig {
     totalRecordCount = kCameraCount * (2 + frameCount);
   }
   uint32_t frameRate;
-  uint32_t simulationDurationMs = 100;
+  uint32_t simulationDurationMs;
   size_t frameCount;
   size_t totalRecordCount;
 };
 
-const FileConfig kClassicFileConfig(30, 100);
-const FileConfig kLongFileConfig(30, 20000);
-const FileConfig kVeryLongFileConfig(90, 60000);
+const FileConfig& getClassicFileConfig();
+const FileConfig& getLongFileConfig();
+const FileConfig& getVeryLongFileConfig();
+
+#define kClassicFileConfig test::getClassicFileConfig()
+#define kLongFileConfig test::getLongFileConfig()
+#define kVeryLongFileConfig test::getVeryLongFileConfig()
 
 /// Parameterization of the VRS file creation, so we can simulate a wide variety of cases.
 struct CreateParams {

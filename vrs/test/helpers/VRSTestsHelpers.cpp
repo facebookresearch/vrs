@@ -34,6 +34,23 @@ using namespace std;
 using namespace vrs;
 using namespace vrs::test;
 
+namespace vrs::test {
+
+const FileConfig& getClassicFileConfig() {
+  static const FileConfig sClassicFileConfig(30, 100);
+  return sClassicFileConfig;
+}
+const FileConfig& getLongFileConfig() {
+  static const FileConfig sLongFileConfig(30, 20000);
+  return sLongFileConfig;
+}
+const FileConfig& getVeryLongFileConfig() {
+  static const FileConfig sVeryLongFileConfig(90, 60000);
+  return sVeryLongFileConfig;
+}
+
+} // namespace vrs::test
+
 namespace {
 
 // Detect if there was any attempt to got back in the file

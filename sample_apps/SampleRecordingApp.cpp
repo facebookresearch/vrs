@@ -36,7 +36,7 @@ using namespace vrs_sample_apps;
 namespace vrs_sample_apps {
 
 // Use your own clock source.
-double getTimestampSec() {
+static double getTimestampSec() {
   using namespace std::chrono;
   return duration_cast<duration<double>>(steady_clock::now().time_since_epoch()).count();
 }

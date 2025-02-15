@@ -219,7 +219,7 @@ struct ChunkCollector : public NewChunkHandler {
   map<size_t, string>& chunks;
 };
 
-void checkChunks(const map<size_t, string>& chunks, const string& path, size_t count) {
+static void checkChunks(const map<size_t, string>& chunks, const string& path, size_t count) {
   EXPECT_EQ(chunks.size(), count);
   if (!chunks.empty()) {
     auto iter = chunks.begin();
