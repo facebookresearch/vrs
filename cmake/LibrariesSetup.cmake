@@ -33,6 +33,18 @@ find_package(PNG REQUIRED)
 find_package(JPEG REQUIRED)
 find_package(TurboJpeg REQUIRED)
 
+if (BUILD_WITH_OPUS)
+  include(FetchContent)
+  FetchContent_Declare(
+    opus
+    URL      https://downloads.xiph.org/releases/opus/opus-1.5.2.tar.gz
+    URL_HASH SHA256=65c1d2f78b9f2fb20082c38cbe47c951ad5839345876e46941612ee87f9a7ce1
+  )
+  FetchContent_MakeAvailable(opus)
+  message("BUILD WITH OPUS: ON")
+endif()
+
+
 # Setup unit test infra, but only if unit tests are enabled
 if (UNIT_TESTS)
   enable_testing()
