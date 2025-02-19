@@ -19,13 +19,14 @@ var searchData=
   ['slamcameradata_16',['SlamCameraData',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a064343971dad4dc557deae1d5565a25d',1,'vrs']]],
   ['slamimudata_17',['SlamImuData',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5ae24168a6f8e7e551114b2d6b15c31391',1,'vrs']]],
   ['slammagnetometerdata_18',['SlamMagnetometerData',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a6c30d8125f6a7e88c6a54d73fc7c932b',1,'vrs']]],
-  ['state_19',['STATE',['../classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2cea2b848a8cc886d253d21a77c43cd50aae',1,'vrs::Record']]],
-  ['stepcountrecordableclass_20',['StepCountRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a7af2c95f40c2a214e7043614e815a643',1,'vrs']]],
-  ['stereoaudiorecordableclass_21',['StereoAudioRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a705e8d05e43ae1c71dc6cb56c7e7616a',1,'vrs']]],
-  ['streaming_22',['Streaming',['../namespacevrs.html#acb1b4358038394407db2b2dc6200afaeaac21d502848247aa2f578d0f718f5d1d',1,'vrs']]],
-  ['streamingbackward_23',['StreamingBackward',['../namespacevrs.html#acb1b4358038394407db2b2dc6200afaeae3cb7042f6a2a56c14df0f764735000b',1,'vrs']]],
-  ['streamingbidirectional_24',['StreamingBidirectional',['../namespacevrs.html#acb1b4358038394407db2b2dc6200afaea02c8e5bdc421c350b1a6a698ae5d4540',1,'vrs']]],
-  ['string_25',['String',['../namespacevrs.html#afb0b040e753b40173e69f247afa430a2a27118326006d3829667a400ad23d5d98',1,'vrs']]],
-  ['stringmap_26',['StringMap',['../namespacevrs.html#afb0b040e753b40173e69f247afa430a2aa217c0217d4330b7b43ec310cba690f1',1,'vrs']]],
-  ['syncrecordableclass_27',['SyncRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a9c5afd3ac39708896bb42a674d0c7b32',1,'vrs']]]
+  ['speechrecordableclass_19',['SpeechRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a24877c8a188794e16964b52b14924d42',1,'vrs']]],
+  ['state_20',['STATE',['../classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2cea2b848a8cc886d253d21a77c43cd50aae',1,'vrs::Record']]],
+  ['stepcountrecordableclass_21',['StepCountRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a7af2c95f40c2a214e7043614e815a643',1,'vrs']]],
+  ['stereoaudiorecordableclass_22',['StereoAudioRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a705e8d05e43ae1c71dc6cb56c7e7616a',1,'vrs']]],
+  ['streaming_23',['Streaming',['../namespacevrs.html#acb1b4358038394407db2b2dc6200afaeaac21d502848247aa2f578d0f718f5d1d',1,'vrs']]],
+  ['streamingbackward_24',['StreamingBackward',['../namespacevrs.html#acb1b4358038394407db2b2dc6200afaeae3cb7042f6a2a56c14df0f764735000b',1,'vrs']]],
+  ['streamingbidirectional_25',['StreamingBidirectional',['../namespacevrs.html#acb1b4358038394407db2b2dc6200afaea02c8e5bdc421c350b1a6a698ae5d4540',1,'vrs']]],
+  ['string_26',['String',['../namespacevrs.html#afb0b040e753b40173e69f247afa430a2a27118326006d3829667a400ad23d5d98',1,'vrs']]],
+  ['stringmap_27',['StringMap',['../namespacevrs.html#afb0b040e753b40173e69f247afa430a2aa217c0217d4330b7b43ec310cba690f1',1,'vrs']]],
+  ['syncrecordableclass_28',['SyncRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a9c5afd3ac39708896bb42a674d0c7b32',1,'vrs']]]
 ];
