@@ -124,6 +124,7 @@ const unordered_map<RecordableTypeId, const char*>& getRecordableTypeIdRegistry(
       {RecordableTypeId::InstructionRecordableClass, "Instruction Data Class"},
       {RecordableTypeId::ScriptRecordableClass, "Script Data Class"},
       {RecordableTypeId::ControlRecordableClass, "Control Data Class"},
+      {RecordableTypeId::PipelineEventRecordableClass, "Pipeline Event Data Class"},
 
       /// << Ground Truth >>
       {RecordableTypeId::GroundTruthRecordableClass, "Ground Truth Data Class"},
