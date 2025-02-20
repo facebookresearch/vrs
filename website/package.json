@@ -29,6 +29,7 @@
     "axios": "^0.28.0",
     "clsx": "^1.1.1",
     "docusaurus-plugin-internaldocs-fb": "1.18.5",
+    "dompurify": "^3.2.4",
     "file-loader": "^6.2.0",
     "micromatch": "^4.0.8",
     "prism-react-renderer": "^1.2.1",
