@@ -57,7 +57,7 @@ class DataPieceVector : public DataPiece {
   /// @param data: Pointer where to write the staged values.
   /// @param bufferSize: Max number of bytes to write.
   /// @return Number of bytes written.
-  size_t collectVariableData(int8_t* data, size_t bufferSize) const override {
+  size_t collectVariableData(int8_t* data, size_t bufferSize) override {
     const size_t writtenSize = min(bufferSize, getVariableSize());
     if (writtenSize > 0) {
       memcpy(data, stagedValues_.data(), writtenSize);
@@ -211,7 +211,7 @@ void DataPieceVector<string>::stage(const string* values, size_t count);
 template <>
 size_t DataPieceVector<string>::getVariableSize() const;
 template <>
-size_t DataPieceVector<string>::collectVariableData(int8_t* data, size_t bufferSize) const;
+size_t DataPieceVector<string>::collectVariableData(int8_t* data, size_t bufferSize);
 template <>
 void DataPieceVector<string>::setDefault(const string* defaultValues, size_t count) = delete;
 template <>

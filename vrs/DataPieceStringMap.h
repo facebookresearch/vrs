@@ -55,7 +55,7 @@ class DataPieceStringMap : public DataPiece {
   /// @param data: Pointer where to write the staged values.
   /// @param bufferSize: Max number of bytes to write.
   /// @return Number of bytes written.
-  size_t collectVariableData(int8_t* data, size_t bufferSize) const override;
+  size_t collectVariableData(int8_t* data, size_t bufferSize) override;
 
   /// Read-only access to the map of values you wish to write to disk.
   /// @return A const reference to the staged map<string, T>.

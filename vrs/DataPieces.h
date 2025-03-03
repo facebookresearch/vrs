@@ -32,9 +32,6 @@ using std::map;
 using std::ostream;
 using std::string;
 
-/// Forward declaration of a mystery type to avoid exposing a third party json library.
-struct JsonWrapper;
-
 /// \brief Abstract class representing a piece of information part of a DataLayout.
 ///
 /// DataPiece objects have a type (DataPieceType) and label (a text name),
@@ -164,7 +161,7 @@ class DataPiece {
   /// @param data: Pointer where to copy the variable-size data.
   /// @param bufferSize: Max number of bytes to copy.
   /// @return Number of bytes actually copied.
-  virtual size_t collectVariableData(int8_t* data, size_t bufferSize) const = 0;
+  virtual size_t collectVariableData(int8_t* data, size_t bufferSize) = 0;
   /// Get the name of the template element type T of the derived template class,
   /// or "string" in the case of DataPieceString.
   /// @return The DataPiece's element type name.

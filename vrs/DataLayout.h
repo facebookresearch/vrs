@@ -50,6 +50,9 @@ namespace internal {
 class DataLayouter;
 }
 
+/// Forward declaration of a mystery type to avoid exposing a third party json library.
+struct JsonWrapper;
+
 /// Specifier for a type of DataPiece.
 enum class DataPieceType : uint8_t {
   Undefined = 0, ///< Undefined type.
@@ -476,8 +479,13 @@ class DataLayout {
   /// After construction of a DataLayout, initializes/resets buffers to hold the DataPiece objects
   /// that have been registered for this DataLayout. This is generally, done automatically by VRS,
   /// but this might be useful for client code to manage a DataLayout creation manually.
-  /// In common practice, this is probably only needed for VRS code itself.
+  /// In common practice, this is probably only needed by the VRS code itself.
   void initLayout();
+
+  /// Export the DataLayout as json, using a specific profile.
+  /// @param jsonWrapper: Wrapper around a json type (to isolate any 3rd party library dependency).
+  /// @param profile: Profile describing what information needs to be exported as json.
+  void serialize(JsonWrapper& rj, const JsonFormatProfileSpec& profile) const;
 
   static bool mapPieces(
       const vector<DataPiece*>& searchPieces,

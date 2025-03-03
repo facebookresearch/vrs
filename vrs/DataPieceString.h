@@ -54,7 +54,7 @@ class DataPieceString : public DataPiece {
   /// @param data: Pointer where to write the staged string's characters.
   /// @param bufferSize: Max number of bytes to write.
   /// @return Number of characters written.
-  size_t collectVariableData(int8_t* data, size_t bufferSize) const override;
+  size_t collectVariableData(int8_t* data, size_t bufferSize) override;
 
   /// Stage a string value.
   /// Note: does not modify the value returned by get().

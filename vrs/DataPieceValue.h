@@ -66,7 +66,7 @@ class DataPieceValue : public DataPiece {
   }
   /// Copy staged variable-size data to a specific location. [doesn't apply].
   /// @internal
-  size_t collectVariableData(int8_t*, size_t) const override {
+  size_t collectVariableData(int8_t*, size_t) override {
     return 0;
   }
 
