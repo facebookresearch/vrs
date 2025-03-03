@@ -361,9 +361,14 @@ class DataLayouter {
   /// End the construction of a DataLayout.
   /// This is called by AutoDataLayoutEnd's constructor, and on demand by ManualDataLayout.
   void dataLayoutEnd() DISABLE_THREAD_SAFETY_ANALYSIS {
-    currentLayout_->initLayout();
+    XR_CHECK_NE(
+        currentLayout_,
+        nullptr,
+        "DataLayouter::dataLayoutEnd() called without prior matching call to DataLayouter::dataLayoutBegin().");
+    DataLayout* layout = currentLayout_;
     currentLayout_ = nullptr;
     mutex_.unlock();
+    layout->initLayout();
   }
   /// Start a sub-structure within a DataLayout, with its own "namespace".
   /// The DataPiece objects within that struct will have a label prepended with the namespace.
