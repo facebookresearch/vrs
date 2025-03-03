@@ -256,6 +256,8 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:a627e734a1477d69ea4e574126e253c14"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c01f8d2c61225c4c481a90b8e8f496e" id="r_a0c01f8d2c61225c4c481a90b8e8f496e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_layout.html#a0c01f8d2c61225c4c481a90b8e8f496e">initLayout</a> ()</td></tr>
 <tr class="separator:a0c01f8d2c61225c4c481a90b8e8f496e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65b3f4969463869e07e54b20a621ffdf" id="r_a65b3f4969463869e07e54b20a621ffdf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_layout.html#a65b3f4969463869e07e54b20a621ffdf">serialize</a> (JsonWrapper &amp;rj, const <a class="el" href="structvrs_1_1_json_format_profile_spec.html">JsonFormatProfileSpec</a> &amp;profile) const</td></tr>
+<tr class="separator:a65b3f4969463869e07e54b20a621ffdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-static-methods" name="pro-static-methods"></a>
 Static Protected Member Functions</h2></td></tr>
@@ -1121,7 +1123,7 @@ template&lt;class T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>After construction of a <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a>, initializes/resets buffers to hold the <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> objects that have been registered for this <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a>. This is generally, done automatically by VRS, but this might be useful for client code to manage a <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> creation manually. In common practice, this is probably only needed for VRS code itself. </p>
+<p>After construction of a <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a>, initializes/resets buffers to hold the <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> objects that have been registered for this <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a>. This is generally, done automatically by VRS, but this might be useful for client code to manage a <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> creation manually. In common practice, this is probably only needed by the VRS code itself. </p>
 
 </div>
 </div>
@@ -1316,6 +1318,49 @@ template&lt;class T &gt; </div>
   <table class="params">
     <tr><td class="paramname">out</td><td>Ostream to write to. </td></tr>
     <tr><td class="paramname">indent</td><td>Prefix to each output line, for nested presentation. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a65b3f4969463869e07e54b20a621ffdf" name="a65b3f4969463869e07e54b20a621ffdf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a65b3f4969463869e07e54b20a621ffdf">&#9670;&#160;</a></span>serialize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void vrs::DataLayout::serialize </td>
+          <td>(</td>
+          <td class="paramtype">JsonWrapper &amp;&#160;</td>
+          <td class="paramname"><em>rj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structvrs_1_1_json_format_profile_spec.html">JsonFormatProfileSpec</a> &amp;&#160;</td>
+          <td class="paramname"><em>profile</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Export the <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> as json, using a specific profile. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">jsonWrapper</td><td>Wrapper around a json type (to isolate any 3rd party library dependency). </td></tr>
+    <tr><td class="paramname">profile</td><td>Profile describing what information needs to be exported as json. </td></tr>
   </table>
   </dd>
 </dl>
