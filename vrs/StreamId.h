@@ -171,6 +171,7 @@ enum class RecordableTypeId : uint16_t {
   TextRecordableClass = 381, ///< For result data streams stored as text.
   EMGGestureRecordableClass = 382, ///< For EMG gesture data streams.
   SpeechRecordableClass = 383, ///< For speech/ASR data streams.
+  QuaternionRecordableClass = 384, ///< For quaternion data streams
 
   // << Annotations >>
   AnnotationRecordableClass = 400, ///< For annotation streams.

@@ -149,6 +149,7 @@ const unordered_map<RecordableTypeId, const char*>& getRecordableTypeIdRegistry(
       {RecordableTypeId::SegmentationRecordableClass, "Segmentation Data Class"},
       {RecordableTypeId::TextRecordableClass, "Text Data Class"},
       {RecordableTypeId::SpeechRecordableClass, "Speech Data Class"},
+      {RecordableTypeId::QuaternionRecordableClass, "Quaternion Data Class"},
 
       /// << Annotations >>
       {RecordableTypeId::AnnotationRecordableClass, "Annotation Data Class"},
