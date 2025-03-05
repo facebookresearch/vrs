@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['_7econtentblockreader_0',['~ContentBlockReader',['../classvrs_1_1_content_block_reader.html#a00e813723ee64728a743885ba3dd0880',1,'vrs::ContentBlockReader']]],
-  ['_7edatalayout_1',['~DataLayout',['../classvrs_1_1_data_layout.html#ab4b397a6aba99ed3279f685e65672738',1,'vrs::DataLayout']]]
+  ['zstd_0',['Zstd',['../namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2fa0c8468c9ff2f38e853335e1e40ade4c3',1,'vrs']]],
+  ['zstddecompressor_1',['ZstdDecompressor',['../classvrs_1_1_decompressor_1_1_zstd_decompressor.html',1,'vrs::Decompressor']]]
 ];
