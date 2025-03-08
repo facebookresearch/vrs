@@ -16,6 +16,7 @@
 
 #include "TelemetryLogger.h"
 
+#include <mutex>
 #include <vector>
 
 #define DEFAULT_LOG_CHANNEL "TelemetryLogger"
@@ -28,18 +29,22 @@ using namespace std;
 
 namespace vrs {
 
-std::atomic<TelemetryLogger*>& TelemetryLogger::instance() {
+std::atomic<TelemetryLogger*>& TelemetryLogger::loggerPtr() {
   static TelemetryLogger sDefaultLogger;
   static std::atomic<TelemetryLogger*> sInstance{&sDefaultLogger};
   return sInstance;
 }
 
 void TelemetryLogger::setLogger(unique_ptr<TelemetryLogger>&& telemetryLogger) {
-  static vector<unique_ptr<TelemetryLogger>> sLoggers;
-  TelemetryLogger* oldInstance = getInstance();
-  instance() = telemetryLogger.get();
-  sLoggers.emplace_back(std::move(telemetryLogger));
-  oldInstance->stop();
+  TelemetryLogger* previousLogger;
+  {
+    static mutex sMutex;
+    lock_guard<mutex> lock(sMutex);
+    static vector<unique_ptr<TelemetryLogger>> sLoggers;
+    sLoggers.emplace_back(std::move(telemetryLogger));
+    previousLogger = loggerPtr().exchange(sLoggers.back().get());
+  }
+  previousLogger->stop();
 }
 
 void TelemetryLogger::logEvent(LogEvent&& event) {

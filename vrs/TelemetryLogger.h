@@ -208,9 +208,9 @@ class TelemetryLogger {
   virtual void stop() {}
 
  private:
-  static std::atomic<TelemetryLogger*>& instance();
+  static std::atomic<TelemetryLogger*>& loggerPtr();
   static inline TelemetryLogger* getInstance() {
-    return instance().load(std::memory_order_relaxed);
+    return loggerPtr().load(std::memory_order_relaxed);
   }
 };
 
