@@ -20,6 +20,6 @@ var searchData=
   ['trackbackgroundthreadqueuebytesize_17',['trackBackgroundThreadQueueByteSize',['../classvrs_1_1_record_file_writer.html#ae13cabd33d9e7b2b7f7a97d52c13291a',1,'vrs::RecordFileWriter']]],
   ['trafficevent_18',['TrafficEvent',['../structvrs_1_1_traffic_event.html',1,'vrs']]],
   ['truncate_19',['truncate',['../classvrs_1_1_write_file_handler.html#a8cb33f91f322edd018ae548bfd77643f',1,'vrs::WriteFileHandler::truncate()'],['../classvrs_1_1_disk_file_t.html#a913a5a3dc08e6b92b767d0f935d155e5',1,'vrs::DiskFileT::truncate()']]],
-  ['type_20',['type',['../classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce',1,'vrs::Record::Type'],['../structvrs_1_1_json_format_profile_spec.html#ad3fac6d5ba31cc8f3e95e0e0226a3817',1,'vrs::JsonFormatProfileSpec::type']]],
+  ['type_20',['type',['../structvrs_1_1_json_format_profile_spec.html#ad3fac6d5ba31cc8f3e95e0e0226a3817',1,'vrs::JsonFormatProfileSpec::type'],['../classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce',1,'vrs::Record::Type']]],
   ['typename_21',['typeName',['../classvrs_1_1_record.html#a2b7323431f35d7dffea5d8fc42b62ac4',1,'vrs::Record']]]
 ];

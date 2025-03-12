@@ -101,13 +101,17 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>logTraffic</b
 <tr class="memitem:aaf2e096102462c4a47911c3b6787ea57" id="r_aaf2e096102462c4a47911c3b6787ea57"><td class="memItemLeft" align="right" valign="top"><a id="aaf2e096102462c4a47911c3b6787ea57" name="aaf2e096102462c4a47911c3b6787ea57"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>flushEvents</b> ()</td></tr>
 <tr class="separator:aaf2e096102462c4a47911c3b6787ea57"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c2bb79351867e6ef964178214f44065" id="r_a1c2bb79351867e6ef964178214f44065"><td class="memItemLeft" align="right" valign="top"><a id="a1c2bb79351867e6ef964178214f44065" name="a1c2bb79351867e6ef964178214f44065"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>start</b> ()</td></tr>
+<tr class="memdesc:a1c2bb79351867e6ef964178214f44065"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start telemetry: background threads should be started, as needed. <br /></td></tr>
+<tr class="separator:a1c2bb79351867e6ef964178214f44065"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a430a748d3ceac9490884e92c3840c305" id="r_a430a748d3ceac9490884e92c3840c305"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_telemetry_logger.html#a430a748d3ceac9490884e92c3840c305">stop</a> ()</td></tr>
 <tr class="separator:a430a748d3ceac9490884e92c3840c305"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:ad5791a5e18d86c8578a566a95e8190bf" id="r_ad5791a5e18d86c8578a566a95e8190bf"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_telemetry_logger.html#ad5791a5e18d86c8578a566a95e8190bf">setLogger</a> (std::unique_ptr&lt; <a class="el" href="classvrs_1_1_telemetry_logger.html">TelemetryLogger</a> &gt; &amp;&amp;telemetryLogger)</td></tr>
-<tr class="separator:ad5791a5e18d86c8578a566a95e8190bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6d91723c0d86e9445399036cf3b93445" id="r_a6d91723c0d86e9445399036cf3b93445"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_telemetry_logger.html#a6d91723c0d86e9445399036cf3b93445">setLogger</a> (std::unique_ptr&lt; <a class="el" href="classvrs_1_1_telemetry_logger.html">TelemetryLogger</a> &gt; telemetryLogger=nullptr)</td></tr>
+<tr class="separator:a6d91723c0d86e9445399036cf3b93445"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acf7f0886a08a2a79e2014b4ac1fa0fe5" id="r_acf7f0886a08a2a79e2014b4ac1fa0fe5"><td class="memItemLeft" align="right" valign="top"><a id="acf7f0886a08a2a79e2014b4ac1fa0fe5" name="acf7f0886a08a2a79e2014b4ac1fa0fe5"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>error</b> (const <a class="el" href="structvrs_1_1_operation_context.html">OperationContext</a> &amp;operationContext, const string &amp;message, const string &amp;serverMessage={})</td></tr>
 <tr class="memdesc:acf7f0886a08a2a79e2014b4ac1fa0fe5"><td class="mdescLeft">&#160;</td><td class="mdescRight">methods for clients to use without having to get an instance, etc <br /></td></tr>
@@ -144,8 +148,8 @@ static constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"
 <div class="textblock"><p><a class="el" href="classvrs_1_1_telemetry_logger.html" title="TelemetryLogger to report important events.">TelemetryLogger</a> to report important events. </p>
 <p>Telemetry building block infra to report events from VRS operations. The default implementation simply logs using XR_LOGI and XR_LOGE, XR_LOGW, but can easily be augmented to implement telemetry in a central database. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="ad5791a5e18d86c8578a566a95e8190bf" name="ad5791a5e18d86c8578a566a95e8190bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad5791a5e18d86c8578a566a95e8190bf">&#9670;&#160;</a></span>setLogger()</h2>
+<a id="a6d91723c0d86e9445399036cf3b93445" name="a6d91723c0d86e9445399036cf3b93445"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6d91723c0d86e9445399036cf3b93445">&#9670;&#160;</a></span>setLogger()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -156,8 +160,8 @@ static constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"
         <tr>
           <td class="memname">void vrs::TelemetryLogger::setLogger </td>
           <td>(</td>
-          <td class="paramtype">std::unique_ptr&lt; <a class="el" href="classvrs_1_1_telemetry_logger.html">TelemetryLogger</a> &gt; &amp;&amp;&#160;</td>
-          <td class="paramname"><em>telemetryLogger</em></td><td>)</td>
+          <td class="paramtype">std::unique_ptr&lt; <a class="el" href="classvrs_1_1_telemetry_logger.html">TelemetryLogger</a> &gt;&#160;</td>
+          <td class="paramname"><em>telemetryLogger</em> = <code>nullptr</code></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -167,7 +171,12 @@ static constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"
   </tr>
 </table>
 </div><div class="memdoc">
-<p>set logger and get back the previous one, making sure the assignment is performed before the previous logger is deleted. </p>
+<p>Change active telemetry logger. The new logger will be started after assignment, and the old one will be stopped after. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">telemetryLogger</td><td>new <a class="el" href="classvrs_1_1_telemetry_logger.html" title="TelemetryLogger to report important events.">TelemetryLogger</a>, or nullptr for default logger. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -193,7 +202,7 @@ static constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"
   </tr>
 </table>
 </div><div class="memdoc">
-<p>End telemetry: All background threads should be stopped, and all pending events should be flushed, and further events should be ignored. </p>
+<p>End telemetry: All background threads should be stopped. All pending events should be flushed, and further events should be ignored. </p>
 
 </div>
 </div>
