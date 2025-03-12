@@ -93,6 +93,10 @@ namespace tag_conventions {
 
   // OS fingerprint: Operating system build signature
   constexpr const char* kOsFingerprint = "os_fingerprint";
+  // OS version: Operating system version
+  constexpr const char* kOsBuildVersion = "os_build_version";
+  // OS build number: Operating system build number
+  constexpr const char* kOsBranch = "os_branch";
   // SW compile time: when the recording software was compiled
   constexpr const char* kSoftwareCompileDate = "software_compile_date";
   // SW revision: source control revision of the software
