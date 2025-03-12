@@ -29,20 +29,29 @@ using namespace std;
 
 namespace vrs {
 
-std::atomic<TelemetryLogger*>& TelemetryLogger::loggerPtr() {
+TelemetryLogger* TelemetryLogger::getDefaultLogger() {
   static TelemetryLogger sDefaultLogger;
-  static std::atomic<TelemetryLogger*> sInstance{&sDefaultLogger};
-  return sInstance;
+  return &sDefaultLogger;
 }
 
-void TelemetryLogger::setLogger(unique_ptr<TelemetryLogger>&& telemetryLogger) {
-  TelemetryLogger* previousLogger;
+std::atomic<TelemetryLogger*>& TelemetryLogger::getCurrentLogger() {
+  static std::atomic<TelemetryLogger*> sCurrentLogger{getDefaultLogger()};
+  return sCurrentLogger;
+}
+
+void TelemetryLogger::setLogger(unique_ptr<TelemetryLogger> telemetryLogger) {
+  TelemetryLogger* previousLogger = nullptr;
   {
     static mutex sMutex;
     lock_guard<mutex> lock(sMutex);
     static vector<unique_ptr<TelemetryLogger>> sLoggers;
-    sLoggers.emplace_back(std::move(telemetryLogger));
-    previousLogger = loggerPtr().exchange(sLoggers.back().get());
+    if (telemetryLogger) {
+      telemetryLogger->start();
+      previousLogger = getCurrentLogger().exchange(telemetryLogger.get());
+      sLoggers.push_back(std::move(telemetryLogger));
+    } else {
+      previousLogger = getCurrentLogger().exchange(getDefaultLogger());
+    }
   }
   previousLogger->stop();
 }

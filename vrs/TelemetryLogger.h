@@ -161,9 +161,10 @@ class TelemetryLogger {
   static constexpr const char* kWarningType = "warning";
   static constexpr const char* kInfoType = "info";
 
-  /// set logger and get back the previous one, making sure the assignment is performed
-  /// before the previous logger is deleted.
-  static void setLogger(std::unique_ptr<TelemetryLogger>&& telemetryLogger);
+  /// Change active telemetry logger.
+  /// The new logger will be started after assignment, and the old one will be stopped after.
+  /// @param telemetryLogger: new TelemetryLogger, or nullptr for default logger.
+  static void setLogger(std::unique_ptr<TelemetryLogger> telemetryLogger = nullptr);
 
   /// methods for clients to use without having to get an instance, etc
   static inline void error(
@@ -203,14 +204,18 @@ class TelemetryLogger {
   virtual void logTraffic(const OperationContext& operationContext, const TrafficEvent& event);
   virtual void flushEvents() {}
 
-  /// End telemetry: All background threads should be stopped, and all pending events should be
-  /// flushed, and further events should be ignored.
+  /// Start telemetry: background threads should be started, as needed.
+  virtual void start() {}
+  /// End telemetry: All background threads should be stopped.
+  /// All pending events should be flushed, and further events should be ignored.
   virtual void stop() {}
 
  private:
-  static std::atomic<TelemetryLogger*>& loggerPtr();
+  static TelemetryLogger* getDefaultLogger();
+  static std::atomic<TelemetryLogger*>& getCurrentLogger();
+
   static inline TelemetryLogger* getInstance() {
-    return loggerPtr().load(std::memory_order_relaxed);
+    return getCurrentLogger().load(std::memory_order_relaxed);
   }
 };
 
