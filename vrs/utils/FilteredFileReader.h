@@ -53,6 +53,8 @@ struct RecordFilterParams {
   bool includeExcludeStream(const string& plusMinusStreamFilter);
   bool includeType(const string& type);
   bool excludeType(const string& type);
+
+  void getIncludedStreams(RecordFileReader& reader, set<StreamId>& outFilteredSet) const;
 };
 
 /// Class to filter out some parts of a VRS file when reading it.

@@ -52,7 +52,7 @@ namespace {
 ///   R    Same as R-
 ///   R-<flavor> Returns all the streams in the file with that recordable type id and flavor
 /// Actual examples: 1004-1 or 1004+3 or 1005- or 1005 or 100-test/synthetic/grey8
-bool stringToIds(const string& ids, RecordFileReader& reader, set<StreamId>& outStreamIds) {
+bool stringToIds(const string& ids, const RecordFileReader& reader, set<StreamId>& outStreamIds) {
   StreamId singleId = reader.getStreamForName(ids);
   if (singleId.isValid()) {
     outStreamIds.insert(singleId);
@@ -125,6 +125,47 @@ bool isValidStreamFilter(const string& numericName) {
   }
 }
 
+void computeIncludedStreams(
+    const RecordFileReader& reader,
+    const vector<string>& streamFilters,
+    set<StreamId>& outFilteredSet) {
+  const auto& allStreams = reader.getStreams();
+  unique_ptr<set<StreamId>> newSet;
+  for (auto iter = streamFilters.begin(); iter != streamFilters.end(); ++iter) {
+    if (*iter == "+") {
+      set<StreamId> argIds;
+      stringToIds(*(++iter), reader, argIds);
+      if (!newSet) {
+        // first command is add? start from empty set
+        newSet = make_unique<set<StreamId>>(std::move(argIds));
+      } else {
+        newSet->insert(argIds.begin(), argIds.end());
+      }
+    } else if (*iter == "-") {
+      set<StreamId> argIds;
+      stringToIds(*(++iter), reader, argIds);
+      if (!newSet) {
+        // first command is remove? start with set of all known streams
+        newSet = make_unique<set<StreamId>>(allStreams);
+      }
+      for (auto id : argIds) {
+        newSet->erase(id);
+      }
+    }
+  }
+  if (newSet) {
+    // Only include streams present in the file
+    outFilteredSet.clear();
+    for (auto id : *newSet) {
+      if (allStreams.find(id) != allStreams.end()) {
+        outFilteredSet.insert(id);
+      }
+    }
+  } else {
+    outFilteredSet = allStreams;
+  }
+}
+
 } // namespace
 
 bool RecordFilterParams::includeStream(const string& streamFilter) {
@@ -171,6 +212,11 @@ bool RecordFilterParams::excludeType(const string& type) {
   typeFilters.emplace_back("-");
   typeFilters.emplace_back(type);
   return true;
+}
+
+void RecordFilterParams::getIncludedStreams(RecordFileReader& reader, set<StreamId>& outFilteredSet)
+    const {
+  computeIncludedStreams(reader, streamFilters, outFilteredSet);
 }
 
 int FilteredFileReader::setSource(
@@ -303,41 +349,7 @@ void FilteredFileReader::applyFilters(const RecordFilterParams& filters) {
 }
 
 void FilteredFileReader::applyRecordableFilters(const vector<string>& filters) {
-  const auto& fileStreams = reader.getStreams();
-  unique_ptr<set<StreamId>> newSet;
-  for (auto iter = filters.begin(); iter != filters.end(); ++iter) {
-    if (*iter == "+") {
-      set<StreamId> argIds;
-      stringToIds(*(++iter), reader, argIds);
-      if (!newSet) {
-        // first command is add? start from empty set
-        newSet = make_unique<set<StreamId>>(std::move(argIds));
-      } else {
-        newSet->insert(argIds.begin(), argIds.end());
-      }
-    } else if (*iter == "-") {
-      set<StreamId> argIds;
-      stringToIds(*(++iter), reader, argIds);
-      if (!newSet) {
-        // first command is remove? start with set of all known streams
-        newSet = make_unique<set<StreamId>>(fileStreams);
-      }
-      for (auto id : argIds) {
-        newSet->erase(id);
-      }
-    }
-  }
-  if (newSet) {
-    // Only include streams present in the file
-    this->filter.streams.clear();
-    for (auto id : *newSet) {
-      if (fileStreams.find(id) != fileStreams.end()) {
-        this->filter.streams.insert(id);
-      }
-    }
-  } else {
-    this->filter.streams = fileStreams;
-  }
+  computeIncludedStreams(reader, filters, filter.streams);
 }
 
 void FilteredFileReader::applyTypeFilters(const vector<string>& filters) {
