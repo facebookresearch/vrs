@@ -187,13 +187,20 @@ bool RecordFilterParams::excludeStream(const string& streamFilter) {
 }
 
 bool RecordFilterParams::includeExcludeStream(const string& plusMinusStreamFilter) {
-  char first = *plusMinusStreamFilter.c_str();
-  if (first == '+') {
-    return includeStream(plusMinusStreamFilter.substr(1));
-  } else if (first == '-' || first == '~') {
-    return excludeStream(plusMinusStreamFilter.substr(1));
+  vector<string> ids;
+  helpers::split(plusMinusStreamFilter, ',', ids, true, " \t");
+  bool valid = true;
+  for (const auto& id : ids) {
+    char first = *id.c_str();
+    if (first == '+') {
+      valid &= includeStream(id.substr(1));
+    } else if (first == '-' || first == '~') {
+      valid &= excludeStream(id.substr(1));
+    } else {
+      valid &= includeStream(id);
+    }
   }
-  return includeStream(plusMinusStreamFilter);
+  return valid;
 }
 
 bool RecordFilterParams::includeType(const string& type) {
