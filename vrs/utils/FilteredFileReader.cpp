@@ -226,6 +226,26 @@ void RecordFilterParams::getIncludedStreams(RecordFileReader& reader, set<Stream
   computeIncludedStreams(reader, streamFilters, outFilteredSet);
 }
 
+string RecordFilterParams::getStreamFiltersConfiguration(std::string_view configName) const {
+  string streams;
+  if (!streamFilters.empty()) {
+    streams.reserve(configName.size() + streamFilters.size() * 10 + 10);
+    streams.append(configName).append("=[");
+    auto iter = streamFilters.begin();
+    while (iter != streamFilters.end()) {
+      streams.append(*iter++);
+      if (iter != streamFilters.end()) {
+        streams.append(*iter++);
+      }
+      if (iter != streamFilters.end()) {
+        streams.append(",");
+      }
+    }
+    streams.append("]");
+  }
+  return streams;
+}
+
 int FilteredFileReader::setSource(
     const string& filePath,
     const unique_ptr<FileHandler>& fileHandler) {

@@ -17,6 +17,7 @@
 #pragma once
 
 #include <limits>
+#include <string_view>
 
 #include <vrs/Record.h>
 #include <vrs/RecordFileReader.h>
@@ -55,6 +56,7 @@ struct RecordFilterParams {
   bool excludeType(const string& type);
 
   void getIncludedStreams(RecordFileReader& reader, set<StreamId>& outFilteredSet) const;
+  string getStreamFiltersConfiguration(std::string_view configName) const;
 };
 
 /// Class to filter out some parts of a VRS file when reading it.
