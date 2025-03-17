@@ -122,6 +122,8 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;</b> (con
 <tr class="separator:a3e2af94a5a0048e01921d2f8dc0b3c83"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7c55f9e889a543cee6f79f182b537f44" id="r_a7c55f9e889a543cee6f79f182b537f44"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_stream_id.html#a7c55f9e889a543cee6f79f182b537f44">getName</a> () const</td></tr>
 <tr class="separator:a7c55f9e889a543cee6f79f182b537f44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a728290777bcaca8f825178bd8a820de0" id="r_a728290777bcaca8f825178bd8a820de0"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_stream_id.html#a728290777bcaca8f825178bd8a820de0">getFullName</a> () const</td></tr>
+<tr class="separator:a728290777bcaca8f825178bd8a820de0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5970a4c200ee60f356a4dbe33820ab9e" id="r_a5970a4c200ee60f356a4dbe33820ab9e"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_stream_id.html#a5970a4c200ee60f356a4dbe33820ab9e">getNumericName</a> () const</td></tr>
 <tr class="separator:a5970a4c200ee60f356a4dbe33820ab9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -210,6 +212,24 @@ static <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>&#160;</td><
 
 </div>
 </div>
+<a id="a728290777bcaca8f825178bd8a820de0" name="a728290777bcaca8f825178bd8a820de0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a728290777bcaca8f825178bd8a820de0">&#9670;&#160;</a></span>getFullName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">string vrs::StreamId::getFullName </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get a complete name for the device, combining the numeric name and recordable type name. </p><dl class="section return"><dt>Returns</dt><dd>Numeric name and recordable type name. </dd></dl>
+
+</div>
+</div>
 <a id="add7eee14c0e75c86668f5bf81a17e5ce" name="add7eee14c0e75c86668f5bf81a17e5ce"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#add7eee14c0e75c86668f5bf81a17e5ce">&#9670;&#160;</a></span>getInstanceId()</h2>
 
@@ -268,7 +288,7 @@ static <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>&#160;</td><
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get a name combining the recordable type and the instance id, as numbers. </p><dl class="section return"><dt>Returns</dt><dd><a class="el" href="classvrs_1_1_recordable.html" title="Class to override to implement a record producing device, or virtual device.">Recordable</a> name, using numeric values. </dd></dl>
+<p>Get a name combining the recordable type and the instance id, as numbers. </p><dl class="section return"><dt>Returns</dt><dd><a class="el" href="classvrs_1_1_recordable.html" title="Class to override to implement a record producing device, or virtual device.">Recordable</a> type ID numeric value and instance ID. </dd></dl>
 
 </div>
 </div>
@@ -320,7 +340,7 @@ static <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>&#160;</td><
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Get the name of the type of device. </p><dl class="section return"><dt>Returns</dt><dd>English readable recordable name. </dd></dl>
+<p>Get the name of the type of device. </p><dl class="section return"><dt>Returns</dt><dd>Descriptive recordable type name. </dd></dl>
 
 </div>
 </div>
