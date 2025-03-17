@@ -64,6 +64,13 @@ void TelemetryLogger::logEvent(LogEvent&& event) {
         event.operationContext.sourceLocation,
         event.message,
         event.serverReply);
+  } else if (event.type == TelemetryLogger::kInfoType) {
+    XR_LOGI(
+        "{}, {}: {}, {}",
+        event.operationContext.operation,
+        event.operationContext.sourceLocation,
+        event.message,
+        event.serverReply);
   } else {
     XR_LOGW(
         "{}, {}: {}, {}",
