@@ -808,11 +808,10 @@ int FileReader::readRecordIfNeeded(
 #endif
   if (log) {
     fmt::print(
-        "Reading {} record #{}, {} - {}\n",
+        "Reading {} record #{}, {}\n",
         toString(record.recordType),
         recordIndex,
-        record.streamId.getNumericName(),
-        record.streamId.getTypeName());
+        record.streamId.getFullName());
   }
   int error = fileReader_->readRecord(record);
   if (error != 0) {

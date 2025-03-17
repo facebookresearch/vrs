@@ -276,15 +276,18 @@ class StreamId {
   }
 
   /// Get the name of the type of device.
-  /// @return English readable recordable name.
+  /// @return Descriptive recordable type name.
   string getTypeName() const {
     return toString(typeId_);
   }
   /// Get a readable name for the device, combining the recordable type name and the instance id.
   /// @return English readable recordable name, including the instance id.
   string getName() const;
+  /// Get a complete name for the device, combining the numeric name and recordable type name.
+  /// @return Numeric name and recordable type name.
+  string getFullName() const;
   /// Get a name combining the recordable type and the instance id, as numbers.
-  /// @return Recordable name, using numeric values.
+  /// @return Recordable type ID numeric value and instance ID.
   string getNumericName() const;
   /// Convert from a stream ID numeric string representation
   /// @param numericName: a stream ID name in numeric representation, e.g., "1100-1"
