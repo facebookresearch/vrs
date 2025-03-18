@@ -112,6 +112,7 @@ enum class RecordableTypeId : uint16_t {
   DistanceRecordableClass = 257, ///< Distance data streams.
   ActiveMinutesRecordableClass = 258, ///< Active minutes data streams.
   HeadingRecordableClass = 259, ///< Heading data streams.
+  // << Discrete sensors continue below at 500 >>
 
   // << Calibration, Setup, Diagnostic, etc >>
   CalibrationRecordableClass = 260, ///< For calibration data streams.
@@ -175,6 +176,9 @@ enum class RecordableTypeId : uint16_t {
 
   // << Annotations >>
   AnnotationRecordableClass = 400, ///< For annotation streams.
+
+  // << Discrete Sensors (continued) >>
+  AmbientLightRecordableClass = 500, ///< Ambient light data streams.
 
   // << Test, Samples and other fake devices >>
   SampleDeviceRecordableClass = 998, ///< For sample device streams.
