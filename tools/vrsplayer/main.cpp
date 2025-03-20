@@ -85,7 +85,7 @@ int main(int argc, char* argv[]) {
   parser.setApplicationDescription("VRSplayer");
   parser.addHelpOption();
   parser.addVersionOption();
-  parser.addPositionalArgument("url", "https://about.facebook.com/realitylabs/");
+  parser.addPositionalArgument("url", "https://about.meta.com/realitylabs");
   parser.process(app);
 
   vrsp::PlayerWindow playerWindow(app);
