@@ -199,13 +199,13 @@ void RecordFilterCopier::processRecord(const CurrentRecord& record, uint32_t rea
 
 void RecordFilterCopier::finishRecordProcessing(const CurrentRecord& record) {
   if (!skipRecord_) {
+    CurrentRecord modifiedHeader(record);
+    doHeaderEdits(modifiedHeader);
     if (copyVerbatim_) {
-      writer_.createRecord(record, verbatimRecordData_);
+      writer_.createRecord(modifiedHeader, verbatimRecordData_);
     } else {
       // filter & flush the collected data, in the order collected
       FilteredChunksSource chunkedSource(chunks_);
-      CurrentRecord modifiedHeader(record);
-      doHeaderEdits(modifiedHeader);
       writer_.createRecord(modifiedHeader, chunkedSource);
     }
   }
