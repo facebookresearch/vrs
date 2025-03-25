@@ -24,6 +24,7 @@
 #include <QtWidgets>
 
 #define DEFAULT_LOG_CHANNEL "PlayerUI"
+#include <logging/Log.h>
 #include <logging/Verify.h>
 
 #include "VideoTime.h"
@@ -296,6 +297,7 @@ void PlayerUI::openPath(const QString& path) {
     setSolidBackground(solidBackground.value<bool>());
   }
   resizeIfNecessary();
+  emit newFileLoaded();
 }
 
 void PlayerUI::resizeToDefault() {

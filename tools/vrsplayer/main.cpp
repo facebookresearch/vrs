@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
   ::arvr::logging::setGlobalLogLevel(arvr::logging::Level::Info);
 
   platformConfig();
-  QApplication app(argc, argv);
+  vrsp::VrsPlayerApplication app(argc, argv);
 
   QApplication::setStyle("Fusion");
 
@@ -90,5 +90,5 @@ int main(int argc, char* argv[]) {
 
   vrsp::PlayerWindow playerWindow(app);
 
-  return playerWindow.processCommandLine(parser);
+  return app.run(playerWindow.getPlayerUI(), parser);
 }

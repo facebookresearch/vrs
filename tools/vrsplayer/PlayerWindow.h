@@ -23,7 +23,6 @@
 #include <QAction>
 #include <QApplication>
 #include <QMainWindow>
-#include <QtCore/QCommandLineParser>
 
 #include "PlayerUI.h"
 
@@ -37,8 +36,6 @@ enum class AudioMode {
 
 class PlayerWindow : public QMainWindow {
   Q_OBJECT public : explicit PlayerWindow(QApplication& app);
-
-  int processCommandLine(QCommandLineParser& parser);
 
   void createMenus();
 

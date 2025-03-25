@@ -29,6 +29,7 @@
 #include <qwidget.h>
 
 #include "FileReader.h"
+#include "VrsPlayerApplication.h"
 
 QT_BEGIN_NAMESPACE
 class QHBoxLayout;
@@ -71,6 +72,7 @@ class PlayerUI : public QWidget {
   }
 
  signals:
+  void newFileLoaded();
   void overlaySettingChanged();
   void selectedAudioChannelsChanged(uint32_t leftAudioChannel, uint32_t rightAudioChannel);
 

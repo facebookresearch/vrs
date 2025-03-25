@@ -45,7 +45,6 @@ inline QKeySequence shortcut(int keyA, int keyB, int keyC = 0) {
 
 PlayerWindow::PlayerWindow(QApplication& app) : QMainWindow(nullptr), player_{this} {
   setCentralWidget(&player_);
-  app.installEventFilter(&player_);
   createMenus();
   connect(
       &player_.getFileReader(),
@@ -54,22 +53,7 @@ PlayerWindow::PlayerWindow(QApplication& app) : QMainWindow(nullptr), player_{th
       &PlayerWindow::updateLayoutAndPresetMenu);
   connect(&player_, &PlayerUI ::overlaySettingChanged, this, &PlayerWindow::updateTextOverlayMenu);
   setWindowFlags(windowFlags() | Qt::CustomizeWindowHint | Qt::WindowMinMaxButtonsHint);
-}
-
-int PlayerWindow::processCommandLine(QCommandLineParser& parser) {
-  if (!parser.positionalArguments().isEmpty()) {
-    const QString& arg = parser.positionalArguments().constFirst();
-    vrs::FileSpec fspec;
-    if (!arg.isEmpty() && fspec.fromPathJsonUri(arg.toStdString()) == 0) {
-      player_.openPath(arg);
-    }
-  } else {
-    player_.openLastFile();
-  }
-  player_.resizeToDefault();
-  show();
   QApplication::setActiveWindow(this);
-  return QApplication::exec();
 }
 
 void PlayerWindow::createMenus() {
