@@ -78,6 +78,7 @@ $(function() {
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-attribs">Static Public Attributes</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classvrs_1_1_content_block-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">vrs::ContentBlock Class Reference</div></div>
 </div><!--header-->
@@ -87,6 +88,15 @@ $(function() {
  <a href="classvrs_1_1_content_block.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_record_format_8h_source.html">RecordFormat.h</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for vrs::ContentBlock:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classvrs_1_1_content_block.png" usemap="#vrs::ContentBlock_map" alt=""/>
+  <map id="vrs::ContentBlock_map" name="vrs::ContentBlock_map">
+<area href="classvrs_1_1_custom_content_block.html" alt="vrs::CustomContentBlock" shape="rect" coords="0,56,151,80"/>
+  </map>
+</div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -151,6 +161,8 @@ size_t&#160;</td><td class="memItemRight" valign="bottom"><b>getBlockSize</b> ()
 <a class="el" href="namespacevrs.html#ae73984aca85d0aa7b6f3406cd9f2f6ea">ContentType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getContentType</b> () const</td></tr>
 <tr class="memdesc:a6afe9948577c6e1cc8bcc65ac9bf5aae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the ContentType of the block. <br /></td></tr>
 <tr class="separator:a6afe9948577c6e1cc8bcc65ac9bf5aae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d69c786caafa110a4afc2d296d9089e" id="r_a7d69c786caafa110a4afc2d296d9089e"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_content_block.html#a7d69c786caafa110a4afc2d296d9089e">getCustomContentBlockFormat</a> () const</td></tr>
+<tr class="separator:a7d69c786caafa110a4afc2d296d9089e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af95f39431c4d860f6400bd59b7951070" id="r_af95f39431c4d860f6400bd59b7951070"><td class="memItemLeft" align="right" valign="top"><a id="af95f39431c4d860f6400bd59b7951070" name="af95f39431c4d860f6400bd59b7951070"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (const <a class="el" href="classvrs_1_1_content_block.html">ContentBlock</a> &amp;rhs) const</td></tr>
 <tr class="separator:af95f39431c4d860f6400bd59b7951070"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -176,6 +188,24 @@ Static Public Attributes</h2></td></tr>
 static const size_t&#160;</td><td class="memItemRight" valign="bottom"><b>kSizeUnknown</b> = numeric_limits&lt;size_t&gt;::max()</td></tr>
 <tr class="memdesc:af5bf7a6af194725194549e35af27e418"><td class="mdescLeft">&#160;</td><td class="mdescRight">Special value used to represent an unknown block size. <br /></td></tr>
 <tr class="separator:af5bf7a6af194725194549e35af27e418"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr class="memitem:a83e504a27be148512e0cb18781f40a38" id="r_a83e504a27be148512e0cb18781f40a38"><td class="memItemLeft" align="right" valign="top"><a id="a83e504a27be148512e0cb18781f40a38" name="a83e504a27be148512e0cb18781f40a38"></a>
+<a class="el" href="namespacevrs.html#ae73984aca85d0aa7b6f3406cd9f2f6ea">ContentType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>contentType_</b> = <a class="el" href="namespacevrs.html#ae73984aca85d0aa7b6f3406cd9f2f6eaaba2b45bdc11e2a4a6e86aab2ac693cbb">ContentType::EMPTY</a></td></tr>
+<tr class="separator:a83e504a27be148512e0cb18781f40a38"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99059a45ca1f9ed437db7a7bdfdcd624" id="r_a99059a45ca1f9ed437db7a7bdfdcd624"><td class="memItemLeft" align="right" valign="top"><a id="a99059a45ca1f9ed437db7a7bdfdcd624" name="a99059a45ca1f9ed437db7a7bdfdcd624"></a>
+size_t&#160;</td><td class="memItemRight" valign="bottom"><b>size_</b> = <a class="el" href="classvrs_1_1_content_block.html#af5bf7a6af194725194549e35af27e418">kSizeUnknown</a></td></tr>
+<tr class="separator:a99059a45ca1f9ed437db7a7bdfdcd624"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afd766fa14952017e39b0a9d5bcb54965" id="r_afd766fa14952017e39b0a9d5bcb54965"><td class="memItemLeft" align="right" valign="top"><a id="afd766fa14952017e39b0a9d5bcb54965" name="afd766fa14952017e39b0a9d5bcb54965"></a>
+<a class="el" href="classvrs_1_1_image_content_block_spec.html">ImageContentBlockSpec</a>&#160;</td><td class="memItemRight" valign="bottom"><b>imageSpec_</b></td></tr>
+<tr class="separator:afd766fa14952017e39b0a9d5bcb54965"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a63348290eb84764ba2e3af35f2d0d43d" id="r_a63348290eb84764ba2e3af35f2d0d43d"><td class="memItemLeft" align="right" valign="top"><a id="a63348290eb84764ba2e3af35f2d0d43d" name="a63348290eb84764ba2e3af35f2d0d43d"></a>
+<a class="el" href="classvrs_1_1_audio_content_block_spec.html">AudioContentBlockSpec</a>&#160;</td><td class="memItemRight" valign="bottom"><b>audioSpec_</b></td></tr>
+<tr class="separator:a63348290eb84764ba2e3af35f2d0d43d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7ab69f396ac3319a8e62f825b41ac657" id="r_a7ab69f396ac3319a8e62f825b41ac657"><td class="memItemLeft" align="right" valign="top"><a id="a7ab69f396ac3319a8e62f825b41ac657" name="a7ab69f396ac3319a8e62f825b41ac657"></a>
+string&#160;</td><td class="memItemRight" valign="bottom"><b>customContentBlockFormat_</b></td></tr>
+<tr class="separator:a7ab69f396ac3319a8e62f825b41ac657"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Specification of a VRS record content block. </p>
@@ -187,7 +217,34 @@ static const size_t&#160;</td><td class="memItemRight" valign="bottom"><b>kSizeU
 <li>Custom</li>
 </ul>
 <p>Each block may have a fixed size, or an unknown size if the size might vary between records. </p>
-</div><hr/>The documentation for this class was generated from the following files:<ul>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a7d69c786caafa110a4afc2d296d9089e" name="a7d69c786caafa110a4afc2d296d9089e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7d69c786caafa110a4afc2d296d9089e">&#9670;&#160;</a></span>getCustomContentBlockFormat()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">string vrs::ContentBlock::getCustomContentBlockFormat </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Get format for custom blocks, as a free-form string, provided on creation by using: <a class="el" href="classvrs_1_1_content_block.html" title="Specification of a VRS record content block.">ContentBlock</a>("custom/format=my_custom_content_block_format_name"). </p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following files:<ul>
 <li>vrs/<a class="el" href="_record_format_8h_source.html">RecordFormat.h</a></li>
 <li>vrs/<b>RecordFormat.cpp</b></li>
 </ul>

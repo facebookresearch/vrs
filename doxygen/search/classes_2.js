@@ -14,5 +14,6 @@ var searchData=
   ['contentblockreader_11',['ContentBlockReader',['../classvrs_1_1_content_block_reader.html',1,'vrs']]],
   ['contentparser_12',['ContentParser',['../classvrs_1_1_content_parser.html',1,'vrs']]],
   ['currentrecord_13',['CurrentRecord',['../structvrs_1_1_current_record.html',1,'vrs']]],
-  ['customblockreader_14',['CustomBlockReader',['../classvrs_1_1_custom_block_reader.html',1,'vrs']]]
+  ['customblockreader_14',['CustomBlockReader',['../classvrs_1_1_custom_block_reader.html',1,'vrs']]],
+  ['customcontentblock_15',['CustomContentBlock',['../classvrs_1_1_custom_content_block.html',1,'vrs']]]
 ];

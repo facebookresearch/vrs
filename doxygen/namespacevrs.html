@@ -160,6 +160,8 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_custom_block_reader.html">CustomBlockReader</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Specialized version of <a class="el" href="classvrs_1_1_content_block_reader.html" title="Abstract class to handle the interpretation of a record format&#39;s content block.">ContentBlockReader</a> to handle a content block containing custom data. Custom data is data which format/content is not known to VRS.  <a href="classvrs_1_1_custom_block_reader.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_custom_content_block.html">CustomContentBlock</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_layout.html">DataLayout</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> class describes the data stored inside a DataLayoutContentBlock.  <a href="classvrs_1_1_data_layout.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -946,43 +948,48 @@ const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">Index
 <tr class="separator:acc82bd51d97d8f4fda23cb5805677bd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a91f1fe4347363f06f6945f694daaeaf1" id="r_a91f1fe4347363f06f6945f694daaeaf1"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs.html#a91f1fe4347363f06f6945f694daaeaf1">getNearestRecordByTime</a> (const std::vector&lt; const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> * &gt; &amp;index, double timestamp, double epsilon, <a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> recordType=<a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2cea0db45d2a4141101bdfe48e3314cfbca3">Record::Type::UNDEFINED</a>)</td></tr>
 <tr class="separator:a91f1fe4347363f06f6945f694daaeaf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6c551d97a145be0b888182f3773e240" id="r_ac6c551d97a145be0b888182f3773e240"><td class="memItemLeft" align="right" valign="top"><a id="ac6c551d97a145be0b888182f3773e240" name="ac6c551d97a145be0b888182f3773e240"></a>
+string&#160;</td><td class="memItemRight" valign="bottom"><b>toString</b> (<a class="el" href="namespacevrs.html#ae73984aca85d0aa7b6f3406cd9f2f6ea">ContentType</a> contentType)</td></tr>
+<tr class="separator:ac6c551d97a145be0b888182f3773e240"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e14c6471ab4a1719e54b2afa7d5fb00" id="r_a0e14c6471ab4a1719e54b2afa7d5fb00"><td class="memItemLeft" align="right" valign="top"><a id="a0e14c6471ab4a1719e54b2afa7d5fb00" name="a0e14c6471ab4a1719e54b2afa7d5fb00"></a>
+template&lt;&gt; </td></tr>
+<tr class="memitem:a0e14c6471ab4a1719e54b2afa7d5fb00"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespacevrs.html#ae73984aca85d0aa7b6f3406cd9f2f6ea">ContentType</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><b>toEnum</b> (const string &amp;name)</td></tr>
+<tr class="memdesc:a0e14c6471ab4a1719e54b2afa7d5fb00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a record type name into an enum value. <br /></td></tr>
+<tr class="separator:a0e14c6471ab4a1719e54b2afa7d5fb00"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8717f849b57ffff184c58e7348f858aa" id="r_a8717f849b57ffff184c58e7348f858aa"><td class="memItemLeft" align="right" valign="top"><a id="a8717f849b57ffff184c58e7348f858aa" name="a8717f849b57ffff184c58e7348f858aa"></a>
+string&#160;</td><td class="memItemRight" valign="bottom"><b>toString</b> (<a class="el" href="namespacevrs.html#a7e8db761dcf6ba474ce112c82babb6c3">ImageFormat</a> imageFormat)</td></tr>
+<tr class="separator:a8717f849b57ffff184c58e7348f858aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a933f7385d5966213602074b4df5c2a59" id="r_a933f7385d5966213602074b4df5c2a59"><td class="memItemLeft" align="right" valign="top"><a id="a933f7385d5966213602074b4df5c2a59" name="a933f7385d5966213602074b4df5c2a59"></a>
 template&lt;&gt; </td></tr>
 <tr class="memitem:a933f7385d5966213602074b4df5c2a59"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespacevrs.html#a7e8db761dcf6ba474ce112c82babb6c3">ImageFormat</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><b>toEnum</b> (const string &amp;name)</td></tr>
 <tr class="memdesc:a933f7385d5966213602074b4df5c2a59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a record type name into an enum value. <br /></td></tr>
 <tr class="separator:a933f7385d5966213602074b4df5c2a59"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa38cdbe7ec9fd32a32090313fb9fc4fd" id="r_aa38cdbe7ec9fd32a32090313fb9fc4fd"><td class="memItemLeft" align="right" valign="top"><a id="aa38cdbe7ec9fd32a32090313fb9fc4fd" name="aa38cdbe7ec9fd32a32090313fb9fc4fd"></a>
+string&#160;</td><td class="memItemRight" valign="bottom"><b>toString</b> (<a class="el" href="namespacevrs.html#a0fbbb88591f21313dd46736fba5a7aa5">PixelFormat</a> pixelFormat)</td></tr>
+<tr class="separator:aa38cdbe7ec9fd32a32090313fb9fc4fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae32eddbaf04e30d062954dd8e61656b2" id="r_ae32eddbaf04e30d062954dd8e61656b2"><td class="memItemLeft" align="right" valign="top"><a id="ae32eddbaf04e30d062954dd8e61656b2" name="ae32eddbaf04e30d062954dd8e61656b2"></a>
 template&lt;&gt; </td></tr>
 <tr class="memitem:ae32eddbaf04e30d062954dd8e61656b2"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespacevrs.html#a0fbbb88591f21313dd46736fba5a7aa5">PixelFormat</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><b>toEnum</b> (const string &amp;name)</td></tr>
 <tr class="memdesc:ae32eddbaf04e30d062954dd8e61656b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a record type name into an enum value. <br /></td></tr>
 <tr class="separator:ae32eddbaf04e30d062954dd8e61656b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a424beafadfa3efc3e78cee0816bdc9e0" id="r_a424beafadfa3efc3e78cee0816bdc9e0"><td class="memItemLeft" align="right" valign="top"><a id="a424beafadfa3efc3e78cee0816bdc9e0" name="a424beafadfa3efc3e78cee0816bdc9e0"></a>
+string&#160;</td><td class="memItemRight" valign="bottom"><b>toString</b> (<a class="el" href="namespacevrs.html#add2bb21a732f1a1a425cb65c9cb69a03">AudioFormat</a> audioFormat)</td></tr>
+<tr class="memdesc:a424beafadfa3efc3e78cee0816bdc9e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert an AudioFormat to a string. <br /></td></tr>
+<tr class="separator:a424beafadfa3efc3e78cee0816bdc9e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac78cc101e8f2f535704df8b95606d1de" id="r_ac78cc101e8f2f535704df8b95606d1de"><td class="memItemLeft" align="right" valign="top"><a id="ac78cc101e8f2f535704df8b95606d1de" name="ac78cc101e8f2f535704df8b95606d1de"></a>
 template&lt;&gt; </td></tr>
 <tr class="memitem:ac78cc101e8f2f535704df8b95606d1de"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespacevrs.html#add2bb21a732f1a1a425cb65c9cb69a03">AudioFormat</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><b>toEnum</b> (const string &amp;name)</td></tr>
 <tr class="memdesc:ac78cc101e8f2f535704df8b95606d1de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a record type name into an enum value. <br /></td></tr>
 <tr class="separator:ac78cc101e8f2f535704df8b95606d1de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2c341ef17cabec1913efbe4ba376385" id="r_af2c341ef17cabec1913efbe4ba376385"><td class="memItemLeft" align="right" valign="top"><a id="af2c341ef17cabec1913efbe4ba376385" name="af2c341ef17cabec1913efbe4ba376385"></a>
+string&#160;</td><td class="memItemRight" valign="bottom"><b>toString</b> (<a class="el" href="namespacevrs.html#a52303127bf307e1191fcb9b2ee2841d4">AudioSampleFormat</a> audioSampleFormat)</td></tr>
+<tr class="memdesc:af2c341ef17cabec1913efbe4ba376385"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert an AudioSampleFormat to a string. <br /></td></tr>
+<tr class="separator:af2c341ef17cabec1913efbe4ba376385"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7accfde5718a6a84e3b968810eaa1240" id="r_a7accfde5718a6a84e3b968810eaa1240"><td class="memItemLeft" align="right" valign="top"><a id="a7accfde5718a6a84e3b968810eaa1240" name="a7accfde5718a6a84e3b968810eaa1240"></a>
 template&lt;&gt; </td></tr>
 <tr class="memitem:a7accfde5718a6a84e3b968810eaa1240"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespacevrs.html#a52303127bf307e1191fcb9b2ee2841d4">AudioSampleFormat</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><b>toEnum</b> (const string &amp;name)</td></tr>
 <tr class="memdesc:a7accfde5718a6a84e3b968810eaa1240"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a record type name into an enum value. <br /></td></tr>
 <tr class="separator:a7accfde5718a6a84e3b968810eaa1240"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac6c551d97a145be0b888182f3773e240" id="r_ac6c551d97a145be0b888182f3773e240"><td class="memItemLeft" align="right" valign="top"><a id="ac6c551d97a145be0b888182f3773e240" name="ac6c551d97a145be0b888182f3773e240"></a>
-string&#160;</td><td class="memItemRight" valign="bottom"><b>toString</b> (<a class="el" href="namespacevrs.html#ae73984aca85d0aa7b6f3406cd9f2f6ea">ContentType</a> contentType)</td></tr>
-<tr class="separator:ac6c551d97a145be0b888182f3773e240"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8717f849b57ffff184c58e7348f858aa" id="r_a8717f849b57ffff184c58e7348f858aa"><td class="memItemLeft" align="right" valign="top"><a id="a8717f849b57ffff184c58e7348f858aa" name="a8717f849b57ffff184c58e7348f858aa"></a>
-string&#160;</td><td class="memItemRight" valign="bottom"><b>toString</b> (<a class="el" href="namespacevrs.html#a7e8db761dcf6ba474ce112c82babb6c3">ImageFormat</a> imageFormat)</td></tr>
-<tr class="separator:a8717f849b57ffff184c58e7348f858aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa38cdbe7ec9fd32a32090313fb9fc4fd" id="r_aa38cdbe7ec9fd32a32090313fb9fc4fd"><td class="memItemLeft" align="right" valign="top"><a id="aa38cdbe7ec9fd32a32090313fb9fc4fd" name="aa38cdbe7ec9fd32a32090313fb9fc4fd"></a>
-string&#160;</td><td class="memItemRight" valign="bottom"><b>toString</b> (<a class="el" href="namespacevrs.html#a0fbbb88591f21313dd46736fba5a7aa5">PixelFormat</a> pixelFormat)</td></tr>
-<tr class="separator:aa38cdbe7ec9fd32a32090313fb9fc4fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a424beafadfa3efc3e78cee0816bdc9e0" id="r_a424beafadfa3efc3e78cee0816bdc9e0"><td class="memItemLeft" align="right" valign="top"><a id="a424beafadfa3efc3e78cee0816bdc9e0" name="a424beafadfa3efc3e78cee0816bdc9e0"></a>
-string&#160;</td><td class="memItemRight" valign="bottom"><b>toString</b> (<a class="el" href="namespacevrs.html#add2bb21a732f1a1a425cb65c9cb69a03">AudioFormat</a> audioFormat)</td></tr>
-<tr class="memdesc:a424beafadfa3efc3e78cee0816bdc9e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert an AudioFormat to a string. <br /></td></tr>
-<tr class="separator:a424beafadfa3efc3e78cee0816bdc9e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af2c341ef17cabec1913efbe4ba376385" id="r_af2c341ef17cabec1913efbe4ba376385"><td class="memItemLeft" align="right" valign="top"><a id="af2c341ef17cabec1913efbe4ba376385" name="af2c341ef17cabec1913efbe4ba376385"></a>
-string&#160;</td><td class="memItemRight" valign="bottom"><b>toString</b> (<a class="el" href="namespacevrs.html#a52303127bf307e1191fcb9b2ee2841d4">AudioSampleFormat</a> audioSampleFormat)</td></tr>
-<tr class="memdesc:af2c341ef17cabec1913efbe4ba376385"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert an AudioSampleFormat to a string. <br /></td></tr>
-<tr class="separator:af2c341ef17cabec1913efbe4ba376385"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aceae789404e1ab5172198cfec03995c5" id="r_aceae789404e1ab5172198cfec03995c5"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs.html#aceae789404e1ab5172198cfec03995c5">toString</a> (<a class="el" href="namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5">RecordableTypeId</a> typeId)</td></tr>
 <tr class="separator:aceae789404e1ab5172198cfec03995c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac1e140ad9105ffb585be345036467c9b" id="r_ac1e140ad9105ffb585be345036467c9b"><td class="memItemLeft" align="right" valign="top"><a id="ac1e140ad9105ffb585be345036467c9b" name="ac1e140ad9105ffb585be345036467c9b"></a>
