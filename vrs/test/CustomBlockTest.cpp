@@ -143,7 +143,7 @@ class CustomStreams : public Recordable {
     addRecordFormat(
         Record::Type::CONFIGURATION,
         kConfigurationVersion,
-        ContentBlock(ContentType::CUSTOM), // Single custom block, no size needed
+        CustomContentBlock("thrift:definition:imu_payload"), // Single custom block, no size needed
         {});
     // Record with a datalayout containing the next content block's size and the spec of an image,
     // then a custom block size (which size was in the datalayout just before -- no choice),
@@ -152,9 +152,9 @@ class CustomStreams : public Recordable {
     addRecordFormat(
         Record::Type::STATE,
         kStateVersion,
-        imageAndCustomBlockMetadata_.getContentBlock() + ContentBlock(ContentType::CUSTOM) +
-            ContentBlock(ImageFormat::RAW) +
-            ContentBlock(ContentType::CUSTOM), // datalayout + custom + image + custom
+        // datalayout + custom + image + custom/format=my_custom_format_state
+        imageAndCustomBlockMetadata_.getContentBlock() + CustomContentBlock() +
+            ContentBlock(ImageFormat::RAW) + CustomContentBlock("my_custom_format_state"),
         {&imageAndCustomBlockMetadata_});
     // Record with a datalayout with the size of the next content block,
     // then a custom block which size was in the datalayout just before,
@@ -164,9 +164,10 @@ class CustomStreams : public Recordable {
     addRecordFormat(
         Record::Type::DATA,
         kDataVersion,
-        customBlockSizeMetadata_.getContentBlock() + ContentBlock(ContentType::CUSTOM) +
-            customBlockSizeMetadata2_.getContentBlock() + ContentBlock(ContentType::CUSTOM) +
-            ContentBlock(ContentType::CUSTOM), // metadata + custom + metadata + custom + custom
+        // datalayout + custom/format=thrift:data:imu_payload + datalayout + custom + custom
+        customBlockSizeMetadata_.getContentBlock() + CustomContentBlock("thrift:data:imu_payload") +
+            customBlockSizeMetadata2_.getContentBlock() + CustomContentBlock() +
+            CustomContentBlock(),
         {&customBlockSizeMetadata_, nullptr, &customBlockSizeMetadata2_});
   }
 
@@ -264,11 +265,14 @@ class CustomStreamPlayer : public RecordFormatStreamPlayer {
     if (record.recordType == Record::Type::CONFIGURATION) {
       EXPECT_EQ(blockIndex, 0);
       configCustom0Count++;
+      EXPECT_EQ(contentBlock.getCustomContentBlockFormat(), "thrift:definition:imu_payload");
     } else if (record.recordType == Record::Type::STATE) {
       if (blockIndex == 1) {
+        EXPECT_EQ(contentBlock.getCustomContentBlockFormat(), "");
         EXPECT_EQ(size, kStateCustomBlockSize1);
         stateCustom1Count++;
       } else if (blockIndex == 3) {
+        EXPECT_EQ(contentBlock.getCustomContentBlockFormat(), "my_custom_format_state");
         EXPECT_EQ(size, kStateCustomBlockSize3);
         stateCustom3Count++;
       } else {
@@ -277,12 +281,15 @@ class CustomStreamPlayer : public RecordFormatStreamPlayer {
       }
     } else if (record.recordType == Record::Type::DATA) {
       if (blockIndex == 1) {
+        EXPECT_EQ(contentBlock.getCustomContentBlockFormat(), "thrift:data:imu_payload");
         EXPECT_EQ(size, kDataCustomBlockSize1);
         dataCustom1Count++;
       } else if (blockIndex == 3) {
+        EXPECT_EQ(contentBlock.getCustomContentBlockFormat(), "");
         EXPECT_EQ(size, kDataCustomBlockSize3);
         dataCustom3Count++;
       } else if (blockIndex == 4) {
+        EXPECT_EQ(contentBlock.getCustomContentBlockFormat(), "");
         EXPECT_EQ(size, kDataCustomBlockSize4);
         dataCustom4Count++;
       } else {

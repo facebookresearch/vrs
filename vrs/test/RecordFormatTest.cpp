@@ -450,6 +450,18 @@ TEST_F(RecordFormatTest, testBlockFormat) {
 
   FORMAT_EQUAL(ContentBlock(ContentType::CUSTOM), "custom");
   FORMAT_EQUAL(ContentBlock(ContentType::CUSTOM, 20), "custom/size=20");
+  FORMAT_EQUAL(CustomContentBlock(), "custom");
+  FORMAT_EQUAL(CustomContentBlock(48), "custom/size=48");
+  FORMAT_EQUAL(
+      CustomContentBlock("thrift:data:imu_format"), "custom/format=thrift:data:imu_format");
+  FORMAT_EQUAL(
+      CustomContentBlock("thrift:data:imu_format", 48),
+      "custom/size=48/format=thrift:data:imu_format");
+  FORMAT_EQUAL(
+      ContentBlock("custom/format=thrift:data:imu_format"), "custom/format=thrift:data:imu_format");
+  FORMAT_EQUAL(
+      ContentBlock("custom/size=48/format=thrift:data:imu_format"),
+      "custom/size=48/format=thrift:data:imu_format");
 }
 
 TEST_F(RecordFormatTest, testBadStride) {
@@ -463,15 +475,15 @@ TEST_F(RecordFormatTest, testBadStride) {
 
 TEST_F(RecordFormatTest, testOperators) {
   FORMAT_EQUAL(RecordFormat(ContentType::CUSTOM), "custom");
+  FORMAT_EQUAL(CustomContentBlock(), "custom");
   FORMAT_EQUAL(ContentBlock(ContentType::CUSTOM), "custom");
-  FORMAT_EQUAL(
-      (ContentBlock(ContentType::IMAGE) + ContentBlock(ContentType::CUSTOM)), "image+custom");
+  FORMAT_EQUAL((ContentBlock(ContentType::IMAGE) + CustomContentBlock()), "image+custom");
   FORMAT_EQUAL(
       (ContentBlock(ContentType::IMAGE) + ContentBlock(ContentType::DATA_LAYOUT) +
-       ContentBlock(ContentType::CUSTOM)),
-      "image+data_layout+custom");
+       CustomContentBlock("my_format")),
+      "image+data_layout+custom/format=my_format");
   FORMAT_EQUAL(
-      (RecordFormat(ContentType::DATA_LAYOUT) + ContentBlock(ContentType::CUSTOM, 56) +
+      (RecordFormat(ContentType::DATA_LAYOUT) + CustomContentBlock(56) +
        ContentBlock(ContentType::AUDIO, 512) + ContentBlock(ContentType::IMAGE)),
       "data_layout+custom/size=56+audio/size=512+image");
 }
@@ -492,6 +504,7 @@ TEST_F(RecordFormatTest, testFormatToString) {
 TEST_F(RecordFormatTest, testUsedBlockCount) {
   EXPECT_EQ(RecordFormat("custom").getUsedBlocksCount(), 1);
   EXPECT_EQ(RecordFormat("custom/size=20").getUsedBlocksCount(), 1);
+  EXPECT_EQ(RecordFormat("custom/size=20/format=thrift").getUsedBlocksCount(), 1);
   EXPECT_EQ(RecordFormat("empty").getUsedBlocksCount(), 0);
   EXPECT_EQ(RecordFormat("image").getUsedBlocksCount(), 1);
   EXPECT_EQ(RecordFormat("audio").getUsedBlocksCount(), 1);
@@ -510,6 +523,8 @@ TEST_F(RecordFormatTest, testUsedBlockCount) {
 TEST_F(RecordFormatTest, testBlocksOfFormatCount) {
   EXPECT_EQ(RecordFormat("custom").getBlocksOfTypeCount(ContentType::CUSTOM), 1);
   EXPECT_EQ(RecordFormat("custom/size=20").getBlocksOfTypeCount(ContentType::CUSTOM), 1);
+  EXPECT_EQ(
+      RecordFormat("custom/size=20/format=thrift").getBlocksOfTypeCount(ContentType::CUSTOM), 1);
   EXPECT_EQ(RecordFormat("empty").getBlocksOfTypeCount(ContentType::CUSTOM), 0);
   EXPECT_EQ(RecordFormat("image").getBlocksOfTypeCount(ContentType::IMAGE), 1);
   EXPECT_EQ(RecordFormat("image").getBlocksOfTypeCount(ContentType::CUSTOM), 0);
@@ -646,6 +661,12 @@ TEST_F(RecordFormatTest, testFormatSizes) {
   EXPECT_EQ(recordFormat.getBlockSize(0, 150), 150);
 
   recordFormat.set("custom/size=20");
+  EXPECT_EQ(recordFormat.getUsedBlocksCount(), 1);
+  EXPECT_EQ(recordFormat.getBlocksOfTypeCount(ContentType::CUSTOM), 1);
+  EXPECT_EQ(recordFormat.getRecordSize(), 20);
+  EXPECT_EQ(recordFormat.getBlockSize(0, 200), 20);
+
+  recordFormat.set("custom/size=20/format=thrift");
   EXPECT_EQ(recordFormat.getUsedBlocksCount(), 1);
   EXPECT_EQ(recordFormat.getBlocksOfTypeCount(ContentType::CUSTOM), 1);
   EXPECT_EQ(recordFormat.getRecordSize(), 20);

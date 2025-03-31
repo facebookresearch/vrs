@@ -219,6 +219,19 @@ string unescapeString(const char* str, size_t length) {
   return s;
 }
 
+string sanitizeCustomContentBlockFormatName(const string& name) {
+  string s;
+  s.reserve(name.size());
+  // be careful, and only allow alphanumeric and a few special characters
+  const char* kAllowedSpecialChars = "_-*.,;:!@~#&|[]{}'";
+  for (unsigned char c : name) {
+    s.push_back(isalnum(c) || strchr(kAllowedSpecialChars, c) != nullptr ? c : '_');
+  }
+  return s;
+}
+
+string_view kCustomContentBlockFormat = "format=";
+
 } // namespace
 
 namespace vrs {
@@ -1022,6 +1035,15 @@ ContentBlock::ContentBlock(const string& formatStr) {
       audioSpec_.set(parser);
       break;
     case ContentType::CUSTOM:
+      if (!parser.str.empty()) {
+        if (helpers::startsWith(parser.str, kCustomContentBlockFormat)) {
+          customContentBlockFormat_ = sanitizeCustomContentBlockFormatName(
+              parser.str.substr(kCustomContentBlockFormat.size()));
+        } else {
+          XR_LOGE("Invalid custom content block specification '{}'.", parser.str.c_str());
+        }
+      }
+      break;
     case ContentType::DATA_LAYOUT:
     case ContentType::EMPTY:
     default:
@@ -1036,7 +1058,8 @@ string ContentBlock::asString() const {
   s.reserve(120);
   s.append(ContentTypeFormatConverter::toString(contentType_));
   if (size_ != kSizeUnknown) {
-    s.append("/size=").append(to_string(size_));
+    constexpr string_view size = "/size=";
+    s.append(size).append(to_string(size_));
   }
   string subtype;
   switch (contentType_) {
@@ -1045,6 +1068,12 @@ string ContentBlock::asString() const {
       break;
     case ContentType::AUDIO:
       subtype = audioSpec_.asString();
+      break;
+    case ContentType::CUSTOM:
+      if (!customContentBlockFormat_.empty()) {
+        subtype.reserve(kCustomContentBlockFormat.size() + customContentBlockFormat_.size());
+        subtype.append(kCustomContentBlockFormat).append(customContentBlockFormat_);
+      }
       break;
     default:
       break;
@@ -1106,6 +1135,13 @@ const AudioContentBlockSpec& ContentBlock::audio() const {
   XR_VERIFY(contentType_ == ContentType::AUDIO);
   return audioSpec_;
 }
+
+CustomContentBlock::CustomContentBlock(const string& customContentBlockFormat, size_t size)
+    : ContentBlock(ContentType::CUSTOM, size) {
+  customContentBlockFormat_ = sanitizeCustomContentBlockFormatName(customContentBlockFormat);
+}
+
+CustomContentBlock::CustomContentBlock(size_t size) : ContentBlock(ContentType::CUSTOM, size) {}
 
 bool RecordFormat::operator==(const RecordFormat& rhs) const {
   size_t usedBlocksCount = getUsedBlocksCount();

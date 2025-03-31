@@ -533,6 +533,8 @@ class ContentBlock {
       imageSpec_ = other.imageSpec_;
     } else if (contentType_ == ContentType::AUDIO) {
       audioSpec_ = other.audioSpec_;
+    } else if (contentType_ == ContentType::CUSTOM) {
+      customContentBlockFormat_ = other.customContentBlockFormat_;
     }
   }
 
@@ -550,6 +552,12 @@ class ContentBlock {
     return contentType_;
   }
 
+  /// Get format for custom blocks, as a free-form string, provided on creation by using:
+  /// ContentBlock("custom/format=my_custom_content_block_format_name").
+  string getCustomContentBlockFormat() const {
+    return customContentBlockFormat_;
+  }
+
   bool operator==(const ContentBlock& rhs) const;
 
   bool operator!=(const ContentBlock& rhs) const {
@@ -564,11 +572,18 @@ class ContentBlock {
   /// Get the audio content spec. Requires the content block to be of type ContentType::AUDIO.
   const AudioContentBlockSpec& audio() const;
 
- private:
+ protected:
   ContentType contentType_ = ContentType::EMPTY;
   size_t size_ = kSizeUnknown;
   ImageContentBlockSpec imageSpec_;
   AudioContentBlockSpec audioSpec_;
+  string customContentBlockFormat_;
+};
+
+class CustomContentBlock : public ContentBlock {
+ public:
+  explicit CustomContentBlock(const string& customContentBlockFormat, size_t size = kSizeUnknown);
+  explicit CustomContentBlock(size_t size = kSizeUnknown);
 };
 
 /// Map a pair of record type/format version to a record format, for a particular stream.
