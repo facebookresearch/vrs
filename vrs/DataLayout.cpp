@@ -420,6 +420,8 @@ class DataLayouter {
   string prefix_;
 };
 
+namespace {
+
 const char* sDataTypeNames[] = {
     "undefined",
     "DataPieceValue",
@@ -439,6 +441,8 @@ struct DataPieceTypeStringConverter : public EnumStringConverter<
       cNamesCount == enumCount<DataPieceType>(),
       "Missing DataPieceType name definitions");
 };
+
+} // namespace
 
 static string makePieceName(const string& pieceTypeName, const string& dataType) {
   return pieceTypeName + '<' + dataType + '>'; // e.g., "value<double>"

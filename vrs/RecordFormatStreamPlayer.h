@@ -28,6 +28,7 @@ namespace vrs {
 
 using std::map;
 using std::string;
+using std::tuple;
 using std::unique_ptr;
 using std::vector;
 

@@ -28,7 +28,6 @@ namespace vrs {
 using std::map;
 using std::pair;
 using std::string;
-using std::tuple;
 using std::unique_ptr;
 using std::vector;
 
@@ -162,8 +161,7 @@ class ImageContentBlockSpec {
       uint32_t keyFrameIndex = 0);
 
   /// Image formats with encoding (png, jpeg, etc).
-  // NOLINTNEXTLINE(hicpp-explicit-conversions)
-  ImageContentBlockSpec(ImageFormat imageFormat, uint32_t width = 0, uint32_t height = 0);
+  ImageContentBlockSpec(ImageFormat imageFormat, uint32_t width = 0, uint32_t height = 0); // NOLINT
 
   /// Raw pixels image formats.
   ImageContentBlockSpec(
@@ -379,21 +377,12 @@ class AudioContentBlockSpec {
   AudioContentBlockSpec& operator=(const AudioContentBlockSpec&) = default;
 
   /// Compare two audio block spec.
-  bool operator==(const AudioContentBlockSpec& rhs) const {
-    return audioFormat_ == rhs.audioFormat_ && sampleFormat_ == rhs.sampleFormat_ &&
-        channelCount_ == rhs.channelCount_ &&
-        getSampleFrameStride() == rhs.getSampleFrameStride() &&
-        sampleFrameCount_ == rhs.sampleFrameCount_ && sampleFrameRate_ == rhs.sampleFrameRate_;
-  }
+  bool operator==(const AudioContentBlockSpec& rhs) const;
   bool operator!=(const AudioContentBlockSpec& rhs) const {
     return !operator==(rhs);
   }
   /// Tell if two audio block have identical audio formats.
-  bool isCompatibleWith(const AudioContentBlockSpec& rhs) const {
-    return sampleFormat_ == rhs.sampleFormat_ && channelCount_ == rhs.channelCount_ &&
-        getSampleFrameStride() == rhs.getSampleFrameStride() &&
-        sampleFrameRate_ == rhs.sampleFrameRate_;
-  }
+  bool isCompatibleWith(const AudioContentBlockSpec& rhs) const;
   /// Get audio format.
   AudioFormat getAudioFormat() const {
     return audioFormat_;
@@ -445,16 +434,7 @@ class AudioContentBlockSpec {
 
   /// Tell if the audio sample format is fully defined.
   /// For instance, PCM audio data when we have enough details: sample format & channel count.
-  bool isSampleBlockFormatDefined() const {
-    switch (audioFormat_) {
-      case AudioFormat::PCM:
-        return sampleFormat_ != AudioSampleFormat::UNDEFINED && channelCount_ != 0;
-      case AudioFormat::UNDEFINED:
-      case AudioFormat::COUNT:
-      default:
-        return false;
-    }
-  }
+  bool isSampleBlockFormatDefined() const;
 
   /// Tell if a specific audio sample format is little endian.
   static bool isLittleEndian(AudioSampleFormat sampleFormat);
@@ -497,15 +477,13 @@ class ContentBlock {
   static const size_t kSizeUnknown;
 
   /// Very generic block description.
-  // NOLINTNEXTLINE(hicpp-explicit-conversions)
-  ContentBlock(ContentType type = ContentType::EMPTY, size_t size = kSizeUnknown);
+  ContentBlock(ContentType type = ContentType::EMPTY, size_t size = kSizeUnknown); // NOLINT
 
   /// Factory-style reconstruct from persisted description as string on disk.
   explicit ContentBlock(const string& formatStr);
 
   /// Image formats with encoding (png, jpeg, etc).
-  // NOLINTNEXTLINE(hicpp-explicit-conversions)
-  ContentBlock(ImageFormat imageFormat, uint32_t width = 0, uint32_t height = 0);
+  ContentBlock(ImageFormat imageFormat, uint32_t width = 0, uint32_t height = 0); // NOLINT
 
   /// Image formats with custom codec encoding.
   ContentBlock(
@@ -525,16 +503,14 @@ class ContentBlock {
       uint32_t stride = 0,
       uint32_t stride2 = 0);
 
-  // NOLINTNEXTLINE(hicpp-explicit-conversions)
-  ContentBlock(const ImageContentBlockSpec& imageSpec, size_t size = kSizeUnknown);
+  ContentBlock(const ImageContentBlockSpec& imageSpec, size_t size = kSizeUnknown); // NOLINT
   ContentBlock(
       const ContentBlock& imageContentBlock,
       double keyFrameTimestamp,
       uint32_t keyFrameIndex);
 
   /// Very generic audio block description.
-  // NOLINTNEXTLINE(hicpp-explicit-conversions)
-  ContentBlock(AudioFormat audioFormat, uint8_t channelCount = 0);
+  ContentBlock(AudioFormat audioFormat, uint8_t channelCount = 0); // NOLINT
   ContentBlock(const AudioContentBlockSpec& audioSpec, size_t size);
 
   /// Audio block description.
@@ -574,22 +550,7 @@ class ContentBlock {
     return contentType_;
   }
 
-  bool operator==(const ContentBlock& rhs) const {
-    // first compare generic content blocks
-    if (contentType_ != rhs.contentType_ || size_ != rhs.size_) {
-      return false;
-    }
-    // now specific parts for given format type
-    switch (contentType_) {
-      case ContentType::IMAGE:
-        return imageSpec_ == rhs.imageSpec_;
-      case ContentType::AUDIO:
-        return audioSpec_ == rhs.audioSpec_;
-      default:
-        // non-specific content type
-        return true;
-    }
-  }
+  bool operator==(const ContentBlock& rhs) const;
 
   bool operator!=(const ContentBlock& rhs) const {
     return !operator==(rhs);
@@ -670,31 +631,26 @@ class RecordFormat {
   /// Empty record format definition.
   RecordFormat() = default;
   /// Default copy constructor
-  // NOLINTNEXTLINE(hicpp-explicit-conversions)
-  RecordFormat(const RecordFormat&) = default;
+  RecordFormat(const RecordFormat&) = default; // NOLINT
 
   /// Build a RecordFormat from a string description.
   /// This constructor is meant for internal VRS usage only.
   /// @internal
-  // NOLINTNEXTLINE(hicpp-explicit-conversions)
-  RecordFormat(const string& format) {
+  RecordFormat(const string& format) { // NOLINT
     set(format);
   }
   /// Build a RecordFormat from a string description.
   /// This constructor is meant for internal VRS usage only.
   /// @internal
-  // NOLINTNEXTLINE(hicpp-explicit-conversions)
-  RecordFormat(const char* format) {
+  RecordFormat(const char* format) { // NOLINT
     set(format);
   }
   /// Build a RecordFormat from a single ContentBlock.
-  // NOLINTNEXTLINE(hicpp-explicit-conversions)
-  RecordFormat(const ContentBlock& block) {
+  RecordFormat(const ContentBlock& block) { // NOLINT
     blocks_.emplace_back(block);
   }
   /// Build a RecordFormat from a single ContentBlock.
-  // NOLINTNEXTLINE(hicpp-explicit-conversions)
-  RecordFormat(ContentBlock&& block) {
+  RecordFormat(ContentBlock&& block) { // NOLINT
     blocks_.emplace_back(block);
   }
   /// Build a RecordFormat from two ContentBlock definitions.
@@ -711,8 +667,7 @@ class RecordFormat {
   /// @param type: Content type of the block.
   /// @param size: Size of the block, or ContentBlock::kSizeUnknown, if the size of the block isn't
   /// known/fixed.
-  // NOLINTNEXTLINE(hicpp-explicit-conversions)
-  RecordFormat(ContentType type, size_t size = ContentBlock::kSizeUnknown) {
+  RecordFormat(ContentType type, size_t size = ContentBlock::kSizeUnknown) { // NOLINT
     blocks_.emplace_back(type, size);
   }
 
@@ -729,18 +684,7 @@ class RecordFormat {
 
   /// Default copy assignment
   RecordFormat& operator=(const RecordFormat&) = default;
-  bool operator==(const RecordFormat& rhs) const {
-    size_t usedBlocksCount = getUsedBlocksCount();
-    if (usedBlocksCount != rhs.getUsedBlocksCount()) {
-      return false;
-    }
-    for (size_t k = 0; k < usedBlocksCount; ++k) {
-      if (getContentBlock(k) != rhs.getContentBlock(k)) {
-        return false;
-      }
-    }
-    return true;
-  }
+  bool operator==(const RecordFormat& rhs) const;
   bool operator!=(const RecordFormat& rhs) const {
     return !operator==(rhs);
   }
@@ -769,13 +713,7 @@ class RecordFormat {
   /// Get a specific ContentBlock. Use getUsedBlocksCount() to know when to stop.
   /// @param index: The index of the block requested.
   /// @return The requested ContentBlock, or an empty block, if there is no block at that index.
-  const ContentBlock& getContentBlock(size_t index) const {
-    if (index < blocks_.size()) {
-      return blocks_[index];
-    }
-    static ContentBlock sEmptyBlock;
-    return sEmptyBlock;
-  }
+  const ContentBlock& getContentBlock(size_t index) const;
   /// Get first content block.
   /// @return The first ContentBlock, or an empty block, if there are no ContentBlock defined.
   const ContentBlock& getFirstContentBlock() const {
