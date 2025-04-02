@@ -53,6 +53,7 @@ enum class Details : uint32_t {
 
   // presentation flags
   UsePublicNames = 1 << 24,
+  CompleteTags = 1 << 25, // don't truncate long tags
 };
 
 /// Combine flags

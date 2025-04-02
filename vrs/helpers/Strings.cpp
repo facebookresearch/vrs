@@ -275,19 +275,19 @@ string make_printable(const string& str) {
       if (c < 128 && isprint(c)) {
         sanitized.push_back(c);
       } else if (c == '\n') {
-        sanitized += "\\n"; // LF
+        sanitized.append("\\n"); // LF
       } else if (c == '\r') {
-        sanitized += "\\r"; // CR
+        sanitized.append("\\r"); // CR
       } else if (c == '\t') {
-        sanitized += "\\t"; // tab
+        sanitized.append("\\t"); // tab
       } else if (c == '\b') {
-        sanitized += "\\b"; // backspace
+        sanitized.append("\\b"); // backspace
       } else if (c == 0x1B) {
-        sanitized += "\\e"; // esc
+        sanitized.append("\\e"); // esc
       } else {
         // stringstream methods just won't work right, even with Stackoverflow's help...
         static const char* digits = "0123456789abcdef";
-        sanitized += "\\x";
+        sanitized.append("\\x");
         sanitized.push_back(digits[(c >> 4) & 0xf]);
         sanitized.push_back(digits[c & 0xf]);
       }
