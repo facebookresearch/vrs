@@ -18,6 +18,7 @@
 
 #include <limits>
 #include <map>
+#include <tuple>
 
 #include "ContentBlockReader.h"
 #include "DataLayout.h"
@@ -27,6 +28,7 @@
 namespace vrs {
 
 using std::map;
+using std::pair;
 using std::string;
 using std::tuple;
 using std::unique_ptr;
