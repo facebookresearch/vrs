@@ -17,6 +17,7 @@
 #include "System.h"
 
 #include <array>
+#include <mutex>
 #include <sstream>
 
 #include <vrs/os/Platform.h>
@@ -25,10 +26,14 @@
 #include <sys/system_properties.h>
 
 #elif IS_MAC_PLATFORM()
+#include <sys/ioctl.h>
 #include <sys/sysctl.h>
+#include <unistd.h>
 
 #elif IS_LINUX_PLATFORM()
+#include <sys/ioctl.h>
 #include <sys/utsname.h>
+#include <unistd.h>
 
 #elif IS_WINDOWS_PLATFORM()
 #ifndef NOMINMAX
@@ -44,9 +49,14 @@
 #define DEFAULT_LOG_CHANNEL "OsSystem"
 #include <logging/Log.h>
 
+#include <vrs/os/Time.h>
+
 using namespace std;
 
-string vrs::os::getOsFingerPrint() {
+namespace vrs {
+namespace os {
+
+string getOsFingerPrint() {
 #if IS_ANDROID_PLATFORM()
   array<char, PROP_VALUE_MAX> osFingerprint;
   int osFingerprintLength = __system_property_get("ro.build.fingerprint", osFingerprint.data());
@@ -95,9 +105,44 @@ string vrs::os::getOsFingerPrint() {
 #endif
 }
 
-string vrs::os::getUniqueSessionId() {
+string getUniqueSessionId() {
   stringstream sstream;
   boost::uuids::random_generator generator;
   sstream << generator();
   return sstream.str();
 }
+
+size_t getTerminalWidth() {
+  static mutex sMutex;
+  static size_t sTerminalWidth = 0;
+  static double sLastWidthCheckTime = 0;
+
+  lock_guard<mutex> lock(sMutex);
+
+  const double kWidthCheckInterval = 5.0; // seconds
+  const size_t kDefaultWidth = 160;
+  double now = getTimestampSec();
+  if (sTerminalWidth == 0 || (sLastWidthCheckTime + kWidthCheckInterval) < now) {
+#if IS_WINDOWS_PLATFORM()
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    sTerminalWidth =
+        (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi) ? csbi.dwSize.X
+                                                                            : kDefaultWidth);
+#elif IS_LINUX_PLATFORM() || IS_MAC_PLATFORM()
+    struct winsize w;
+    sTerminalWidth = ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == 0 ? w.ws_col : kDefaultWidth;
+
+#else
+    sTerminalWidth = kDefaultWidth;
+
+#endif
+    if (sTerminalWidth < 40 || sTerminalWidth > 300) {
+      sTerminalWidth = kDefaultWidth;
+    }
+    sLastWidthCheckTime = now;
+  }
+  return sTerminalWidth;
+}
+
+} // namespace os
+} // namespace vrs

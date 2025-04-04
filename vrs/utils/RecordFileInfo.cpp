@@ -23,6 +23,7 @@
 
 #include <vrs/helpers/Rapidjson.hpp>
 #include <vrs/helpers/Strings.h>
+#include <vrs/os/System.h>
 
 #include <vrs/ErrorCode.h>
 #include <vrs/IndexRecord.h>
@@ -81,17 +82,15 @@ void printTime(
   }
 }
 
-const size_t kMaxVRSTagLineLength = 160;
-
-void appendTruncated(string& line, const string& extra, Details details) {
+void appendTruncated(string& line, const string& extra, Details details, size_t width) {
   if (details & Details::CompleteTags) {
     line.append(extra);
   } else {
-    if (line.size() >= kMaxVRSTagLineLength) {
-      line.resize(kMaxVRSTagLineLength);
+    if (line.size() >= width) {
+      line.resize(width);
     } else {
-      if (line.size() + extra.size() > kMaxVRSTagLineLength) {
-        line.append(extra.substr(0, kMaxVRSTagLineLength - line.size()));
+      if (line.size() + extra.size() > width) {
+        line.append(extra.substr(0, width - line.size()));
       } else {
         line.append(extra);
       }
@@ -100,23 +99,24 @@ void appendTruncated(string& line, const string& extra, Details details) {
 }
 
 void printTags(ostream& out, string_view prefix, const map<string, string>& tags, Details details) {
+  const size_t width = os::getTerminalWidth();
   string line;
-  line.reserve(kMaxVRSTagLineLength * 2);
+  line.reserve(width * 2);
   for (const auto& iter : tags) {
     line.clear();
     line.append(prefix).append(iter.first).append(" = ");
-    appendTruncated(line, iter.second, details);
+    appendTruncated(line, iter.second, details, width);
     if (iter.first == tag_conventions::kCaptureTimeEpoch) {
       time_t creationTimeSec = static_cast<time_t>(stoul(iter.second));
       if (creationTimeSec > 1000000) {
         stringstream ss;
         ss << put_time(localtime(&creationTimeSec), " -- %c %Z");
-        appendTruncated(line, ss.str(), details);
+        appendTruncated(line, ss.str(), details, width);
       }
     }
     string printable = make_printable(line);
-    if (printable.size() > kMaxVRSTagLineLength - 3 && !(details & Details::CompleteTags)) {
-      out << printable.substr(0, kMaxVRSTagLineLength - 3) << "...\n";
+    if (printable.size() > width - 3 && !(details & Details::CompleteTags)) {
+      out << printable.substr(0, width - 3) << "...\n";
     } else {
       out << printable << "\n";
     }
