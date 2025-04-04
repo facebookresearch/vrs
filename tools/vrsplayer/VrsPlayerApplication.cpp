@@ -29,6 +29,7 @@
 
 #include "VideoTime.h"
 
+#include <vrs/ErrorCode.h>
 #include <vrs/helpers/Strings.h>
 
 namespace vrsp {
@@ -74,9 +75,14 @@ int VrsPlayerApplication::run(PlayerUI& playerUI, QCommandLineParser& parser) {
   if (!parser.positionalArguments().isEmpty()) {
     const QString& arg = parser.positionalArguments().constFirst();
     vrs::FileSpec fspec;
-    if (!arg.isEmpty() && fspec.fromPathJsonUri(arg.toStdString()) == 0) {
-      firstFile_ = arg;
-      XR_LOGD("VrsPlayerApplication::processCommandLine: {}", firstFile_.toStdString());
+    if (!arg.isEmpty()) {
+      int status = fspec.fromPathJsonUri(arg.toStdString());
+      if (status == 0) {
+        firstFile_ = arg;
+        XR_LOGD("VrsPlayerApplication::processCommandLine: {}", firstFile_.toStdString());
+      } else {
+        XR_LOGE("Can't open '{}': {}", arg.toStdString(), vrs::errorCodeToMessageWithCode(status));
+      }
     }
   }
   // We can't tell yet if the user opened a file from the UI and a FileOpen event is coming in
