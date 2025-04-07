@@ -53,6 +53,7 @@ int remove(const std::string& path); // file or folder
 int rename(const std::string& originalName, const std::string& newName); // file or folder
 bool getLinkedTarget(const std::string& sourcePath, std::string& outLinkedPath);
 int hidePath(const std::string& path, bool hide = true); // only does something on Windows
+void shortenPath(std::string& path); // only does something on Windows, maybe...
 std::string sanitizeFileName(const std::string& filename);
 std::string randomName(int length);
 const std::string& getTempFolder();

@@ -167,13 +167,23 @@ string fileErrorToString(int errnum) {
 // we can't use std::tmpnam, because it's deprecated, and throws a warning, breaking the build...
 // So yes, we're reinventing the wheel.
 string randomName(int length) {
-  const char charset[] = "0123456789_abcdefghijklmnopqrstuvwxyz";
+  const char charset[] = "0123456789abcdefghijklmnopqrstuvwxyz";
   std::default_random_engine rng(std::random_device{}());
   std::uniform_int_distribution<> dist(0, sizeof(charset) - 2);
   auto randchar = [charset, &dist, &rng]() { return charset[dist(rng)]; };
   string str(length, 0);
   generate_n(str.begin(), length, randchar);
   return str;
+}
+
+void shortenPath(std::string& path) {
+#if IS_WINDOWS_PLATFORM()
+  char shortPath[MAX_PATH];
+  DWORD length = GetShortPathNameA(path.c_str(), shortPath, MAX_PATH);
+  if (length > 1 && length < path.size()) {
+    path.assign(shortPath, length);
+  }
+#endif
 }
 
 #if IS_VRS_OSS_CODE()
