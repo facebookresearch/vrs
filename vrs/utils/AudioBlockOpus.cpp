@@ -17,8 +17,10 @@
 #include "AudioBlock.h"
 
 #ifdef OPUS_IS_AVAILABLE
+extern "C" {
 #include <opus.h>
 #include <opus_multistream.h>
+}
 #endif
 
 #define DEFAULT_LOG_CHANNEL "AudioBlockOpus"
