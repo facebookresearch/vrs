@@ -27,6 +27,7 @@ jobs:
               libjpeg-dev libturbojpeg-dev libpng-dev \
               liblz4-dev libzstd-dev libxxhash-dev \
               libboost-system-dev libboost-filesystem-dev libboost-date-time-dev \
+              libopus-dev \
               qtbase5-dev portaudio19-dev
 
           elif [ "$RUNNER_OS" == "macOS" ]; then
@@ -34,6 +35,7 @@ jobs:
                   jpeg-turbo libpng \
                   lz4 zstd xxhash \
                   boost \
+                  opus \
                   qt5 portaudio
 
           else
