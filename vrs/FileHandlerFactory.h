@@ -48,6 +48,7 @@ class FileHandlerFactory {
       unique_ptr<FileDelegator>&& delegator);
   void unregisterExtraDelegator(const string& extraName, const string& extraValue);
   FileDelegator* getExtraDelegator(const FileSpec& fileSpec);
+  FileDelegator* getExtraDelegator(const string& extraName, const string& extraValue);
 
   /// Delegators operating on FileSpec.fileHandlerName
   void registerFileHandler(unique_ptr<FileHandler>&& fileHandler);

@@ -187,6 +187,23 @@ FileDelegator* FileHandlerFactory::getExtraDelegator(const FileSpec& fileSpec) {
   return nullptr;
 }
 
+FileDelegator* FileHandlerFactory::getExtraDelegator(
+    const string& extraName,
+    const string& extraValue) {
+  if (extraName.empty() || extraValue.empty()) {
+    return nullptr;
+  }
+  unique_lock<mutex> lock(mutex_);
+  const auto& iter = extraDelegatorMap_.find(extraName);
+  if (iter != extraDelegatorMap_.end()) {
+    const auto& delegateIter = iter->second.find(extraValue);
+    if (delegateIter != iter->second.end()) {
+      return delegateIter->second.get();
+    }
+  }
+  return nullptr;
+}
+
 FileDelegator* FileHandlerFactory::getFileDelegator(const string& name) {
   unique_lock<mutex> lock(mutex_);
   auto delegator = fileDelegatorMap_.find(name);

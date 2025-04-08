@@ -25,6 +25,7 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/FileHandlerFactory.h>
 #include <vrs/helpers/EnumStringConverter.h>
 #include <vrs/helpers/Rapidjson.hpp>
 #include <vrs/helpers/Strings.h>
@@ -301,10 +302,25 @@ string FileSpec::getSourceLocation() const {
 
 string FileSpec::getEasyPath() const {
   if (!uri.empty()) {
-    if (fileName.empty()) {
-      return uri;
+    // The uri field, when present, is a trace of where the FileSpec came from, but it might no
+    // longer be accurate, if the FileSpec was manipulated directly unceremoniously. This has caused
+    // confusion when using getEasyPath() to show a file's path, on error in particular, when the
+    // presence of a delegator not visible. So when showing the uri, should there be a delegator in
+    // the FileSpec not directly visible in the uri, let's make sure to reveal the delegator.
+    string uriDelagator;
+    FileHandlerFactory& factory = FileHandlerFactory::getInstance();
+    for (const auto& extra : extras) {
+      if ((uri.find(extra.first) == string::npos || uri.find(extra.second) == string::npos) &&
+          factory.getExtraDelegator(extra.first, extra.second) != nullptr) {
+        uriDelagator = fmt::format("{} with delegator {}={}", uri, extra.first, extra.second);
+        break;
+      }
     }
-    return "uri: " + uri + ", name: " + fileName;
+    const string& easyPath = uriDelagator.empty() ? uri : uriDelagator;
+    if (fileName.empty()) {
+      return easyPath;
+    }
+    return fmt::format("uri: {}, name: {}", easyPath, fileName);
   }
   if (isDiskFile() && chunks.size() == 1 && extras.empty()) {
     return chunks.front();

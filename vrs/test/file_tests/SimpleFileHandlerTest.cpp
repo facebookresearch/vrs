@@ -22,6 +22,7 @@
 
 #include <vrs/DataLayoutConventions.h>
 #include <vrs/FileHandler.h>
+#include <vrs/FileHandlerFactory.h>
 #include <vrs/RecordFileReader.h>
 #include <vrs/RecordFileWriter.h>
 #include <vrs/RecordFormatStreamPlayer.h>
@@ -331,7 +332,19 @@ inline string escape(const string& str) {
   return out;
 }
 
+// Fake delegator for testing
+class PastisDelegator : public FileDelegator {
+ public:
+  int delegateOpen(const FileSpec& fileSpec, unique_ptr<FileHandler>& outNewDelegate) override {
+    outNewDelegate = make_unique<DiskFile>();
+    return 0;
+  }
+};
+
 TEST_F(SimpleFileHandlerTest, pathJsonUriParse) {
+  FileHandlerFactory::getInstance().registerExtraDelegator(
+      "dealer", "pastis", make_unique<PastisDelegator>());
+
   vector<string> chunks;
   vector<int64_t> chunkSizes;
   FileSpec spec;
@@ -589,4 +602,30 @@ TEST_F(SimpleFileHandlerTest, pathJsonUriParse) {
   json = "{\"chunks\":[\"\\\\\\\\?\\\\D:\\\\folder\\\\dir\\\\file.ext\"],\"storage\":\"diskfile\"}";
   EXPECT_EQ(spec.toJson(), json);
   EXPECT_EQ(spec.getEasyPath(), WINDOWS_PATH);
+
+  const string kPastisUri = "diskfile:/dir/file.vrs?dealer=pastis";
+  EXPECT_EQ(spec.fromPathJsonUri(kPastisUri), 0);
+  EXPECT_EQ(spec.uri, kPastisUri);
+  EXPECT_EQ(spec.fileHandlerName, "diskfile");
+  chunks = {"/dir/file.vrs"};
+  EXPECT_EQ(spec.chunks, chunks);
+  EXPECT_TRUE(spec.chunkSizes.empty());
+  EXPECT_EQ(spec.fileName, "");
+  EXPECT_FALSE(spec.hasChunkSizes());
+  EXPECT_EQ(spec.getFileSize(), -1);
+  EXPECT_EQ(spec.getSourceLocation(), "diskfile");
+  json =
+      "{\"chunks\":[\"/dir/file.vrs\"],\"storage\":\"diskfile\",\"source_uri\":\"diskfile"
+      ":/dir/file.vrs?dealer=pastis\",\"dealer\":\"pastis\"}";
+  EXPECT_EQ(spec.toJson(), json);
+  EXPECT_EQ(spec.getEasyPath(), kPastisUri);
+
+  // remove mention of the delegator
+  spec.uri = "diskfile:/dir/file.vrs";
+  EXPECT_EQ(spec.getEasyPath(), "diskfile:/dir/file.vrs with delegator dealer=pastis");
+
+  spec.fileName = "good_stuff.vrs";
+  EXPECT_EQ(
+      spec.getEasyPath(),
+      "uri: diskfile:/dir/file.vrs with delegator dealer=pastis, name: good_stuff.vrs");
 }
