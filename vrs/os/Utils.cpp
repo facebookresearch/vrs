@@ -176,7 +176,7 @@ string randomName(int length) {
   return str;
 }
 
-void shortenPath(std::string& path) {
+void shortenPath(MAYBE_UNUSED string& path) {
 #if IS_WINDOWS_PLATFORM()
   char shortPath[MAX_PATH];
   DWORD length = GetShortPathNameA(path.c_str(), shortPath, MAX_PATH);
@@ -187,14 +187,26 @@ void shortenPath(std::string& path) {
 }
 
 #if IS_VRS_OSS_CODE()
+const string& getOsTempFolder() {
+  static string sOsTempFolder = [] {
+    string folderPath;
+#if IS_ANDROID_PLATFORM()
+    folderPath = "/data/local/tmp/";
+#else // !IS_ANDROID_PLATFORM()
+    folderPath = fs::temp_directory_path().string();
+    os::shortenPath(folderPath);
+#endif // !IS_ANDROID_PLATFORM()
+    if (!folderPath.empty() && (folderPath.back() != '/' && folderPath.back() != '\\')) {
+      folderPath += '/';
+    }
+    return folderPath;
+  }();
+  return sOsTempFolder;
+}
+
 const string& getTempFolder() {
   static string sUniqueFolderName = [] {
-    fs::path tempDir;
-#if IS_ANDROID_PLATFORM()
-    tempDir = "/data/local/tmp/";
-#else // !IS_ANDROID_PLATFORM()
-    tempDir = fs::temp_directory_path();
-#endif // !IS_ANDROID_PLATFORM()
+    const string tempDir = getOsTempFolder();
 
     string processName = getFilename(getCurrentExecutablePath());
     const size_t maxLength = 40;
@@ -203,8 +215,10 @@ const string& getTempFolder() {
     }
     processName += '-';
     string uniqueFolderName;
+    uniqueFolderName.reserve(tempDir.size() + processName.size() + 6);
     do {
-      uniqueFolderName = (tempDir / (processName + randomName(10))).string();
+      uniqueFolderName.clear();
+      uniqueFolderName.append(tempDir).append(processName).append(randomName(5));
     } while (pathExists(uniqueFolderName) || makeDir(uniqueFolderName) != 0);
     uniqueFolderName += '/';
     return uniqueFolderName;
@@ -313,7 +327,7 @@ string sanitizeFileName(const string& filename) {
   return sanitizedName;
 }
 
-string makeUniqueFolder(const std::string& baseName, size_t randomSuffixLength) {
+string makeUniqueFolder(const string& baseName, size_t randomSuffixLength) {
   string path;
   do {
     path = getUniquePath(baseName.empty() ? getTempFolder() : baseName, randomSuffixLength);
