@@ -28,32 +28,32 @@ version = "1.1.0"
 clean = { cmd = "rm -rf build" }
 print-env = { cmd = "echo $PATH" }
 prepare = "cmake -G 'Ninja' -B build -S . -DCMAKE_BUILD_TYPE=Release"
-build = { cmd = "cmake --build build --config Release --target all", depends_on = [
+build = { cmd = "cmake --build build --config Release --target all", depends-on = [
     "prepare",
 ] }
-test = {cmd = "cd build; ctest -j --rerun-failed --output-on-failure ", depends_on = ["build"] }
-vrs = { cmd = "build/tools/vrs/vrs", depends_on = ["build"]}
+test = {cmd = "cd build; ctest -j --rerun-failed --output-on-failure ", depends-on = ["build"] }
+vrs = { cmd = "build/tools/vrs/vrs", depends-on = ["build"]}
 
 [target.win-64.tasks] # Deal with windows specifics (prepare and build)
 cmake-generator = "cmake --help"
 prepare = "cmake -G 'Visual Studio 16 2019' -B build -S . -DCMAKE_BUILD_TYPE=Release"
-build = { cmd = "cmake --build build --config Release  -- /m", depends_on = [
+build = { cmd = "cmake --build build --config Release  -- /m", depends-on = [
     "prepare",
 ] }
-vrs = { cmd = "build/tools/vrs/Release/vrs", depends_on = ["build"]}
+vrs = { cmd = "build/tools/vrs/Release/vrs", depends-on = ["build"]}
 
 [build-dependencies]
-cmake = "3.27.6"
-cxx-compiler = "1.6.0.*"
-ninja = "1.11.1"
+cmake = "4.0.0.*"
+cxx-compiler = "1.9.0.*"
+ninja = "1.12.1.*"
 
 [dependencies]
-boost = "1.84.0.*"
-fmt = "10.1.1.*"
-gtest = "1.14.0"
-libjpeg-turbo = "2.1.4.*"
-libpng = "1.6.39.*"
-lz4 = "4.3.2.*"
-portaudio = "19.6.0.*"
-xxhash = "0.8.2"
-zlib = "1.2.13.*"
+boost = "1.85.0.*"
+fmt = "11.1.4.*"
+gtest = "1.16.0.*"
+libjpeg-turbo = "3.0.0.*"
+libpng = "1.6.47.*"
+lz4 = "4.3.3.*"
+portaudio = "19.7.0.*"
+xxhash = "0.8.3.*"
+zlib = "1.3.1.*"
