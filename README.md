@@ -80,7 +80,7 @@ system.
 - install tools & libraries:
   ```
   brew install cmake git ninja ccache boost fmt libpng jpeg jpeg-turbo lz4 zstd xxhash glog googletest
-  brew install qt5 portaudio pybind11
+  brew install qt5 portaudio pybind11 opus
   brew install node doxygen
   ```
 
@@ -95,7 +95,7 @@ therefore not supported._
   sudo apt-get install cmake git ninja-build ccache libgtest-dev libfmt-dev libjpeg-dev libturbojpeg-dev libpng-dev
   sudo apt-get install liblz4-dev libzstd-dev libxxhash-dev
   sudo apt-get install libboost-system-dev libboost-filesystem-dev libboost-date-time-dev
-  sudo apt-get install qtbase5-dev portaudio19-dev
+  sudo apt-get install qtbase5-dev portaudio19-dev libopus-dev
   sudo apt-get install npm doxygen
   ```
 
@@ -237,6 +237,9 @@ and audio files. It also provides ways to visualize record's metadata as they
 are played. It can be found in the cmake build folder at
 `oss/tools/vrsplayer/vrsplayer`. For more information, see the
 [`vrsplayer` documentation](https://facebookresearch.github.io/vrs/docs/vrsplayer).
+
+Note: Tooling can be installed using the
+[conda eco-system](https://anaconda.org/conda-forge/vrs).
 
 # Python interface
 
