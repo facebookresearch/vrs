@@ -384,6 +384,7 @@ TEST_F(AudioContentBlockReaderTest, testFullSpecData) {
   EXPECT_EQ(analytics.unsupportedCount, 0);
 }
 
+#ifdef OPUS_IS_AVAILABLE
 TEST_F(AudioContentBlockReaderTest, testOpusStereo) {
   ASSERT_GT(stereoAudio.samples.size(), 100000);
 
@@ -432,3 +433,4 @@ TEST_F(AudioContentBlockReaderTest, testOpusMultiChannel) {
   EXPECT_EQ(analytics.audioSampleCount, kBlockCount * kBlockSampleSize);
   EXPECT_EQ(analytics.unsupportedCount, 0);
 }
+#endif // OPUS_IS_AVAILABLE
