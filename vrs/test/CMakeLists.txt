@@ -30,6 +30,7 @@ target_link_libraries(vrs_test_helpers
 target_compile_definitions(vrs_test_helpers PUBLIC GTEST_BUILD)
 
 add_executable(test_vrslib
+  AudioContentBlockReaderTest.cpp
   ContentBlockReaderTest.cpp
   CustomBlockTest.cpp
   DataLayoutFormatTest.cpp
@@ -47,12 +48,17 @@ add_executable(test_vrslib
   RecordManagerTest.cpp
   RecordTest.cpp
 )
+if (BUILD_WITH_OPUS)
+  target_compile_definitions(test_vrslib PRIVATE OPUS_IS_AVAILABLE)
+endif()
+
 if (NOT CMAKE_HOST_WIN32)
   target_sources(test_vrslib PUBLIC TestProcessTest.cpp)
 endif()
 target_link_libraries(test_vrslib
   PUBLIC
     vrslib
+    vrs_utils
     vrs_oss_testdatadir
     vrs_test_helpers
     GTest::Main
