@@ -36,6 +36,12 @@ target_link_libraries(vrs_utils
     rapidjson::rapidjson
     vrs_logging
 )
+
+if (BUILD_WITH_OPUS)
+  target_link_libraries(vrs_utils PRIVATE Opus::opus)
+  target_compile_definitions(vrs_utils PRIVATE OPUS_IS_AVAILABLE)
+endif()
+
 target_include_directories(vrs_utils
   INTERFACE
     $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
