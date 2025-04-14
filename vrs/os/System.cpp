@@ -17,7 +17,7 @@
 #include "System.h"
 
 #include <array>
-#include <mutex>
+#include <atomic>
 #include <sstream>
 
 #include <vrs/os/Platform.h>
@@ -112,36 +112,40 @@ string getUniqueSessionId() {
   return sstream.str();
 }
 
-size_t getTerminalWidth() {
-  static mutex sMutex;
-  static size_t sTerminalWidth = 0;
-  static double sLastWidthCheckTime = 0;
-
-  lock_guard<mutex> lock(sMutex);
+size_t getTerminalWidth(size_t setValue) {
+  static atomic<size_t> sTerminalWidth = 0;
+  static atomic<double> sLastWidthCheckTime = 0;
 
   const double kWidthCheckInterval = 5.0; // seconds
   const size_t kDefaultWidth = 160;
   double now = getTimestampSec();
-  if (sTerminalWidth == 0 || (sLastWidthCheckTime + kWidthCheckInterval) < now) {
+  size_t width = sTerminalWidth.load(memory_order_relaxed);
+  if (setValue != 0) {
+    width = setValue;
+    sTerminalWidth = width;
+    sLastWidthCheckTime = now + 10000; // make the value stick for a long while
+  } else if (
+      width == 0 || (sLastWidthCheckTime.load(memory_order_relaxed) + kWidthCheckInterval) < now) {
 #if IS_WINDOWS_PLATFORM()
     CONSOLE_SCREEN_BUFFER_INFO csbi;
-    sTerminalWidth =
+    width =
         (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi) ? csbi.dwSize.X
                                                                             : kDefaultWidth);
 #elif IS_LINUX_PLATFORM() || IS_MAC_PLATFORM()
     struct winsize w;
-    sTerminalWidth = ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == 0 ? w.ws_col : kDefaultWidth;
+    width = ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == 0 ? w.ws_col : kDefaultWidth;
 
 #else
-    sTerminalWidth = kDefaultWidth;
+    width = kDefaultWidth;
 
 #endif
-    if (sTerminalWidth < 40 || sTerminalWidth > 300) {
-      sTerminalWidth = kDefaultWidth;
+    if (width < 40 || width > 300) {
+      width = kDefaultWidth;
     }
+    sTerminalWidth = width;
     sLastWidthCheckTime = now;
   }
-  return sTerminalWidth;
+  return width;
 }
 
 } // namespace os

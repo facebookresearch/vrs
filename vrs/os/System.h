@@ -23,7 +23,7 @@ namespace os {
 
 std::string getOsFingerPrint();
 std::string getUniqueSessionId();
-size_t getTerminalWidth();
+size_t getTerminalWidth(size_t setValue = 0); // option to set value for tests
 
 } // namespace os
 } // namespace vrs
