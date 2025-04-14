@@ -204,6 +204,18 @@ void DataLayout::serialize(JsonWrapper& jw, const JsonFormatProfileSpec& profile
   jw.value.AddMember(vrs_rapidjson::StringRef(kFieldName), jpieces, jw.alloc);
 }
 
+string DataLayout::getListOfPiecesSpec() const {
+  string list;
+  list.reserve((fixedSizePieces_.size() + varSizePieces_.size()) * 50);
+  for (const auto& piece : fixedSizePieces_) {
+    list.append(piece->getLabel()).append(" - ").append(piece->getTypeName()).append("\n");
+  }
+  for (const auto& piece : varSizePieces_) {
+    list.append(piece->getLabel()).append(" - ").append(piece->getTypeName()).append("\n");
+  }
+  return list;
+}
+
 ContentBlock DataLayout::getContentBlock() const {
   return {
       ContentType::DATA_LAYOUT,

@@ -344,6 +344,9 @@ class DataLayout {
   /// @return json text string.
   string asJson(const JsonFormatProfileSpec& profile = JsonFormatProfileSpec()) const;
 
+  /// Get a text list of fields, types & names, one per line. Useful for tests.
+  string getListOfPiecesSpec() const;
+
   /// Compare two layouts, and tells if all the pieces are in the same order,
   /// with the same properties (name, type, tags, etc). Does not compare actual values!
   /// @param otherLayout: Layout to compare to.

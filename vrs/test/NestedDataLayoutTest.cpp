@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-#include <sstream>
-
 #include <gtest/gtest.h>
 
 #include <vrs/DataPieces.h>
@@ -206,16 +204,13 @@ TEST_F(NestedDataLayoutTester, DataLayoutStructArrayCanPrint) {
       angles.set(mockValues.data(), TestHandLayout::kNFingers);
     }
   }
-  std::ostringstream stream;
-  layout.printLayoutCompact(stream);
-  EXPECT_EQ(
-      stream.str(),
-      R"(  hands/0/window/0/angles:  0 0 0 0 0
-  hands/0/window/1/angles:  0 1 0 0 0
-  hands/0/window/2/angles:  0 2 0 0 0
-  hands/1/window/0/angles:  1 0 0 0 0
-  hands/1/window/1/angles:  1 1 0 0 0
-  hands/1/window/2/angles:  1 2 0 0 0
+
+  EXPECT_EQ(layout.getListOfPiecesSpec(), R"(hands/0/window/0/angles - DataPieceArray<float>
+hands/0/window/1/angles - DataPieceArray<float>
+hands/0/window/2/angles - DataPieceArray<float>
+hands/1/window/0/angles - DataPieceArray<float>
+hands/1/window/1/angles - DataPieceArray<float>
+hands/1/window/2/angles - DataPieceArray<float>
 )");
 }
 

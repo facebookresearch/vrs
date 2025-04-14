@@ -24,6 +24,7 @@
 #include <vrs/RecordFileReader.h>
 #include <vrs/RecordFileWriter.h>
 #include <vrs/RecordFormatStreamPlayer.h>
+#include <vrs/os/System.h>
 #include <vrs/os/Utils.h>
 
 using namespace vrs;
@@ -88,12 +89,23 @@ struct Data : public AutoDataLayout {
 
 struct FormatValues : public AutoDataLayout {
   DataPieceValue<int32_t> int32{"int32_t"};
+  DataPieceValue<uint8_t> uint8{"uint8_t"};
   DataPieceValue<uint32_t> uint32{"uint32_t"};
   DataPieceValue<int64_t> int64{"int64_t"};
   DataPieceValue<uint64_t> uint64{"uint64_t"};
   DataPieceValue<float> floatv{"float"};
   DataPieceValue<double> doublev{"double"};
+  DataPieceValue<Point2Di> point2diValue{"point2di_value"};
+  DataPieceValue<Matrix2Di> matrix2diValue{"matrix2di_value"};
+
+  DataPieceArray<int8_t> int8Array{"int8_array", 4};
+  DataPieceVector<int16_t> vectorInt16{"int_vector"};
   DataPieceStringMap<double> stringMapDouble{"string_map_double"};
+  DataPieceStringMap<uint8_t> stringMapUint8{"string_map_uint8"};
+
+  DataPieceString stringValue{"string_value"};
+  DataPieceVector<string> vectorString{"string_vector"};
+  DataPieceStringMap<string> stringMapString{"string_map_string"};
 
   AutoDataLayoutEnd endLayout;
 };
@@ -363,22 +375,103 @@ TEST_F(DataLayoutFormatTester, FormatValuesTest) {
   valuesdl.uint64.set(SAMPLE_EPOCH_TIME);
   valuesdl.doublev.set(1.7044e9);
   valuesdl.floatv.set(SAMPLE_EPOCH_TIME);
+  valuesdl.uint8.set(255);
+  valuesdl.point2diValue.set({1, 2});
+  int32_t matrix2i[2][2] = {
+      {
+          1,
+          2,
+      },
+      {
+          3,
+          4,
+      }};
+  valuesdl.matrix2diValue.set(matrix2i);
+  valuesdl.int8Array.set({1, -1, -128, 127});
+  valuesdl.vectorInt16.stage({1, -1, -128, 127, -32768, 32767});
   valuesdl.stringMapDouble.stagedValues()["walltime"] = SAMPLE_EPOCH_TIME;
   valuesdl.stringMapDouble.stagedValues()["arrival"] = 1.7044e9;
+  valuesdl.stringMapUint8.stagedValues()["lowest"] = 0;
+  valuesdl.stringMapUint8.stagedValues()["highest"] = 255;
+
+  const string veryLongString =
+      "This is a very long string that is longer than 255 characters. "
+      "For that I need a lot more text that I'm getting like this. "
+      "This is a story worth telling, really, because we want to "
+      "see text wrapping and truncation.";
+  valuesdl.stringValue.stage(veryLongString);
+  valuesdl.vectorString.stage({"one", veryLongString, "three"});
+  valuesdl.stringMapString.stagedValues()["first"] = "un";
+  valuesdl.stringMapString.stagedValues()["second"] = "deux";
+  valuesdl.stringMapString.stagedValues()["third"] = "trois";
 
   valuesdl.collectVariableDataAndUpdateIndex();
 
-  stringstream ss;
-  valuesdl.printLayoutCompact(ss);
-  EXPECT_EQ(
-      ss.str(),
-      "  int32_t: 2000000000\n"
-      "  uint32_t: 2000000000\n"
-      "  int64_t: 2000000000\n"
-      "  uint64_t: 2000000000\n"
-      "  float: 2e+09\n"
-      "  double: 1704400000.000\n"
-      "  string_map_double, 2 values:\n"
-      "      \"arrival\": 1704400000.000\n"
-      "      \"walltime\": 2000000000.000\n");
+  os::getTerminalWidth(120);
+
+  {
+    stringstream ss;
+    valuesdl.printLayoutCompact(ss);
+    EXPECT_EQ(ss.str(), R"=(  int32_t: 2000000000
+  uint8_t: 255
+  uint32_t: 2000000000
+  int64_t: 2000000000
+  uint64_t: 2000000000
+  float: 2e+09
+  double: 1704400000.000
+  point2di_value: [1, 2]
+  matrix2di_value: [[1, 2], [3, 4]]
+  int8_array:  1 -1 -128 127
+  int_vector:  1 -1 -128 127 -32768 32767
+  string_map_double, 2 values:
+      "arrival": 1704400000.000
+      "walltime": 2000000000.000
+  string_map_uint8, 2 values:
+      "highest": 255
+      "lowest": 0
+  string_value: "This is a very long string that is longer than 255 characters. F  ***truncated***   and truncation."
+  string_vector:  "one" "This is a very long string that is longer than 255 characters. F  ***truncated***   and truncation." "three"
+  string_map_string, 3 values:
+      "first": un
+      "second": deux
+      "third": trois
+)=");
+  }
+
+  {
+    stringstream ss;
+    valuesdl.printLayout(ss);
+    EXPECT_EQ(ss.str(), R"=(10 fixed size pieces, total 113 bytes.
+  int32_t (int32_t) @ 0+4 Value: 2000000000
+  uint8_t (uint8_t) @ 4+1 Value: 255
+  uint32_t (uint32_t) @ 5+4 Value: 2000000000
+  int64_t (int64_t) @ 9+8 Value: 2000000000
+  uint64_t (uint64_t) @ 17+8 Value: 2000000000
+  float (float) @ 25+4 Value: 2e+09
+  double (double) @ 29+8 Value: 1704400000.000
+  point2di_value (Point2Di) @ 37+8 Value: [1, 2]
+  matrix2di_value (Matrix2Di) @ 45+16 Value: [[1, 2], [3, 4]]
+  int8_array (int8_t[4]) @ 61+4
+    Values: 1 -1 -128 127
+6 variable size pieces, total 577 bytes.
+  int_vector (vector<int16_t>) @ index: 0, count: 6
+    Values: 1 -1 -128 127 -32768 32767
+  string_map_double (stringMap<double>) @ index: 1, count: 2
+    Values:
+      "arrival": 1704400000.000
+      "walltime": 2000000000.000
+  string_map_uint8 (stringMap<uint8_t>) @ index: 2, count: 2
+    Values:
+      "highest": 255
+      "lowest": 0
+  string_value (string) @ index 3 = "This is a very long string that is longer than 255 characters. For that I need a lot more text that I'm getting like this. This is a story worth telling, really, because we want to see text wrapping and truncation."
+  string_vector (vector<string>) @ index: 4, count: 3
+    Values: "one" "This is a very long string that is longer than 255 characters. For that I need a lot more text that I'm getting like this. This is a story worth telling, really, because we want to see text wrapping and truncation." "three"
+  string_map_string (stringMap<string>) @ index: 5, count: 3
+    Values:
+      "first": un
+      "second": deux
+      "third": trois
+)=");
+  }
 }
