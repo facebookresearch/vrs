@@ -49,9 +49,10 @@ enum class Details : uint32_t {
   Overview = MainCounters,
   Counters = MainCounters | StreamRecordCounts,
 
-  Everything = (1 << 24) - 1, // 24 bits for data selection
+  Everything = (1 << 23) - 1, // 23 bits for data selection
 
   // presentation flags
+  JsonPretty = 1 << 23, // pretty print json
   UsePublicNames = 1 << 24,
   CompleteTags = 1 << 25, // don't truncate long tags
 };

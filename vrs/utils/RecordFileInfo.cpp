@@ -446,7 +446,8 @@ string jsonOverview(const string& path, Details details) {
   doc.AddMember(
       stringToJvalue("error_message", allocator), stringToJvalue(error, allocator), allocator);
 
-  return jDocumentToJsonString(doc);
+  return (details & Details::JsonPretty) ? jDocumentToJsonStringPretty(doc)
+                                         : jDocumentToJsonString(doc);
 }
 
 string jsonOverview(RecordFileReader& recordFile, Details details) {
@@ -538,7 +539,8 @@ string jsonOverview(RecordFileReader& recordFile, const set<StreamId>& streams, 
     doc.AddMember(stringToJvalue("devices", allocator), devices, allocator);
   }
 
-  return jDocumentToJsonString(doc);
+  return (details & Details::JsonPretty) ? jDocumentToJsonStringPretty(doc)
+                                         : jDocumentToJsonString(doc);
 }
 
 } // namespace RecordFileInfo

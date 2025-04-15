@@ -80,6 +80,7 @@ const char* sCommands[] = {
     "extract-audio",
     "extract-all",
     "json-description",
+    "json-pretty-description",
     "fix-index",
     "compression-benchmark",
 };
@@ -128,6 +129,7 @@ const CommandSpec& getCommandSpec(Command cmd) {
       {Command::ExtractAudio, 1},
       {Command::ExtractAll, 1},
       {Command::JsonDescription, 1},
+      {Command::JsonPrettyDescription, 1},
       {Command::FixIndex, 1000, Details::Basics},
       {Command::CompressionBenchmark, 1},
   };
@@ -154,16 +156,12 @@ void printHelp(const string& appName) {
       << CMD("Show this documentation", "help")
 
       << "\n"
-      << CMD("Copy all the streams from one or more files into one",
-             "copy [ vrsfiles.vrs ]+ --to <target.vrs> [copy-options] [tag-options] [filter-options]")
-      << CMD("Merge all the streams from one or more files into one",
-             "merge [ vrsfiles.vrs ]+ --to <target.vrs> [copy-options] [tag-options] [filter-options]")
-      << CMD("Copy all the data from a file into a new one, but with blanked/zeroed image and audio data,\n"
-             "so the copy is much smaller because of lossless compression",
-             "copy --zero-vrs <file.vrs> --to <output.vrs>")
 
-      << "\n"
-      << CMD("List records, with their timestamp, stream name and identifier, and record type.",
+      << CMD("Print a detailed description of a vrs file in single-line json form",
+             "json-description <file.vrs>")
+      << CMD("Print a detailed description of a vrs file in indented json form",
+             "json-pretty-description <file.vrs>")
+      << CMD("List records, with their timestamp, stream name and identifier, and record type",
              "list <file.vrs> [filter-options]")
       << CMD("Show RecordFormat and DataLayout definitions", "record-formats <file.vrs>")
       << CMD("Print records using RecordFormat & DataLayout", "print <file.vrs> [filter-options]")
@@ -175,6 +173,15 @@ void printHelp(const string& appName) {
              "print-json-pretty <file.vrs> [filter-options]")
       << CMD("Print detailed file info and first records for one-stop diagnostic purposes",
              "rage <file.vrs>")
+
+      << "\n"
+      << CMD("Copy all the streams from one or more files into one",
+             "copy [ vrsfiles.vrs ]+ --to <target.vrs> [copy-options] [tag-options] [filter-options]")
+      << CMD("Merge all the streams from one or more files into one",
+             "merge [ vrsfiles.vrs ]+ --to <target.vrs> [copy-options] [tag-options] [filter-options]")
+      << CMD("Copy all the data from a file into a new one, but with blanked/zeroed image and audio data,\n"
+             "so the copy is much smaller because of lossless compression",
+             "copy --zero-vrs <file.vrs> --to <output.vrs>")
 
       << "\n"
       << CMD("Extract images in a folder. jpg and png are extracted as is.\n"
@@ -232,14 +239,17 @@ void printHelp(const string& appName) {
 void printSamples(const string& appName) {
   cout << "\n"
        << "Examples:\n"
-       << "To peek at what's inside a recording:\n"
+       << "To get a summary of what's inside a recording:\n"
        << SP("src.vrs")
+
+       << "To print a detailed description of a vrs file in single-line json form:\n"
+       << SP("json-description file.vrs")
+
+       << "To print a detailed description of a vrs file in indented json form:\n"
+       << SP("json-pretty-description file.vrs")
 
        << "To list records (basic details):\n"
        << SP("list src.vrs")
-
-       << "To peek at what's inside a recording and print as json:\n"
-       << SP("json-description src.vrs")
 
        << "To print configuration records as json:\n"
        << SP("print-json src.vrs + configuration")
@@ -539,6 +549,13 @@ int VrsCommand::runCommands() {
                   filteredReader.reader,
                   filteredReader.filter.streams,
                   RecordFileInfo::Details::Everything)
+           << "\n";
+      break;
+    case Command::JsonPrettyDescription:
+      cout << RecordFileInfo::jsonOverview(
+                  filteredReader.reader,
+                  filteredReader.filter.streams,
+                  RecordFileInfo::Details::Everything | RecordFileInfo::Details::JsonPretty)
            << "\n";
       break;
     case Command::CompressionBenchmark:

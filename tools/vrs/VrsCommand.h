@@ -53,6 +53,7 @@ enum class Command {
   ExtractAudio,
   ExtractAll,
   JsonDescription,
+  JsonPrettyDescription,
   FixIndex,
   CompressionBenchmark,
 
