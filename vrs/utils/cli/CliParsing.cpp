@@ -240,7 +240,7 @@ bool parseTimeAndStreamFilters(
       cerr << appName << ": error. '" << arg << "' option requires a second argument.\n";
       outStatusCode = EXIT_FAILURE;
     }
-  } else if (arg == "--first-records") {
+  } else if (arg == "-1" || arg == "--first-records") {
     filteredReader.firstRecordsOnly = true;
   } else {
     return false;
@@ -267,7 +267,7 @@ void printTimeAndStreamFiltersHelp() {
           "  [ - <recordable_type_id>-<instance_id> ]: ignore a specific stream.\n"
           "  [ + [configuration|state|data] ]: consider records of that type.\n"
           "  [ - [configuration|state|data] ]: ignore records of that type.\n"
-          "  [ --first-records ]: only consider the first record of each stream & type.\n";
+          "  [ -1 | --first-records ]: only consider the first record of each stream & type.\n";
 }
 
 namespace {
