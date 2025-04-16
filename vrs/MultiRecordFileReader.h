@@ -208,6 +208,20 @@ class MultiRecordFileReader {
   /// Call isValid() to know if a matching stream was actually found.
   UniqueStreamId getStreamForSerialNumber(const string& serialNumber) const;
 
+  /// Tell if a stream might contain at least one image (and probably will).
+  /// This is a best guess effort, but it is still possible that no images are actually found!
+  /// @param streamId: StreamId of the record stream to check.
+  /// @return True if at least one Data record RecordFormat definition found in the stream has at
+  /// least one image content block, and the stream contains at least one data record.
+  bool mightContainImages(UniqueStreamId uniqueStreamId) const;
+
+  /// Tell if a stream might contain some audio data (and probably will).
+  /// This is a best guess effort, but it is still possible that no audio will actually be found!
+  /// @param streamId: StreamId of the record stream to check.
+  /// @return True if at least one Data record RecordFormat definition found in the stream has at
+  /// least one audio content block, and the stream contains at least one data record.
+  bool mightContainAudio(UniqueStreamId uniqueStreamId) const;
+
   /// Get a record's index in the global index, which is ordered by timestamp across all open files.
   /// @param record: Pointer of the record.
   /// @return Index in the global index, or getRecordCount() is record is nullptr or an invalid

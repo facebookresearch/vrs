@@ -279,6 +279,34 @@ UniqueStreamId MultiRecordFileReader::getStreamForSerialNumber(
   return {};
 }
 
+bool MultiRecordFileReader::mightContainImages(UniqueStreamId uniqueStreamId) const {
+  if (!isOpened_ || !uniqueStreamId.isValid()) {
+    return false;
+  }
+  if (hasSingleFile()) {
+    return readers_.front()->mightContainImages(uniqueStreamId);
+  }
+  const StreamIdReaderPair* streamIdReaderPair = getStreamIdReaderPair(uniqueStreamId);
+  if (streamIdReaderPair == nullptr) {
+    return false;
+  }
+  return streamIdReaderPair->second->mightContainImages(streamIdReaderPair->first);
+}
+
+bool MultiRecordFileReader::mightContainAudio(UniqueStreamId uniqueStreamId) const {
+  if (!isOpened_ || !uniqueStreamId.isValid()) {
+    return false;
+  }
+  if (hasSingleFile()) {
+    return readers_.front()->mightContainAudio(uniqueStreamId);
+  }
+  const StreamIdReaderPair* streamIdReaderPair = getStreamIdReaderPair(uniqueStreamId);
+  if (streamIdReaderPair == nullptr) {
+    return false;
+  }
+  return streamIdReaderPair->second->mightContainAudio(streamIdReaderPair->first);
+}
+
 uint32_t MultiRecordFileReader::getRecordIndex(const IndexRecord::RecordInfo* record) const {
   if (!isOpened_ || record == nullptr) {
     return getRecordCount();
