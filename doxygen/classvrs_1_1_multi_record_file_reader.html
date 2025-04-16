@@ -143,6 +143,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a48f07e2b49133a6c9514767bb3694839"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa17a884be55f4fe7b1469515833fc312" id="r_aa17a884be55f4fe7b1469515833fc312"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#a95c324393b94d95ab8558c25d4c6a999">UniqueStreamId</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#aa17a884be55f4fe7b1469515833fc312">getStreamForSerialNumber</a> (const string &amp;serialNumber) const</td></tr>
 <tr class="separator:aa17a884be55f4fe7b1469515833fc312"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c1fd382ea3cf00fccff0a156fb66cfc" id="r_a1c1fd382ea3cf00fccff0a156fb66cfc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#a1c1fd382ea3cf00fccff0a156fb66cfc">mightContainImages</a> (<a class="el" href="classvrs_1_1_multi_record_file_reader.html#a95c324393b94d95ab8558c25d4c6a999">UniqueStreamId</a> uniqueStreamId) const</td></tr>
+<tr class="separator:a1c1fd382ea3cf00fccff0a156fb66cfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a406b19bd218168b58b9e104194dcb1ce" id="r_a406b19bd218168b58b9e104194dcb1ce"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#a406b19bd218168b58b9e104194dcb1ce">mightContainAudio</a> (<a class="el" href="classvrs_1_1_multi_record_file_reader.html#a95c324393b94d95ab8558c25d4c6a999">UniqueStreamId</a> uniqueStreamId) const</td></tr>
+<tr class="separator:a406b19bd218168b58b9e104194dcb1ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaf6dbf733277c8645819646a1585f6e6" id="r_aaf6dbf733277c8645819646a1585f6e6"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#aaf6dbf733277c8645819646a1585f6e6">getRecordIndex</a> (const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> *record) const</td></tr>
 <tr class="separator:aaf6dbf733277c8645819646a1585f6e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa051712405a9bbc475dda3e5fd01a1c2" id="r_aa051712405a9bbc475dda3e5fd01a1c2"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#aa051712405a9bbc475dda3e5fd01a1c2">getRecord</a> (uint32_t globalIndex) const</td></tr>
@@ -1287,6 +1291,56 @@ Static Public Attributes</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if available, false if unavailable (e.g. would require a network fetch). </dd></dl>
+
+</div>
+</div>
+<a id="a406b19bd218168b58b9e104194dcb1ce" name="a406b19bd218168b58b9e104194dcb1ce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a406b19bd218168b58b9e104194dcb1ce">&#9670;&#160;</a></span>mightContainAudio()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool vrs::MultiRecordFileReader::mightContainAudio </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#a95c324393b94d95ab8558c25d4c6a999">UniqueStreamId</a>&#160;</td>
+          <td class="paramname"><em>uniqueStreamId</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Tell if a stream might contain some audio data (and probably will). This is a best guess effort, but it is still possible that no audio will actually be found! </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">streamId</td><td><a class="el" href="classvrs_1_1_stream_id.html" title="VRS stream identifier class.">StreamId</a> of the record stream to check. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if at least one Data record <a class="el" href="classvrs_1_1_record_format.html" title="Description of the format of a VRS record as a succession of typed blocks of content.">RecordFormat</a> definition found in the stream has at least one audio content block, and the stream contains at least one data record. </dd></dl>
+
+</div>
+</div>
+<a id="a1c1fd382ea3cf00fccff0a156fb66cfc" name="a1c1fd382ea3cf00fccff0a156fb66cfc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1c1fd382ea3cf00fccff0a156fb66cfc">&#9670;&#160;</a></span>mightContainImages()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool vrs::MultiRecordFileReader::mightContainImages </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#a95c324393b94d95ab8558c25d4c6a999">UniqueStreamId</a>&#160;</td>
+          <td class="paramname"><em>uniqueStreamId</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Tell if a stream might contain at least one image (and probably will). This is a best guess effort, but it is still possible that no images are actually found! </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">streamId</td><td><a class="el" href="classvrs_1_1_stream_id.html" title="VRS stream identifier class.">StreamId</a> of the record stream to check. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if at least one Data record <a class="el" href="classvrs_1_1_record_format.html" title="Description of the format of a VRS record as a succession of typed blocks of content.">RecordFormat</a> definition found in the stream has at least one image content block, and the stream contains at least one data record. </dd></dl>
 
 </div>
 </div>
