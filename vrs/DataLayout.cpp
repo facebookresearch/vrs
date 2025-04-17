@@ -200,8 +200,8 @@ void DataLayout::serialize(JsonWrapper& jw, const JsonFormatProfileSpec& profile
     piece->serialize(rj, profile);
     jpieces.PushBack(jpiece, rj.alloc);
   }
-  const char* kFieldName = profile.publicNames ? "metadata" : "data_layout";
-  jw.value.AddMember(vrs_rapidjson::StringRef(kFieldName), jpieces, jw.alloc);
+  jw.value.AddMember(
+      jStringRef(profile.publicNames ? "metadata" : "data_layout"), jpieces, jw.alloc);
 }
 
 string DataLayout::getListOfPiecesSpec() const {

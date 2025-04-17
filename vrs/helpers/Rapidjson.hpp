@@ -45,16 +45,24 @@ using JMemberIterator = JDocument::MemberIterator;
 using JValue = vrs_rapidjson::GenericValue<JUtf8Encoding, JCrtAllocator>;
 using JStringRef = vrs_rapidjson::GenericStringRef<char>;
 
-static inline JStringRef jStringRef(const char* str) {
+inline JStringRef jStringRef(const char* str) {
   // NOLINTNEXTLINE(modernize-return-braced-init-list)
   return JStringRef(str, strlen(str));
 }
-static inline JStringRef jStringRef(const string& str) {
+inline JStringRef jStringRef(const string& str) {
   // NOLINTNEXTLINE(modernize-return-braced-init-list)
   return JStringRef(str.c_str(), str.size());
 }
+inline JValue jStringCopy(const char* str, JDocument::AllocatorType& allocator) {
+  // NOLINTNEXTLINE(modernize-return-braced-init-list)
+  return JValue(str, strlen(str), allocator);
+}
+inline JValue jStringCopy(const string& str, JDocument::AllocatorType& allocator) {
+  // NOLINTNEXTLINE(modernize-return-braced-init-list)
+  return JValue(str.c_str(), str.size(), allocator);
+}
 template <class T>
-static inline void jParse(JDocument& document, const T& str) {
+inline void jParse(JDocument& document, const T& str) {
   document.Parse(str.data(), str.size());
 }
 
