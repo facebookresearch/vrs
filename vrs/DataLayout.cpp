@@ -36,6 +36,7 @@
 #include <vrs/helpers/Strings.h>
 #include <vrs/os/CompilerAttributes.h>
 #include <vrs/os/Platform.h>
+#include <vrs/os/System.h>
 
 #include "DataLayoutConventions.h"
 #include "DataPieces.h"
@@ -751,36 +752,115 @@ bool DataPiece::isSame(const DataPiece* rhs) const {
 
 namespace {
 
-string compactString(const string& str) {
-  const size_t kMaxLength = 80;
+#define FIELDINDENT "  "
+#define SUBINDENT "    "
+const string_view kTruncated = "  [ ... ]  ";
+const size_t kPrintCompactMaxVectorValues = 400; // arbitrary
+
+string truncatedString(const string& str) {
+  const size_t kMaxLength = os::getTerminalWidth() / 2;
   if (str.size() < kMaxLength) {
     return helpers::make_printable(str);
   }
   const size_t kSplitLength = kMaxLength / 5;
   string front(str.c_str(), kMaxLength - kSplitLength);
   string tail(str.c_str() + str.size() - kSplitLength, kSplitLength);
-  return helpers::make_printable(front) + "  ***truncated***  " + helpers::make_printable(tail);
+  return helpers::make_printable(front).append(kTruncated).append(helpers::make_printable(tail));
 }
 
-template <typename T>
-void adjustPrecision(const T&, ostream&) {}
+string printable(const char* str, size_t size, bool front) {
+  string result(str, size);
+  result = helpers::make_printable(result);
+  if (front) {
+    result.resize(size);
+  } else if (result.size() > size) {
+    result = result.substr(result.size() - size);
+  }
+  return result;
+}
 
-template <>
-void adjustPrecision<double>(const double& v, ostream& str) {
-  // if the value looks like a count of seconds since EPOCH between 2015 and 2035, then
-  // use fixed 3 digit precision, otherwise let the C++ library format the number...
-  const double kEpoch2015 = 1420070400; // Jan 1, 2015
-  const double kEpoch2040 = 2051222400; // Jan 1, 2035
-  if (v >= kEpoch2015 && v < kEpoch2040) {
-    str << fixed << setprecision(3);
-  } else {
-    str << defaultfloat;
+// Print a string with a prefix and a suffix, carefully truncating it if it's too long to fit a
+// width, but only within reason. The string is made printable before printing, which can change its
+// length...
+void printStringFitted(
+    const string& prefix,
+    const string& str,
+    const string& suffix,
+    ostream& os,
+    size_t kMax = 0) {
+  if (kMax == 0) {
+    kMax = os::getTerminalWidth();
+  }
+  size_t overhead = prefix.size() + suffix.size() + 2;
+  if (overhead + str.size() <= kMax) {
+    string printableStr = helpers::make_printable(str);
+    if (overhead + printableStr.size() <= kMax) {
+      os << prefix << '"' << printableStr << '"' << suffix << '\n';
+      return;
+    }
+  }
+  overhead += kTruncated.size();
+  size_t frontSize = 6;
+  size_t tailSize = 2;
+  if (overhead + frontSize + tailSize < kMax) {
+    size_t rest = kMax - overhead;
+    frontSize = rest / 4 * 3;
+    tailSize = rest - frontSize;
+  }
+  string front = printable(str.c_str(), frontSize, true);
+  string tail = printable(str.c_str() + str.size() - tailSize, tailSize, false);
+  os << prefix << '"' << front << kTruncated << tail << '"' << suffix << '\n';
+}
+
+void printTextFitted(
+    const string& prefix,
+    const string& text,
+    const string& suffix,
+    ostream& os,
+    size_t kMax = 0) {
+  if (kMax == 0) {
+    kMax = os::getTerminalWidth();
+  }
+  size_t overhead = prefix.size() + suffix.size();
+  if (overhead + text.size() <= kMax) {
+    os << prefix << text << suffix << '\n';
+    return;
+  }
+  overhead += kTruncated.size();
+  size_t frontSize = 6;
+  size_t tailSize = 2;
+  if (overhead + frontSize + tailSize < kMax) {
+    size_t rest = kMax - overhead;
+    frontSize = rest / 4 * 3;
+    tailSize = rest - frontSize;
+  }
+  string front(text.c_str(), frontSize);
+  string tail(text.c_str() + text.size() - tailSize, tailSize);
+  os << prefix << front << kTruncated << tail << suffix << '\n';
+}
+
+void printTextWrapped(
+    const string& prefix,
+    const string& text,
+    const string& indent,
+    ostream& os,
+    size_t kMax = 0) {
+  if (kMax == 0) {
+    kMax = os::getTerminalWidth();
+  }
+  kMax = max<size_t>(kMax, prefix.size() + 20);
+  if (prefix.size() + text.size() <= kMax) {
+    os << prefix << text << '\n';
+    return;
+  }
+  os << prefix << text.substr(0, kMax - prefix.size()) << '\n';
+  size_t offset = kMax - prefix.size();
+  while (offset < text.size()) {
+    size_t nextOffset = min<size_t>(offset + kMax - indent.size(), text.size());
+    os << indent << text.substr(offset, nextOffset - offset) << '\n';
+    offset = nextOffset;
   }
 }
-
-// Adjust the formatting for a value of type T of the stream named "out", then return value as is...
-// For use in template classes using the type T and printing out to "out"...
-#define FORMAT(PARAM_T, out) (adjustPrecision<T>(PARAM_T, out), PARAM_T)
 
 // Print char/int8/uint8 as numbers
 // https://stackoverflow.com/questions/19562103/uint8-t-cant-be-printed-with-cout
@@ -922,6 +1002,80 @@ bool loadElement<string>(string& destStr, const int8_t* source, size_t& readSize
   return true;
 }
 
+template <typename T>
+void adjustPrecision(const T&, ostream&) {}
+
+template <>
+void adjustPrecision<double>(const double& v, ostream& str) {
+  // if the value looks like a count of seconds since EPOCH between 2015 and 2035, then
+  // use fixed 3 digit precision, otherwise let the C++ library format the number...
+  const double kEpoch2015 = 1420070400; // Jan 1, 2015
+  const double kEpoch2040 = 2051222400; // Jan 1, 2035
+  if (v >= kEpoch2015 && v < kEpoch2040) {
+    str << fixed << setprecision(3);
+  } else {
+    str << defaultfloat;
+  }
+}
+
+// Adjust the formatting for a value of type T of the stream named "out", then return value as is...
+// For use in template classes using the type T and printing out to "out"...
+#define FORMAT(PARAM_T, out) (adjustPrecision<T>(PARAM_T, out), PARAM_T)
+
+template <typename T>
+void printValue(ostream& out, const T& value, const string&) {
+  using namespace special_chars;
+  out << FORMAT(value, out);
+}
+
+template <typename T>
+string sprintValue(const T& value, const string&) {
+  stringstream ss;
+  printValue<T>(ss, value, {});
+  return ss.str();
+}
+
+template <>
+void printValue<datalayout_conventions::ImageSpecType>(
+    ostream& out,
+    const datalayout_conventions::ImageSpecType& value,
+    const string& label) {
+  using namespace special_chars;
+  if (label == datalayout_conventions::kImagePixelFormat) {
+    out << toString(static_cast<PixelFormat>(value)) << " (" << value << ")";
+  } else {
+    out << value;
+  }
+}
+
+template <>
+string sprintValue<datalayout_conventions::ImageSpecType>(
+    const datalayout_conventions::ImageSpecType& value,
+    const string& label) {
+  stringstream ss;
+  printValue<datalayout_conventions::ImageSpecType>(ss, value, label);
+  return ss.str();
+}
+
+template <>
+void printValue<uint8_t>(ostream& out, const uint8_t& value, const string& label) {
+  using namespace special_chars;
+  if (label == datalayout_conventions::kAudioFormat) {
+    out << toString(static_cast<AudioFormat>(value)) << " (" << value << ")";
+  } else if (label == datalayout_conventions::kAudioSampleFormat) {
+    out << toString(static_cast<AudioSampleFormat>(value)) << " (" << value << ")";
+  } else {
+    out << value;
+  }
+}
+
+template <>
+string sprintValue<uint8_t>(const uint8_t& value, const string& label) {
+  stringstream ss;
+  printValue<uint8_t>(ss, value, label);
+  return ss.str();
+}
+
 } // namespace
 
 /*
@@ -1020,68 +1174,39 @@ DataPieceValue<T>::DataPieceValue(const DataPiece::MakerBundle& bundle)
 }
 
 template <typename T>
-void printValue(ostream& out, const T& value, const string&) {
-  using namespace special_chars;
-  out << FORMAT(value, out);
-}
-
-template <>
-void printValue<datalayout_conventions::ImageSpecType>(
-    ostream& out,
-    const datalayout_conventions::ImageSpecType& value,
-    const string& label) {
-  using namespace special_chars;
-  if (label == datalayout_conventions::kImagePixelFormat) {
-    out << toString(static_cast<PixelFormat>(value)) << " (" << value << ")";
-  } else {
-    out << value;
-  }
-}
-
-template <>
-void printValue<uint8_t>(ostream& out, const uint8_t& value, const string& label) {
-  using namespace special_chars;
-  if (label == datalayout_conventions::kAudioFormat) {
-    out << toString(static_cast<AudioFormat>(value)) << " (" << value << ")";
-  } else if (label == datalayout_conventions::kAudioSampleFormat) {
-    out << toString(static_cast<AudioSampleFormat>(value)) << " (" << value << ")";
-  } else {
-    out << value;
-  }
-}
-
-template <typename T>
 void DataPieceValue<T>::print(ostream& out, const string& indent) const {
-  out << indent << getLabel() << " (" << getElementTypeName() << ") @ ";
+  string str;
+  str.reserve(400);
+  str.append(getLabel()).append(" (").append(getElementTypeName()).append(") @ ");
   if (getOffset() == DataLayout::kNotFound) {
-    out << "<unavailable>";
+    str.append("<unavailable>");
   } else {
-    out << getOffset();
+    str.append(std::to_string(getOffset()));
   }
-  out << '+' << getFixedSize();
+  str.append("+").append(std::to_string(getFixedSize()));
   if (isRequired()) {
-    out << " required";
+    str.append(" required");
   }
-  using namespace special_chars;
   T value;
   bool hasValue = get(value);
   bool isDefault = !hasValue && getDefault(value);
   if (hasValue) {
-    out << (isDefault ? " Value (default): " : " Value: ");
-    printValue<T>(out, value, getLabel());
-    out << "\n";
+    str.append(isDefault ? " (default): " : ": ").append(sprintValue<T>(value, getLabel()));
   }
+  printTextWrapped(indent, str, indent + SUBINDENT, out);
   for (const auto& prop : properties_) {
-    out << indent << "  " << prop.first << ": " << FORMAT(prop.second, out) << "\n";
+    using namespace special_chars;
+    out << indent << FIELDINDENT << prop.first << ": " << FORMAT(prop.second, out) << "\n";
   }
 }
 
 template <typename T>
 void DataPieceValue<T>::printCompact(ostream& out, const string& indent) const {
-  using namespace special_chars;
-  out << indent << getLabel() << ": ";
-  printValue<T>(out, get(), getLabel());
-  out << ((getOffset() == DataLayout::kNotFound) ? " *\n" : "\n");
+  printTextFitted(
+      fmt::format("{}{}: ", indent, getLabel()),
+      sprintValue<T>(get(), getLabel()),
+      (getOffset() == DataLayout::kNotFound) ? " *" : "",
+      out);
 }
 
 template <typename T>
@@ -1125,72 +1250,54 @@ DataPieceArray<T>::DataPieceArray(const DataPiece::MakerBundle& bundle)
   getJMap(properties_, bundle.piece, "properties");
 }
 
-namespace {
-template <class T>
-size_t getCountPerLine(const T& value) {
-  stringstream ss;
-  ss << FORMAT(value, ss);
-  return max<size_t>(1, 96 / (ss.str().size() + 1));
-}
-
-const size_t kPrintCompactMaxVectorValues = 400; // arbitrary
-
-} // namespace
-
 template <typename T>
 void DataPieceArray<T>::print(ostream& out, const string& indent) const {
-  out << indent << getLabel() << " (" << getElementTypeName() << '[' << count_ << "]) @ ";
-  if (getOffset() == DataLayout::kNotFound) {
-    out << "<unavailable>";
-  } else {
-    out << getOffset();
-  }
-  out << '+' << getFixedSize();
-  if (isRequired()) {
-    out << " required";
-  }
-  out << "\n";
-  using namespace special_chars;
   vector<T> values;
   bool hasValue = get(values);
   bool isDefault = !hasValue && !getDefault().empty();
-  if (hasValue) {
-    const size_t kCountPerLine = getCountPerLine<T>(values.front());
-    out << indent << (isDefault ? "  Values (default):" : "  Values:");
-    for (size_t k = 0; k < values.size(); k++) {
-      if (k % kCountPerLine == 0 && values.size() > kCountPerLine) {
-        out << "\n" << indent << "    ";
-      } else {
-        out << " ";
-      }
-      out << FORMAT(values[k], out);
-    }
-    out << "\n";
+  string str;
+  str.reserve(200 + values.size() * 40);
+  str.append(getLabel()).append(" (").append(getElementTypeName());
+  str.append("[").append(to_string(count_)).append("]) @ ");
+  if (getOffset() == DataLayout::kNotFound) {
+    str.append("<unavailable>");
+  } else {
+    str.append(to_string(getOffset()));
   }
+  str.append("+").append(to_string(getFixedSize()));
+  if (isRequired()) {
+    str.append(" required");
+  }
+  str.append(isDefault ? " (default): " : ": ");
+  if (hasValue && !values.empty()) {
+    for (const auto& value : values) {
+      str.append(sprintValue<T>(value, {})).append(", ");
+    }
+    str.resize(str.size() - 2);
+  }
+  printTextWrapped(indent, str, indent + SUBINDENT, out);
   for (const auto& prop : properties_) {
-    out << indent << "  " << prop.first << ": " << FORMAT(prop.second, out) << "\n";
+    using namespace special_chars;
+    out << indent << FIELDINDENT << prop.first << ": " << FORMAT(prop.second, out) << "\n";
   }
 }
 
 template <typename T>
 void DataPieceArray<T>::printCompact(ostream& out, const string& indent) const {
-  out << indent << getLabel() << ": ";
   vector<T> values;
   bool hasValue = get(values);
-  const size_t kCountPerLine = values.empty() ? 1 : getCountPerLine<T>(values.front());
-  for (size_t k = 0; k < values.size(); k++) {
-    if (k % kCountPerLine == 0 && values.size() > kCountPerLine) {
-      out << "\n" << indent << "    ";
-    } else {
-      out << " ";
-    }
+  stringstream ss;
+  for (const auto& value : values) {
     using namespace special_chars;
-    out << FORMAT(values[k], out);
+    ss << FORMAT(value, ss) << ", ";
   }
-  if (!hasValue) {
-    out << " *\n";
+  string valuesStr = ss.str();
+  if (!values.empty()) {
+    valuesStr.resize(valuesStr.size() - 2);
   }
-  out << "\n";
+  string suffix = hasValue ? "" : " *";
+  printTextFitted(
+      fmt::format("{}{}[{}]: ", indent, getLabel(), getArraySize()), valuesStr, suffix, out);
 }
 
 template <typename T>
@@ -1300,112 +1407,110 @@ bool DataPieceVector<string>::get(vector<string>& outValues) const {
 
 template <typename T>
 void DataPieceVector<T>::print(ostream& out, const string& indent) const {
-  out << indent << getLabel() << " (vector<" << getElementTypeName() << ">) @ ";
-  if (getOffset() == DataLayout::kNotFound) {
-    out << "<unavailable>";
-  } else {
-    out << "index: " << getOffset();
-  }
-  if (isRequired()) {
-    out << " required";
-  }
   vector<T> values;
   bool isDefault = !get(values);
-  out << ", count: " << values.size() << "\n";
-  if (!values.empty()) {
-    const size_t kCountPerLine = getCountPerLine<T>(values.front());
-    out << indent << (isDefault ? "  Values (default):" : "  Values:");
-    for (size_t k = 0; k < values.size(); k++) {
-      if (k % kCountPerLine == 0 && values.size() > kCountPerLine) {
-        out << "\n" << indent << "    ";
-      } else {
-        out << ' ';
-      }
-      using namespace special_chars;
-      out << FORMAT(values[k], out);
-    }
-    out << "\n";
+  string str;
+  str.reserve(200 + values.size() * 40);
+  str.append(getLabel()).append(" (vector<").append(getElementTypeName()).append(">) @ ");
+  if (getOffset() == DataLayout::kNotFound) {
+    str.append("<unavailable>");
+  } else {
+    str.append(to_string(getOffset())).append("x").append(to_string(values.size()));
   }
+  if (isRequired()) {
+    str.append(" required");
+  }
+  str.append(isDefault ? " (default): " : ": ");
+  if (!values.empty()) {
+    for (const auto& value : values) {
+      str.append(sprintValue<T>(value, {})).append(", ");
+    }
+    str.resize(str.size() - 2);
+  }
+  printTextWrapped(indent, str, indent + SUBINDENT, out);
 }
 
 template <>
 void DataPieceVector<string>::print(ostream& out, const string& indent) const {
-  const size_t kCountPerLine = 5;
+  vector<string> values;
+  bool isDefault = !get(values);
   out << indent << getLabel() << " (vector<string>) @ ";
   if (getOffset() == DataLayout::kNotFound) {
     out << "<unavailable>";
   } else {
-    out << "index: " << getOffset();
+    out << getOffset() << "x" << values.size();
   }
   if (isRequired()) {
     out << " required";
   }
-  vector<string> values;
-  bool isDefault = !get(values);
-  out << ", count: " << values.size() << "\n";
+  out << (isDefault ? " (default):\n" : ":\n");
   if (!values.empty()) {
-    out << indent << (isDefault ? "  Values (default):" : "  Values:");
-    for (size_t k = 0; k < values.size(); k++) {
-      if (k % kCountPerLine == 0 && values.size() > kCountPerLine) {
-        out << "\n" << indent << "    ";
-      } else {
-        out << ' ';
-      }
-      out << '"' << helpers::make_printable(values[k]) << '"';
+    string valuesStr;
+    valuesStr.reserve(values.size() * 20);
+    valuesStr.append(SUBINDENT);
+    for (const auto& value : values) {
+      valuesStr.append("\"").append(helpers::make_printable(value)).append("\", ");
     }
-    out << "\n";
+    if (!valuesStr.empty()) {
+      valuesStr.resize(valuesStr.size() - 2);
+    }
+    printTextWrapped(indent, valuesStr, indent + SUBINDENT, out);
   }
 }
 
 template <typename T>
 void DataPieceVector<T>::printCompact(ostream& out, const string& indent) const {
-  out << indent << getLabel() << ": ";
-  vector<T> values;
-  get(values);
-  const size_t kCountPerLine = values.empty() ? 1 : getCountPerLine<T>(values.front());
-  for (size_t k = 0; k < min<size_t>(kPrintCompactMaxVectorValues, values.size()); k++) {
-    if (k % kCountPerLine == 0 && values.size() > kCountPerLine) {
-      out << "\n" << indent << "    ";
-    } else {
-      out << ' ';
-    }
-    using namespace special_chars;
-    out << FORMAT(values[k], out);
-  }
-  if (values.size() > kPrintCompactMaxVectorValues) {
-    out << "\n"
-        << indent << "    ...and " << values.size() - kPrintCompactMaxVectorValues
-        << " more values.";
-  }
   if (getOffset() == DataLayout::kNotFound) {
-    out << "<unavailable>";
+    out << indent << getLabel() << ": " << "<unavailable>\n";
+  } else {
+    vector<T> values;
+    get(values);
+    stringstream ss;
+    for (size_t k = 0; k < min<size_t>(kPrintCompactMaxVectorValues, values.size()); k++) {
+      using namespace special_chars;
+      ss << FORMAT(values[k], ss) << ", ";
+    }
+    string valuesStr = ss.str();
+    if (!valuesStr.empty()) {
+      valuesStr.resize(valuesStr.size() - 2);
+    }
+    printTextWrapped(
+        fmt::format("{}{}[{}]: ", indent, getLabel(), values.size()),
+        valuesStr,
+        indent + SUBINDENT,
+        out);
+    if (values.size() > kPrintCompactMaxVectorValues) {
+      out << indent << SUBINDENT "...and " << values.size() - kPrintCompactMaxVectorValues
+          << " more values.";
+    }
   }
-  out << "\n";
 }
 
 template <>
 void DataPieceVector<string>::printCompact(ostream& out, const string& indent) const {
-  const size_t kCountPerLine = 5;
-  out << indent << getLabel() << ": ";
-  vector<string> values;
-  get(values);
-  for (size_t k = 0; k < min<size_t>(kPrintCompactMaxVectorValues, values.size()); k++) {
-    if (k % kCountPerLine == 0 && values.size() > kCountPerLine) {
-      out << "\n" << indent << "    ";
-    } else {
-      out << ' ';
-    }
-    out << '"' << compactString(values[k]) << '"';
-  }
-  if (values.size() > kPrintCompactMaxVectorValues) {
-    out << "\n"
-        << indent << "    ...and " << values.size() - kPrintCompactMaxVectorValues
-        << " more values.";
-  }
   if (getOffset() == DataLayout::kNotFound) {
-    out << "<unavailable>";
+    out << indent << getLabel() << ": " << "<unavailable>\n";
+  } else {
+    vector<string> values;
+    get(values);
+    stringstream ss;
+    for (size_t k = 0; k < min<size_t>(kPrintCompactMaxVectorValues, values.size()); k++) {
+      ss << '"' << truncatedString(values[k]) << "\", ";
+    }
+    string valuesStr = ss.str();
+    if (!valuesStr.empty()) {
+      valuesStr.resize(valuesStr.size() - 2);
+    }
+    printTextWrapped(
+        fmt::format("{}{}[{}]: ", indent, getLabel(), values.size()),
+        valuesStr,
+        indent + SUBINDENT,
+        out);
+    if (values.size() > kPrintCompactMaxVectorValues) {
+      out << indent << SUBINDENT "...and " << values.size() - kPrintCompactMaxVectorValues
+          << " more values.";
+    }
   }
-  out << "\n";
 }
 
 template <typename T>
@@ -1489,23 +1594,33 @@ bool DataPieceStringMap<T>::get(map<string, T>& outValues) const {
 template <typename T>
 void DataPieceStringMap<T>::print(ostream& out, const string& indent) const {
   out << indent << getLabel() << " (stringMap<" << getElementTypeName() << ">) @ ";
+  map<string, T> values;
+  bool isDefault = !get(values);
   if (getOffset() == DataLayout::kNotFound) {
     out << "<unavailable>";
   } else {
-    out << "index: " << getOffset();
+    out << getOffset() << "x" << values.size();
   }
   if (isRequired()) {
     out << " required";
   }
-  map<string, T> values;
-  bool isDefault = !get(values);
-  out << ", count: " << values.size() << "\n";
-  if (!values.empty()) {
-    out << indent << (isDefault ? "  Values (default):" : "  Values:") << "\n";
+  if (values.empty()) {
+    out << "\n";
+  } else {
+    out << (isDefault ? " (default):\n" : ":\n");
+    string valuesStr;
+    valuesStr.reserve(200);
+    string indent2 = indent + SUBINDENT;
+    string indent3 = indent2 + SUBINDENT;
     for (auto& iter : values) {
-      out << indent << "    \"" << iter.first << "\": ";
-      printValue<T>(out, iter.second, getLabel());
-      out << "\n";
+      valuesStr.clear();
+      valuesStr.append("\"").append(iter.first).append("\": ");
+      if (std::is_same_v<T, string>) {
+        valuesStr.append("\"").append(sprintValue(iter.second, {})).append("\"");
+      } else {
+        valuesStr.append(sprintValue(iter.second, getLabel()));
+      }
+      printTextWrapped(indent2, valuesStr, indent3, out);
     }
   }
 }
@@ -1515,11 +1630,13 @@ void DataPieceStringMap<T>::printCompact(ostream& out, const string& indent) con
   out << indent << getLabel();
   map<string, T> values;
   bool isDefault = !get(values);
-  out << ", " << values.size() << (isDefault ? " default" : "") << " values:\n";
+  out << "[" << values.size() << "]" << (isDefault ? " default" : "") << ":\n";
   for (auto& iter : values) {
-    out << indent << "    \"" << iter.first << "\": ";
-    printValue<T>(out, iter.second, getLabel());
-    out << "\n";
+    printTextFitted(
+        fmt::format("{}    \"{}\": ", indent, iter.first),
+        sprintValue(iter.second, getLabel()),
+        {},
+        out);
   }
 }
 
@@ -1528,9 +1645,11 @@ void DataPieceStringMap<string>::printCompact(ostream& out, const string& indent
   out << indent << getLabel();
   map<string, string> values;
   bool isDefault = !get(values);
-  out << ", " << values.size() << (isDefault ? " default" : "") << " values:\n";
+  out << "[" << values.size() << "]" << (isDefault ? " default" : "") << ":\n";
+  const size_t width = os::getTerminalWidth();
   for (auto& iter : values) {
-    out << indent << "    \"" << iter.first << "\": " << compactString(iter.second) << "\n";
+    printStringFitted(
+        fmt::format("{}    \"{}\": ", indent, iter.first), iter.second, {}, out, width);
   }
 }
 
@@ -1607,26 +1726,25 @@ bool DataPieceString::isAvailable() const {
 }
 
 void DataPieceString::print(ostream& out, const string& indent) const {
-  out << indent << getLabel() << " (string) @ ";
+  string value = helpers::make_printable(get());
+  string str;
+  str.reserve(100 + value.size());
+  str.append(getLabel()).append(" (string) @ ");
   if (getOffset() == DataLayout::kNotFound) {
-    out << "<unavailable>";
+    str.append("<unavailable>");
   } else {
-    out << "index " << getOffset();
+    str.append(to_string(getOffset()));
   }
   if (isRequired()) {
-    out << " required";
+    str.append(" required");
   }
-  string value = get();
-  out << " = \"" << helpers::make_printable(value) << (isAvailable() ? "\"" : "\" (default value)");
-  out << "\n";
+  str.append((isAvailable() ? "" : " (default)")).append(" = \"").append(value).append("\"");
+  printTextWrapped(indent, str, indent + SUBINDENT, out);
 }
 
 void DataPieceString::printCompact(ostream& out, const string& indent) const {
-  out << indent << getLabel() << ": \"" << compactString(get()) << "\"";
-  if (getOffset() == DataLayout::kNotFound) {
-    out << "<unavailable>";
-  }
-  out << "\n";
+  const string suffix = (getOffset() == DataLayout::kNotFound) ? "<unavailable>" : "";
+  printStringFitted(fmt::format("{}{}: ", indent, getLabel()), get(), suffix, out);
 }
 
 bool DataPieceString::isSame(const DataPiece* rhs) const {

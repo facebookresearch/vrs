@@ -402,12 +402,12 @@ TEST_F(DataLayoutFormatTester, FormatValuesTest) {
   valuesdl.stringValue.stage(veryLongString);
   valuesdl.vectorString.stage({"one", veryLongString, "three"});
   valuesdl.stringMapString.stagedValues()["first"] = "un";
-  valuesdl.stringMapString.stagedValues()["second"] = "deux";
+  valuesdl.stringMapString.stagedValues()["second"] = veryLongString;
   valuesdl.stringMapString.stagedValues()["third"] = "trois";
 
   valuesdl.collectVariableDataAndUpdateIndex();
 
-  os::getTerminalWidth(120);
+  os::getTerminalWidth(160);
 
   {
     stringstream ss;
@@ -421,20 +421,20 @@ TEST_F(DataLayoutFormatTester, FormatValuesTest) {
   double: 1704400000.000
   point2di_value: [1, 2]
   matrix2di_value: [[1, 2], [3, 4]]
-  int8_array:  1 -1 -128 127
-  int_vector:  1 -1 -128 127 -32768 32767
-  string_map_double, 2 values:
+  int8_array[4]: 1, -1, -128, 127
+  int_vector[6]: 1, -1, -128, 127, -32768, 32767
+  string_map_double[2]:
       "arrival": 1704400000.000
       "walltime": 2000000000.000
-  string_map_uint8, 2 values:
+  string_map_uint8[2]:
       "highest": 255
       "lowest": 0
-  string_value: "This is a very long string that is longer than 255 characters. F  ***truncated***   and truncation."
-  string_vector:  "one" "This is a very long string that is longer than 255 characters. F  ***truncated***   and truncation." "three"
-  string_map_string, 3 values:
-      "first": un
-      "second": deux
-      "third": trois
+  string_value: "This is a very long string that is longer than 255 characters. For that I need a lot more text t  [ ... ]  o see text wrapping and truncation."
+  string_vector[3]: "one", "This is a very long string that is longer than 255 characters. F  [ ... ]   and truncation.", "three"
+  string_map_string[3]:
+      "first": "un"
+      "second": "This is a very long string that is longer than 255 characters. For that I need a lot more text t  [ ... ]  o see text wrapping and truncation."
+      "third": "trois"
 )=");
   }
 
@@ -442,36 +442,107 @@ TEST_F(DataLayoutFormatTester, FormatValuesTest) {
     stringstream ss;
     valuesdl.printLayout(ss);
     EXPECT_EQ(ss.str(), R"=(10 fixed size pieces, total 113 bytes.
-  int32_t (int32_t) @ 0+4 Value: 2000000000
-  uint8_t (uint8_t) @ 4+1 Value: 255
-  uint32_t (uint32_t) @ 5+4 Value: 2000000000
-  int64_t (int64_t) @ 9+8 Value: 2000000000
-  uint64_t (uint64_t) @ 17+8 Value: 2000000000
-  float (float) @ 25+4 Value: 2e+09
-  double (double) @ 29+8 Value: 1704400000.000
-  point2di_value (Point2Di) @ 37+8 Value: [1, 2]
-  matrix2di_value (Matrix2Di) @ 45+16 Value: [[1, 2], [3, 4]]
-  int8_array (int8_t[4]) @ 61+4
-    Values: 1 -1 -128 127
-6 variable size pieces, total 577 bytes.
-  int_vector (vector<int16_t>) @ index: 0, count: 6
-    Values: 1 -1 -128 127 -32768 32767
-  string_map_double (stringMap<double>) @ index: 1, count: 2
-    Values:
+  int32_t (int32_t) @ 0+4: 2000000000
+  uint8_t (uint8_t) @ 4+1: 255
+  uint32_t (uint32_t) @ 5+4: 2000000000
+  int64_t (int64_t) @ 9+8: 2000000000
+  uint64_t (uint64_t) @ 17+8: 2000000000
+  float (float) @ 25+4: 2e+09
+  double (double) @ 29+8: 1704400000.000
+  point2di_value (Point2Di) @ 37+8: [1, 2]
+  matrix2di_value (Matrix2Di) @ 45+16: [[1, 2], [3, 4]]
+  int8_array (int8_t[4]) @ 61+4: 1, -1, -128, 127
+6 variable size pieces, total 787 bytes.
+  int_vector (vector<int16_t>) @ 0x6: 1, -1, -128, 127, -32768, 32767
+  string_map_double (stringMap<double>) @ 1x2:
       "arrival": 1704400000.000
       "walltime": 2000000000.000
-  string_map_uint8 (stringMap<uint8_t>) @ index: 2, count: 2
-    Values:
+  string_map_uint8 (stringMap<uint8_t>) @ 2x2:
       "highest": 255
       "lowest": 0
-  string_value (string) @ index 3 = "This is a very long string that is longer than 255 characters. For that I need a lot more text that I'm getting like this. This is a story worth telling, really, because we want to see text wrapping and truncation."
-  string_vector (vector<string>) @ index: 4, count: 3
-    Values: "one" "This is a very long string that is longer than 255 characters. For that I need a lot more text that I'm getting like this. This is a story worth telling, really, because we want to see text wrapping and truncation." "three"
-  string_map_string (stringMap<string>) @ index: 5, count: 3
-    Values:
-      "first": un
-      "second": deux
-      "third": trois
+  string_value (string) @ 3 = "This is a very long string that is longer than 255 characters. For that I need a lot more text that I'm getting like this. This i
+      s a story worth telling, really, because we want to see text wrapping and truncation."
+  string_vector (vector<string>) @ 4x3:
+      "one", "This is a very long string that is longer than 255 characters. For that I need a lot more text that I'm getting like this. This is a story worth t
+      elling, really, because we want to see text wrapping and truncation.", "three"
+  string_map_string (stringMap<string>) @ 5x3:
+      "first": "un"
+      "second": "This is a very long string that is longer than 255 characters. For that I need a lot more text that I'm getting like this. This is a story wort
+          h telling, really, because we want to see text wrapping and truncation."
+      "third": "trois"
+)=");
+  }
+
+  os::getTerminalWidth(80);
+
+  {
+    stringstream ss;
+    valuesdl.printLayoutCompact(ss);
+    EXPECT_EQ(ss.str(), R"=(  int32_t: 2000000000
+  uint8_t: 255
+  uint32_t: 2000000000
+  int64_t: 2000000000
+  uint64_t: 2000000000
+  float: 2e+09
+  double: 1704400000.000
+  point2di_value: [1, 2]
+  matrix2di_value: [[1, 2], [3, 4]]
+  int8_array[4]: 1, -1, -128, 127
+  int_vector[6]: 1, -1, -128, 127, -32768, 32767
+  string_map_double[2]:
+      "arrival": 1704400000.000
+      "walltime": 2000000000.000
+  string_map_uint8[2]:
+      "highest": 255
+      "lowest": 0
+  string_value: "This is a very long string that is l  [ ... ]  and truncation."
+  string_vector[3]: "one", "This is a very long string that   [ ... ]  ncation."
+      , "three"
+  string_map_string[3]:
+      "first": "un"
+      "second": "This is a very long string that is l  [ ... ]  and truncation."
+      "third": "trois"
+)=");
+  }
+
+  {
+    stringstream ss;
+    valuesdl.printLayout(ss);
+    EXPECT_EQ(ss.str(), R"=(10 fixed size pieces, total 113 bytes.
+  int32_t (int32_t) @ 0+4: 2000000000
+  uint8_t (uint8_t) @ 4+1: 255
+  uint32_t (uint32_t) @ 5+4: 2000000000
+  int64_t (int64_t) @ 9+8: 2000000000
+  uint64_t (uint64_t) @ 17+8: 2000000000
+  float (float) @ 25+4: 2e+09
+  double (double) @ 29+8: 1704400000.000
+  point2di_value (Point2Di) @ 37+8: [1, 2]
+  matrix2di_value (Matrix2Di) @ 45+16: [[1, 2], [3, 4]]
+  int8_array (int8_t[4]) @ 61+4: 1, -1, -128, 127
+6 variable size pieces, total 787 bytes.
+  int_vector (vector<int16_t>) @ 0x6: 1, -1, -128, 127, -32768, 32767
+  string_map_double (stringMap<double>) @ 1x2:
+      "arrival": 1704400000.000
+      "walltime": 2000000000.000
+  string_map_uint8 (stringMap<uint8_t>) @ 2x2:
+      "highest": 255
+      "lowest": 0
+  string_value (string) @ 3 = "This is a very long string that is longer than 25
+      5 characters. For that I need a lot more text that I'm getting like this. 
+      This is a story worth telling, really, because we want to see text wrappin
+      g and truncation."
+  string_vector (vector<string>) @ 4x3:
+      "one", "This is a very long string that is longer than 255 characters. For
+       that I need a lot more text that I'm getting like this. This is a story w
+      orth telling, really, because we want to see text wrapping and truncation.
+      ", "three"
+  string_map_string (stringMap<string>) @ 5x3:
+      "first": "un"
+      "second": "This is a very long string that is longer than 255 characters. 
+          For that I need a lot more text that I'm getting like this. This is a 
+          story worth telling, really, because we want to see text wrapping and 
+          truncation."
+      "third": "trois"
 )=");
   }
 }
