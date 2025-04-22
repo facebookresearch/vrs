@@ -18,6 +18,10 @@
 
 #include <string>
 
+#ifdef logError
+#undef logError
+#endif
+
 namespace vrs {
 
 using std::string;
