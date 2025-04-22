@@ -27,8 +27,7 @@
 
 #include <string>
 
-#include <boost/process/io.hpp>
-#include <boost/process/system.hpp>
+#include <vrs/os/Process.h>
 
 /// To test command line tools
 /// Add a definition for the location of the tool in the BUCK file, as an env variable.
@@ -37,7 +36,7 @@
 namespace vrs {
 namespace test {
 
-namespace bp = boost::process;
+namespace bp = vrs::os::process;
 
 class TestProcess {
  public:
