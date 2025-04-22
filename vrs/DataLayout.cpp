@@ -457,19 +457,17 @@ struct DataPieceTypeStringConverter : public EnumStringConverter<
 
 } // namespace
 
-static string makePieceName(const string& pieceTypeName, const string& dataType) {
-  return pieceTypeName + '<' + dataType + '>'; // e.g., "value<double>"
+static string makePieceName(const char* pieceTypeName, const string& dataType) {
+  string pieceName;
+  pieceName.reserve(20 + dataType.size() + 2);
+  pieceName.append(pieceTypeName).append("<").append(dataType).append(">");
+  return pieceName;
 }
 
-static string makePieceName(DataPieceType pieceType, const string& dataType) {
-  if (pieceType == DataPieceType::String) {
-    return DataPieceTypeStringConverter::toString(pieceType);
-  }
-  return makePieceName(DataPieceTypeStringConverter::toString(pieceType), dataType);
-}
-
-static string makePieceName(DataPieceType pieceType) {
-  return DataPieceTypeStringConverter::toString(pieceType);
+static inline string makePieceName(DataPieceType pieceType, const string& dataType) {
+  return pieceType == DataPieceType::String
+      ? DataPieceTypeStringConverter::toString(pieceType)
+      : makePieceName(DataPieceTypeStringConverter::toString(pieceType), dataType);
 }
 
 using DataPieceMaker = DataPiece* (*)(const DataPiece::MakerBundle&);
@@ -491,7 +489,7 @@ struct DataPieceFactory {
 
   template <class T>
   struct Registerer {
-    explicit Registerer(const string& pieceTypeName, const string& dataType) {
+    explicit Registerer(const char* pieceTypeName, const string& dataType) {
       registerClass(makePieceName(pieceTypeName, dataType), makeDataPiece);
     }
     explicit Registerer(const string& pieceName) {
@@ -511,13 +509,13 @@ struct DataPieceFactory {
 };
 
 static DataPieceFactory::Registerer<DataPieceString> Registerer_DataPieceString(
-    makePieceName(DataPieceType::String));
+    DataPieceTypeStringConverter::toString(DataPieceType::String));
 
 static DataPieceFactory::Registerer<DataPieceVector<string>> Registerer_DataPieceVector(
-    makePieceName(DataPieceType::Vector, "string"));
+    makePieceName(DataPieceType::Vector, getTypeName<string>()));
 
 static DataPieceFactory::Registerer<DataPieceStringMap<string>> Registerer_DataPieceStringMap(
-    makePieceName(DataPieceType::StringMap, "string"));
+    makePieceName(DataPieceType::StringMap, getTypeName<string>()));
 
 } // namespace internal
 
@@ -1133,8 +1131,9 @@ void DataPiece::serialize(JsonWrapper& rj, const JsonFormatProfileSpec& profile)
   if (profile.type) {
     string typeName = getTypeName();
     // Remove the "DataPiece" prefix that's not pretty...
-    if (profile.shortType && strncmp(typeName.c_str(), "DataPiece", 9) == 0) {
-      typeName = typeName.substr(9);
+    string_view prefix = "DataPiece";
+    if (profile.shortType && strncmp(typeName.c_str(), prefix.data(), prefix.size()) == 0) {
+      typeName = typeName.substr(prefix.size());
     }
     rj.addMember("type", typeName);
   }
@@ -1882,7 +1881,8 @@ JsonFormatProfileSpec::JsonFormatProfileSpec(JsonFormatProfile profile) {
 #define XSTR(x) STR(x)
 #define REGISTER_TEMPLATE(TEMPLATE_CLASS, TEMPLATE_TYPE)                            \
   static vrs::internal::DataPieceFactory::Registerer<TEMPLATE_CLASS<TEMPLATE_TYPE>> \
-      Registerer_##TEMPLATE_CLASS##_##TEMPLATE_TYPE(STR(TEMPLATE_CLASS), STR(TEMPLATE_TYPE));
+      Registerer_##TEMPLATE_CLASS##_##TEMPLATE_TYPE(                                \
+          STR(TEMPLATE_CLASS), getTypeName<TEMPLATE_TYPE>());
 
 #define DEFINE_FIND_DATA_PIECE(T)                                                                 \
   template const DataPieceValue<T>* DataLayout::findDataPieceValue<T>(const string& label) const; \
