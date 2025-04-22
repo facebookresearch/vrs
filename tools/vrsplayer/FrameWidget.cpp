@@ -158,7 +158,8 @@ void FrameWidget::paintEvent(QPaintEvent* evt) {
 
   // draw fps overlay
   if (hasImage && dataFps_ > 0) {
-    QString fpsStr = QString("%1/%2").arg(dataFps_).arg(imageFps_.value());
+    QString fpsStr =
+        QString("%1/%2").arg(dataFps_.load(memory_order_relaxed)).arg(imageFps_.value());
     int fps = drawFps_.newFrame();
     if (fps > 0) {
       fpsStr += QString("-%1").arg(fps);
