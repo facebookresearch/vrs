@@ -1917,4 +1917,7 @@ JsonFormatProfileSpec::JsonFormatProfileSpec(JsonFormatProfile profile) {
 #define POD_MACRO DEFINE_DATA_PIECE_TYPE
 #include <vrs/helpers/PODMacro.inc>
 
+template class DataPieceVector<string>;
+template class DataPieceStringMap<string>;
+
 } // namespace vrs
