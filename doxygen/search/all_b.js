@@ -12,7 +12,7 @@ var searchData=
   ['littleendian_3c_20uint64_5ft_20_3e_9',['LittleEndian&lt; uint64_t &gt;',['../classvrs_1_1_file_format_1_1_little_endian.html',1,'vrs::FileFormat']]],
   ['littleendian_3c_20uint8_5ft_20_3e_10',['LittleEndian&lt; uint8_t &gt;',['../classvrs_1_1_file_format_1_1_little_endian.html',1,'vrs::FileFormat']]],
   ['logduration_11',['logduration',['../classvrs_1_1_progress_logger.html#a11fd9409df363eb21fcd5cdca5093e3b',1,'vrs::ProgressLogger::logDuration()'],['../classvrs_1_1_silent_logger.html#a66ad3671f7e0919b1c95f128577bf35f',1,'vrs::SilentLogger::logDuration()']]],
-  ['logerror_12',['logError',['../classvrs_1_1_progress_logger.html#ac1fd1026616bc5e38917c14ff3829258',1,'vrs::ProgressLogger']]],
+  ['logerrormessage_12',['logErrorMessage',['../classvrs_1_1_progress_logger.html#abe7c303df9399f37b8fcc0d802a700fb',1,'vrs::ProgressLogger']]],
   ['logevent_13',['logevent',['../classvrs_1_1_telemetry_logger.html#a947eb78b85578ad00c2ee5f48ffe9890',1,'vrs::TelemetryLogger::logEvent()'],['../structvrs_1_1_log_event.html',1,'vrs::LogEvent']]],
   ['logmessage_14',['logMessage',['../classvrs_1_1_progress_logger.html#a9c3f1356f2cf6aa177a337ed55cebfb4',1,'vrs::ProgressLogger']]],
   ['lognewstep_15',['logNewStep',['../classvrs_1_1_progress_logger.html#aa97f13ca414ea11ab9fbad188742dc17',1,'vrs::ProgressLogger']]],
