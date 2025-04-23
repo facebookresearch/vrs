@@ -46,6 +46,7 @@
 #include <logging/Log.h>
 
 #include <vrs/ErrorCode.h>
+#include <vrs/ProgressLogger.h>
 #include <vrs/helpers/EnumStringConverter.h>
 #include <vrs/os/Utils.h>
 #include <vrs/utils/FrameRateEstimator.h>
@@ -202,8 +203,8 @@ class OpenProgressDialog : public ProgressLogger {
     progressDialog_.setLabelText(QString().fromStdString(message));
     qApp->processEvents();
   }
-  void logError(const string& message) override {
-    ProgressLogger::logError(message);
+  void logErrorMessage(const string& message) override {
+    ProgressLogger::logErrorMessage(message);
     progressDialog_.setLabelText(QString().fromStdString(message));
     qApp->processEvents();
   }

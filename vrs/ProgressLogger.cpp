@@ -83,7 +83,7 @@ bool ProgressLogger::logStatus(const string& stepName, int status) {
     if (status == 0) {
       logMessage(stepName + " complete.");
     } else {
-      logError(stepName + " failed!");
+      logErrorMessage(stepName + " failed!");
     }
     updateNextProgressTime();
   }
@@ -108,7 +108,7 @@ void ProgressLogger::logMessage(const string& message) {
   XR_LOGI("{}: {}", helpers::humanReadableDateTime(os::getCurrentTimeSecSinceEpoch()), message);
 }
 
-void ProgressLogger::logError(const string& message) {
+void ProgressLogger::logErrorMessage(const string& message) {
   XR_LOGE("{}: {}", helpers::humanReadableDateTime(os::getCurrentTimeSecSinceEpoch()), message);
 }
 

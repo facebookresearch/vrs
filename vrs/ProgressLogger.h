@@ -18,10 +18,6 @@
 
 #include <string>
 
-#ifdef logError
-#undef logError
-#endif
-
 namespace vrs {
 
 using std::string;
@@ -106,7 +102,7 @@ class ProgressLogger {
   /// Log an error message. This is called when some text needs to actually be logged after all the
   /// filtering logic has been applied.
   /// @param message: the error text message to log.
-  virtual void logError(const string& message);
+  virtual void logErrorMessage(const string& message);
   /// Callback to update the current step's progress, for instance, when displaying a progress bar.
   /// @param progress: the current progress in the step.
   /// @param maxProgress: the max value of the progress counter in the step.

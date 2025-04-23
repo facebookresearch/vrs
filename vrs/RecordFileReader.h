@@ -27,7 +27,6 @@
 #include "FileFormat.h"
 #include "FileHandler.h"
 #include "IndexRecord.h"
-#include "ProgressLogger.h"
 #include "Record.h"
 #include "RecordFormat.h"
 #include "RecordReaders.h"
@@ -43,6 +42,7 @@ using std::vector;
 
 class DataLayout;
 class StreamPlayer;
+class ProgressLogger;
 
 /// This is a special boolean extra field in FileSpec to make RecordFileReader fail fast
 /// on open if the file's index is incomplete or missing, and prevent VRS from rebuilding the index.
@@ -594,8 +594,8 @@ class RecordFileReader {
   map<StreamId, StreamPlayer*> streamPlayers_;
 
   // Misc less critical members, for presentation or optimization
-  ProgressLogger defaultProgressLogger_;
-  ProgressLogger* openProgressLogger_{&defaultProgressLogger_};
+  unique_ptr<ProgressLogger> defaultProgressLogger_;
+  ProgressLogger* openProgressLogger_;
   unique_ptr<std::thread> detailsSaveThread_;
   mutable map<StreamId, vector<const IndexRecord::RecordInfo*>> streamIndex_;
   // Location of the last record searched for a specific stream & record type

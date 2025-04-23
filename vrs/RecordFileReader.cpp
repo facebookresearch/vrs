@@ -37,6 +37,7 @@
 #include "FileHandlerFactory.h"
 #include "IndexRecord.h"
 #include "LegacyFormatsProvider.h"
+#include "ProgressLogger.h"
 #include "StreamPlayer.h"
 #include "TagsRecord.h"
 #include "TelemetryLogger.h"
@@ -73,6 +74,8 @@ StreamPlayer::~StreamPlayer() = default;
 
 RecordFileReader::RecordFileReader() {
   file_ = make_unique<DiskFile>();
+  defaultProgressLogger_ = make_unique<ProgressLogger>();
+  openProgressLogger_ = defaultProgressLogger_.get();
 }
 
 RecordFileReader::~RecordFileReader() {
@@ -482,7 +485,7 @@ int RecordFileReader::closeFile() {
   streamTags_.clear();
   fileTags_.clear();
   recordIndex_.clear();
-  openProgressLogger_ = &defaultProgressLogger_;
+  openProgressLogger_ = defaultProgressLogger_.get();
   streamIndex_.clear();
   streamRecordCounts_.clear();
   recordBoundaries_.clear();
