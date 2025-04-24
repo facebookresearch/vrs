@@ -426,6 +426,10 @@ class PixelFrame {
       PixelFrame& outNormalizedFrame,
       PixelFormat targetPixelFormat,
       const NormalizeOptions& options) const;
+  bool normalizeToPixelFormatWithOcean(
+      PixelFrame& outFrame,
+      PixelFormat targetPixelFormat,
+      const NormalizeOptions& options) const;
 
  private:
   ImageContentBlockSpec imageSpec_;

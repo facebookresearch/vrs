@@ -563,6 +563,9 @@ bool PixelFrame::normalizeFrame(
       return true;
     }
   }
+  if (normalizeToPixelFormatWithOcean(outNormalizedFrame, normalizedPixelFormat, options)) {
+    return true;
+  }
   if (normalizeToPixelFormat(outNormalizedFrame, normalizedPixelFormat, options)) {
     return true;
   }
@@ -1038,11 +1041,6 @@ bool PixelFrame::normalizeToPixelFormat(
     PixelFrame& convertedFrame,
     PixelFormat targetPixelFormat,
     const NormalizeOptions& options) const {
-  return false;
-}
-
-bool PixelFrame::msssimCompare(const PixelFrame& other, double& msssim) {
-  THROTTLED_LOGW(nullptr, "PixelFrame::msssimCompare() has no open source implementation");
   return false;
 }
 
