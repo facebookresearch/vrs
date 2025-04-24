@@ -36,7 +36,7 @@ find_package(TurboJpeg REQUIRED)
 
 # Optional dependencies
 find_package(Opus)
-
+find_package(Ocean)
 
 # Setup unit test infra, but only if unit tests are enabled
 if (UNIT_TESTS)
