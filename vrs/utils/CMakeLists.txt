@@ -17,7 +17,7 @@ add_subdirectory(xxhash)
 add_subdirectory(cli)
 
 file (GLOB VRS_UTILS_SRCS *.cpp *.h *.hpp)
-# Remove fb-only source files (if there is still any lying around)
+# Remove fb-only source files (if there are still any lying around)
 file(GLOB VRS_UTILS_FB_SRCS *_fb.cpp *_fb.h)
 if (VRS_UTILS_FB_SRCS)
   list(REMOVE_ITEM VRS_UTILS_SRCS ${VRS_UTILS_FB_SRCS})
