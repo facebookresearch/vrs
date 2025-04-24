@@ -57,4 +57,5 @@ lz4 = "4.3.2.*"
 portaudio = "19.6.0.*"
 xxhash = "0.8.2"
 zlib = "1.2.13.*"
+eigen = "3.4.0"
 libopus = "1.4" # optional dependency

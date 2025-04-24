@@ -28,7 +28,8 @@ jobs:
               liblz4-dev libzstd-dev libxxhash-dev \
               libboost-system-dev libboost-filesystem-dev libboost-date-time-dev \
               libopus-dev \
-              qtbase5-dev portaudio19-dev
+              qtbase5-dev portaudio19-dev \
+              libeigen3-dev
 
           elif [ "$RUNNER_OS" == "macOS" ]; then
               brew install cmake git ninja googletest glog fmt \
@@ -36,7 +37,8 @@ jobs:
                   lz4 zstd xxhash \
                   boost \
                   opus \
-                  qt5 portaudio
+                  qt5 portaudio \
+                  eigen
 
           else
               echo "$RUNNER_OS not supported"
