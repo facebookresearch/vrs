@@ -28,10 +28,8 @@ version = "1.1.0"
 clean = { cmd = "rm -rf build" }
 print-env = { cmd = "echo $PATH" }
 prepare = "cmake -G 'Ninja' -B build -S . -DCMAKE_BUILD_TYPE=Release"
-build = { cmd = "cmake --build build --config Release --target all", depends-on = [
-    "prepare",
-] }
-test = {cmd = "cd build; ctest -j --rerun-failed --output-on-failure ", depends-on = ["build"] }
+build = { cmd = "cmake --build build --config Release --target all", depends-on = ["prepare"] }
+test = { cmd = "ctest -j --rerun-failed --output-on-failure ", cwd = "build", depends-on = ["clean", "build"]}
 vrs = { cmd = "build/tools/vrs/vrs", depends-on = ["build"]}
 
 [target.win-64.tasks] # Deal with windows specifics (prepare and build)
