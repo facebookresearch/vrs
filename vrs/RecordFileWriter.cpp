@@ -1049,7 +1049,7 @@ int RecordFileWriter::writeRecordsMultiThread(
     int lastError) {
   uint64_t recordsToWriteCount = recordsToCompress.size();
   CompressionJob noCompressionJob;
-#if IS_ANDROID_PLATFORM() || IS_IOS_PLATFORM()
+#if IS_MOBILE_PLATFORM()
   // Mobile platform have much tighter memory restrictions
   vector<CompressionJob> jobs(compressionThreadPoolSize_ * 4);
 #else

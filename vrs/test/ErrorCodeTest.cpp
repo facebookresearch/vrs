@@ -31,7 +31,7 @@ struct ErrorCodeTest : testing::Test {};
 TEST_F(ErrorCodeTest, testErrorCode) {
   EXPECT_EQ(ErrorCode::SUCCESS, 0);
 
-#if IS_MAC_PLATFORM() || IS_IOS_PLATFORM()
+#if IS_APPLE_PLATFORM()
   EXPECT_EQ(ErrorCode::FAILURE, 200000);
 #elif IS_WINDOWS_PLATFORM()
   EXPECT_EQ(ErrorCode::FAILURE, 1 << 29);

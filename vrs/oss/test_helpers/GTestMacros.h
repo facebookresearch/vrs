@@ -30,6 +30,12 @@
 #define ANDROID_DISABLED(x) x
 #endif
 
+#if IS_MOBILE_PLATFORM()
+#define MOBILE_DISABLED(x) DISABLE_TEST(x)
+#else
+#define MOBILE_DISABLED(x) x
+#endif
+
 #if IS_WINDOWS_PLATFORM()
 #define WINDOWS_DISABLED(x) DISABLE_TEST(x)
 #else

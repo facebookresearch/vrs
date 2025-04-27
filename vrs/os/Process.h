@@ -18,7 +18,7 @@
 
 #include <vrs/os/Platform.h>
 
-#if IS_LINUX_PLATFORM() || IS_MAC_PLATFORM() || IS_WINDOWS_PLATFORM() || IS_ANDROID_PLATFORM()
+#if IS_LINUX_PLATFORM() || IS_APPLE_PLATFORM() || IS_WINDOWS_PLATFORM() || IS_ANDROID_PLATFORM()
 
 // Starting with boost 1.88.0, the default boost/process namespace is v2,
 // but the code in this file is still using v1, which is the only option ATM in

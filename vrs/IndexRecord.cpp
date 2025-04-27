@@ -47,21 +47,21 @@ constexpr size_t kMaxRecordCount = 500000000;
 
 // Compression presets, in increasingly tighter settings, starting with NONE, which will be only
 // used when there are too few index entries for compression to reasonably work...
-#if IS_ANDROID_PLATFORM()
+#if IS_MOBILE_PLATFORM()
 CompressionPreset kDefaultCompression = CompressionPreset::ZstdLight;
 const array<CompressionPreset, 4> kCompressionLevels = {
     CompressionPreset::None,
     CompressionPreset::ZstdFast,
     CompressionPreset::ZstdMedium,
     CompressionPreset::ZstdTight};
-#else // !IS_ANDROID_PLATFORM()
+#else // !IS_MOBILE_PLATFORM()
 CompressionPreset kDefaultCompression = CompressionPreset::ZstdTight;
 const array<CompressionPreset, 3> kCompressionLevels = {
     CompressionPreset::None,
     CompressionPreset::ZstdMedium,
     CompressionPreset::ZstdTight};
 
-#endif // !IS_ANDROID_PLATFORM()
+#endif // !IS_MOBILE_PLATFORM()
 
 // Compression doesn't work for small sizes, under this number of records, don't try to compress
 // If we don't have enough records, start with no compression (also for preallocation)

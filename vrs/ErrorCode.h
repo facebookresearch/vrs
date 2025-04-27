@@ -25,7 +25,7 @@
 
 namespace vrs {
 
-#if IS_MAC_PLATFORM() || IS_IOS_PLATFORM()
+#if IS_APPLE_PLATFORM()
 // http://www.cs.cmu.edu/afs/cs/user/lenzo/html/mac_errors.html
 // Largest error number is 100102 kPOSIXErrorEOPNOTSUPP
 const int kPlatformUserErrorsStart = 200000;

@@ -34,6 +34,8 @@
 /// -> are we compiling for the iOS mobile platform? (implies IS_APPLE_PLATFORM() is true)
 /// IS_WINDOWS_PLATFORM()
 /// -> are we compiling for the Windows desktop platform?
+/// IS_MOBILE_PLATFORM()
+/// -> are we compiling for a mobile platform? (implies IS_ANDROID_PLATFORM() or IS_IOS_PLATFORM())
 
 // Set OSS_BUILD_MODE in the open source version of the code.
 #ifndef OSS_BUILD_MODE // @oss-enable
@@ -149,3 +151,5 @@
 #if IS_X86_PLATFORM() && IS_ARM_PLATFORM()
 #error "Invalid dual-arch platform detected"
 #endif
+
+#define IS_MOBILE_PLATFORM() (IS_ANDROID_PLATFORM() || IS_IOS_PLATFORM())

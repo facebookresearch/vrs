@@ -25,7 +25,7 @@
 #if IS_ANDROID_PLATFORM()
 #include <sys/system_properties.h>
 
-#elif IS_MAC_PLATFORM()
+#elif IS_APPLE_PLATFORM()
 #include <sys/ioctl.h>
 #include <sys/sysctl.h>
 #include <unistd.h>
@@ -66,10 +66,10 @@ string getOsFingerPrint() {
   }
   return osFingerprintString;
 
-#elif IS_MAC_PLATFORM()
+#elif IS_APPLE_PLATFORM()
   array<char, 256> osFingerprint{};
   size_t size = osFingerprint.size();
-  string osFingerprintString = "MacOS ";
+  string osFingerprintString = IS_MAC_PLATFORM() ? "MacOS " : "iOS ";
   if (sysctlbyname("kern.osrelease", osFingerprint.data(), &size, nullptr, 0) == 0) {
     osFingerprintString.append(osFingerprint.data());
   } else {
