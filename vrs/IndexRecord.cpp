@@ -49,16 +49,15 @@ constexpr size_t kMaxRecordCount = 500000000;
 // used when there are too few index entries for compression to reasonably work...
 #if IS_MOBILE_PLATFORM()
 CompressionPreset kDefaultCompression = CompressionPreset::ZstdLight;
-const array<CompressionPreset, 4> kCompressionLevels = {
-    CompressionPreset::None,
-    CompressionPreset::ZstdFast,
-    CompressionPreset::ZstdMedium,
-    CompressionPreset::ZstdTight};
-#else // !IS_MOBILE_PLATFORM()
-CompressionPreset kDefaultCompression = CompressionPreset::ZstdTight;
 const array<CompressionPreset, 3> kCompressionLevels = {
     CompressionPreset::None,
     CompressionPreset::ZstdMedium,
+    CompressionPreset::ZstdHigh};
+#else // !IS_MOBILE_PLATFORM()
+CompressionPreset kDefaultCompression = CompressionPreset::ZstdMedium;
+const array<CompressionPreset, 3> kCompressionLevels = {
+    CompressionPreset::None,
+    CompressionPreset::ZstdHigh,
     CompressionPreset::ZstdTight};
 
 #endif // !IS_MOBILE_PLATFORM()
