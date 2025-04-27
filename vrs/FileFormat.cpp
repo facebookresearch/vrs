@@ -29,6 +29,7 @@
 #include <logging/Verify.h>
 
 #include <vrs/helpers/FileMacros.h>
+#include <vrs/helpers/Strings.h>
 
 #include "ErrorCode.h"
 #include "IndexRecord.h"
@@ -197,8 +198,14 @@ bool RecordHeader::isSanityCheckOk() const {
       !XR_VERIFY(recordType.get() < static_cast<uint8_t>(Record::Type::COUNT))) {
     return false;
   }
-  if (uncompressedSize.get() > 0) {
-    if (!XR_VERIFY(uncompressedSize.get() >= recordSize.get() / 2)) {
+  uint32_t uncompressedPayload = uncompressedSize.get(); // doesn't include header already
+  if (uncompressedPayload > 0) {
+    uint32_t compressedPayload = recordSize.get() - sizeof(RecordHeader);
+    // we did not always check that compression actually helped, and smaller sizes do worse
+    uint32_t maxIncrease = (uncompressedPayload < 200)
+        ? max<size_t>(50, uncompressedPayload / 2) // 50 bytes or 50%
+        : max<size_t>(100, uncompressedPayload * 5ULL / 100); // 100 bytes or 5%
+    if (!XR_VERIFY(compressedPayload < uncompressedPayload + maxIncrease)) {
       return false;
     }
     if (!XR_VERIFY(compressionType.get() != static_cast<uint8_t>(CompressionType::None)) ||
@@ -273,7 +280,8 @@ bool printVRSFileInternals(unique_ptr<FileHandler>& file) {
   IF_ERROR_LOG(file->setPos(fileHeader.descriptionRecordOffset.get()));
   IF_ERROR_LOG(file->read(descriptionRecordHeader));
 
-  cout << "Description record size: " << descriptionRecordHeader.recordSize.get() << " bytes.\n";
+  cout << "Description record size: "
+       << helpers::humanReadableFileSize(descriptionRecordHeader.recordSize.get()) << ".\n";
   int64_t indexRecordOffset = fileHeader.indexRecordOffset.get();
   cout << "Index record offset: " << indexRecordOffset << ", ";
   if (indexRecordOffset ==
@@ -289,16 +297,17 @@ bool printVRSFileInternals(unique_ptr<FileHandler>& file) {
     }
   }
 
-  // Check description record header
+  // Check index record header
   FileFormat::RecordHeader indexRecordHeader;
   IF_ERROR_LOG(file->setPos(indexRecordOffset));
   IF_ERROR_LOG(file->read(indexRecordHeader));
 
-  cout << "Index Record size: " << indexRecordHeader.recordSize.get() << " bytes.\n";
+  cout << "Index Record size: "
+       << helpers::humanReadableFileSize(indexRecordHeader.recordSize.get()) << ".\n";
   if (indexRecordHeader.recordSize.get() == fileHeader.recordHeaderSize.get()) {
     cout << "This index record looks empty\n";
   } else if (indexRecordHeader.recordSize.get() < fileHeader.recordHeaderSize.get()) {
-    cerr << "This is smaller than the record index, something's really off!\n";
+    cerr << "This is smaller than a record header, so something's really off!\n";
     returnValue = false;
   }
   int64_t endOfSplitIndexRecordOffset = 0;
