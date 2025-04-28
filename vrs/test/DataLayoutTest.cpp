@@ -991,3 +991,107 @@ TEST_F(DataLayoutTester, testCopyClonedDataPieceValues) {
     checkValues(clone);
   }
 }
+
+namespace {
+
+struct FileLayout : public AutoDataLayout {
+  DataPieceValue<int32_t> value{"value"};
+  DataPieceArray<uint32_t> int32Array{"int32_array", 3};
+  DataPieceString string{"string"};
+  DataPieceVector<int32_t> vectorInts{"vector_ints"};
+  DataPieceVector<std::string> vectorStrings{"vector_strings"};
+  DataPieceStringMap<int64_t> stringIntsMap{"string_ints_map"};
+  DataPieceStringMap<std::string> stringStringMap{"string_string_map"};
+
+  AutoDataLayoutEnd end;
+
+  void setValues() {
+    value.set(1);
+    int32Array.set({1, 2, 3});
+    string.stage("string");
+    vectorInts.stage({1, 2, 3});
+    vectorStrings.stage({"one", "two", "three"});
+    stringIntsMap.stage({{"one", 1}, {"two", 2}, {"three", 3}});
+    stringStringMap.stage({{"one", "1"}, {"two", "2"}, {"three", "3"}});
+    collectVariableDataAndUpdateIndex();
+  }
+};
+
+struct ReadLayout : public AutoDataLayout {
+  DataPieceValue<int32_t> value{"value"};
+  DataPieceValue<int32_t> value2{"value_2"};
+  DataPieceArray<uint32_t> int32Array{"int32_array", 3};
+  DataPieceArray<uint32_t> int32Array2{"int32_array_2", 3};
+  DataPieceString string{"string"};
+  DataPieceString string2{"string_2"};
+  DataPieceVector<int32_t> vectorInts{"vector_ints"};
+  DataPieceVector<int32_t> vectorInts2{"vector_ints_2"};
+  DataPieceVector<std::string> vectorStrings{"vector_strings"};
+  DataPieceVector<std::string> vectorStrings2{"vector_strings_2"};
+  DataPieceStringMap<int64_t> stringIntsMap{"string_ints_map"};
+  DataPieceStringMap<int64_t> stringIntsMap2{"string_ints_map_2"};
+  DataPieceStringMap<std::string> stringStringMap{"string_string_map"};
+  DataPieceStringMap<std::string> stringStringMap2{"string_string_map_2"};
+
+  AutoDataLayoutEnd end;
+
+  void setValues() {
+    value.set(2);
+    value2.set(3);
+    int32Array.set({4, 5, 6});
+    int32Array2.set({7, 8, 9});
+    string.stage("string2");
+    string2.stage("string3");
+    vectorInts.stage({4, 5, 6});
+    vectorInts2.stage({7, 8, 9});
+    vectorStrings.stage({"four", "five", "six"});
+    vectorStrings2.stage({"seven", "eight", "nine"});
+    stringIntsMap.stage({{"one", 1}, {"two", 2}, {"three", 3}});
+    stringIntsMap2.stage({{"two", 2}, {"three", 3}, {"four", 4}});
+    stringStringMap.stage({{"one", "1"}, {"two", "2"}, {"three", "3"}});
+    stringStringMap2.stage({{"four", "4"}, {"five", "5"}, {"six", "6"}});
+  }
+};
+
+const char* compact = R"=(  value: 1
+  value_2: 3
+  int32_array[3]: 1, 2, 3
+  int32_array_2[3]: 7, 8, 9
+  string: "string"
+  string_2: "string3"
+  vector_ints[3]: 1, 2, 3
+  vector_ints_2[3]: 7, 8, 9
+  vector_strings[3]: "one", "two", "three"
+  vector_strings_2[3]: "seven", "eight", "nine"
+  string_ints_map[3]:
+      "one": 1
+      "three": 3
+      "two": 2
+  string_ints_map_2[3]:
+      "four": 4
+      "three": 3
+      "two": 2
+  string_string_map[3]:
+      "one": "1"
+      "three": "3"
+      "two": "2"
+  string_string_map_2[3]:
+      "five": "5"
+      "four": "4"
+      "six": "6"
+)=";
+
+} // namespace
+
+TEST_F(DataLayoutTester, testCopyLayout) {
+  FileLayout fileLayout;
+  ReadLayout readLayout, mappedLayout;
+  mappedLayout.mapLayout(fileLayout);
+  fileLayout.setValues();
+  readLayout.setValues();
+  EXPECT_EQ(readLayout.copyDataPieceValuesFromMappedLayout(mappedLayout), 7);
+  readLayout.collectVariableDataAndUpdateIndex();
+  stringstream ss;
+  readLayout.printLayoutCompact(ss);
+  EXPECT_EQ(ss.str(), compact);
+}

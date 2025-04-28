@@ -156,7 +156,7 @@ class DataPieceString : public DataPiece {
   }
 
  protected:
-  bool stageFrom(const DataPiece* original) override {
+  bool copyFrom(const DataPiece* original) override {
     const DataPieceString* cloneString = reinterpret_cast<const DataPieceString*>(original);
     return cloneString->get(stagedString_);
   }

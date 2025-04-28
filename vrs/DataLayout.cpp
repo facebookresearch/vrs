@@ -88,29 +88,33 @@ void DataLayout::collectVariableDataAndUpdateIndex(void* destination) {
   }
 }
 
+DataPiece*
+DataLayout::findMatch(DataPiece* piece, const vector<DataPiece*>& pieces, size_t& startIndex) {
+  // do a linear search starting after last match
+  size_t pieceCount = pieces.size();
+  for (size_t index = startIndex; index < pieceCount; index++) {
+    if (piece->isMatch(*pieces[index])) {
+      startIndex = index + 1;
+      return pieces[index];
+    }
+  }
+  size_t stopIndex = min(startIndex, pieceCount);
+  for (size_t index = 0; index < stopIndex; index++) {
+    if (piece->isMatch(*pieces[index])) {
+      startIndex = index + 1;
+      return pieces[index];
+    }
+  }
+  return nullptr;
+}
+
 bool DataLayout::mapPieces(
     const vector<DataPiece*>& searchPieces,
     const vector<DataPiece*>& givenPieces) {
   size_t nextMatchStartIndex = 0;
   bool allRequiredFound = true;
   for (DataPiece* piece : searchPieces) {
-    DataPiece* foundPiece = nullptr;
-    // do a linear search starting where we last found something
-    for (size_t index = nextMatchStartIndex; foundPiece == nullptr && index < givenPieces.size();
-         index++) {
-      if (piece->isMatch(*givenPieces[index])) {
-        foundPiece = givenPieces[index];
-        nextMatchStartIndex = index + 1;
-      }
-    }
-    // if we haven't found it yet, search from the beginning
-    size_t stopIndex = min(nextMatchStartIndex, givenPieces.size());
-    for (size_t index = 0; foundPiece == nullptr && index < stopIndex; index++) {
-      if (piece->isMatch(*givenPieces[index])) {
-        foundPiece = givenPieces[index];
-        nextMatchStartIndex = index + 1;
-      }
-    }
+    DataPiece* foundPiece = findMatch(piece, givenPieces, nextMatchStartIndex);
     if (foundPiece != nullptr) {
       piece->setIndexOffset(foundPiece->getPieceIndex(), foundPiece->getOffset());
     } else {
@@ -129,6 +133,42 @@ bool DataLayout::mapLayout(DataLayout& targetLayout) {
   hasAllRequiredPieces_ =
       mapPieces(varSizePieces_, targetLayout.varSizePieces_) && hasAllRequiredPieces_;
   return hasAllRequiredPieces_;
+}
+
+size_t DataLayout::copyMappedValues(
+    const vector<DataPiece*>& pieces,
+    const vector<DataPiece*>& mappedPieces) {
+  // we expect the pieces to map 1:1, same number and same signature for each
+  // If that's not the case, the XR_VERIFY will tell you you're doing it wrong.
+  if (!XR_VERIFY(pieces.size() == mappedPieces.size())) {
+    return 0;
+  }
+  size_t copyCount = 0;
+  auto pieceIter = pieces.begin();
+  auto mappedPieceIter = mappedPieces.begin();
+  while (pieceIter != pieces.end()) {
+    DataPiece& piece = **pieceIter;
+    DataPiece* mappedPiece = *mappedPieceIter;
+    if (!XR_VERIFY(piece.getPieceType() == mappedPiece->getPieceType()) ||
+        !XR_VERIFY(piece.getElementTypeName() == mappedPiece->getElementTypeName())) {
+      return 0;
+    }
+    if (mappedPiece->isMapped() && piece.copyFrom(mappedPiece)) {
+      copyCount++;
+    }
+    ++pieceIter, ++mappedPieceIter;
+  }
+  return copyCount;
+}
+
+size_t DataLayout::copyDataPieceValuesFromMappedLayout(const DataLayout& mappedLayout) {
+  // This layout may not be mapped, while mappedLayout must be mapped.
+  if (!XR_VERIFY(!isMapped()) && !XR_VERIFY(mappedLayout.isMapped())) {
+    return 0;
+  }
+  // This object and the mappedLayout must have the exact same layout!
+  return copyMappedValues(fixedSizePieces_, mappedLayout.fixedSizePieces_) +
+      copyMappedValues(varSizePieces_, mappedLayout.varSizePieces_);
 }
 
 DataPiece* DataLayout::getPieceByIndex(size_t pieceIndex) {
@@ -299,7 +339,7 @@ bool DataLayout::copyClonedDataPieceValues(const DataLayout& originalLayout) {
     if (!XR_VERIFY(copy->getPieceType() == original->getPieceType())) {
       return false;
     }
-    copy->stageFrom(original);
+    copy->copyFrom(original);
   }
   return true;
 }

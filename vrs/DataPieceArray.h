@@ -333,8 +333,10 @@ class DataPieceArray : public DataPiece {
   }
 
  protected:
-  bool stageFrom(const DataPiece* /*original*/) override {
-    return false; // not applicable
+  bool copyFrom(const DataPiece* original) override {
+    const auto* source = reinterpret_cast<const DataPieceArray<T>*>(original);
+    vector<T> values;
+    return source->get(values) && set(values);
   }
 
  private:

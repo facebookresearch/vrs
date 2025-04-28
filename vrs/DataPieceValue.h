@@ -270,8 +270,10 @@ class DataPieceValue : public DataPiece {
   }
 
  protected:
-  bool stageFrom(const DataPiece* /*original*/) override {
-    return false; // not applicable
+  bool copyFrom(const DataPiece* original) override {
+    const auto* source = reinterpret_cast<const DataPieceValue<T>*>(original);
+    T value;
+    return source->get(value) && set(value);
   }
 
  private:

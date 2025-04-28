@@ -216,8 +216,8 @@ class DataPiece {
     pieceIndex_ = pieceIndex;
     offset_ = offset;
   }
-  /// Stage value from another piece known to be of the same type.
-  virtual bool stageFrom(const DataPiece* original) = 0;
+  /// Set or stage value from another piece known to be of the same type.
+  virtual bool copyFrom(const DataPiece* original) = 0;
 
   const string label_;
   const DataPieceType pieceType_;

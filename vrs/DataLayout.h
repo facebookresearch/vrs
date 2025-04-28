@@ -287,6 +287,19 @@ class DataLayout {
   /// @param originalLayout: cloned datalayout from which DataPiece values need to be copied.
   /// @return True if the copy was successful, false if the layout isn't a clone of originalLayout.
   bool copyClonedDataPieceValues(const DataLayout& originalLayout);
+  /// Copy (set or stage) the DataPiece values from a mapped layout, to this layout.
+  /// The mapped layout must be a different instance of the same layout as this object (identical
+  /// fields), but it may be mapped on any layout, and maybe have all, some, or no pieces mapped.
+  /// By using a mapped layout hopefully provided by the getExpectedLayout() API and therefore be
+  /// cached, we can make sure that repeat copy operations are as fast as possible, no matter what
+  /// the underlying layout is.
+  /// @param mappedLayout: layout from which DataPiece values are copied from. The type of
+  /// mappedLayout must be identical with this layout, and it must be mapped on another layout,
+  /// but that other layout can be anything. Every mapped data piece will be set or staged with the
+  /// value accessed through mappedLayout. Unmapped data pieces are unmodified.
+  /// Note that some safety checks will be done, to avoid incorrect use of the API.
+  /// @return The number of DataPiece values copied.
+  size_t copyDataPieceValuesFromMappedLayout(const DataLayout& mappedLayout);
 
   /// Map the data pieces of this layout to that of another layout, field by field.
   /// Note that this call is fairly expensive, and it is normally not necessary to call directly.
@@ -499,9 +512,13 @@ class DataLayout {
   /// @param profile: Profile describing what information needs to be exported as json.
   void serialize(JsonWrapper& rj, const JsonFormatProfileSpec& profile) const;
 
+  static DataPiece* findMatch(DataPiece* piece, const vector<DataPiece*>& pieces, size_t& start);
   static bool mapPieces(
       const vector<DataPiece*>& searchPieces,
       const vector<DataPiece*>& givenPieces);
+  static size_t copyMappedValues(
+      const vector<DataPiece*>& pieces,
+      const vector<DataPiece*>& mappedPieces);
 
   friend class internal::DataLayouter;
   friend class DataPiece;

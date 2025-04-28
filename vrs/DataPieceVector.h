@@ -204,7 +204,7 @@ class DataPieceVector : public DataPiece {
   }
 
  protected:
-  bool stageFrom(const DataPiece* original) override {
+  bool copyFrom(const DataPiece* original) override {
     const DataPieceVector<T>* originalVect = reinterpret_cast<const DataPieceVector<T>*>(original);
     return originalVect->get(stagedValues_);
   }

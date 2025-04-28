@@ -155,7 +155,7 @@ class DataPieceStringMap : public DataPiece {
   }
 
  protected:
-  bool stageFrom(const DataPiece* original) override {
+  bool copyFrom(const DataPiece* original) override {
     const DataPieceStringMap<T>* origMap = reinterpret_cast<const DataPieceStringMap<T>*>(original);
     return origMap->get(stagedValues_);
   }
