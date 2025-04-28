@@ -218,6 +218,15 @@ class DataPieceValue : public DataPiece {
     properties_[kMaxIncrement] = maxIncrement;
   }
 
+  /// Patch a value in the mapped DataLayout.
+  /// This method is named patchValue, because it's meant to edit a DataLayout found in a file,
+  /// when doing a filter-copy operation.
+  /// @return True if the piece is mapped and the value was set.
+  bool patchValue(T value) const {
+    auto* patchedPiece = layout_.getMappedPiece<DataPieceValue<T>>(pieceIndex_);
+    return patchedPiece != nullptr && patchedPiece->set(value);
+  }
+
   /// Tell if a DataPiece value is available.
   /// @return True if the value is available, false if the DataPiece could not be mapped.
   bool isAvailable() const override {

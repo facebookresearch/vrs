@@ -86,6 +86,14 @@ class DataPiece {
   /// @return PieceTypeName<DataType> e.g. "value<double>"
   string getTypeName() const;
 
+  /// Get the index of the DataPiece in the DataLayout, or mapped DataLayout if any.
+  /// @return Piece index, fixed size pieces first, then variable size pieces.
+  /// For mapped DataLayouts, the index is the index of the DataPiece in the target DataLayout,
+  /// or DataLayout::kNotFound if the DataPiece was not successfully mapped.
+  size_t getPieceIndex() const {
+    return pieceIndex_;
+  }
+
   /// Get the offset of the DataPiece in the DataLayout.
   /// For fixed-size DataPiece objects, it's the memory index in the fixed size data buffer.
   /// For variable-size DataPiece objects, it's the index of the variable DataPiece.
@@ -170,6 +178,10 @@ class DataPiece {
   /// @return True if the DataLayout was not mapped, or if a matching DataPiece was found,
   /// False if the DataLayout was mapped and no matching DataPiece was found.
   virtual bool isAvailable() const = 0;
+  /// Tells if the DataPiece is mapped to another DataPiece in a mapped DataLayout.
+  bool isMapped() const {
+    return layout_.isMapped() && pieceIndex_ != DataLayout::kNotFound;
+  }
   /// Print the DataPiece to the out stream, with many details,
   /// using indent text at the start of each line of output.
   /// @param out: Output stream to print to.
@@ -200,7 +212,8 @@ class DataPiece {
   bool isMatch(const DataPiece& rhs) const;
   /// Match signature & properties (default value, min/max, etc).
   virtual bool isSame(const DataPiece* rhs) const;
-  void setOffset(size_t offset) {
+  void setIndexOffset(size_t pieceIndex, size_t offset) {
+    pieceIndex_ = pieceIndex;
     offset_ = offset;
   }
   /// Stage value from another piece known to be of the same type.
@@ -209,6 +222,7 @@ class DataPiece {
   const string label_;
   const DataPieceType pieceType_;
   const size_t fixedSize_;
+  size_t pieceIndex_;
   size_t offset_;
   DataLayout& layout_;
   map<string, string> tags_;

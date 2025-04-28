@@ -105,6 +105,15 @@ class DataPieceString : public DataPiece {
     defaultString_ = std::move(defaultString);
   }
 
+  /// Patch a string value in the mapped DataLayout.
+  /// This method is named patchValue, because it's meant to edit a DataLayout found in a file,
+  /// when doing a filter-copy operation.
+  /// @return True if the piece is mapped and the value was staged.
+  bool patchValue(const string& str) const {
+    auto* patchedPiece = layout_.getMappedPiece<DataPieceString>(pieceIndex_);
+    return patchedPiece != nullptr && (patchedPiece->stage(str), true);
+  }
+
   /// Tell if a value is available, in this DataLayout or the mapped DataLayout.
   bool isAvailable() const override;
 

@@ -283,6 +283,15 @@ class DataPieceArray : public DataPiece {
     return getProperty(kMinValue, outMax);
   }
 
+  /// Patch values in the mapped DataLayout.
+  /// This method is named patchValue, because it's meant to edit a DataLayout found in a file,
+  /// when doing a filter-copy operation.
+  /// @return True if the piece is mapped and the values were set.
+  bool patchValue(const T* values, size_t count) const {
+    auto* patchedPiece = layout_.getMappedPiece<DataPieceArray<T>>(pieceIndex_);
+    return patchedPiece != nullptr && patchedPiece->set(values, count);
+  }
+
   /// Tell if a DataPiece value is available.
   /// @return True if the value is available, false if the DataPiece could not be mapped.
   bool isAvailable() const override {

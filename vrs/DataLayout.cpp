@@ -112,9 +112,9 @@ bool DataLayout::mapPieces(
       }
     }
     if (foundPiece != nullptr) {
-      piece->setOffset(foundPiece->getOffset());
+      piece->setIndexOffset(foundPiece->getPieceIndex(), foundPiece->getOffset());
     } else {
-      piece->setOffset(kNotFound);
+      piece->setIndexOffset(kNotFound, kNotFound);
       if (piece->isRequired()) {
         allRequiredFound = false;
       }
@@ -129,6 +129,15 @@ bool DataLayout::mapLayout(DataLayout& targetLayout) {
   hasAllRequiredPieces_ =
       mapPieces(varSizePieces_, targetLayout.varSizePieces_) && hasAllRequiredPieces_;
   return hasAllRequiredPieces_;
+}
+
+DataPiece* DataLayout::getPieceByIndex(size_t pieceIndex) {
+  if (pieceIndex >= fixedSizePieces_.size() + varSizePieces_.size()) {
+    return nullptr;
+  }
+  return pieceIndex < fixedSizePieces_.size()
+      ? fixedSizePieces_[pieceIndex]
+      : varSizePieces_[pieceIndex - fixedSizePieces_.size()];
 }
 
 void DataLayout::requireAllPieces() {
@@ -224,9 +233,10 @@ ContentBlock DataLayout::getContentBlock() const {
 }
 
 void DataLayout::initLayout() {
+  size_t pieceIndex = 0;
   size_t offset = 0;
   for (auto* piece : fixedSizePieces_) {
-    piece->offset_ = offset;
+    piece->setIndexOffset(pieceIndex++, offset);
     offset += piece->getFixedSize();
   }
   // at the end of the fixed data buffer, we place the index for var size fields,
@@ -236,7 +246,7 @@ void DataLayout::initLayout() {
   // Var pieces do not get a buffer by default, their offset tells which OffsetAndLength to use
   offset = 0;
   for (auto* piece : varSizePieces_) {
-    piece->offset_ = offset++;
+    piece->setIndexOffset(pieceIndex++, offset++);
   }
   varData_.clear();
   hasAllRequiredPieces_ = true;
@@ -1084,6 +1094,7 @@ DataPiece::DataPiece(const string& label, DataPieceType type, size_t size)
     : label_{internal::DataLayouter::get().dataLayoutPieceLabel(label)},
       pieceType_{type},
       fixedSize_{size},
+      pieceIndex_{DataLayout::kNotFound},
       offset_{DataLayout::kNotFound},
       layout_{internal::DataLayouter::get().registerDataPiece(this)},
       required_{false} {}

@@ -478,6 +478,15 @@ class DataLayout {
     outCount = 0;
     return nullptr;
   }
+  /// Get a piece by index, fixed size pieces first, then variable size pieces.
+  DataPiece* getPieceByIndex(size_t pieceIndex);
+  /// Get a typed piece by index in the mapped datalayout, exclusively.
+  template <class T>
+  T* getMappedPiece(size_t pieceIndex) const {
+    return mappedDataLayout_ != nullptr
+        ? static_cast<T*>(mappedDataLayout_->getPieceByIndex(pieceIndex))
+        : nullptr;
+  }
 
   /// After construction of a DataLayout, initializes/resets buffers to hold the DataPiece objects
   /// that have been registered for this DataLayout. This is generally, done automatically by VRS,

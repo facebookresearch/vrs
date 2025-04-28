@@ -99,6 +99,15 @@ class DataPieceStringMap : public DataPiece {
     defaultValues_ = std::move(values);
   }
 
+  /// Patch values in the mapped DataLayout.
+  /// This method is named patchValue, because it's meant to edit a DataLayout found in a file,
+  /// when doing a filter-copy operation.
+  /// @return True if the piece is mapped and the values were staged.
+  bool patchValue(const map<string, T>& values) const {
+    auto* patchedPiece = layout_.getMappedPiece<DataPieceStringMap<T>>(pieceIndex_);
+    return patchedPiece != nullptr && (patchedPiece->stage(values), true);
+  }
+
   /// Tell if the DataPiece is available, directly or mapped successfully.
   /// @return True if values can be read without using default values.
   bool isAvailable() const override {
