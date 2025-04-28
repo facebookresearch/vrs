@@ -17,6 +17,10 @@ add_subdirectory(os)
 add_subdirectory(oss)
 add_subdirectory(utils)
 
+if (BUILD_WITH_XPRS)
+  add_subdirectory(xprs)
+endif()
+
 file (GLOB VRS_SRCS *.cpp *.h *.hpp)
 add_library(vrslib ${VRS_SRCS})
 target_include_directories(vrslib
