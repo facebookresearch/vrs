@@ -215,8 +215,13 @@ bool RecordFilterCopier::onDataLayoutRead(const CurrentRecord& rec, size_t index
   vector<int8_t> fixedData = dl.getFixedData();
   vector<int8_t> varData = dl.getVarData();
   dl.stageCurrentValues();
+  size_t chunkCountBefore = chunks_.size();
   doDataLayoutEdits(rec, index, dl);
-  pushDataLayout(dl);
+  // If the count of chunks changed, assume pushDataLayout(otherLayout) was called already.
+  // This allows for complete DataLayout replacements.
+  if (chunks_.size() == chunkCountBefore) {
+    pushDataLayout(dl);
+  }
   // restore datalayout state, so decoding the file isn't affected
   fixedData.swap(dl.getFixedData());
   varData.swap(dl.getVarData());
