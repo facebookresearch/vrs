@@ -5,8 +5,8 @@
 
 #include "FFmpegDecode.h"
 
-#include <logging/Log.h>
 #define DEFAULT_LOG_CHANNEL "XPRS"
+#include <logging/Log.h>
 
 namespace xprs {
 

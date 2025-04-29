@@ -66,4 +66,19 @@ target_link_libraries(ffmpeg_decoding INTERFACE
 # Set the include directories for the interface target
 target_include_directories(ffmpeg_decoding INTERFACE "${FFmpeg_INCLUDE_DIRS}")
 
+# Link against VideoToolbox on macOS
+if(APPLE)
+  target_link_libraries(ffmpeg_decoding
+    INTERFACE
+      "-framework VideoToolbox"
+      "-framework CoreFoundation"
+      "-framework CoreMedia"
+      "-framework CoreVideo"
+  )
+  target_link_libraries(ffmpeg_decoding
+    INTERFACE
+        "-liconv"
+  )
+endif()
+
 message(STATUS "Found FFmpeg lib, with include dirs: ${FFmpeg_INCLUDE_DIRS}")

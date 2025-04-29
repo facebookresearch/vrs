@@ -59,7 +59,14 @@ tar -xzf "$FFMPEG_VERSION.tar.gz"
 # Change to the FFmpeg source directory, configure, compile, and install
 cd "FFmpeg-$FFMPEG_VERSION"
 echo "Configuring FFmpeg..."
-./configure --prefix="$INSTALL_PATH" --disable-swresample --disable-swscale --disable-everything --enable-decoder=hevc --enable-zlib --enable-static --disable-shared
+./configure --prefix="$INSTALL_PATH" \
+  --disable-swresample --disable-swscale --disable-everything \
+  --enable-decoder=hevc \
+  $( [ "$VRS_PLATFORM" = "macos" ] && printf '%s ' \
+       --enable-decoder=hevc_videotoolbox \
+       --enable-hwaccel=hevc_videotoolbox \
+       --enable-videotoolbox ) \
+  --enable-zlib --enable-static --disable-shared
 echo "Compiling FFmpeg..."
 make -j$(nproc)
 if [ $? -ne 0 ]; then

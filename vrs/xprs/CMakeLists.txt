@@ -27,6 +27,7 @@ target_link_libraries(xprs
   PRIVATE
     vrs_logging
     ffmpeg_decoding
+    fmt::fmt
 )
 
 target_include_directories(xprs
