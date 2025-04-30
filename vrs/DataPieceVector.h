@@ -149,6 +149,11 @@ class DataPieceVector : public DataPiece {
     defaultValues_ = std::move(values);
   }
 
+  /// Initialize to default value.
+  void initToDefault() override {
+    stagedValues_ = defaultValues_;
+  }
+
   /// Patch values in the mapped DataLayout.
   /// This method is named patchValue, because it's meant to edit a DataLayout found in a file,
   /// when doing a filter-copy operation.

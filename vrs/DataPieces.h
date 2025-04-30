@@ -204,6 +204,8 @@ class DataPiece {
   virtual bool stageCurrentValue() {
     return isAvailable();
   }
+  /// Initialize (set or stage) the DataPiece to its default value.
+  virtual void initToDefault() = 0;
   /// Create a new DataPiece of the same type, with the same label.
   virtual unique_ptr<DataPiece> clone() const = 0;
 

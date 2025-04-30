@@ -161,6 +161,18 @@ size_t DataLayout::copyMappedValues(
   return copyCount;
 }
 
+void DataLayout::initDataPiecesToDefaultValue() {
+  if (isMapped()) {
+    return;
+  }
+  for (auto* piece : fixedSizePieces_) {
+    piece->initToDefault();
+  }
+  for (auto* piece : varSizePieces_) {
+    piece->initToDefault();
+  }
+}
+
 size_t DataLayout::copyDataPieceValuesFromMappedLayout(const DataLayout& mappedLayout) {
   // This layout may not be mapped, while mappedLayout must be mapped.
   if (!XR_VERIFY(!isMapped()) && !XR_VERIFY(mappedLayout.isMapped())) {

@@ -228,6 +228,11 @@ class DataPieceArray : public DataPiece {
     setDefault(values.data(), values.size());
   }
 
+  /// Initialize to default value.
+  void initToDefault() override {
+    set(defaultValues_);
+  }
+
   /// Set a property.
   /// @param propertyName: Name of the property.
   /// @param value: Value of the property.

@@ -106,6 +106,11 @@ class DataPieceString : public DataPiece {
     defaultString_ = std::move(defaultString);
   }
 
+  /// Initialize to default value.
+  void initToDefault() override {
+    stagedString_ = defaultString_;
+  }
+
   /// Patch a string value in the mapped DataLayout.
   /// This method is named patchValue, because it's meant to edit a DataLayout found in a file,
   /// when doing a filter-copy operation.

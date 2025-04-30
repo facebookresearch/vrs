@@ -103,7 +103,7 @@ class DataPieceValue : public DataPiece {
 
   /// Get default value.
   /// @return Default value, or default value for type T.
-  T getDefault() const {
+  inline T getDefault() const {
     return defaultValue_ ? *defaultValue_.get() : T{};
   }
   /// Get default value.
@@ -126,6 +126,11 @@ class DataPieceValue : public DataPiece {
     } else {
       defaultValue_ = std::make_unique<T>(defaultValue);
     }
+  }
+
+  /// Initialize to default value.
+  void initToDefault() override {
+    set(getDefault());
   }
 
   /// Get a property

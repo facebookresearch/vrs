@@ -995,13 +995,15 @@ TEST_F(DataLayoutTester, testCopyClonedDataPieceValues) {
 namespace {
 
 struct FileLayout : public AutoDataLayout {
-  DataPieceValue<int32_t> value{"value"};
-  DataPieceArray<uint32_t> int32Array{"int32_array", 3};
-  DataPieceString string{"string"};
-  DataPieceVector<int32_t> vectorInts{"vector_ints"};
-  DataPieceVector<std::string> vectorStrings{"vector_strings"};
-  DataPieceStringMap<int64_t> stringIntsMap{"string_ints_map"};
-  DataPieceStringMap<std::string> stringStringMap{"string_string_map"};
+  DataPieceValue<int32_t> value{"value", -1};
+  DataPieceArray<uint32_t> int32Array{"int32_array", 3, {3, 2, 1}};
+  DataPieceString string{"string", "hello"};
+  DataPieceVector<int32_t> vectorInts{"vector_ints", {0, 1}};
+  DataPieceVector<std::string> vectorStrings{"vector_strings", {"bonjour", "hello"}};
+  DataPieceStringMap<int64_t> stringIntsMap{"string_ints_map", {{"un", 1}, {"deux", 2}}};
+  DataPieceStringMap<std::string> stringStringMap{
+      "string_string_map",
+      {{"un", "1"}, {"deux", "2"}}};
 
   AutoDataLayoutEnd end;
 
@@ -1016,6 +1018,19 @@ struct FileLayout : public AutoDataLayout {
     collectVariableDataAndUpdateIndex();
   }
 };
+
+const char* initValues = R"=(  value: -1
+  int32_array[3]: 3, 2, 1
+  string: "hello"
+  vector_ints[2]: 0, 1
+  vector_strings[2]: "bonjour", "hello"
+  string_ints_map[2]:
+      "deux": 2
+      "un": 1
+  string_string_map[2]:
+      "deux": "2"
+      "un": "1"
+)=";
 
 struct ReadLayout : public AutoDataLayout {
   DataPieceValue<int32_t> value{"value"};
@@ -1082,6 +1097,15 @@ const char* compact = R"=(  value: 1
 )=";
 
 } // namespace
+
+TEST_F(DataLayoutTester, testInitValues) {
+  FileLayout fileLayout;
+  fileLayout.initDataPiecesToDefaultValue();
+  fileLayout.collectVariableDataAndUpdateIndex();
+  stringstream ss;
+  fileLayout.printLayoutCompact(ss);
+  EXPECT_EQ(ss.str(), initValues);
+}
 
 TEST_F(DataLayoutTester, testCopyLayout) {
   FileLayout fileLayout;
