@@ -36,8 +36,9 @@ using std::string;
 class DataPieceString : public DataPiece {
  public:
   /// @param label: Name for the DataPiece.
-  explicit DataPieceString(const string& label)
-      : DataPiece(label, DataPieceType::String, DataLayout::kVariableSize) {}
+  explicit DataPieceString(string label, string defaultValue = {})
+      : DataPiece(std::move(label), DataPieceType::String, DataLayout::kVariableSize),
+        defaultString_{std::move(defaultValue)} {}
   /// @param bundle: Bundle to reconstruct a DataPieceString from disk.
   /// @internal
   explicit DataPieceString(const MakerBundle& bundle);

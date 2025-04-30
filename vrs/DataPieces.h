@@ -48,7 +48,7 @@ class DataPiece {
   /// @param label: Text name.
   /// @param type: A DataPieceType.
   /// @param size: Size in bytes of the DataPiece, or the constant: DataLayout::kVariableSize.
-  DataPiece(const string& label, DataPieceType type, size_t size);
+  DataPiece(string label, DataPieceType type, size_t size);
 
   /// Special tag name to specify a unit of the DataPiece.
   static const string kUnit;

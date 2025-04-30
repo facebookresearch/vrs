@@ -37,8 +37,9 @@ template <typename T>
 class DataPieceStringMap : public DataPiece {
  public:
   /// @param label: Name for the DataPiece.
-  explicit DataPieceStringMap(const string& label)
-      : DataPiece(label, DataPieceType::StringMap, DataLayout::kVariableSize) {}
+  explicit DataPieceStringMap(string label, map<string, T> defaultValues = {})
+      : DataPiece(std::move(label), DataPieceType::StringMap, DataLayout::kVariableSize),
+        defaultValues_{std::move(defaultValues)} {}
   /// @param bundle: Bundle to reconstruct a DataPieceStringMap from disk.
   /// @internal
   explicit DataPieceStringMap(const MakerBundle& bundle);

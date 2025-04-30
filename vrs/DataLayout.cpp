@@ -458,9 +458,9 @@ class DataLayouter {
   /// belongs to a DataLayoutStruct.
   /// @param label: name requested for the DataPiece.
   /// @return The full label for the DataPiece, which may have been prepended with a suffix.
-  string dataLayoutPieceLabel(const string& label) {
+  string dataLayoutPieceLabel(string&& label) {
     if (prefix_.empty()) {
-      return label;
+      return std::move(label);
     }
     return prefix_ + '/' + label;
   }
@@ -1130,8 +1130,8 @@ string sprintValue<uint8_t>(const uint8_t& value, const string& label) {
  * DataPiece<T> definitions
  */
 
-DataPiece::DataPiece(const string& label, DataPieceType type, size_t size)
-    : label_{internal::DataLayouter::get().dataLayoutPieceLabel(label)},
+DataPiece::DataPiece(string label, DataPieceType type, size_t size)
+    : label_{internal::DataLayouter::get().dataLayoutPieceLabel(std::move(label))},
       pieceType_{type},
       fixedSize_{size},
       pieceIndex_{DataLayout::kNotFound},

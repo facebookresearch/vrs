@@ -42,12 +42,12 @@ class DataPieceValue : public DataPiece {
 
  public:
   /// @param label: Name for the DataPiece.
-  explicit DataPieceValue(const string& label)
-      : DataPiece(label, DataPieceType::Value, sizeof(T)) {}
+  explicit DataPieceValue(string label)
+      : DataPiece(std::move(label), DataPieceType::Value, sizeof(T)) {}
   /// @param label: Name for the DataPiece.
   /// @param defaultValue: Default value for the DataPiece.
-  DataPieceValue(const string& label, T defaultValue)
-      : DataPiece(label, DataPieceType::Value, sizeof(T)) {
+  DataPieceValue(string label, T defaultValue)
+      : DataPiece(std::move(label), DataPieceType::Value, sizeof(T)) {
     defaultValue_ = std::make_unique<T>(defaultValue);
   }
   /// @param bundle: Bundle to reconstruct a DataPieceValue from disk.

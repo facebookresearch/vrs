@@ -42,14 +42,14 @@ class DataPieceArray : public DataPiece {
  public:
   /// @param label: Name for the DataPiece.
   /// @param count: Number of elements in the fixes size-array.
-  DataPieceArray(const string& label, size_t count)
-      : DataPiece(label, DataPieceType::Array, sizeof(T) * count), count_(count) {}
+  DataPieceArray(string label, size_t count)
+      : DataPiece(std::move(label), DataPieceType::Array, sizeof(T) * count), count_(count) {}
   /// @param label: Name for the DataPiece.
   /// @param count: Number of elements in the fixes size-array.
   /// @param defaultValues: Static array of default values.
   template <size_t n>
-  DataPieceArray(const string& label, size_t count, const T (&defaultValues)[n])
-      : DataPiece(label, DataPieceType::Array, sizeof(T) * count), count_(count) {
+  DataPieceArray(string label, size_t count, const T (&defaultValues)[n])
+      : DataPiece(std::move(label), DataPieceType::Array, sizeof(T) * count), count_(count) {
     setDefault(defaultValues, n);
   }
   /// @param bundle: Bundle to reconstruct a DataPieceArray from disk.

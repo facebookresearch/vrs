@@ -37,8 +37,9 @@ template <typename T>
 class DataPieceVector : public DataPiece {
  public:
   /// @param label: Name for the DataPiece.
-  explicit DataPieceVector(const string& label)
-      : DataPiece(label, DataPieceType::Vector, DataLayout::kVariableSize) {}
+  explicit DataPieceVector(string label, vector<T> defaultValues = {})
+      : DataPiece(std::move(label), DataPieceType::Vector, DataLayout::kVariableSize),
+        defaultValues_{std::move(defaultValues)} {}
   /// @param bundle: Bundle to reconstruct a DataPieceVector from disk.
   /// @internal
   explicit DataPieceVector(const MakerBundle& bundle);
