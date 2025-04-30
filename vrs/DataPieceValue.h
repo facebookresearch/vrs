@@ -278,7 +278,9 @@ class DataPieceValue : public DataPiece {
   bool copyFrom(const DataPiece* original) override {
     const auto* source = reinterpret_cast<const DataPieceValue<T>*>(original);
     T value;
-    return source->get(value) && set(value);
+    bool retrieved = source->get(value);
+    set(value);
+    return retrieved;
   }
 
  private:

@@ -153,7 +153,8 @@ size_t DataLayout::copyMappedValues(
         !XR_VERIFY(piece.getElementTypeName() == mappedPiece->getElementTypeName())) {
       return 0;
     }
-    if (mappedPiece->isMapped() && piece.copyFrom(mappedPiece)) {
+    if (mappedPiece->isMapped()) {
+      piece.copyFrom(mappedPiece);
       copyCount++;
     }
     ++pieceIter, ++mappedPieceIter;

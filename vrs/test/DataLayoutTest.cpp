@@ -1033,20 +1033,24 @@ const char* initValues = R"=(  value: -1
 )=";
 
 struct ReadLayout : public AutoDataLayout {
-  DataPieceValue<int32_t> value{"value"};
-  DataPieceValue<int32_t> value2{"value_2"};
-  DataPieceArray<uint32_t> int32Array{"int32_array", 3};
-  DataPieceArray<uint32_t> int32Array2{"int32_array_2", 3};
-  DataPieceString string{"string"};
-  DataPieceString string2{"string_2"};
-  DataPieceVector<int32_t> vectorInts{"vector_ints"};
-  DataPieceVector<int32_t> vectorInts2{"vector_ints_2"};
-  DataPieceVector<std::string> vectorStrings{"vector_strings"};
-  DataPieceVector<std::string> vectorStrings2{"vector_strings_2"};
-  DataPieceStringMap<int64_t> stringIntsMap{"string_ints_map"};
-  DataPieceStringMap<int64_t> stringIntsMap2{"string_ints_map_2"};
-  DataPieceStringMap<std::string> stringStringMap{"string_string_map"};
-  DataPieceStringMap<std::string> stringStringMap2{"string_string_map_2"};
+  DataPieceValue<int32_t> value{"value", -1};
+  DataPieceValue<int32_t> value2{"value_2", -2};
+  DataPieceArray<uint32_t> int32Array{"int32_array", 3, {11, 22, 33}};
+  DataPieceArray<uint32_t> int32Array2{"int32_array_2", 3, {44, 55, 66}};
+  DataPieceString string{"string", "default1"};
+  DataPieceString string2{"string_2", "default2"};
+  DataPieceVector<int32_t> vectorInts{"vector_ints", {11, 22}};
+  DataPieceVector<int32_t> vectorInts2{"vector_ints_2", {22, 33}};
+  DataPieceVector<std::string> vectorStrings{"vector_strings", {"one", "two"}};
+  DataPieceVector<std::string> vectorStrings2{"vector_strings_2", {"un", "deux"}};
+  DataPieceStringMap<int64_t> stringIntsMap{"string_ints_map", {{"one", 1}, {"two", 2}}};
+  DataPieceStringMap<int64_t> stringIntsMap2{"string_ints_map_2", {{"two", 2}, {"three", 3}}};
+  DataPieceStringMap<std::string> stringStringMap{
+      "string_string_map",
+      {{"one", "1"}, {"two", "2"}}};
+  DataPieceStringMap<std::string> stringStringMap2{
+      "string_string_map_2",
+      {{"four", "4"}, {"five", "5"}}};
 
   AutoDataLayoutEnd end;
 

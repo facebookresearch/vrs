@@ -341,7 +341,9 @@ class DataPieceArray : public DataPiece {
   bool copyFrom(const DataPiece* original) override {
     const auto* source = reinterpret_cast<const DataPieceArray<T>*>(original);
     vector<T> values;
-    return source->get(values) && set(values);
+    bool retrieved = source->get(values);
+    set(values);
+    return retrieved;
   }
 
  private:
