@@ -180,14 +180,17 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>isMapped</b> () const
 <tr class="separator:a81cce341e71a9a237691f3dc87111dc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7bed0939410664810c80aaf9edb22d7c" id="r_a7bed0939410664810c80aaf9edb22d7c"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece.html#a7bed0939410664810c80aaf9edb22d7c">stageCurrentValue</a> ()</td></tr>
 <tr class="separator:a7bed0939410664810c80aaf9edb22d7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7179aa3209e5307b77111f89238d3515" id="r_a7179aa3209e5307b77111f89238d3515"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece.html#a7179aa3209e5307b77111f89238d3515">initToDefault</a> ()=0</td></tr>
+<tr class="memdesc:a7179aa3209e5307b77111f89238d3515"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize (set or stage) the <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> to its default value.  <br /></td></tr>
+<tr class="separator:a7179aa3209e5307b77111f89238d3515"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acde48d15eff2674f18d155431c5fa52c" id="r_acde48d15eff2674f18d155431c5fa52c"><td class="memItemLeft" align="right" valign="top">virtual unique_ptr&lt; <a class="el" href="classvrs_1_1_data_piece.html">DataPiece</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece.html#acde48d15eff2674f18d155431c5fa52c">clone</a> () const =0</td></tr>
 <tr class="memdesc:acde48d15eff2674f18d155431c5fa52c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> of the same type, with the same label.  <br /></td></tr>
 <tr class="separator:acde48d15eff2674f18d155431c5fa52c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a48b6cf35663fa9a63ff69ebf0e388c05" id="r_a48b6cf35663fa9a63ff69ebf0e388c05"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece.html#a48b6cf35663fa9a63ff69ebf0e388c05">DataPiece</a> (const string &amp;label, <a class="el" href="namespacevrs.html#afb0b040e753b40173e69f247afa430a2">DataPieceType</a> type, size_t size)</td></tr>
-<tr class="separator:a48b6cf35663fa9a63ff69ebf0e388c05"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acc4d22342da4aa3903ee1962a25883d1" id="r_acc4d22342da4aa3903ee1962a25883d1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece.html#acc4d22342da4aa3903ee1962a25883d1">DataPiece</a> (string label, <a class="el" href="namespacevrs.html#afb0b040e753b40173e69f247afa430a2">DataPieceType</a> type, size_t size)</td></tr>
+<tr class="separator:acc4d22342da4aa3903ee1962a25883d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6da3267c1a2cf30c798f490fc16af34f" id="r_a6da3267c1a2cf30c798f490fc16af34f"><td class="memItemLeft" align="right" valign="top"><a id="a6da3267c1a2cf30c798f490fc16af34f" name="a6da3267c1a2cf30c798f490fc16af34f"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>isMatch</b> (const <a class="el" href="classvrs_1_1_data_piece.html">DataPiece</a> &amp;rhs) const</td></tr>
 <tr class="memdesc:a6da3267c1a2cf30c798f490fc16af34f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Match signature only. <br /></td></tr>
@@ -266,8 +269,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>DataLayout</b></td><
 <div class="textblock"><p>Abstract class representing a piece of information part of a <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a>. </p>
 <p><a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> objects have a type (DataPieceType) and label (a text name), which together are enough to identify uniquely a <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> of a particular <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a>. See <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> for more details. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a48b6cf35663fa9a63ff69ebf0e388c05" name="a48b6cf35663fa9a63ff69ebf0e388c05"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a48b6cf35663fa9a63ff69ebf0e388c05">&#9670;&#160;</a></span>DataPiece()</h2>
+<a id="acc4d22342da4aa3903ee1962a25883d1" name="acc4d22342da4aa3903ee1962a25883d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acc4d22342da4aa3903ee1962a25883d1">&#9670;&#160;</a></span>DataPiece()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -278,7 +281,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>DataLayout</b></td><
         <tr>
           <td class="memname">vrs::DataPiece::DataPiece </td>
           <td>(</td>
-          <td class="paramtype">const string &amp;&#160;</td>
+          <td class="paramtype">string&#160;</td>
           <td class="paramname"><em>label</em>, </td>
         </tr>
         <tr>
@@ -777,6 +780,35 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>DataLayout</b></td><
 </table>
 </div><div class="memdoc">
 <p>Tell if the <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> has a fixed-size. </p><dl class="section return"><dt>Returns</dt><dd>True if the <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> needs the same memory space, no matter what the value is. </dd></dl>
+
+</div>
+</div>
+<a id="a7179aa3209e5307b77111f89238d3515" name="a7179aa3209e5307b77111f89238d3515"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7179aa3209e5307b77111f89238d3515">&#9670;&#160;</a></span>initToDefault()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void vrs::DataPiece::initToDefault </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Initialize (set or stage) the <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> to its default value. </p>
+
+<p>Implemented in <a class="el" href="classvrs_1_1_data_piece_array.html#a5ac2403e46a24b4495ef285a4cdf3b53">vrs::DataPieceArray&lt; T &gt;</a>, <a class="el" href="classvrs_1_1_data_piece_array.html#a5ac2403e46a24b4495ef285a4cdf3b53">vrs::DataPieceArray&lt; Matrix3Dd &gt;</a>, <a class="el" href="classvrs_1_1_data_piece_string.html#acfbcb3a43aa003c145b7e6d515924681">vrs::DataPieceString</a>, <a class="el" href="classvrs_1_1_data_piece_string_map.html#a05210106f08708f7e4145d32e5ffaf1d">vrs::DataPieceStringMap&lt; T &gt;</a>, <a class="el" href="classvrs_1_1_data_piece_string_map.html#a05210106f08708f7e4145d32e5ffaf1d">vrs::DataPieceStringMap&lt; Matrix4Dd &gt;</a>, <a class="el" href="classvrs_1_1_data_piece_string_map.html#a05210106f08708f7e4145d32e5ffaf1d">vrs::DataPieceStringMap&lt; string &gt;</a>, <a class="el" href="classvrs_1_1_data_piece_value.html#aeeb87b3da4b8a9904bfd9e4a4199774a">vrs::DataPieceValue&lt; T &gt;</a>, <a class="el" href="classvrs_1_1_data_piece_value.html#aeeb87b3da4b8a9904bfd9e4a4199774a">vrs::DataPieceValue&lt; ContentBlockSizeType &gt;</a>, <a class="el" href="classvrs_1_1_data_piece_value.html#aeeb87b3da4b8a9904bfd9e4a4199774a">vrs::DataPieceValue&lt; double &gt;</a>, <a class="el" href="classvrs_1_1_data_piece_value.html#aeeb87b3da4b8a9904bfd9e4a4199774a">vrs::DataPieceValue&lt; float &gt;</a>, <a class="el" href="classvrs_1_1_data_piece_value.html#aeeb87b3da4b8a9904bfd9e4a4199774a">vrs::DataPieceValue&lt; ImageSpecType &gt;</a>, <a class="el" href="classvrs_1_1_data_piece_value.html#aeeb87b3da4b8a9904bfd9e4a4199774a">vrs::DataPieceValue&lt; Point3Dd &gt;</a>, <a class="el" href="classvrs_1_1_data_piece_value.html#aeeb87b3da4b8a9904bfd9e4a4199774a">vrs::DataPieceValue&lt; StorageType &gt;</a>, <a class="el" href="classvrs_1_1_data_piece_value.html#aeeb87b3da4b8a9904bfd9e4a4199774a">vrs::DataPieceValue&lt; uint32_t &gt;</a>, <a class="el" href="classvrs_1_1_data_piece_value.html#aeeb87b3da4b8a9904bfd9e4a4199774a">vrs::DataPieceValue&lt; uint64_t &gt;</a>, <a class="el" href="classvrs_1_1_data_piece_value.html#aeeb87b3da4b8a9904bfd9e4a4199774a">vrs::DataPieceValue&lt; uint8_t &gt;</a>, <a class="el" href="classvrs_1_1_data_piece_vector.html#a0863a5339b8a44affcbd1e40e138e46b">vrs::DataPieceVector&lt; T &gt;</a>, <a class="el" href="classvrs_1_1_data_piece_vector.html#a0863a5339b8a44affcbd1e40e138e46b">vrs::DataPieceVector&lt; float &gt;</a>, <a class="el" href="classvrs_1_1_data_piece_vector.html#a0863a5339b8a44affcbd1e40e138e46b">vrs::DataPieceVector&lt; Point3Df &gt;</a>, <a class="el" href="classvrs_1_1_data_piece_vector.html#a0863a5339b8a44affcbd1e40e138e46b">vrs::DataPieceVector&lt; string &gt;</a>, and <a class="el" href="classvrs_1_1_data_piece_vector.html#a0863a5339b8a44affcbd1e40e138e46b">vrs::DataPieceVector&lt; vrs::MatrixND &gt;</a>.</p>
 
 </div>
 </div>

@@ -99,8 +99,8 @@ Inheritance diagram for vrs::DataPieceString:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:abb02e502d7c07680bc1671e8f50fcb97" id="r_abb02e502d7c07680bc1671e8f50fcb97"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece_string.html#abb02e502d7c07680bc1671e8f50fcb97">DataPieceString</a> (const string &amp;label)</td></tr>
-<tr class="separator:abb02e502d7c07680bc1671e8f50fcb97"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3161a2eae42c32ee46b2838d3643a636" id="r_a3161a2eae42c32ee46b2838d3643a636"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece_string.html#a3161a2eae42c32ee46b2838d3643a636">DataPieceString</a> (string label, string defaultValue={})</td></tr>
+<tr class="separator:a3161a2eae42c32ee46b2838d3643a636"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8f0e48b9d90d42c24418d740c6c1446f" id="r_a8f0e48b9d90d42c24418d740c6c1446f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece_string.html#a8f0e48b9d90d42c24418d740c6c1446f">DataPieceString</a> (const <a class="el" href="structvrs_1_1_data_piece_1_1_maker_bundle.html">MakerBundle</a> &amp;bundle)</td></tr>
 <tr class="separator:a8f0e48b9d90d42c24418d740c6c1446f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad4a769d401fe9dba822482b5882eb51d" id="r_ad4a769d401fe9dba822482b5882eb51d"><td class="memItemLeft" align="right" valign="top">const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece_string.html#ad4a769d401fe9dba822482b5882eb51d">getElementTypeName</a> () const override</td></tr>
@@ -137,6 +137,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>setDefault</b> (const
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setDefault</b> (string &amp;&amp;defaultString)</td></tr>
 <tr class="memdesc:a56e34c593b2e51f58bee32b2337168bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the default string, in case the <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> is mapped, but this <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> was not mapped. <br /></td></tr>
 <tr class="separator:a56e34c593b2e51f58bee32b2337168bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acfbcb3a43aa003c145b7e6d515924681" id="r_acfbcb3a43aa003c145b7e6d515924681"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece_string.html#acfbcb3a43aa003c145b7e6d515924681">initToDefault</a> () override</td></tr>
+<tr class="memdesc:acfbcb3a43aa003c145b7e6d515924681"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize to default value.  <br /></td></tr>
+<tr class="separator:acfbcb3a43aa003c145b7e6d515924681"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7ebf0f09bae0c48785faebdb75a50933" id="r_a7ebf0f09bae0c48785faebdb75a50933"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece_string.html#a7ebf0f09bae0c48785faebdb75a50933">patchValue</a> (const string &amp;str) const</td></tr>
 <tr class="separator:a7ebf0f09bae0c48785faebdb75a50933"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a87a6a6b874b563acee696e7f7f0d56b8" id="r_a87a6a6b874b563acee696e7f7f0d56b8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece_string.html#a87a6a6b874b563acee696e7f7f0d56b8">isAvailable</a> () const override</td></tr>
@@ -198,8 +201,8 @@ Protected Member Functions</h2></td></tr>
 <tr class="memdesc:a25fa6753f00a669e68e4428724bcbd97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set or stage value from another piece known to be of the same type.  <br /></td></tr>
 <tr class="separator:a25fa6753f00a669e68e4428724bcbd97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classvrs_1_1_data_piece"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classvrs_1_1_data_piece')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classvrs_1_1_data_piece.html">vrs::DataPiece</a></td></tr>
-<tr class="memitem:a48b6cf35663fa9a63ff69ebf0e388c05 inherit pro_methods_classvrs_1_1_data_piece" id="r_a48b6cf35663fa9a63ff69ebf0e388c05"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece.html#a48b6cf35663fa9a63ff69ebf0e388c05">DataPiece</a> (const string &amp;label, <a class="el" href="namespacevrs.html#afb0b040e753b40173e69f247afa430a2">DataPieceType</a> type, size_t size)</td></tr>
-<tr class="separator:a48b6cf35663fa9a63ff69ebf0e388c05 inherit pro_methods_classvrs_1_1_data_piece"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acc4d22342da4aa3903ee1962a25883d1 inherit pro_methods_classvrs_1_1_data_piece" id="r_acc4d22342da4aa3903ee1962a25883d1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece.html#acc4d22342da4aa3903ee1962a25883d1">DataPiece</a> (string label, <a class="el" href="namespacevrs.html#afb0b040e753b40173e69f247afa430a2">DataPieceType</a> type, size_t size)</td></tr>
+<tr class="separator:acc4d22342da4aa3903ee1962a25883d1 inherit pro_methods_classvrs_1_1_data_piece"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6da3267c1a2cf30c798f490fc16af34f inherit pro_methods_classvrs_1_1_data_piece" id="r_a6da3267c1a2cf30c798f490fc16af34f"><td class="memItemLeft" align="right" valign="top">
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>isMatch</b> (const <a class="el" href="classvrs_1_1_data_piece.html">DataPiece</a> &amp;rhs) const</td></tr>
 <tr class="memdesc:a6da3267c1a2cf30c798f490fc16af34f inherit pro_methods_classvrs_1_1_data_piece"><td class="mdescLeft">&#160;</td><td class="mdescRight">Match signature only. <br /></td></tr>
@@ -265,8 +268,8 @@ static const string&#160;</td><td class="memItemRight" valign="bottom"><b>kMaxIn
 <div class="textblock"><p><a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> for variable length string. </p>
 <p>Written values are stored in the string member of this class (VRS record creation) Read values are extracted from the <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a>'s buffer, (VRS records reading/decoding) </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="abb02e502d7c07680bc1671e8f50fcb97" name="abb02e502d7c07680bc1671e8f50fcb97"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abb02e502d7c07680bc1671e8f50fcb97">&#9670;&#160;</a></span>DataPieceString() <span class="overload">[1/2]</span></h2>
+<a id="a3161a2eae42c32ee46b2838d3643a636" name="a3161a2eae42c32ee46b2838d3643a636"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3161a2eae42c32ee46b2838d3643a636">&#9670;&#160;</a></span>DataPieceString() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -277,9 +280,19 @@ static const string&#160;</td><td class="memItemRight" valign="bottom"><b>kMaxIn
         <tr>
           <td class="memname">vrs::DataPieceString::DataPieceString </td>
           <td>(</td>
-          <td class="paramtype">const string &amp;&#160;</td>
-          <td class="paramname"><em>label</em></td><td>)</td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>label</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>defaultValue</em> = <code>{}</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -524,6 +537,35 @@ static const string&#160;</td><td class="memItemRight" valign="bottom"><b>kMaxIn
 <p>Get the size of the staged string, if any. </p><dl class="section return"><dt>Returns</dt><dd>Number of bytes to store the staged string (not including a trailing 0). </dd></dl>
 
 <p>Implements <a class="el" href="classvrs_1_1_data_piece.html#af8bc48f7e55cbbdd5b12327863b59514">vrs::DataPiece</a>.</p>
+
+</div>
+</div>
+<a id="acfbcb3a43aa003c145b7e6d515924681" name="acfbcb3a43aa003c145b7e6d515924681"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acfbcb3a43aa003c145b7e6d515924681">&#9670;&#160;</a></span>initToDefault()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void vrs::DataPieceString::initToDefault </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Initialize to default value. </p>
+
+<p>Implements <a class="el" href="classvrs_1_1_data_piece.html#a7179aa3209e5307b77111f89238d3515">vrs::DataPiece</a>.</p>
 
 </div>
 </div>
