@@ -18,8 +18,8 @@
 #include <libavutil/hwcontext_videotoolbox.h>
 #endif
 
-#include <logging/Log.h>
 #define DEFAULT_LOG_CHANNEL "XPRS"
+#include <logging/Log.h>
 
 namespace xprs {
 

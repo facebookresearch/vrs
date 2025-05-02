@@ -4,11 +4,11 @@
 #include "xprsDecoder.h"
 #include "xprsUtils.h"
 
-#include <logging/Log.h>
 #include <algorithm>
 #include <string_view>
 
 #define DEFAULT_LOG_CHANNEL "XPRS"
+#include <logging/Log.h>
 
 namespace xprs {
 
