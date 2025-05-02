@@ -241,7 +241,7 @@ TEST_F(DataLayoutTester, testDataLayoutMatcher) {
   EXPECT_FALSE(otherConfig.mapLayout(testConfig));
   double v = 0;
   EXPECT_FALSE(otherConfig.double_.get(v));
-  EXPECT_FALSE(otherConfig.double_.getDefault(v));
+  EXPECT_EQ(otherConfig.double_.getDefault(), 0);
 
   MyConfig newConfig;
   OldConfig oldConfig;
@@ -293,7 +293,7 @@ TEST_F(DataLayoutTester, testDataLayoutMatcher) {
 
   // check missing data, with no default
   float floatt = 0;
-  EXPECT_FALSE(newConfig.float_.getDefault(floatt));
+  EXPECT_EQ(newConfig.float_.getDefault(), 0);
   EXPECT_EQ(newConfig.float_.get(), 0);
   floatt = -1;
   EXPECT_FALSE(newConfig.float_.get(floatt));
@@ -301,13 +301,13 @@ TEST_F(DataLayoutTester, testDataLayoutMatcher) {
 
   // check missing data, with default
   EXPECT_FALSE(newConfig.double_.isAvailable());
-  double doublet_default = 0;
-  EXPECT_TRUE(newConfig.double_.getDefault(doublet_default));
-  EXPECT_EQ(doublet_default, 3.14);
-  EXPECT_EQ(newConfig.double_.get(), doublet_default);
+  EXPECT_EQ(newConfig.double_.getDefault(), 3.14);
+  EXPECT_EQ(newConfig.double_.get(), newConfig.double_.getDefault());
   double doublet = -1;
   EXPECT_FALSE(newConfig.double_.get(doublet));
-  EXPECT_EQ(doublet_default, 3.14); // get(value) returns false when a default value is returned
+  EXPECT_EQ(
+      doublet,
+      newConfig.double_.getDefault()); // get(value) returns false when default value is returned
 
   char name[30];
   EXPECT_TRUE(oldConfig.name_.get(name, sizeof(name)));

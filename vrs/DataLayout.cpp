@@ -1252,10 +1252,7 @@ void DataPieceValue<T>::print(ostream& out, const string& indent) const {
   }
   T value;
   bool hasValue = get(value);
-  bool isDefault = !hasValue && getDefault(value);
-  if (hasValue) {
-    str.append(isDefault ? " (default): " : ": ").append(sprintValue<T>(value, getLabel()));
-  }
+  str.append(!hasValue ? " (default): " : ": ").append(sprintValue<T>(value, getLabel()));
   printTextWrapped(indent, str, indent + SUBINDENT, out);
   for (const auto& prop : properties_) {
     using namespace special_chars;
@@ -1292,9 +1289,8 @@ void DataPieceValue<T>::serialize(JsonWrapper& rj, const JsonFormatProfileSpec& 
   }
   DataPiece::serialize(rj, profile);
   if (profile.defaults) {
-    T defaultValue;
-    if (getDefault(defaultValue)) {
-      rj.addMember("default", defaultValue);
+    if (getDefault() != T{}) {
+      rj.addMember("default", getDefault());
     }
   }
   if (profile.properties) {

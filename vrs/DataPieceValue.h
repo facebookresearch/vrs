@@ -42,14 +42,9 @@ class DataPieceValue : public DataPiece {
 
  public:
   /// @param label: Name for the DataPiece.
-  explicit DataPieceValue(string label)
-      : DataPiece(std::move(label), DataPieceType::Value, sizeof(T)) {}
-  /// @param label: Name for the DataPiece.
   /// @param defaultValue: Default value for the DataPiece.
-  DataPieceValue(string label, T defaultValue)
-      : DataPiece(std::move(label), DataPieceType::Value, sizeof(T)) {
-    defaultValue_ = std::make_unique<T>(defaultValue);
-  }
+  explicit DataPieceValue(string label, T defaultValue = {})
+      : DataPiece(std::move(label), DataPieceType::Value, sizeof(T)), defaultValue_{defaultValue} {}
   /// @param bundle: Bundle to reconstruct a DataPieceValue from disk.
   /// @internal
   explicit DataPieceValue(const MakerBundle& bundle);
@@ -84,7 +79,7 @@ class DataPieceValue : public DataPiece {
       outValue = readUnaligned<T>(ptr);
       return true;
     } else {
-      getDefault(outValue);
+      outValue = getDefault();
       return false;
     }
   }
@@ -103,29 +98,14 @@ class DataPieceValue : public DataPiece {
 
   /// Get default value.
   /// @return Default value, or default value for type T.
-  inline T getDefault() const {
-    return defaultValue_ ? *defaultValue_.get() : T{};
-  }
-  /// Get default value.
-  /// @param reference: Reference to a default value to set.
-  /// @return True if the value was set to default value.
-  bool getDefault(T& outDefault) const {
-    if (defaultValue_) {
-      outDefault = *defaultValue_.get();
-      return true;
-    }
-    outDefault = T{};
-    return false;
+  inline const T& getDefault() const {
+    return defaultValue_;
   }
 
   /// Set default value.
   /// @param defaultValue: Value to use as default.
   void setDefault(const T& defaultValue) {
-    if (defaultValue_) {
-      *defaultValue_.get() = defaultValue;
-    } else {
-      defaultValue_ = std::make_unique<T>(defaultValue);
-    }
+    defaultValue_ = defaultValue;
   }
 
   /// Initialize to default value.
@@ -268,9 +248,7 @@ class DataPieceValue : public DataPiece {
     other->tags_ = tags_;
     other->required_ = required_;
     other->properties_ = properties_;
-    if (defaultValue_) {
-      other->defaultValue_ = std::make_unique<T>(*defaultValue_);
-    }
+    other->defaultValue_ = defaultValue_;
     return other;
   }
 
@@ -285,7 +263,7 @@ class DataPieceValue : public DataPiece {
 
  private:
   map<string, T> properties_;
-  unique_ptr<T> defaultValue_;
+  T defaultValue_;
 };
 
 /// \brief DataPieceValue specialization class to store enums more conveniently and safely.
