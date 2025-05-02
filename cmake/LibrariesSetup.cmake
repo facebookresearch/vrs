@@ -38,6 +38,11 @@ find_package(TurboJpeg REQUIRED)
 find_package(Opus)
 find_package(Ocean)
 
+# Optional dependencies for XPRS decoding: only on Unix-like platforms (Linux & macOS)
+if (TARGET_LINUX OR TARGET_MACOS)
+  find_package(FFmpeg)
+endif()
+
 # Setup unit test infra, but only if unit tests are enabled
 if (UNIT_TESTS)
   enable_testing()
