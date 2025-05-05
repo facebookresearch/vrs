@@ -74,8 +74,8 @@ OPTION(BUILD_WITH_XPRS "Build with XPRS decoding library" OFF)
 
 # Check the operating system for BUILD_WITH_XPRS
 if (BUILD_WITH_XPRS)
-  if (NOT TARGET_LINUX)
-    message(FATAL_ERROR "BUILD_WITH_XPRS is only supported on Linux.")
+  if (NOT TARGET_LINUX AND NOT TARGET_MACOS)
+    message(FATAL_ERROR "BUILD_WITH_XPRS is only supported on Linux and macOS.")
   endif()
 endif()
 
