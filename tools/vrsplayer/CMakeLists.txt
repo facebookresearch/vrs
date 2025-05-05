@@ -42,6 +42,11 @@ if (QT_FOUND)
       Threads::Threads
   )
 
+  # Conditionally link to vrs_utils_xprs if INCLUDE_XPRS is set
+  if (BUILD_WITH_XPRS)
+    target_link_libraries(vrsplayer PRIVATE vrs_utils_xprs)
+  endif()
+
   install(TARGETS vrsplayer EXPORT VRSLibTargets
     RUNTIME DESTINATION bin
   )

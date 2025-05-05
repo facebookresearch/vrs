@@ -16,12 +16,22 @@
 
 #include "VrsCommand.h"
 
+#ifdef INCLUDE_XPRS
+#include <vrs/utils/DecoderFactory.h>
+#include <vrs/utils/xprs/XprsDecoder.h>
+#endif
+
 #include <vrs/os/Utils.h>
 
 using namespace std;
 using namespace vrscli;
 
 int main(int argc, char** argv) {
+// Initialize with XPRS if included
+#ifdef INCLUDE_XPRS
+  vrs::utils::DecoderFactory::get().registerDecoderMaker(vrs::vxprs::xprsDecoderMaker);
+#endif
+
   const string& appName = vrs::os::getFilename(argv[0]);
   if (argc == 1) {
     printHelp(appName);

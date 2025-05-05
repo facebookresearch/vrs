@@ -29,6 +29,12 @@ target_link_libraries(vrs
     vrs_logging
 )
 
+# Conditionally link to vrs_utils_xprs if INCLUDE_XPRS is set
+  if (BUILD_WITH_XPRS)
+    target_link_libraries(vrs PRIVATE vrs_utils_xprs)
+  endif()
+
+
 install(TARGETS vrs EXPORT VRSLibTargets
   RUNTIME DESTINATION bin
 )

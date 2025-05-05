@@ -43,6 +43,11 @@ if (BUILD_WITH_OPUS)
   target_compile_definitions(vrs_utils PRIVATE OPUS_IS_AVAILABLE)
 endif()
 
+if (BUILD_WITH_XPRS)
+  add_subdirectory(xprs)
+  target_compile_definitions(vrs_utils PUBLIC INCLUDE_XPRS)
+endif()
+
 target_include_directories(vrs_utils
   INTERFACE
     $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
