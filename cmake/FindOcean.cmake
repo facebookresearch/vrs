@@ -32,8 +32,8 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/facebookresearch/ocean.git
   GIT_TAG        origin/main
 )
-set(OCEAN_BUILD_MINIMAL ON CACHE BOOL "" FORCE)
-set(OCEAN_BUILD_TEST    OFF CACHE BOOL "" FORCE)
+set(OCEAN_BUILD_MINIMAL ON)
+set(OCEAN_BUILD_TEST    OFF)
 message(STATUS "⤷ FetchContent: pulling and building Facebook Ocean…")
 FetchContent_MakeAvailable(ocean)
 
@@ -87,9 +87,9 @@ install(
 
 # --------------------------
 # 5) In-tree find_package support
-set(Ocean_FOUND     TRUE            CACHE INTERNAL "")
-set(Ocean_LIBRARIES Ocean::Ocean    CACHE INTERNAL "")
-set(Ocean_INCLUDE_DIRS "${ocean_SOURCE_DIR}/impl" CACHE INTERNAL "")
+set(Ocean_FOUND     TRUE)
+set(Ocean_LIBRARIES Ocean::Ocean)
+set(Ocean_INCLUDE_DIRS "${ocean_SOURCE_DIR}/impl")
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(Ocean
   REQUIRED_VARS Ocean_LIBRARIES
