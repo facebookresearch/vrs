@@ -216,7 +216,7 @@ const char* convertExceptionToError(const std::exception& exception, XprsResult&
 }
 
 bool checkFileType(std::string filename, std::string filetype) {
-  return filename.substr(filename.find_last_of(".") + 1) == filetype;
+  return filename.substr(filename.find_last_of('.') + 1) == filetype;
 }
 
 bool isHardwareCodec(const AVCodec* avCodec) {
