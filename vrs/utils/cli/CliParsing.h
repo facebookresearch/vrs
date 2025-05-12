@@ -17,12 +17,14 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 
 #include <vrs/utils/FilteredFileReader.h>
 
 namespace vrs::utils {
 
 using std::string;
+using std::string_view;
 
 /// Parse copy options for copy/merge/filter operations.
 /// --no-progress, --compression=<value>, --chunk-size <size>, --mt <n>
@@ -41,8 +43,8 @@ using std::string;
 /// outStatusCode is unchanged (presumably, it's still set to EXIT_SUCCESS),
 /// and the next argument parameter to parse is at argn + 1.
 bool parseCopyOptions(
-    const string& appName,
-    const string& arg,
+    string_view appName,
+    string_view arg,
     int& argn,
     int argc,
     char** argv,
@@ -68,8 +70,8 @@ void printCopyOptionsHelp();
 /// outStatusCode is unchanged (presumably, it's still set to EXIT_SUCCESS),
 /// and the next argument parameter to parse is at argn + 1.
 bool parseTagOverrideOptions(
-    const string& appName,
-    const string& arg,
+    string_view appName,
+    string_view arg,
     int& argn,
     int argc,
     char** argv,
@@ -97,8 +99,8 @@ void printTagOverrideOptionsHelp();
 /// outStatusCode is unchanged (presumably, it's still set to EXIT_SUCCESS),
 /// and the next argument parameter to parse is at argn + 1.
 bool parseTimeAndStreamFilters(
-    const string& appName,
-    const string& arg,
+    string_view appName,
+    string_view arg,
     int& argn,
     int argc,
     char** argv,
@@ -125,8 +127,8 @@ void printTimeAndStreamFiltersHelp();
 /// outStatusCode is unchanged (presumably, it's still set to EXIT_SUCCESS),
 /// and the next argument parameter to parse is at argn + 1.
 bool parseDecimationOptions(
-    const string& appName,
-    const string& arg,
+    string_view appName,
+    string_view arg,
     int& argn,
     int argc,
     char** argv,

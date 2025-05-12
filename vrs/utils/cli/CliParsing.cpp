@@ -33,28 +33,31 @@ inline bool isSigned(const char* str) {
 } // namespace
 
 bool parseCopyOptions(
-    const string& appName,
-    const string& arg,
+    string_view appName,
+    string_view arg,
     int& argn,
     int argc,
     char** argv,
     int& outStatusCode,
     CopyOptions& copyOptions) {
+  string_view compressionOption = "--compression=";
   if (arg == "--no-progress") {
     copyOptions.showProgress = false;
-  } else if (arg == "--compression=default") {
-    copyOptions.setCompressionPreset(CompressionPreset::Default);
-  } else if (arg == "--compression=zdefault") {
-    copyOptions.setCompressionPreset(CompressionPreset::ZstdMedium);
-  } else if (helpers::startsWith(arg, "--compression=")) {
-    const char* optionValue = arg.c_str() + strlen("--compression=");
-    CompressionPreset preset = toEnum<CompressionPreset>(optionValue);
-    if (preset != CompressionPreset::Undefined) {
-      copyOptions.setCompressionPreset(preset);
+  } else if (helpers::startsWith(arg, compressionOption)) {
+    string_view optionValue = arg.substr(compressionOption.size());
+    if (optionValue == "default") {
+      copyOptions.setCompressionPreset(CompressionPreset::Default);
+    } else if (optionValue == "zsdefault") {
+      copyOptions.setCompressionPreset(CompressionPreset::ZstdMedium);
     } else {
-      cerr << appName << ": error. Invalid --compression argument value: '" << optionValue
-           << "'.\n";
-      outStatusCode = EXIT_FAILURE;
+      CompressionPreset preset = toEnum<CompressionPreset>(string(optionValue));
+      if (preset != CompressionPreset::Undefined) {
+        copyOptions.setCompressionPreset(preset);
+      } else {
+        cerr << appName << ": error. Invalid --compression argument value: '" << optionValue
+             << "'.\n";
+        outStatusCode = EXIT_FAILURE;
+      }
     }
   } else if (arg == "--chunk-size") {
     if (++argn < argc) {
@@ -111,8 +114,8 @@ void printCopyOptionsHelp() {
 }
 
 bool parseTagOverrideOptions(
-    const string& appName,
-    const string& arg,
+    string_view appName,
+    string_view arg,
     int& argn,
     int argc,
     char** argv,
@@ -168,8 +171,8 @@ void printTagOverrideOptionsHelp() {
 }
 
 bool parseTimeAndStreamFilters(
-    const string& appName,
-    const string& arg,
+    string_view appName,
+    string_view arg,
     int& argn,
     int argc,
     char** argv,
@@ -280,8 +283,8 @@ DecimationParams& getDecimatorParams(RecordFilterParams& filters) {
 } // namespace
 
 bool parseDecimationOptions(
-    const string& appName,
-    const string& arg,
+    string_view appName,
+    string_view arg,
     int& argn,
     int argc,
     char** argv,
