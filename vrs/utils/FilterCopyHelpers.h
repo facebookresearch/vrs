@@ -200,8 +200,9 @@ class RecordFilterCopier : public RecordFormatStreamPlayer {
   virtual void doHeaderEdits(CurrentRecord& record) {}
 
   // Edit DataLayout blocks, if needed.
-  // Use DataLayout's findDataPieceXXX methods to find the fields you want to edit,
-  // so you can set or stage a different value.
+  // Use getExpectedLayout() to get the DataLayout object in the form you expect, then for each of
+  // its DataPiece fields, use isMapped() to tell if the field is present, and use patchValue(x) to
+  // modify the value as you need.
   virtual void doDataLayoutEdits(const CurrentRecord& record, size_t blockIndex, DataLayout& dl) {}
 
   // Filter image blocks. If the filter is more than a simple pixel buffer modification,
