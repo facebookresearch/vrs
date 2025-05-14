@@ -79,8 +79,9 @@ system.
   [Brew’s web site](https://brew.sh/).
 - install tools & libraries:
   ```
-  brew install cmake git ninja ccache boost fmt libpng jpeg jpeg-turbo lz4 zstd xxhash glog googletest
-  brew install qt5 portaudio pybind11 opus
+  brew install cmake git ninja ccache boost fmt libpng jpeg jpeg-turbo
+  brew install lz4 zstd xxhash glog googletest eigen
+  brew install qt5 portaudio pybind11 opus wget ninja
   brew install node doxygen
   ```
 
@@ -93,7 +94,7 @@ therefore not supported._
 - install tools & libraries:
   ```
   sudo apt-get install cmake git ninja-build ccache libgtest-dev libfmt-dev libjpeg-dev libturbojpeg-dev libpng-dev
-  sudo apt-get install liblz4-dev libzstd-dev libxxhash-dev
+  sudo apt-get install liblz4-dev libzstd-dev libxxhash-dev nasm yasm libeigen3-dev
   sudo apt-get install libboost-system-dev libboost-filesystem-dev libboost-date-time-dev
   sudo apt-get install qtbase5-dev portaudio19-dev libopus-dev
   sudo apt-get install npm doxygen
@@ -165,6 +166,40 @@ int main() {
 }
 
 ```
+
+## Build & run with H.265 (HEVC) decoding support (macOS & Linux)
+
+VRS can now decode H.265 (HEVC) streams in the reader when built with the XPRS
+feature. To enable it:
+
+1. **Install FFmpeg (decoding-only build)** From the repo root, run:
+
+   ```bash
+   ./build_third_party_libs/build_ffmpeg_linuxunix.sh
+   ```
+
+   This will fetch and compile FFmpeg into `~/vrs_third_party_libs/ffmpeg/`.
+   Remove that folder and rerun the script if you ever need to reinstall or
+   update.
+
+2. **Configure & build VRS with XPRS**
+
+   ```bash
+   cmake -S . -B build -G Ninja -DBUILD_WITH_XPRS=ON
+   cd build
+   ninja all
+   ```
+
+   With `-DBUILD_WITH_XPRS=ON`, the VRS reader links against your custom FFmpeg
+   build and gains full H.265 decoding support.
+
+3. **Use the new feature** Any VRS file containing HEVC streams will now be
+   readable by both the `vrs` CLI tool and `vrsplayer` visualizer if you have QT
+   installed.
+
+> **Note:** XPRS-based decoding is currently not supported on Pixi or Windows—if
+> you hit any issues, please check that your FFmpeg build completed without
+> errors and open an issue on the repo.
 
 ## Container build & Usage
 
