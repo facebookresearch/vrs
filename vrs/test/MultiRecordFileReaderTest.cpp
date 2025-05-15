@@ -157,17 +157,16 @@ void createVRSFileSynchronously(
   fileBuilder.build();
 }
 
-string getOsTempPath(const string& path) {
+inline string getOsTempPath(const string& path) {
   return os::pathJoin(os::getTempFolder(), path);
 }
 
 vector<string> getOsTempPaths(size_t n) {
   vector<string> paths;
   paths.reserve(n);
-  auto timestamp = getTimestampSec();
   for (size_t i = 0; i < n; i++) {
     paths.push_back(
-        getOsTempPath(fmt::format("MultiRecordFileReaderTest-{}-{}.vrs", timestamp, i)));
+        getOsTempPath(fmt::format("MultiRecordFileReaderTest-{}-{}.vrs", os::randomName(16), i)));
   }
   return paths;
 }
