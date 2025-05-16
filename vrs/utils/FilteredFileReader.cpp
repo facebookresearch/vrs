@@ -226,6 +226,15 @@ void RecordFilterParams::getIncludedStreams(RecordFileReader& reader, set<Stream
   computeIncludedStreams(reader, streamFilters, outFilteredSet);
 }
 
+unique_ptr<set<StreamId>> RecordFilterParams::getIncludedStreams(RecordFileReader& reader) const {
+  if (streamFilters.empty()) {
+    return {};
+  }
+  unique_ptr<set<StreamId>> filteredSet = make_unique<set<StreamId>>();
+  computeIncludedStreams(reader, streamFilters, *filteredSet);
+  return filteredSet;
+}
+
 string RecordFilterParams::getStreamFiltersConfiguration(std::string_view configName) const {
   string streams;
   if (!streamFilters.empty()) {

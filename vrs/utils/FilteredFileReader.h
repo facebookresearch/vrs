@@ -56,6 +56,7 @@ struct RecordFilterParams {
   bool excludeType(const string& type);
 
   void getIncludedStreams(RecordFileReader& reader, set<StreamId>& outFilteredSet) const;
+  unique_ptr<set<StreamId>> getIncludedStreams(RecordFileReader& reader) const; // if nullptr, all
   string getStreamFiltersConfiguration(std::string_view configName) const;
 };
 
