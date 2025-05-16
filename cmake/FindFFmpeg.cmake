@@ -15,69 +15,102 @@
 # - Find FFmpeg
 # Find the FFmpeg library
 
-# Specify the installation path for FFmpeg
-set(FFmpeg_ROOT "$ENV{HOME}/vrs_third_party_libs/ffmpeg")
-
-# Set the include directories
-set(FFmpeg_INCLUDE_DIRS
-    "${FFmpeg_ROOT}/include"
-)
-
-# Link against ZLIB
-find_package(ZLIB REQUIRED)
-if (ZLIB_FOUND)
-    message(STATUS "Zlib found: ${ZLIB_LIBRARIES}")
-else()
-    message(FATAL_ERROR "Zlib not found")
+# Allow user override of root install prefix
+if(NOT FFmpeg_ROOT)
+  set(FFmpeg_ROOT "$ENV{HOME}/vrs_third_party_libs/ffmpeg")
 endif()
 
-# Create imported targets for each static library
-add_library(ffmpeg_avcodec STATIC IMPORTED)
-set_target_properties(ffmpeg_avcodec PROPERTIES
-    IMPORTED_LOCATION "${FFmpeg_ROOT}/lib/libavcodec.a"
-)
-add_library(ffmpeg_avformat STATIC IMPORTED)
-set_target_properties(ffmpeg_avformat  PROPERTIES
-    IMPORTED_LOCATION "${FFmpeg_ROOT}/lib/libavformat.a"
-)
-add_library(ffmpeg_avutil STATIC IMPORTED)
-set_target_properties(ffmpeg_avutil PROPERTIES
-    IMPORTED_LOCATION "${FFmpeg_ROOT}/lib/libavutil.a"
-)
-add_library(ffmpeg_avdevice STATIC IMPORTED)
-set_target_properties(ffmpeg_avdevice  PROPERTIES
-    IMPORTED_LOCATION "${FFmpeg_ROOT}/lib/libavdevice.a"
-)
-add_library(ffmpeg_avfilter STATIC IMPORTED)
-set_target_properties(ffmpeg_avfilter  PROPERTIES
-    IMPORTED_LOCATION "${FFmpeg_ROOT}/lib/libavfilter.a"
+set(_ffmpeg_search_paths
+  ${FFmpeg_ROOT}
 )
 
-# Create an imported target for the FFmpeg library
-add_library(ffmpeg_decoding INTERFACE)
-target_link_libraries(ffmpeg_decoding INTERFACE
-    ffmpeg_avformat
-    ffmpeg_avcodec
-    ffmpeg_avutil
-    ffmpeg_avdevice
-    ffmpeg_avfilter
-    ZLIB::ZLIB
+# Headers
+find_path(FFMPEG_INCLUDE_DIR
+  NAMES libavcodec/avcodec.h
+  HINTS ${_ffmpeg_search_paths}
+  PATH_SUFFIXES include
 )
-# Set the include directories for the interface target
-target_include_directories(ffmpeg_decoding INTERFACE "${FFmpeg_INCLUDE_DIRS}")
 
-# Link against VideoToolbox on macOS
-if(APPLE)
-  target_link_libraries(ffmpeg_decoding
-    INTERFACE
-      "-framework VideoToolbox"
-      "-framework CoreFoundation"
-      "-framework CoreMedia"
-      "-framework CoreVideo"
+# Shared libs
+find_library(AVCODEC_SO avcodec
+  HINTS ${_ffmpeg_search_paths}
+  PATH_SUFFIXES lib lib64
+)
+find_library(AVFORMAT_SO avformat
+  HINTS ${_ffmpeg_search_paths}
+  PATH_SUFFIXES lib lib64
+)
+find_library(AVUTIL_SO avutil
+  HINTS ${_ffmpeg_search_paths}
+  PATH_SUFFIXES lib lib64
+)
+find_library(AVDEVICE_SO avdevice
+  HINTS ${_ffmpeg_search_paths}
+  PATH_SUFFIXES lib lib64
+)
+find_library(AVFILTER_SO avfilter
+  HINTS ${_ffmpeg_search_paths}
+  PATH_SUFFIXES lib lib64
+)
+
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(FFmpeg
+  REQUIRED_VARS FFMPEG_INCLUDE_DIR
+                AVCODEC_SO
+                AVFORMAT_SO
+                AVUTIL_SO
+                AVDEVICE_SO
+                AVFILTER_SO
+)
+
+mark_as_advanced(
+  FFMPEG_INCLUDE_DIR
+  AVCODEC_SO
+  AVFORMAT_SO
+  AVUTIL_SO
+  AVDEVICE_SO
+  AVFILTER_SO
+)
+
+# Create imported targets
+foreach(comp avcodec avformat avutil avdevice avfilter)
+  string(TOUPPER ${comp} COMP_UPPER)
+  find_library(LIB_${COMP_UPPER}_SO ${comp}
+    HINTS ${_ffmpeg_search_paths}
+    PATH_SUFFIXES lib lib64
   )
-  target_link_libraries(ffmpeg_decoding
-    INTERFACE
-        "-liconv"
+  add_library(FFmpeg::${comp} SHARED IMPORTED)
+  set_target_properties(FFmpeg::${comp} PROPERTIES
+    IMPORTED_LOCATION "${LIB_${COMP_UPPER}_SO}"
+    INTERFACE_INCLUDE_DIRECTORIES "${FFMPEG_INCLUDE_DIR}"
+  )
+endforeach()
+
+# 1. Create an INTERFACE library called ffmpeg_decode
+add_library(ffmpeg_decoding INTERFACE)
+
+# 2. Tell it to link against all the FFmpeg shared‐library targets
+target_link_libraries(ffmpeg_decoding INTERFACE
+    FFmpeg::avcodec
+    FFmpeg::avformat
+    FFmpeg::avutil
+    FFmpeg::avdevice         # if you need device APIs
+    FFmpeg::avfilter         # if you need filter APIs
+    ZLIB::ZLIB               # transitively needed by FFmpeg
+)
+
+# 3. Propagate include dirs
+target_include_directories(ffmpeg_decoding INTERFACE
+    ${FFMPEG_INCLUDE_DIR}    # or your variable for <prefix>/include
+)
+
+# 4. (macOS only) If you still need to pull in VideoToolbox, wrap that too
+if(APPLE)
+  target_link_libraries(ffmpeg_decoding INTERFACE
+    "-framework VideoToolbox"
+    "-framework CoreFoundation"
+    "-framework CoreMedia"
+    "-framework CoreVideo"
   )
 endif()
 
