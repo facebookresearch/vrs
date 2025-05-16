@@ -42,26 +42,38 @@ bool PixelFrame::readJpegFrame(RecordReader* reader, uint32_t sizeBytes) {
 
 static bool
 readJpegFrameHelper(PixelFrame& frame, struct jpeg_decompress_struct& cinfo, bool decodePixels) {
-  jpeg_read_header(&cinfo, TRUE);
-  if (cinfo.num_components == 1) {
-    cinfo.out_color_space = JCS_GRAYSCALE;
-    frame.init(PixelFormat::GREY8, cinfo.image_width, cinfo.image_height);
-  } else {
-    cinfo.out_color_space = JCS_RGB;
-    frame.init(PixelFormat::RGB8, cinfo.image_width, cinfo.image_height);
-  }
-  if (decodePixels) {
-    // decompress row by row
-    jpeg_start_decompress(&cinfo);
-    uint8_t* rowPtr = frame.wdata();
-    while (cinfo.output_scanline < cinfo.output_height) {
-      jpeg_read_scanlines(&cinfo, &rowPtr, 1);
-      rowPtr += frame.getSpec().getStride();
+  bool success = true;
+  try {
+    jpeg_read_header(&cinfo, TRUE);
+    if (cinfo.num_components == 1) {
+      cinfo.out_color_space = JCS_GRAYSCALE;
+      frame.init(PixelFormat::GREY8, cinfo.image_width, cinfo.image_height);
+    } else {
+      cinfo.out_color_space = JCS_RGB;
+      frame.init(PixelFormat::RGB8, cinfo.image_width, cinfo.image_height);
     }
-    jpeg_finish_decompress(&cinfo);
+    if (decodePixels) {
+      // decompress row by row
+      jpeg_start_decompress(&cinfo);
+      uint8_t* rowPtr = frame.wdata();
+      while (cinfo.output_scanline < cinfo.output_height) {
+        jpeg_read_scanlines(&cinfo, &rowPtr, 1);
+        rowPtr += frame.getSpec().getStride();
+      }
+      jpeg_finish_decompress(&cinfo);
+    }
+  } catch (runtime_error&) {
+    success = false;
   }
   jpeg_destroy_decompress(&cinfo);
-  return true;
+  return success;
+}
+
+static void error_exit(j_common_ptr cinfo) {
+  char buffer[JMSG_LENGTH_MAX];
+  (*cinfo->err->format_message)(cinfo, buffer);
+  XR_LOGD("{}", buffer);
+  throw runtime_error("libjpeg error");
 }
 
 bool PixelFrame::readJpegFrame(const vector<uint8_t>& jpegBuf, bool decodePixels) {
@@ -69,6 +81,7 @@ bool PixelFrame::readJpegFrame(const vector<uint8_t>& jpegBuf, bool decodePixels
   struct jpeg_decompress_struct cinfo {};
   struct jpeg_error_mgr jerr {};
   cinfo.err = jpeg_std_error(&jerr);
+  jerr.error_exit = error_exit;
   jpeg_create_decompress(&cinfo);
   jpeg_mem_src(&cinfo, jpegBuf.data(), jpegBuf.size());
   return readJpegFrameHelper(*this, cinfo, decodePixels);
@@ -84,6 +97,7 @@ bool PixelFrame::readJpegFrameFromFile(const std::string& path, bool decodePixel
   struct jpeg_decompress_struct cinfo {};
   struct jpeg_error_mgr jerr {};
   cinfo.err = jpeg_std_error(&jerr);
+  jerr.error_exit = error_exit;
   jpeg_create_decompress(&cinfo);
   jpeg_stdio_src(&cinfo, infile);
   const bool success = readJpegFrameHelper(*this, cinfo, decodePixels);
