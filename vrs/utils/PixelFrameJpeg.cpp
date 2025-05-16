@@ -23,6 +23,15 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/helpers/Throttler.h>
+
+namespace {
+vrs::utils::Throttler& getThrottler() {
+  static vrs::utils::Throttler sThrottler;
+  return sThrottler;
+}
+} // namespace
+
 namespace vrs::utils {
 
 using namespace std;
@@ -72,7 +81,7 @@ readJpegFrameHelper(PixelFrame& frame, struct jpeg_decompress_struct& cinfo, boo
 static void error_exit(j_common_ptr cinfo) {
   char buffer[JMSG_LENGTH_MAX];
   (*cinfo->err->format_message)(cinfo, buffer);
-  XR_LOGD("{}", buffer);
+  THROTTLED_LOGW("error_exit", "{}", buffer);
   throw runtime_error("libjpeg error");
 }
 
