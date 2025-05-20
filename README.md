@@ -197,9 +197,16 @@ feature. To enable it:
    readable by both the `vrs` CLI tool and `vrsplayer` visualizer if you have QT
    installed.
 
-> **Note:** XPRS-based decoding is currently not supported on Pixi or Windows—if
-> you hit any issues, please check that your FFmpeg build completed without
-> errors and open an issue on the repo.
+> **Note:**
+>
+> - XPRS-based decoding is currently not supported on Pixi or Windows—if you hit
+>   any issues, please check that your FFmpeg build completed without errors and
+>   open an issue on the repo.
+> - By enabling H.265 (HEVC) decoding feature, the project depends on FFmpeg,
+>   which is licensed under the Lesser General Public License (LGPL) version 2.1
+>   or later. You can obtain the source code of FFmpeg, matching the version
+>   used in this library, by visiting the official FFmpeg website:
+>   https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n7.1.tar.gz.
 
 ## Container build & Usage
 

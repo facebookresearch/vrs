@@ -13,6 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Parts of this software are licensed under the <a href=http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html>LGPLv2.1</a>
+# and its source can be downloaded <a href=https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n7.1.tar.gz>here</a>
+
 set -e
 
 if [[ $(uname -s) == "Darwin" ]]; then
