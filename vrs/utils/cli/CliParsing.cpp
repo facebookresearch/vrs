@@ -107,8 +107,8 @@ void printCopyOptionsHelp() {
   cout << "  [ --no-progress ]:"
           " don't show any progress information (useful for offline usage with basic terminals).\n"
           "  [ --mt <thread-count> ]: use <thread-count> threads for compression while copying.\n"
-          "  [ --chunk-size <nb>[M|G] ]: chunk output file every <nb> number of MB or GB.\n"
-          "    Use 'M' for MB (default), or 'G' for GB.\n"
+          "  [ --chunk-size <nb>[M|G] ]: chunk output file every <nb> number of MiB or GiB.\n"
+          "    Use 'M' for MiB (default), or 'G' for GiB.\n"
           "  [ --compression={none|default|fast|tight|zfast|zlight|zmedium|ztight|zmax} ]:"
           " set compression setting.\n";
 }
@@ -252,25 +252,30 @@ bool parseTimeAndStreamFilters(
 }
 
 void printTimeAndStreamFiltersHelp() {
-  cout << "  [ --before [+|-]<max-timestamp> ]: filter-out records newer than <max-timestamp>.\n"
-          "  [ --after [+|-]<min-timestamp> ]:"
-          " filter-out records equal to or older than <min-timestamp>.\n"
-          "  [ --range [+|-]<min-timestamp> [+|-]<max-timestamp> ]:"
-          " filter-out records outside of the given time range,\n"
-          "    min-timestamp excluded, max-timestamp included.\n"
-          "  [ --around [+|-]<timestamp> <time-range> ]:"
-          " filter-out records outside of <timestamp> -/+<time-range>/2.\n"
-          "    Timestamps starting with an explicit '+' sign are durations relative to the"
-          " first data record's timestamp.\n"
-          "    Negative timestamps are durations relative to the last data record's timestamp.\n"
-          "    All timestamps, durations or intervals are in seconds.\n"
-          "  [ + <recordable_type_id> ]: consider streams of that recordable type ID.\n"
-          "  [ + <recordable_type_id>-<instance_id> ]: consider a specific stream ID.\n"
-          "  [ - <recordable_type_id> ]: ignore all streams of that recordable type ID.\n"
-          "  [ - <recordable_type_id>-<instance_id> ]: ignore a specific stream.\n"
-          "  [ + [configuration|state|data] ]: consider records of that type.\n"
-          "  [ - [configuration|state|data] ]: ignore records of that type.\n"
-          "  [ -1 | --first-records ]: only consider the first record of each stream & type.\n";
+  cout
+      << "\n Timestamp Filtering Options:\n"
+         "  - Time values starting with a digit are considered absolute timestamp values.\n"
+         "  - Time values starting with a '+' sign represent offsets relative to the first data record timestamp.\n"
+         "  - Time values starting with a '-' sign represent offsets relative to the last data record timestamp.\n"
+         "  - All time values, timestamps, and offsets are expressed in seconds as floating point numbers.\n"
+         "  - Lower boundaries are exclusive, while upper boundaries are inclusive (e.g., (min, max]).\n"
+         "  - When filtering by timestamp with a min-time boundary, last configuration and state records are preserved.\n"
+         "  [ --after [+|-]<min-time> ]: include records with timestamps greater than [+|-]<min-time>.\n"
+         "  [ --before [+|-]<max-time> ]: include records with timestamps less than or equal to [+|-]<max-time>.\n"
+         "  [ --range [+|-]<min-time> [+|-]<max-time> ]:"
+         " include records with timestamps within the range ([+|-]min-time, [+|-]max-time].\n"
+         "  [ --around [+|-]<time> <range> ]:"
+         " include records with timestamps within the range ([+|-]time-range, [+|-]time+range].\n\n"
+         " Stream Filtering Options:\n"
+         "  [ + <recordable_type_id> ]: include streams of the specified recordable type ID.\n"
+         "  [ + <recordable_type_id>-<instance_id> ]: include a specific stream ID.\n"
+         "  [ - <recordable_type_id> ]: exclude all streams of the specified recordable type ID.\n"
+         "  [ - <recordable_type_id>-<instance_id> ]: exclude a specific stream.\n\n"
+         " Record Type Filtering Options:\n"
+         "  [ + [configuration|state|data] ]: include records of the specified type.\n"
+         "  [ - [configuration|state|data] ]: exclude records of the specified type.\n\n"
+         " Other Record Filtering Options:\n"
+         "  [ -1 | --first-records ]: only include the first record of each stream and type.\n";
 }
 
 namespace {

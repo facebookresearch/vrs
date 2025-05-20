@@ -221,16 +221,16 @@ void printHelp(const string& appName) {
       << CMD("Print VRS file format debug information", "debug <file.vrs>")
 
       << "\n"
-      << "Filter options:\n";
+      << "Record Filtering Options:\n";
   printTimeAndStreamFiltersHelp();
   printDecimationOptionsHelp();
 
   cout << "\n"
-          "Copy options:\n";
+          "Copy Options:\n";
   printCopyOptionsHelp();
 
   cout << "\n"
-          "Tag override options:\n";
+          "Tag Override Options:\n";
   printTagOverrideOptionsHelp();
 }
 
