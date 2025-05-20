@@ -75,7 +75,7 @@ echo "Configuring FFmpeg..."
        --enable-decoder=hevc_videotoolbox \
        --enable-hwaccel=hevc_videotoolbox \
        --enable-videotoolbox ) \
-  --enable-zlib --enable-static --disable-shared
+  --enable-zlib --enable-shared --disable-static
 echo "Compiling FFmpeg..."
 if ! make -j"$(nproc)"
 then
