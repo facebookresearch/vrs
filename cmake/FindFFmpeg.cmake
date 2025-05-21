@@ -113,4 +113,4 @@ if(APPLE)
   )
 endif()
 
-message(STATUS "Found FFmpeg lib, with include dirs: ${FFmpeg_INCLUDE_DIRS}")
+message(STATUS "Found FFmpeg lib, with include dirs: ${FFMPEG_INCLUDE_DIR}")
