@@ -27,7 +27,7 @@ version = "1.1.0"
 # Note: extra CLI argument after `pixi run TASK` are passed to the task cmd.
 clean = { cmd = "rm -rf build" }
 print-env = { cmd = "echo $PATH" }
-prepare = "cmake -G 'Ninja' -B build -S . -DCMAKE_BUILD_TYPE=Release"
+prepare = "cmake -G 'Ninja' -B build -S . -DBUILD_WITH_XPRS:BOOL=ON -DFFmpeg_ROOT=$CONDA_PREFIX -DCMAKE_BUILD_TYPE=Release"
 build = { cmd = "cmake --build build --config Release --target all", depends-on = ["prepare"] }
 test = { cmd = "ctest -j --rerun-failed --output-on-failure ", cwd = "build", depends-on = ["build"]}
 vrs = { cmd = "build/tools/vrs/vrs", depends-on = ["build"]}
@@ -57,3 +57,4 @@ xxhash = "0.8.*"
 zlib = "1.2.*"
 eigen = "3.4.*"
 libopus = "1.4*" # optional dependency
+ffmpeg = { version = "*", build = "*lgpl*" }
