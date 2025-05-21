@@ -8,11 +8,12 @@ on:
 
 jobs:
   build:
-    name: Build VRS on ${{ matrix.os }}
+    name: Build VRS on ${{ matrix.os }} / XPRS=${{ matrix.XPRS_FLAG }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, macos-13, macOS-latest] #macOS-13 is macIntel, macOS-latest is macSilicon
+        XPRS_FLAG: ["ON", "OFF"]
       fail-fast: false
 
     steps:
@@ -47,6 +48,7 @@ jobs:
 
       - name: Build FFMPEG
         shell: bash
+        if: matrix.XPRS_FLAG == 'ON'
         run: |
           ./build_third_party_libs/build_ffmpeg_linuxunix.sh
 
@@ -57,7 +59,7 @@ jobs:
               export QT_DIR=$(find /usr/local/Cellar/qt\@5 -name "5.*" -depth 1)
           fi
           mkdir build
-          cmake -S . -B build -G Ninja -DBUILD_WITH_XPRS:BOOL=ON
+          cmake -S . -B build -G Ninja -DBUILD_WITH_XPRS:BOOL="${{ matrix.XPRS_FLAG }}"
 
       - name: Build and Test C++
         shell: bash
