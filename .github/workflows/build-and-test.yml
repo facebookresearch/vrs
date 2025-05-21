@@ -45,6 +45,11 @@ jobs:
               exit 1
           fi
 
+      - name: Build FFMPEG
+        shell: bash
+        run: |
+          ./build_third_party_libs/build_ffmpeg_linuxunix.sh
+
       - name: Configure
         shell: bash
         run: |
@@ -52,7 +57,7 @@ jobs:
               export QT_DIR=$(find /usr/local/Cellar/qt\@5 -name "5.*" -depth 1)
           fi
           mkdir build
-          cmake -S . -B build -G Ninja
+          cmake -S . -B build -G Ninja -DBUILD_WITH_XPRS:BOOL=ON
 
       - name: Build and Test C++
         shell: bash
