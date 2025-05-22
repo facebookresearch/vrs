@@ -39,7 +39,7 @@ find_package(Opus)
 find_package(Ocean)
 
 # Optional dependencies for XPRS decoding: only on Unix-like platforms (Linux & macOS)
-if (TARGET_LINUX OR TARGET_MACOS)
+if (BUILD_WITH_XPRS AND (TARGET_LINUX OR TARGET_MACOS))
   find_package(FFmpeg)
 endif()
 
