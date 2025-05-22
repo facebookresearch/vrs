@@ -96,7 +96,6 @@ target_link_libraries(ffmpeg_decoding INTERFACE
     FFmpeg::avutil
     FFmpeg::avdevice         # if you need device APIs
     FFmpeg::avfilter         # if you need filter APIs
-    ZLIB::ZLIB               # transitively needed by FFmpeg
 )
 
 # 3. Propagate include dirs
