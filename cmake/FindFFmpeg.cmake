@@ -98,12 +98,7 @@ target_link_libraries(ffmpeg_decoding INTERFACE
     FFmpeg::avfilter         # if you need filter APIs
 )
 
-# 3. Propagate include dirs
-target_include_directories(ffmpeg_decoding INTERFACE
-    ${FFMPEG_INCLUDE_DIR}    # or your variable for <prefix>/include
-)
-
-# 4. (macOS only) If you still need to pull in VideoToolbox, wrap that too
+# 3. (macOS only) If you still need to pull in VideoToolbox, wrap that too
 if(APPLE)
   target_link_libraries(ffmpeg_decoding INTERFACE
     "-framework VideoToolbox"
