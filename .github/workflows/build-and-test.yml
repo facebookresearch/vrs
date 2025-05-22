@@ -12,7 +12,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest,  macOS-latest]
+        os: [ubuntu-latest, macos-13, macOS-latest] #macOS-13 is macIntel, macOS-latest is macSilicon
       fail-fast: false
 
     steps:
