@@ -479,6 +479,9 @@ class MultiRecordFileReader {
     return readers_;
   }
 
+  static std::unique_ptr<RecordFileReader> reduceToRecordFileReader_TEMPORARY_API_TO_DELETE(
+      MultiRecordFileReader& multiRecordFileReader);
+
  private:
   using StreamIdToUniqueIdMap = map<StreamId, UniqueStreamId>;
   using StreamIdReaderPair = std::pair<StreamId, RecordFileReader*>;

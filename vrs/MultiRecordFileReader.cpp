@@ -877,4 +877,15 @@ UniqueStreamId MultiRecordFileReader::getUniqueStreamIdInternal(
   return readerStreamIdToUniqueMap_.at(reader).at(streamId);
 }
 
+unique_ptr<RecordFileReader>
+MultiRecordFileReader::reduceToRecordFileReader_TEMPORARY_API_TO_DELETE(
+    MultiRecordFileReader& multiRecordFileReader) {
+  if (multiRecordFileReader.readers_.size() != 1) {
+    return nullptr;
+  }
+  std::unique_ptr<RecordFileReader> reader = std::move(multiRecordFileReader.readers_[0]);
+  multiRecordFileReader.readers_.pop_back();
+  multiRecordFileReader.close();
+  return reader;
+}
 } // namespace vrs
