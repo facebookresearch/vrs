@@ -44,14 +44,6 @@ find_library(AVUTIL_SO avutil
   HINTS ${_ffmpeg_search_paths}
   PATH_SUFFIXES lib lib64
 )
-find_library(AVDEVICE_SO avdevice
-  HINTS ${_ffmpeg_search_paths}
-  PATH_SUFFIXES lib lib64
-)
-find_library(AVFILTER_SO avfilter
-  HINTS ${_ffmpeg_search_paths}
-  PATH_SUFFIXES lib lib64
-)
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(FFmpeg
@@ -59,8 +51,6 @@ find_package_handle_standard_args(FFmpeg
                 AVCODEC_SO
                 AVFORMAT_SO
                 AVUTIL_SO
-                AVDEVICE_SO
-                AVFILTER_SO
 )
 
 mark_as_advanced(
@@ -68,8 +58,6 @@ mark_as_advanced(
   AVCODEC_SO
   AVFORMAT_SO
   AVUTIL_SO
-  AVDEVICE_SO
-  AVFILTER_SO
 )
 
 # Create imported targets
@@ -94,8 +82,6 @@ target_link_libraries(ffmpeg_decoding INTERFACE
     FFmpeg::avcodec
     FFmpeg::avformat
     FFmpeg::avutil
-    FFmpeg::avdevice         # if you need device APIs
-    FFmpeg::avfilter         # if you need filter APIs
 )
 
 # 3. (macOS only) If you still need to pull in VideoToolbox, wrap that too
