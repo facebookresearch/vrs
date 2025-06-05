@@ -27,14 +27,14 @@ version = "1.1.0"
 # Note: extra CLI argument after `pixi run TASK` are passed to the task cmd.
 clean = { cmd = "rm -rf build" }
 print-env = { cmd = "echo $PATH" }
-prepare = "cmake -G 'Ninja' -B build -S . -DBUILD_WITH_XPRS:BOOL=ON -DFFmpeg_ROOT=$CONDA_PREFIX -DCMAKE_BUILD_TYPE=Release"
+prepare = "cmake -G 'Ninja' -B build -S . -DCMAKE_BUILD_TYPE=Release -DBUILD_WITH_XPRS:BOOL=ON -DFFmpeg_ROOT=$CONDA_PREFIX"
 build = { cmd = "cmake --build build --config Release --target all", depends-on = ["prepare"] }
 test = { cmd = "ctest -j --rerun-failed --output-on-failure ", cwd = "build", depends-on = ["build"]}
 vrs = { cmd = "build/tools/vrs/vrs", depends-on = ["build"]}
 
 [target.win-64.tasks] # Deal with windows specifics (prepare and build)
 cmake-generator = "cmake --help"
-prepare = "cmake -G 'Visual Studio 16 2019' -B build -S . -DCMAKE_BUILD_TYPE=Release"
+prepare = "cmake -G 'Visual Studio 16 2019' -B build -S . -DCMAKE_BUILD_TYPE=Release -DBUILD_WITH_XPRS:BOOL=ON -DFFmpeg_ROOT=$CONDA_PREFIX"
 build = { cmd = "cmake --build build --config Release  -- /m", depends-on = [
     "prepare",
 ] }

@@ -72,13 +72,6 @@ OPTION(BUILD_TOOLS "Build all of the tools" ON)
 OPTION(BUILD_SAMPLES "Build sample code and sample apps" ON)
 OPTION(BUILD_WITH_XPRS "Build with XPRS decoding library" OFF)
 
-# Check the operating system for BUILD_WITH_XPRS
-if (BUILD_WITH_XPRS)
-  if (NOT TARGET_LINUX AND NOT TARGET_MACOS)
-    message(FATAL_ERROR "BUILD_WITH_XPRS is only supported on Linux and macOS.")
-  endif()
-endif()
-
 # Add xprs folder if BUILD_WITH_XPRS is set
 if (BUILD_WITH_XPRS)
   add_subdirectory(${VRS_SOURCE_DIR}/xprs)

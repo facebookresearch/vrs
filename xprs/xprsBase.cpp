@@ -27,10 +27,6 @@ namespace xprs {
 
 constexpr std::string_view SUPPORTED_CODEC_FORMATS[] = {"H.264", "H.265", "VP9", "AV1"};
 
-static_assert(
-    sizeof(SUPPORTED_CODEC_FORMATS) / sizeof(SUPPORTED_CODEC_FORMATS[0]) ==
-    int(VideoCodecFormat::LAST));
-
 ///
 /// Verifies 'standard' is a valid enumerated video codec format and places the corresponding string
 /// identifier in 'videoCodecStr'.

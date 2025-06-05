@@ -38,8 +38,8 @@ find_package(TurboJpeg REQUIRED)
 find_package(Opus)
 find_package(Ocean)
 
-# Optional dependencies for XPRS decoding: only on Unix-like platforms (Linux & macOS)
-if (BUILD_WITH_XPRS AND (TARGET_LINUX OR TARGET_MACOS))
+# Optional dependencies for XPRS decoding
+if (BUILD_WITH_XPRS)
   find_package(FFmpeg)
 endif()
 
