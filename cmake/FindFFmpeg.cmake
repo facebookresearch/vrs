@@ -12,38 +12,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# - Find FFmpeg
-# Find the FFmpeg library
+# - Find FFmpeg libraries
 
 # Allow user override of root install prefix
 if(NOT FFmpeg_ROOT)
   set(FFmpeg_ROOT "$ENV{HOME}/vrs_third_party_libs/ffmpeg")
 endif()
 
-set(_ffmpeg_search_paths
-  ${FFmpeg_ROOT}
-)
-
 # Headers
 find_path(FFMPEG_INCLUDE_DIR
   NAMES libavcodec/avcodec.h
-  HINTS ${_ffmpeg_search_paths}
+  HINTS ${FFmpeg_ROOT}
   PATH_SUFFIXES include
 )
 
-# Shared libs
-find_library(AVCODEC_SO avcodec
-  HINTS ${_ffmpeg_search_paths}
-  PATH_SUFFIXES lib lib64
-)
-find_library(AVFORMAT_SO avformat
-  HINTS ${_ffmpeg_search_paths}
-  PATH_SUFFIXES lib lib64
-)
-find_library(AVUTIL_SO avutil
-  HINTS ${_ffmpeg_search_paths}
-  PATH_SUFFIXES lib lib64
-)
+# Create imported targets
+foreach(comp avcodec avformat avutil)
+  string(TOUPPER ${comp} COMP_UPPER)
+  find_library(${COMP_UPPER}_SO ${comp}
+    HINTS ${FFmpeg_ROOT}
+    PATH_SUFFIXES lib lib64
+  )
+  add_library(FFmpeg::${comp} SHARED IMPORTED)
+  set_target_properties(FFmpeg::${comp} PROPERTIES
+    IMPORTED_LOCATION "${${COMP_UPPER}_SO}"
+    INTERFACE_INCLUDE_DIRECTORIES "${FFMPEG_INCLUDE_DIR}"
+  )
+endforeach()
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(FFmpeg
@@ -53,28 +48,7 @@ find_package_handle_standard_args(FFmpeg
                 AVUTIL_SO
 )
 
-mark_as_advanced(
-  FFMPEG_INCLUDE_DIR
-  AVCODEC_SO
-  AVFORMAT_SO
-  AVUTIL_SO
-)
-
-# Create imported targets
-foreach(comp avcodec avformat avutil avdevice avfilter)
-  string(TOUPPER ${comp} COMP_UPPER)
-  find_library(LIB_${COMP_UPPER}_SO ${comp}
-    HINTS ${_ffmpeg_search_paths}
-    PATH_SUFFIXES lib lib64
-  )
-  add_library(FFmpeg::${comp} SHARED IMPORTED)
-  set_target_properties(FFmpeg::${comp} PROPERTIES
-    IMPORTED_LOCATION "${LIB_${COMP_UPPER}_SO}"
-    INTERFACE_INCLUDE_DIRECTORIES "${FFMPEG_INCLUDE_DIR}"
-  )
-endforeach()
-
-# 1. Create an INTERFACE library called ffmpeg_decode
+# 1. Create an INTERFACE library called ffmpeg_decoding
 add_library(ffmpeg_decoding INTERFACE)
 
 # 2. Tell it to link against all the FFmpeg shared‐library targets
