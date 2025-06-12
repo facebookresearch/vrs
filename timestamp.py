@@ -1,5 +1,6 @@
 import vrs
 
+
 def adjust_timestamps(input_path, output_path, time_offset_sec):
     # Open original file for reading
     reader = vrs.RecordFileReader()
