@@ -180,6 +180,7 @@ enum class RecordableTypeId : uint16_t {
 
   // << Discrete Sensors (continued) >>
   AmbientLightRecordableClass = 500, ///< Ambient light data streams.
+  ElevationRecordableClass = 501, ///< Elevation data streams.
 
   // << Test, Samples and other fake devices >>
   SampleDeviceRecordableClass = 998, ///< For sample device streams.
