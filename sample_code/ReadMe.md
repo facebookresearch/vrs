@@ -7,3 +7,7 @@ actually do anything useful, or show complete functionality.
 - `SampleRecordAndPlay.cpp`: Demonstrates how to create and read a VRS file.
 - `SampleRecordFormatDataLayout.cpp`: Demonstrates how to create and read
   records using `RecordFormat` and `DataLayout`.
+- `SampleRecordFormatStreamPlayer.cpp`: This sample code demonstrates the use of
+  the RecordFormat & DataLayout.
+- `FilterCopySamples.cpp`: This sample code demonstrates how to use the
+  FilterCopy methods, to create a modified/edited version of a VRS file.
