@@ -36,11 +36,11 @@ constexpr size_t kRecordHeaderSize = sizeof(vrs::FileFormat::RecordHeader);
 namespace vrs {
 
 namespace {
-const char* sRecordTypes[] = {"Undefined", "State", "Configuration", "Data", "Tags"};
+string_view sRecordTypes[] = {"Undefined", "State", "Configuration", "Data", "Tags"};
 struct RecordTypeConverter : public EnumStringConverter<
                                  Record::Type,
                                  sRecordTypes,
-                                 COUNT_OF(sRecordTypes),
+                                 array_size(sRecordTypes),
                                  Record::Type::UNDEFINED,
                                  Record::Type::UNDEFINED> {
   static_assert(cNamesCount == enumCount<Record::Type>(), "Missing Record::Type name definitions");
@@ -155,8 +155,8 @@ int Record::writeRecord(
   return 0;
 }
 
-const char* Record::typeName(Type type) {
-  return RecordTypeConverter::toString(type);
+const char* Record::typeName(Record::Type type) {
+  return RecordTypeConverter::toCString(type);
 }
 
 } // namespace vrs

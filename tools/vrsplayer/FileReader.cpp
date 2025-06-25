@@ -58,12 +58,12 @@
 #define FIXED_3 fixed << setprecision(3)
 
 namespace {
-const char* sStateNames[] = {"UNDEFINED", "NO_MEDIA", "PAUSED", "PLAYING", "ERROR"};
+std::string_view sStateNames[] = {"UNDEFINED", "NO_MEDIA", "PAUSED", "PLAYING", "ERROR"};
 
-struct FileReaderStateConverter : public EnumStringConverter<
+struct FileReaderStateConverter : public vrs::EnumStringConverter<
                                       FileReaderState,
                                       sStateNames,
-                                      COUNT_OF(sStateNames),
+                                      vrs::array_size(sStateNames),
                                       FileReaderState::Undefined,
                                       FileReaderState::Undefined> {
   static_assert(

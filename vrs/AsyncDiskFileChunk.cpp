@@ -26,11 +26,11 @@
 #include <vrs/os/Utils.h>
 
 namespace {
-const char* sIoEngineTypes[] = {"sync", "aio", "psync"};
-struct IoEngineTypeConverter : public EnumStringConverter<
+std::string_view sIoEngineTypes[] = {"sync", "aio", "psync"};
+struct IoEngineTypeConverter : public vrs::EnumStringConverter<
                                    vrs::AsyncDiskFileChunk::IoEngine,
                                    sIoEngineTypes,
-                                   COUNT_OF(sIoEngineTypes),
+                                   vrs::array_size(sIoEngineTypes),
                                    vrs::AsyncDiskFileChunk::IoEngine::AIO,
                                    vrs::AsyncDiskFileChunk::IoEngine::AIO,
                                    true> {};

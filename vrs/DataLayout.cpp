@@ -498,7 +498,7 @@ class DataLayouter {
 
 namespace {
 
-const char* sDataTypeNames[] = {
+string_view sDataTypeNames[] = {
     "undefined",
     "DataPieceValue",
     "DataPieceArray",
@@ -510,7 +510,7 @@ const char* sDataTypeNames[] = {
 struct DataPieceTypeStringConverter : public EnumStringConverter<
                                           DataPieceType,
                                           sDataTypeNames,
-                                          COUNT_OF(sDataTypeNames),
+                                          array_size(sDataTypeNames),
                                           DataPieceType::Undefined,
                                           DataPieceType::Undefined> {
   static_assert(
@@ -520,9 +520,9 @@ struct DataPieceTypeStringConverter : public EnumStringConverter<
 
 } // namespace
 
-static string makePieceName(const char* pieceTypeName, const string& dataType) {
+static string makePieceName(const string_view& pieceTypeName, const string& dataType) {
   string pieceName;
-  pieceName.reserve(20 + dataType.size() + 2);
+  pieceName.reserve(pieceTypeName.size() + dataType.size() + 2);
   pieceName.append(pieceTypeName).append("<").append(dataType).append(">");
   return pieceName;
 }
@@ -530,7 +530,7 @@ static string makePieceName(const char* pieceTypeName, const string& dataType) {
 static inline string makePieceName(DataPieceType pieceType, const string& dataType) {
   return pieceType == DataPieceType::String
       ? DataPieceTypeStringConverter::toString(pieceType)
-      : makePieceName(DataPieceTypeStringConverter::toString(pieceType), dataType);
+      : makePieceName(DataPieceTypeStringConverter::toStringView(pieceType), dataType);
 }
 
 using DataPieceMaker = DataPiece* (*)(const DataPiece::MakerBundle&);

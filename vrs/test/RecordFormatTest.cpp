@@ -597,7 +597,7 @@ TEST_F(RecordFormatTest, testFormat) {
       "image/video/640x480/pixel=grey8/codec=H.254/keyframe_timestamp=2.251009123/keyframe_index=5",
       "data_layout+image/raw/102x200/pixel=depth32f",
       "custom/size=70+image/raw/20x30/pixel=bgr8/stride=24"};
-  for (size_t k = 0; k < COUNT_OF(formats); ++k) {
+  for (size_t k = 0; k < array_size(formats); ++k) {
     FORMAT_EQUAL(RecordFormat(formats[k]), formats[k]);
   }
 }

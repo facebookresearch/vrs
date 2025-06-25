@@ -35,17 +35,17 @@ using namespace std;
 namespace {
 using vrs::CachingStrategy;
 
-const char* sCachingStrategyNames[] = {
+string_view sCachingStrategyNames[] = {
     "Undefined",
     "Passive",
     "Streaming",
     "StreamingBidirectional",
     "StreamingBackward",
     "ReleaseAfterRead"};
-struct CachingStrategyConverter : public EnumStringConverter<
+struct CachingStrategyConverter : public vrs::EnumStringConverter<
                                       CachingStrategy,
                                       sCachingStrategyNames,
-                                      COUNT_OF(sCachingStrategyNames),
+                                      vrs::array_size(sCachingStrategyNames),
                                       CachingStrategy::Undefined,
                                       CachingStrategy::Undefined> {
   static_assert(

@@ -21,7 +21,6 @@
 #include <array>
 #include <limits>
 #include <sstream>
-#include <tuple>
 #include <utility>
 
 #define DEFAULT_LOG_CHANNEL "RecordFormat"
@@ -67,22 +66,22 @@ namespace {
 using namespace vrs;
 
 // These text names may NEVER BE CHANGED, as they are used in data layout definitions!!
-const char* sContentTypeNames[] = {"custom", "empty", "data_layout", "image", "audio"};
+string_view sContentTypeNames[] = {"custom", "empty", "data_layout", "image", "audio"};
 struct ContentTypeFormatConverter : public EnumStringConverter<
                                         ContentType,
                                         sContentTypeNames,
-                                        COUNT_OF(sContentTypeNames),
+                                        array_size(sContentTypeNames),
                                         ContentType::CUSTOM,
                                         ContentType::CUSTOM> {
   static_assert(cNamesCount == enumCount<ContentType>(), "Missing ContentType name definitions");
 };
 
 // These text names may NEVER BE CHANGED, as they are used in data layout definitions!!
-const char* sImageFormatNames[] = {"undefined", "raw", "jpg", "png", "video", "jxl"};
+string_view sImageFormatNames[] = {"undefined", "raw", "jpg", "png", "video", "jxl"};
 struct ImageFormatConverter : public EnumStringConverter<
                                   ImageFormat,
                                   sImageFormatNames,
-                                  COUNT_OF(sImageFormatNames),
+                                  array_size(sImageFormatNames),
                                   ImageFormat::UNDEFINED,
                                   ImageFormat::UNDEFINED> {
   static_assert(cNamesCount == enumCount<ImageFormat>(), "Missing ImageFormat name definitions");
@@ -96,7 +95,7 @@ static_assert(static_cast<int>(ImageFormat::VIDEO) == 4, "ImageFormat enum value
 static_assert(static_cast<int>(ImageFormat::JXL) == 5, "ImageFormat enum values CHANGED!");
 
 // These text names may NEVER BE CHANGED, as they are used in data layout definitions!!
-const char* sPixelFormatNames[] = {
+string_view sPixelFormatNames[] = {
     "undefined",        "grey8",        "bgr8",        "depth32f",  "rgb8",
     "yuv_i420_split",   "rgba8",        "rgb10",       "rgb12",     "grey10",
     "grey12",           "grey16",       "rgb32F",      "scalar64F", "yuy2",
@@ -106,7 +105,7 @@ const char* sPixelFormatNames[] = {
 struct PixelFormatConverter : public EnumStringConverter<
                                   PixelFormat,
                                   sPixelFormatNames,
-                                  COUNT_OF(sPixelFormatNames),
+                                  array_size(sPixelFormatNames),
                                   PixelFormat::UNDEFINED,
                                   PixelFormat::UNDEFINED> {
   static_assert(cNamesCount == enumCount<PixelFormat>(), "Missing PixelFormat name definitions");
@@ -136,11 +135,11 @@ static_assert(
 static_assert(
     static_cast<int>(PixelFormat::YUV_420_NV12) == 22,
     "PixelFormat enum values CHANGED!");
-const char* sAudioFormatNames[] = {"undefined", "pcm", "opus"};
+string_view sAudioFormatNames[] = {"undefined", "pcm", "opus"};
 struct AudioFormatConverter : public EnumStringConverter<
                                   AudioFormat,
                                   sAudioFormatNames,
-                                  COUNT_OF(sAudioFormatNames),
+                                  array_size(sAudioFormatNames),
                                   AudioFormat::UNDEFINED,
                                   AudioFormat::UNDEFINED> {
   static_assert(cNamesCount == enumCount<AudioFormat>(), "Missing AudioFormat name definitions");
@@ -151,14 +150,14 @@ static_assert(static_cast<int>(AudioFormat::PCM) == 1, "AudioFormat enum values 
 static_assert(static_cast<int>(AudioFormat::OPUS) == 2, "AudioFormat enum values CHANGED!");
 
 // These text names may NEVER BE CHANGED, as they are used in data layout definitions!!
-const char* sAudioSampleFormatNames[] = {
+string_view sAudioSampleFormatNames[] = {
     "undefined", "int8",     "uint8",    "uint8alaw", "uint8mulaw", "int16le",   "uint16le",
     "int16be",   "uint16be", "int24le",  "uint24le",  "int24be",    "uint24be",  "int32le",
     "uint32le",  "int32be",  "uint32be", "float32le", "float32be",  "float64le", "float64be"};
 struct AudioSampleFormatConverter : public EnumStringConverter<
                                         AudioSampleFormat,
                                         sAudioSampleFormatNames,
-                                        COUNT_OF(sAudioSampleFormatNames),
+                                        array_size(sAudioSampleFormatNames),
                                         AudioSampleFormat::UNDEFINED,
                                         AudioSampleFormat::UNDEFINED> {
   static_assert(

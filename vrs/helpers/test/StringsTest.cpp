@@ -103,7 +103,7 @@ TEST_F(StringsHelpersTester, makePrintableTest) {
   string kStrings[] = {"hello\n", "\t", {0}, {0, 13, 10, 32, 9, 8, 127, 0x1b, 1, 0, 2}, ""};
   string kCleanStrings[] = {
       "hello\\n", "\\t", "\\x00", "\\x00\\r\\n \\t\\b\\x7f\\e\\x01\\x00\\x02", ""};
-  size_t kCount = COUNT_OF(kStrings);
+  size_t kCount = array_size(kStrings);
   for (size_t k = 0; k < kCount; k++) {
     EXPECT_EQ(make_printable(kStrings[k]), kCleanStrings[k]);
   }

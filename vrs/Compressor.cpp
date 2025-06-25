@@ -69,7 +69,7 @@ const map<CompressionPreset, const char*> sPresetNames = {
     {CompressionPreset::ZstdTight, "zstd-tight"},
     {CompressionPreset::ZstdMax, "zstd-max"}};
 
-const char* sCompressionPresetNames[] = {
+string_view sCompressionPresetNames[] = {
     "none",
     "fast",
     "tight",
@@ -84,16 +84,16 @@ const char* sCompressionPresetNames[] = {
 struct CompressionPresetConverter : public EnumStringConverter<
                                         CompressionPreset,
                                         sCompressionPresetNames,
-                                        COUNT_OF(sCompressionPresetNames),
+                                        array_size(sCompressionPresetNames),
                                         CompressionPreset::Undefined,
                                         CompressionPreset::Undefined,
                                         true> {
   static_assert(
-      COUNT_OF(sCompressionPresetNames) == enumCount<CompressionPreset>(),
+      array_size(sCompressionPresetNames) == enumCount<CompressionPreset>(),
       "Missing CompressionPreset name definitions");
 };
 
-const char* sCompressionTypeNames[] = {
+string_view sCompressionTypeNames[] = {
     "none",
     "lz4",
     "zstd",
@@ -101,12 +101,12 @@ const char* sCompressionTypeNames[] = {
 struct CompressionTypeConverter : public EnumStringConverter<
                                       CompressionType,
                                       sCompressionTypeNames,
-                                      COUNT_OF(sCompressionTypeNames),
+                                      array_size(sCompressionTypeNames),
                                       CompressionType::None,
                                       CompressionType::None,
                                       true> {
   static_assert(
-      COUNT_OF(sCompressionTypeNames) == enumCount<CompressionType>(),
+      array_size(sCompressionTypeNames) == enumCount<CompressionType>(),
       "Missing CompressionType name definitions");
 };
 

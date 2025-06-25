@@ -54,7 +54,7 @@ namespace {
 
 using namespace vrscli;
 
-const char* sCommands[] = {
+string_view sCommands[] = {
     "none",
     "help",
     "details",
@@ -87,10 +87,10 @@ const char* sCommands[] = {
 struct CommandConverter : public EnumStringConverter<
                               Command,
                               sCommands,
-                              COUNT_OF(sCommands),
+                              array_size(sCommands),
                               Command::None,
                               Command::None> {
-  static_assert(COUNT_OF(sCommands) == enumCount<Command>(), "Missing GaiaOp name definitions");
+  static_assert(array_size(sCommands) == enumCount<Command>(), "Missing GaiaOp name definitions");
 };
 
 const RecordFileInfo::Details kCopyOpsDetails = Details::MainCounters;

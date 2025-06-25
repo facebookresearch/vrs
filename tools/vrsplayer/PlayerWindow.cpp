@@ -28,12 +28,12 @@ using namespace vrsp;
 using namespace std;
 
 namespace {
-const char* sAudioModeNames[] = {"mono", "stereo-auto", "stereo-manual"};
+string_view sAudioModeNames[] = {"mono", "stereo-auto", "stereo-manual"};
 
-struct AudioModeConverter : public EnumStringConverter<
+struct AudioModeConverter : public vrs::EnumStringConverter<
                                 AudioMode,
                                 sAudioModeNames,
-                                COUNT_OF(sAudioModeNames),
+                                vrs::array_size(sAudioModeNames),
                                 AudioMode::autoStereo,
                                 AudioMode::autoStereo,
                                 true> {};
