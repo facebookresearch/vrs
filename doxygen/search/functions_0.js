@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['add_0',['add',['../classvrs_1_1_manual_data_layout.html#af655823a19be3b03f9ea8c9d9cb74044',1,'vrs::ManualDataLayout::add()'],['../classvrs_1_1_aligned_buffer.html#aec3b7cda02172b540d3547fbaff11186',1,'vrs::AlignedBuffer::add()']]],
+  ['add_0',['add',['../classvrs_1_1_manual_data_layout.html#af655823a19be3b03f9ea8c9d9cb74044',1,'vrs::ManualDataLayout']]],
   ['addcapturetime_1',['addCaptureTime',['../namespacevrs_1_1tag__conventions.html#ad3e1542bb4141147369a2abf335c4efe',1,'vrs::tag_conventions']]],
-  ['addchunk_2',['addchunk',['../classvrs_1_1_write_file_handler.html#acc15477a0e4cac5307cd4d97ba9f94c9',1,'vrs::WriteFileHandler::addChunk()'],['../classvrs_1_1_disk_file_t.html#abac5192bf096be66db2973f7c86fbec0',1,'vrs::DiskFileT::addChunk()']]],
+  ['addchunk_2',['addchunk',['../classvrs_1_1_disk_file_t.html#abac5192bf096be66db2973f7c86fbec0',1,'vrs::DiskFileT::addChunk()'],['../classvrs_1_1_write_file_handler.html#acc15477a0e4cac5307cd4d97ba9f94c9',1,'vrs::WriteFileHandler::addChunk()']]],
   ['adddevice_3',['addDevice',['../namespacevrs_1_1tag__conventions.html#ad54ca81705a9275b739472459494fe6c',1,'vrs::tag_conventions']]],
   ['adddeviceid_4',['addDeviceId',['../namespacevrs_1_1tag__conventions.html#af6414b6b6430f35cc640116adc42226f',1,'vrs::tag_conventions']]],
   ['adddirectwriterecorddata_5',['addDirectWriteRecordData',['../classvrs_1_1_record.html#a4f3649abe19e063c5c4a1b298746d77e',1,'vrs::Record']]],
