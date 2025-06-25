@@ -39,7 +39,7 @@
 #include <vrs/ErrorCode.h>
 
 #if VRS_ASYNC_DISKFILE_SUPPORTED()
-#include <vrs/AsyncDiskFileChunk.hpp>
+#include <vrs/AsyncDiskFileChunk.h>
 #endif
 
 using namespace std;
