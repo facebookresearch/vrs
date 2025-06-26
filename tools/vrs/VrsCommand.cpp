@@ -84,14 +84,7 @@ string_view sCommands[] = {
     "fix-index",
     "compression-benchmark",
 };
-struct CommandConverter : public EnumStringConverter<
-                              Command,
-                              sCommands,
-                              array_size(sCommands),
-                              Command::None,
-                              Command::None> {
-  static_assert(array_size(sCommands) == enumCount<Command>(), "Missing GaiaOp name definitions");
-};
+ENUM_STRING_CONVERTER(Command, sCommands, Command::None);
 
 const RecordFileInfo::Details kCopyOpsDetails = Details::MainCounters;
 

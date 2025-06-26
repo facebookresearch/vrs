@@ -86,6 +86,40 @@ struct EnumStringConverter {
   }
 };
 
+#define ENUM_STRING_CONVERTER(E, NAMES, DEFAULT_ENUM)                                        \
+  struct E##Converter                                                                        \
+      : public vrs::EnumStringConverter<E, NAMES, vrs::array_size(NAMES), DEFAULT_ENUM> {    \
+    static_assert(cNamesCount == vrs::enumCount<E>(), "Non-matching count of " #E " names"); \
+  };
+
+#define ENUM_STRING_CONVERTER2(E, NAMES, DEFAULT_ENUM, DEFAULT_NAME)                            \
+  struct E##Converter                                                                           \
+      : public vrs::                                                                            \
+            EnumStringConverter<E, NAMES, vrs::array_size(NAMES), DEFAULT_ENUM, DEFAULT_NAME> { \
+    static_assert(cNamesCount == vrs::enumCount<E>(), "Non-matching count of " #E " names");    \
+  };
+
+#define ENUM_STRING_CONVERTER3(E, NAMES, DEFAULT_ENUM, DEFAULT_NAME, INDEX_ZERO)             \
+  struct E##Converter : public vrs::EnumStringConverter<                                     \
+                            E,                                                               \
+                            NAMES,                                                           \
+                            vrs::array_size(NAMES),                                          \
+                            DEFAULT_ENUM,                                                    \
+                            DEFAULT_NAME,                                                    \
+                            INDEX_ZERO> {                                                    \
+    static_assert(cNamesCount == vrs::enumCount<E>(), "Non-matching count of " #E " names"); \
+  };
+
+#define DEFINE_ENUM_CONVERTERS(E)                    \
+  string toString(E evalue) {                        \
+    return E##Converter::toString(evalue);           \
+  }                                                  \
+                                                     \
+  template <>                                        \
+  E toEnum<>(const string& name) {                   \
+    return E##Converter::toEnumNoCase(name.c_str()); \
+  }
+
 // Implementation moved outside class to reduce template instantiation overhead
 template <
     class E,

@@ -498,25 +498,14 @@ class DataLayouter {
 
 namespace {
 
-string_view sDataTypeNames[] = {
+string_view sDataPieceTypeNames[] = {
     "undefined",
     "DataPieceValue",
     "DataPieceArray",
     "DataPieceVector",
     "DataPieceString",
     "DataPieceStringMap"};
-
-/// \brief Helper to convert data piece types enums to/from names.
-struct DataPieceTypeStringConverter : public EnumStringConverter<
-                                          DataPieceType,
-                                          sDataTypeNames,
-                                          array_size(sDataTypeNames),
-                                          DataPieceType::Undefined,
-                                          DataPieceType::Undefined> {
-  static_assert(
-      cNamesCount == enumCount<DataPieceType>(),
-      "Missing DataPieceType name definitions");
-};
+ENUM_STRING_CONVERTER(DataPieceType, sDataPieceTypeNames, DataPieceType::Undefined);
 
 } // namespace
 
@@ -529,8 +518,8 @@ static string makePieceName(const string_view& pieceTypeName, const string& data
 
 static inline string makePieceName(DataPieceType pieceType, const string& dataType) {
   return pieceType == DataPieceType::String
-      ? DataPieceTypeStringConverter::toString(pieceType)
-      : makePieceName(DataPieceTypeStringConverter::toStringView(pieceType), dataType);
+      ? DataPieceTypeConverter::toString(pieceType)
+      : makePieceName(DataPieceTypeConverter::toStringView(pieceType), dataType);
 }
 
 using DataPieceMaker = DataPiece* (*)(const DataPiece::MakerBundle&);
@@ -572,7 +561,7 @@ struct DataPieceFactory {
 };
 
 static DataPieceFactory::Registerer<DataPieceString> Registerer_DataPieceString(
-    DataPieceTypeStringConverter::toString(DataPieceType::String));
+    DataPieceTypeConverter::toString(DataPieceType::String));
 
 static DataPieceFactory::Registerer<DataPieceVector<string>> Registerer_DataPieceVector(
     makePieceName(DataPieceType::Vector, getTypeName<string>()));

@@ -31,22 +31,15 @@ using namespace std;
 
 namespace {
 constexpr size_t kRecordHeaderSize = sizeof(vrs::FileFormat::RecordHeader);
-}
 
-namespace vrs {
-
-namespace {
 string_view sRecordTypes[] = {"Undefined", "State", "Configuration", "Data", "Tags"};
-struct RecordTypeConverter : public EnumStringConverter<
-                                 Record::Type,
-                                 sRecordTypes,
-                                 array_size(sRecordTypes),
-                                 Record::Type::UNDEFINED,
-                                 Record::Type::UNDEFINED> {
-  static_assert(cNamesCount == enumCount<Record::Type>(), "Missing Record::Type name definitions");
-};
+
+using RecordType = vrs::Record::Type;
+ENUM_STRING_CONVERTER(RecordType, sRecordTypes, RecordType::UNDEFINED);
 
 } // namespace
+
+namespace vrs {
 
 string toString(Record::Type recordType) {
   return RecordTypeConverter::toString(recordType);

@@ -81,34 +81,24 @@ string_view sCompressionPresetNames[] = {
     "zhigh",
     "ztight",
     "zmax"};
-struct CompressionPresetConverter : public EnumStringConverter<
-                                        CompressionPreset,
-                                        sCompressionPresetNames,
-                                        array_size(sCompressionPresetNames),
-                                        CompressionPreset::Undefined,
-                                        CompressionPreset::Undefined,
-                                        true> {
-  static_assert(
-      array_size(sCompressionPresetNames) == enumCount<CompressionPreset>(),
-      "Missing CompressionPreset name definitions");
-};
+ENUM_STRING_CONVERTER3(
+    CompressionPreset,
+    sCompressionPresetNames,
+    CompressionPreset::Undefined,
+    CompressionPreset::Undefined,
+    true);
 
 string_view sCompressionTypeNames[] = {
     "none",
     "lz4",
     "zstd",
 };
-struct CompressionTypeConverter : public EnumStringConverter<
-                                      CompressionType,
-                                      sCompressionTypeNames,
-                                      array_size(sCompressionTypeNames),
-                                      CompressionType::None,
-                                      CompressionType::None,
-                                      true> {
-  static_assert(
-      array_size(sCompressionTypeNames) == enumCount<CompressionType>(),
-      "Missing CompressionType name definitions");
-};
+ENUM_STRING_CONVERTER3(
+    CompressionType,
+    sCompressionTypeNames,
+    CompressionType::None,
+    CompressionType::None,
+    true);
 
 int zstdPresetToCompressionLevel(CompressionPreset preset) {
   auto iter = sZstdPresets.find(preset);
@@ -124,23 +114,8 @@ namespace vrs {
 
 const size_t Compressor::kMinByteCountForCompression = 250;
 
-string toString(CompressionPreset preset) {
-  return CompressionPresetConverter::toString(preset);
-}
-
-template <>
-CompressionPreset toEnum<CompressionPreset>(const string& name) {
-  return CompressionPresetConverter::toEnumNoCase(name);
-}
-
-std::string toString(CompressionType compressionType) {
-  return CompressionTypeConverter::toString(compressionType);
-}
-
-template <>
-CompressionType toEnum<CompressionType>(const std::string& compressionTypeName) {
-  return CompressionTypeConverter::toEnumNoCase(compressionTypeName);
-}
+DEFINE_ENUM_CONVERTERS(CompressionPreset);
+DEFINE_ENUM_CONVERTERS(CompressionType)
 
 #define IF_ZCOMP_ERROR_LOG_AND_RETURN(operation__)                                       \
   do {                                                                                   \

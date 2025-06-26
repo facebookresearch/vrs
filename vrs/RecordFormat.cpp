@@ -67,25 +67,11 @@ using namespace vrs;
 
 // These text names may NEVER BE CHANGED, as they are used in data layout definitions!!
 string_view sContentTypeNames[] = {"custom", "empty", "data_layout", "image", "audio"};
-struct ContentTypeFormatConverter : public EnumStringConverter<
-                                        ContentType,
-                                        sContentTypeNames,
-                                        array_size(sContentTypeNames),
-                                        ContentType::CUSTOM,
-                                        ContentType::CUSTOM> {
-  static_assert(cNamesCount == enumCount<ContentType>(), "Missing ContentType name definitions");
-};
+ENUM_STRING_CONVERTER(ContentType, sContentTypeNames, ContentType::CUSTOM);
 
 // These text names may NEVER BE CHANGED, as they are used in data layout definitions!!
 string_view sImageFormatNames[] = {"undefined", "raw", "jpg", "png", "video", "jxl"};
-struct ImageFormatConverter : public EnumStringConverter<
-                                  ImageFormat,
-                                  sImageFormatNames,
-                                  array_size(sImageFormatNames),
-                                  ImageFormat::UNDEFINED,
-                                  ImageFormat::UNDEFINED> {
-  static_assert(cNamesCount == enumCount<ImageFormat>(), "Missing ImageFormat name definitions");
-};
+ENUM_STRING_CONVERTER(ImageFormat, sImageFormatNames, ImageFormat::UNDEFINED);
 
 // Enum values may NEVER BE CHANGED, as they are used in data layout definitions!!
 static_assert(static_cast<int>(ImageFormat::RAW) == 1, "ImageFormat enum values CHANGED!");
@@ -101,15 +87,7 @@ string_view sPixelFormatNames[] = {
     "grey12",           "grey16",       "rgb32F",      "scalar64F", "yuy2",
     "rgb_ir_4x4",       "rgba32F",      "bayer8_rggb", "raw10",     "raw10_bayer_rggb",
     "raw10_bayer_bggr", "yuv_420_nv21", "yuv_420_nv12"};
-
-struct PixelFormatConverter : public EnumStringConverter<
-                                  PixelFormat,
-                                  sPixelFormatNames,
-                                  array_size(sPixelFormatNames),
-                                  PixelFormat::UNDEFINED,
-                                  PixelFormat::UNDEFINED> {
-  static_assert(cNamesCount == enumCount<PixelFormat>(), "Missing PixelFormat name definitions");
-};
+ENUM_STRING_CONVERTER(PixelFormat, sPixelFormatNames, PixelFormat::UNDEFINED);
 
 // Enum values may NEVER BE CHANGED, as they are used in data layout definitions!!
 // We're testing some key values, but NONE of the declared values may be changed, ever!
@@ -135,15 +113,9 @@ static_assert(
 static_assert(
     static_cast<int>(PixelFormat::YUV_420_NV12) == 22,
     "PixelFormat enum values CHANGED!");
+
 string_view sAudioFormatNames[] = {"undefined", "pcm", "opus"};
-struct AudioFormatConverter : public EnumStringConverter<
-                                  AudioFormat,
-                                  sAudioFormatNames,
-                                  array_size(sAudioFormatNames),
-                                  AudioFormat::UNDEFINED,
-                                  AudioFormat::UNDEFINED> {
-  static_assert(cNamesCount == enumCount<AudioFormat>(), "Missing AudioFormat name definitions");
-};
+ENUM_STRING_CONVERTER(AudioFormat, sAudioFormatNames, AudioFormat::UNDEFINED);
 
 // Enum values may NEVER BE CHANGED, as they are used in data layout definitions!!
 static_assert(static_cast<int>(AudioFormat::PCM) == 1, "AudioFormat enum values CHANGED!");
@@ -154,16 +126,7 @@ string_view sAudioSampleFormatNames[] = {
     "undefined", "int8",     "uint8",    "uint8alaw", "uint8mulaw", "int16le",   "uint16le",
     "int16be",   "uint16be", "int24le",  "uint24le",  "int24be",    "uint24be",  "int32le",
     "uint32le",  "int32be",  "uint32be", "float32le", "float32be",  "float64le", "float64be"};
-struct AudioSampleFormatConverter : public EnumStringConverter<
-                                        AudioSampleFormat,
-                                        sAudioSampleFormatNames,
-                                        array_size(sAudioSampleFormatNames),
-                                        AudioSampleFormat::UNDEFINED,
-                                        AudioSampleFormat::UNDEFINED> {
-  static_assert(
-      cNamesCount == enumCount<AudioSampleFormat>(),
-      "Missing AudioSampleFormat name definitions");
-};
+ENUM_STRING_CONVERTER(AudioSampleFormat, sAudioSampleFormatNames, AudioSampleFormat::UNDEFINED);
 
 // Enum values may NEVER BE CHANGED, as they are used in data layout definitions!!
 // We're testing some key values, but NONE of the declared values may be changed, ever!
@@ -235,45 +198,11 @@ string_view kCustomContentBlockFormat = "format=";
 
 namespace vrs {
 
-string toString(ContentType contentType) {
-  return ContentTypeFormatConverter::toString(contentType);
-}
-template <>
-ContentType toEnum<>(const string& name) {
-  return ContentTypeFormatConverter::toEnumNoCase(name.c_str());
-}
-
-string toString(ImageFormat imageFormat) {
-  return ImageFormatConverter::toString(imageFormat);
-}
-template <>
-ImageFormat toEnum<>(const string& name) {
-  return ImageFormatConverter::toEnumNoCase(name.c_str());
-}
-
-string toString(PixelFormat pixelFormat) {
-  return PixelFormatConverter::toString(pixelFormat);
-}
-template <>
-PixelFormat toEnum<>(const string& name) {
-  return PixelFormatConverter::toEnumNoCase(name.c_str());
-}
-
-string toString(AudioFormat audioFormat) {
-  return AudioFormatConverter::toString(audioFormat);
-}
-template <>
-AudioFormat toEnum<>(const string& name) {
-  return AudioFormatConverter::toEnumNoCase(name.c_str());
-}
-
-string toString(AudioSampleFormat audioSampleFormat) {
-  return AudioSampleFormatConverter::toString((audioSampleFormat));
-}
-template <>
-AudioSampleFormat toEnum<>(const string& name) {
-  return AudioSampleFormatConverter::toEnumNoCase(name.c_str());
-}
+DEFINE_ENUM_CONVERTERS(ContentType);
+DEFINE_ENUM_CONVERTERS(ImageFormat);
+DEFINE_ENUM_CONVERTERS(PixelFormat);
+DEFINE_ENUM_CONVERTERS(AudioFormat);
+DEFINE_ENUM_CONVERTERS(AudioSampleFormat);
 
 ImageContentBlockSpec::ImageContentBlockSpec(
     const ImageContentBlockSpec& imageSpec,
@@ -1019,7 +948,7 @@ ContentBlock::ContentBlock(ContentType type, size_t size) : contentType_(type), 
 
 ContentBlock::ContentBlock(const string& formatStr) {
   ContentParser parser(formatStr, '/');
-  contentType_ = ContentTypeFormatConverter::toEnum(parser.str.c_str());
+  contentType_ = ContentTypeConverter::toEnum(parser.str.c_str());
   parser.next();
   uint32_t size = 0;
   if (sscanf(parser.str.c_str(), "size=%u", &size) == 1) {
@@ -1055,7 +984,7 @@ ContentBlock::ContentBlock(const string& formatStr) {
 string ContentBlock::asString() const {
   string s;
   s.reserve(120);
-  s.append(ContentTypeFormatConverter::toString(contentType_));
+  s.append(ContentTypeConverter::toString(contentType_));
   if (size_ != kSizeUnknown) {
     constexpr string_view size = "/size=";
     s.append(size).append(to_string(size_));
