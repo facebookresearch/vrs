@@ -451,13 +451,13 @@ string ImageContentBlockSpec::asString() const {
   }
   string s;
   s.reserve(120);
-  s.append(ImageFormatConverter::toString(imageFormat_));
+  s.append(ImageFormatConverter::toStringView(imageFormat_));
   if (width_ > 0 && height_ > 0) {
     s.append("/").append(to_string(width_)).append("x").append(to_string(height_));
   }
   if (imageFormat_ == ImageFormat::RAW || imageFormat_ == ImageFormat::VIDEO) {
     if (pixelFormat_ != PixelFormat::UNDEFINED) {
-      s.append("/pixel=").append(PixelFormatConverter::toString(pixelFormat_));
+      s.append("/pixel=").append(PixelFormatConverter::toStringView(pixelFormat_));
     }
     if (stride_ > 0) {
       s.append("/stride=").append(to_string(stride_));
@@ -799,9 +799,9 @@ string AudioContentBlockSpec::asString() const {
   }
   string s;
   s.reserve(120);
-  s.append(AudioFormatConverter::toString(audioFormat_));
+  s.append(AudioFormatConverter::toStringView(audioFormat_));
   if (sampleFormat_ != AudioSampleFormat::UNDEFINED) {
-    s.append("/").append(AudioSampleFormatConverter::toString(sampleFormat_));
+    s.append("/").append(AudioSampleFormatConverter::toStringView(sampleFormat_));
   }
   if (channelCount_ != 0) {
     s.append("/channels=").append(to_string(channelCount_));
