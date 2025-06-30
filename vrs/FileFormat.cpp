@@ -33,6 +33,7 @@
 
 #include "ErrorCode.h"
 #include "IndexRecord.h"
+#include "ProgressLogger.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -200,13 +201,15 @@ bool RecordHeader::isSanityCheckOk() const {
   }
   uint32_t uncompressedPayload = uncompressedSize.get(); // doesn't include header already
   if (uncompressedPayload > 0) {
-    uint32_t compressedPayload = recordSize.get() - sizeof(RecordHeader);
-    // we did not always check that compression actually helped, and smaller sizes do worse
-    uint32_t maxIncrease = (uncompressedPayload < 200)
-        ? max<size_t>(50, uncompressedPayload / 2) // 50 bytes or 50%
-        : max<size_t>(100, uncompressedPayload * 5ULL / 100); // 100 bytes or 5%
-    if (!XR_VERIFY(compressedPayload < uncompressedPayload + maxIncrease)) {
-      return false;
+    if (getRecordableTypeId() != RecordableTypeId::VRSIndex) {
+      uint32_t compressedPayload = recordSize.get() - sizeof(RecordHeader);
+      // we did not always check that compression actually helped, and smaller sizes do worse
+      uint32_t maxIncrease = (uncompressedPayload < 200)
+          ? max<size_t>(50, uncompressedPayload / 2) // 50 bytes or 50%
+          : max<size_t>(100, uncompressedPayload * 5ULL / 100); // 100 bytes or 5%
+      if (!XR_VERIFY(compressedPayload < uncompressedPayload + maxIncrease)) {
+        return false;
+      }
     }
     if (!XR_VERIFY(compressionType.get() != static_cast<uint8_t>(CompressionType::None)) ||
         !XR_VERIFY(compressionType.get() < static_cast<uint8_t>(CompressionType::COUNT))) {
@@ -309,6 +312,38 @@ bool printVRSFileInternals(unique_ptr<FileHandler>& file) {
   } else if (indexRecordHeader.recordSize.get() < fileHeader.recordHeaderSize.get()) {
     cerr << "This is smaller than a record header, so something's really off!\n";
     returnValue = false;
+  } else if (
+      indexRecordHeader.getCompressionType() != CompressionType::None ||
+      indexRecordHeader.uncompressedSize.get() != 0) {
+    cout << "Index Record uncompressed size: "
+         << helpers::humanReadableFileSize(indexRecordHeader.uncompressedSize.get())
+         << ", compressed with " << toString(indexRecordHeader.getCompressionType()) << ".\n";
+  }
+  int64_t offsetBefore = file->getPos();
+  set<StreamId> streamIds;
+  vector<IndexRecord::RecordInfo> records;
+  ProgressLogger logger;
+  IndexRecord::Reader indexReader(*file, fileHeader, &logger, streamIds, records);
+  int64_t usedFileSize{};
+  int status = indexReader.readRecord(fileHeader.firstUserRecordOffset.get(), usedFileSize);
+  if (status != 0) {
+    cerr << "Can't read index record, error " << errorCodeToMessageWithCode(status) << "\n";
+    returnValue = false;
+  } else {
+    int64_t indexReadSize = file->getPos() - offsetBefore;
+    cout << "Index Record contains " << records.size() << " records, "
+         << helpers::humanReadableFileSize(records.size() * sizeof(IndexRecord::DiskRecordInfo))
+         << " worth of data, " << helpers::humanReadableFileSize(indexReadSize) << " compressed";
+    if (indexRecordHeader.uncompressedSize.get() > 0) {
+      double ratio = ((indexRecordHeader.uncompressedSize.get() - indexReadSize) * 100.0) /
+          indexRecordHeader.uncompressedSize.get();
+      cout << fmt::format(", {:.2f}% saved", ratio);
+    }
+    if (indexRecordHeader.recordSize.get() > indexReadSize) {
+      double usage = (indexReadSize * 100.0) / indexRecordHeader.recordSize.get();
+      cout << fmt::format(", record {:.2f}% used", usage);
+    }
+    cout << ".\n";
   }
   int64_t endOfSplitIndexRecordOffset = 0;
   uint32_t indexFormatVersion = indexRecordHeader.formatVersion.get();
