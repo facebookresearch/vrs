@@ -34,7 +34,7 @@ vrs = { cmd = "build/tools/vrs/vrs", depends-on = ["build"]}
 
 [target.win-64.tasks] # Deal with windows specifics (prepare and build)
 cmake-generator = "cmake --help"
-prepare = "cmake -G 'Visual Studio 16 2019' -B build -S . -DCMAKE_BUILD_TYPE=Release"
+prepare = "cmake -B build -S . -DCMAKE_BUILD_TYPE=Release"
 build = { cmd = "cmake --build build --config Release  -- /m", depends-on = [
     "prepare",
 ] }
