@@ -32,6 +32,8 @@ enum class AudioMode {
   mono = 0, // same audio channel sent to all output channels
   autoStereo = 1, // successive audio channels sent as left-right stereo pair
   manualStereo = 2, // arbitrary channels selected to be sent as stereo pair
+
+  COUNT
 };
 
 class PlayerWindow : public QMainWindow {

@@ -58,18 +58,9 @@
 #define FIXED_3 fixed << setprecision(3)
 
 namespace {
+using namespace vrs;
 std::string_view sStateNames[] = {"UNDEFINED", "NO_MEDIA", "PAUSED", "PLAYING", "ERROR"};
-
-struct FileReaderStateConverter : public vrs::EnumStringConverter<
-                                      FileReaderState,
-                                      sStateNames,
-                                      vrs::array_size(sStateNames),
-                                      FileReaderState::Undefined,
-                                      FileReaderState::Undefined> {
-  static_assert(
-      cNamesCount == vrs::enumCount<FileReaderState>(),
-      "Missing FileReaderState name definitions");
-};
+ENUM_STRING_CONVERTER(FileReaderState, sStateNames, FileReaderState::Undefined);
 
 QString kLastMaxPerRow("last_max_per_row");
 QString kVisibleStreams("visible_streams");

@@ -33,6 +33,7 @@
 using namespace std;
 
 namespace {
+using namespace vrs;
 using vrs::CachingStrategy;
 
 string_view sCachingStrategyNames[] = {
@@ -42,16 +43,7 @@ string_view sCachingStrategyNames[] = {
     "StreamingBidirectional",
     "StreamingBackward",
     "ReleaseAfterRead"};
-struct CachingStrategyConverter : public vrs::EnumStringConverter<
-                                      CachingStrategy,
-                                      sCachingStrategyNames,
-                                      vrs::array_size(sCachingStrategyNames),
-                                      CachingStrategy::Undefined,
-                                      CachingStrategy::Undefined> {
-  static_assert(
-      cNamesCount == vrs::enumCount<CachingStrategy>(),
-      "Missing CachingStrategy name definitions");
-};
+ENUM_STRING_CONVERTER(CachingStrategy, sCachingStrategyNames, CachingStrategy::Undefined);
 
 } // namespace
 
@@ -123,13 +115,6 @@ bool FileHandler::isFileHandlerMatch(const FileSpec& fileSpec) const {
   return fileSpec.fileHandlerName.empty() || getFileHandlerName() == fileSpec.fileHandlerName;
 }
 
-string toString(CachingStrategy cachingStrategy) {
-  return CachingStrategyConverter::toString(cachingStrategy);
-}
-
-template <>
-CachingStrategy toEnum<>(const string& name) {
-  return CachingStrategyConverter::toEnumNoCase(name.c_str());
-}
+DEFINE_ENUM_CONVERTERS(CachingStrategy);
 
 } // namespace vrs

@@ -28,15 +28,14 @@ using namespace vrsp;
 using namespace std;
 
 namespace {
+using namespace vrs;
 string_view sAudioModeNames[] = {"mono", "stereo-auto", "stereo-manual"};
-
-struct AudioModeConverter : public vrs::EnumStringConverter<
-                                AudioMode,
-                                sAudioModeNames,
-                                vrs::array_size(sAudioModeNames),
-                                AudioMode::autoStereo,
-                                AudioMode::autoStereo,
-                                true> {};
+ENUM_STRING_CONVERTER3(
+    AudioMode,
+    sAudioModeNames,
+    AudioMode::autoStereo,
+    AudioMode::autoStereo,
+    true);
 } // namespace
 
 inline QKeySequence shortcut(int keyA, int keyB, int keyC = 0) {
@@ -364,6 +363,9 @@ void PlayerWindow::setAudioMode(AudioMode audioMode) {
 
     case AudioMode::manualStereo:
       // Nothing to do
+      break;
+
+    case AudioMode::COUNT:
       break;
   }
 
