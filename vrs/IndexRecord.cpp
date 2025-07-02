@@ -227,6 +227,11 @@ int writeClassicIndexRecord(
   outLastRecordSize = indexRecordHeader.recordSize.get();
   return 0;
 }
+
+inline bool isValid(Record::Type recordType) {
+  return recordType > Record::Type::UNDEFINED && recordType < Record::Type::COUNT;
+}
+
 } // namespace
 
 namespace vrs {
@@ -390,6 +395,15 @@ int IndexRecord::Reader::readClassicIndexRecord(
     index_.reserve(recordStructs.size());
     int64_t fileOffset = firstUserRecordOffset;
     for (auto record : recordStructs) {
+      if (!isValid(record.getRecordType())) {
+        XR_LOGE(
+            "Unexpected index record entry: Stream Id: {} Type: {} Size: {} Timestamp: {}",
+            record.getStreamId().getNumericName(),
+            toString(record.getRecordType()),
+            record.recordSize.get(),
+            record.timestamp.get());
+        return INDEX_RECORD_ERROR;
+      }
       int64_t nextFileOffset = fileOffset + record.recordSize.get();
       if (nextFileOffset > totalFileSize_) {
         droppedRecordCount_ = static_cast<int32_t>(recordStructs.size() - index_.size());
@@ -530,10 +544,10 @@ int IndexRecord::Reader::readSplitIndexRecord(
   const uint32_t recordHeaderSize = fileHeader_.recordHeaderSize.get();
   for (const DiskRecordInfo& record : recordStructs) {
     Record::Type recordType = record.getRecordType();
-    if (record.recordSize.get() < recordHeaderSize) {
+    if (record.recordSize.get() < recordHeaderSize || !isValid(recordType)) {
       XR_LOGE(
           "Unexpected index record entry: Stream Id: {} Type: {} Size: {} Timestamp: {}",
-          record.getStreamId().getName(),
+          record.getStreamId().getNumericName(),
           toString(recordType),
           record.recordSize.get(),
           record.timestamp.get());
@@ -726,8 +740,7 @@ int IndexRecord::Reader::rebuildIndex(bool writeFixedIndex) {
       // We read/skipped that record: it's "good", as far as we can tell. Add it to the index!
       StreamId streamId{recordHeader->getStreamId()};
       Record::Type recordType = recordHeader->getRecordType();
-      if (recordType == Record::Type::STATE || recordType == Record::Type::CONFIGURATION ||
-          recordType == Record::Type::DATA || recordType == Record::Type::TAGS) {
+      if (isValid(recordType)) {
         streamIds_.insert(streamId);
         index_.emplace_back(recordHeader->timestamp.get(), absolutePosition, streamId, recordType);
         if (index_.size() > 1 && index_.back() < index_[index_.size() - 2]) {
