@@ -110,7 +110,8 @@ void printCopyOptionsHelp() {
           "  [ --chunk-size <nb>[M|G] ]: chunk output file every <nb> number of MiB or GiB.\n"
           "    Use 'M' for MiB (default), or 'G' for GiB.\n"
           "  [ --compression={none|default|fast|tight|zfast|zlight|zmedium|ztight|zmax} ]:"
-          " set compression setting.\n";
+          " set compression setting.\n"
+          "  [ --late-index ]: write the index at the end of the file.\n";
 }
 
 bool parseTagOverrideOptions(

@@ -72,6 +72,9 @@ struct CopyOptions {
   unique_ptr<TagOverrider> tagOverrider;
   // For merge operations only: tell if streams with the same RecordableTypeId should be merged.
   bool mergeStreams = false;
+  // Control if the index record should be pre-allocated early in the file (good for streaming).
+  bool preallocateIndex = true;
+
   // Count the number of records copied. Set during the copy/merge operation.
   mutable uint32_t outRecordCopiedCount = 0;
   // Maybe: output URI if the destination's storage system decides where to write the file
