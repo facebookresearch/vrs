@@ -93,7 +93,7 @@ int filterCopy(
   if (copyOptions.tagOverrider) {
     copyOptions.tagOverrider->overrideTags(writer);
   }
-  if (throttledFileDelegate->shouldPreallocateIndex()) {
+  if (copyOptions.preallocateIndex && throttledFileDelegate->shouldPreallocateIndex()) {
     writer.preallocateIndex(filteredReader.buildIndex());
   }
   int copyResult = throttledFileDelegate->createFile(pathToCopy);
@@ -276,7 +276,7 @@ int filterMerge(
   }
   sort(records.begin(), records.end());
 
-  if (throttledFileDelegate->shouldPreallocateIndex()) {
+  if (copyOptions.preallocateIndex && throttledFileDelegate->shouldPreallocateIndex()) {
     // Build preliminary index
     auto preliminaryIndex = make_unique<deque<IndexRecord::DiskRecordInfo>>();
     deque<IndexRecord::DiskRecordInfo>& index = *preliminaryIndex;
