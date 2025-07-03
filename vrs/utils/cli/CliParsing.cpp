@@ -280,11 +280,11 @@ void printTimeAndStreamFiltersHelp() {
 }
 
 namespace {
-DecimationParams& getDecimatorParams(RecordFilterParams& filters) {
-  if (!filters.decimationParams) {
-    filters.decimationParams = make_unique<DecimationParams>();
+DecimationParams& getDecimatorParams(unique_ptr<DecimationParams>& decimationParams) {
+  if (!decimationParams) {
+    decimationParams = make_unique<DecimationParams>();
   }
-  return *filters.decimationParams;
+  return *decimationParams;
 }
 } // namespace
 
@@ -295,13 +295,13 @@ bool parseDecimationOptions(
     int argc,
     char** argv,
     int& outStatusCode,
-    RecordFilterParams& outFilters) {
+    unique_ptr<DecimationParams>& decimationParams) {
   if (arg == "--decimate") {
     if (argn + 2 < argc) {
       try {
         const string streamId = string(argv[++argn]);
         const double interval = stod(argv[++argn]);
-        getDecimatorParams(outFilters).decimationIntervals.emplace_back(streamId, interval);
+        getDecimatorParams(decimationParams).decimationIntervals.emplace_back(streamId, interval);
       } catch (logic_error&) {
         cerr << appName << ": error. Invalid --decimate numeric value.\n";
         outStatusCode = EXIT_FAILURE;
@@ -313,7 +313,7 @@ bool parseDecimationOptions(
   } else if (arg == "--bucket-interval") {
     if (++argn < argc) {
       try {
-        getDecimatorParams(outFilters).bucketInterval = stod(argv[argn]);
+        getDecimatorParams(decimationParams).bucketInterval = stod(argv[argn]);
       } catch (logic_error&) {
         cerr << appName << ": error. Invalid '--bucket-interval' numeric value.\n";
         outStatusCode = EXIT_FAILURE;
@@ -325,7 +325,7 @@ bool parseDecimationOptions(
   } else if (arg == "--bucket-max-delta") {
     if (++argn < argc) {
       try {
-        getDecimatorParams(outFilters).bucketMaxTimestampDelta = stod(argv[argn]);
+        getDecimatorParams(decimationParams).bucketMaxTimestampDelta = stod(argv[argn]);
       } catch (logic_error&) {
         cerr << appName << ": error. Invalid '--bucket-max-delta' numeric value.\n";
         outStatusCode = EXIT_FAILURE;

@@ -20,6 +20,7 @@
 #include <string_view>
 
 #include <vrs/utils/FilteredFileReader.h>
+#include <vrs/utils/cli/DefaultDecimator.h>
 
 namespace vrs::utils {
 
@@ -133,7 +134,7 @@ bool parseDecimationOptions(
     int argc,
     char** argv,
     int& outStatusCode,
-    RecordFilterParams& outFilters);
+    unique_ptr<DecimationParams>& decimationParams);
 /// Print decimation options help
 void printDecimationOptionsHelp();
 
