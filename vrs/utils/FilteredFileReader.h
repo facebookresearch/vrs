@@ -31,20 +31,10 @@ struct FilteredFileReader;
 
 using RecordReaderFunc = function<bool(RecordFileReader&, const IndexRecord::RecordInfo&)>;
 
-struct DecimationParams {
-  // Per stream decimation intervals
-  vector<pair<string, double>> decimationIntervals;
-  // Divide time where we have all records into intervals, 0 to disable bucketing
-  double bucketInterval = 0.0;
-  // Disregard records which timestamp is more than this delta away from the bucket's
-  double bucketMaxTimestampDelta = 1.0 / 30.0;
-};
-
 /// Filters as specified using the command line, as a series of parameters, grouped by type
 struct RecordFilterParams {
   vector<string> streamFilters;
   vector<string> typeFilters;
-  unique_ptr<DecimationParams> decimationParams;
 
   // Add constraints, typically from command line options
   bool includeStream(const string& streamFilter);
@@ -86,42 +76,22 @@ struct RecordFilter {
   bool timeRangeValid() const;
 };
 
-/// Class handling stream interval & bucket decimation
 class Decimator {
  public:
-  Decimator(FilteredFileReader& filteredReader, DecimationParams& params);
+  virtual ~Decimator() = default;
 
   // chance to reset internal state before each iteration
-  void reset();
+  virtual void reset() = 0;
   // tell if a record should be read decimated (return true)
-  bool decimate(
+  virtual bool decimate(
       RecordReaderFunc& recordReaderFunc,
       ThrottledWriter* throttledWriter,
       const IndexRecord::RecordInfo& record,
-      bool& inOutKeepGoing);
+      bool& inOutKeepGoing) = 0;
   // chance to process final records before the end of an iteration
-  void flush(RecordReaderFunc& recordReaderFunc, ThrottledWriter* throttledWriter);
+  virtual void flush(RecordReaderFunc& recordReaderFunc, ThrottledWriter* throttledWriter) = 0;
 
-  double getGraceWindow() const;
-
- private:
-  bool submitBucket(RecordReaderFunc& recordReaderFunc, ThrottledWriter* throttledWriter);
-
-  FilteredFileReader& filteredReader_;
-  // Timestamp intervals used to skip data records (does not apply to config and state records)
-  map<StreamId, double> decimationIntervals_;
-  // Divide time where we have all records into intervals, 0 to disable bucketing
-  const double bucketInterval_;
-  // Disregard records which timestamp is more than this delta away from the bucket's
-  const double bucketMaxTimestampDelta_;
-  // Grace time window to avoid unsorted records because of pending buckets
-  const double graceWindow_;
-
-  // iteration specific variables
-  map<StreamId, double> decimateCursors_;
-  // Timestamp of the current bucket we are creating
-  double bucketCurrentTimestamp_{};
-  map<StreamId, const IndexRecord::RecordInfo*> bucketCandidates_;
+  virtual double getGraceWindow() const = 0;
 };
 
 /// Encapsulation of a VRS file to read, along with filters to only reads some records/streams.
@@ -174,9 +144,6 @@ struct FilteredFileReader {
   void expandTimeRange(double& inOutStartTimestamp, double& inOutEndTimestamp) const;
   // Constrain the given time range to the current filter's time constraints
   void constrainTimeRange(double& inOutStartTimestamp, double& inOutEndTimestamp) const;
-
-  // Decimate data record with a minimum time interval
-  void decimateByInterval(double minIntervalSec);
 
   // Apply filters, which can only be done after the file was opened already
   void applyFilters(const RecordFilterParams& filters);

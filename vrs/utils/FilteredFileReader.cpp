@@ -362,12 +362,6 @@ void FilteredFileReader::constrainTimeRange(double& inOutStartTimestamp, double&
   }
 }
 
-void FilteredFileReader::decimateByInterval(double minIntervalSec) {
-  utils::DecimationParams params;
-  params.bucketInterval = minIntervalSec;
-  decimator_ = make_unique<utils::Decimator>(*this, params);
-}
-
 void FilteredFileReader::getConstrainedTimeRange(
     double& outStartTimestamp,
     double& outEndTimestamp) {
@@ -379,9 +373,6 @@ void FilteredFileReader::getConstrainedTimeRange(
 void FilteredFileReader::applyFilters(const RecordFilterParams& filters) {
   applyRecordableFilters(filters.streamFilters);
   applyTypeFilters(filters.typeFilters);
-  if (filters.decimationParams) {
-    decimator_ = make_unique<Decimator>(*this, *filters.decimationParams);
-  }
 }
 
 void FilteredFileReader::applyRecordableFilters(const vector<string>& filters) {
@@ -483,99 +474,6 @@ string RecordFilter::getTimeConstraintDescription() const {
 
 bool RecordFilter::timeRangeValid() const {
   return !relativeMinTime && !relativeMaxTime && !aroundTime && minTime <= maxTime;
-}
-
-Decimator::Decimator(FilteredFileReader& filteredReader, DecimationParams& params)
-    : filteredReader_{filteredReader},
-      bucketInterval_{params.bucketInterval},
-      bucketMaxTimestampDelta_{params.bucketMaxTimestampDelta},
-      graceWindow_{bucketInterval_ * 1.2} {
-  for (const auto& interval : params.decimationIntervals) {
-    set<StreamId> argIds;
-    stringToIds(interval.first, filteredReader_.reader, argIds);
-    for (auto id : argIds) {
-      decimationIntervals_[id] = interval.second;
-    }
-  }
-}
-
-void Decimator::reset() {
-  decimateCursors_.clear();
-  bucketCurrentTimestamp_ = numeric_limits<double>::quiet_NaN();
-  bucketCandidates_.clear();
-}
-
-double Decimator::getGraceWindow() const {
-  return graceWindow_;
-}
-
-bool Decimator::decimate(
-    RecordReaderFunc& recordReaderFunc,
-    ThrottledWriter* throttledWriter,
-    const IndexRecord::RecordInfo& record,
-    bool& inOutKeepGoing) {
-  // only decimate data records
-  if (record.recordType != Record::Type::DATA) {
-    return false;
-  }
-  // Interval decimation
-  if (!decimationIntervals_.empty()) {
-    auto decimateInterval = decimationIntervals_.find(record.streamId);
-    if (decimateInterval != decimationIntervals_.end()) {
-      auto decimateCursor = decimateCursors_.find(record.streamId);
-      if (decimateCursor != decimateCursors_.end() &&
-          record.timestamp < decimateCursor->second + decimateInterval->second) {
-        return true; // Decimate this record
-      }
-      // Keep this record & remember its timestamp
-      decimateCursors_[record.streamId] = record.timestamp;
-    }
-    return false;
-  }
-  // Bucket decimation
-  if (bucketInterval_ > 0) {
-    if (isnan(bucketCurrentTimestamp_)) {
-      bucketCurrentTimestamp_ = record.timestamp;
-    }
-    // are we past the limit for the current bucket?
-    if (record.timestamp - bucketCurrentTimestamp_ > bucketMaxTimestampDelta_) {
-      // no chance of finding better candidates, we need to "submit" this bucket
-      inOutKeepGoing = submitBucket(recordReaderFunc, throttledWriter);
-      bucketCurrentTimestamp_ += bucketInterval_;
-    }
-    // does this frame qualify for the bucket?
-    else if (fabs(record.timestamp - bucketCurrentTimestamp_) <= bucketMaxTimestampDelta_) {
-      // can we find a closer candidate for the bucket for this stream id?
-      const auto it = bucketCandidates_.find(record.streamId);
-      if (it == bucketCandidates_.end() ||
-          fabs(it->second->timestamp - bucketCurrentTimestamp_) <
-              fabs(record.timestamp - bucketCurrentTimestamp_)) {
-        bucketCandidates_[record.streamId] = &record;
-      }
-    }
-    return true;
-  }
-  return false;
-}
-
-void Decimator::flush(RecordReaderFunc& recordReaderFunc, ThrottledWriter* throttledWriter) {
-  if (bucketInterval_ > 0) {
-    submitBucket(recordReaderFunc, throttledWriter);
-  }
-}
-
-bool Decimator::submitBucket(RecordReaderFunc& recordReaderFunc, ThrottledWriter* throttledWriter) {
-  bool keepGoing = true;
-  double maxTimestamp = 0.0;
-  for (const auto& bucketRecord : bucketCandidates_) {
-    keepGoing = keepGoing && recordReaderFunc(filteredReader_.reader, *bucketRecord.second);
-    maxTimestamp = max(maxTimestamp, bucketRecord.second->timestamp);
-  }
-  bucketCandidates_.clear();
-  if (throttledWriter != nullptr) {
-    throttledWriter->onRecordDecoded(maxTimestamp, graceWindow_);
-  }
-  return keepGoing;
 }
 
 bool FilteredFileReader::timeRangeValid() const {

@@ -336,7 +336,7 @@ bool VrsCommand::parseArgument(
         parseTagOverrideOptions(appName, arg, argn, argc, argv, outStatusCode, copyOptions) ||
         parseTimeAndStreamFilters(
                appName, arg, argn, argc, argv, outStatusCode, filteredReader, filters) ||
-        parseDecimationOptions(appName, arg, argn, argc, argv, outStatusCode, filters);
+        parseDecimationOptions(appName, arg, argn, argc, argv, outStatusCode, decimationParams);
   }
   return true;
 }
@@ -407,8 +407,8 @@ bool VrsCommand::openOtherVrsFile(
       return false;
     }
     otherReader.filter = filteredReader.filter;
-    if (filters.decimationParams) {
-      otherReader.decimator_ = make_unique<Decimator>(otherReader, *filters.decimationParams);
+    if (decimationParams) {
+      DefaultDecimator::decimate(otherReader, *decimationParams);
     }
     applyFilters(otherReader);
     if (details != Details::None) {
@@ -429,6 +429,9 @@ bool VrsCommand::openOtherVrsFiles(RecordFileInfo::Details details) {
 
 void VrsCommand::applyFilters(FilteredFileReader& reader) {
   reader.applyFilters(filters);
+  if (decimationParams) {
+    DefaultDecimator::decimate(reader, *decimationParams);
+  }
 }
 
 int VrsCommand::runCommands() {
@@ -638,10 +641,10 @@ bool VrsCommand::isRemoteFileSystem(const string& path) {
 }
 
 DecimationParams& VrsCommand::getDecimatorParams() {
-  if (!filters.decimationParams) {
-    filters.decimationParams = make_unique<DecimationParams>();
+  if (!decimationParams) {
+    decimationParams = make_unique<DecimationParams>();
   }
-  return *filters.decimationParams;
+  return *decimationParams;
 }
 
 } // namespace vrscli

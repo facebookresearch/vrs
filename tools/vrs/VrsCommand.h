@@ -21,6 +21,7 @@
 #include <vrs/utils/FilterCopy.h>
 #include <vrs/utils/RecordFileInfo.h>
 #include <vrs/utils/Validation.h>
+#include <vrs/utils/cli/DefaultDecimator.h>
 #include <vrs/utils/cli/PrintRecordFormatRecords.h>
 
 namespace vrscli {
@@ -122,6 +123,7 @@ struct VrsCommand {
   /// Source file and its filters
   vrs::utils::FilteredFileReader filteredReader;
   vrs::utils::RecordFilterParams filters;
+  std::unique_ptr<vrs::utils::DecimationParams> decimationParams;
   /// Helper to use when setting up decimation, to make sure it's created & initialized before use
   vrs::utils::DecimationParams& getDecimatorParams();
 
