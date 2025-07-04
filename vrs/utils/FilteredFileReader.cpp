@@ -436,6 +436,14 @@ void RecordFilter::setMaxTime(double maximumTime, bool relativeToEnd) {
   relativeMaxTime = relativeToEnd;
 }
 
+void RecordFilter::copyTimeConstraints(const RecordFilter& sourceFilter) {
+  relativeMinTime = sourceFilter.relativeMinTime;
+  relativeMaxTime = sourceFilter.relativeMaxTime;
+  aroundTime = sourceFilter.aroundTime;
+  minTime = sourceFilter.minTime;
+  maxTime = sourceFilter.maxTime;
+}
+
 bool RecordFilter::resolveRelativeTimeConstraints(double startTimestamp, double endTimestamp) {
   if (relativeMinTime || relativeMaxTime || aroundTime) {
     if (relativeMinTime) {

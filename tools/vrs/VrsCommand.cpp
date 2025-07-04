@@ -406,7 +406,7 @@ bool VrsCommand::openOtherVrsFile(
       cerr << "Error: could not open " << otherReader.spec.getEasyPath() << "\n";
       return false;
     }
-    otherReader.filter = filteredReader.filter;
+    otherReader.filter.copyTimeConstraints(filteredReader.filter);
     applyFilters(otherReader);
     if (details != Details::None) {
       RecordFileInfo::printOverview(cout, otherReader.reader, otherReader.filter.streams, details);

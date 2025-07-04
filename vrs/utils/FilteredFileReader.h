@@ -68,6 +68,9 @@ struct RecordFilter {
   void setMinTime(double minimumTime, bool relativeToBegin);
   void setMaxTime(double maximumTime, bool relativeToEnd);
 
+  // Copy time constraints from another filter
+  void copyTimeConstraints(const RecordFilter& sourceFilter);
+
   // Resolve relative time constraints based on the given start & end timestamps
   bool resolveRelativeTimeConstraints(double startTimestamp, double endTimestamp);
   string getTimeConstraintDescription() const;
