@@ -72,14 +72,35 @@ static int loadFrameFromMemory(
 }
 
 TEST_F(ImageIndexerLoaderTest, ImageIndexerLoaderTest) {
-  vector<DirectImageReference> readImages;
+  vector<DirectImageReferencePlus> readImages;
 
   ASSERT_EQ(indexImages(kRgbFile, readImages), 0);
   const string format = "raw/1224x1024/pixel=rgb8/stride=3672";
-  vector<DirectImageReference> expectedImages = {
-      {2251, 2105916, format, CompressionType::Zstd, 52, 3760128},
-      {2108199, 2106944, format, CompressionType::Zstd, 52, 3760128},
-      {4215175, 2106022, format, CompressionType::Zstd, 52, 3760128},
+  vector<DirectImageReferencePlus> expectedImages = {
+      {{RecordableTypeId::EyeTrackingCamera, 1},
+       0,
+       2251,
+       2105916,
+       format,
+       CompressionType::Zstd,
+       52,
+       3760128},
+      {{RecordableTypeId::EyeTrackingCamera, 1},
+       1,
+       2108199,
+       2106944,
+       format,
+       CompressionType::Zstd,
+       52,
+       3760128},
+      {{RecordableTypeId::EyeTrackingCamera, 1},
+       2,
+       4215175,
+       2106022,
+       format,
+       CompressionType::Zstd,
+       52,
+       3760128},
   };
   ASSERT_EQ(readImages, expectedImages);
   unique_ptr<FileHandler> file = FileHandler::makeOpen(kRgbFile);
@@ -91,7 +112,14 @@ TEST_F(ImageIndexerLoaderTest, ImageIndexerLoaderTest) {
 
   ASSERT_EQ(indexImages(kJpgFile, readImages), 0);
   expectedImages = {
-      {6046, 1985655, "jpg", CompressionType::None, 0, 0},
+      {{RecordableTypeId::RgbCameraRecordableClass, 1},
+       0,
+       6046,
+       1985655,
+       "jpg",
+       CompressionType::None,
+       0,
+       0},
   };
   EXPECT_EQ(readImages, expectedImages);
   ASSERT_NE(file = FileHandler::makeOpen(kJpgFile), nullptr);

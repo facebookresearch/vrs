@@ -20,7 +20,7 @@
 
 namespace vrs::utils {
 
-/// Helper class to reference images in a VRS file.
+/// Helper class to reference images in a VRS file, optimized for reading.
 struct DirectImageReference {
   DirectImageReference(int64_t dataOffset, uint32_t dataSize, string imageFormat)
       : dataOffset{dataOffset}, dataSize{dataSize}, imageFormat{std::move(imageFormat)} {}
@@ -62,17 +62,52 @@ struct DirectImageReference {
   uint32_t compressedLength{};
 };
 
+/// Helper class to reference images in a VRS file, with additional details when indexing.
+struct DirectImageReferencePlus : public DirectImageReference {
+  DirectImageReferencePlus(
+      StreamId streamId,
+      uint32_t dataRecordIndex,
+      int64_t dataOffset,
+      uint32_t dataSize,
+      string imageFormat)
+      : DirectImageReference(dataOffset, dataSize, std::move(imageFormat)),
+        streamId{streamId},
+        dataRecordIndex{dataRecordIndex} {}
+
+  DirectImageReferencePlus(
+      StreamId streamId,
+      uint32_t dataRecordIndex,
+      int64_t dataOffset,
+      uint32_t dataSize,
+      string imageFormat,
+      CompressionType compressionType,
+      uint32_t compressedOffset,
+      uint32_t compressedLength)
+      : DirectImageReference(
+            dataOffset,
+            dataSize,
+            std::move(imageFormat),
+            compressionType,
+            compressedOffset,
+            compressedLength),
+        streamId{streamId},
+        dataRecordIndex{dataRecordIndex} {}
+
+  StreamId streamId;
+  uint32_t dataRecordIndex;
+};
+
 /// Get the list of references for all the images found in a VRS file.
 /// @param path: path to the VRS file to index.
 /// @param outImages: on exit, a list of image references.
 /// @return 0 on success, or an error code.
-int indexImages(const string& path, vector<DirectImageReference>& outImages);
+int indexImages(const string& path, vector<DirectImageReferencePlus>& outImages);
 
 /// Get a list of references for the images found in a VRS file, using a FilteredFileReader
 /// that may restrict the streams and time range considered. Useful for a CLI tool.
 /// @param reader: an open FilteredFileReader, with or without filters.
 /// @param outImages: on exit, a list of image references.
 /// @return 0 on success, or an error code.
-int indexImages(FilteredFileReader& reader, vector<DirectImageReference>& outImages);
+int indexImages(FilteredFileReader& reader, vector<DirectImageReferencePlus>& outImages);
 
 } // namespace vrs::utils

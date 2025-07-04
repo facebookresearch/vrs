@@ -15,7 +15,6 @@
  */
 
 #include <memory>
-#include <ostream>
 #include <vector>
 
 #define DEFAULT_LOG_CHANNEL "ImageIndexer"
@@ -38,7 +37,10 @@ namespace {
 
 class ImageOffsetWriter : public utils::VideoRecordFormatStreamPlayer {
  public:
-  explicit ImageOffsetWriter(vector<DirectImageReference>& images, int& counter, int& compressed)
+  explicit ImageOffsetWriter(
+      vector<DirectImageReferencePlus>& images,
+      int& counter,
+      int& compressed)
       : images_{images}, counter_{counter}, compressed_{compressed} {}
 
   bool processRecordHeader(const CurrentRecord& record, DataReference& outDataReference) override {
@@ -48,28 +50,46 @@ class ImageOffsetWriter : public utils::VideoRecordFormatStreamPlayer {
   }
 
   bool onImageRead(const CurrentRecord& r, size_t /* id x*/, const ContentBlock& cb) override {
-    if (r.reader->getCompressionType() == CompressionType::None) {
-      images_.emplace_back(r.reader->getFileOffset(), cb.getBlockSize(), cb.image().asString());
-      counter_++;
-    } else {
-      images_.emplace_back(
-          recordStartOffset_,
-          recordDiskSize_,
-          cb.image().asString(),
-          r.reader->getCompressionType(),
-          r.recordSize - r.reader->getUnreadBytes(),
-          cb.getBlockSize());
-      counter_++, compressed_++;
+    if (r.recordType == Record::Type::DATA) {
+      if (r.reader->getCompressionType() == CompressionType::None) {
+        images_.emplace_back(
+            r.streamId,
+            dataRecordIndex_,
+            r.reader->getFileOffset(),
+            cb.getBlockSize(),
+            cb.image().asString());
+        counter_++;
+      } else {
+        images_.emplace_back(
+            r.streamId,
+            dataRecordIndex_,
+            recordStartOffset_,
+            recordDiskSize_,
+            cb.image().asString(),
+            r.reader->getCompressionType(),
+            r.recordSize - r.reader->getUnreadBytes(),
+            cb.getBlockSize());
+        counter_++, compressed_++;
+      }
+      utils::PixelFrame frame;
+      XR_VERIFY(readFrame(frame, r, cb));
     }
-    utils::PixelFrame frame;
-    XR_VERIFY(readFrame(frame, r, cb));
     return true;
   }
 
+  int recordReadComplete(RecordFileReader& reader, const IndexRecord::RecordInfo& recordInfo)
+      override {
+    if (recordInfo.recordType == Record::Type::DATA) {
+      dataRecordIndex_++;
+    }
+    return VideoRecordFormatStreamPlayer::recordReadComplete(reader, recordInfo);
+  }
+
  private:
-  vector<DirectImageReference>& images_;
+  vector<DirectImageReferencePlus>& images_;
   int& counter_;
   int& compressed_;
+  uint32_t dataRecordIndex_{0};
   int64_t recordStartOffset_{-1};
   uint32_t recordDiskSize_{0};
 };
@@ -78,7 +98,7 @@ class ImageOffsetWriter : public utils::VideoRecordFormatStreamPlayer {
 
 namespace vrs::utils {
 
-int indexImages(FilteredFileReader& reader, vector<DirectImageReference>& outImages) {
+int indexImages(FilteredFileReader& reader, vector<DirectImageReferencePlus>& outImages) {
   outImages.clear();
 
   int uncompressed = 0;
@@ -114,7 +134,7 @@ int indexImages(FilteredFileReader& reader, vector<DirectImageReference>& outIma
   return 0;
 }
 
-int indexImages(const string& path, vector<DirectImageReference>& outImages) {
+int indexImages(const string& path, vector<DirectImageReferencePlus>& outImages) {
   FilteredFileReader reader;
   int status = reader.setSource(path);
   if (status != 0 || (status = reader.openFile()) != 0) {
