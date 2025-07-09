@@ -56,6 +56,7 @@ var searchData=
   ['csarecordableclass_53',['CsaRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5aea1216f1fdca3e4dd60db534a6e9e9fc',1,'vrs']]],
   ['currentrecord_54',['CurrentRecord',['../structvrs_1_1_current_record.html',1,'vrs']]],
   ['custom_55',['CUSTOM',['../namespacevrs.html#ae73984aca85d0aa7b6f3406cd9f2f6eaa72baef04098f035e8a320b03ad197818',1,'vrs']]],
-  ['customblockreader_56',['CustomBlockReader',['../classvrs_1_1_custom_block_reader.html',1,'vrs']]],
-  ['customcontentblock_57',['CustomContentBlock',['../classvrs_1_1_custom_content_block.html',1,'vrs']]]
+  ['custom_5fcodec_56',['CUSTOM_CODEC',['../namespacevrs.html#a7e8db761dcf6ba474ce112c82babb6c3a203788b166cb536761be414e5935590f',1,'vrs']]],
+  ['customblockreader_57',['CustomBlockReader',['../classvrs_1_1_custom_block_reader.html',1,'vrs']]],
+  ['customcontentblock_58',['CustomContentBlock',['../classvrs_1_1_custom_content_block.html',1,'vrs']]]
 ];

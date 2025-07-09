@@ -594,10 +594,10 @@ Enumerations</h2></td></tr>
 , <br />
 &#160;&#160;<a class="el" href="namespacevrs.html#a7e8db761dcf6ba474ce112c82babb6c3ae60ae31f67ab883c746bb71c7a145c18">VIDEO</a>
 , <a class="el" href="namespacevrs.html#a7e8db761dcf6ba474ce112c82babb6c3ac86979304ea7a8b0b96f90e8ffc493d3">JXL</a>
+, <a class="el" href="namespacevrs.html#a7e8db761dcf6ba474ce112c82babb6c3a203788b166cb536761be414e5935590f">CUSTOM_CODEC</a>
 , <a class="el" href="namespacevrs.html#a7e8db761dcf6ba474ce112c82babb6c3a4905ac9d6a22bdfc1ae096094ce6248d">COUNT</a>
 <br />
  }</td></tr>
-<tr class="memdesc:a7e8db761dcf6ba474ce112c82babb6c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Image format type.  <a href="namespacevrs.html#a7e8db761dcf6ba474ce112c82babb6c3">More...</a><br /></td></tr>
 <tr class="separator:a7e8db761dcf6ba474ce112c82babb6c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0fbbb88591f21313dd46736fba5a7aa5" id="r_a0fbbb88591f21313dd46736fba5a7aa5"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs.html#a0fbbb88591f21313dd46736fba5a7aa5">PixelFormat</a> : uint8_t { <br />
 &#160;&#160;<a class="el" href="namespacevrs.html#a0fbbb88591f21313dd46736fba5a7aa5a0db45d2a4141101bdfe48e3314cfbca3">UNDEFINED</a> = 0
@@ -1329,8 +1329,7 @@ const int&#160;</td><td class="memItemRight" valign="bottom"><b>kDomainErrorsSta
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Image format type. </p>
+<p>Image format type. For CUSTOM_CODEC and VIDEO, the actual data format is provided by codec name, See <a class="el" href="classvrs_1_1datalayout__conventions_1_1_image_spec.html" title="DataLayout definitions use to describe what&#39;s in an image content block.">datalayout_conventions::ImageSpec</a> for more details. </p>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a7e8db761dcf6ba474ce112c82babb6c3a0db45d2a4141101bdfe48e3314cfbca3" name="a7e8db761dcf6ba474ce112c82babb6c3a0db45d2a4141101bdfe48e3314cfbca3"></a>UNDEFINED&#160;</td><td class="fielddoc"><p>Unknown/unspecified. </p>
 </td></tr>
@@ -1340,9 +1339,11 @@ const int&#160;</td><td class="memItemRight" valign="bottom"><b>kDomainErrorsSta
 </td></tr>
 <tr><td class="fieldname"><a id="a7e8db761dcf6ba474ce112c82babb6c3a55505ba281b015ec31f03ccb151b2a34" name="a7e8db761dcf6ba474ce112c82babb6c3a55505ba281b015ec31f03ccb151b2a34"></a>PNG&#160;</td><td class="fielddoc"><p>PNG data. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a7e8db761dcf6ba474ce112c82babb6c3ae60ae31f67ab883c746bb71c7a145c18" name="a7e8db761dcf6ba474ce112c82babb6c3ae60ae31f67ab883c746bb71c7a145c18"></a>VIDEO&#160;</td><td class="fielddoc"><p>Video codec encoded frame. </p>
+<tr><td class="fieldname"><a id="a7e8db761dcf6ba474ce112c82babb6c3ae60ae31f67ab883c746bb71c7a145c18" name="a7e8db761dcf6ba474ce112c82babb6c3ae60ae31f67ab883c746bb71c7a145c18"></a>VIDEO&#160;</td><td class="fielddoc"><p>Video codec encoded images. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a7e8db761dcf6ba474ce112c82babb6c3ac86979304ea7a8b0b96f90e8ffc493d3" name="a7e8db761dcf6ba474ce112c82babb6c3ac86979304ea7a8b0b96f90e8ffc493d3"></a>JXL&#160;</td><td class="fielddoc"><p>JPEG-XL data. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a7e8db761dcf6ba474ce112c82babb6c3a203788b166cb536761be414e5935590f" name="a7e8db761dcf6ba474ce112c82babb6c3a203788b166cb536761be414e5935590f"></a>CUSTOM_CODEC&#160;</td><td class="fielddoc"><p>Images encoded with a custom or experimental codec. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a7e8db761dcf6ba474ce112c82babb6c3a4905ac9d6a22bdfc1ae096094ce6248d" name="a7e8db761dcf6ba474ce112c82babb6c3a4905ac9d6a22bdfc1ae096094ce6248d"></a>COUNT&#160;</td><td class="fielddoc"><p>Count of values in this enum type. </p>
 </td></tr>
