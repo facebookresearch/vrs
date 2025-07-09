@@ -44,13 +44,16 @@ enum class ContentType : uint8_t {
 string toString(ContentType contentType);
 
 /// Image format type.
+/// For CUSTOM_CODEC and VIDEO, the actual data format is provided by codec name,
+/// See datalayout_conventions::ImageSpec for more details.
 enum class ImageFormat : uint8_t {
   UNDEFINED = 0, ///< Unknown/unspecified.
   RAW, ///< Raw pixel data.
   JPG, ///< JPEG data.
   PNG, ///< PNG data.
-  VIDEO, ///< Video codec encoded frame.
+  VIDEO, ///< Video codec encoded images.
   JXL, ///< JPEG-XL data.
+  CUSTOM_CODEC, ///< Images encoded with a custom or experimental codec.
   COUNT ///< Count of values in this enum type. @internal
 };
 
@@ -171,6 +174,17 @@ class ImageContentBlockSpec {
       uint32_t stride = 0, ///< number of bytes between lines, if not width * sizeof(pixelFormat)
       uint32_t stride2 = 0 ///< stride for planes after the first plane
   );
+
+  /// Custom codec or video image with codec name.
+  ImageContentBlockSpec(
+      ImageFormat imageFormat,
+      string codecName,
+      uint8_t codecQuality = kQualityUndefined,
+      PixelFormat pixelFormat = PixelFormat::UNDEFINED,
+      uint32_t width = 0,
+      uint32_t height = 0,
+      uint32_t stride = 0,
+      uint32_t stride2 = 0);
 
   /// Video image with codec.
   ImageContentBlockSpec(

@@ -42,14 +42,18 @@ bool isImageSpec(
     DataLayout& layout,
     const ImageContentBlockSpec& base,
     size_t blockSize = ContentBlock::kSizeUnknown) {
-  return getImageContentBlock(layout, base, blockSize).image() == spec;
+  ContentBlock cb = getImageContentBlock(layout, base, blockSize);
+  string imageBlock = cb.image().asString();
+  string expected = spec.asString();
+  return imageBlock == expected;
 }
 
 bool hasImageContentBlock(
     DataLayout& layout,
     const ImageContentBlockSpec& base,
     size_t blockSize = ContentBlock::kSizeUnknown) {
-  return getImageContentBlock(layout, base, blockSize).getContentType() == ContentType::IMAGE;
+  ContentBlock cb = getImageContentBlock(layout, base, blockSize);
+  return cb.getContentType() == ContentType::IMAGE;
 }
 
 } // namespace
@@ -76,6 +80,65 @@ TEST_F(ContentBlockReaderTest, rawImageSpecTest) {
   EXPECT_TRUE(isImageSpec({PixelFormat::GREY8, 100, 100}, spec, ImageFormat::RAW, 123));
 }
 
+TEST_F(ContentBlockReaderTest, customCodecImageSpecTest) {
+  class Spec : public AutoDataLayout {
+   public:
+    DataLayout& set(PixelFormat format, uint32_t w = 0, uint32_t h = 0) {
+      pixelFormat.set(format);
+      width.set(w);
+      height.set(h);
+      codecQuality.set(ImageContentBlockSpec::kQualityUndefined);
+      return *this;
+    }
+    DataLayout& set(
+        const string& cname,
+        uint32_t quality = ImageContentBlockSpec::kQualityUndefined,
+        PixelFormat format = PixelFormat::UNDEFINED,
+        uint32_t w = 0,
+        uint32_t h = 0) {
+      codecName.stage(cname);
+      pixelFormat.set(format);
+      width.set(w);
+      height.set(h);
+      codecQuality.set(quality);
+      return *this;
+    }
+
+    DataPieceEnum<PixelFormat, ImageSpecType> pixelFormat{kImagePixelFormat};
+    DataPieceValue<ImageSpecType> height{kImageHeight};
+    DataPieceValue<ImageSpecType> width{kImageWidth};
+    DataPieceString codecName{kImageCodecName};
+    DataPieceValue<ImageSpecType> codecQuality{kImageCodecQuality};
+
+    AutoDataLayoutEnd end;
+  };
+
+  // custom codec images require a codec name, but quality is optional
+  EXPECT_TRUE(isImageSpec(
+      {ImageFormat::CUSTOM_CODEC, "mycodec"},
+      Spec().set("mycodec"),
+      ImageFormat::CUSTOM_CODEC,
+      123));
+  EXPECT_TRUE(isImageSpec(
+      {ImageFormat::CUSTOM_CODEC, "mycodec"},
+      Spec().set("mycodec"),
+      ImageContentBlockSpec("custom_codec/codec=mycodec2"),
+      123));
+  EXPECT_TRUE(isImageSpec(
+      {ImageFormat::CUSTOM_CODEC,
+       "mycodec",
+       ImageContentBlockSpec::kQualityUndefined,
+       PixelFormat::GREY8,
+       100,
+       100},
+      Spec().set("mycodec", ImageContentBlockSpec::kQualityUndefined, PixelFormat::GREY8, 100, 100),
+      ImageFormat::CUSTOM_CODEC,
+      123));
+  // fails because the codec name is empty
+  EXPECT_FALSE(hasImageContentBlock(
+      Spec().set("", 42, PixelFormat::GREY8, 100, 100), ImageFormat::CUSTOM_CODEC, 123));
+}
+
 TEST_F(ContentBlockReaderTest, videoImageSpecTest) {
   class VideoSpec : public AutoDataLayout {
    public:
@@ -99,7 +162,7 @@ TEST_F(ContentBlockReaderTest, videoImageSpecTest) {
   spec.set(PixelFormat::GREY8, 100, 100);
   spec.codecQuality.set(ImageContentBlockSpec::kQualityUndefined);
   EXPECT_TRUE(isImageSpec({PixelFormat::GREY8, 100, 100}, spec, ImageFormat::RAW, 123));
-  EXPECT_TRUE(isImageSpec(
+  EXPECT_FALSE(isImageSpec(
       {ImageFormat::VIDEO, PixelFormat::GREY8, 100, 100}, spec, ImageFormat::VIDEO, 123));
   spec.codecName.stage("H.264");
   EXPECT_TRUE(isImageSpec(
@@ -134,7 +197,7 @@ TEST_F(ContentBlockReaderTest, videoImageSpecTest) {
       123));
   spec.codecName.stage({});
   spec.codecQuality.set(5);
-  EXPECT_TRUE(isImageSpec(
+  EXPECT_FALSE(isImageSpec(
       {ImageFormat::VIDEO, PixelFormat::GREY8, 100, 100, 0, 0, {}, 5},
       spec,
       ImageFormat::VIDEO,

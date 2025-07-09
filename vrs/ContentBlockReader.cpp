@@ -339,7 +339,8 @@ bool ImageBlockReader::readBlock(const CurrentRecord& record, RecordFormatStream
     }
   }
   // Search for a DataLayout that has enough data to interpret the image data
-  if (imageFormat == ImageFormat::RAW || imageFormat == ImageFormat::VIDEO) {
+  if (imageFormat == ImageFormat::RAW || imageFormat == ImageFormat::CUSTOM_CODEC ||
+      imageFormat == ImageFormat::VIDEO) {
     RecordFormatReader* reader = player.getCurrentRecordFormatReader();
     bool readNextBlock = true;
     // Use a lambda to repeat the search using many local variables and few differences...

@@ -39,7 +39,8 @@ constexpr const char* kImagePixelFormat = "image_pixel_format";
 /// DataLayout convention name for the number of bytes per pixel, deprecated.
 /// Deprecated because less specific than kImagePixelFormat, which you should use instead.
 constexpr const char* kImageBytesPerPixel = "image_bytes_per_pixel";
-/// DataLayout convention name for video codec name.
+
+/// DataLayout convention name for image/custom_codec and image/video images' codec name.
 constexpr const char* kImageCodecName = "image_codec_name";
 /// DataLayout convention video codec quality setting.
 constexpr const char* kImageCodecQuality = "image_codec_quality";
@@ -68,7 +69,7 @@ class ImageSpec : public AutoDataLayout {
   DataPieceValue<ImageSpecType> stride2{kImageStride2};
   DataPieceEnum<PixelFormat, ImageSpecType> pixelFormat{kImagePixelFormat};
 
-  // For video encoding
+  // For custom codec & video images
   DataPieceString codecName{kImageCodecName};
   DataPieceValue<ImageSpecType> codecQuality{kImageCodecQuality};
 

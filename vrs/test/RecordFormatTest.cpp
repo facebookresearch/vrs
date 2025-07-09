@@ -375,6 +375,39 @@ TEST_F(RecordFormatTest, testBlockFormat) {
   EXPECT_EQ(videoCodecEscaped.image().getCodecName(), "+confusing/codec/bad+name");
   EXPECT_EQ(videoCodecEscaped.image().getCodecQuality(), ImageContentBlockSpec::kQualityUndefined);
 
+  ContentBlock customCodecImage("image/custom_codec");
+  EXPECT_EQ(customCodecImage.getContentType(), ContentType::IMAGE);
+  EXPECT_EQ(customCodecImage.image().getImageFormat(), ImageFormat::CUSTOM_CODEC);
+  EXPECT_EQ(customCodecImage.image().getPixelFormat(), PixelFormat::UNDEFINED);
+  EXPECT_TRUE(checkImageDimensions(customCodecImage, 0, 0, 0, 0));
+  EXPECT_TRUE(checkImageHeights(customCodecImage, 0));
+  EXPECT_EQ(customCodecImage.image().getBytesPerPixel(), ContentBlock::kSizeUnknown);
+  EXPECT_EQ(customCodecImage.image().getChannelCountPerPixel(), 0);
+  EXPECT_EQ(customCodecImage.image().getCodecName(), "");
+  EXPECT_EQ(customCodecImage.image().getCodecQuality(), 255);
+
+  ContentBlock customCodecImage1("image/custom_codec/codec=jpgGenZ");
+  EXPECT_EQ(customCodecImage1.getContentType(), ContentType::IMAGE);
+  EXPECT_EQ(customCodecImage1.image().getImageFormat(), ImageFormat::CUSTOM_CODEC);
+  EXPECT_EQ(customCodecImage1.image().getPixelFormat(), PixelFormat::UNDEFINED);
+  EXPECT_TRUE(checkImageDimensions(customCodecImage1, 0, 0, 0, 0));
+  EXPECT_TRUE(checkImageHeights(customCodecImage1, 0));
+  EXPECT_EQ(customCodecImage1.image().getBytesPerPixel(), ContentBlock::kSizeUnknown);
+  EXPECT_EQ(customCodecImage1.image().getChannelCountPerPixel(), 0);
+  EXPECT_EQ(customCodecImage1.image().getCodecName(), "jpgGenZ");
+  EXPECT_EQ(customCodecImage1.image().getCodecQuality(), 255);
+
+  ContentBlock customCodecImage2("image/custom_codec/codec=jpgGenZ/codec_quality=35");
+  EXPECT_EQ(customCodecImage2.getContentType(), ContentType::IMAGE);
+  EXPECT_EQ(customCodecImage2.image().getImageFormat(), ImageFormat::CUSTOM_CODEC);
+  EXPECT_EQ(customCodecImage2.image().getPixelFormat(), PixelFormat::UNDEFINED);
+  EXPECT_TRUE(checkImageDimensions(customCodecImage2, 0, 0, 0, 0));
+  EXPECT_TRUE(checkImageHeights(customCodecImage2, 0));
+  EXPECT_EQ(customCodecImage2.image().getBytesPerPixel(), ContentBlock::kSizeUnknown);
+  EXPECT_EQ(customCodecImage2.image().getChannelCountPerPixel(), 0);
+  EXPECT_EQ(customCodecImage2.image().getCodecName(), "jpgGenZ");
+  EXPECT_EQ(customCodecImage2.image().getCodecQuality(), 35);
+
   ContentBlock partial("audio/pcm/uint24be/rate=32000/channels=1");
   EXPECT_EQ(partial.getContentType(), ContentType::AUDIO);
   EXPECT_EQ(partial.getBlockSize(), ContentBlock::kSizeUnknown);
@@ -595,6 +628,10 @@ TEST_F(RecordFormatTest, testFormat) {
       "image/video/1920x1080/pixel=rgb8/codec_quality=100",
       "image/video/640x480/pixel=grey8/codec=H.264%20%25%20%2B%20%2F%20%5C%20%22%20",
       "image/video/640x480/pixel=grey8/codec=H.254/keyframe_timestamp=2.251009123/keyframe_index=5",
+      "image/custom_codec",
+      "image/custom_codec/codec=my_codec",
+      "image/custom_codec/codec=my_codec/codec_quality=85",
+      "image/custom_codec/2048x3072/pixel=grey8/stride=2050/codec=my_codec/codec_quality=85",
       "data_layout+image/raw/102x200/pixel=depth32f",
       "custom/size=70+image/raw/20x30/pixel=bgr8/stride=24"};
   for (size_t k = 0; k < array_size(formats); ++k) {

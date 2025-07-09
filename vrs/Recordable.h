@@ -198,6 +198,11 @@ class Recordable {
     return getTag(tags_.vrs, getSerialNumberTagName());
   }
 
+  /// Get the stream's flavor, if any.
+  const string& getStreamFlavor() const {
+    return getTag(tags_.vrs, getFlavorTagName());
+  }
+
   /// Get the name of the VRS tag used to store the original name of the recordable.
   /// @internal
   static const string& getOriginalNameTagName() {

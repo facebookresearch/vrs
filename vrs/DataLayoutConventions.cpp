@@ -56,31 +56,50 @@ ContentBlock ImageSpec::getImageContentBlock(const ImageContentBlockSpec& base, 
       }
     }
   }
-  if (readWidth != 0 && readHeight != 0 && readPixelFormat != PixelFormat::UNDEFINED) {
-    uint32_t readStride = stride.get(); // get value or 0
-    uint32_t readStride2 = stride2.get(); // get value or 0
-    if (base.getImageFormat() == ImageFormat::RAW) {
-      return {readPixelFormat, readWidth, readHeight, readStride, readStride2};
-    } else if (base.getImageFormat() == ImageFormat::VIDEO) {
-      if (blockSize != ContentBlock::kSizeUnknown) {
-        string aCodecName;
-        if (!codecName.get(aCodecName) || aCodecName.empty()) {
-          aCodecName = base.getCodecName();
-        }
-        uint32_t aCodecQuality = 0;
-        if (!codecQuality.get(aCodecQuality) ||
-            !ImageContentBlockSpec::isQualityValid(aCodecQuality)) {
-          aCodecQuality = base.getCodecQuality();
-        }
+  bool hasMinRawSpec =
+      readWidth != 0 && readHeight != 0 && readPixelFormat != PixelFormat::UNDEFINED;
+  ImageFormat imageFormat = base.getImageFormat();
+  if (imageFormat == ImageFormat::RAW) {
+    if (hasMinRawSpec) {
+      return {readPixelFormat, readWidth, readHeight, stride.get(), stride2.get()};
+    }
+  } else if (
+      blockSize != ContentBlock::kSizeUnknown &&
+      (imageFormat == ImageFormat::CUSTOM_CODEC || imageFormat == ImageFormat::VIDEO)) {
+    string theCodecName;
+    bool foundCodecName = codecName.get(theCodecName) && !theCodecName.empty();
+    if (!foundCodecName) {
+      theCodecName = base.getCodecName();
+    }
+    uint32_t quality = ImageContentBlockSpec::kQualityUndefined;
+    if (!codecQuality.get(quality) || !ImageContentBlockSpec::isQualityValid(quality)) {
+      quality = base.getCodecQuality();
+    }
+    if (imageFormat == ImageFormat::VIDEO) {
+      if (!theCodecName.empty() && hasMinRawSpec) {
         return {
             ImageContentBlockSpec(
-                aCodecName,
-                aCodecQuality,
+                std::move(theCodecName),
+                quality,
                 readPixelFormat,
                 readWidth,
                 readHeight,
-                readStride,
-                readStride2),
+                stride.get(),
+                stride2.get()),
+            blockSize};
+      }
+    } else if (imageFormat == ImageFormat::CUSTOM_CODEC) {
+      if (foundCodecName || (!theCodecName.empty() && hasMinRawSpec)) {
+        return {
+            ImageContentBlockSpec(
+                ImageFormat::CUSTOM_CODEC,
+                readPixelFormat,
+                readWidth,
+                readHeight,
+                stride.get(),
+                stride2.get(),
+                std::move(theCodecName),
+                quality),
             blockSize};
       }
     }

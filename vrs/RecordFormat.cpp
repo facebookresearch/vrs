@@ -71,7 +71,8 @@ string_view sContentTypeNames[] = {"custom", "empty", "data_layout", "image", "a
 ENUM_STRING_CONVERTER(ContentType, sContentTypeNames, ContentType::CUSTOM);
 
 // These text names may NEVER BE CHANGED, as they are used in data layout definitions!!
-string_view sImageFormatNames[] = {"undefined", "raw", "jpg", "png", "video", "jxl"};
+string_view sImageFormatNames[] =
+    {"undefined", "raw", "jpg", "png", "video", "jxl", "custom_codec"};
 ENUM_STRING_CONVERTER(ImageFormat, sImageFormatNames, ImageFormat::UNDEFINED);
 
 // Enum values may NEVER BE CHANGED, as they are used in data layout definitions!!
@@ -263,6 +264,26 @@ ImageContentBlockSpec::ImageContentBlockSpec(
 }
 
 ImageContentBlockSpec::ImageContentBlockSpec(
+    ImageFormat imageFormat,
+    string codecName,
+    uint8_t codecQuality,
+    PixelFormat pixelFormat,
+    uint32_t width,
+    uint32_t height,
+    uint32_t stride,
+    uint32_t stride2)
+    : imageFormat_{imageFormat},
+      pixelFormat_{pixelFormat},
+      width_{width},
+      height_{height},
+      stride_{stride},
+      stride2_{stride2},
+      codecName_{std::move(codecName)},
+      codecQuality_{codecQuality} {
+  sanityCheckStrides();
+}
+
+ImageContentBlockSpec::ImageContentBlockSpec(
     string codecName,
     uint8_t codecQuality,
     PixelFormat pixelFormat,
@@ -385,24 +406,25 @@ string ImageContentBlockSpec::asString() const {
   if (width_ > 0 && height_ > 0) {
     s.append("/").append(to_string(width_)).append("x").append(to_string(height_));
   }
-  if (imageFormat_ == ImageFormat::RAW || imageFormat_ == ImageFormat::VIDEO) {
-    if (pixelFormat_ != PixelFormat::UNDEFINED) {
-      s.append("/pixel=").append(PixelFormatConverter::toStringView(pixelFormat_));
-    }
+  if (pixelFormat_ != PixelFormat::UNDEFINED) {
+    s.append("/pixel=").append(PixelFormatConverter::toStringView(pixelFormat_));
+  }
+  if (imageFormat_ == ImageFormat::RAW || imageFormat_ == ImageFormat::VIDEO ||
+      imageFormat_ == ImageFormat::CUSTOM_CODEC) {
     if (stride_ > 0) {
       s.append("/stride=").append(to_string(stride_));
     }
     if (stride2_ > 0) {
       s.append("/stride_2=").append(to_string(stride2_));
     }
-    if (imageFormat_ == ImageFormat::VIDEO) {
+    if (imageFormat_ == ImageFormat::VIDEO || imageFormat_ == ImageFormat::CUSTOM_CODEC) {
       if (!codecName_.empty()) {
         s.append("/codec=").append(escapeString(codecName_));
       }
       if (isQualityValid(codecQuality_)) {
         s.append("/codec_quality=").append(to_string(codecQuality_));
       }
-      if (keyFrameTimestamp_ != kInvalidTimestamp) {
+      if (imageFormat_ == ImageFormat::VIDEO && keyFrameTimestamp_ != kInvalidTimestamp) {
         // These conversions will only be needed for debugging, so precision issues are ok.
         // Using 9 for up to nanosecond precision.
         s.append("/keyframe_timestamp=")
