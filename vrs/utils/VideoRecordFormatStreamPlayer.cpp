@@ -20,7 +20,8 @@
 #include <logging/Checks.h>
 
 #include <vrs/IndexRecord.h>
-#include <vrs/utils/PixelFrame.h>
+
+#include "PixelFrame.h"
 
 namespace vrs::utils {
 

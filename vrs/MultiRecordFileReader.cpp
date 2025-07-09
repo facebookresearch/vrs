@@ -22,14 +22,14 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
-#include <vrs/ErrorCode.h>
-#include <vrs/IndexRecord.h>
-#include <vrs/MultiRecordFileReader.h>
-#include <vrs/RecordFileReader.h>
-#include <vrs/StreamId.h>
-#include <vrs/StreamPlayer.h>
-#include <vrs/TagConventions.h>
 #include <vrs/helpers/FileMacros.h>
+
+#include "ErrorCode.h"
+#include "IndexRecord.h"
+#include "MultiRecordFileReader.h"
+#include "RecordFileReader.h"
+#include "StreamId.h"
+#include "StreamPlayer.h"
 
 using namespace std;
 

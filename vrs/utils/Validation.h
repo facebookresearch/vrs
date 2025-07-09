@@ -20,7 +20,7 @@
 
 #include <vrs/Compressor.h>
 
-#include <vrs/utils/FilteredFileReader.h>
+#include "FilteredFileReader.h"
 
 namespace vrs::utils {
 

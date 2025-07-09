@@ -28,8 +28,9 @@
 #include <vrs/helpers/Rapidjson.hpp>
 #include <vrs/helpers/Throttler.h>
 #include <vrs/os/Utils.h>
-#include <vrs/utils/PixelFrame.h>
-#include <vrs/utils/RecordFileInfo.h>
+
+#include "PixelFrame.h"
+#include "RecordFileInfo.h"
 
 const char* kReadMeContent =
 #include "DataExtractorReadMe.hpp"

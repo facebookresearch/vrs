@@ -18,7 +18,8 @@
 
 #include <vrs/DiskFile.h>
 #include <vrs/RecordFormatStreamPlayer.h>
-#include <vrs/utils/AudioBlock.h>
+
+#include "AudioBlock.h"
 
 namespace vrs::utils {
 

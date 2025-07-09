@@ -20,11 +20,11 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
-#include <vrs/FileFormat.h>
 #include <vrs/helpers/FileMacros.h>
 #include <vrs/helpers/Throttler.h>
 #include <vrs/os/CompilerAttributes.h>
 
+#include "FileFormat.h"
 #include "RecordFormatStreamPlayer.h"
 #include "RecordReaders.h"
 

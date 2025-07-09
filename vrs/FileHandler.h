@@ -22,10 +22,12 @@
 #include <utility>
 #include <vector>
 
-#include <vrs/FileDelegator.h>
-#include <vrs/FileSpec.h>
 #include <vrs/helpers/EnumTemplates.hpp>
 #include <vrs/os/CompilerAttributes.h>
+
+#include "ErrorCode.h"
+#include "FileDelegator.h"
+#include "FileSpec.h"
 
 namespace vrs {
 

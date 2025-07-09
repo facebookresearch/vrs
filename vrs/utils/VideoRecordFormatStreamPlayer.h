@@ -19,7 +19,8 @@
 #include <map>
 
 #include <vrs/RecordFormatStreamPlayer.h>
-#include <vrs/utils/VideoFrameHandler.h>
+
+#include "VideoFrameHandler.h"
 
 namespace vrs::utils {
 

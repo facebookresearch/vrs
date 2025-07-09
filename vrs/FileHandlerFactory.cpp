@@ -18,10 +18,11 @@
 #include <logging/Checks.h>
 #include <logging/Log.h>
 
-#include <vrs/DiskFile.h>
-#include <vrs/ErrorCode.h>
-#include <vrs/FileHandlerFactory.h>
 #include <vrs/helpers/FileMacros.h>
+
+#include "DiskFile.h"
+#include "ErrorCode.h"
+#include "FileHandlerFactory.h"
 
 using namespace std;
 

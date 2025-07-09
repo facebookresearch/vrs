@@ -29,7 +29,8 @@
 #include <vrs/helpers/Rapidjson.hpp>
 #include <vrs/helpers/Strings.h>
 #include <vrs/os/Utils.h>
-#include <vrs/utils/AudioExtractor.h>
+
+#include "AudioExtractor.h"
 
 using namespace std;
 using namespace vrs;

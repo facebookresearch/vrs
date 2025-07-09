@@ -25,7 +25,6 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
-#include <vrs/FileHandlerFactory.h>
 #include <vrs/helpers/EnumStringConverter.h>
 #include <vrs/helpers/Rapidjson.hpp>
 #include <vrs/helpers/Strings.h>

@@ -30,10 +30,11 @@
 #include <vrs/helpers/Strings.h>
 #include <vrs/helpers/Throttler.h>
 #include <vrs/os/Time.h>
-#include <vrs/utils/FilterCopy.h>
-#include <vrs/utils/PixelFrame.h>
-#include <vrs/utils/VideoRecordFormatStreamPlayer.h>
 #include <vrs/utils/xxhash/xxhash.h>
+
+#include "FilterCopy.h"
+#include "PixelFrame.h"
+#include "VideoRecordFormatStreamPlayer.h"
 
 using namespace std;
 using namespace vrs;

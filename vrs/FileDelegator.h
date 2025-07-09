@@ -18,9 +18,9 @@
 
 #include <memory>
 
-#include <vrs/ErrorCode.h>
-#include <vrs/FileSpec.h>
 #include <vrs/os/CompilerAttributes.h>
+
+#include "FileSpec.h"
 
 namespace vrs {
 

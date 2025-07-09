@@ -22,7 +22,8 @@
 #include <vrs/ErrorCode.h>
 #include <vrs/RecordFileReader.h>
 #include <vrs/helpers/FileMacros.h>
-#include <vrs/utils/PixelFrame.h>
+
+#include "PixelFrame.h"
 
 using namespace std;
 

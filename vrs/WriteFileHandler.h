@@ -18,6 +18,7 @@
 
 #include <vrs/os/CompilerAttributes.h>
 
+#include "ErrorCode.h"
 #include "FileHandler.h"
 
 namespace vrs {

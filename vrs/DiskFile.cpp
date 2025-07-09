@@ -33,13 +33,13 @@
 #include <vrs/os/Platform.h>
 #include <vrs/os/Utils.h>
 
-#include <vrs/Compressor.h>
-#include <vrs/Decompressor.h>
-#include <vrs/DiskFileChunk.hpp>
-#include <vrs/ErrorCode.h>
+#include "Compressor.h"
+#include "Decompressor.h"
+#include "DiskFileChunk.hpp"
+#include "ErrorCode.h"
 
 #if VRS_ASYNC_DISKFILE_SUPPORTED()
-#include <vrs/AsyncDiskFileChunk.h>
+#include "AsyncDiskFileChunk.h"
 #endif
 
 using namespace std;

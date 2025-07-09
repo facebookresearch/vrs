@@ -23,7 +23,7 @@
 #include <vrs/RecordFileReader.h>
 #include <vrs/RecordFileWriter.h>
 
-#include <vrs/utils/ThrottleHelpers.h>
+#include "ThrottleHelpers.h"
 
 namespace vrs::utils {
 

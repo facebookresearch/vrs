@@ -27,8 +27,9 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
-#include <vrs/DataLayout.h>
 #include <vrs/helpers/EnumStringConverter.h>
+
+#include "DataLayout.h"
 
 using namespace std;
 

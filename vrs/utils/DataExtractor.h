@@ -20,8 +20,9 @@
 #include <memory>
 
 #include <vrs/RecordFileReader.h>
-#include <vrs/utils/AudioExtractor.h>
-#include <vrs/utils/VideoRecordFormatStreamPlayer.h>
+
+#include "AudioExtractor.h"
+#include "VideoRecordFormatStreamPlayer.h"
 
 namespace vrs::utils {
 
