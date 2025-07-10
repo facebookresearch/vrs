@@ -147,9 +147,12 @@ class DataPieceArray : public DataPiece {
   bool set(const T* values, size_t count) {
     T* const ptr = layout_.getFixedData<T>(offset_, getFixedSize());
     if (ptr != nullptr) {
-      memcpy(ptr, values, sizeof(T) * min<size_t>(count, count_));
+      if (count > 0) {
+        memcpy(ptr, values, sizeof(T) * min<size_t>(count, count_));
+      }
+      T v{};
       while (count < count_) {
-        writeUnaligned<T>(ptr + count++, T{});
+        writeUnaligned<T>(ptr + count++, v);
       }
       return true;
     } else {
@@ -188,7 +191,7 @@ class DataPieceArray : public DataPiece {
   /// If not enough values are given to set the whole array, T's default constructor is used to init
   /// the remaining values.
   bool set(const vector<T>& values) {
-    return set(values.data(), values.size());
+    return values.empty() ? set(nullptr, 0) : set(values.data(), values.size());
   }
 
   /// Get the array's default values.

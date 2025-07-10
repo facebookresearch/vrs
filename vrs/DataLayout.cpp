@@ -1764,6 +1764,10 @@ bool DataPieceString::get(string& outString) const {
     outString.append(ptr, size);
     return true;
   }
+  if (pieceIndex_ != DataLayout::kNotFound) {
+    outString.clear();
+    return true;
+  }
   outString = defaultString_;
   return false;
 }

@@ -848,9 +848,8 @@ TEST_F(DataLayoutTester, testMetaData) {
 TEST_F(DataLayoutTester, testStaging) {
   VarSizeLayout layout;
   string name, expectedName;
-  EXPECT_FALSE(layout.name_.get(name));
-  expectedName = "default_name";
-  EXPECT_EQ(name, expectedName);
+  EXPECT_TRUE(layout.name_.get(name));
+  EXPECT_TRUE(name.empty());
   vector<int32_t> ints, expectedInts;
   EXPECT_FALSE(layout.ints_.get(ints));
   EXPECT_EQ(ints, expectedInts);
@@ -1122,4 +1121,104 @@ TEST_F(DataLayoutTester, testCopyLayout) {
   stringstream ss;
   readLayout.printLayoutCompact(ss);
   EXPECT_EQ(ss.str(), compact);
+}
+TEST_F(DataLayoutTester, getTest) {
+  struct GetLayout : public AutoDataLayout {
+    GetLayout() {
+      int32Set.set(42);
+      int32Zero.set(0);
+      arraySet.set({10, 20});
+      arrayZero.set({});
+      stringSet.stage("string_set");
+      stringEmpty.stage("");
+      collectVariableDataAndUpdateIndex();
+    }
+
+    DataPieceValue<int32_t> int32Unset{"int32_unset", 1};
+    DataPieceValue<int32_t> int32Set{"int32_set", 1};
+    DataPieceValue<int32_t> int32Zero{"int32_zero", 1};
+    DataPieceArray<int32_t> arrayUnset{"array_unset", 2, {1, 1}};
+    DataPieceArray<int32_t> arraySet{"array_set", 2, {1, 1}};
+    DataPieceArray<int32_t> arrayZero{"array_zero", 2, {1, 1}};
+    DataPieceString stringUnset{"string_unset", "1"};
+    DataPieceString stringSet{"string_set", "1"};
+    DataPieceString stringEmpty{"string_empty", "1"};
+
+    AutoDataLayoutEnd end;
+  };
+
+  struct GetLayout2 : public AutoDataLayout {
+    DataPieceValue<int32_t> int32Unset{"int32_unset", 1};
+    DataPieceValue<int32_t> int32Set{"int32_set", 1};
+    DataPieceValue<int32_t> int32Zero{"int32_zero", 1};
+    DataPieceValue<int32_t> int32Unmapped{"int32_unmapped", 1};
+    DataPieceArray<int32_t> arrayUnset{"array_unset", 2, {1, 1}};
+    DataPieceArray<int32_t> arraySet{"array_set", 2, {1, 1}};
+    DataPieceArray<int32_t> arrayZero{"array_zero", 2, {1, 1}};
+    DataPieceArray<int32_t> arrayUnmapped{"array_unmapped", 2, {1, 1}};
+    DataPieceString stringUnset{"string_unset", "1"};
+    DataPieceString stringSet{"string_set", "1"};
+    DataPieceString stringEmpty{"string_empty", "1"};
+    DataPieceString stringUnmapped{"string_unmapped", "1"};
+
+    AutoDataLayoutEnd end;
+  };
+
+  GetLayout sourceLayout;
+  GetLayout2 targetLayout;
+  targetLayout.mapLayout(sourceLayout);
+
+  int32_t i = 0;
+  EXPECT_TRUE(sourceLayout.int32Unset.get(i));
+  EXPECT_EQ(i, 0);
+  EXPECT_TRUE(sourceLayout.int32Set.get(i));
+  EXPECT_EQ(i, 42);
+  EXPECT_TRUE(sourceLayout.int32Zero.get(i));
+  EXPECT_EQ(i, 0);
+
+  EXPECT_TRUE(targetLayout.int32Unset.get(i));
+  EXPECT_EQ(i, 0);
+  EXPECT_TRUE(targetLayout.int32Set.get(i));
+  EXPECT_EQ(i, 42);
+  EXPECT_TRUE(targetLayout.int32Zero.get(i));
+  EXPECT_EQ(i, 0);
+  EXPECT_FALSE(targetLayout.int32Unmapped.get(i));
+  EXPECT_EQ(i, 1);
+
+  vector<int32_t> a;
+  vector<int32_t> zeroArray{0, 0};
+  vector<int32_t> setArray{10, 20};
+  vector<int32_t> defaultArray{1, 1};
+  EXPECT_TRUE(sourceLayout.arrayUnset.get(a));
+  EXPECT_EQ(a, zeroArray);
+  EXPECT_TRUE(sourceLayout.arraySet.get(a));
+  EXPECT_EQ(a, setArray);
+  EXPECT_TRUE(sourceLayout.arrayZero.get(a));
+  EXPECT_EQ(a, zeroArray);
+
+  EXPECT_TRUE(targetLayout.arrayUnset.get(a));
+  EXPECT_EQ(a, zeroArray);
+  EXPECT_TRUE(targetLayout.arraySet.get(a));
+  EXPECT_EQ(a, setArray);
+  EXPECT_TRUE(targetLayout.arrayZero.get(a));
+  EXPECT_EQ(a, zeroArray);
+  EXPECT_FALSE(targetLayout.arrayUnmapped.get(a));
+  EXPECT_EQ(a, defaultArray);
+
+  string s;
+  EXPECT_TRUE(sourceLayout.stringUnset.get(s));
+  EXPECT_EQ(s, "");
+  EXPECT_TRUE(sourceLayout.stringSet.get(s));
+  EXPECT_EQ(s, "string_set");
+  EXPECT_TRUE(sourceLayout.stringEmpty.get(s));
+  EXPECT_EQ(s, "");
+
+  EXPECT_TRUE(targetLayout.stringUnset.get(s));
+  EXPECT_EQ(s, "");
+  EXPECT_TRUE(targetLayout.stringSet.get(s));
+  EXPECT_EQ(s, "string_set");
+  EXPECT_TRUE(targetLayout.stringEmpty.get(s));
+  EXPECT_EQ(s, "");
+  EXPECT_FALSE(targetLayout.stringUnmapped.get(s));
+  EXPECT_EQ(s, "1");
 }
