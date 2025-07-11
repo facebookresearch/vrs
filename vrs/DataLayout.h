@@ -129,9 +129,9 @@ struct JsonFormatProfileSpec {
 ///
 /// A DataLayout is an ordered collection of individual pieces of data, all deriving from the
 /// DataPiece abstract class. Classes deriving from DataPiece fall in two categories:
-/// Fixed-size DataPiece objects, and variable-size DataPiece objects.
+/// Fixed-size and variable-size DataPiece objects.
 ///
-/// Fixed-size DataPiece objects, use the same number of bytes, no matter the actual value:
+/// Fixed-size DataPiece objects, use a fixed number of bytes, no matter the actual value:
 /// - single values of the supported POD types.
 /// - fixed size arrays of the supported POD types.
 ///
@@ -139,11 +139,11 @@ struct JsonFormatProfileSpec {
 /// - native C/C++ types, like int8, int16, int32, int64, signed or unsigned, float & double.
 /// - Bool, which is a replacement for bool, because vector<bool> is not an STL container, see
 ///   https://stackoverflow.com/questions/17794569/why-is-vectorbool-not-a-stl-container
-/// - 2, 3 & 4 D points, 3 & 4 D matrices, of types int32, float & double, for instance:
+/// - 2, 3 & 4D points, 3 & 4D matrices, of types int32, float & double, for instance:
 ///   Point2Df: a 2 dimension point using float.
 ///   Matrix4Dd: a 4 dimension matrix using double.
 ///
-/// DataPieceValue<T> and DataPieceArray<T> are the two fixed size DataPiece template classes.
+/// DataPieceValue<T> and DataPieceArray<T> are the two fixed size DataPiece template types.
 ///
 /// Note: You can not use DataLayout template types with your own POD types, because:
 ///  1. DataLayout needs a factory able to instantiate them, even when your code isn't around,
@@ -151,43 +151,61 @@ struct JsonFormatProfileSpec {
 ///  POD type would have to be versioned & managed by hand.
 ///
 /// Variable-size DataPiece objects use a number of bytes that depends on their actual value:
-/// - DataPieceVector<T>: a vector of any of the supported POD types, or std::string.
-/// - DataPieceStringMap<T>: a string map of any of the supported POD types, or std::string.
-/// - DataPieceString: an ASCII or utf8 text string.
+///  - DataPieceVector<T>: a vector of any of the supported POD types, or std::string.
+///  - DataPieceStringMap<T>: a string map of any of the supported POD types, or std::string.
+///  - DataPieceString: an ASCII or utf8 text string. Avoid using any other character encoding to
+///    avoid issues handling strings in Python.
 ///
 /// Internal representation (what you don't need to know unless you are working on DataLayout)
 ///
-/// Because there is a known fixed number of fixed-size DataPiece objects, each of known size,
+/// Because there is a known static number of fixed-size DataPiece objects, each of known size,
 /// we can pre-allocate a buffer to hold the data values of all those DataPiece objects.
 /// Fixed-size DataPiece objects reference their data using an offset and the size of their data.
 /// All read & write value operations on fixed-size DataPiece objects use that buffer, so that
 /// we can directly read from and write to disk that part of a DataLayout's data.
 /// That buffer is the first section of the fixedData_ byte vector.
 ///
-/// For variable-size DataPiece objects, because the DataPiece data has an unforeseeable size,
-/// data reads & writes are not handled the same as for fixed-size DataPiece objects.
+/// For variable-size DataPiece objects, because their DataPiece data has an unpredictable size,
+/// data reads & writes can't be handled the same as with fixed-size DataPiece objects.
 /// Variable-size DataPiece objects don't have setter methods, but "stage" methods, that set the
-/// value in a field of the DataPiece object itself. The "stage" methods also allows to read the
-/// staged values. Once the value of all the variable-size DataPiece objects are staged, the staged
-/// values can be collected in a buffer, the varData_ byte vector. To interpret a variable size
-/// buffer read from disk, we need an index, to know where each piece starts, and their size.
-/// That's the variable size index. The size of that index is known ahead of time, since there is
-/// one index entry per variable-size DataPiece, and we know up-front how many we have.
-/// The index is stored in the fixedData_ vector, after the data of fixed-size DataPiece values.
-/// The values of the index are set when the variable size data is collected.
-/// When reading the value of a variable-size DataPiece, the varData_ buffer is used, if present.
+/// value in a field of the DataPiece object itself. The "stage" methods also allow to read staged
+/// values. Once all the variable-size DataPiece objects are staged, the staged values can be
+/// collected in a buffer, the varData_ byte vector. To interpret a variable size buffer read from
+/// disk, we need an index, to know where each piece starts, and their size. That's the variable
+/// size index. The size of that index is known ahead of time, because there is one index entry per
+/// variable-size DataPiece, and we know up-front how many we have. The index is stored at the end
+/// of fixedData_ buffer. The values of the index are set when the variable size data is collected.
 ///
-/// To write a DataLayout section, the 3 following operations are needed:
-///  1. collect the variable-size DataPiece values. That operations allocates the varData_ buffer,
-///    and updates the var data index in the fixedData_ buffer.
-///  2. write the fixedData_ buffer.
-///  3. write the varData_ buffer.
+/// When reading a DataLayout from disk, the fixedData_ buffer is read first with one IO, since we
+/// can predict its size. This data contains the variable-size data index, so we can tell how large
+/// the varData_ buffer is, and we can read it all in a second IO.
+/// When reading variable-size DataPiece values, and the varData_ buffer and its index are used.
 ///
-/// Therefore, to read & write the data of a DataLayout from & to disk, there is no encoding of the
-/// data, unlike with json, which guaranties the bit accuracy of your data.
-/// That can be critically important when using float & double numbers.
+/// To write a DataLayout content block, the 3 following operations are needed:
+///  1. Collect the variable-size DataPiece values. That operations allocates the varData_ buffer,
+///     and updates the var data index in the fixedData_ buffer.
+///  2. Write the fixedData_ buffer.
+///  3. Write the varData_ buffer.
+///
+/// In practice, when creating a record, no varData_ buffer is actually used, because we can copy
+/// the staged data directly in the record's memory buffer when it's created:
+///  1. We update the var data index in the fixedData_ buffer, by iterating over the variable-size
+///     data pieces. So we now know the size required for variable-size data, and the whole
+///     DataLayout.
+///  2. The record's uncompressed size can be computed and a buffer allocated for the whole record.
+///  2. We copy the fixedData_ buffer in the record's buffer in one memcopy operation.
+///  3. We iterate over the variable-size data pieces, and append their data in the record's buffer.
+///  4. The DataLayout's data has been fully captured, and it can be modified for the next record
+///     without concern. The record can be compressed later in a separate thread asynchronously, if
+///     appropriate, then written to disk in a single IO.
+///
+/// Therefore, to read & write a DataLayout's data very efficiently from & to disk. The data is
+/// memory copied without any encoding in a binary buffer without any padding, which guaranties its
+/// tightness and bit accuracy, which can be critically important when using float & double numbers.
+/// Records can then be compressed as a whole, with the appropriate speed/compactness trade off.
 ///
 /// Of course, all of this is the responsibility of VRS itself.
+///
 class DataLayout {
  protected:
   DataLayout() = default;
