@@ -963,7 +963,7 @@ ostream& operator<<(ostream& os, const MatrixND<T, N>& matrix) {
 /// @param object: a reference to that object (the value might be needed for non-POD types).
 /// @return Number of bytes needed.
 template <class T>
-size_t elementSize(const T&) {
+inline size_t elementSize(const T&) {
   return sizeof(T);
 }
 
@@ -971,7 +971,7 @@ size_t elementSize(const T&) {
 // Not using 0 as terminator, as if a string has been manually created with an internal 0,
 // this would break the ability to read the data (and possibly crash the code).
 template <>
-size_t elementSize<string>(const string& s) {
+inline size_t elementSize<string>(const string& s) {
   return sizeof(uint32_t) + s.size(); // size as uint32_t + string bytes
 }
 
@@ -1629,10 +1629,17 @@ bool DataPieceStringMap<T>::get(map<string, T>& outValues) const {
           loadElement<T>(value, ptr, readSize, dataSize)) {
         outValues[key] = value;
       } else {
+        // some reading error occurred: stop reading...
+        if (pieceIndex_ != DataLayout::kNotFound) {
+          return true;
+        }
         outValues = defaultValues_;
-        return false; // some reading error occurred: stop reading & use default value.
+        return false;
       }
     }
+    return true;
+  }
+  if (pieceIndex_ != DataLayout::kNotFound) {
     return true;
   }
   outValues = defaultValues_;

@@ -114,6 +114,10 @@ class DataPieceVector : public DataPiece {
       memcpy(outValues.data(), ptr, count * sizeof(T));
       return true;
     }
+    if (pieceIndex_ != DataLayout::kNotFound) {
+      outValues.clear();
+      return true;
+    }
     outValues = defaultValues_;
     return false;
   }

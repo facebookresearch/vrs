@@ -851,10 +851,10 @@ TEST_F(DataLayoutTester, testStaging) {
   EXPECT_TRUE(layout.name_.get(name));
   EXPECT_TRUE(name.empty());
   vector<int32_t> ints, expectedInts;
-  EXPECT_FALSE(layout.ints_.get(ints));
+  EXPECT_TRUE(layout.ints_.get(ints));
   EXPECT_EQ(ints, expectedInts);
   map<string, string> stringMap, stringMapExpected;
-  EXPECT_FALSE(layout.mapString_.get(stringMap));
+  EXPECT_TRUE(layout.mapString_.get(stringMap));
   EXPECT_EQ(stringMap, stringMapExpected);
 
   // stage values, collect them, verify reads
@@ -1131,6 +1131,10 @@ TEST_F(DataLayoutTester, getTest) {
       arrayZero.set({});
       stringSet.stage("string_set");
       stringEmpty.stage("");
+      vectorSet.stage({1, 2, 3});
+      vectorEmpty.stage({});
+      mapSet.stage({{"key1", 1}, {"key2", 2}});
+      mapEmpty.stage({});
       collectVariableDataAndUpdateIndex();
     }
 
@@ -1143,6 +1147,12 @@ TEST_F(DataLayoutTester, getTest) {
     DataPieceString stringUnset{"string_unset", "1"};
     DataPieceString stringSet{"string_set", "1"};
     DataPieceString stringEmpty{"string_empty", "1"};
+    DataPieceVector<int32_t> vectorUnset{"vector_unset", {1}};
+    DataPieceVector<int32_t> vectorSet{"vector_set", {1}};
+    DataPieceVector<int32_t> vectorEmpty{"vector_empty", {1}};
+    DataPieceStringMap<int32_t> mapUnset{"map_unset", {{"default", 1}}};
+    DataPieceStringMap<int32_t> mapSet{"map_set", {{"default", 1}}};
+    DataPieceStringMap<int32_t> mapEmpty{"map_empty", {{"default", 1}}};
 
     AutoDataLayoutEnd end;
   };
@@ -1160,6 +1170,14 @@ TEST_F(DataLayoutTester, getTest) {
     DataPieceString stringSet{"string_set", "1"};
     DataPieceString stringEmpty{"string_empty", "1"};
     DataPieceString stringUnmapped{"string_unmapped", "1"};
+    DataPieceVector<int32_t> vectorUnset{"vector_unset", {1}};
+    DataPieceVector<int32_t> vectorSet{"vector_set", {1}};
+    DataPieceVector<int32_t> vectorEmpty{"vector_empty", {1}};
+    DataPieceVector<int32_t> vectorUnmapped{"vector_unmapped", {1}};
+    DataPieceStringMap<int32_t> mapUnset{"map_unset", {{"default", 1}}};
+    DataPieceStringMap<int32_t> mapSet{"map_set", {{"default", 1}}};
+    DataPieceStringMap<int32_t> mapEmpty{"map_empty", {{"default", 1}}};
+    DataPieceStringMap<int32_t> mapUnmapped{"map_unmapped", {{"default", 1}}};
 
     AutoDataLayoutEnd end;
   };
@@ -1221,4 +1239,42 @@ TEST_F(DataLayoutTester, getTest) {
   EXPECT_EQ(s, "");
   EXPECT_FALSE(targetLayout.stringUnmapped.get(s));
   EXPECT_EQ(s, "1");
+
+  vector<int32_t> v;
+  EXPECT_TRUE(sourceLayout.vectorUnset.get(v));
+  EXPECT_EQ(v, vector<int32_t>{});
+  EXPECT_TRUE(sourceLayout.vectorSet.get(v));
+  EXPECT_EQ(v, (vector<int32_t>{1, 2, 3}));
+  EXPECT_TRUE(sourceLayout.vectorEmpty.get(v));
+  EXPECT_EQ(v, vector<int32_t>{});
+
+  EXPECT_TRUE(targetLayout.vectorUnset.get(v));
+  EXPECT_EQ(v, vector<int32_t>{});
+  EXPECT_TRUE(targetLayout.vectorSet.get(v));
+  EXPECT_EQ(v, (vector<int32_t>{1, 2, 3}));
+  EXPECT_TRUE(targetLayout.vectorEmpty.get(v));
+  EXPECT_EQ(v, vector<int32_t>{});
+  EXPECT_FALSE(targetLayout.vectorUnmapped.get(v));
+  EXPECT_EQ(v, vector<int32_t>{1});
+
+  map<string, int32_t> m;
+  map<string, int32_t> emptyMap;
+  map<string, int32_t> setMap{{"key1", 1}, {"key2", 2}};
+  map<string, int32_t> defaultMap{{"default", 1}};
+
+  EXPECT_TRUE(sourceLayout.mapUnset.get(m));
+  EXPECT_EQ(m, emptyMap);
+  EXPECT_TRUE(sourceLayout.mapSet.get(m));
+  EXPECT_EQ(m, setMap);
+  EXPECT_TRUE(sourceLayout.mapEmpty.get(m));
+  EXPECT_EQ(m, emptyMap);
+
+  EXPECT_TRUE(targetLayout.mapUnset.get(m));
+  EXPECT_EQ(m, emptyMap);
+  EXPECT_TRUE(targetLayout.mapSet.get(m));
+  EXPECT_EQ(m, setMap);
+  EXPECT_TRUE(targetLayout.mapEmpty.get(m));
+  EXPECT_EQ(m, emptyMap);
+  EXPECT_FALSE(targetLayout.mapUnmapped.get(m));
+  EXPECT_EQ(m, defaultMap);
 }
