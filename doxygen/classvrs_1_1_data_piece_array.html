@@ -131,8 +131,6 @@ size_t&#160;</td><td class="memItemRight" valign="bottom"><b>getArraySize</b> ()
 <tr class="separator:a6cb7a8376d65a3a105c3866c14614a7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa14c81e9725d9034681f3d6ceae04680" id="r_aa14c81e9725d9034681f3d6ceae04680"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece_array.html#aa14c81e9725d9034681f3d6ceae04680">set</a> (const vector&lt; T &gt; &amp;values)</td></tr>
 <tr class="separator:aa14c81e9725d9034681f3d6ceae04680"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a10cbaf74b00104c669f2c6bfc24d9525" id="r_a10cbaf74b00104c669f2c6bfc24d9525"><td class="memItemLeft" align="right" valign="top">const vector&lt; T &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece_array.html#a10cbaf74b00104c669f2c6bfc24d9525">getDefault</a> () const</td></tr>
-<tr class="separator:a10cbaf74b00104c669f2c6bfc24d9525"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:accc90a131b4c622ece6b99e56401138f" id="r_accc90a131b4c622ece6b99e56401138f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece_array.html#accc90a131b4c622ece6b99e56401138f">setDefault</a> (const T *defaultValues, size_t count)</td></tr>
 <tr class="separator:accc90a131b4c622ece6b99e56401138f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa4f2cb97c83f5511dd60a022947b351e" id="r_aa4f2cb97c83f5511dd60a022947b351e"><td class="memTemplParams" colspan="2">template&lt;size_t n&gt; </td></tr>
@@ -140,6 +138,8 @@ size_t&#160;</td><td class="memItemRight" valign="bottom"><b>getArraySize</b> ()
 <tr class="separator:aa4f2cb97c83f5511dd60a022947b351e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abf8017e179c43570e7fce3226daaa672" id="r_abf8017e179c43570e7fce3226daaa672"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece_array.html#abf8017e179c43570e7fce3226daaa672">setDefault</a> (const vector&lt; T &gt; &amp;values)</td></tr>
 <tr class="separator:abf8017e179c43570e7fce3226daaa672"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10cbaf74b00104c669f2c6bfc24d9525" id="r_a10cbaf74b00104c669f2c6bfc24d9525"><td class="memItemLeft" align="right" valign="top">const vector&lt; T &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece_array.html#a10cbaf74b00104c669f2c6bfc24d9525">getDefault</a> () const</td></tr>
+<tr class="separator:a10cbaf74b00104c669f2c6bfc24d9525"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5ac2403e46a24b4495ef285a4cdf3b53" id="r_a5ac2403e46a24b4495ef285a4cdf3b53"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece_array.html#a5ac2403e46a24b4495ef285a4cdf3b53">initToDefault</a> () override</td></tr>
 <tr class="memdesc:a5ac2403e46a24b4495ef285a4cdf3b53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize to default value.  <br /></td></tr>
 <tr class="separator:a5ac2403e46a24b4495ef285a4cdf3b53"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -673,7 +673,7 @@ template&lt;typename T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Get the array's default values. </p><dl class="section return"><dt>Returns</dt><dd>Default values. The vector is empty if no default values were set. </dd></dl>
+<p>Get the default value returned by <a class="el" href="classvrs_1_1_data_piece_array.html#a226f9e5c8f4d5184dd1992c2bb09afb6">get()</a> when the <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> is not mapped. </p><dl class="section return"><dt>Returns</dt><dd>Default values. The vector is empty if no default values were set. </dd></dl>
 
 </div>
 </div>
@@ -1330,7 +1330,7 @@ template&lt;typename T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set the array's default values. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Specify a default value returned by <a class="el" href="classvrs_1_1_data_piece_array.html#a226f9e5c8f4d5184dd1992c2bb09afb6">get()</a> when the <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> is not mapped. This value is not automatically used as an initialization value for the <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a>. Use <a class="el" href="classvrs_1_1_data_piece_array.html#a5ac2403e46a24b4495ef285a4cdf3b53" title="Initialize to default value.">initToDefault()</a> or <a class="el" href="classvrs_1_1_data_layout.html#a561f1f664ed47811b3e2198cb5fffa12">DataLayout::initDataPiecesToDefaultValue()</a> for that. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">defaultValues</td><td>Pointer to the first default value. </td></tr>
     <tr><td class="paramname">count</td><td>Number of default values to use. Note: if fewer default values are passed that the size of the array, T's default constructor is used to have the exact count of default values. </td></tr>
@@ -1367,7 +1367,7 @@ template&lt;size_t n&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set the array's default values. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Specify a default value returned by <a class="el" href="classvrs_1_1_data_piece_array.html#a226f9e5c8f4d5184dd1992c2bb09afb6">get()</a> when the <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> is not mapped. This value is not automatically used as an initialization value for the <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a>. Use <a class="el" href="classvrs_1_1_data_piece_array.html#a5ac2403e46a24b4495ef285a4cdf3b53" title="Initialize to default value.">initToDefault()</a> or <a class="el" href="classvrs_1_1_data_layout.html#a561f1f664ed47811b3e2198cb5fffa12">DataLayout::initDataPiecesToDefaultValue()</a> for that. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">arr</td><td>C-style array ot default values. Note: if fewer default values are passed that the size of the array, T's default constructor is used to have the exact count of default values. </td></tr>
   </table>
@@ -1401,7 +1401,7 @@ template&lt;typename T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set the array's default values. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Specify a default value returned by <a class="el" href="classvrs_1_1_data_piece_array.html#a226f9e5c8f4d5184dd1992c2bb09afb6">get()</a> when the <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> is not mapped. This value is not automatically used as an initialization value for the <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a>. Use <a class="el" href="classvrs_1_1_data_piece_array.html#a5ac2403e46a24b4495ef285a4cdf3b53" title="Initialize to default value.">initToDefault()</a> or <a class="el" href="classvrs_1_1_data_layout.html#a561f1f664ed47811b3e2198cb5fffa12">DataLayout::initDataPiecesToDefaultValue()</a> for that. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">defaultValues</td><td>Vector of default values. Note: if fewer default values are passed that the size of the array, T's default constructor is used to have the exact count of default values. </td></tr>
   </table>

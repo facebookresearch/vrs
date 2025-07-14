@@ -118,10 +118,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a24223fdf787310d66b048b9a8e18bb5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6095abecff20ff8fa0bfaff82aff85e7" id="r_a6095abecff20ff8fa0bfaff82aff85e7"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece_value.html#a6095abecff20ff8fa0bfaff82aff85e7">set</a> (const T &amp;value)</td></tr>
 <tr class="separator:a6095abecff20ff8fa0bfaff82aff85e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:add03fb3fd3a96f35ae07a924bf6a7641" id="r_add03fb3fd3a96f35ae07a924bf6a7641"><td class="memItemLeft" align="right" valign="top">const T &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece_value.html#add03fb3fd3a96f35ae07a924bf6a7641">getDefault</a> () const</td></tr>
-<tr class="separator:add03fb3fd3a96f35ae07a924bf6a7641"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aab45018a15b21341f0c75260d09d35ff" id="r_aab45018a15b21341f0c75260d09d35ff"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece_value.html#aab45018a15b21341f0c75260d09d35ff">setDefault</a> (const T &amp;defaultValue)</td></tr>
 <tr class="separator:aab45018a15b21341f0c75260d09d35ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add03fb3fd3a96f35ae07a924bf6a7641" id="r_add03fb3fd3a96f35ae07a924bf6a7641"><td class="memItemLeft" align="right" valign="top">const T &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece_value.html#add03fb3fd3a96f35ae07a924bf6a7641">getDefault</a> () const</td></tr>
+<tr class="separator:add03fb3fd3a96f35ae07a924bf6a7641"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeeb87b3da4b8a9904bfd9e4a4199774a" id="r_aeeb87b3da4b8a9904bfd9e4a4199774a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece_value.html#aeeb87b3da4b8a9904bfd9e4a4199774a">initToDefault</a> () override</td></tr>
 <tr class="memdesc:aeeb87b3da4b8a9904bfd9e4a4199774a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize to default value.  <br /></td></tr>
 <tr class="separator:aeeb87b3da4b8a9904bfd9e4a4199774a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -546,7 +546,7 @@ template&lt;typename T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Get default value. </p><dl class="section return"><dt>Returns</dt><dd>Default value, or default value for type T. </dd></dl>
+<p>Get the default value returned by <a class="el" href="classvrs_1_1_data_piece_value.html#a75aba7aba332bf8d73d4a5fc9dad7b2e">get()</a> when the <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> is not mapped. </p><dl class="section return"><dt>Returns</dt><dd>Default value, or default value for type T. </dd></dl>
 
 </div>
 </div>
@@ -1124,7 +1124,7 @@ template&lt;typename T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set default value. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Specify a default value returned by <a class="el" href="classvrs_1_1_data_piece_value.html#a75aba7aba332bf8d73d4a5fc9dad7b2e">get()</a> when the <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> is not mapped. This value is not automatically used as an initialization value for the <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a>. Use <a class="el" href="classvrs_1_1_data_piece_value.html#aeeb87b3da4b8a9904bfd9e4a4199774a" title="Initialize to default value.">initToDefault()</a> or <a class="el" href="classvrs_1_1_data_layout.html#a561f1f664ed47811b3e2198cb5fffa12">DataLayout::initDataPiecesToDefaultValue()</a> for that. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">defaultValue</td><td>Value to use as default. </td></tr>
   </table>

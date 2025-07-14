@@ -119,14 +119,14 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a0b9220ad7bb34485f6af6af7ad4a0f76"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad5994833376375daf51776a2872e58b1" id="r_ad5994833376375daf51776a2872e58b1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece_string_map.html#ad5994833376375daf51776a2872e58b1">get</a> (map&lt; string, T &gt; &amp;outValues) const</td></tr>
 <tr class="separator:ad5994833376375daf51776a2872e58b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af48f2c9fd1528416b815abfce5bc78a2" id="r_af48f2c9fd1528416b815abfce5bc78a2"><td class="memItemLeft" align="right" valign="top">const map&lt; string, T &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece_string_map.html#af48f2c9fd1528416b815abfce5bc78a2">getDefault</a> () const</td></tr>
-<tr class="separator:af48f2c9fd1528416b815abfce5bc78a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af8481724dce6971bb7ef5393520efc61" id="r_af8481724dce6971bb7ef5393520efc61"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece_string_map.html#af8481724dce6971bb7ef5393520efc61">setDefault</a> (const map&lt; string, T &gt; &amp;values)</td></tr>
 <tr class="separator:af8481724dce6971bb7ef5393520efc61"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a04656470d176f7784077f4d4c23539e1" id="r_a04656470d176f7784077f4d4c23539e1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece_string_map.html#a04656470d176f7784077f4d4c23539e1">setDefault</a> (map&lt; string, T &gt; &amp;&amp;values)</td></tr>
 <tr class="separator:a04656470d176f7784077f4d4c23539e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af48f2c9fd1528416b815abfce5bc78a2" id="r_af48f2c9fd1528416b815abfce5bc78a2"><td class="memItemLeft" align="right" valign="top">const map&lt; string, T &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece_string_map.html#af48f2c9fd1528416b815abfce5bc78a2">getDefault</a> () const</td></tr>
+<tr class="separator:af48f2c9fd1528416b815abfce5bc78a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a05210106f08708f7e4145d32e5ffaf1d" id="r_a05210106f08708f7e4145d32e5ffaf1d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece_string_map.html#a05210106f08708f7e4145d32e5ffaf1d">initToDefault</a> () override</td></tr>
-<tr class="memdesc:a05210106f08708f7e4145d32e5ffaf1d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize to default value.  <br /></td></tr>
+<tr class="memdesc:a05210106f08708f7e4145d32e5ffaf1d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stage default value.  <br /></td></tr>
 <tr class="separator:a05210106f08708f7e4145d32e5ffaf1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3619020992fb2a72212f0000a8863301" id="r_a3619020992fb2a72212f0000a8863301"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_piece_string_map.html#a3619020992fb2a72212f0000a8863301">patchValue</a> (const map&lt; string, T &gt; &amp;values) const</td></tr>
 <tr class="separator:a3619020992fb2a72212f0000a8863301"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -498,7 +498,7 @@ template&lt;typename T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Get the default value. </p><dl class="section return"><dt>Returns</dt><dd>Default values. The vector might be empty if there are no defaults set. </dd></dl>
+<p>Get the default value returned by <a class="el" href="classvrs_1_1_data_piece_string_map.html#ad5994833376375daf51776a2872e58b1">get()</a> when the <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> is not mapped. </p><dl class="section return"><dt>Returns</dt><dd>Default values. The vector might be empty if there are no defaults set. </dd></dl>
 
 </div>
 </div>
@@ -587,7 +587,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Initialize to default value. </p>
+<p>Stage default value. </p>
 
 <p>Implements <a class="el" href="classvrs_1_1_data_piece.html#a7179aa3209e5307b77111f89238d3515">vrs::DataPiece</a>.</p>
 
@@ -900,7 +900,7 @@ template&lt;typename T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set default values using a vector. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Specify a default value returned by <a class="el" href="classvrs_1_1_data_piece_string_map.html#ad5994833376375daf51776a2872e58b1">get()</a> when the <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> is not mapped. This value is not automatically used as an initialization value for the <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a>. Use <a class="el" href="classvrs_1_1_data_piece_string_map.html#a05210106f08708f7e4145d32e5ffaf1d" title="Stage default value.">initToDefault()</a> or <a class="el" href="classvrs_1_1_data_layout.html#a561f1f664ed47811b3e2198cb5fffa12">DataLayout::initDataPiecesToDefaultValue()</a> for that. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">values</td><td>Vector of values to use a default. </td></tr>
   </table>
@@ -934,7 +934,7 @@ template&lt;typename T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set default values using a vector. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Specify a default value returned by <a class="el" href="classvrs_1_1_data_piece_string_map.html#ad5994833376375daf51776a2872e58b1">get()</a> when the <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> is not mapped. This value is not automatically used as an initialization value for the <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a>. Use <a class="el" href="classvrs_1_1_data_piece_string_map.html#a05210106f08708f7e4145d32e5ffaf1d" title="Stage default value.">initToDefault()</a> or <a class="el" href="classvrs_1_1_data_layout.html#a561f1f664ed47811b3e2198cb5fffa12">DataLayout::initDataPiecesToDefaultValue()</a> for that. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">values</td><td>Vector of values to use a default. </td></tr>
   </table>
