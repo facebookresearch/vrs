@@ -107,7 +107,7 @@ class RecordableDemo : public Recordable {
 
  public:
   // declare your device's unique id in RecordableTypeId.h
-  RecordableDemo() : Recordable(RecordableTypeId::SampleDeviceRecordableClass, kSampleFlavor) {
+  RecordableDemo() : Recordable(RecordableTypeId::ImageStream, kSampleFlavor) {
     // define your RecordFormat & DataLayout definitions for this stream
     addRecordFormat(
         Record::Type::DATA, // the type of records this definition applies to
@@ -257,7 +257,7 @@ class PlaybackSample {
       // When dealing with stream that have a recordable flavor defined,
       // rather than iterating over all the streams of the VRS file, just find the one(s) we need...
       StreamId sampleDevice =
-          reader.getStreamForFlavor(RecordableTypeId::SampleDeviceRecordableClass, kSampleFlavor);
+          reader.getStreamForFlavor(RecordableTypeId::ImageStream, kSampleFlavor);
       if (sampleDevice.isValid()) {
         // The RecordFilePlayer does *not* take ownership of the stream player,
         // which allows for the same StreamPlayer object to be used for different recordables.
@@ -271,7 +271,7 @@ class PlaybackSample {
       // and hookup the ones you recognize & care for...
       const set<StreamId>& streamIds = reader.getStreams();
       for (auto id : streamIds) {
-        if (id.getTypeId() == RecordableTypeId::SampleDeviceRecordableClass) {
+        if (id.getTypeId() == RecordableTypeId::ImageStream) {
           // The RecordFilePlayer does *not* take ownership of the stream player,
           // which allows for the same StreamPlayer object to be used for different recordables.
           // The caller of setRecordablePlayer is responsible for deleting the StreamPlayer.
