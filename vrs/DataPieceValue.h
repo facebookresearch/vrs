@@ -96,16 +96,18 @@ class DataPieceValue : public DataPiece {
     return false;
   }
 
-  /// Get default value.
-  /// @return Default value, or default value for type T.
-  inline const T& getDefault() const {
-    return defaultValue_;
-  }
-
-  /// Set default value.
+  /// Specify a default value returned by get() when the DataPiece is not mapped.
+  /// This value is not automatically used as an initialization value for the DataPiece.
+  /// Use initToDefault() or DataLayout::initDataPiecesToDefaultValue() for that.
   /// @param defaultValue: Value to use as default.
   void setDefault(const T& defaultValue) {
     defaultValue_ = defaultValue;
+  }
+
+  /// Get the default value returned by get() when the DataPiece is not mapped.
+  /// @return Default value, or default value for type T.
+  inline const T& getDefault() const {
+    return defaultValue_;
   }
 
   /// Initialize to default value.
@@ -291,8 +293,8 @@ class DataPieceEnum : public DataPieceValue<StorageType> {
       : DataPieceValue<StorageType>(label, static_cast<StorageType>(defaultValue)) {}
 
   /// Get the value in enum form.
-  /// If the value isn't available, returns the default value.
   /// @return The value as an enum.
+  /// If the DataPiece isn't mapped, returns the default value.
   EnumType get() const {
     return static_cast<EnumType>(DataPieceValue<StorageType>::get());
   }
@@ -300,7 +302,7 @@ class DataPieceEnum : public DataPieceValue<StorageType> {
   /// Get the value in enum form, with test for availability.
   /// @param e: A reference to the enum to get.
   /// @return True if the value was set.
-  /// If the value wasn't available, returns false.
+  /// If the DataPiece isn't mapped, returns false.
   bool get(EnumType& e) const {
     StorageType v{};
     bool r = DataPieceValue<StorageType>::get(v);
@@ -315,13 +317,20 @@ class DataPieceEnum : public DataPieceValue<StorageType> {
     return DataPieceValue<StorageType>::set(static_cast<StorageType>(e));
   }
 
-  /// Get default value.
+  /// Specify a default value returned by get() when the DataPiece is not mapped.
+  /// This value is not automatically used as an initialization value for the DataPiece.
+  /// @param defaultValue: Value to use as default.
+  void setDefault(const EnumType defaultValue) {
+    DataPieceValue<StorageType>::setDefault(static_cast<StorageType>(defaultValue));
+  }
+
+  /// Get the default value returned by get() when the DataPiece is not mapped.
   /// @return Default value if one was specified, or default value for the enum.
   EnumType getDefault() const {
     return static_cast<EnumType>(DataPieceValue<StorageType>::getDefault());
   }
 
-  /// Get default value.
+  /// Get the default value returned by get() when the DataPiece is not mapped.
   /// @param reference: Reference to the variable to set.
   /// @return True if the value was set to an explicitly specified default value.
   bool getDefault(EnumType& outDefault) const {
@@ -329,12 +338,6 @@ class DataPieceEnum : public DataPieceValue<StorageType> {
     bool r = DataPieceValue<StorageType>::getDefault(v);
     outDefault = static_cast<EnumType>(v);
     return r;
-  }
-
-  /// Explicitly specify a default value.
-  /// @param defaultValue: Value to use as default.
-  void setDefault(const EnumType defaultValue) {
-    DataPieceValue<StorageType>::setDefault(static_cast<StorageType>(defaultValue));
   }
 };
 

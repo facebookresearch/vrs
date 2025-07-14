@@ -89,20 +89,25 @@ class DataPieceString : public DataPiece {
   /// @return True, if the value returned was read from the field or a mapped field.
   bool get(string& outString) const;
 
-  /// Get the default string, if one was was set.
-  const string& getDefault() const {
-    return defaultString_;
-  }
-  /// Set the default string, in case the DataLayout is mapped, but this DataPiece was not mapped.
+  /// Specify a default value returned by get() when the DataPiece is not mapped.
+  /// This value is not automatically used as an initialization value for the DataPiece.
+  /// Use initToDefault() or DataLayout::initDataPiecesToDefaultValue() for that.
   void setDefault(const string& defaultString) {
     defaultString_ = defaultString;
   }
-  /// Set the default string, in case the DataLayout is mapped, but this DataPiece was not mapped.
+  /// Specify a default value returned by get() when the DataPiece is not mapped.
+  /// This value is not automatically used as an initialization value for the DataPiece.
+  /// Use initToDefault() or DataLayout::initDataPiecesToDefaultValue() for that.
   void setDefault(string&& defaultString) {
     defaultString_ = std::move(defaultString);
   }
+  /// Get the default value returned by get() when the DataPiece is not mapped.
+  /// @return Default value, or default value for type T.
+  const string& getDefault() const {
+    return defaultString_;
+  }
 
-  /// Initialize to default value.
+  /// Stage default value.
   void initToDefault() override {
     stagedString_ = defaultString_;
   }

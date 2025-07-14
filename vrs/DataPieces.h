@@ -204,7 +204,11 @@ class DataPiece {
   virtual bool stageCurrentValue() {
     return isAvailable();
   }
+
   /// Initialize (set or stage) the DataPiece to its default value.
+  /// Default values are returned by get() when a DataPiece is not mapped,
+  /// but they are not automatic initialization values for DataPieceXXX objects.
+  /// Use initToDefault() or DataLayout::initDataPiecesToDefaultValue() for that.
   virtual void initToDefault() = 0;
   /// Create a new DataPiece of the same type, with the same label.
   virtual unique_ptr<DataPiece> clone() const = 0;

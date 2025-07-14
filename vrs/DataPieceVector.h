@@ -122,12 +122,9 @@ class DataPieceVector : public DataPiece {
     return false;
   }
 
-  /// Get the default value.
-  /// @return Default values. The vector might be empty if there are no defaults set.
-  const vector<T>& getDefault() const {
-    return defaultValues_;
-  }
-  /// Set the default values.
+  /// Specify a default value returned by get() when the DataPiece is not mapped.
+  /// This value is not automatically used as an initialization value for the DataPiece.
+  /// Use initToDefault() or DataLayout::initDataPiecesToDefaultValue() for that.
   /// @param defaultValues: Pointer to the default values.
   /// @param count: Number of default values.
   void setDefault(const T* defaultValues, size_t count) {
@@ -136,24 +133,34 @@ class DataPieceVector : public DataPiece {
       memcpy(defaultValues_.data(), defaultValues, count * sizeof(T));
     }
   }
-  /// Set the default values using a C-style fixed size array.
+  /// Specify a default value returned by get() when the DataPiece is not mapped.
+  /// This value is not automatically used as an initialization value for the DataPiece.
+  /// Use initToDefault() or DataLayout::initDataPiecesToDefaultValue() for that.
   /// @param arr: C-style fixed size array of default values.
   template <size_t n>
   void setDefault(const T (&arr)[n]) {
     setDefault(arr, n);
   }
-  /// Set default values using a vector.
+  /// Specify a default value returned by get() when the DataPiece is not mapped.
+  /// This value is not automatically used as an initialization value for the DataPiece.
+  /// Use initToDefault() or DataLayout::initDataPiecesToDefaultValue() for that.
   /// @param values: Vector of values to use a default.
   void setDefault(const vector<T>& values) {
     defaultValues_ = values;
   }
-  /// Set default values using a vector.
+  /// Specify a default value returned by get() when the DataPiece is not mapped.
+  /// This value is not automatically used as an initialization value for the DataPiece.
+  /// Use initToDefault() or DataLayout::initDataPiecesToDefaultValue() for that.
   /// @param values: Vector of values to use a default.
   void setDefault(vector<T>&& values) {
     defaultValues_ = std::move(values);
   }
-
-  /// Initialize to default value.
+  /// Get the default value returned by get() when the DataPiece is not mapped.
+  /// @return Default values. The vector might be empty if there are no defaults set.
+  const vector<T>& getDefault() const {
+    return defaultValues_;
+  }
+  /// Stage default value.
   void initToDefault() override {
     stagedValues_ = defaultValues_;
   }

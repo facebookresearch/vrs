@@ -84,23 +84,26 @@ class DataPieceStringMap : public DataPiece {
   /// @return True if outValues was set from read values (maybe mapped), not default values.
   bool get(map<string, T>& outValues) const;
 
-  /// Get the default value.
-  /// @return Default values. The vector might be empty if there are no defaults set.
-  const map<string, T>& getDefault() const {
-    return defaultValues_;
-  }
-  /// Set default values using a vector.
+  /// Specify a default value returned by get() when the DataPiece is not mapped.
+  /// This value is not automatically used as an initialization value for the DataPiece.
+  /// Use initToDefault() or DataLayout::initDataPiecesToDefaultValue() for that.
   /// @param values: Vector of values to use a default.
   void setDefault(const map<string, T>& values) {
     defaultValues_ = values;
   }
-  /// Set default values using a vector.
+  /// Specify a default value returned by get() when the DataPiece is not mapped.
+  /// This value is not automatically used as an initialization value for the DataPiece.
+  /// Use initToDefault() or DataLayout::initDataPiecesToDefaultValue() for that.
   /// @param values: Vector of values to use a default.
   void setDefault(map<string, T>&& values) {
     defaultValues_ = std::move(values);
   }
-
-  /// Initialize to default value.
+  /// Get the default value returned by get() when the DataPiece is not mapped.
+  /// @return Default values. The vector might be empty if there are no defaults set.
+  const map<string, T>& getDefault() const {
+    return defaultValues_;
+  }
+  /// Stage default value.
   void initToDefault() override {
     stagedValues_ = defaultValues_;
   }

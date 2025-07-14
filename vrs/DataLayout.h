@@ -266,11 +266,11 @@ class DataLayout {
     return fixedDataSizeNeeded_;
   }
 
-  /// Set or stage all the DataPieces to their default value.
-  /// Attention! DataPieces are NOT automatically set or staged to default values when a DataLayout
-  /// instance is created! Default values primary usage is to provide a value when trying to get a
-  /// value from an unmapped DataPiece object. However, with this method, you can also initialize
-  /// all the DataPieces of a DataLayout explicitly.
+  /// Set or stage all the DataPieces to their custom default value.
+  /// Default values provide a custom value to return when retrieving the value of an unmapped
+  /// DataPiece value with get(). Default values are not automatic DataPiece initialization values.
+  /// When a DataLayout instance is created, DataPiece values are initialized to the default for
+  /// their type, NOT to possibly provided custom default values!
   void initDataPiecesToDefaultValue();
 
   /// Retrieve size of the var size pieces *from the index*.

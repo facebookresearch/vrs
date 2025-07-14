@@ -194,13 +194,9 @@ class DataPieceArray : public DataPiece {
     return values.empty() ? set(nullptr, 0) : set(values.data(), values.size());
   }
 
-  /// Get the array's default values.
-  /// @return Default values. The vector is empty if no default values were set.
-  const vector<T>& getDefault() const {
-    return defaultValues_;
-  }
-
-  /// Set the array's default values.
+  /// Specify a default value returned by get() when the DataPiece is not mapped.
+  /// This value is not automatically used as an initialization value for the DataPiece.
+  /// Use initToDefault() or DataLayout::initDataPiecesToDefaultValue() for that.
   /// @param defaultValues: Pointer to the first default value.
   /// @param count: Number of default values to use.
   /// Note: if fewer default values are passed that the size of the array,
@@ -215,7 +211,9 @@ class DataPieceArray : public DataPiece {
       defaultValues_[count] = T{};
     }
   }
-  /// Set the array's default values.
+  /// Specify a default value returned by get() when the DataPiece is not mapped.
+  /// This value is not automatically used as an initialization value for the DataPiece.
+  /// Use initToDefault() or DataLayout::initDataPiecesToDefaultValue() for that.
   /// @param arr: C-style array ot default values.
   /// Note: if fewer default values are passed that the size of the array,
   /// T's default constructor is used to have the exact count of default values.
@@ -223,14 +221,20 @@ class DataPieceArray : public DataPiece {
   void setDefault(const T (&arr)[n]) {
     setDefault(arr, n);
   }
-  /// Set the array's default values.
+  /// Specify a default value returned by get() when the DataPiece is not mapped.
+  /// This value is not automatically used as an initialization value for the DataPiece.
+  /// Use initToDefault() or DataLayout::initDataPiecesToDefaultValue() for that.
   /// @param defaultValues: Vector of default values.
   /// Note: if fewer default values are passed that the size of the array,
   /// T's default constructor is used to have the exact count of default values.
   void setDefault(const vector<T>& values) {
     setDefault(values.data(), values.size());
   }
-
+  /// Get the default value returned by get() when the DataPiece is not mapped.
+  /// @return Default values. The vector is empty if no default values were set.
+  const vector<T>& getDefault() const {
+    return defaultValues_;
+  }
   /// Initialize to default value.
   void initToDefault() override {
     set(defaultValues_);
