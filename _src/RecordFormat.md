@@ -9,9 +9,9 @@ import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
 
 Each record in a stream has its own format version number, which is a `uint32_t` value. However, because records belong to a single stream and each has a record type (Configuration, State, or Data), format version numbers are only meaningful within that stream and for that record type. You do not need to worry about format version collisions between streams and record types.
 
-Before `RecordFormat` was available, record format versioning was critical, because it was the only information about how the record's data was formatted. You were responsible for interpreting every byte of data. You also had to manually manage all data format changes. Since record data formats were not self-described within the file, each time you needed to add, remove, or change a field, you had to change the format version, and handle a growing number of format versions explicitly in the code. This was unmanageable.
+Before `RecordFormat` was available, record format versioning was critical, because it was the only information about how the record's data was formatted. In the `StreamPlayer` callbacks you received when reading a file, you were responsible for interpreting every byte of data and you also had to manually manage all data format changes. Since record data formats were not self-described within the file, each time you needed to add, remove, or change a field, you had to change the format version, and handle a growing number of format versions explicitly in your code. This was unmanageable. Moreover, it was not possible to write standard tools that could interpret that was stored in records, show the images they might contains, or any other metadata.
 
-`RecordFormat` and `DataLayout` were designed to solve this challenge, and since, record format version changes are very rarely needed. `RecordFormat` abstracts the description of a record as a succession of typed blocks, embedding descriptions, including `DataLayout` definitions, in the stream itself. VRS uses these embedded descriptions to interpret records, calculate content block boundaries using DataLayout Conventions, and pass parsed content blocks to callbacks.
+`RecordFormat` and `DataLayout` were designed to solve these challenges, and since, record format version changes are very rarely needed. `RecordFormat` structures records as a succession of typed content blocks, embedding descriptions, including `DataLayout` definitions, in the stream itself. VRS uses these embedded descriptions to interpret records, calculate content block boundaries using DataLayout Conventions, and send parsed content blocks to `RecordFormatStreamPlayer` callbacks when reading a VRS file. With `RecordFormat` and the DataLayout Conventions, it is now possible to write generic tools like vrsplayer, that can let you explore what's in a VRS file without any prior knowledge of the use case in which the file was recorded.
 
 ## `RecordFormat`
 
@@ -23,9 +23,12 @@ The content block types are: `image`, `audio`, `datalayout`, and `custom`. VRS s
 
 - `image`
 - `image/png`
+- `image/jpg`
+- `image/jxl`
 - `image/raw`
 - `image/raw/640x480/pixel=grb8`
 - `image/raw/640x480/pixel=grey8/stride=648`
+- `image/custom_codec/codec=my_experiment`
 - `image/video`
 - `image/video/codec=H.264`
 - `audio`
@@ -34,6 +37,7 @@ The content block types are: `image`, `audio`, `datalayout`, and `custom`. VRS s
 - `datalayout`
 - `datalayout/size=48`
 - `custom`
+- `custom/format=my_own_payload_format`
 - `custom/size=160`
 
 `image` and `audio` content blocks are pretty much what you expect when you read their text description. `datalayout` blocks contain structured metadata information. `custom` content blocks are blocks of raw data, which format is known only to you, and which you are responsible for interpreting.
@@ -55,9 +59,9 @@ In practice, the majority of the records used in VRS today use one of the follow
 
 ### Datalayout Content Blocks
 
-Datalayout content blocks, commonly referred to as datalayouts, are `DataLayout` objects that hold containers of [POD values](https://en.wikipedia.org/wiki/Passive_data_structure) and strings. If you have never seen a `DataLayout` definition, look at the `MyDataLayout` definition in the **`DataLayout` Examples** section below.
+Datalayout content blocks, commonly referred to as datalayouts, are `DataLayout` objects that hold a collection of `DataPieceXXX` objects, which are containers of [POD values](https://en.wikipedia.org/wiki/Passive_data_structure) and strings. If you have never seen a `DataLayout` definition, look at the `MyDataLayout` definition in the **`DataLayout` Examples** section below.
 
-`DataLayout` are `struct` objects containing `DataPieceXXX` member variables, that each have their own text label. The supported `DataPieceXXX` types are:
+`DataLayout` are typically `struct` objects containing a series of `DataPieceXXX` member variables, that each have their own type and text label. The supported `DataPieceXXX` types are:
 
 `DataPieceValue`, a single value of POD type `T`:
 
@@ -105,7 +109,7 @@ Template class `T` can also be any of these vector types (using `float`, `double
 
 <!-- prettier-ignore -->
 :::note
-Always use `<cstdint>` definitions. Never use platform dependent types like `short`, `int`, `long`, or `size_t`. The actual size will vary depending on the architecture or the compiler configuration.
+Always use `<cstdint>` definitions. Never use native platform dependent types like `short`, `int`, `long`, or `size_t`, because their actual size will vary depending on the architecture or the compiler configuration.
 :::
 
 ### `DataLayout` Format Resilience
@@ -269,7 +273,8 @@ Audio blocks are analog to image blocks, and are handled the same way.
 
 ```cpp
 ContentBlock(ContentType::CUSTOM); // No details at all
-ContentBlock(ContentType::CUSTOM, 256); // 256 byte custom content block
+ContentBlock(ContentType::CUSTOM, 256); // 256 bytes custom content block
+CustomContentBlock("my_thing", 48); // 48 bytes custom content block in the format "my_thing"
 ```
 
 If they are not the last content block in the record, custom content blocks may need to have their size provided using the Datalayout conventions.
@@ -449,17 +454,19 @@ When reading and writing records, no binary-ascii conversions are made, only bin
 All the power of `DataLayout` lies in its ability to amortize costs. Amortized, `DataLayout` objects...
 
 - ...store one byte of payload at the cost of 1 byte of storage (or less, because of record level compression).
-- ...have zero serialization/deserialization overhead, both on read and write, including when handling data version mismatch (that’s when the data stored in a file and the definition you have when reading that file don’t match).
+- ...have zero serialization/deserialization overhead, both on read and write, including when handling a format mismatch (that’s when the data stored in a file and the definition you have when reading that file don’t match).
 - ...have constant field access time, no matter how many you have.
 - ...are pure binary containers (no string conversions, unlike json).
 - ...require no pre-processor/code generation: `DataLayout` definitions are directly compiled by a C++ compiler.
 - ...minimize memory allocations overhead. It’s possible to create and read records without memory allocations beyond record management, even when dealing with variable size arrays (vectors). Again, amortized.
 - ...look, behave, and feel like a simple C++ struct: they are very readable, very easy and efficient to read and write to.
+- ...no format evolution cost: you can iterate over your `DataLayout` definitions as often as you like, they'll be just as efficient as if there had been no format evolutions.
 
-The key assumption VRS makes is that data collected within each stream is extremely repetitive throughout a particular file, and everything is done to leverage that property to the fullest. So `DataLayout` stores definitions once per file, parses them once per file-read, maps the `DataLayout` format expected to the `DataLayout` found in the stream once, so all the relatively expensive operations are done only once.
+The key assumption VRS makes is that data collected within each stream is extremely repetitive throughout a particular file, and everything is done to leverage that property to the fullest. `DataLayout` definitions are stored once per stream, parsed once per file-read, expected `DataLayout` formats are mapped to the `DataLayout` found in the stream once, so all the relatively expensive operations are amortized (done only once).
 
-### What is `DataLayout` not good at?
+### What is `DataLayout` not so good at?
 
-- seamless integration with existing data representations. You will need to write converters to copy your data source(s) to your `DataLayout` definitions, field by field.
+- seamless integration with existing data representations, like structs and other classes. You will need to write converters to copy your data source(s) to your `DataLayout` definitions, field by field.\
+  This can feel tedious, but ultimately, protects you against unexpected changes and provides a clear place where to handle format conversions and evolutions.
 - Nested definitions are supported, but with limitations. See [this documentation (in the “Example 2: nested definitions” tab) for details](https://facebookresearch.github.io/vrs/docs/RecordFormat#datalayout-examples). For 99% of sensor data use cases, `DataLayout` works great and this limitation isn’t even apparent, but for advanced use cases with more structured data and variable formats, of when you have nested definitions with variable size data, `DataLayout` conversion becomes a pain point.
-- complex data structures, in particular, arbitrary data structures that might change with every record, or not be known at compile time, so that converter code can not be written. In that case, you might need to use a self-described container, such as json or msgpack (which is a binary version of json). Looking at the needs of sensor data collection, this should be rare, or needed only for configuration records, which is fine, because it’s typically a one record need, and the trade offs are radically different when you need to do an operation once during setup vs. N million times in realtime. For instance, camera calibration is often stored as json in a `DataLayout` of a configuration record, and there is no reason to change that.
+- complex data structures, in particular, arbitrary data structures that might change with every record, or not be known at compile time, so that converter code can not be written. In that case, you might need to use a self-described container, such as json or msgpack (binary variation of json). Looking at the needs of sensor data collection, this should be rare, or needed only for configuration records. Using json in configuration records is fine, because it’s typically a one record need, and the trade offs are radically different when you need to do an expensive operation and store data relatively inneficiently once during setup vs. N million times in realtime (for each record). For instance, camera calibration is often provided as a json string the stream's configuration record, and there is no reason to change that.
