@@ -89,10 +89,6 @@ class DataPieceString : public DataPiece {
   /// @return True, if the value returned was read from the field or a mapped field.
   bool get(string& outString) const;
 
-  /// Tell if a the DataPiece has a default value.
-  bool hasDefault() const {
-    return !defaultString_.empty();
-  }
   /// Get the default string, if one was was set.
   const string& getDefault() const {
     return defaultString_;
