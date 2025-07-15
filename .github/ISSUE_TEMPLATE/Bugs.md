@@ -24,10 +24,8 @@ git rev-parse HEAD; git diff
 <put logs here>
 ```
 
-4. please simplify the steps as much as possible so they do not require
-   additional resources to run, such as a private dataset.
+4. please simplify the steps as much as possible so they do not require additional resources to run, such as a private dataset.
 
 ## Expected behavior:
 
-If there are no obvious error in "what you observed" provided above, please tell
-us the expected behavior.
+If there are no obvious error in "what you observed" provided above, please tell us the expected behavior.

@@ -1,11 +1,8 @@
 # VRS Open Source Project Change Log
 
-This file captures the main changes made to the VRS open source project since
-its creation. None of the changes made before VRS was open sourced are meant to
-be covered.
+This file captures the main changes made to the VRS open source project since its creation. None of the changes made before VRS was open sourced are meant to be covered.
 
-Note that fixes and minor improvements are rolling in regularly without
-triggering a new version number.
+Note that fixes and minor improvements are rolling in regularly without triggering a new version number.
 
 ## Version 1.3.0 (Sep 16, 2024)
 
