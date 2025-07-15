@@ -25,7 +25,7 @@
 
 enum class FileReaderState;
 
-typedef void PaStream;
+using PaStream = void;
 
 namespace vrsp {
 
