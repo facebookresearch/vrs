@@ -198,13 +198,13 @@ static bool readPngFrameWithWuff(PixelFrame& frame, const vector<uint8_t>& pngBu
 
   switch (channels) {
     case 1:
-      frame.init(ImageContentBlockSpec(PixelFormat::GREY8, dim_x, dim_y));
+      frame.init(PixelFormat::GREY8, dim_x, dim_y);
       break;
     case 3:
-      frame.init(ImageContentBlockSpec(PixelFormat::RGB8, dim_x, dim_y));
+      frame.init(PixelFormat::RGB8, dim_x, dim_y);
       break;
     case 4:
-      frame.init(ImageContentBlockSpec(PixelFormat::RGBA8, dim_x, dim_y));
+      frame.init(PixelFormat::RGBA8, dim_x, dim_y);
       break;
     default:
       XR_LOGE("PNG pixel format not supported");
@@ -341,24 +341,24 @@ bool PixelFrame::readPngFrame(const vector<uint8_t>& pngBuffer, bool decodePixel
       return false;
     }
     if (bitdepth == 16) {
-      init(ImageContentBlockSpec(PixelFormat::GREY16, imgWidth, imgHeight));
+      init(PixelFormat::GREY16, imgWidth, imgHeight);
       png_set_swap(pngPtr);
     } else {
       // for any other possible bitdepth we will convert to 8 bit (see below)
-      init(ImageContentBlockSpec(PixelFormat::GREY8, imgWidth, imgHeight));
+      init(PixelFormat::GREY8, imgWidth, imgHeight);
     }
   } else if (colorType == PNG_COLOR_TYPE_RGB) {
     if (channels != 3) {
       XR_LOGE("{} channels color images make no sense with PNG_COLOR_TYPE_RGB...", channels);
       return false;
     }
-    init(ImageContentBlockSpec(PixelFormat::RGB8, imgWidth, imgHeight));
+    init(PixelFormat::RGB8, imgWidth, imgHeight);
   } else if (colorType == PNG_COLOR_TYPE_RGB_ALPHA) {
     if (channels != 4) {
       XR_LOGE("{} channels color images make no sense with PNG_COLOR_TYPE_RGB_ALPHA...", channels);
       return false;
     }
-    init(ImageContentBlockSpec(PixelFormat::RGBA8, imgWidth, imgHeight));
+    init(PixelFormat::RGBA8, imgWidth, imgHeight);
   } else {
     XR_LOGE("Only gray and rgb images are supported.");
     return false;

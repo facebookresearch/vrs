@@ -145,6 +145,7 @@ class ImageContentBlockSpec {
   ImageContentBlockSpec() = default;
 
   ImageContentBlockSpec(const ImageContentBlockSpec&) = default;
+  ImageContentBlockSpec(ImageContentBlockSpec&&) = default;
   ImageContentBlockSpec(
       const ImageContentBlockSpec& imageSpec,
       double keyFrameTimestamp,
@@ -199,6 +200,19 @@ class ImageContentBlockSpec {
   /// Constructor used for factory construction. @internal
   explicit ImageContentBlockSpec(const string& formatStr);
 
+  ~ImageContentBlockSpec() = default;
+
+  void init(
+      PixelFormat pixelFormat,
+      uint32_t width = 0,
+      uint32_t height = 0,
+      uint32_t stride = 0,
+      uint32_t stride2 = 0,
+      string codecName = {},
+      uint8_t codecQuality = kQualityUndefined,
+      double keyFrameTimestamp = kInvalidTimestamp,
+      uint32_t keyFrameIndex = 0);
+
   /// When constructing from a string. @internal
   void set(ContentParser& parser);
   /// Clear/reset object to default values.
@@ -221,6 +235,7 @@ class ImageContentBlockSpec {
 
   /// Default copy assignment
   ImageContentBlockSpec& operator=(const ImageContentBlockSpec&) = default;
+  ImageContentBlockSpec& operator=(ImageContentBlockSpec&&) = default;
 
   /// Compare two image block spec strictly, field by field.
   bool operator==(const ImageContentBlockSpec& rhs) const;
@@ -501,7 +516,7 @@ class ContentBlock {
 
   /// Image formats with custom codec encoding.
   ContentBlock(
-      const std::string& codecName,
+      std::string codecName,
       uint8_t codecQuality,
       PixelFormat pixelFormat = PixelFormat::UNDEFINED,
       uint32_t width = 0,
@@ -518,6 +533,7 @@ class ContentBlock {
       uint32_t stride2 = 0);
 
   ContentBlock(const ImageContentBlockSpec& imageSpec, size_t size = kSizeUnknown); // NOLINT
+  ContentBlock(ImageContentBlockSpec&& imageSpec, size_t size = kSizeUnknown); // NOLINT
   ContentBlock(
       const ContentBlock& imageContentBlock,
       double keyFrameTimestamp,
@@ -539,6 +555,7 @@ class ContentBlock {
 
   /// Default copy constructor
   ContentBlock(const ContentBlock&) = default;
+  ContentBlock(ContentBlock&&) = default;
 
   /// Copy constructor, except for the size.
   ContentBlock(const ContentBlock& other, size_t size)
@@ -552,8 +569,11 @@ class ContentBlock {
     }
   }
 
+  ~ContentBlock() = default;
+
   /// Default copy assignment
   ContentBlock& operator=(const ContentBlock& rhs) = default;
+  ContentBlock& operator=(ContentBlock&& rhs) = default;
 
   /// Conversion to string, to store on disk & reconstruct later using constructor. @internal
   string asString() const;

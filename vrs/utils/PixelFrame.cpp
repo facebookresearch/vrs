@@ -235,12 +235,12 @@ PixelFrame::PixelFrame(const ImageContentBlockSpec& spec, vector<uint8_t>&& fram
 
 void PixelFrame::init(const ImageContentBlockSpec& spec) {
   if (imageSpec_.getImageFormat() != ImageFormat::RAW || !hasSamePixels(spec)) {
-    imageSpec_ = {
+    imageSpec_.init(
         spec.getPixelFormat(),
         spec.getWidth(),
         spec.getHeight(),
         spec.getRawStride(),
-        spec.getRawStride2()};
+        spec.getRawStride2());
     size_t size = imageSpec_.getRawImageSize();
     if (size != ContentBlock::kSizeUnknown) {
       frameBytes_.resize(size);
@@ -254,7 +254,7 @@ void PixelFrame::init(const ImageContentBlockSpec& spec, vector<uint8_t>&& frame
 }
 
 void PixelFrame::init(PixelFormat pf, uint32_t w, uint32_t h, uint32_t stride, uint32_t stride2) {
-  imageSpec_ = {pf, w, h, stride, stride2};
+  imageSpec_.init(pf, w, h, stride, stride2);
   size_t size = imageSpec_.getRawImageSize();
   if (size != ContentBlock::kSizeUnknown) {
     frameBytes_.resize(size);
@@ -272,7 +272,8 @@ void PixelFrame::swap(PixelFrame& other) noexcept {
 
 bool PixelFrame::hasSamePixels(const ImageContentBlockSpec& spec) const {
   return getPixelFormat() == spec.getPixelFormat() && getWidth() == spec.getWidth() &&
-      getHeight() == spec.getHeight() && getStride() == spec.getStride();
+      getHeight() == spec.getHeight() && getStride() == spec.getStride() &&
+      imageSpec_.getRawStride2() == spec.getRawStride2();
 }
 
 void PixelFrame::blankFrame() {

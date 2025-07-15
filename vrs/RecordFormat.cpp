@@ -308,6 +308,29 @@ ImageContentBlockSpec::ImageContentBlockSpec(const string& formatStr) {
   sanityCheckStrides();
 }
 
+void ImageContentBlockSpec::init(
+    PixelFormat pixelFormat,
+    uint32_t width,
+    uint32_t height,
+    uint32_t stride,
+    uint32_t stride2,
+    string codecName,
+    uint8_t codecQuality,
+    double keyFrameTimestamp,
+    uint32_t keyFrameIndex) {
+  imageFormat_ = ImageFormat::RAW;
+  pixelFormat_ = pixelFormat;
+  width_ = width;
+  height_ = height;
+  stride_ = stride;
+  stride2_ = stride2;
+  codecName_ = std::move(codecName);
+  codecQuality_ = codecQuality;
+  keyFrameTimestamp_ = keyFrameTimestamp;
+  keyFrameIndex_ = keyFrameIndex;
+  sanityCheckStrides();
+}
+
 void ImageContentBlockSpec::clear() {
   imageFormat_ = ImageFormat::UNDEFINED;
   pixelFormat_ = PixelFormat::UNDEFINED;
@@ -903,7 +926,7 @@ ContentBlock::ContentBlock(ImageFormat imageFormat, uint32_t width, uint32_t hei
     : contentType_(ContentType::IMAGE), imageSpec_(imageFormat, width, height) {}
 
 ContentBlock::ContentBlock(
-    const string& codecName,
+    string codecName,
     uint8_t codecQuality,
     PixelFormat pixelFormat,
     uint32_t width,
@@ -911,7 +934,7 @@ ContentBlock::ContentBlock(
     uint32_t stride,
     uint32_t stride2)
     : contentType_(ContentType::IMAGE),
-      imageSpec_(codecName, codecQuality, pixelFormat, width, height, stride, stride2) {}
+      imageSpec_(std::move(codecName), codecQuality, pixelFormat, width, height, stride, stride2) {}
 
 ContentBlock::ContentBlock(
     PixelFormat pixelFormat,
@@ -923,6 +946,8 @@ ContentBlock::ContentBlock(
 
 ContentBlock::ContentBlock(const ImageContentBlockSpec& imageSpec, size_t size)
     : contentType_(ContentType::IMAGE), size_{size}, imageSpec_{imageSpec} {}
+ContentBlock::ContentBlock(ImageContentBlockSpec&& imageSpec, size_t size)
+    : contentType_(ContentType::IMAGE), size_{size}, imageSpec_{std::move(imageSpec)} {}
 
 ContentBlock::ContentBlock(
     const ContentBlock& imageContentBlock,
