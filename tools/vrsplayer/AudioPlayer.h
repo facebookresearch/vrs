@@ -25,7 +25,7 @@
 
 enum class FileReaderState;
 
-using PaStream = void;
+typedef void PaStream; // NOLINT(modernize-use-using)
 
 namespace vrsp {
 

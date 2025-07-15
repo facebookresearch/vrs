@@ -20,7 +20,7 @@
 
 #include <vrs/os/Time.h>
 
-using PaStream = void;
+typedef void PaStream; // NOLINT(modernize-use-using)
 
 namespace vrsp {
 
