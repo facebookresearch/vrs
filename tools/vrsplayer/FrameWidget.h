@@ -21,6 +21,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <utility>
 
 #include <QtCore/qglobal.h>
 #include <QtWidgets/QWidget>
@@ -125,7 +126,7 @@ class FrameWidget : public QWidget {
     setNeedsUpdate();
   }
   void setOverlayColor(QColor color) {
-    overlayColor_ = color;
+    overlayColor_ = std::move(color);
     setNeedsUpdate();
   }
   void setFontSize(int fontSize) {

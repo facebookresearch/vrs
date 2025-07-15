@@ -121,7 +121,7 @@ class FileReader : public QObject {
 
  public slots:
   std::vector<FrameWidget*> openFile(const QString& url, QVBoxLayout* videoFrame, QWidget* parent);
-  void setOverlayColor(QColor color);
+  void setOverlayColor(const QColor& color);
   void setFontSize(int fontSize);
   void setSolidBackground(bool solid);
   void recordTypeChanged(const QString& type);

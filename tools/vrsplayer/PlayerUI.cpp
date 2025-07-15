@@ -18,6 +18,8 @@
 
 #include <cctype>
 
+#include <utility>
+
 #include <fmt/format.h>
 
 #include <qmessagebox.h>
@@ -94,12 +96,7 @@ class JumpSlider : public QSlider {
 
 } // namespace
 
-PlayerUI::PlayerUI(PlayerWindow* playerWindow)
-    : QWidget(nullptr),
-      playerWindow_{playerWindow},
-      time_{nullptr},
-      positionSlider_{nullptr},
-      statusLabel_{nullptr} {
+PlayerUI::PlayerUI(PlayerWindow* playerWindow) : QWidget(nullptr), playerWindow_{playerWindow} {
   fileReader_.setPlayerUi(this);
   connect(
       this,
@@ -419,7 +416,7 @@ void PlayerUI::reportError(const QString& errorTitle, const QString& errorMessag
 }
 
 void PlayerUI::setOverlayColor(QColor color) {
-  overlayColor_ = color;
+  overlayColor_ = std::move(color);
   fileReader_.setOverlayColor(overlayColor_);
   settings_.setValue(kOverlayColorSetting, overlayColor_);
   overlaySettingChanged();

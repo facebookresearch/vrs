@@ -110,22 +110,22 @@ class PlayerUI : public QWidget {
   bool eventFilter(QObject* obj, QEvent* event) override;
 
  private:
-  PlayerWindow* playerWindow_;
+  PlayerWindow* playerWindow_{nullptr};
   QSettings settings_;
   QColor overlayColor_{Qt::yellow};
   int fontSize_{14};
   bool solidBackground_{false};
   FileReader fileReader_;
-  QVBoxLayout* videoFrames_;
+  QVBoxLayout* videoFrames_{nullptr};
   std::vector<FrameWidget*> frames_;
-  QAbstractButton* backwardButton_;
-  QAbstractButton* stopButton_;
-  QAbstractButton* playPauseButton_;
-  QAbstractButton* forwardButton_;
-  QComboBox* speedControl_;
-  QLabel* time_;
-  QSlider* positionSlider_;
-  QLabel* statusLabel_;
+  QAbstractButton* backwardButton_{nullptr};
+  QAbstractButton* stopButton_{nullptr};
+  QAbstractButton* playPauseButton_{nullptr};
+  QAbstractButton* forwardButton_{nullptr};
+  QComboBox* speedControl_{nullptr};
+  QLabel* time_{nullptr};
+  QSlider* positionSlider_{nullptr};
+  QLabel* statusLabel_{nullptr};
   QTimer checkForUpdatesTimer_;
   PathPreparer pathPreparer_;
 };

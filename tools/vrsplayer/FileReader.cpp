@@ -191,12 +191,12 @@ class OpenProgressDialog : public ProgressLogger {
  protected:
   void logMessage(const string& message) override {
     ProgressLogger::logMessage(message);
-    progressDialog_.setLabelText(QString().fromStdString(message));
+    progressDialog_.setLabelText(QString::fromStdString(message));
     qApp->processEvents();
   }
   void logErrorMessage(const string& message) override {
     ProgressLogger::logErrorMessage(message);
-    progressDialog_.setLabelText(QString().fromStdString(message));
+    progressDialog_.setLabelText(QString::fromStdString(message));
     qApp->processEvents();
   }
   void updateStep(size_t progress, size_t maxProgress) override {
@@ -429,7 +429,7 @@ vector<FrameWidget*> FileReader::openFile(QVBoxLayout* videoFrames, QWidget* wid
   return frames;
 }
 
-void FileReader::setOverlayColor(QColor color) {
+void FileReader::setOverlayColor(const QColor& color) {
   for (auto& image : imageReaders_) {
     image.second->getWidget()->setOverlayColor(color);
   }
@@ -1243,7 +1243,7 @@ void FileReader::loadConfiguration() {
   fileConfig_ = make_unique<QSettings>("VRSplayer", ss.str().c_str());
   layoutPresets_ = fileConfig_->value(kLayoutPresets).toMap();
   if (DEBUG_CONFIG) {
-    for (auto key : layoutPresets_.keys()) {
+    for (const auto& key : layoutPresets_.keys()) {
       QJsonDocument jdoc = QJsonDocument::fromVariant(layoutPresets_[key]);
       QByteArray config = jdoc.toJson();
       XR_LOGI("\nPreset {}: {}", key.toStdString(), string(config.constData(), config.size()));
@@ -1302,7 +1302,7 @@ void FileReader::setTimeRange(double start, double end, uint32_t firstDataRecord
   firstDataRecordIndex_ = firstDataRecordIndex;
   durationChanged(start, end, rawTimeToPosition(endTime_ - startTime_));
   cout << "Player time range: " << helpers::humanReadableTimestamp(startTime_) << " - "
-       << helpers::humanReadableTimestamp(end) << endl;
+       << helpers::humanReadableTimestamp(end) << '\n';
 }
 
 } // namespace vrsp
