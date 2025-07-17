@@ -33,17 +33,15 @@ struct OperationContext {
   OperationContext(string op, string sourceLoc)
       : operation{std::move(op)}, sourceLocation{std::move(sourceLoc)} {}
   OperationContext(const OperationContext& rhs) = default;
-  OperationContext(OperationContext&& rhs) noexcept
-      : operation{std::move(rhs.operation)}, sourceLocation{std::move(rhs.sourceLocation)} {}
+  OperationContext(OperationContext&& rhs) noexcept = default;
+  ~OperationContext() = default;
+
+  OperationContext& operator=(const OperationContext& rhs) = default;
+  OperationContext& operator=(OperationContext&& rhs) noexcept = default;
 
   bool operator<(const OperationContext& rhs) const {
     auto tie = [](const OperationContext& oc) { return std::tie(oc.operation, oc.sourceLocation); };
     return tie(*this) < tie(rhs);
-  }
-  OperationContext& operator=(OperationContext&& rhs) noexcept {
-    operation = std::move(rhs.operation);
-    sourceLocation = std::move(rhs.sourceLocation);
-    return *this;
   }
 };
 
@@ -55,19 +53,12 @@ struct LogEvent {
         operationContext{std::move(opContext)},
         message{std::move(message)},
         serverReply{std::move(serverReply)} {}
-  LogEvent(LogEvent&& rhs) noexcept
-      : type{std::move(rhs.type)},
-        operationContext{std::move(rhs.operationContext)},
-        message{std::move(rhs.message)},
-        serverReply{std::move(rhs.serverReply)} {}
+  LogEvent(const LogEvent& rhs) = default;
+  LogEvent(LogEvent&& rhs) noexcept = default;
+  ~LogEvent() = default;
 
-  LogEvent& operator=(LogEvent&& rhs) noexcept {
-    type = std::move(rhs.type);
-    operationContext = std::move(rhs.operationContext);
-    message = std::move(rhs.message);
-    serverReply = std::move(rhs.serverReply);
-    return *this;
-  }
+  LogEvent& operator=(const LogEvent& rhs) = default;
+  LogEvent& operator=(LogEvent&& rhs) noexcept = default;
 
   std::string type;
   OperationContext operationContext;

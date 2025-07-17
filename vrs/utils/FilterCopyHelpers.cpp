@@ -23,6 +23,8 @@
 #include <vrs/RecordFileWriter.h>
 #include <vrs/helpers/Throttler.h>
 
+#include <utility>
+
 using namespace std;
 using namespace vrs;
 
@@ -142,8 +144,8 @@ ContentBlockChunk::ContentBlockChunk(const ContentBlock& contentBlock, const Cur
   }
 }
 
-ContentBlockChunk::ContentBlockChunk(const ContentBlock& contentBlock, vector<uint8_t>&& buffer)
-    : ContentChunk(std::move(buffer)), contentBlock_{contentBlock} {}
+ContentBlockChunk::ContentBlockChunk(ContentBlock contentBlock, vector<uint8_t>&& buffer)
+    : ContentChunk(std::move(buffer)), contentBlock_{std::move(contentBlock)} {}
 
 void FilteredChunksSource::copyTo(uint8_t* buffer) const {
   for (auto& chunk : chunks_) {

@@ -31,6 +31,7 @@
 #include <vrs/helpers/Throttler.h>
 #include <vrs/utils/BufferRecordReader.hpp>
 #include <vrs/utils/converters/Raw10ToGrey10Converter.h>
+#include <utility>
 
 using namespace std;
 using namespace vrs;
@@ -230,8 +231,8 @@ PixelFrame::PixelFrame(PixelFormat pf, uint32_t w, uint32_t h, uint32_t stride)
   }
 }
 
-PixelFrame::PixelFrame(const ImageContentBlockSpec& spec, vector<uint8_t>&& frameBytes)
-    : imageSpec_{spec}, frameBytes_{std::move(frameBytes)} {}
+PixelFrame::PixelFrame(ImageContentBlockSpec spec, vector<uint8_t>&& frameBytes)
+    : imageSpec_{std::move(spec)}, frameBytes_{std::move(frameBytes)} {}
 
 void PixelFrame::init(const ImageContentBlockSpec& spec) {
   if (imageSpec_.getImageFormat() != ImageFormat::RAW || !hasSamePixels(spec)) {
@@ -934,7 +935,7 @@ static bool printSegColors(
   const uint32_t kMaxColumnIndex = classSegmentation ? 4 : 8;
   const uint32_t rows = (usedColors.size() + kMaxColumnIndex - 1) / kMaxColumnIndex;
   for (uint32_t row = 0; row < rows; ++row) {
-    for (uint16_t column = 0; column < kMaxColumnIndex; ++column) {
+    for (uint32_t column = 0; column < kMaxColumnIndex; ++column) {
       uint32_t colorIndex = rows * column + row;
       if (colorIndex < sortedColors.size()) {
         uint32_t color = sortedColors[colorIndex];

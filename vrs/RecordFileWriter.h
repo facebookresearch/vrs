@@ -92,8 +92,11 @@ class RecordFileWriter {
  public:
   RecordFileWriter();
   RecordFileWriter(const RecordFileWriter&) = delete;
-  RecordFileWriter& operator=(const RecordFileWriter&) = delete;
+  RecordFileWriter(RecordFileWriter&&) = delete;
   virtual ~RecordFileWriter();
+
+  RecordFileWriter& operator=(const RecordFileWriter&) = delete;
+  RecordFileWriter& operator=(RecordFileWriter&&) = delete;
 
   /// A record file holds data from various recordables, registered using this method.
   /// The ownership of the recordable is not transferred, and the caller is responsible for deleting

@@ -143,9 +143,8 @@ inline JValue JsonWrapper::jValue<string>(const string& str) {
 
 template <typename T, typename JSTR>
 inline void serializeMap(const map<string, T>& amap, JsonWrapper& rj, const JSTR& name) {
-  using namespace vrs_rapidjson;
   if (amap.size() > 0) {
-    JValue mapValues(kObjectType);
+    JValue mapValues(vrs_rapidjson::kObjectType);
     for (const auto& element : amap) {
       mapValues.AddMember(rj.jValue(element.first), rj.jValue(element.second), rj.alloc);
     }
@@ -157,9 +156,8 @@ inline void serializeMap(const map<string, T>& amap, JsonWrapper& rj, const JSTR
 template <typename JSTR>
 inline void
 serializeStringRefMap(const map<string, string>& stringMap, JsonWrapper& rj, const JSTR& name) {
-  using namespace vrs_rapidjson;
   if (!stringMap.empty()) {
-    JValue mapValues(kObjectType);
+    JValue mapValues(vrs_rapidjson::kObjectType);
     for (const auto& element : stringMap) {
       mapValues.AddMember(jStringRef(element.first), jStringRef(element.second), rj.alloc);
     }
@@ -169,10 +167,9 @@ serializeStringRefMap(const map<string, string>& stringMap, JsonWrapper& rj, con
 
 template <typename T, typename JSTR>
 inline void serializeVector(const vector<T>& vect, JsonWrapper& rj, const JSTR& name) {
-  using namespace vrs_rapidjson;
   if (!vect.empty()) {
-    JValue arrayValues(kArrayType);
-    arrayValues.Reserve(static_cast<SizeType>(vect.size()), rj.alloc);
+    JValue arrayValues(vrs_rapidjson::kArrayType);
+    arrayValues.Reserve(static_cast<vrs_rapidjson::SizeType>(vect.size()), rj.alloc);
     for (const auto& element : vect) {
       arrayValues.PushBack(rj.jValue(element), rj.alloc);
     }
@@ -184,10 +181,9 @@ inline void serializeVector(const vector<T>& vect, JsonWrapper& rj, const JSTR& 
 template <typename JSTR>
 inline void
 serializeStringRefVector(const vector<string>& vect, JsonWrapper& rj, const JSTR& name) {
-  using namespace vrs_rapidjson;
   if (!vect.empty()) {
-    JValue arrayValues(kArrayType);
-    arrayValues.Reserve(static_cast<SizeType>(vect.size()), rj.alloc);
+    JValue arrayValues(vrs_rapidjson::kArrayType);
+    arrayValues.Reserve(static_cast<vrs_rapidjson::SizeType>(vect.size()), rj.alloc);
     for (const auto& str : vect) {
       arrayValues.PushBack(jStringRef(str), rj.alloc);
     }
@@ -240,7 +236,7 @@ inline bool getFromJValue(const JValue& value, string& outValue) {
 
 template <typename T, size_t N>
 inline bool getFromJValue(const JValue& value, PointND<T, N>& outPoint) {
-  using namespace vrs_rapidjson;
+  using vrs_rapidjson::SizeType;
   if (value.IsArray() && value.Size() == N) {
     for (size_t n = 0; n < N; ++n) {
       if (!getJValueAs<float, T>(value[static_cast<SizeType>(n)], outPoint.dim[n]) &&
@@ -255,7 +251,7 @@ inline bool getFromJValue(const JValue& value, PointND<T, N>& outPoint) {
 
 template <typename T, size_t N>
 inline bool getFromJValue(const JValue& value, MatrixND<T, N>& outMatrix) {
-  using namespace vrs_rapidjson;
+  using vrs_rapidjson::SizeType;
   if (value.IsArray() && value.Size() == N) {
     for (size_t n = 0; n < N; ++n) {
       if (!getFromJValue<T, N>(value[static_cast<SizeType>(n)], outMatrix.points[n])) {
@@ -268,7 +264,6 @@ inline bool getFromJValue(const JValue& value, MatrixND<T, N>& outMatrix) {
 
 template <typename T, typename JSTR>
 inline bool getJMap(map<string, T>& outMap, const JValue& piece, const JSTR& name) {
-  using namespace vrs_rapidjson;
   outMap.clear();
   const JValue::ConstMemberIterator properties = piece.FindMember(name);
   if (properties != piece.MemberEnd() && properties->value.IsObject()) {
@@ -287,7 +282,6 @@ inline bool getJMap(map<string, T>& outMap, const JValue& piece, const JSTR& nam
 
 template <typename T, typename JSTR>
 inline bool getJVector(vector<T>& outVector, const JValue& piece, const JSTR& name) {
-  using namespace vrs_rapidjson;
   outVector.clear();
   const JValue::ConstMemberIterator properties = piece.FindMember(name);
   if (properties != piece.MemberEnd() && properties->value.IsArray()) {
@@ -306,7 +300,6 @@ inline bool getJVector(vector<T>& outVector, const JValue& piece, const JSTR& na
 
 template <typename JSTR>
 inline bool getJString(string& outString, const JValue& piece, const JSTR& name) {
-  using namespace vrs_rapidjson;
   const JValue::ConstMemberIterator member = piece.FindMember(name);
   if (member != piece.MemberEnd() && member->value.IsString()) {
     outString = member->value.GetString();
@@ -318,7 +311,6 @@ inline bool getJString(string& outString, const JValue& piece, const JSTR& name)
 
 template <typename JSTR>
 inline bool getJInt64(int64_t& outInt64, const JValue& piece, const JSTR& name) {
-  using namespace vrs_rapidjson;
   const JValue::ConstMemberIterator member = piece.FindMember(name);
   if (member != piece.MemberEnd() && member->value.IsInt64()) {
     outInt64 = member->value.GetInt64();
@@ -330,7 +322,6 @@ inline bool getJInt64(int64_t& outInt64, const JValue& piece, const JSTR& name) 
 
 template <typename JSTR>
 inline bool getJInt(int& outInt, const JValue& piece, const JSTR& name) {
-  using namespace vrs_rapidjson;
   const JValue::ConstMemberIterator member = piece.FindMember(name);
   if (member != piece.MemberEnd() && member->value.IsInt()) {
     outInt = member->value.GetInt();
@@ -342,7 +333,6 @@ inline bool getJInt(int& outInt, const JValue& piece, const JSTR& name) {
 
 template <typename JSTR>
 inline bool getJDouble(double& outDouble, const JValue& piece, const JSTR& name) {
-  using namespace vrs_rapidjson;
   const JValue::ConstMemberIterator member = piece.FindMember(name);
   if (member != piece.MemberEnd() && member->value.IsDouble()) {
     outDouble = member->value.GetDouble();

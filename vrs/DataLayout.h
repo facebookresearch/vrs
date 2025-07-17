@@ -211,13 +211,14 @@ class DataLayout {
   DataLayout() = default;
 
  public:
-  DataLayout& operator=(const DataLayout&) = delete;
   DataLayout(const DataLayout&) = delete;
+  DataLayout(const DataLayout&&) = delete;
 
-  /// DataLayout has no virtual method, but it is used in containers, and some of its
-  /// derived classes have important clean-up work to do in their destructor.
-  /// Therefore, DataLayout requires a virtual destructor.
-  virtual ~DataLayout();
+  virtual ~DataLayout(); // for derived classes
+
+  DataLayout& operator=(const DataLayout&) = delete;
+  DataLayout& operator=(const DataLayout&&) = delete;
+
   /// Special OffsetAndLength offset value marking that a piece of data isn't available.
   static const size_t kNotFound;
   /// Special value used for a DataPiece size, telling that that DataPiece has a variable size.

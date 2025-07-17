@@ -145,7 +145,7 @@ class ImageContentBlockSpec {
   ImageContentBlockSpec() = default;
 
   ImageContentBlockSpec(const ImageContentBlockSpec&) = default;
-  ImageContentBlockSpec(ImageContentBlockSpec&&) = default;
+  ImageContentBlockSpec(ImageContentBlockSpec&&) noexcept = default;
   ImageContentBlockSpec(
       const ImageContentBlockSpec& imageSpec,
       double keyFrameTimestamp,
@@ -165,7 +165,7 @@ class ImageContentBlockSpec {
       uint32_t keyFrameIndex = 0);
 
   /// Image formats with encoding (png, jpeg, etc).
-  ImageContentBlockSpec(ImageFormat imageFormat, uint32_t width = 0, uint32_t height = 0); // NOLINT
+  ImageContentBlockSpec(ImageFormat imageFormat, uint32_t width = 0, uint32_t height = 0);
 
   /// Raw pixels image formats.
   ImageContentBlockSpec(
@@ -235,7 +235,7 @@ class ImageContentBlockSpec {
 
   /// Default copy assignment
   ImageContentBlockSpec& operator=(const ImageContentBlockSpec&) = default;
-  ImageContentBlockSpec& operator=(ImageContentBlockSpec&&) = default;
+  ImageContentBlockSpec& operator=(ImageContentBlockSpec&&) noexcept = default;
 
   /// Compare two image block spec strictly, field by field.
   bool operator==(const ImageContentBlockSpec& rhs) const;
@@ -371,6 +371,7 @@ class AudioContentBlockSpec {
   AudioContentBlockSpec() = default;
   /// Default copy constructor
   AudioContentBlockSpec(const AudioContentBlockSpec&) = default;
+  AudioContentBlockSpec(AudioContentBlockSpec&&) noexcept = default;
   /// For audio formats with encoding (mp3, flac, etc).
   explicit AudioContentBlockSpec(AudioFormat audioFormat, uint8_t channelCount = 0);
   AudioContentBlockSpec(
@@ -381,6 +382,7 @@ class AudioContentBlockSpec {
       uint32_t sampleFrameRate = 0,
       uint32_t sampleFrameCount = 0,
       uint8_t stereoPairCount = 0);
+  ~AudioContentBlockSpec() = default;
 
   /// Constructor used for factory construction.
   /// @internal
@@ -392,6 +394,13 @@ class AudioContentBlockSpec {
   /// Clear/reset object to default values.
   void clear();
 
+  AudioContentBlockSpec& operator=(const AudioContentBlockSpec&) = default;
+  AudioContentBlockSpec& operator=(AudioContentBlockSpec&&) noexcept = default;
+
+  bool operator==(const AudioContentBlockSpec& rhs) const;
+  bool operator!=(const AudioContentBlockSpec& rhs) const {
+    return !operator==(rhs);
+  }
   /// Convert to string, to store on disk & reconstruct later using factory constructor.
   /// @internal
   string asString() const;
@@ -402,14 +411,6 @@ class AudioContentBlockSpec {
   /// Assuming PCM, get the number of bytes for this content block, or ContentBlock::kSizeUnknown.
   size_t getPcmBlockSize() const;
 
-  /// Default copy assignment
-  AudioContentBlockSpec& operator=(const AudioContentBlockSpec&) = default;
-
-  /// Compare two audio block spec.
-  bool operator==(const AudioContentBlockSpec& rhs) const;
-  bool operator!=(const AudioContentBlockSpec& rhs) const {
-    return !operator==(rhs);
-  }
   /// Tell if two audio block have identical audio formats.
   bool isCompatibleWith(const AudioContentBlockSpec& rhs) const;
   /// Get audio format.
@@ -506,13 +507,13 @@ class ContentBlock {
   static const size_t kSizeUnknown;
 
   /// Very generic block description.
-  ContentBlock(ContentType type = ContentType::EMPTY, size_t size = kSizeUnknown); // NOLINT
+  ContentBlock(ContentType type = ContentType::EMPTY, size_t size = kSizeUnknown);
 
   /// Factory-style reconstruct from persisted description as string on disk.
   explicit ContentBlock(const string& formatStr);
 
   /// Image formats with encoding (png, jpeg, etc).
-  ContentBlock(ImageFormat imageFormat, uint32_t width = 0, uint32_t height = 0); // NOLINT
+  ContentBlock(ImageFormat imageFormat, uint32_t width = 0, uint32_t height = 0);
 
   /// Image formats with custom codec encoding.
   ContentBlock(
@@ -532,15 +533,15 @@ class ContentBlock {
       uint32_t stride = 0,
       uint32_t stride2 = 0);
 
-  ContentBlock(const ImageContentBlockSpec& imageSpec, size_t size = kSizeUnknown); // NOLINT
-  ContentBlock(ImageContentBlockSpec&& imageSpec, size_t size = kSizeUnknown); // NOLINT
+  ContentBlock(const ImageContentBlockSpec& imageSpec, size_t size = kSizeUnknown);
+  ContentBlock(ImageContentBlockSpec&& imageSpec, size_t size = kSizeUnknown) noexcept;
   ContentBlock(
       const ContentBlock& imageContentBlock,
       double keyFrameTimestamp,
       uint32_t keyFrameIndex);
 
   /// Very generic audio block description.
-  ContentBlock(AudioFormat audioFormat, uint8_t channelCount = 0); // NOLINT
+  ContentBlock(AudioFormat audioFormat, uint8_t channelCount = 0);
   ContentBlock(const AudioContentBlockSpec& audioSpec, size_t size);
 
   /// Audio block description.
@@ -555,7 +556,7 @@ class ContentBlock {
 
   /// Default copy constructor
   ContentBlock(const ContentBlock&) = default;
-  ContentBlock(ContentBlock&&) = default;
+  ContentBlock(ContentBlock&&) noexcept = default;
 
   /// Copy constructor, except for the size.
   ContentBlock(const ContentBlock& other, size_t size)
@@ -571,9 +572,8 @@ class ContentBlock {
 
   ~ContentBlock() = default;
 
-  /// Default copy assignment
   ContentBlock& operator=(const ContentBlock& rhs) = default;
-  ContentBlock& operator=(ContentBlock&& rhs) = default;
+  ContentBlock& operator=(ContentBlock&& rhs) noexcept = default;
 
   /// Conversion to string, to store on disk & reconstruct later using constructor. @internal
   string asString() const;
@@ -680,27 +680,32 @@ class RecordFormat {
   /// Empty record format definition.
   RecordFormat() = default;
   /// Default copy constructor
-  RecordFormat(const RecordFormat&) = default; // NOLINT
+  RecordFormat(const RecordFormat&) = default;
+  RecordFormat(RecordFormat&&) noexcept = default;
+  ~RecordFormat() = default;
+
+  RecordFormat& operator=(const RecordFormat&) = default;
+  RecordFormat& operator=(RecordFormat&&) noexcept = default;
 
   /// Build a RecordFormat from a string description.
   /// This constructor is meant for internal VRS usage only.
   /// @internal
-  RecordFormat(const string& format) { // NOLINT
+  RecordFormat(const string& format) {
     set(format);
   }
   /// Build a RecordFormat from a string description.
   /// This constructor is meant for internal VRS usage only.
   /// @internal
-  RecordFormat(const char* format) { // NOLINT
+  RecordFormat(const char* format) {
     set(format);
   }
   /// Build a RecordFormat from a single ContentBlock.
-  RecordFormat(const ContentBlock& block) { // NOLINT
+  RecordFormat(const ContentBlock& block) {
     blocks_.emplace_back(block);
   }
   /// Build a RecordFormat from a single ContentBlock.
-  RecordFormat(ContentBlock&& block) { // NOLINT
-    blocks_.emplace_back(block);
+  RecordFormat(ContentBlock&& block) noexcept {
+    blocks_.emplace_back(std::move(block));
   }
   /// Build a RecordFormat from two ContentBlock definitions.
   RecordFormat(const ContentBlock& first, const ContentBlock& second) {
@@ -708,15 +713,15 @@ class RecordFormat {
     blocks_.emplace_back(second);
   }
   /// Build a RecordFormat from two ContentBlock definitions.
-  RecordFormat(const ContentBlock&& first, const ContentBlock&& second) {
-    blocks_.emplace_back(first);
-    blocks_.emplace_back(second);
+  RecordFormat(ContentBlock&& first, ContentBlock&& second) noexcept {
+    blocks_.emplace_back(std::move(first));
+    blocks_.emplace_back(std::move(second));
   }
   /// Build a RecordFormat from a simple ContentType & block size.
   /// @param type: Content type of the block.
   /// @param size: Size of the block, or ContentBlock::kSizeUnknown, if the size of the block isn't
   /// known/fixed.
-  RecordFormat(ContentType type, size_t size = ContentBlock::kSizeUnknown) { // NOLINT
+  RecordFormat(ContentType type, size_t size = ContentBlock::kSizeUnknown) {
     blocks_.emplace_back(type, size);
   }
 
@@ -727,12 +732,10 @@ class RecordFormat {
   }
   /// Append a ContentBlock to this RecordFormat.
   RecordFormat& operator+(ContentBlock&& block) {
-    blocks_.emplace_back(block);
+    blocks_.emplace_back(std::move(block));
     return *this;
   }
 
-  /// Default copy assignment
-  RecordFormat& operator=(const RecordFormat&) = default;
   bool operator==(const RecordFormat& rhs) const;
   bool operator!=(const RecordFormat& rhs) const {
     return !operator==(rhs);

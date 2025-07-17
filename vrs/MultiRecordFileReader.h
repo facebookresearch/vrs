@@ -44,8 +44,11 @@ class MultiRecordFileReader {
 
   MultiRecordFileReader() = default;
   MultiRecordFileReader(const MultiRecordFileReader&) = delete;
-  MultiRecordFileReader& operator=(const MultiRecordFileReader&) = delete;
+  MultiRecordFileReader(MultiRecordFileReader&&) = delete;
   virtual ~MultiRecordFileReader();
+
+  MultiRecordFileReader& operator=(const MultiRecordFileReader&) = delete;
+  MultiRecordFileReader& operator=(MultiRecordFileReader&&) = delete;
 
   /// Open the given VRS files.
   /// Only related files are allowed to be opened together. i.e. the files which have the same

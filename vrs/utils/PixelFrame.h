@@ -84,7 +84,7 @@ class PixelFrame {
  public:
   PixelFrame() = default;
   explicit PixelFrame(const ImageContentBlockSpec& spec);
-  PixelFrame(const ImageContentBlockSpec& spec, vector<uint8_t>&& frameBytes);
+  PixelFrame(ImageContentBlockSpec spec, vector<uint8_t>&& frameBytes);
   PixelFrame(PixelFormat pf, uint32_t w, uint32_t h, uint32_t stride = 0);
 
   void init(const ImageContentBlockSpec& spec);

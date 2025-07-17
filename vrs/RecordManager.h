@@ -41,8 +41,11 @@ class RecordManager {
  public:
   RecordManager();
   RecordManager(const RecordManager&) = delete;
-  void operator=(const RecordManager&) = delete;
+  RecordManager(RecordManager&&) = delete;
   ~RecordManager();
+
+  void operator=(const RecordManager&) = delete;
+  void operator=(RecordManager&&) = delete;
 
   /// Create & hold a record using the given parameters. RecordManager is responsible for deleting
   /// the record. Copies the data referenced by the DataSource.

@@ -156,7 +156,7 @@ class ContentChunk {
 class ContentBlockChunk : public ContentChunk {
  public:
   ContentBlockChunk(const ContentBlock& contentBlock, const CurrentRecord& record);
-  ContentBlockChunk(const ContentBlock& contentBlock, vector<uint8_t>&& buffer);
+  ContentBlockChunk(ContentBlock contentBlock, vector<uint8_t>&& buffer);
 
   const ContentBlock& getContentBlock() const {
     return contentBlock_;

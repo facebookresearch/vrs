@@ -946,7 +946,7 @@ ContentBlock::ContentBlock(
 
 ContentBlock::ContentBlock(const ImageContentBlockSpec& imageSpec, size_t size)
     : contentType_(ContentType::IMAGE), size_{size}, imageSpec_{imageSpec} {}
-ContentBlock::ContentBlock(ImageContentBlockSpec&& imageSpec, size_t size)
+ContentBlock::ContentBlock(ImageContentBlockSpec&& imageSpec, size_t size) noexcept
     : contentType_(ContentType::IMAGE), size_{size}, imageSpec_{std::move(imageSpec)} {}
 
 ContentBlock::ContentBlock(

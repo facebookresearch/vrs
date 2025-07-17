@@ -33,6 +33,7 @@ class DiskFileChunk {
   DiskFileChunk() = default;
   DiskFileChunk(string path, int64_t offset, int64_t size)
       : path_{std::move(path)}, offset_{offset}, size_{size} {}
+  DiskFileChunk(const DiskFileChunk& other) = delete;
   DiskFileChunk(DiskFileChunk&& other) noexcept {
     close();
     file_ = other.file_;
@@ -46,6 +47,10 @@ class DiskFileChunk {
   ~DiskFileChunk() {
     close();
   }
+
+  DiskFileChunk& operator=(const DiskFileChunk& other) = delete;
+  DiskFileChunk& operator=(DiskFileChunk&& other) = delete;
+
   int create(const string& newPath, MAYBE_UNUSED const map<string, string>& options) {
     close();
     file_ = os::fileOpen(newPath, "wb");

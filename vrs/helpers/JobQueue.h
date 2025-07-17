@@ -159,9 +159,16 @@ class JobQueue {
 template <class T>
 class JobQueueWithThread : public JobQueue<T> {
  public:
+  JobQueueWithThread() = default;
+  JobQueueWithThread(const JobQueueWithThread&) = delete;
+  JobQueueWithThread(JobQueueWithThread&&) = delete;
+
   ~JobQueueWithThread() {
     endThread();
   }
+
+  JobQueueWithThread& operator=(const JobQueueWithThread&) = delete;
+  JobQueueWithThread& operator=(JobQueueWithThread&&) = delete;
 
   template <typename... Args>
   void startThread(Args&&... args) {

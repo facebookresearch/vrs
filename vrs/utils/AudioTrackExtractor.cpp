@@ -232,7 +232,7 @@ string extractAudioTrack(FilteredFileReader& filteredReader, const std::string& 
   JDocument doc;
   JsonWrapper json{doc};
   string folderPath = os::getParentFolder(wavFilePath);
-  if (folderPath.length() > 0) {
+  if (!folderPath.empty()) {
     if (!os::pathExists(folderPath)) {
       int status = os::makeDirectories(folderPath);
       if (status != 0) {

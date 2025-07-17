@@ -39,7 +39,7 @@ void extractImages(
     FilteredFileReader& filteredReader,
     bool extractImagesRaw,
     ImageNamer* imageNamer) {
-  if (path.length() > 0) {
+  if (!path.empty()) {
     os::makeDirectories(path);
   }
   ImageNamer defaultImageNamer;
@@ -63,7 +63,7 @@ void extractImages(
 }
 
 int extractAudio(const string& path, FilteredFileReader& filteredReader) {
-  if (path.length() > 0) {
+  if (!path.empty()) {
     if (!os::pathExists(path)) {
       int status = os::makeDirectories(path);
       if (status != 0) {

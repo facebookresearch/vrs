@@ -70,11 +70,11 @@ struct DataLayoutChunk {
 class DataSourceChunk {
  public:
   /// Not copyable as there are derived classes that aren't safe to copy from the base class.
-  DataSourceChunk(const DataSourceChunk& other) = delete;
-  const DataSourceChunk& operator=(const DataSourceChunk& other) = delete;
+  DataSourceChunk(const DataSourceChunk& other) = default;
+  DataSourceChunk(DataSourceChunk&& other) noexcept = default;
 
   /// Empty DataSourceChunk.
-  DataSourceChunk() : data_{}, size_{} {}
+  DataSourceChunk() = default;
   /// Constructor for a raw pointer + size.
   DataSourceChunk(const void* _data, size_t _size);
   /// Constructor for a vector<T> of objects of POD type T.
@@ -83,6 +83,9 @@ class DataSourceChunk {
   DataSourceChunk(const vector<T>& vectorT)
       : data_{vectorT.data()}, size_{sizeof(T) * vectorT.size()} {}
   virtual ~DataSourceChunk() = default;
+
+  DataSourceChunk& operator=(const DataSourceChunk& other) = default;
+  DataSourceChunk& operator=(DataSourceChunk&& other) noexcept = default;
 
   /// Constructor for a trivially copyable type T.
   template <
@@ -108,8 +111,8 @@ class DataSourceChunk {
   }
 
  private:
-  const void* const data_;
-  const size_t size_;
+  const void* data_{};
+  size_t size_{0};
 };
 
 /// \brief Class to represent a data chunk composed of multiple smaller
@@ -204,7 +207,10 @@ class DataSource {
       const DataSourceChunk& thirdChunk);
 
   DataSource(const DataSource&) = delete;
+  DataSource(DataSource&&) = delete;
+
   DataSource& operator=(const DataSource&) = delete;
+  DataSource& operator=(DataSource&&) = delete;
 
   /// Get the total amount of data to copy, calculated once & cached at construction.
   /// Might not be the same as the sum of the chunks sizes, when this class is derived.

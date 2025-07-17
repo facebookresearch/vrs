@@ -54,7 +54,11 @@ class CompressionJob {
  public:
   CompressionJob() = default;
   CompressionJob(const CompressionJob&) = delete;
+  CompressionJob(CompressionJob&& other) = delete;
+  ~CompressionJob() = default;
+
   CompressionJob& operator=(const CompressionJob&) = delete;
+  CompressionJob& operator=(CompressionJob&& other) = delete;
 
   void setSortRecord(const RecordFileWriter::SortRecord& record) {
     sortRecord_ = record;
@@ -94,9 +98,14 @@ class CompressionWorker {
         threadIndex_{threadIndex},
         initCreatedThreadCallback_{std::move(initCreatedThreadCallback)},
         thread_{&CompressionWorker::threadActivity, this} {}
+  CompressionWorker(const CompressionWorker&) = delete;
+  CompressionWorker(CompressionWorker&&) = delete;
   ~CompressionWorker() {
     thread_.join();
   }
+
+  CompressionWorker& operator=(const CompressionWorker&) = delete;
+  CompressionWorker& operator=(CompressionWorker&&) = delete;
 
  private:
   void threadActivity() {
@@ -138,10 +147,16 @@ struct CompressionThreadsData {
     }
   }
 
+  CompressionThreadsData() = default;
+  CompressionThreadsData(const CompressionThreadsData&) = delete;
+  CompressionThreadsData(CompressionThreadsData&&) = delete;
   ~CompressionThreadsData() {
     jobsQueue.endQueue();
     compressionThreadsPool_.clear();
   }
+
+  CompressionThreadsData& operator=(const CompressionThreadsData&) = delete;
+  CompressionThreadsData& operator=(CompressionThreadsData&&) = delete;
 };
 
 // structure holding the background save thread's data, if any
@@ -154,12 +169,17 @@ struct WriterThreadData {
     // The thread may start before the constructor even finished and returned, which means the
     // main thread may not even have a reference to this object.
   }
+  WriterThreadData(const WriterThreadData&) = delete;
+  WriterThreadData(WriterThreadData&&) = delete;
 
   ~WriterThreadData() {
     if (!shouldEndThread) {
       XR_LOGE("Unrequested exit of WriterThreadData");
     }
   }
+
+  WriterThreadData& operator=(const WriterThreadData&) = delete;
+  WriterThreadData& operator=(WriterThreadData&&) = delete;
 
   atomic<int> fileError{}; // 0, or last write error
   atomic<bool> shouldEndThread{}; // set when this thread should finish-up & end
@@ -197,12 +217,17 @@ struct PurgeThreadData {
         maxTimestampProvider{maxTimestampProvider},
         autoPurgeDelay{autoPurgeDelay},
         purgingPaused_{purgePaused} {}
+  PurgeThreadData(const PurgeThreadData&) = delete;
+  PurgeThreadData(PurgeThreadData&&) = delete;
 
   ~PurgeThreadData() {
     if (!shouldEndThread) {
       XR_LOGE("Unrequested exit of PurgeThreadData");
     }
   }
+
+  PurgeThreadData& operator=(const PurgeThreadData&) = delete;
+  PurgeThreadData& operator=(PurgeThreadData&&) = delete;
 
   atomic<bool> shouldEndThread; // set when the thread should end
   // os::EventChannel used to wake the purge background thread to purge old records
@@ -717,7 +742,11 @@ class RecordList {
   explicit RecordList(const pair<StreamId, list<Record*>>& deviceRecords)
       : deviceRecords_{&deviceRecords}, iter_{deviceRecords.second.begin()} {}
   RecordList(const RecordList& rhs) = default;
+  RecordList(RecordList&& rhs) = default;
+  ~RecordList() = default;
+
   RecordList& operator=(const RecordList& rhs) = default;
+  RecordList& operator=(RecordList&& rhs) = default;
 
   // Get the record currently at the front of the
   inline RecordFileWriter::SortRecord getRecord() const {

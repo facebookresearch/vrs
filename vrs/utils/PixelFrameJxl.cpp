@@ -17,9 +17,6 @@
 #include "PixelFrame.h"
 
 #include <algorithm>
-#include <map>
-#include <mutex>
-#include <thread>
 
 #ifdef JXL_IS_AVAILABLE
 #include <jxl/color_encoding.h>

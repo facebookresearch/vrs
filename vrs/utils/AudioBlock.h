@@ -49,6 +49,7 @@ struct AudioDecompressionHandler {
 class AudioBlock {
  public:
   AudioBlock() = default;
+  AudioBlock(AudioBlock& other) = default;
   AudioBlock(AudioBlock&& other) noexcept = default;
   AudioBlock(const AudioContentBlockSpec& spec, vector<uint8_t>&& frameBytes);
   explicit AudioBlock(const AudioContentBlockSpec& spec);
@@ -66,6 +67,7 @@ class AudioBlock {
             sampleFrameStride,
             sampleRate,
             sampleCount)) {}
+  ~AudioBlock() = default;
 
   void init(const AudioContentBlockSpec& spec);
   inline void init(
@@ -80,8 +82,10 @@ class AudioBlock {
   }
   void init(const AudioContentBlockSpec& spec, vector<uint8_t>&& frameBytes);
 
+  AudioBlock& operator=(const AudioBlock& other) = default;
+  AudioBlock& operator=(AudioBlock&& other) noexcept = default;
+
   void swap(AudioBlock& other) noexcept;
-  AudioBlock& operator=(AudioBlock&& other) = default;
 
   const AudioContentBlockSpec& getSpec() const {
     return audioSpec_;

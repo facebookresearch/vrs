@@ -67,9 +67,12 @@ class RecordFileReader {
  public:
   RecordFileReader();
   RecordFileReader(const RecordFileReader&) = delete;
-  RecordFileReader& operator=(const RecordFileReader&) = delete;
+  RecordFileReader(RecordFileReader&&) = delete;
 
   virtual ~RecordFileReader();
+
+  RecordFileReader& operator=(const RecordFileReader&) = delete;
+  RecordFileReader& operator=(RecordFileReader&&) = delete;
 
   /// Checks if a file is most probably a VRS file by checking its header for VRS file's format
   /// magic numbers.
@@ -546,7 +549,7 @@ class RecordFileReader {
     using ParentType = std::array<uint32_t, enumCount<Record::Type>()>;
 
    public:
-    RecordTypeCounter() {
+    RecordTypeCounter() : array() {
       fill(0);
     }
     inline uint32_t operator[](Record::Type recordType) const {

@@ -244,8 +244,10 @@ class StreamId {
  public:
   StreamId() : typeId_{RecordableTypeId::Undefined}, instanceId_{0} {}
   StreamId(const StreamId& rhs) = default;
+  StreamId(StreamId&& rhs) noexcept = default;
   StreamId(RecordableTypeId typeId, uint16_t instanceId)
       : typeId_{typeId}, instanceId_{instanceId} {}
+  ~StreamId() = default;
 
   /// Get the recordable type id.
   /// @return Recordable type id.
@@ -260,7 +262,7 @@ class StreamId {
   }
 
   StreamId& operator=(const StreamId& rhs) = default;
-  StreamId& operator=(StreamId&& rhs) = default;
+  StreamId& operator=(StreamId&& rhs) noexcept = default;
   bool operator==(const StreamId& rhs) const {
     return typeId_ == rhs.typeId_ && instanceId_ == rhs.instanceId_;
   }
