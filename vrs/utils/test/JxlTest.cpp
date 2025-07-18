@@ -19,7 +19,6 @@
 #endif
 #include <cmath>
 
-#include <numbers>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -110,7 +109,7 @@ void fill_in_row_jahne_grey16(
 }
 
 void FillInJahneTestPattern(PixelFrame& f) {
-  float frequency_coefficient = std::numbers::pi_v<float> / (2.0f * f.getWidth());
+  float frequency_coefficient = (float)(M_PI) / (2.0f * f.getWidth());
   float center_row_index = f.getHeight() / 2.0f;
   float center_col_index = f.getWidth() / 2.0f;
   float centered_row = 0.0f;
