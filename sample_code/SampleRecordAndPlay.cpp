@@ -205,7 +205,7 @@ class RecordSample {
     XR_CHECK(result == 0);
 
     double lastTime = os::getTimestampSec();
-    while (recordable.iNeedToRecordMoreData()) {
+    while (vrs_sample_code::RecordableDemo::iNeedToRecordMoreData()) {
       recordable.createMoreRecords(); // for each recordable, maybe create new records of any type
       // maybe once every second, call:
       double now = os::getTimestampSec(); // current time using your *unique* time source
