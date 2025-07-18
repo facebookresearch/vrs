@@ -265,7 +265,7 @@ void printSamples(const string& appName) {
        << SP("copy src.vrs --to extract.vrs + 100-1 + 101-1")
 
        << "Trim data records in the first 2 seconds and the last second of a recording:\n"
-       << SP("copy src.vrs --to extract.vrs --range +2 -1")
+       << SP("copy src.vrs --to extract.vrs --after +2 --before -1")
 
        << "Copy multiple VRS files into a single one, keeping all streams separate:\n"
        << SP("copy first.vrs second.vrs third.vrs --to new.vrs")
