@@ -126,14 +126,18 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a3f5698ec569a34f6341bc54bf411c17f" id="r_a3f5698ec569a34f6341bc54bf411c17f"><td class="memItemLeft" align="right" valign="top"><a id="a3f5698ec569a34f6341bc54bf411c17f" name="a3f5698ec569a34f6341bc54bf411c17f"></a>
-<a class="el" href="classvrs_1_1_data_layout.html">DataLayout</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classvrs_1_1_data_layout.html">DataLayout</a> &amp;)=delete</td></tr>
-<tr class="separator:a3f5698ec569a34f6341bc54bf411c17f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3afc4d7268965b78151baa7900cd6603" id="r_a3afc4d7268965b78151baa7900cd6603"><td class="memItemLeft" align="right" valign="top"><a id="a3afc4d7268965b78151baa7900cd6603" name="a3afc4d7268965b78151baa7900cd6603"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>DataLayout</b> (const <a class="el" href="classvrs_1_1_data_layout.html">DataLayout</a> &amp;)=delete</td></tr>
 <tr class="separator:a3afc4d7268965b78151baa7900cd6603"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab4b397a6aba99ed3279f685e65672738" id="r_ab4b397a6aba99ed3279f685e65672738"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_layout.html#ab4b397a6aba99ed3279f685e65672738">~DataLayout</a> ()</td></tr>
-<tr class="separator:ab4b397a6aba99ed3279f685e65672738"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acabba8ba35469a9120f07444e982afc1" id="r_acabba8ba35469a9120f07444e982afc1"><td class="memItemLeft" align="right" valign="top"><a id="acabba8ba35469a9120f07444e982afc1" name="acabba8ba35469a9120f07444e982afc1"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>DataLayout</b> (const <a class="el" href="classvrs_1_1_data_layout.html">DataLayout</a> &amp;&amp;)=delete</td></tr>
+<tr class="separator:acabba8ba35469a9120f07444e982afc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f5698ec569a34f6341bc54bf411c17f" id="r_a3f5698ec569a34f6341bc54bf411c17f"><td class="memItemLeft" align="right" valign="top"><a id="a3f5698ec569a34f6341bc54bf411c17f" name="a3f5698ec569a34f6341bc54bf411c17f"></a>
+<a class="el" href="classvrs_1_1_data_layout.html">DataLayout</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classvrs_1_1_data_layout.html">DataLayout</a> &amp;)=delete</td></tr>
+<tr class="separator:a3f5698ec569a34f6341bc54bf411c17f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af65502829e5c4bdb75db9e906929c11e" id="r_af65502829e5c4bdb75db9e906929c11e"><td class="memItemLeft" align="right" valign="top"><a id="af65502829e5c4bdb75db9e906929c11e" name="af65502829e5c4bdb75db9e906929c11e"></a>
+<a class="el" href="classvrs_1_1_data_layout.html">DataLayout</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classvrs_1_1_data_layout.html">DataLayout</a> &amp;&amp;)=delete</td></tr>
+<tr class="separator:af65502829e5c4bdb75db9e906929c11e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7ba3915c662bb4207b29b1549ce4eaeb" id="r_a7ba3915c662bb4207b29b1549ce4eaeb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classvrs_1_1_content_block.html">ContentBlock</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_layout.html#a7ba3915c662bb4207b29b1549ce4eaeb">getContentBlock</a> () const</td></tr>
 <tr class="separator:a7ba3915c662bb4207b29b1549ce4eaeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab76d9bdfe7e3185ccfa49b1588bb545a" id="r_ab76d9bdfe7e3185ccfa49b1588bb545a"><td class="memItemLeft" align="right" valign="top">vector&lt; int8_t &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_data_layout.html#ab76d9bdfe7e3185ccfa49b1588bb545a">getFixedData</a> ()</td></tr>
@@ -396,34 +400,7 @@ Anatomy of a DataLayout</h1>
 </ol>
 <p>Therefore, to read &amp; write a <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a>'s data very efficiently from &amp; to disk. The data is memory copied without any encoding in a binary buffer without any padding, which guaranties its tightness and bit accuracy, which can be critically important when using float &amp; double numbers. Records can then be compressed as a whole, with the appropriate speed/compactness trade off.</p>
 <p>Of course, all of this is the responsibility of VRS itself. </p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="ab4b397a6aba99ed3279f685e65672738" name="ab4b397a6aba99ed3279f685e65672738"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab4b397a6aba99ed3279f685e65672738">&#9670;&#160;</a></span>~DataLayout()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">vrs::DataLayout::~DataLayout </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span><span class="mlabel">default</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p><a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> has no virtual method, but it is used in containers, and some of its derived classes have important clean-up work to do in their destructor. Therefore, <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> requires a virtual destructor. </p>
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
+</div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a0bc2c897c4a70bdb4b17447a6e101e59" name="a0bc2c897c4a70bdb4b17447a6e101e59"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0bc2c897c4a70bdb4b17447a6e101e59">&#9670;&#160;</a></span>asJson() <span class="overload">[1/2]</span></h2>
 

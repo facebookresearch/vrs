@@ -121,76 +121,79 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> <span class="keyword">public</span>:</div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>  <a class="code hl_class" href="classvrs_1_1_record_manager.html">RecordManager</a>();</div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>  <a class="code hl_class" href="classvrs_1_1_record_manager.html">RecordManager</a>(<span class="keyword">const</span> <a class="code hl_class" href="classvrs_1_1_record_manager.html">RecordManager</a>&amp;) = <span class="keyword">delete</span>;</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>  <span class="keywordtype">void</span> operator=(<span class="keyword">const</span> <a class="code hl_class" href="classvrs_1_1_record_manager.html">RecordManager</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>  <a class="code hl_class" href="classvrs_1_1_record_manager.html">RecordManager</a>(<a class="code hl_class" href="classvrs_1_1_record_manager.html">RecordManager</a>&amp;&amp;) = <span class="keyword">delete</span>;</div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>  <a class="code hl_class" href="classvrs_1_1_record_manager.html">~RecordManager</a>();</div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span> </div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>  <a class="code hl_class" href="classvrs_1_1_record.html">Record</a>*</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>  <a class="code hl_function" href="classvrs_1_1_record_manager.html#ac9609c8bd45a8ec1f2c98ef032e0a1c4">createRecord</a>(<span class="keywordtype">double</span> timestamp, <a class="code hl_enumeration" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> type, uint32_t formatVersion, <span class="keyword">const</span> <a class="code hl_class" href="classvrs_1_1_data_source.html">DataSource</a>&amp; data);</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>  <a class="code hl_class" href="classvrs_1_1_record.html">Record</a>* <a class="code hl_function" href="classvrs_1_1_record_manager.html#ac57ff039568255ccb9bac5f511a6a8bc">createUncompressedRecord</a>(</div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>      <span class="keywordtype">double</span> timestamp,</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>      <a class="code hl_enumeration" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> type,</div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>      uint32_t formatVersion,</div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>      <span class="keyword">const</span> <a class="code hl_class" href="classvrs_1_1_data_source.html">DataSource</a>&amp; data,</div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>      std::unique_ptr&lt;DirectWriteRecordData&gt;&amp;&amp; directWriteData);</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span> </div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>  uint32_t <a class="code hl_function" href="classvrs_1_1_record_manager.html#a5a2b2380b4e3af398631f0471dc09a28">purgeOldRecords</a>(<span class="keywordtype">double</span> oldestTimestamp, <span class="keywordtype">bool</span> recycleBuffers = <span class="keyword">true</span>);</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span> </div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classvrs_1_1_record_manager.html#af554e9dac61108218c37dd95b5708240">purgeCache</a>();</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>  <span class="keywordtype">void</span> operator=(<span class="keyword">const</span> <a class="code hl_class" href="classvrs_1_1_record_manager.html">RecordManager</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>  <span class="keywordtype">void</span> operator=(<a class="code hl_class" href="classvrs_1_1_record_manager.html">RecordManager</a>&amp;&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>  <a class="code hl_class" href="classvrs_1_1_record.html">Record</a>*</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>  <a class="code hl_function" href="classvrs_1_1_record_manager.html#ac9609c8bd45a8ec1f2c98ef032e0a1c4">createRecord</a>(<span class="keywordtype">double</span> timestamp, <a class="code hl_enumeration" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> type, uint32_t formatVersion, <span class="keyword">const</span> <a class="code hl_class" href="classvrs_1_1_data_source.html">DataSource</a>&amp; data);</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>  <a class="code hl_class" href="classvrs_1_1_record.html">Record</a>* <a class="code hl_function" href="classvrs_1_1_record_manager.html#ac57ff039568255ccb9bac5f511a6a8bc">createUncompressedRecord</a>(</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>      <span class="keywordtype">double</span> timestamp,</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>      <a class="code hl_enumeration" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> type,</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>      uint32_t formatVersion,</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>      <span class="keyword">const</span> <a class="code hl_class" href="classvrs_1_1_data_source.html">DataSource</a>&amp; data,</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>      std::unique_ptr&lt;DirectWriteRecordData&gt;&amp;&amp; directWriteData);</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span> </div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>  uint32_t <a class="code hl_function" href="classvrs_1_1_record_manager.html#a5a2b2380b4e3af398631f0471dc09a28">purgeOldRecords</a>(<span class="keywordtype">double</span> oldestTimestamp, <span class="keywordtype">bool</span> recycleBuffers = <span class="keyword">true</span>);</div>
 <div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classvrs_1_1_record_manager.html#a6267f35dcc1d838dfe7bbb83725e9fb0">collectOldRecords</a>(<span class="keywordtype">double</span> maxAge, list&lt;Record*&gt;&amp; outCollectedRecords);</div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span> </div>
-<div class="foldopen" id="foldopen00092" data-start="{" data-end="}">
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno"><a class="line" href="classvrs_1_1_record_manager.html#a0a23c2d0601528e6408833fc1abd2cac">   92</a></span>  <a class="code hl_enumeration" href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7b">CompressionPreset</a> <a class="code hl_function" href="classvrs_1_1_record_manager.html#a0a23c2d0601528e6408833fc1abd2cac">getCompression</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    <span class="keywordflow">return</span> compression_;</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>  }</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classvrs_1_1_record_manager.html#af554e9dac61108218c37dd95b5708240">purgeCache</a>();</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span> </div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classvrs_1_1_record_manager.html#a6267f35dcc1d838dfe7bbb83725e9fb0">collectOldRecords</a>(<span class="keywordtype">double</span> maxAge, list&lt;Record*&gt;&amp; outCollectedRecords);</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span> </div>
+<div class="foldopen" id="foldopen00095" data-start="{" data-end="}">
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno"><a class="line" href="classvrs_1_1_record_manager.html#a0a23c2d0601528e6408833fc1abd2cac">   95</a></span>  <a class="code hl_enumeration" href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7b">CompressionPreset</a> <a class="code hl_function" href="classvrs_1_1_record_manager.html#a0a23c2d0601528e6408833fc1abd2cac">getCompression</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    <span class="keywordflow">return</span> compression_;</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>  }</div>
 </div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span> </div>
-<div class="foldopen" id="foldopen00099" data-start="{" data-end="}">
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno"><a class="line" href="classvrs_1_1_record_manager.html#a2c9520d6b1e83ef3951d429fc99f098a">   99</a></span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classvrs_1_1_record_manager.html#a2c9520d6b1e83ef3951d429fc99f098a">setCompression</a>(<a class="code hl_enumeration" href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7b">CompressionPreset</a> compression) {</div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    compression_ = compression;</div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>  }</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span> </div>
+<div class="foldopen" id="foldopen00102" data-start="{" data-end="}">
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno"><a class="line" href="classvrs_1_1_record_manager.html#a2c9520d6b1e83ef3951d429fc99f098a">  102</a></span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classvrs_1_1_record_manager.html#a2c9520d6b1e83ef3951d429fc99f098a">setCompression</a>(<a class="code hl_enumeration" href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7b">CompressionPreset</a> compression) {</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>    compression_ = compression;</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>  }</div>
 </div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span> </div>
-<div class="foldopen" id="foldopen00106" data-start="{" data-end="}">
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno"><a class="line" href="classvrs_1_1_record_manager.html#af48723193df4dbd378ea39193142f7b9">  106</a></span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classvrs_1_1_record_manager.html#af48723193df4dbd378ea39193142f7b9">setMaxCacheSize</a>(<span class="keywordtype">size_t</span> max) {</div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    maxCacheSize_ = max;</div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>  }</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span> </div>
+<div class="foldopen" id="foldopen00109" data-start="{" data-end="}">
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno"><a class="line" href="classvrs_1_1_record_manager.html#af48723193df4dbd378ea39193142f7b9">  109</a></span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classvrs_1_1_record_manager.html#af48723193df4dbd378ea39193142f7b9">setMaxCacheSize</a>(<span class="keywordtype">size_t</span> max) {</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    maxCacheSize_ = max;</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>  }</div>
 </div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span> </div>
-<div class="foldopen" id="foldopen00113" data-start="{" data-end="}">
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno"><a class="line" href="classvrs_1_1_record_manager.html#ae2434e3a130f837a70361ab2fa856acb">  113</a></span>  <span class="keywordtype">size_t</span> <a class="code hl_function" href="classvrs_1_1_record_manager.html#ae2434e3a130f837a70361ab2fa856acb">getCurrentCacheSize</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    <span class="keywordflow">return</span> cache_.size();</div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>  }</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span> </div>
+<div class="foldopen" id="foldopen00116" data-start="{" data-end="}">
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno"><a class="line" href="classvrs_1_1_record_manager.html#ae2434e3a130f837a70361ab2fa856acb">  116</a></span>  <span class="keywordtype">size_t</span> <a class="code hl_function" href="classvrs_1_1_record_manager.html#ae2434e3a130f837a70361ab2fa856acb">getCurrentCacheSize</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    <span class="keywordflow">return</span> cache_.size();</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>  }</div>
 </div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span> </div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span> <span class="keyword">private</span>:</div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>  <span class="keyword">static</span> <span class="keywordtype">size_t</span> getAcceptableOverCapacity(<span class="keywordtype">size_t</span> capacity);</div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>  <span class="keywordtype">void</span> recycle(<a class="code hl_class" href="classvrs_1_1_record.html">Record</a>* record);</div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span> </div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>  std::mutex mutex_;</div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>  list&lt;Record*&gt; activeRecords_; <span class="comment">// Records ready to be written</span></div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>  list&lt;Record*&gt; cache_; <span class="comment">// Written/recycled records available for reuse</span></div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span> </div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>  <a class="code hl_enumeration" href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7b">CompressionPreset</a> compression_;</div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>  <span class="keywordtype">size_t</span> maxCacheSize_;</div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>  uint64_t creationOrder_;</div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>};</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span> </div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span> <span class="keyword">private</span>:</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>  <span class="keyword">static</span> <span class="keywordtype">size_t</span> getAcceptableOverCapacity(<span class="keywordtype">size_t</span> capacity);</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>  <span class="keywordtype">void</span> recycle(<a class="code hl_class" href="classvrs_1_1_record.html">Record</a>* record);</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span> </div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>  std::mutex mutex_;</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>  list&lt;Record*&gt; activeRecords_; <span class="comment">// Records ready to be written</span></div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>  list&lt;Record*&gt; cache_; <span class="comment">// Written/recycled records available for reuse</span></div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span> </div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>  <a class="code hl_enumeration" href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7b">CompressionPreset</a> compression_;</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>  <span class="keywordtype">size_t</span> maxCacheSize_;</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>  uint64_t creationOrder_;</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>};</div>
 </div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span> </div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>} <span class="comment">// namespace vrs</span></div>
-<div class="ttc" id="aclassvrs_1_1_data_source_html"><div class="ttname"><a href="classvrs_1_1_data_source.html">vrs::DataSource</a></div><div class="ttdoc">A class referencing data to be captured in a record at creation.</div><div class="ttdef"><b>Definition</b> DataSource.h:151</div></div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span> </div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>} <span class="comment">// namespace vrs</span></div>
+<div class="ttc" id="aclassvrs_1_1_data_source_html"><div class="ttname"><a href="classvrs_1_1_data_source.html">vrs::DataSource</a></div><div class="ttdoc">A class referencing data to be captured in a record at creation.</div><div class="ttdef"><b>Definition</b> DataSource.h:154</div></div>
 <div class="ttc" id="aclassvrs_1_1_record_html"><div class="ttname"><a href="classvrs_1_1_record.html">vrs::Record</a></div><div class="ttdoc">Essential VRS class holding a record's details and payload in memory during creation.</div><div class="ttdef"><b>Definition</b> Record.h:79</div></div>
 <div class="ttc" id="aclassvrs_1_1_record_html_a449931b6fc23eaef585e3c7a4c0ed2ce"><div class="ttname"><a href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">vrs::Record::Type</a></div><div class="ttdeci">Type</div><div class="ttdef"><b>Definition</b> Record.h:88</div></div>
 <div class="ttc" id="aclassvrs_1_1_record_manager_html"><div class="ttname"><a href="classvrs_1_1_record_manager.html">vrs::RecordManager</a></div><div class="ttdoc">VRS internal class to manage the records of a specific Recordable after their creation.</div><div class="ttdef"><b>Definition</b> RecordManager.h:38</div></div>
-<div class="ttc" id="aclassvrs_1_1_record_manager_html_a0a23c2d0601528e6408833fc1abd2cac"><div class="ttname"><a href="classvrs_1_1_record_manager.html#a0a23c2d0601528e6408833fc1abd2cac">vrs::RecordManager::getCompression</a></div><div class="ttdeci">CompressionPreset getCompression() const</div><div class="ttdef"><b>Definition</b> RecordManager.h:92</div></div>
-<div class="ttc" id="aclassvrs_1_1_record_manager_html_a2c9520d6b1e83ef3951d429fc99f098a"><div class="ttname"><a href="classvrs_1_1_record_manager.html#a2c9520d6b1e83ef3951d429fc99f098a">vrs::RecordManager::setCompression</a></div><div class="ttdeci">void setCompression(CompressionPreset compression)</div><div class="ttdef"><b>Definition</b> RecordManager.h:99</div></div>
+<div class="ttc" id="aclassvrs_1_1_record_manager_html_a0a23c2d0601528e6408833fc1abd2cac"><div class="ttname"><a href="classvrs_1_1_record_manager.html#a0a23c2d0601528e6408833fc1abd2cac">vrs::RecordManager::getCompression</a></div><div class="ttdeci">CompressionPreset getCompression() const</div><div class="ttdef"><b>Definition</b> RecordManager.h:95</div></div>
+<div class="ttc" id="aclassvrs_1_1_record_manager_html_a2c9520d6b1e83ef3951d429fc99f098a"><div class="ttname"><a href="classvrs_1_1_record_manager.html#a2c9520d6b1e83ef3951d429fc99f098a">vrs::RecordManager::setCompression</a></div><div class="ttdeci">void setCompression(CompressionPreset compression)</div><div class="ttdef"><b>Definition</b> RecordManager.h:102</div></div>
 <div class="ttc" id="aclassvrs_1_1_record_manager_html_a5a2b2380b4e3af398631f0471dc09a28"><div class="ttname"><a href="classvrs_1_1_record_manager.html#a5a2b2380b4e3af398631f0471dc09a28">vrs::RecordManager::purgeOldRecords</a></div><div class="ttdeci">uint32_t purgeOldRecords(double oldestTimestamp, bool recycleBuffers=true)</div><div class="ttdef"><b>Definition</b> RecordManager.cpp:127</div></div>
 <div class="ttc" id="aclassvrs_1_1_record_manager_html_a6267f35dcc1d838dfe7bbb83725e9fb0"><div class="ttname"><a href="classvrs_1_1_record_manager.html#a6267f35dcc1d838dfe7bbb83725e9fb0">vrs::RecordManager::collectOldRecords</a></div><div class="ttdeci">void collectOldRecords(double maxAge, list&lt; Record * &gt; &amp;outCollectedRecords)</div><div class="ttdef"><b>Definition</b> RecordManager.cpp:181</div></div>
 <div class="ttc" id="aclassvrs_1_1_record_manager_html_ac57ff039568255ccb9bac5f511a6a8bc"><div class="ttname"><a href="classvrs_1_1_record_manager.html#ac57ff039568255ccb9bac5f511a6a8bc">vrs::RecordManager::createUncompressedRecord</a></div><div class="ttdeci">Record * createUncompressedRecord(double timestamp, Record::Type type, uint32_t formatVersion, const DataSource &amp;data, std::unique_ptr&lt; DirectWriteRecordData &gt; &amp;&amp;directWriteData)</div><div class="ttdef"><b>Definition</b> RecordManager.cpp:116</div></div>
 <div class="ttc" id="aclassvrs_1_1_record_manager_html_ac9609c8bd45a8ec1f2c98ef032e0a1c4"><div class="ttname"><a href="classvrs_1_1_record_manager.html#ac9609c8bd45a8ec1f2c98ef032e0a1c4">vrs::RecordManager::createRecord</a></div><div class="ttdeci">Record * createRecord(double timestamp, Record::Type type, uint32_t formatVersion, const DataSource &amp;data)</div><div class="ttdef"><b>Definition</b> RecordManager.cpp:55</div></div>
-<div class="ttc" id="aclassvrs_1_1_record_manager_html_ae2434e3a130f837a70361ab2fa856acb"><div class="ttname"><a href="classvrs_1_1_record_manager.html#ae2434e3a130f837a70361ab2fa856acb">vrs::RecordManager::getCurrentCacheSize</a></div><div class="ttdeci">size_t getCurrentCacheSize() const</div><div class="ttdef"><b>Definition</b> RecordManager.h:113</div></div>
-<div class="ttc" id="aclassvrs_1_1_record_manager_html_af48723193df4dbd378ea39193142f7b9"><div class="ttname"><a href="classvrs_1_1_record_manager.html#af48723193df4dbd378ea39193142f7b9">vrs::RecordManager::setMaxCacheSize</a></div><div class="ttdeci">void setMaxCacheSize(size_t max)</div><div class="ttdef"><b>Definition</b> RecordManager.h:106</div></div>
+<div class="ttc" id="aclassvrs_1_1_record_manager_html_ae2434e3a130f837a70361ab2fa856acb"><div class="ttname"><a href="classvrs_1_1_record_manager.html#ae2434e3a130f837a70361ab2fa856acb">vrs::RecordManager::getCurrentCacheSize</a></div><div class="ttdeci">size_t getCurrentCacheSize() const</div><div class="ttdef"><b>Definition</b> RecordManager.h:116</div></div>
+<div class="ttc" id="aclassvrs_1_1_record_manager_html_af48723193df4dbd378ea39193142f7b9"><div class="ttname"><a href="classvrs_1_1_record_manager.html#af48723193df4dbd378ea39193142f7b9">vrs::RecordManager::setMaxCacheSize</a></div><div class="ttdeci">void setMaxCacheSize(size_t max)</div><div class="ttdef"><b>Definition</b> RecordManager.h:109</div></div>
 <div class="ttc" id="aclassvrs_1_1_record_manager_html_af554e9dac61108218c37dd95b5708240"><div class="ttname"><a href="classvrs_1_1_record_manager.html#af554e9dac61108218c37dd95b5708240">vrs::RecordManager::purgeCache</a></div><div class="ttdeci">void purgeCache()</div><div class="ttdoc">Release as much memory as possible, by deleting all the records in the cache.</div><div class="ttdef"><b>Definition</b> RecordManager.cpp:173</div></div>
 <div class="ttc" id="anamespacevrs_html"><div class="ttname"><a href="namespacevrs.html">vrs</a></div><div class="ttdef"><b>Definition</b> Compressor.cpp:113</div></div>
 <div class="ttc" id="anamespacevrs_html_a37a35edf18e8bb343398cb938d3e2b7b"><div class="ttname"><a href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7b">vrs::CompressionPreset</a></div><div class="ttdeci">CompressionPreset</div><div class="ttdoc">VRS Compression setting.</div><div class="ttdef"><b>Definition</b> Compressor.h:38</div></div>
