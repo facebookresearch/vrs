@@ -10,7 +10,6 @@ To create a VRS file:
 - Add tags to the file writer and the Recordables as necessary to describe your devices and setup. Add things such as serial numbers, global configuration settings, user names, locations, user heights, etc. Make sure you capture all the context you will need when you play back the VRS file.
 
 - The following best practices are extremely important:
-
   - Use the tag name conventions defined in [`<VRS/TagConventions.h>`](https://github.com/facebookresearch/vrs/blob/main/vrs/TagConventions.h) as much as possible.
   - Capture all the tags upfront, in case the recording is interrupted (out of disk space or crashes).
 
