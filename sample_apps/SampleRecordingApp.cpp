@@ -35,10 +35,15 @@ using namespace vrs_sample_apps;
 
 namespace vrs_sample_apps {
 
-// Use your own clock source.
-static double getTimestampSec() {
+static double now() {
   using namespace std::chrono;
   return duration_cast<duration<double>>(steady_clock::now().time_since_epoch()).count();
+}
+
+// Use your own clock source.
+static double getTimestampSec() {
+  static double kStartTime = now();
+  return (now() - kStartTime) * 500; // arbitrarily spread timestamps over more time
 }
 
 /// \brief Sample fake device showing how to produce records containing metadata and images.
