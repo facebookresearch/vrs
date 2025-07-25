@@ -40,6 +40,6 @@ var searchData=
   ['directwriterecorddata_37',['DirectWriteRecordData',['../classvrs_1_1_direct_write_record_data.html',1,'vrs']]],
   ['diskfilechunk_38',['DiskFileChunk',['../classvrs_1_1_disk_file_chunk.html',1,'vrs']]],
   ['diskfilet_39',['DiskFileT',['../classvrs_1_1_disk_file_t.html',1,'vrs']]],
-  ['diskrecordinfo_40',['diskrecordinfo',['../structvrs_1_1_file_details_cache_1_1_disk_record_info.html',1,'vrs::FileDetailsCache::DiskRecordInfo'],['../structvrs_1_1_index_record_1_1_disk_record_info.html',1,'vrs::IndexRecord::DiskRecordInfo']]],
-  ['diskstreamid_41',['diskstreamid',['../structvrs_1_1_file_details_cache_1_1_disk_stream_id.html',1,'vrs::FileDetailsCache::DiskStreamId'],['../structvrs_1_1_index_record_1_1_disk_stream_id.html',1,'vrs::IndexRecord::DiskStreamId']]]
+  ['diskrecordinfo_40',['DiskRecordInfo',['../structvrs_1_1_index_record_1_1_disk_record_info.html',1,'vrs::IndexRecord']]],
+  ['diskstreamid_41',['DiskStreamId',['../structvrs_1_1_index_record_1_1_disk_stream_id.html',1,'vrs::IndexRecord']]]
 ];

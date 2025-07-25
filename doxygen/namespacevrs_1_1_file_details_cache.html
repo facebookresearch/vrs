@@ -76,7 +76,6 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">vrs::FileDetailsCache Namespace Reference</div></div>
 </div><!--header-->
@@ -85,15 +84,6 @@ $(function() {
 <p>Helper methods to read &amp; write file details in a cache file.  
 <a href="namespacevrs_1_1_file_details_cache.html#details">More...</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvrs_1_1_file_details_cache_1_1_disk_record_info.html">DiskRecordInfo</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper class to store record information on disk.  <a href="structvrs_1_1_file_details_cache_1_1_disk_record_info.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvrs_1_1_file_details_cache_1_1_disk_stream_id.html">DiskStreamId</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper class to store stream id on disk.  <a href="structvrs_1_1_file_details_cache_1_1_disk_stream_id.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a6aaf66cb0cdb190f711fdbf48bef8df0" id="r_a6aaf66cb0cdb190f711fdbf48bef8df0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs_1_1_file_details_cache.html#a6aaf66cb0cdb190f711fdbf48bef8df0">write</a> (const string &amp;cacheFile, const set&lt; <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a> &gt; &amp;streamIds, const map&lt; string, string &gt; &amp;fileTags, const map&lt; <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>, <a class="el" href="structvrs_1_1_stream_tags.html">StreamTags</a> &gt; &amp;streamTags, const vector&lt; <a class="el" href="structvrs_1_1_index_record_1_1_record_info.html">IndexRecord::RecordInfo</a> &gt; &amp;recordIndex, bool fileHasIndex)</td></tr>
@@ -103,6 +93,13 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Helper methods to read &amp; write file details in a cache file. </p>
+<p>File Format:</p>
+<p>FileHeader: same struct as a regular VRS file, but with different magic numbers. descriptionRecordOffset: offset of the description record (same as for a VRS file). indexRecordOffset: offset of the index data, in its special case format. firstUserRecordOffset: offset past the index data, effectively the end of the file.</p>
+<p>Description record: same as for a regular VRS file.</p>
+<p>Index data: custom for this use case, stream IDs and the index itself. uint32_t recordableCount: count of <a class="el" href="classvrs_1_1_stream_id.html" title="VRS stream identifier class.">StreamId</a> structs, always present, value may be 0. DiskStreamId streamId[recordableCount]: one per stream ID instance uint32_t recordCount: count of DiskRecordInfo structs, always present, value may be 0. DiskRecordInfo recordInfo[recordCount]; // one per actual record, zstd-frames compressed.</p>
+<p>The file header's "future4" is used to save some flags, which may not have been set in the past:</p><ul>
+<li>bit 0, when set, means the original VRS file is known to NOT have an index. </li>
+</ul>
 </div><h2 class="groupheader">Function Documentation</h2>
 <a id="a108f4765e8b95d9ab83e6b917f913304" name="a108f4765e8b95d9ab83e6b917f913304"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a108f4765e8b95d9ab83e6b917f913304">&#9670;&#160;</a></span>read()</h2>
