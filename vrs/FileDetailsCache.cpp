@@ -42,6 +42,7 @@ static const uint32_t kOriginalFileFormatVersion = FileFormat::fourCharCode('V',
 
 #pragma pack(push, 1)
 
+namespace {
 /// \brief Helper class to store stream id on disk.
 struct DiskStreamId {
   DiskStreamId() : typeId(static_cast<uint16_t>(RecordableTypeId::Undefined)), instanceId(0) {}
@@ -86,6 +87,7 @@ struct DiskRecordInfo {
     return streamId.getStreamId();
   }
 };
+} // anonymous namespace
 
 #pragma pack(pop)
 
