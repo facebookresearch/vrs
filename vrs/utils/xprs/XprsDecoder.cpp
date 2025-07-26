@@ -100,6 +100,7 @@ namespace vrs::vxprs {
 using namespace std;
 using xprs::XprsResult;
 
+namespace {
 class VXDecoder : public vrs::utils::DecoderI {
  public:
   explicit VXDecoder(unique_ptr<xprs::IVideoDecoder>&& videoDecoder)
@@ -341,6 +342,7 @@ class VXDecoder : public vrs::utils::DecoderI {
   vector<uint8_t> conversionBuffer_{};
   xprs::PixelFormat xprsPixelFormat_{xprs::PixelFormat::UNKNOWN};
 };
+} // anonymous namespace
 
 unique_ptr<utils::DecoderI> xprsDecoderMaker(
     const vector<uint8_t>& encodedFrame,
