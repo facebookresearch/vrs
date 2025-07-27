@@ -108,25 +108,19 @@ static bool readPngFrameWithWuff(PixelFrame& frame, const vector<uint8_t>& pngBu
       channels = 4;
       break;
     case WUFFS_BASE__PIXEL_FORMAT__BGR_565:
-      pixfmt_repr = WUFFS_BASE__PIXEL_FORMAT__RGB;
-      channels = 3;
-      break;
+      [[fallthrough]];
     case WUFFS_BASE__PIXEL_FORMAT__BGR:
       pixfmt_repr = WUFFS_BASE__PIXEL_FORMAT__RGB;
       channels = 3;
       break;
     case WUFFS_BASE__PIXEL_FORMAT__BGRA_NONPREMUL:
-      pixfmt_repr = WUFFS_BASE__PIXEL_FORMAT__RGBA_NONPREMUL;
-      channels = 4;
-      break;
+      [[fallthrough]];
     case WUFFS_BASE__PIXEL_FORMAT__BGRA_NONPREMUL_4X16LE:
       pixfmt_repr = WUFFS_BASE__PIXEL_FORMAT__RGBA_NONPREMUL;
       channels = 4;
       break;
     case WUFFS_BASE__PIXEL_FORMAT__BGRA_PREMUL:
-      pixfmt_repr = WUFFS_BASE__PIXEL_FORMAT__RGBA_PREMUL;
-      channels = 4;
-      break;
+      [[fallthrough]];
     case WUFFS_BASE__PIXEL_FORMAT__BGRA_PREMUL_4X16LE:
       pixfmt_repr = WUFFS_BASE__PIXEL_FORMAT__RGBA_PREMUL;
       channels = 4;
@@ -144,17 +138,13 @@ static bool readPngFrameWithWuff(PixelFrame& frame, const vector<uint8_t>& pngBu
       channels = 3;
       break;
     case WUFFS_BASE__PIXEL_FORMAT__RGBA_NONPREMUL:
-      pixfmt_repr = WUFFS_BASE__PIXEL_FORMAT__RGBA_NONPREMUL;
-      channels = 4;
-      break;
+      [[fallthrough]];
     case WUFFS_BASE__PIXEL_FORMAT__RGBA_NONPREMUL_4X16LE:
       pixfmt_repr = WUFFS_BASE__PIXEL_FORMAT__RGBA_NONPREMUL;
       channels = 4;
       break;
     case WUFFS_BASE__PIXEL_FORMAT__RGBA_PREMUL:
-      pixfmt_repr = WUFFS_BASE__PIXEL_FORMAT__RGBA_PREMUL;
-      channels = 4;
-      break;
+      [[fallthrough]];
     case WUFFS_BASE__PIXEL_FORMAT__RGBA_PREMUL_4X16LE:
       pixfmt_repr = WUFFS_BASE__PIXEL_FORMAT__RGBA_PREMUL;
       channels = 4;
