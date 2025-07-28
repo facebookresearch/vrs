@@ -65,8 +65,9 @@ VideoDecode::~VideoDecode() {
 
 void VideoDecode::open() {
   int ret = avcodec_open2(_avContext, _avCodec, nullptr);
-  if (ret < 0)
+  if (ret < 0) {
     throw INVOKE_CODEC_EXCEPTION_CODE(ret);
+  }
 }
 
 void VideoDecode::decode(uint8_t* buffer, size_t size, Picture& pix) {

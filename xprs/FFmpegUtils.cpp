@@ -28,8 +28,9 @@ namespace xprs {
 
 Picture::Picture() {
   _avFrame = av_frame_alloc();
-  if (_avFrame == nullptr)
+  if (_avFrame == nullptr) {
     throw INVOKE_CODEC_EXCEPTION_MESSAGE("av_frame_alloc failed");
+  }
 }
 
 Picture::~Picture() {
