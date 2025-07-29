@@ -140,78 +140,63 @@ namespace vrscli {
 
 void printHelp(const string& appName) {
   cout
-      << CMD("Get details about a VRS files", "[ file.vrs ] [filter-options]")
+      << CMD("Get details about a VRS file", "[ file.vrs ] [filter-options]")
 
       << "\n"
-      << CMD("All the other commands have the following format", "<command> [ arguments ]*")
+      << CMD("Command format", "<command> [ arguments ]*")
 
       << "\n"
       << CMD("Show this documentation", "help")
 
       << "\n"
 
-      << CMD("Print a detailed description of a vrs file in single-line json form",
-             "json-description <file.vrs>")
-      << CMD("Print a detailed description of a vrs file in indented json form",
-             "json-pretty-description <file.vrs>")
-      << CMD("List records, with their timestamp, stream name and identifier, and record type",
+      << CMD("Export file description as single-line JSON", "json-description <file.vrs>")
+      << CMD("Export file description as indented JSON", "json-pretty-description <file.vrs>")
+      << CMD("List records with timestamp, stream name and type",
              "list <file.vrs> [filter-options]")
       << CMD("Show RecordFormat and DataLayout definitions", "record-formats <file.vrs>")
       << CMD("Print records using RecordFormat & DataLayout", "print <file.vrs> [filter-options]")
-      << CMD("Print records with details using RecordFormat & DataLayout",
+      << CMD("Print detailed records with RecordFormat & DataLayout",
              "print-details <file.vrs> [filter-options]")
-      << CMD("Print records as json using RecordFormat & DataLayout",
-             "print-json <file.vrs> [filter-options]")
-      << CMD("Print records as json-pretty using RecordFormat & DataLayout",
-             "print-json-pretty <file.vrs> [filter-options]")
-      << CMD("Print detailed file info and first records for one-stop diagnostic purposes",
-             "rage <file.vrs>")
+      << CMD("Export records as JSON", "print-json <file.vrs> [filter-options]")
+      << CMD("Export records as indented JSON", "print-json-pretty <file.vrs> [filter-options]")
+      << CMD("Print file info and first records for diagnostics", "rage <file.vrs>")
 
       << "\n"
-      << CMD("Copy all the streams from one or more files into one",
+      << CMD("Copy streams from one or more files into one",
              "copy [ vrsfiles.vrs ]+ --to <target.vrs> [copy-options] [tag-options] [filter-options]")
-      << CMD("Merge all the streams from one or more files into one",
+      << CMD("Merge streams from multiple files into one",
              "merge [ vrsfiles.vrs ]+ --to <target.vrs> [copy-options] [tag-options] [filter-options]")
-      << CMD("Copy all the data from a file into a new one, but with blanked/zeroed image and audio data,\n"
-             "so the copy is much smaller because of lossless compression",
+      << CMD("Create compressed copy with zeroed image and audio data",
              "copy --zero-vrs <file.vrs> --to <output.vrs>")
 
       << "\n"
-      << CMD("Extract images in a folder. jpg and png are extracted as is.\n"
-             "RAW images are saved as GREY8, GREY16, RGB8 or RGBA8 png files,\n"
-             "or as .raw image files without any conversion with the --raw-images option.",
-             "extract-images file.vrs [ --to <folder_path> ] [ --raw-images ] [filter-options]                        ")
-      << CMD("Extract audio data as WAVE file(s) in a folder",
+      << CMD("Extract images to folder (jpg/png preserved, RAW converted to PNG or kept as raw with --raw-images)",
+             "extract-images file.vrs [ --to <folder_path> ] [ --raw-images ] [filter-options]")
+      << CMD("Extract audio as WAVE files",
              "extract-audio file.vrs [ --to <folder_path> ] [filter-options]")
-      << CMD("Extract images, audio, and meta data in a folder",
+      << CMD("Extract images, audio, and metadata",
              "extract-all file.vrs [ --to <folder_path> ] [filter-options]")
 
       << "\n"
-      << CMD("Check that a file can be read (checks integrity)",
-             "check <file.vrs> [filter-options]")
-      << CMD("Check that a file can be decoded (record-format integrity and image decompression)",
-             "decode <file.vrs> [filter-options]")
-      << CMD("Calculate a checksum for the whole file, at the VRS data level",
-             "checksum <file.vrs> [filter-options]")
-      << CMD("Calculate checksums for each part of the VRS file",
-             "checksums <file.vrs> [filter-options]")
-      << CMD("Calculate a checksum for the whole file, at the raw level (VRS or not)",
-             "checksum-verbatim <file.vrs> [filter-options]")
-      << CMD("Calculate checksums for each part of the VRS file, print records in hex",
-             "hexdump <file.vrs> [filter-options]")
-      << CMD("Compare a VRS file to one or more files, at the VRS data logical level",
+      << CMD("Verify file integrity", "check <file.vrs> [filter-options]")
+      << CMD("Verify record formats and image compression", "decode <file.vrs> [filter-options]")
+      << CMD("Calculate file checksum at VRS data level", "checksum <file.vrs> [filter-options]")
+      << CMD("Calculate checksums for each file section", "checksums <file.vrs> [filter-options]")
+      << CMD("Calculate raw file checksum", "checksum-verbatim <file.vrs> [filter-options]")
+      << CMD("Show hex dump with checksums", "hexdump <file.vrs> [filter-options]")
+      << CMD("Compare files at VRS data level",
              "compare <original.vrs> [others.vrs]+ [filter-options]")
-      << CMD("Compare two files at the raw level (VRS or not)",
-             "compare-verbatim <original.vrs> <other.vrs>")
+      << CMD("Compare files at raw binary level", "compare-verbatim <original.vrs> <other.vrs>")
 
       << "\n"
-      << CMD("Compute some lossless compression benchmarks", "compression-benchmark <file.vrs>")
+      << CMD("Run compression benchmarks", "compression-benchmark <file.vrs>")
 
       << "\n"
       << "Special Commands:\n"
-      << CMD("Fix VRS index in place, if necessary. MIGHT MODIFY THE ORIGINAL FILES IF NEEDED.",
-             "fix-index <file.vrs> [<file2.vrs>+")
-      << CMD("Print VRS file format debug information", "debug <file.vrs>")
+      << CMD("Fix VRS index in place (WARNING: MODIFIES FILES IF NEEDED)",
+             "fix-index <file.vrs> [<file2.vrs>]+")
+      << CMD("Show VRS file format internals", "debug <file.vrs>")
 
       << "\n"
       << "Record Filtering Options:\n";
@@ -232,52 +217,52 @@ void printHelp(const string& appName) {
 void printSamples(const string& appName) {
   cout << "\n"
        << "Examples:\n"
-       << "To get a summary of what's inside a recording:\n"
+       << "Get file summary:\n"
        << SP("src.vrs")
 
-       << "To print a detailed description of a vrs file in single-line json form:\n"
+       << "Get file description as JSON:\n"
        << SP("json-description file.vrs")
 
-       << "To print a detailed description of a vrs file in indented json form:\n"
+       << "Get file description as indented JSON:\n"
        << SP("json-pretty-description file.vrs")
 
-       << "To list records (basic details):\n"
+       << "List records with basic details:\n"
        << SP("list src.vrs")
 
-       << "To print configuration records as json:\n"
+       << "Get configuration records as JSON:\n"
        << SP("print-json src.vrs + configuration")
 
-       << "To print device id 1001's configuration & state records as json:\n"
+       << "Get device 1001's config & state records as JSON:\n"
        << SP("print-json src.vrs + 1001 - data")
 
-       << "Copy & clean-up a recording with default compression and rebuilding the index:\n"
+       << "Clean up recording with default compression and rebuilt index:\n"
        << SP("copy src.vrs --to cleanedRecording.vrs")
 
-       << "Recompress a recording with a tighter compression than default:\n"
+       << "Recompress with tighter zstd compression:\n"
        << SP("copy src.vrs --to tight.vrs --compression=ztight")
 
        << "Remove all ImageStream streams:\n"
-       << SP("src.vrs # to see that '100' is ImageStream...")
+       << SP("src.vrs # identify that '100' is ImageStream")
        << SP("copy src.vrs --to noImageStream.vrs - 100")
 
-       << "Extract only two specific streams out of many streams:\n"
-       << SP("src.vrs # to find the ids of the streams we want, for instance 100-1 and 101-1")
+       << "Extract specific streams:\n"
+       << SP("src.vrs # identify stream IDs (e.g., 100-1 and 101-1)")
        << SP("copy src.vrs --to extract.vrs + 100-1 + 101-1")
 
-       << "Trim data records in the first 2 seconds and the last second of a recording:\n"
+       << "Trim data records in first 2s and last 1s:\n"
        << SP("copy src.vrs --to extract.vrs --after +2 --before -1")
 
-       << "Copy multiple VRS files into a single one, keeping all streams separate:\n"
+       << "Combine multiple files (keeping streams separate):\n"
        << SP("copy first.vrs second.vrs third.vrs --to new.vrs")
 
-       << "Merge multiple VRS files into a single one, merging streams by type:\n"
+       << "Merge multiple files (combining streams by type):\n"
        << SP("merge first.vrs second.vrs third.vrs --to new.vrs")
 
-       << "Extract all images as images files:\n"
+       << "Extract all images to folder:\n"
        << SP("extract-images file.vrs --to imageFolder")
 
-       << "Save all ImageStream images, recorded in the first 5 seconds:\n"
-       << SP("src.vrs # to see that '100' is ImageStream...")
+       << "Extract ImageStream images from first 5 seconds:\n"
+       << SP("src.vrs # identify that '100' is ImageStream")
        << SP("extract-images file.vrs --to imageFolder + 100 --before +5")
 
        << "\n";

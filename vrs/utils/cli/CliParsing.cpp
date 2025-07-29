@@ -104,14 +104,13 @@ bool parseCopyOptions(
 }
 
 void printCopyOptionsHelp() {
-  cout << "  [ --no-progress ]:"
-          " don't show any progress information (useful for offline usage with basic terminals).\n"
-          "  [ --mt <thread-count> ]: use <thread-count> threads for compression while copying.\n"
-          "  [ --chunk-size <nb>[M|G] ]: chunk output file every <nb> number of MiB or GiB.\n"
-          "    Use 'M' for MiB (default), or 'G' for GiB.\n"
-          "  [ --compression={none|default|fast|tight|zfast|zlight|zmedium|ztight|zmax} ]:"
-          " set compression setting.\n"
-          "  [ --late-index ]: write the index at the end of the file.\n";
+  cout
+      << "  [ --no-progress ]: Hide progress information (useful when scripting using basic terminals).\n"
+         "  [ --mt <thread-count> ]: Use specified number of threads for compression.\n"
+         "  [ --chunk-size <nb>[M|G] ]: Split output file into chunks of <nb> MiB (default) or GiB.\n"
+         "  [ --compression=<level> ]: Set lz4 or zstd record compression level.\n"
+         "    levels: none, default, fast, tight, zfast, zlight, zmedium, ztight, zmax.\n"
+         "  [ --late-index ]: Write index at end of file (smaller file, but worsse for streaming).\n";
 }
 
 bool parseTagOverrideOptions(
@@ -165,10 +164,8 @@ bool parseTagOverrideOptions(
 }
 
 void printTagOverrideOptionsHelp() {
-  cout << "  [ --file-tag <tag_name> <tag_value> ]:"
-          " set a file tag in the copied/merged file.\n"
-          "  [ --stream-tag <recordable_type_id> <tag_name> <tag_value> ]:"
-          " set a tag of a particular stream in the copied/merged file.\n";
+  cout << "  [ --file-tag <tag_name> <tag_value> ]: Set file-level tag.\n"
+          "  [ --stream-tag <recordable_type_id> <tag_name> <tag_value> ]: Set stream-level tag.\n";
 }
 
 bool parseTimeAndStreamFilters(
@@ -254,29 +251,27 @@ bool parseTimeAndStreamFilters(
 
 void printTimeAndStreamFiltersHelp() {
   cout
-      << "\n Timestamp Filtering Options:\n"
-         "  - Time values starting with a digit are considered absolute timestamp values.\n"
-         "  - Time values starting with a '+' sign represent offsets relative to the first data record timestamp.\n"
-         "  - Time values starting with a '-' sign represent offsets relative to the last data record timestamp.\n"
-         "  - All time values, timestamps, and offsets are expressed in seconds as floating point numbers.\n"
-         "  - All min-time limits are exclusive, while max-time limits are inclusive, e.g., (min-time, max-time].\n"
-         "  - When filtering by timestamp with a min-time limit, last configuration and state records are preserved.\n"
-         "  [ --after [+|-]<min-time> ]: include records with timestamps greater than [+|-]<min-time>.\n"
-         "  [ --before [+|-]<max-time> ]: include records with timestamps less than or equal to [+|-]<max-time>.\n"
-         "  [ --range [+|-]<min-time> [+|-]<max-time> ]:"
-         " include records with timestamps within the range ([+|-]min-time, [+|-]max-time].\n"
-         "  [ --around [+|-]<time> <range> ]:"
-         " include records with timestamps within the range ([+|-]time-range, [+|-]time+range].\n\n"
-         " Stream Filtering Options:\n"
-         "  [ + <recordable_type_id> ]: include streams of the specified recordable type ID.\n"
-         "  [ + <recordable_type_id>-<instance_id> ]: include a specific stream ID.\n"
-         "  [ - <recordable_type_id> ]: exclude all streams of the specified recordable type ID.\n"
-         "  [ - <recordable_type_id>-<instance_id> ]: exclude a specific stream.\n\n"
-         " Record Type Filtering Options:\n"
-         "  [ + [configuration|state|data] ]: include records of the specified type.\n"
-         "  [ - [configuration|state|data] ]: exclude records of the specified type.\n\n"
-         " Other Record Filtering Options:\n"
-         "  [ -1 | --first-records ]: only include the first record of each stream and type.\n";
+      << "\n Timestamp Filtering:\n"
+         "  - Timestamps: Values starting with a digit are absolute timestamps.\n"
+         "  - '+' prefix: Offset from first data record timestamp.\n"
+         "  - '-' prefix: Offset from last data record timestamp.\n"
+         "  - All times are in seconds as floating point numbers.\n"
+         "  - Range notation: (min-time, max-time] (min exclusive, max inclusive).\n"
+         "  - Min-time filters preserve last configuration and state records before.\n"
+         "  [ --after [+|-]<min-time> ]: Include records after specified time.\n"
+         "  [ --before [+|-]<max-time> ]: Include records before or at specified time.\n"
+         "  [ --range [+|-]<min-time> [+|-]<max-time> ]: Include records within specified time range.\n"
+         "  [ --around [+|-]<time> <range> ]: Include records within time±range window.\n\n"
+         " Stream Filtering:\n"
+         "  [ + <recordable_type_id> ]: Include all streams of specified type.\n"
+         "  [ + <recordable_type_id>-<instance_id> ]: Include specific stream.\n"
+         "  [ - <recordable_type_id> ]: Exclude all streams of specified type.\n"
+         "  [ - <recordable_type_id>-<instance_id> ]: Exclude specific stream.\n\n"
+         " Record Type Filtering:\n"
+         "  [ + [configuration|state|data] ]: Include specified record type.\n"
+         "  [ - [configuration|state|data] ]: Exclude specified record type.\n\n"
+         " Other Record Filtering:\n"
+         "  [ -1 | --first-records ]: Include only first record of each stream and type.\n";
 }
 
 namespace {
@@ -342,14 +337,12 @@ bool parseDecimationOptions(
 }
 
 void printDecimationOptionsHelp() {
-  cout << "  [ --decimate <recordable_type_id>[-<instance_id>] <timestamp_interval> ]:"
-          " output at most one data record\n"
-          "    every <timestamp_interval> for the stream(s) specified.\n"
-          "  [ --bucket-interval <timestamp_interval> ]\n"
-          "  [ --bucket-max-delta <timestamp_delta> ]:"
-          " bucket frames with close timestamps into buckets.\n"
-          "    Only output one frame per stream per bucket."
-          " If frame timestamps are more than max-delta away, skip them.\n";
+  cout
+      << "  [ --decimate <recordable_type_id>[-<instance_id>] <timestamp_interval> ]: Output at most\n"
+         "    one data record per <timestamp_interval> seconds for specified stream(s).\n"
+         "  [ --bucket-interval <timestamp_interval> ]\n"
+         "  [ --bucket-max-delta <timestamp_delta> ]: Group records with similar timestamps into buckets.\n"
+         "    Outputs one records per stream per bucket. Skips records with timestamps exceeding max-delta.\n";
 }
 
 } // namespace vrs::utils
