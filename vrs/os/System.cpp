@@ -112,14 +112,14 @@ string getUniqueSessionId() {
   return sstream.str();
 }
 
-size_t getTerminalWidth(size_t setValue) {
-  static atomic<size_t> sTerminalWidth = 0;
+uint32_t getTerminalWidth(uint32_t setValue) {
+  static atomic<uint32_t> sTerminalWidth = 0;
   static atomic<double> sLastWidthCheckTime = 0;
 
   const double kWidthCheckInterval = 5.0; // seconds
-  const size_t kDefaultWidth = 160;
+  const uint32_t kDefaultWidth = 160;
   double now = getTimestampSec();
-  size_t width = sTerminalWidth.load(memory_order_relaxed);
+  uint32_t width = sTerminalWidth.load(memory_order_relaxed);
   if (setValue != 0) {
     width = setValue;
     sTerminalWidth = width;
@@ -139,8 +139,8 @@ size_t getTerminalWidth(size_t setValue) {
     width = kDefaultWidth;
 
 #endif
-    if (width < 40 || width > 300) {
-      width = kDefaultWidth;
+    if (width < 40 || width > 1000) {
+      width = kDefaultWidth; // when sanity check fails, use default
     }
     sTerminalWidth = width;
     sLastWidthCheckTime = now;
