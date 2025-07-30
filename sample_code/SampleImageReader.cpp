@@ -27,6 +27,8 @@ namespace vrs_sample_code {
 // conventions. The code compiles, but it is not actually functional, it just demonstrates basic
 // principles.
 
+namespace {
+
 /// Sample class to read images from a VRS file stream.
 class ImagePlayer : public RecordFormatStreamPlayer {
   /// Callback that will receive the images
@@ -74,5 +76,7 @@ struct SampleImageReader {
     }
   }
 };
+
+} // anonymous namespace
 
 } // namespace vrs_sample_code
