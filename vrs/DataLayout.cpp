@@ -1529,7 +1529,7 @@ void DataPieceVector<T>::printCompact(ostream& out, const string& indent) const 
         out);
     if (values.size() > kPrintCompactMaxVectorValues) {
       out << indent << SUBINDENT "...and " << values.size() - kPrintCompactMaxVectorValues
-          << " more values.";
+          << " more values.\n";
     }
   }
 }
@@ -1556,7 +1556,7 @@ void DataPieceVector<string>::printCompact(ostream& out, const string& indent) c
         out);
     if (values.size() > kPrintCompactMaxVectorValues) {
       out << indent << SUBINDENT "...and " << values.size() - kPrintCompactMaxVectorValues
-          << " more values.";
+          << " more values.\n";
     }
   }
 }
