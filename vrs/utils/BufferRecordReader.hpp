@@ -129,7 +129,7 @@ class BufferFileHandler : public FileHandler {
     return false;
   }
 
- private:
+ protected:
   const string fileHandlerName_;
   const uint8_t* data_{};
   int64_t totalSize_{0};
