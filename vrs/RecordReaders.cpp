@@ -107,7 +107,7 @@ int CompressedRecordReader::read(
   do {
     bool readData = false;
     if (decompressor_.getRemainingCompressedDataBufferSize() == 0 && remainingDiskBytes_ > 0) {
-      size_t targetReadSize = (knownNeedSize - outReadSize >= remainingUncompressedSize_)
+      size_t targetReadSize = (knownNeedSize >= remainingUncompressedSize_ + outReadSize)
           ? remainingDiskBytes_
           : knownNeedSize;
       size_t recommendedNextBufferSize = decompressor_.getRecommendedInputBufferSize();
@@ -119,10 +119,14 @@ int CompressedRecordReader::read(
       }
       int error =
           file_->read(decompressor_.allocateCompressedDataBuffer(targetReadSize), targetReadSize);
-      remainingDiskBytes_ -= static_cast<uint32_t>(file_->getLastRWSize());
       if (error != 0) {
         return error;
       }
+      uint32_t readSize = static_cast<uint32_t>(file_->getLastRWSize());
+      if (!XR_VERIFY(remainingDiskBytes_ >= readSize)) {
+        return VRSERROR_INTERNAL_ERROR;
+      }
+      remainingDiskBytes_ -= readSize;
       readData = true;
     }
     uint32_t decompressedSize = 0;
