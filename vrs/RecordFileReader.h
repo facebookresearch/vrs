@@ -607,6 +607,7 @@ class RecordFileReader {
   int64_t endOfUserRecordsOffset_{};
   uint32_t recordHeaderSize_{};
   bool fileHasAnIndex_{};
+  bool autoPrefetch_{};
 };
 
 /// The method to search the nearest record from the index list.

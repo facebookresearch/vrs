@@ -46,6 +46,8 @@ using namespace std;
 
 namespace {
 
+constexpr size_t kMinHeaderRead = 1024 * 1024;
+
 using namespace vrs;
 
 bool before(Record::Type lhs, Record::Type rhs) {
@@ -256,6 +258,7 @@ int RecordFileReader::doOpenFile(
     return NOT_A_VRS_FILE;
   }
   TemporaryCachingStrategy temporaryCachingStrategy(file_, CachingStrategy::Passive);
+  autoPrefetch_ = fileSpec.getExtraAsBool(kPrefetchCache, false);
   FileFormat::FileHeader fileHeader;
   LOG_PROGRESS(readFileHeader(fileSpec, fileHeader), error, [&]() {
     string fileSize = helpers::humanReadableFileSize(file_->getTotalSize());
@@ -363,6 +366,9 @@ int RecordFileReader::readFileHeader(
     }
   }
   if (!readHeaderFromCache) {
+    if (autoPrefetch_) {
+      file_->prefetchReadSequence({{0, kMinHeaderRead}});
+    }
     IF_ERROR_LOG_AND_RETURN(file_->read(outFileHeader));
     if (!headerCacheFilePath.empty()) {
       DiskFile::writeZstdFile(headerCacheFilePath, &outFileHeader, sizeof(outFileHeader));
@@ -377,6 +383,9 @@ int RecordFileReader::readFileDetails(
     FileFormat::FileHeader& fileHeader) {
   int error = 0;
   int64_t firstUserRecordOffset = fileHeader.firstUserRecordOffset.get();
+  if (autoPrefetch_) {
+    file_->prefetchReadSequence({{0, max<size_t>(kMinHeaderRead, firstUserRecordOffset)}});
+  }
   if (firstUserRecordOffset == 0) {
     // firstUserRecordOffset was only created when we added support for early index records.
     firstUserRecordOffset = fileHeader.fileHeaderSize.get();
@@ -913,6 +922,16 @@ double RecordFileReader::getLastDataRecordTime() const {
 bool RecordFileReader::readConfigRecords(
     const set<const IndexRecord::RecordInfo*>& configRecords,
     StreamPlayer* streamPlayer) {
+  if (autoPrefetch_) {
+    vector<const IndexRecord::RecordInfo*> configRecordsVector;
+    configRecordsVector.reserve(configRecords.size());
+    for (const IndexRecord::RecordInfo* record : configRecords) {
+      if (record != nullptr) {
+        configRecordsVector.emplace_back(record);
+      }
+    }
+    prefetchRecordSequence(configRecordsVector, true);
+  }
   bool foundAtLeastOneStream = false;
   bool allGood = true;
   for (auto configRecord : configRecords) {
@@ -1147,6 +1166,9 @@ int RecordFileReader::readRecord(
   // since it's gone, we can save ourselves potentially quite a few fseek and fread operations.
   if (streamPlayer == nullptr) {
     return 0;
+  }
+  if (autoPrefetch_) {
+    prefetchRecordSequence({&recordInfo});
   }
   if (setupPlayer) {
     streamPlayer->onAttachedToFileReader(*this, recordInfo.streamId);

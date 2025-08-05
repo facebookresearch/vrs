@@ -49,6 +49,9 @@ enum class CachingStrategy {
   COUNT
 };
 
+/// To enable basic caching for network file handlers
+constexpr const char* kPrefetchCache = "prefetch_cache";
+
 string toString(CachingStrategy cachingStrategy);
 
 template <>
