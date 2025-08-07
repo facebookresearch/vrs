@@ -33,10 +33,11 @@ var searchData=
   ['knextcontentblocksize_30',['kNextContentBlockSize',['../namespacevrs_1_1datalayout__conventions.html#a7da8e48312f1e15451bdc9e8c1ffb9f3',1,'vrs::datalayout_conventions']]],
   ['knotfound_31',['kNotFound',['../classvrs_1_1_data_layout.html#aa44c7b903f235a37f75b341c60c351a6',1,'vrs::DataLayout']]],
   ['koriginalfileformatversion_32',['kOriginalFileFormatVersion',['../namespacevrs_1_1_file_format.html#adbcf90ca0a24446136f1a6fd2949299b',1,'vrs::FileFormat']]],
-  ['krelatedfiletags_33',['kRelatedFileTags',['../classvrs_1_1_multi_record_file_reader.html#aef6ee0a0207b4d827f1a1da04b1e402f',1,'vrs::MultiRecordFileReader']]],
-  ['krenderdepthimagesrangemin_34',['kRenderDepthImagesRangeMin',['../namespacevrs_1_1tag__conventions.html#aa98fe070d88cb1cffccc334c27d80f3b',1,'vrs::tag_conventions']]],
-  ['ksizeunknown_35',['kSizeUnknown',['../classvrs_1_1_content_block.html#af5bf7a6af194725194549e35af27e418',1,'vrs::ContentBlock']]],
-  ['kunit_36',['kUnit',['../classvrs_1_1_data_piece.html#adf6997100539f4fb1ddcba3c3b04c3e0',1,'vrs::DataPiece']]],
-  ['kvariablesize_37',['kVariableSize',['../classvrs_1_1_data_layout.html#a28316f2660ae5807081e9bf4ecd29fd3',1,'vrs::DataLayout']]],
-  ['kzstdformatversion_38',['kZstdFormatVersion',['../namespacevrs_1_1_file_format.html#ac491cb7287ee1ce8a2e925fe8f3a2c9f',1,'vrs::FileFormat']]]
+  ['kprefetchcache_33',['kPrefetchCache',['../namespacevrs.html#a9f75733e7ab755bebd0312e0d65e6053',1,'vrs']]],
+  ['krelatedfiletags_34',['kRelatedFileTags',['../classvrs_1_1_multi_record_file_reader.html#aef6ee0a0207b4d827f1a1da04b1e402f',1,'vrs::MultiRecordFileReader']]],
+  ['krenderdepthimagesrangemin_35',['kRenderDepthImagesRangeMin',['../namespacevrs_1_1tag__conventions.html#aa98fe070d88cb1cffccc334c27d80f3b',1,'vrs::tag_conventions']]],
+  ['ksizeunknown_36',['kSizeUnknown',['../classvrs_1_1_content_block.html#af5bf7a6af194725194549e35af27e418',1,'vrs::ContentBlock']]],
+  ['kunit_37',['kUnit',['../classvrs_1_1_data_piece.html#adf6997100539f4fb1ddcba3c3b04c3e0',1,'vrs::DataPiece']]],
+  ['kvariablesize_38',['kVariableSize',['../classvrs_1_1_data_layout.html#a28316f2660ae5807081e9bf4ecd29fd3',1,'vrs::DataLayout']]],
+  ['kzstdformatversion_39',['kZstdFormatVersion',['../namespacevrs_1_1_file_format.html#ac491cb7287ee1ce8a2e925fe8f3a2c9f',1,'vrs::FileFormat']]]
 ];
