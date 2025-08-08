@@ -27,49 +27,13 @@
 #include <vrs/RecordFormat.h>
 #include <vrs/RecordReaders.h>
 #include <vrs/utils/DecoderFactory.h>
+#include <vrs/utils/PixelFrameOptions.h>
 #include <vrs/utils/VideoFrameHandler.h>
 
 namespace vrs::utils {
 
 using std::shared_ptr;
 using std::vector;
-
-// When additional compression options are needed, use this struct instead of overloading the API
-struct CompressionOptions {
-  uint16_t maxCompressionThreads{0}; // max compression threads, or 0 to let encoder decide.
-
-  /// jxl specific options
-
-  /// jxlQualityIsButteraugliDistance: if false, quality is a percentage, 100% being lossless.
-  /// If true, quality is a Butteraugli distance (Google "Butteraugli" for details), where
-  /// Butteraugli distance 0 is lossless, and 15 is the worst Butteraugli distance supported.
-  /// 99.99% ~ Butteraugli 0.1, 99% ~ Butteraugli 0.2, 95.5% ~ Butteraugli 0.5, 90% ~ Butteraugli 1
-  bool jxlQualityIsButteraugliDistance{false};
-  /// jxlEffort: Sets encoder effort/speed level without affecting decoding speed.
-  /// Valid values are, from faster to slower speed: 1:lightning 2:thunder 3:falcon
-  /// 4:cheetah 5:hare 6:wombat 7:squirrel 8:kitten 9:tortoise.
-  int jxlEffort{3};
-};
-
-enum class ImageSemantic : uint16_t {
-  Undefined,
-  Camera, ///< Visual data (regular image)
-  ObjectClassSegmentation, ///< Segmentation data, one value per object class.
-  ObjectIdSegmentation, ///< Segmentation data, one value per object instance.
-  Depth, ///< Depth information
-};
-
-struct NormalizeOptions {
-  NormalizeOptions() = default;
-  explicit NormalizeOptions(ImageSemantic semantic) : semantic{semantic} {}
-  NormalizeOptions(ImageSemantic semantic, float min, float max)
-      : semantic{semantic}, min{min}, max{max} {}
-
-  ImageSemantic semantic{ImageSemantic::Undefined};
-  bool speedOverPrecision{false}; // prefer speed (for display?) or precision (to save to disk?)
-  float min{0};
-  float max{0};
-};
 
 /// Helper class to read & convert images read using RecordFormat into simpler, but maybe degraded,
 /// pixel buffer, that can easily be displayed, or saved to disk as jpg or png.
