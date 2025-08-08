@@ -299,7 +299,7 @@ int DataExtractor::createOutput() {
   }
 
   RecordFileInfo::Details details =
-      RecordFileInfo::Details::Everything | RecordFileInfo::Details::UsePublicNames;
+      RecordFileInfo::Details::Everything + RecordFileInfo::Details::UsePublicNames;
   const auto ids = getStreams();
   readme << kReadMeContent << "\n```\n";
   RecordFileInfo::printOverview(readme, reader_, ids, details);

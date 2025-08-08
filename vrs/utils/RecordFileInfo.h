@@ -58,12 +58,17 @@ enum class Details : uint32_t {
 };
 
 /// Combine flags
-inline Details operator|(const Details& lhs, const Details& rhs) {
+inline Details operator+(Details lhs, Details rhs) {
   return static_cast<Details>(static_cast<uint32_t>(lhs) | static_cast<uint32_t>(rhs));
 }
 
+/// Remove flags
+inline Details operator-(Details lhs, Details rhs) {
+  return static_cast<Details>(static_cast<uint32_t>(lhs) & ~static_cast<uint32_t>(rhs));
+}
+
 /// Test than two sets of flags intersect (at least one flag is set in both sets)
-inline bool operator&(const Details& lhs, const Details& rhs) {
+inline bool operator&(Details lhs, Details rhs) {
   return (static_cast<uint32_t>(lhs) & static_cast<uint32_t>(rhs)) != 0;
 }
 

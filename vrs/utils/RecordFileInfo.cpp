@@ -296,7 +296,7 @@ void printOverview(
     const auto& tags = recordFile.getTags();
     printTags(out, "  Tag: ", tags, details);
   }
-  if (details & (Details::StreamNames | Details::StreamTags | Details::StreamRecordCounts)) {
+  if (details & (Details::StreamNames + Details::StreamTags + Details::StreamRecordCounts)) {
     for (auto id : streamIds) {
       overView(out, recordFile, id, details);
     }
@@ -507,7 +507,7 @@ string jsonOverview(RecordFileReader& recordFile, const set<StreamId>& streams, 
     }
   }
 
-  if (details & (Details::StreamNames | Details::StreamTags | Details::StreamRecordCounts)) {
+  if (details & (Details::StreamNames + Details::StreamTags + Details::StreamRecordCounts)) {
     JValue devices(kArrayType);
     for (auto id : streams) {
       devices.PushBack(devicesOverView(recordFile, id, details, allocator), allocator);

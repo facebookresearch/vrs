@@ -533,7 +533,7 @@ int VrsCommand::runCommands() {
       cout << RecordFileInfo::jsonOverview(
                   filteredReader.reader,
                   filteredReader.filter.streams,
-                  RecordFileInfo::Details::Everything | RecordFileInfo::Details::JsonPretty)
+                  RecordFileInfo::Details::Everything + RecordFileInfo::Details::JsonPretty)
            << "\n";
       break;
     case Command::CompressionBenchmark:
