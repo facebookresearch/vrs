@@ -206,6 +206,12 @@ set<uint16_t>& getusedObjectColors() {
   return sUsedObjectColors;
 };
 
+// tell if grey16 is better than grey8 for precision wrt a particular pixel format
+bool grey16helps(PixelFormat format) {
+  return format == PixelFormat::GREY16 || format == PixelFormat::GREY12 ||
+      format == PixelFormat::GREY10 || format == PixelFormat::RAW10;
+}
+
 } // namespace
 
 namespace vrs::utils {
@@ -441,8 +447,8 @@ PixelFormat PixelFrame::getNormalizedPixelFormat(
   } else {
     format = ImageContentBlockSpec::getChannelCountPerPixel(sourcePixelFormat) > 1
         ? PixelFormat::RGB8
-        : grey16supported ? PixelFormat::GREY16
-                          : PixelFormat::GREY8;
+        : grey16supported && grey16helps(sourcePixelFormat) ? PixelFormat::GREY16
+                                                            : PixelFormat::GREY8;
   }
   return format;
 }
