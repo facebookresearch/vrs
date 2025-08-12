@@ -135,7 +135,9 @@ bool PixelFrame::jpgCompress(
   if (!XR_VERIFY(pixelSpec.getImageFormat() == ImageFormat::RAW) ||
       !XR_VERIFY(
           pixelSpec.getPixelFormat() == PixelFormat::RGB8 ||
-          pixelSpec.getPixelFormat() == PixelFormat::GREY8)) {
+              pixelSpec.getPixelFormat() == PixelFormat::GREY8,
+          "Unexpected pixelformat: {}",
+          pixelSpec.getPixelFormatAsString())) {
     return false;
   }
   const bool isGrey8 = (pixelSpec.getChannelCountPerPixel() == 1);

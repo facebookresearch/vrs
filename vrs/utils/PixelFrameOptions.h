@@ -19,6 +19,8 @@
 #include <cstdint>
 #include <memory>
 
+#include <vrs/ForwardDefinitions.h>
+
 namespace vrs::utils {
 
 class PixelFrame;
@@ -100,10 +102,15 @@ struct ResizeOptions {
       uint32_t& outTargetWidth,
       uint32_t& outTargetHeight) const;
 
-  /// Rescale a pixel frame according to the resize options
-  /// @param sourceFrame: the source frame to rescale
-  /// @return a new rescaled frame, or nullptr if rescaling failed or is not needed
-  std::unique_ptr<PixelFrame> rescale(const PixelFrame& sourceFrame) const;
+  /// Tell if resizing a particular PixelFormat is supported
+  /// @param pixelFormat: the pixel format to check
+  /// @return true if resizing is supported, false otherwise
+  static bool canResize(PixelFormat pixelFormat);
+
+  /// Resize a PixelFrame according to the resize options
+  /// @param sourceFrame: the source frame to resize
+  /// @return a new resized frame, or nullptr if resizing failed or is not needed
+  std::unique_ptr<PixelFrame> resize(const PixelFrame& sourceFrame) const;
 };
 
 } // namespace vrs::utils

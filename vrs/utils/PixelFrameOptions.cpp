@@ -22,6 +22,7 @@
 #include <ocean/cv/FrameInterpolator.h>
 
 #include "PixelFrame.h"
+#include "PixelFrameOcean.h"
 
 namespace {
 
@@ -101,8 +102,24 @@ bool ResizeOptions::computeTargetDimensions(
   return outTargetWidth != sourceWidth || outTargetHeight != sourceHeight;
 }
 
-std::unique_ptr<PixelFrame> ResizeOptions::rescale(const PixelFrame& sourceFrame) const {
+// Only the pixel formats for which we verified that Ocean supports resizing.
+bool ResizeOptions::canResize(PixelFormat pixelFormat) {
+  return pixelFormat == PixelFormat::GREY8 || pixelFormat == PixelFormat::RGB8 ||
+      pixelFormat == PixelFormat::RGBA8 || pixelFormat == PixelFormat::YUY2;
+}
+
+std::unique_ptr<PixelFrame> ResizeOptions::resize(const PixelFrame& sourceFrame) const {
   const ImageContentBlockSpec& sourceSpec = sourceFrame.getSpec();
+
+  PixelFormat pixelFormat = sourceSpec.getPixelFormat();
+  if (!canResize(pixelFormat)) {
+    return nullptr;
+  }
+  const Ocean::FrameType::PixelFormat oceanPixelFormat = vrsToOceanPixelFormat(pixelFormat);
+  if (oceanPixelFormat == Ocean::FrameType::FORMAT_UNDEFINED) {
+    return nullptr;
+  }
+
   uint32_t sourceWidth = sourceSpec.getWidth();
   uint32_t sourceHeight = sourceSpec.getHeight();
 
@@ -111,57 +128,25 @@ std::unique_ptr<PixelFrame> ResizeOptions::rescale(const PixelFrame& sourceFrame
     return nullptr;
   }
 
-  // Only support GREY8 and RGB8 pixel formats for downscaling
-  PixelFormat pixelFormat = sourceSpec.getPixelFormat();
-  if (pixelFormat != PixelFormat::GREY8 && pixelFormat != PixelFormat::RGB8) {
-    return nullptr;
-  }
-
   std::unique_ptr<PixelFrame> targetFrame =
       std::make_unique<PixelFrame>(pixelFormat, computedWidth, computedHeight);
 
-  const Ocean::FrameType::PixelFormat oceanPixelFormat = (pixelFormat == PixelFormat::GREY8)
-      ? Ocean::FrameType::PixelFormat::FORMAT_Y8
-      : Ocean::FrameType::PixelFormat::FORMAT_RGB24;
-
-  unsigned int sourcePaddingElements{};
-  if (!Ocean::Frame::strideBytes2paddingElements(
-          oceanPixelFormat, sourceWidth, sourceSpec.getStride(), sourcePaddingElements)) {
+  auto sourceOceanFrame =
+      createOceanFrameFromVRS(sourceSpec, sourceFrame.rdata(), oceanPixelFormat);
+  if (!sourceOceanFrame) {
     return nullptr;
   }
-
-  Ocean::Frame::PlaneInitializers<uint8_t> sourcePlaneInitializers;
-  for (uint32_t i = 0; i < sourceSpec.getPlaneCount(); ++i) {
-    sourcePlaneInitializers.emplace_back(
-        const_cast<uint8_t*>(sourceFrame.rdata()),
-        Ocean::Frame::CM_USE_KEEP_LAYOUT,
-        sourcePaddingElements);
-  }
-
-  Ocean::FrameType sourceFrameType(
-      sourceWidth, sourceHeight, oceanPixelFormat, Ocean::FrameType::ORIGIN_UPPER_LEFT);
-  const Ocean::Frame sourceOceanFrame(sourceFrameType, sourcePlaneInitializers);
 
   const ImageContentBlockSpec& targetSpec = targetFrame->getSpec();
-  unsigned int targetPaddingElements{};
-  if (!Ocean::Frame::strideBytes2paddingElements(
-          oceanPixelFormat, computedWidth, targetSpec.getStride(), targetPaddingElements)) {
+  auto targetOceanFrame =
+      createOceanFrameFromVRS(targetSpec, targetFrame->wdata(), oceanPixelFormat);
+  if (!targetOceanFrame) {
     return nullptr;
   }
 
-  Ocean::Frame::PlaneInitializers<uint8_t> targetPlaneInitializers;
-  for (uint32_t i = 0; i < targetSpec.getPlaneCount(); ++i) {
-    targetPlaneInitializers.emplace_back(
-        targetFrame->wdata(), Ocean::Frame::CM_USE_KEEP_LAYOUT, targetPaddingElements);
-  }
-
-  Ocean::FrameType targetFrameType(
-      computedWidth, computedHeight, oceanPixelFormat, Ocean::FrameType::ORIGIN_UPPER_LEFT);
-  Ocean::Frame targetOceanFrame(targetFrameType, targetPlaneInitializers);
-
   if (!Ocean::CV::FrameInterpolator::resize(
-          sourceOceanFrame,
-          targetOceanFrame,
+          *sourceOceanFrame,
+          *targetOceanFrame,
           Ocean::CV::FrameInterpolator::ResizeMethod::RM_AUTOMATIC)) {
     return nullptr;
   }

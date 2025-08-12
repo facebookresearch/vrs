@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include "PixelFrameOcean.h"
 #include "PixelFrame.h"
 
 #include <ocean/base/Frame.h>
@@ -28,22 +29,124 @@
 using namespace std;
 using namespace vrs;
 
-namespace {
+namespace vrs::utils {
 
+/// All the VRS pixel formats to Ocean pixel formats we know, even if conversion is not supported.
 Ocean::FrameType::PixelFormat vrsToOceanPixelFormat(vrs::PixelFormat targetPixelFormat) {
   switch (targetPixelFormat) {
-    case PixelFormat::GREY8:
+    case vrs::PixelFormat::GREY8:
       return Ocean::FrameType::FORMAT_Y8;
-    case PixelFormat::GREY16:
+    case vrs::PixelFormat::GREY10:
+      return Ocean::FrameType::FORMAT_Y10;
+    case vrs::PixelFormat::RAW10:
+      return Ocean::FrameType::FORMAT_Y10_PACKED;
+    case vrs::PixelFormat::GREY16:
       return Ocean::FrameType::FORMAT_Y16;
-    default:
+    case vrs::PixelFormat::RGB8:
       return Ocean::FrameType::FORMAT_RGB24;
+    case vrs::PixelFormat::RGBA8:
+      return Ocean::FrameType::FORMAT_RGBA32;
+    case vrs::PixelFormat::YUY2:
+      return Ocean::FrameType::FORMAT_YUYV16;
+    case vrs::PixelFormat::YUV_I420_SPLIT:
+      return Ocean::FrameType::FORMAT_Y_U_V12;
+    case vrs::PixelFormat::YUV_420_NV21:
+      return Ocean::FrameType::FORMAT_Y_VU12;
+    case vrs::PixelFormat::YUV_420_NV12:
+      return Ocean::FrameType::FORMAT_Y_UV12;
+    default:
+      return Ocean::FrameType::FORMAT_UNDEFINED;
   }
 }
 
-} // namespace
+/// Create an Ocean::Frame from a VRS PixelFrame with proper plane initialization
+std::unique_ptr<Ocean::Frame> createOceanFrameFromVRS(
+    const ImageContentBlockSpec& imageSpec,
+    const uint8_t* data,
+    Ocean::FrameType::PixelFormat oceanPixelFormat) {
+  const uint32_t width = imageSpec.getWidth();
+  const uint32_t height = imageSpec.getHeight();
 
-namespace vrs::utils {
+  switch (imageSpec.getPixelFormat()) {
+    case vrs::PixelFormat::YUV_I420_SPLIT: {
+      const Ocean::FrameType sourceFrameType(
+          width, height, Ocean::FrameType::FORMAT_Y_U_V12, Ocean::FrameType::ORIGIN_UPPER_LEFT);
+      const uint8_t* baseAddressYPlane = data;
+      const uint8_t* baseAddressUPlane =
+          baseAddressYPlane + imageSpec.getPlaneStride(0) * imageSpec.getPlaneHeight(0);
+      const uint8_t* baseAddressVPlane =
+          baseAddressUPlane + imageSpec.getPlaneStride(1) * imageSpec.getPlaneHeight(1);
+      Ocean::Frame::PlaneInitializers<uint8_t> planeInitializers = {
+          {const_cast<uint8_t*>(baseAddressYPlane),
+           Ocean::Frame::CM_USE_KEEP_LAYOUT,
+           imageSpec.getPlaneStride(0) - imageSpec.getDefaultStride()},
+          {const_cast<uint8_t*>(baseAddressUPlane),
+           Ocean::Frame::CM_USE_KEEP_LAYOUT,
+           imageSpec.getPlaneStride(1) - imageSpec.getDefaultStride2()},
+          {const_cast<uint8_t*>(baseAddressVPlane),
+           Ocean::Frame::CM_USE_KEEP_LAYOUT,
+           imageSpec.getPlaneStride(2) - imageSpec.getDefaultStride2()},
+      };
+      return std::make_unique<Ocean::Frame>(sourceFrameType, planeInitializers);
+    }
+    case vrs::PixelFormat::YUV_420_NV21: {
+      const Ocean::FrameType sourceFrameType(
+          width, height, Ocean::FrameType::FORMAT_Y_VU12, Ocean::FrameType::ORIGIN_UPPER_LEFT);
+      const uint8_t* baseAddressYPlane = data;
+      const uint8_t* baseAddressUPlane =
+          baseAddressYPlane + imageSpec.getPlaneStride(0) * imageSpec.getPlaneHeight(0);
+      Ocean::Frame::PlaneInitializers<uint8_t> planeInitializers = {
+          {const_cast<uint8_t*>(baseAddressYPlane),
+           Ocean::Frame::CM_USE_KEEP_LAYOUT,
+           imageSpec.getPlaneStride(0) - imageSpec.getDefaultStride()},
+          {const_cast<uint8_t*>(baseAddressUPlane),
+           Ocean::Frame::CM_USE_KEEP_LAYOUT,
+           imageSpec.getPlaneStride(1) - imageSpec.getDefaultStride2()},
+      };
+      return std::make_unique<Ocean::Frame>(sourceFrameType, planeInitializers);
+    }
+    case vrs::PixelFormat::YUV_420_NV12: {
+      const Ocean::FrameType sourceFrameType(
+          width, height, Ocean::FrameType::FORMAT_Y_UV12, Ocean::FrameType::ORIGIN_UPPER_LEFT);
+      const uint8_t* baseAddressYPlane = data;
+      const uint8_t* baseAddressUPlane =
+          baseAddressYPlane + imageSpec.getPlaneStride(0) * imageSpec.getPlaneHeight(0);
+      Ocean::Frame::PlaneInitializers<uint8_t> planeInitializers = {
+          {const_cast<uint8_t*>(baseAddressYPlane),
+           Ocean::Frame::CM_USE_KEEP_LAYOUT,
+           imageSpec.getPlaneStride(0) - imageSpec.getDefaultStride()},
+          {const_cast<uint8_t*>(baseAddressUPlane),
+           Ocean::Frame::CM_USE_KEEP_LAYOUT,
+           imageSpec.getPlaneStride(1) - imageSpec.getDefaultStride2()},
+      };
+      return std::make_unique<Ocean::Frame>(sourceFrameType, planeInitializers);
+    }
+    case PixelFormat::YUY2: {
+      const Ocean::FrameType sourceFrameType(
+          width, height, Ocean::FrameType::FORMAT_YUYV16, Ocean::FrameType::ORIGIN_UPPER_LEFT);
+      return std::make_unique<Ocean::Frame>(
+          sourceFrameType,
+          const_cast<uint8_t*>(data),
+          Ocean::Frame::CM_USE_KEEP_LAYOUT,
+          imageSpec.getStride() - 2 * width);
+    }
+    default: {
+      // For single-plane formats, use the provided Ocean pixel format
+      const Ocean::FrameType sourceFrameType(
+          width, height, oceanPixelFormat, Ocean::FrameType::ORIGIN_UPPER_LEFT);
+      unsigned int paddingElements = 0;
+      if (Ocean::Frame::strideBytes2paddingElements(
+              oceanPixelFormat, width, imageSpec.getStride(), paddingElements)) {
+        return std::make_unique<Ocean::Frame>(
+            sourceFrameType,
+            const_cast<uint8_t*>(data),
+            Ocean::Frame::CM_USE_KEEP_LAYOUT,
+            paddingElements);
+      }
+      return nullptr;
+    }
+  }
+}
 
 bool PixelFrame::msssimCompare(const PixelFrame& other, double& msssim) {
   if (!XR_VERIFY(getPixelFormat() == other.getPixelFormat()) ||
@@ -69,71 +172,14 @@ bool PixelFrame::normalizeToPixelFormatWithOcean(
   using namespace Ocean;
   const uint32_t width = imageSpec_.getWidth();
   const uint32_t height = imageSpec_.getHeight();
-  // Try to create an Ocean-style source frame
-  unique_ptr<Ocean::Frame> sourceFrame;
-  switch (imageSpec_.getPixelFormat()) {
-    case vrs::PixelFormat::YUV_I420_SPLIT: {
-      const FrameType sourceFrameType(
-          width, height, FrameType::FORMAT_Y_U_V12, FrameType::ORIGIN_UPPER_LEFT);
-      const uint8_t* baseAddressYPlane = rdata();
-      const uint8_t* baseAddressUPlane =
-          baseAddressYPlane + imageSpec_.getPlaneStride(0) * imageSpec_.getPlaneHeight(0);
-      const uint8_t* baseAddressVPlane =
-          baseAddressUPlane + imageSpec_.getPlaneStride(1) * imageSpec_.getPlaneHeight(1);
-      Frame::PlaneInitializers<uint8_t> planeInitializers = {
-          {baseAddressYPlane,
-           Frame::CM_USE_KEEP_LAYOUT,
-           imageSpec_.getPlaneStride(0) - imageSpec_.getDefaultStride()},
-          {baseAddressUPlane,
-           Frame::CM_USE_KEEP_LAYOUT,
-           imageSpec_.getPlaneStride(1) - imageSpec_.getDefaultStride2()},
-          {baseAddressVPlane,
-           Frame::CM_USE_KEEP_LAYOUT,
-           imageSpec_.getPlaneStride(2) - imageSpec_.getDefaultStride2()},
-      };
-      sourceFrame = make_unique<Frame>(sourceFrameType, planeInitializers);
-    } break;
-    case vrs::PixelFormat::YUV_420_NV21: {
-      const FrameType sourceFrameType(
-          width, height, FrameType::FORMAT_Y_VU12, FrameType::ORIGIN_UPPER_LEFT);
-      const uint8_t* baseAddressYPlane = rdata();
-      const uint8_t* baseAddressUPlane =
-          baseAddressYPlane + imageSpec_.getPlaneStride(0) * imageSpec_.getPlaneHeight(0);
-      Frame::PlaneInitializers<uint8_t> planeInitializers = {
-          {baseAddressYPlane,
-           Frame::CM_USE_KEEP_LAYOUT,
-           imageSpec_.getPlaneStride(0) - imageSpec_.getDefaultStride()},
-          {baseAddressUPlane,
-           Frame::CM_USE_KEEP_LAYOUT,
-           imageSpec_.getPlaneStride(1) - imageSpec_.getDefaultStride2()},
-      };
-      sourceFrame = make_unique<Frame>(sourceFrameType, planeInitializers);
-    } break;
-    case vrs::PixelFormat::YUV_420_NV12: {
-      const FrameType sourceFrameType(
-          width, height, FrameType::FORMAT_Y_UV12, FrameType::ORIGIN_UPPER_LEFT);
-      const uint8_t* baseAddressYPlane = rdata();
-      const uint8_t* baseAddressUPlane =
-          baseAddressYPlane + imageSpec_.getPlaneStride(0) * imageSpec_.getPlaneHeight(0);
-      Frame::PlaneInitializers<uint8_t> planeInitializers = {
-          {baseAddressYPlane,
-           Frame::CM_USE_KEEP_LAYOUT,
-           imageSpec_.getPlaneStride(0) - imageSpec_.getDefaultStride()},
-          {baseAddressUPlane,
-           Frame::CM_USE_KEEP_LAYOUT,
-           imageSpec_.getPlaneStride(1) - imageSpec_.getDefaultStride2()},
-      };
-      sourceFrame = make_unique<Frame>(sourceFrameType, planeInitializers);
-    } break;
-    case PixelFormat::YUY2: {
-      const FrameType sourceFrameType(
-          width, height, FrameType::FORMAT_YUYV16, FrameType::ORIGIN_UPPER_LEFT);
-      sourceFrame = make_unique<Frame>(
-          sourceFrameType, rdata(), Frame::CM_USE_KEEP_LAYOUT, imageSpec_.getStride() - 2 * width);
-    } break;
-    default:
-      return false;
+
+  // Use the helper function to create the source Ocean::Frame with proper plane initialization
+  auto sourceFrame =
+      createOceanFrameFromVRS(imageSpec_, rdata(), Ocean::FrameType::FORMAT_UNDEFINED);
+  if (!sourceFrame) {
+    return false;
   }
+
   // Create an Ocean-style target frame
   outNormalizedFrame.init(targetPixelFormat, width, height);
   const FrameType targetFrameType(
