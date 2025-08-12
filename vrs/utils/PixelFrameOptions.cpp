@@ -105,7 +105,9 @@ bool ResizeOptions::computeTargetDimensions(
 // Only the pixel formats for which we verified that Ocean supports resizing.
 bool ResizeOptions::canResize(PixelFormat pixelFormat) {
   return pixelFormat == PixelFormat::GREY8 || pixelFormat == PixelFormat::RGB8 ||
-      pixelFormat == PixelFormat::RGBA8 || pixelFormat == PixelFormat::YUY2;
+      pixelFormat == PixelFormat::RGBA8 || pixelFormat == PixelFormat::YUY2 ||
+      pixelFormat == PixelFormat::YUV_I420_SPLIT || pixelFormat == PixelFormat::YUV_420_NV21 ||
+      pixelFormat == PixelFormat::YUV_420_NV12;
 }
 
 std::unique_ptr<PixelFrame> ResizeOptions::resize(const PixelFrame& sourceFrame) const {
