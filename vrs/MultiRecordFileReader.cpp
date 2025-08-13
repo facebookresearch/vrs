@@ -37,6 +37,9 @@ using UniqueStreamId = vrs::MultiRecordFileReader::UniqueStreamId;
 
 namespace vrs {
 
+MultiRecordFileReader::MultiRecordFileReader()
+    : relatedFileTags_{tag_conventions::kCaptureTimeEpoch, tag_conventions::kSessionId} {}
+
 /// Checks whether a given record belogs to the given reader
 static bool belongsTo(const IndexRecord::RecordInfo* record, const RecordFileReader& reader) {
   const auto& index = reader.getIndex();
@@ -89,6 +92,10 @@ int MultiRecordFileReader::open(const vector<FileSpec>& fileSpecs) {
   initializeFileTags();
   isOpened_ = true;
   return SUCCESS;
+}
+
+void MultiRecordFileReader::setRelatedFileTags(std::vector<std::string>&& tags) {
+  relatedFileTags_ = std::move(tags);
 }
 
 int MultiRecordFileReader::close() {
@@ -719,7 +726,7 @@ bool MultiRecordFileReader::areFilesRelated() const {
   if (readers_.empty() || hasSingleFile()) {
     return true;
   }
-  for (const auto& relatedTag : kRelatedFileTags) {
+  for (const auto& relatedTag : relatedFileTags_) {
     auto readerIt = readers_.cbegin();
     // The first non-empty value must be treated as the expectedValue
     string expectedValue;

@@ -42,7 +42,7 @@ class MultiRecordFileReader {
   /// UniqueStreamId is expected.
   using UniqueStreamId = StreamId;
 
-  MultiRecordFileReader() = default;
+  MultiRecordFileReader();
   MultiRecordFileReader(const MultiRecordFileReader&) = delete;
   MultiRecordFileReader(MultiRecordFileReader&&) = delete;
   virtual ~MultiRecordFileReader();
@@ -95,6 +95,14 @@ class MultiRecordFileReader {
   static inline const string kRelatedFileTags[] = {
       tag_conventions::kCaptureTimeEpoch,
       tag_conventions::kSessionId};
+
+  /// Set the tags that determine whether VRS files are related to each other.
+  /// When multiple files are opened, they must have identical values for these tags.
+  /// Use this method before opening files to override the default tags.
+  /// Defaults to kCaptureTimeEpoch and kSessionId.
+  /// @param tags: Vector of tag names that must match across files.
+  /// Can be empty to disable related file checks.
+  void setRelatedFileTags(std::vector<std::string>&& tags);
 
   /// Close the underlying files, if any are open.
   /// @return 0 on success or if no file was open.
@@ -553,6 +561,10 @@ class MultiRecordFileReader {
   vector<string> filePaths_;
   const RecordComparatorGT recordComparatorGT_{*this};
   map<string, string> fileTags_;
+  /// Tags that determine whether VRS files are related to each other.
+  /// Related files are expected to have the same value for these tags.
+  /// Defaults to legacy kRelatedFileTags values.
+  vector<string> relatedFileTags_;
 
 #ifdef GTEST_BUILD
   FRIEND_TEST(::MultiRecordFileReaderTest, multiFile);

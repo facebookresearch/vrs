@@ -285,6 +285,13 @@ TEST_F(MultiRecordFileReaderTest, relatedFiles) {
   auto unrelatedFilePaths = relatedFilePaths;
   unrelatedFilePaths.push_back(unrelatedFilePath);
   ASSERT_NE(SUCCESS, MultiRecordFileReader().open(unrelatedFilePaths));
+
+  // Test setRelatedFileTags() - verify we can disable related file checks and open unrelated files
+  MultiRecordFileReader readerWithoutTagCheck;
+  readerWithoutTagCheck.setRelatedFileTags({}); // Empty vector disables checks
+  ASSERT_EQ(SUCCESS, readerWithoutTagCheck.open(unrelatedFilePaths)); // Should succeed now
+  ASSERT_EQ(SUCCESS, readerWithoutTagCheck.close());
+
   removeFiles(unrelatedFilePaths);
 }
 
