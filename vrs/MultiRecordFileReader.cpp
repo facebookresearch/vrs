@@ -30,6 +30,7 @@
 #include "RecordFileReader.h"
 #include "StreamId.h"
 #include "StreamPlayer.h"
+#include "TagConventions.h"
 
 using namespace std;
 

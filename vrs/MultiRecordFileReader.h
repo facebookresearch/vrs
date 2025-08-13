@@ -26,7 +26,6 @@ class GTEST_TEST_CLASS_NAME_(MultiRecordFileReaderTest, multiFile);
 
 #include <vrs/IndexRecord.h>
 #include <vrs/RecordFileReader.h>
-#include <vrs/TagConventions.h>
 
 namespace vrs {
 
@@ -51,9 +50,9 @@ class MultiRecordFileReader {
   MultiRecordFileReader& operator=(MultiRecordFileReader&&) = delete;
 
   /// Open the given VRS files.
-  /// Only related files are allowed to be opened together. i.e. the files which have the same
-  /// values for tags defined in `kRelatedFileTags`. If these tags are present, then the values must
-  /// match.
+  /// Only related files are allowed to be opened together, that is, files that have certain file
+  /// tags in common. If these tags are present, then the values must match.
+  /// By default, these tags are tag_conventions::kCaptureTimeEpoch and tag_conventions::kSessionId
   /// All the files must have their timestamps in the same time domain.
   /// This method is expected to be invoked only once per instance.
   /// @param paths: VRS file paths to open.
@@ -61,12 +60,8 @@ class MultiRecordFileReader {
   /// error code, in which case, further read calls will fail.
   int open(const std::vector<std::string>& paths);
 
-  /// Open the given VRS files.
-  /// Only related files are allowed to be opened together. i.e. the files which have the same
-  /// values for tags defined in `kRelatedFileTags`. If these tags are present, then the values must
-  /// match.
-  /// All the files must have their timestamps in the same time domain.
-  /// This method is expected to be invoked only once per instance.
+  /// Open the given VRS files, specified by their FileSpecs.
+  /// See open(const std::vector<std::string>& paths) for more details.
   /// @param fileSpecs: VRS file specs to open.
   /// @return 0 on success and you can read all the files, or some non-zero
   /// error code, in which case, further read calls will fail.
@@ -89,12 +84,6 @@ class MultiRecordFileReader {
   int open(const FileSpec& fileSpec) {
     return open(std::vector<FileSpec>{fileSpec});
   }
-
-  /// Tags which determine whether VRS files are related to each other.
-  /// Related files are expected to have the same value for these tags.
-  static inline const string kRelatedFileTags[] = {
-      tag_conventions::kCaptureTimeEpoch,
-      tag_conventions::kSessionId};
 
   /// Set the tags that determine whether VRS files are related to each other.
   /// When multiple files are opened, they must have identical values for these tags.
@@ -503,8 +492,8 @@ class MultiRecordFileReader {
     return readers_.size() == 1;
   }
 
-  /// Are the given files related i.e. have the same value for certain pre-specified tags
-  /// (`kRelatedFileTags`)?
+  /// Are the given files related i.e. have the same value for certain pre-specified tags?
+  /// These tags can be customized using setRelatedFileTags()
   /// MultiRecordFileReader will only allow you to open related files.
   /// @return true if the files associated with this instance are related, false otherwise.
   bool areFilesRelated() const;
@@ -561,9 +550,7 @@ class MultiRecordFileReader {
   vector<string> filePaths_;
   const RecordComparatorGT recordComparatorGT_{*this};
   map<string, string> fileTags_;
-  /// Tags that determine whether VRS files are related to each other.
-  /// Related files are expected to have the same value for these tags.
-  /// Defaults to legacy kRelatedFileTags values.
+  /// File tags that determine whether VRS files are related to each other.
   vector<string> relatedFileTags_;
 
 #ifdef GTEST_BUILD

@@ -279,8 +279,8 @@ TEST_F(MultiRecordFileReaderTest, relatedFiles) {
   const auto unrelatedFilePath =
       getOsTempPath(fmt::format("UnrelatedPath{}.vrs", relatedFilePaths.size()));
   auto mismatchingTags = getDefaultTags();
-  // Modify the value of one of kRelatedFileTags to make this file seem unrelated
-  mismatchingTags[MultiRecordFileReader::kRelatedFileTags[0]].append("_unrelated");
+  // Modify the value of one of the related tags to make this file seem unrelated
+  mismatchingTags[tag_conventions::kSessionId].append("_unrelated");
   createVRSFileSynchronously(unrelatedFilePath, numRecords, mismatchingTags);
   auto unrelatedFilePaths = relatedFilePaths;
   unrelatedFilePaths.push_back(unrelatedFilePath);
