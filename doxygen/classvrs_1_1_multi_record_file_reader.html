@@ -118,6 +118,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a37b8e10c675577a8a7d907fa4813af73"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa4edd3bbfb351c3aedd554feae96e77e" id="r_aa4edd3bbfb351c3aedd554feae96e77e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#aa4edd3bbfb351c3aedd554feae96e77e">open</a> (const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;fileSpec)</td></tr>
 <tr class="separator:aa4edd3bbfb351c3aedd554feae96e77e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a260d5950345983cc2785c4b5c0c33b18" id="r_a260d5950345983cc2785c4b5c0c33b18"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#a260d5950345983cc2785c4b5c0c33b18">setRelatedFileTags</a> (std::vector&lt; std::string &gt; &amp;&amp;tags)</td></tr>
+<tr class="separator:a260d5950345983cc2785c4b5c0c33b18"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a80d0e7da59d14619bf2d47f4e9e257f3" id="r_a80d0e7da59d14619bf2d47f4e9e257f3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#a80d0e7da59d14619bf2d47f4e9e257f3">close</a> ()</td></tr>
 <tr class="separator:a80d0e7da59d14619bf2d47f4e9e257f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aea6d2e06fac1b08114256872edfc7aae" id="r_aea6d2e06fac1b08114256872edfc7aae"><td class="memItemLeft" align="right" valign="top">const set&lt; <a class="el" href="classvrs_1_1_multi_record_file_reader.html#a95c324393b94d95ab8558c25d4c6a999">UniqueStreamId</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_multi_record_file_reader.html#aea6d2e06fac1b08114256872edfc7aae">getStreams</a> () const</td></tr>
@@ -1727,6 +1729,30 @@ Static Public Attributes</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the caching strategy was set. False if any of the underlying file handlers doesn't support the requested strategy, or any particular strategy. </dd></dl>
+
+</div>
+</div>
+<a id="a260d5950345983cc2785c4b5c0c33b18" name="a260d5950345983cc2785c4b5c0c33b18"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a260d5950345983cc2785c4b5c0c33b18">&#9670;&#160;</a></span>setRelatedFileTags()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void vrs::MultiRecordFileReader::setRelatedFileTags </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; std::string &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"><em>tags</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Set the tags that determine whether VRS files are related to each other. When multiple files are opened, they must have identical values for these tags. Use this method before opening files to override the default tags. Defaults to kCaptureTimeEpoch and kSessionId. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tags</td><td>Vector of tag names that must match across files. Can be empty to disable related file checks. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
