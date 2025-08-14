@@ -735,6 +735,8 @@ uint64_t RecordFileWriter::collectOldRecords(RecordBatch& batch, double maxTimes
   return count;
 }
 
+namespace {
+
 /// \brief Helper class pointing to the next record in a device's list of records.
 /// This class doesn't not modify the list, simply iterating on it.
 class RecordList {
@@ -766,6 +768,8 @@ class RecordList {
   const pair<StreamId, list<Record*>>* deviceRecords_;
   list<Record*>::const_iterator iter_; // pointer to the next record to consider
 };
+
+} // namespace
 
 uint64_t RecordFileWriter::addRecordBatchesToSortedRecords(
     const RecordBatches& batches,
