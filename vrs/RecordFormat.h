@@ -87,6 +87,7 @@ enum class PixelFormat : uint8_t {
   RAW10_BAYER_BGGR, ///< 10 bit per pixel, BGGR bayer pattern.
   YUV_420_NV21, ///< Y plane + half width/half height chroma plane with weaved V and U values.
   YUV_420_NV12, ///< Y plane + half width/half height chroma plane with weaved U and V values.
+  GREY10PACKED, ///< 10 bit per pixel, packed in successive little-endian bits, in 40 bits blocks.
 
   COUNT, ///< Count of values in this enum type. @internal
 };

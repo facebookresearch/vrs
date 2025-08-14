@@ -84,11 +84,11 @@ static_assert(static_cast<int>(ImageFormat::JXL) == 5, "ImageFormat enum values 
 
 // These text names may NEVER BE CHANGED, as they are used in data layout definitions!!
 string_view sPixelFormatNames[] = {
-    "undefined",        "grey8",        "bgr8",        "depth32f",  "rgb8",
-    "yuv_i420_split",   "rgba8",        "rgb10",       "rgb12",     "grey10",
-    "grey12",           "grey16",       "rgb32F",      "scalar64F", "yuy2",
-    "rgb_ir_4x4",       "rgba32F",      "bayer8_rggb", "raw10",     "raw10_bayer_rggb",
-    "raw10_bayer_bggr", "yuv_420_nv21", "yuv_420_nv12"};
+    "undefined",        "grey8",        "bgr8",         "depth32f",    "rgb8",
+    "yuv_i420_split",   "rgba8",        "rgb10",        "rgb12",       "grey10",
+    "grey12",           "grey16",       "rgb32F",       "scalar64F",   "yuy2",
+    "rgb_ir_4x4",       "rgba32F",      "bayer8_rggb",  "raw10",       "raw10_bayer_rggb",
+    "raw10_bayer_bggr", "yuv_420_nv21", "yuv_420_nv12", "grey10packed"};
 ENUM_STRING_CONVERTER(PixelFormat, sPixelFormatNames, PixelFormat::UNDEFINED);
 
 // Enum values may NEVER BE CHANGED, as they are used in data layout definitions!!
@@ -114,6 +114,9 @@ static_assert(
     "PixelFormat enum values CHANGED!");
 static_assert(
     static_cast<int>(PixelFormat::YUV_420_NV12) == 22,
+    "PixelFormat enum values CHANGED!");
+static_assert(
+    static_cast<int>(PixelFormat::GREY10PACKED) == 23,
     "PixelFormat enum values CHANGED!");
 
 string_view sAudioFormatNames[] = {"undefined", "pcm", "opus"};
@@ -472,6 +475,7 @@ uint8_t ImageContentBlockSpec::getChannelCountPerPixel(PixelFormat pixel) {
     case PixelFormat::RAW10_BAYER_RGGB:
     case PixelFormat::RAW10_BAYER_BGGR:
     case PixelFormat::RAW10:
+    case PixelFormat::GREY10PACKED:
       return 1; // grayscale, or "depth", or any form of single numeric value per pixel
     case PixelFormat::BGR8:
     case PixelFormat::RGB8:
@@ -533,6 +537,7 @@ size_t ImageContentBlockSpec::getBytesPerPixel(PixelFormat pixel) {
     case PixelFormat::RAW10_BAYER_BGGR:
     case PixelFormat::YUV_420_NV21:
     case PixelFormat::YUV_420_NV12:
+    case PixelFormat::GREY10PACKED:
     case PixelFormat::UNDEFINED:
     case PixelFormat::COUNT:
       return ContentBlock::kSizeUnknown;
@@ -657,7 +662,8 @@ uint32_t ImageContentBlockSpec::getDefaultStride() const {
       return getWidth();
     case PixelFormat::RAW10:
     case PixelFormat::RAW10_BAYER_RGGB:
-    case PixelFormat::RAW10_BAYER_BGGR: {
+    case PixelFormat::RAW10_BAYER_BGGR:
+    case PixelFormat::GREY10PACKED: {
       // groups of 4 pixels use 5 bytes, sharing the 5th for their last two bits
       uint32_t fourPixelsGroupCount = (getWidth() + 3) / 4;
       return fourPixelsGroupCount * 5;

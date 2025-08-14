@@ -325,6 +325,27 @@ TEST_F(RecordFormatTest, testBlockFormat) {
   EXPECT_EQ(raw10b.image().getChannelCountPerPixel(), 1);
   EXPECT_EQ(raw10b.image().getCodecQuality(), ImageContentBlockSpec::kQualityUndefined);
 
+  ContentBlock grey10packedA("image/raw/640x480/pixel=grey10packed");
+  EXPECT_EQ(grey10packedA.getContentType(), ContentType::IMAGE);
+  EXPECT_EQ(grey10packedA.image().getImageFormat(), ImageFormat::RAW);
+  EXPECT_EQ(grey10packedA.image().getPixelFormat(), PixelFormat::GREY10PACKED);
+  EXPECT_TRUE(checkImageDimensions(grey10packedA, 640, 480, 0, 800));
+  EXPECT_TRUE(checkImageHeights(grey10packedA, 480));
+  EXPECT_EQ(grey10packedA.image().getBlockSize(), 800 * 480);
+  EXPECT_EQ(grey10packedA.image().getBytesPerPixel(), ContentBlock::kSizeUnknown);
+  EXPECT_EQ(grey10packedA.image().getChannelCountPerPixel(), 1);
+
+  ContentBlock grey10packedB("image/raw/641x480/pixel=grey10packed");
+  EXPECT_EQ(grey10packedB.getContentType(), ContentType::IMAGE);
+  EXPECT_EQ(grey10packedB.image().getImageFormat(), ImageFormat::RAW);
+  EXPECT_EQ(grey10packedB.image().getPixelFormat(), PixelFormat::GREY10PACKED);
+  EXPECT_TRUE(checkImageDimensions(grey10packedB, 641, 480, 0, 805));
+  EXPECT_TRUE(checkImageHeights(grey10packedB, 480));
+  EXPECT_EQ(grey10packedB.image().getBlockSize(), 805 * 480);
+  EXPECT_EQ(grey10packedB.image().getBytesPerPixel(), ContentBlock::kSizeUnknown);
+  EXPECT_EQ(grey10packedB.image().getChannelCountPerPixel(), 1);
+  EXPECT_EQ(grey10packedB.image().getCodecQuality(), ImageContentBlockSpec::kQualityUndefined);
+
   ContentBlock video("image/video/codec_quality=100");
   EXPECT_EQ(video.getContentType(), ContentType::IMAGE);
   EXPECT_EQ(video.image().getImageFormat(), ImageFormat::VIDEO);

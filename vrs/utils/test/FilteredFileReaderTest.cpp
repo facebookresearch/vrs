@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-#include <memory>
 #include <string>
 
 #include <gtest/gtest.h>
@@ -37,22 +36,23 @@ struct FilteredFileReaderTest : testing::Test {
   void SetUp() override {
     filteredReader.setSource(kTestFilePath);
     ASSERT_EQ(filteredReader.openFile({}), 0);
-    ASSERT_EQ(filteredReader.reader.getStreams().size(), 22);
+    ASSERT_EQ(
+        filteredReader.reader.getStreams().size(), static_cast<size_t>(PixelFormat::COUNT) - 1);
   }
 };
 
 TEST_F(FilteredFileReaderTest, excludeStreams) {
   utils::RecordFilterParams filters;
   filteredReader.applyFilters(filters);
-  EXPECT_EQ(filteredReader.filter.streams.size(), 22);
+  EXPECT_EQ(filteredReader.filter.streams.size(), static_cast<size_t>(PixelFormat::COUNT) - 1);
 
   filters.excludeStream("100-test/synthetic/grey8");
   filteredReader.applyFilters(filters);
-  EXPECT_EQ(filteredReader.filter.streams.size(), 21);
+  EXPECT_EQ(filteredReader.filter.streams.size(), static_cast<size_t>(PixelFormat::COUNT) - 2);
 
   filters.excludeStream("100-4");
   filteredReader.applyFilters(filters);
-  EXPECT_EQ(filteredReader.filter.streams.size(), 20);
+  EXPECT_EQ(filteredReader.filter.streams.size(), static_cast<size_t>(PixelFormat::COUNT) - 3);
 }
 
 TEST_F(FilteredFileReaderTest, includeStreams) {
@@ -66,13 +66,13 @@ TEST_F(FilteredFileReaderTest, includeStreams) {
     utils::RecordFilterParams filters;
     filters.includeStream("100-");
     filteredReader.applyFilters(filters);
-    EXPECT_EQ(filteredReader.filter.streams.size(), 5);
+    EXPECT_EQ(filteredReader.filter.streams.size(), 6);
   }
   {
     utils::RecordFilterParams filters;
     filters.includeStream("100");
     filteredReader.applyFilters(filters);
-    EXPECT_EQ(filteredReader.filter.streams.size(), 5);
+    EXPECT_EQ(filteredReader.filter.streams.size(), 6);
   }
   {
     utils::RecordFilterParams filters;
@@ -110,12 +110,12 @@ TEST_F(FilteredFileReaderTest, includeExcludeStreams) {
     filters.excludeStream("100-test/synthetic/nope");
     filters.excludeStream("100-test/synthetic/grey8");
     filteredReader.applyFilters(filters);
-    EXPECT_EQ(filteredReader.filter.streams.size(), 4);
+    EXPECT_EQ(filteredReader.filter.streams.size(), 5);
 
     filters.includeStream("100-");
     filters.includeStream("214");
     filters.excludeStream("100-test/synthetic/raw10");
     filteredReader.applyFilters(filters);
-    EXPECT_EQ(filteredReader.filter.streams.size(), 18);
+    EXPECT_EQ(filteredReader.filter.streams.size(), 19);
   }
 }

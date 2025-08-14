@@ -30,6 +30,7 @@
 #include <vrs/helpers/FileMacros.h>
 #include <vrs/helpers/Throttler.h>
 #include <vrs/utils/BufferRecordReader.hpp>
+#include <vrs/utils/converters/Grey10PackedConverters.h>
 #include <vrs/utils/converters/Raw10ToGrey10Converter.h>
 #include <utility>
 
@@ -209,7 +210,8 @@ set<uint16_t>& getusedObjectColors() {
 // tell if grey16 is better than grey8 for precision wrt a particular pixel format
 bool grey16helps(PixelFormat format) {
   return format == PixelFormat::GREY16 || format == PixelFormat::GREY12 ||
-      format == PixelFormat::GREY10 || format == PixelFormat::RAW10;
+      format == PixelFormat::GREY10 || format == PixelFormat::GREY10PACKED ||
+      format == PixelFormat::RAW10;
 }
 
 } // namespace
@@ -664,14 +666,11 @@ bool PixelFrame::normalizeFrame(
     case PixelFormat::RAW10:
     case PixelFormat::RAW10_BAYER_RGGB:
     case PixelFormat::RAW10_BAYER_BGGR:
+    case PixelFormat::GREY10PACKED:
       if (grey16supported) {
         format = PixelFormat::GREY16;
-        bitsToShift = 6;
-        componentCount = 1;
       } else {
         format = PixelFormat::GREY8;
-        bitsToShift = 2;
-        componentCount = 1;
       }
       break;
     case PixelFormat::YUY2:
@@ -752,6 +751,32 @@ bool PixelFrame::normalizeFrame(
         for (uint32_t remainder = 0; remainder < width % 4; remainder++) {
           lineOutPtr[remainder] = lineSrcPtr[remainder];
         }
+      }
+    }
+  } else if (srcFormat == PixelFormat::GREY10PACKED) {
+    if (format == PixelFormat::GREY16) {
+      if (!convertGrey10PackedToGrey10(
+              outNormalizedFrame.wdata(),
+              outNormalizedFrame.getBuffer().size(),
+              outNormalizedFrame.getStride(),
+              rdata(),
+              frameBytes_.size(),
+              getWidth(),
+              getHeight(),
+              getStride())) {
+        return false;
+      }
+    } else {
+      if (!convertGrey10PackedToGrey8(
+              outNormalizedFrame.wdata(),
+              outNormalizedFrame.getBuffer().size(),
+              outNormalizedFrame.getStride(),
+              rdata(),
+              frameBytes_.size(),
+              getWidth(),
+              getHeight(),
+              getStride())) {
+        return false;
       }
     }
   } else if (srcFormat == PixelFormat::RGB_IR_RAW_4X4) {
