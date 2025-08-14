@@ -34,9 +34,8 @@ install(TARGETS vrs_utils_converters EXPORT VRSLibTargets
 if (UNIT_TESTS)
   enable_testing()
 
-  add_executable(test_vrs_utils_converters
-    test/Raw10ToGrey10ConverterTest.cpp
-  )
+  file (GLOB VRS_UTILS_CONVERTERS_TEST_SRCS test/*.cpp)
+  add_executable(test_vrs_utils_converters ${VRS_UTILS_CONVERTERS_TEST_SRCS})
   target_link_libraries(test_vrs_utils_converters
     PUBLIC
       vrs_utils_converters
