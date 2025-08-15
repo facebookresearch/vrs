@@ -52,6 +52,30 @@ inline int strncasecmp(const char* first, const char* second, size_t size) {
 }
 #endif
 
+inline int strcasecmp(const std::string& first, const char* second) {
+  return strcasecmp(first.c_str(), second);
+}
+
+inline int strcasecmp(const std::string& first, const std::string& second) {
+  return strcasecmp(first.c_str(), second.c_str());
+}
+
+inline int strcasecmp(const char* first, const std::string& second) {
+  return strcasecmp(first, second.c_str());
+}
+
+inline int strncasecmp(const std::string& first, const char* second, size_t size) {
+  return strncasecmp(first.c_str(), second, size);
+}
+
+inline int strncasecmp(const std::string& first, const std::string& second, size_t size) {
+  return strncasecmp(first.c_str(), second.c_str(), size);
+}
+
+inline int strncasecmp(const char* first, const std::string& second, size_t size) {
+  return strncasecmp(first, second.c_str(), size);
+}
+
 /// Compare strings, as you'd expect in a modern desktop OS (Explorer/Finder), treating digit
 /// sections as numbers, so that "image1.png" is before "image02.png", and "image010.png" is the
 /// same as "image00010.png".

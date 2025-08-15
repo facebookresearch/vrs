@@ -23,38 +23,21 @@
 namespace vrs {
 namespace test {
 
+struct InputOutpuSpecs {
+  ImageContentBlockSpec inputSpec;
+  ImageContentBlockSpec outputSpec;
+};
+
+inline ImageContentBlockSpec operator+(
+    const ImageContentBlockSpec& lhs,
+    const ImageContentBlockSpec& rhs) {
+  return {lhs.getImageFormat(), rhs.getPixelFormat(), rhs.getWidth(), rhs.getHeight()};
+}
+
 class ImageSpecCollector : public utils::VideoRecordFormatStreamPlayer {
  public:
-  explicit ImageSpecCollector(RecordFileReader& reader) {
-    for (auto id : reader.getStreams()) {
-      reader.setStreamPlayer(id, this);
-      auto config = reader.getRecord(id, Record::Type::CONFIGURATION, 0);
-      if (config != nullptr) {
-        reader.readRecord(*config);
-      }
-      auto data = reader.getRecord(id, Record::Type::DATA, 0);
-      if (data != nullptr) {
-        reader.readRecord(*data);
-      }
-    }
-  }
-  bool onImageRead(const CurrentRecord& record, size_t blockIndex, const ContentBlock& cb)
-      override {
-    if (record.recordType == Record::Type::DATA) {
-      // Collect original content block image spec
-      imageSpecs[record.streamId] = cb.image();
-
-      // Decode the image and collect the decoded image spec
-      utils::PixelFrame frame;
-      if (frame.readFrame(record.reader, cb)) {
-        decodedImageSpecs[record.streamId] = frame.getSpec();
-      } else {
-        // If decoding fails, use the original spec as fallback
-        decodedImageSpecs[record.streamId] = cb.image();
-      }
-    }
-    return false;
-  }
+  explicit ImageSpecCollector(RecordFileReader& reader);
+  bool onImageRead(const CurrentRecord& record, size_t blockIndex, const ContentBlock& cb) override;
 
   // Original image specs from content block metadata
   map<StreamId, ImageContentBlockSpec> imageSpecs;
@@ -62,6 +45,10 @@ class ImageSpecCollector : public utils::VideoRecordFormatStreamPlayer {
   // Decoded image specs from actual decoded image data
   map<StreamId, ImageContentBlockSpec> decodedImageSpecs;
 };
+
+std::map<StreamId, InputOutpuSpecs> getImageProcessing(
+    RecordFileReader& inputReader,
+    RecordFileReader& outputReader);
 
 } // namespace test
 } // namespace vrs
