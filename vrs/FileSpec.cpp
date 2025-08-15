@@ -387,9 +387,13 @@ const string& FileSpec::getExtra(const string& name) const {
   return (extra == extras.end()) ? kEmptyString : extra->second;
 }
 
-const string& FileSpec::getExtra(const string& name, const string& defaultValue) const {
+bool FileSpec::getExtra(const string& name, string& outValue) const {
   const auto extra = extras.find(name);
-  return (extra == extras.end()) ? defaultValue : extra->second;
+  if (extra == extras.end()) {
+    return false;
+  }
+  outValue = extra->second;
+  return true;
 }
 
 bool FileSpec::hasExtra(const string& name) const {

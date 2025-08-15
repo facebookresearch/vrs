@@ -100,8 +100,8 @@ struct FileSpec {
 
   /// Get an extra parameter, or the empty string.
   const string& getExtra(const string& name) const;
-  /// Get an extra parameter, or the empty string.
-  const string& getExtra(const string& name, const string& defaultValue) const;
+  /// Get an extra parameter value, and know if a match was found.
+  bool getExtra(const string& name, string& outValue) const;
   /// Tell if an extra parameter is defined.
   bool hasExtra(const string& name) const;
   /// Get an extra parameter interpreted as an int, or a default value if not available,
