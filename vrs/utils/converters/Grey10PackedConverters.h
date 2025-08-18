@@ -20,7 +20,7 @@
 
 namespace vrs::utils {
 
-bool convertGrey10PackedToGrey10(
+bool convertGrey10PackedToGrey16(
     void* dst,
     uint32_t dstSize,
     uint32_t dstStride,

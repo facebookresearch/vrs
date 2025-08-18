@@ -669,8 +669,12 @@ bool PixelFrame::normalizeFrame(
     case PixelFormat::GREY10PACKED:
       if (grey16supported) {
         format = PixelFormat::GREY16;
+        bitsToShift = 6;
+        componentCount = 1;
       } else {
         format = PixelFormat::GREY8;
+        bitsToShift = 2;
+        componentCount = 1;
       }
       break;
     case PixelFormat::YUY2:
@@ -755,7 +759,7 @@ bool PixelFrame::normalizeFrame(
     }
   } else if (srcFormat == PixelFormat::GREY10PACKED) {
     if (format == PixelFormat::GREY16) {
-      if (!convertGrey10PackedToGrey10(
+      if (!convertGrey10PackedToGrey16(
               outNormalizedFrame.wdata(),
               outNormalizedFrame.getBuffer().size(),
               outNormalizedFrame.getStride(),

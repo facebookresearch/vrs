@@ -117,7 +117,7 @@ struct PixelGrey10Packed {
 
 namespace vrs::utils {
 
-bool convertGrey10PackedToGrey10(
+bool convertGrey10PackedToGrey16(
     void* dst,
     uint32_t dstSize,
     uint32_t dstStride,
@@ -164,10 +164,10 @@ bool convertGrey10PackedToGrey10(
 
     const uint32_t total_quadruplets_in_row = width / 4;
     for (uint32_t j = 0; j < total_quadruplets_in_row; j++) {
-      grey10[0] = grey10packed->p1();
-      grey10[1] = grey10packed->p2();
-      grey10[2] = grey10packed->p3();
-      grey10[3] = grey10packed->p4();
+      grey10[0] = grey10packed->p1() << 6;
+      grey10[1] = grey10packed->p2() << 6;
+      grey10[2] = grey10packed->p3() << 6;
+      grey10[3] = grey10packed->p4() << 6;
       grey10packed++;
       grey10 += 4;
     }

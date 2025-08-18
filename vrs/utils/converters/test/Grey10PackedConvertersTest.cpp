@@ -26,22 +26,24 @@ using namespace std;
 using namespace vrs::utils;
 
 static void checkRevert(
-    const vector<uint16_t>& grey16,
+    const vector<uint16_t>& grey10,
     const vector<uint8_t>& packed10,
     uint32_t width,
     uint32_t height) {
   // verify packed10 to grey16 goes back to starting point
-  vector<uint16_t> revert(width * height);
-  EXPECT_TRUE(convertGrey10PackedToGrey10(
-      revert.data(),
-      revert.size() * 2,
+  vector<uint16_t> grey16(width * height);
+  EXPECT_TRUE(convertGrey10PackedToGrey16(
+      grey16.data(),
+      grey16.size() * 2,
       width * 2,
       packed10.data(),
       packed10.size(),
       width,
       height,
       width * 5 / 4));
-  EXPECT_EQ(grey16, revert);
+  for (size_t k = 0; k < grey16.size(); ++k) {
+    EXPECT_EQ(grey16[k] >> 6, grey10[k]);
+  }
 
   // verify convertGrey10PackedToGrey8 behavior
   vector<uint8_t> grey8(width * height);
@@ -54,10 +56,10 @@ static void checkRevert(
       width,
       height,
       width * 5 / 4));
-  EXPECT_EQ(revert.size(), grey8.size());
+  EXPECT_EQ(grey16.size(), grey8.size());
 
-  for (size_t k = 0; k < revert.size(); ++k) {
-    EXPECT_EQ(static_cast<uint8_t>(revert[k] >> 2), grey8[k]);
+  for (size_t k = 0; k < grey16.size(); ++k) {
+    EXPECT_EQ(static_cast<uint8_t>(grey16[k] >> 8), grey8[k]);
   }
 }
 
