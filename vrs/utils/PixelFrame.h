@@ -316,18 +316,25 @@ class PixelFrame {
   /// Returns false if the frame could not be converted, or the format doesn't need conversion.
   /// @param outNormalizedFrame: on exit, the normalized frame. Input value is ignored.
   /// @param grey16supported: true to allow PixelFormat::GREY16.
-  /// @param normalizedPixelFormat: the pixel format to target. Expects GREY8, GREY16 and RGB8.
-  /// Only valid for what getNormalizedPixelFormat() returns!
+  /// @param normalizedPixelFormat: if you computed it, the normalized pixel format.
+  /// Only valid for what getNormalizedPixelFormat() returns! (to avoid double-calculations)
   bool normalizeFrame(
       PixelFrame& outNormalizedFrame,
       bool grey16supported,
       const NormalizeOptions& options = {},
       PixelFormat normalizedPixelFormat = PixelFormat::UNDEFINED) const;
 
+  /// Get normalized pixel format for a given pixel format and options.
   static PixelFormat getNormalizedPixelFormat(
       PixelFormat sourcePixelFormat,
       bool grey16supported,
       const NormalizeOptions& options = {});
+
+  /// Tell if an image format supports a specific pixel format.
+  /// Only meaningful for png, jpg, jxl.
+  /// Always true for ImageFormat::VIDEO (needs decoders to be sure).
+  /// Always false for ImageFormat::CUSTOM_CODEC (never available).
+  static bool areCompatible(ImageFormat imageFormat, PixelFormat pixelFormat);
 
   /// Conversion in place from RGBA to RGB (no memory allocation)
   /// @return True if the conversion was performed, false if source wasn't an RGBA frame.

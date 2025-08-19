@@ -1072,6 +1072,31 @@ PixelFrame::getStreamNormalizeOptions(RecordFileReader& reader, StreamId id, Pix
   return NormalizeOptions(ImageSemantic::Camera);
 }
 
+bool PixelFrame::areCompatible(ImageFormat imageFormat, PixelFormat pixelFormat) {
+  switch (imageFormat) {
+    case ImageFormat::RAW:
+      return pixelFormat != PixelFormat::UNDEFINED;
+
+    case ImageFormat::JPG:
+      return pixelFormat == PixelFormat::GREY8 || pixelFormat == PixelFormat::RGB8;
+
+    case ImageFormat::PNG:
+      return pixelFormat == PixelFormat::GREY8 || pixelFormat == PixelFormat::GREY16 ||
+          pixelFormat == PixelFormat::RGB8 || pixelFormat == PixelFormat::RGBA8;
+
+    case ImageFormat::JXL:
+      return pixelFormat == PixelFormat::GREY8 || pixelFormat == PixelFormat::RGB8 ||
+          pixelFormat == PixelFormat::RGBA8;
+
+    case ImageFormat::VIDEO:
+      return pixelFormat != PixelFormat::UNDEFINED;
+
+    case ImageFormat::CUSTOM_CODEC:
+    default:
+      return false;
+  }
+}
+
 #if IS_VRS_OSS_CODE()
 
 bool PixelFrame::normalizeToPixelFormat(
