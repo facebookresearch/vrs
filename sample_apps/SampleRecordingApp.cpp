@@ -35,6 +35,8 @@ using namespace vrs_sample_apps;
 
 namespace vrs_sample_apps {
 
+namespace {
+
 static double now() {
   using namespace std::chrono;
   return duration_cast<duration<double>>(steady_clock::now().time_since_epoch()).count();
@@ -219,6 +221,8 @@ class MotionStream : public Recordable {
   MotionStreamConfig config_;
   MotionStreamData data_;
 };
+
+} // namespace
 
 } // namespace vrs_sample_apps
 
