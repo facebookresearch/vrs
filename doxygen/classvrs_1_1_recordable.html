@@ -96,11 +96,8 @@ Inheritance diagram for vrs::Recordable:</div>
  <div class="center">
   <img src="classvrs_1_1_recordable.png" usemap="#vrs::Recordable_map" alt=""/>
   <map id="vrs::Recordable_map" name="vrs::Recordable_map">
-<area href="classvrs__sample__apps_1_1_audio_stream.html" title="Sample fake device showing how to produce records containing audio data (no metadata)." alt="vrs_sample_apps::AudioStream" shape="rect" coords="0,56,244,80"/>
-<area href="classvrs__sample__apps_1_1_image_stream.html" title="Sample fake device showing how to produce records containing metadata and images." alt="vrs_sample_apps::ImageStream" shape="rect" coords="254,56,498,80"/>
-<area href="classvrs__sample__apps_1_1_motion_stream.html" title="Sample fake device showing how to produce records containing metadata." alt="vrs_sample_apps::MotionStream" shape="rect" coords="508,56,752,80"/>
-<area href="classvrs__sample__code_1_1_my_camera_recordable.html" title="Class to generate a stream of sample records." alt="vrs_sample_code::MyCameraRecordable" shape="rect" coords="762,56,1006,80"/>
-<area href="classvrs__sample__code_1_1_recordable_demo.html" title="Sample device recording some trivial metadata." alt="vrs_sample_code::RecordableDemo" shape="rect" coords="1016,56,1260,80"/>
+<area href="classvrs__sample__code_1_1_my_camera_recordable.html" title="Class to generate a stream of sample records." alt="vrs_sample_code::MyCameraRecordable" shape="rect" coords="0,56,244,80"/>
+<area href="classvrs__sample__code_1_1_recordable_demo.html" title="Sample device recording some trivial metadata." alt="vrs_sample_code::RecordableDemo" shape="rect" coords="254,56,498,80"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -372,7 +369,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>RecordFileWriter</b>
 </div><div class="memdoc">
 <p>Configuration records describe how the device recorded is configured/setup. The configuration of a recordable is probably not changed by data flowing through. A framerate, a resolution, are probably part of the configuration. An exposure setting as well, unless it is automatically adjusted as data flows through. The <a class="el" href="classvrs_1_1_record_file_writer.html" title="The class to create VRS files.">RecordFileWriter</a> will call this method to make sure a configuration record is captured, when a record file is created asynchronously. </p>
 
-<p>Implemented in <a class="el" href="classvrs__sample__apps_1_1_image_stream.html#a692c75d040cccfc7ed70ac1bc51a323c">vrs_sample_apps::ImageStream</a>, <a class="el" href="classvrs__sample__apps_1_1_audio_stream.html#ad4d22c78b1478ec05b1b35c59dc18834">vrs_sample_apps::AudioStream</a>, <a class="el" href="classvrs__sample__apps_1_1_motion_stream.html#a113685418d74d3ce056794b4023b7883">vrs_sample_apps::MotionStream</a>, <a class="el" href="classvrs__sample__code_1_1_recordable_demo.html#a7b1162509b6513632dd15ff215ddcc2e">vrs_sample_code::RecordableDemo</a>, and <a class="el" href="classvrs__sample__code_1_1_my_camera_recordable.html#adc772d673632e2c823cee2754c7a1224">vrs_sample_code::MyCameraRecordable</a>.</p>
+<p>Implemented in <a class="el" href="classvrs__sample__code_1_1_recordable_demo.html#a7b1162509b6513632dd15ff215ddcc2e">vrs_sample_code::RecordableDemo</a>, and <a class="el" href="classvrs__sample__code_1_1_my_camera_recordable.html#adc772d673632e2c823cee2754c7a1224">vrs_sample_code::MyCameraRecordable</a>.</p>
 
 </div>
 </div>
@@ -464,7 +461,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>RecordFileWriter</b>
 <p>State records describe the internal state of the device, if it's stateful. It is probably the result of previous calculation/processing of data.</p>
 <p>State records should not to be confused with the configuration of the device. A position tracking algorithm probably has a state: the last position it determined, which will be used to calculate the next state when the next data come in. State data typically changes as data flows, according to that data. A camera probably has no state, but probably has a configuration. The <a class="el" href="classvrs_1_1_record_file_writer.html" title="The class to create VRS files.">RecordFileWriter</a> will call this method to make sure a configuration record is captured, when a record file is created asynchronously. </p>
 
-<p>Implemented in <a class="el" href="classvrs__sample__apps_1_1_image_stream.html#a6a8acfc84db68126143b3424f575ed96">vrs_sample_apps::ImageStream</a>, <a class="el" href="classvrs__sample__apps_1_1_audio_stream.html#a644191e1701b9598d9c2e80ddd316963">vrs_sample_apps::AudioStream</a>, <a class="el" href="classvrs__sample__apps_1_1_motion_stream.html#ad9d08781f4b714d00b084dfa920f425c">vrs_sample_apps::MotionStream</a>, <a class="el" href="classvrs__sample__code_1_1_recordable_demo.html#a2ca2bdc54e43511435c63ee5efd44b70">vrs_sample_code::RecordableDemo</a>, and <a class="el" href="classvrs__sample__code_1_1_my_camera_recordable.html#a302ccaab585ecb270f830de8372dfc86">vrs_sample_code::MyCameraRecordable</a>.</p>
+<p>Implemented in <a class="el" href="classvrs__sample__code_1_1_recordable_demo.html#a2ca2bdc54e43511435c63ee5efd44b70">vrs_sample_code::RecordableDemo</a>, and <a class="el" href="classvrs__sample__code_1_1_my_camera_recordable.html#a302ccaab585ecb270f830de8372dfc86">vrs_sample_code::MyCameraRecordable</a>.</p>
 
 </div>
 </div>
