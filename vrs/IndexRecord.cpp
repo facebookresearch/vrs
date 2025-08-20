@@ -229,7 +229,7 @@ int writeClassicIndexRecord(
 }
 
 inline bool isValid(Record::Type recordType) {
-  return recordType > Record::Type::UNDEFINED && recordType < Record::Type::COUNT;
+  return enumIsValid<Record::Type>(recordType);
 }
 
 } // namespace

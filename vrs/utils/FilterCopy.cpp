@@ -176,7 +176,7 @@ class NoDuplicateCopier : public Copier {
   }
 
  protected:
-  array<double, static_cast<size_t>(Record::Type::COUNT)> lastRecordTimestamps_{};
+  array<double, enumCount<Record::Type>()> lastRecordTimestamps_{};
 };
 
 struct SourceRecord {

@@ -28,8 +28,7 @@ ContentBlock ImageSpec::getImageContentBlock(const ImageContentBlockSpec& base, 
   uint32_t readBytesPerPixel{};
   uint8_t readBytesPerPixel8{};
   if (width.get(readWidth) && readWidth > 0 && height.get(readHeight) && readHeight > 0) {
-    if (pixelFormat.get(readPixelFormat) && readPixelFormat != PixelFormat::UNDEFINED &&
-        readPixelFormat < PixelFormat::COUNT) {
+    if (pixelFormat.get(readPixelFormat) && enumIsValid(readPixelFormat)) {
       // that's all we need
     } else {
       readPixelFormat = PixelFormat::UNDEFINED;

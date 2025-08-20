@@ -36,23 +36,22 @@ struct FilteredFileReaderTest : testing::Test {
   void SetUp() override {
     filteredReader.setSource(kTestFilePath);
     ASSERT_EQ(filteredReader.openFile({}), 0);
-    ASSERT_EQ(
-        filteredReader.reader.getStreams().size(), static_cast<size_t>(PixelFormat::COUNT) - 1);
+    ASSERT_EQ(filteredReader.reader.getStreams().size(), enumCount<PixelFormat>() - 1);
   }
 };
 
 TEST_F(FilteredFileReaderTest, excludeStreams) {
   utils::RecordFilterParams filters;
   filteredReader.applyFilters(filters);
-  EXPECT_EQ(filteredReader.filter.streams.size(), static_cast<size_t>(PixelFormat::COUNT) - 1);
+  EXPECT_EQ(filteredReader.filter.streams.size(), enumCount<PixelFormat>() - 1);
 
   filters.excludeStream("100-test/synthetic/grey8");
   filteredReader.applyFilters(filters);
-  EXPECT_EQ(filteredReader.filter.streams.size(), static_cast<size_t>(PixelFormat::COUNT) - 2);
+  EXPECT_EQ(filteredReader.filter.streams.size(), enumCount<PixelFormat>() - 2);
 
   filters.excludeStream("100-4");
   filteredReader.applyFilters(filters);
-  EXPECT_EQ(filteredReader.filter.streams.size(), static_cast<size_t>(PixelFormat::COUNT) - 3);
+  EXPECT_EQ(filteredReader.filter.streams.size(), enumCount<PixelFormat>() - 3);
 }
 
 TEST_F(FilteredFileReaderTest, includeStreams) {

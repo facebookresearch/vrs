@@ -126,7 +126,7 @@ const CommandSpec& getCommandSpec(Command cmd) {
       {Command::FixIndex, 1000, Details::Basics},
       {Command::CompressionBenchmark, 1},
   };
-  if (!XR_VERIFY(cmd > Command::None && cmd < Command::COUNT)) {
+  if (!XR_VERIFY(enumIsValid(cmd))) {
     return sCommandSpecs[static_cast<size_t>(Command::None)];
   }
   return sCommandSpecs[static_cast<size_t>(cmd)];

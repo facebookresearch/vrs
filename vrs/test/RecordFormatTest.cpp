@@ -930,9 +930,8 @@ TEST_F(RecordFormatTest, testCompare) {
 }
 
 TEST_F(RecordFormatTest, testPixelFormat) {
-  for (uint8_t p = 1; p < static_cast<uint8_t>(PixelFormat::COUNT); p++) {
-    PixelFormat pf = static_cast<PixelFormat>(p);
-    ImageContentBlockSpec spec(pf, 100, 100, 0);
+  FOR_EACH_ENUM(PixelFormat, pixelFormat) {
+    ImageContentBlockSpec spec(pixelFormat, 100, 100, 0);
     for (uint32_t plane = 0; plane < spec.getPlaneCount(); plane++) {
       EXPECT_NE(spec.getPlaneStride(plane), 0);
     }

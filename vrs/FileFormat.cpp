@@ -195,8 +195,7 @@ bool RecordHeader::isSanityCheckOk() const {
           previousRecordSize.get() == 0 || previousRecordSize.get() >= sizeof(RecordHeader))) {
     return false;
   }
-  if (!XR_VERIFY(recordType.get() > static_cast<uint8_t>(Record::Type::UNDEFINED)) ||
-      !XR_VERIFY(recordType.get() < static_cast<uint8_t>(Record::Type::COUNT))) {
+  if (!XR_VERIFY(enumIsValid_cast<Record::Type>(recordType.get()))) {
     return false;
   }
   uint32_t uncompressedPayload = uncompressedSize.get(); // doesn't include header already
@@ -211,8 +210,7 @@ bool RecordHeader::isSanityCheckOk() const {
         return false;
       }
     }
-    if (!XR_VERIFY(compressionType.get() != static_cast<uint8_t>(CompressionType::None)) ||
-        !XR_VERIFY(compressionType.get() < static_cast<uint8_t>(CompressionType::COUNT))) {
+    if (!XR_VERIFY(enumIsValid_cast<CompressionType>(compressionType.get()))) {
       return false;
     }
   }

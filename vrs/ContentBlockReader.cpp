@@ -264,9 +264,8 @@ bool AudioBlockReader::audioContentFromAudioSpec(
     audioFormat = AudioFormat::PCM;
   }
   // check minimal set of required fields
-  if ((audioFormat > AudioFormat::UNDEFINED && audioFormat < AudioFormat::COUNT) &&
-      (audioSpec_.sampleType.get(sampleFormat) && sampleFormat > AudioSampleFormat::UNDEFINED &&
-       sampleFormat < AudioSampleFormat::COUNT) &&
+  if (enumIsValid(audioFormat) &&
+      (audioSpec_.sampleType.get(sampleFormat) && enumIsValid(sampleFormat)) &&
       (audioSpec_.channelCount.get(numChannels) && numChannels > 0) &&
       (audioSpec_.sampleRate.get(sampleRate) && sampleRate > 0)) {
     // everything looks fine, check optional fields
