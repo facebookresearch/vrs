@@ -21,43 +21,29 @@
     "prettier:diff": "prettier --config .prettierrc --list-different \"**/*.{js,jsx,ts,tsx,md,mdx}\""
   },
   "dependencies": {
-    "@algolia/client-search": "^5.23.0",
-    "@docusaurus/babel": "^3.8.1",
     "@docusaurus/core": "^3.8.1",
     "@docusaurus/preset-classic": "^3.8.1",
-    "@docusaurus/theme-classic": "^3.8.1",
     "@mdx-js/react": "^3.1.0",
-    "@svgr/webpack": "^5.5.0",
-    "@types/react": "^18.3.3",
-    "axios": "^1.8.2",
+    "@svgr/webpack": "^8.1.0",
     "clsx": "^2.1.1",
     "docusaurus-plugin-internaldocs-fb": "^1.19.2",
-    "dompurify": "^3.2.4",
     "file-loader": "^6.2.0",
-    "micromatch": "^4.0.8",
-    "prism-react-renderer": "^1.2.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-loadable": "^5.5.0",
-    "semver": "^6.3.1",
-    "url-loader": "^4.1.1",
-    "webpack": "^5.94.0"
+    "url-loader": "^4.1.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.26.10",
-    "@babel/eslint-parser": "^7.27.0",
-    "eslint": "^8.19.0",
+    "@babel/eslint-parser": "^7.27.1",
+    "eslint": "^8.57.1",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^10.1.0",
     "eslint-plugin-header": "^3.1.1",
-    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-import": "^2.31.1",
     "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
-    "prettier": "^3.5.3",
-    "stylelint": "^16.17.0",
-    "typescript": "5.8.2",
-    "webpack-dev-server": "^5.2.1"
+    "prettier": "^3.5.4",
+    "stylelint": "^16.18.0"
   },
   "browserslist": {
     "production": [
@@ -77,8 +63,25 @@
     "yarn": "^1.5"
   },
   "resolutions": {
-    "shelljs": "^0.8.5",
+    "@algolia/client-search": "^5.30.0",
+    "@babel/core": "^7.26.12",
+    "@docusaurus/theme-classic": "^3.8.1",
     "@mdx-js/react": "^3.1.0",
-    "ansi-html": "0.0.8"
+    "@types/react": "^18.3.12",
+    "ansi-html": "0.0.8",
+    "axios": "^1.8.3",
+    "dompurify": "^3.2.4",
+    "form-data": "^4.0.4",
+    "mermaid": "^11.10.0",
+    "micromatch": "^4.0.8",
+    "nth-check": ">=2.0.1",
+    "on-headers": "^1.1.0",
+    "prism-react-renderer": "^2.4.0",
+    "react-loadable": "^5.5.0",
+    "semver": "^7.6.3",
+    "shelljs": "^0.8.5",
+    "typescript": "5.8.2",
+    "webpack": "^5.95.0",
+    "webpack-dev-server": "^5.2.2"
   }
 }
