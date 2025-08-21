@@ -166,7 +166,10 @@ class ImageContentBlockSpec {
       uint32_t keyFrameIndex = 0);
 
   /// Image formats with encoding (png, jpeg, etc).
-  ImageContentBlockSpec(ImageFormat imageFormat, uint32_t width = 0, uint32_t height = 0);
+  /* implicit */ ImageContentBlockSpec(
+      ImageFormat imageFormat,
+      uint32_t width = 0,
+      uint32_t height = 0);
 
   /// Raw pixels image formats.
   ImageContentBlockSpec(
@@ -508,13 +511,13 @@ class ContentBlock {
   static const size_t kSizeUnknown;
 
   /// Very generic block description.
-  ContentBlock(ContentType type = ContentType::EMPTY, size_t size = kSizeUnknown);
+  /* implicit */ ContentBlock(ContentType type = ContentType::EMPTY, size_t size = kSizeUnknown);
 
   /// Factory-style reconstruct from persisted description as string on disk.
   explicit ContentBlock(const string& formatStr);
 
   /// Image formats with encoding (png, jpeg, etc).
-  ContentBlock(ImageFormat imageFormat, uint32_t width = 0, uint32_t height = 0);
+  /* implicit */ ContentBlock(ImageFormat imageFormat, uint32_t width = 0, uint32_t height = 0);
 
   /// Image formats with custom codec encoding.
   ContentBlock(
@@ -534,16 +537,18 @@ class ContentBlock {
       uint32_t stride = 0,
       uint32_t stride2 = 0);
 
-  ContentBlock(const ImageContentBlockSpec& imageSpec, size_t size = kSizeUnknown);
-  ContentBlock(ImageContentBlockSpec&& imageSpec, size_t size = kSizeUnknown) noexcept;
+  /* implicit */ ContentBlock(const ImageContentBlockSpec& imageSpec, size_t size = kSizeUnknown);
+  /* implicit */ ContentBlock(
+      ImageContentBlockSpec&& imageSpec,
+      size_t size = kSizeUnknown) noexcept;
   ContentBlock(
       const ContentBlock& imageContentBlock,
       double keyFrameTimestamp,
       uint32_t keyFrameIndex);
 
   /// Very generic audio block description.
-  ContentBlock(AudioFormat audioFormat, uint8_t channelCount = 0);
-  ContentBlock(const AudioContentBlockSpec& audioSpec, size_t size);
+  /* implicit */ ContentBlock(AudioFormat audioFormat, uint8_t channelCount = 0);
+  /* implicit */ ContentBlock(const AudioContentBlockSpec& audioSpec, size_t size);
 
   /// Audio block description.
   ContentBlock(
@@ -682,7 +687,7 @@ class RecordFormat {
   RecordFormat() = default;
   /// Default copy constructor
   RecordFormat(const RecordFormat&) = default;
-  RecordFormat(RecordFormat&&) noexcept = default;
+  /* implicit */ RecordFormat(RecordFormat&&) noexcept = default;
   ~RecordFormat() = default;
 
   RecordFormat& operator=(const RecordFormat&) = default;
@@ -691,21 +696,21 @@ class RecordFormat {
   /// Build a RecordFormat from a string description.
   /// This constructor is meant for internal VRS usage only.
   /// @internal
-  RecordFormat(const string& format) {
+  explicit RecordFormat(const string& format) {
     set(format);
   }
   /// Build a RecordFormat from a string description.
   /// This constructor is meant for internal VRS usage only.
   /// @internal
-  RecordFormat(const char* format) {
+  explicit RecordFormat(const char* format) {
     set(format);
   }
   /// Build a RecordFormat from a single ContentBlock.
-  RecordFormat(const ContentBlock& block) {
+  /* implicit */ RecordFormat(const ContentBlock& block) {
     blocks_.emplace_back(block);
   }
   /// Build a RecordFormat from a single ContentBlock.
-  RecordFormat(ContentBlock&& block) noexcept {
+  /* implicit */ RecordFormat(ContentBlock&& block) noexcept {
     blocks_.emplace_back(std::move(block));
   }
   /// Build a RecordFormat from two ContentBlock definitions.
@@ -722,7 +727,7 @@ class RecordFormat {
   /// @param type: Content type of the block.
   /// @param size: Size of the block, or ContentBlock::kSizeUnknown, if the size of the block isn't
   /// known/fixed.
-  RecordFormat(ContentType type, size_t size = ContentBlock::kSizeUnknown) {
+  /* implicit */ RecordFormat(ContentType type, size_t size = ContentBlock::kSizeUnknown) {
     blocks_.emplace_back(type, size);
   }
 

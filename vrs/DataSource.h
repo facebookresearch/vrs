@@ -79,8 +79,7 @@ class DataSourceChunk {
   DataSourceChunk(const void* _data, size_t _size);
   /// Constructor for a vector<T> of objects of POD type T.
   template <typename T>
-  // NOLINTNEXTLINE(hicpp-explicit-conversions)
-  DataSourceChunk(const vector<T>& vectorT)
+  /* implicit */ DataSourceChunk(const vector<T>& vectorT)
       : data_{vectorT.data()}, size_{sizeof(T) * vectorT.size()} {}
   virtual ~DataSourceChunk() = default;
 
@@ -94,8 +93,7 @@ class DataSourceChunk {
       std::enable_if_t<std::is_trivially_copyable<T>::value, int> = 0,
       // T may not be a pointer.
       typename = typename std::enable_if<!is_pointer<T>::value, T>::type>
-  // NOLINTNEXTLINE(hicpp-explicit-conversions)
-  DataSourceChunk(const T& object) : data_{&object}, size_{sizeof(T)} {}
+  /* implicit */ DataSourceChunk(const T& object) : data_{&object}, size_{sizeof(T)} {}
 
   /// Copy the data (if any), and update the provided buffer pointer accordingly.
   /// The number of bytes copied *must be the exact size* specified in the constructor.

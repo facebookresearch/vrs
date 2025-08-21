@@ -79,8 +79,7 @@ struct PointND {
   static constexpr size_t kSize = N;
 
   PointND() : dim{} {}
-  // NOLINTNEXTLINE(hicpp-explicit-conversions)
-  PointND(const T arr[N]) {
+  /* implicit */ PointND(const T arr[N]) {
     operator=(arr);
   }
 
@@ -182,8 +181,7 @@ struct MatrixND {
   static constexpr size_t kMatrixSize = N;
 
   MatrixND() = default;
-  // NOLINTNEXTLINE(hicpp-explicit-conversions)
-  MatrixND(const T arr[N][N]) {
+  /* implicit */ MatrixND(const T arr[N][N]) {
     operator=(arr);
   }
 

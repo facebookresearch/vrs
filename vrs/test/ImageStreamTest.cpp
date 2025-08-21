@@ -73,7 +73,7 @@ class TestImageStream : public Recordable {
 
   class Player : public RecordFormatStreamPlayer {
    public:
-    Player(typename IMAGE_TEST::DataRecord& dataRecord) : dataRecord_{dataRecord} {}
+    explicit Player(typename IMAGE_TEST::DataRecord& dataRecord) : dataRecord_{dataRecord} {}
     bool onImageRead(const CurrentRecord& record, size_t idx, const ContentBlock& cb) override {
       XR_LOGI("onImageRead: {} - {}", record.streamId.getNumericName(), cb.image().asString());
       const auto& imageSpec = cb.image();
