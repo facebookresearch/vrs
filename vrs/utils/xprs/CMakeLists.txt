@@ -17,10 +17,10 @@ add_library(vrs_utils_xprs ${VRS_UTILS_XPRS_SRCS})
 target_link_libraries(vrs_utils_xprs
   PUBLIC
     vrs_utils
+    xprs
   PRIVATE
     vrs_logging
     vrs_os
-    xprs
     Ocean::Ocean
 )
 target_include_directories(vrs_utils_xprs
