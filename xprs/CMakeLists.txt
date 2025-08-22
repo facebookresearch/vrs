@@ -24,9 +24,10 @@ if (ENABLE_NVCODEC)
 endif()
 
 target_link_libraries(xprs
+  PUBLIC
+    ffmpeg_decoding
   PRIVATE
     vrs_logging
-    ffmpeg_decoding
 )
 
 target_include_directories(xprs

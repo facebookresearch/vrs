@@ -20,6 +20,8 @@
 
 #include <logging/Log.h>
 
+#include <algorithm>
+
 #include <vrs/helpers/EnumStringConverter.h>
 #include <vrs/helpers/FileMacros.h>
 #include <vrs/helpers/Strings.h>
