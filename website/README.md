@@ -39,3 +39,11 @@ Some common defaults for linting/formatting have been set for you. If you integr
 ```
 $ yarn ci
 ```
+
+### Updating components when a security vulnerability is found
+
+If a security vulnerability is found in a component, you can update the version of the componens in the `package.json` file. If a component isn't listed already, you can add them in the "resolutions" section. Then run the following commands:
+
+```
+$ yarn install && yarn upgrade && yarn build
+```

@@ -1537,7 +1537,7 @@
     webpack "^5.95.0"
     webpackbar "^6.0.1"
 
-"@docusaurus/core@3.8.1", "@docusaurus/core@^3.8.1":
+"@docusaurus/core@3.8.1":
   version "3.8.1"
   resolved "https://registry.yarnpkg.com/@docusaurus/core/-/core-3.8.1.tgz#c22e47c16a22cb7d245306c64bc54083838ff3db"
   integrity sha512-ENB01IyQSqI2FLtOzqSI3qxG2B/jP4gQPahl2C3XReiLebcVh5B5cB9KYFvdoOqOWPyr5gXK4sjgTKv7peXCrA==
@@ -1791,7 +1791,7 @@
     tslib "^2.6.0"
     webpack "^5.88.1"
 
-"@docusaurus/preset-classic@^3.8.1":
+"@docusaurus/preset-classic@3.8.1":
   version "3.8.1"
   resolved "https://registry.yarnpkg.com/@docusaurus/preset-classic/-/preset-classic-3.8.1.tgz#bb79fd12f3211363720c569a526c7e24d3aa966b"
   integrity sha512-yJSjYNHXD8POMGc2mKQuj3ApPrN+eG0rO1UPgSx7jySpYU+n4WjBikbrA2ue5ad9A7aouEtMWUoiSRXTH/g7KQ==

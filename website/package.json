@@ -21,13 +21,15 @@
     "prettier:diff": "prettier --config .prettierrc --list-different \"**/*.{js,jsx,ts,tsx,md,mdx}\""
   },
   "dependencies": {
-    "@docusaurus/core": "^3.8.1",
-    "@docusaurus/preset-classic": "^3.8.1",
+    "@docusaurus/core": "3.8.1",
+    "@docusaurus/preset-classic": "3.8.1",
     "@mdx-js/react": "^3.1.0",
     "@svgr/webpack": "^8.1.0",
+    "@types/react": "^18.3.12",
     "clsx": "^2.1.1",
     "docusaurus-plugin-internaldocs-fb": "^1.19.2",
     "file-loader": "^6.2.0",
+    "mermaid": "^11.10.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "url-loader": "^4.1.1"
@@ -72,7 +74,6 @@
     "axios": "^1.8.3",
     "dompurify": "^3.2.4",
     "form-data": "^4.0.4",
-    "mermaid": "^11.10.0",
     "micromatch": "^4.0.8",
     "nth-check": ">=2.0.1",
     "on-headers": "^1.1.0",
