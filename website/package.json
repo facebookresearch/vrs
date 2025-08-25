@@ -77,8 +77,10 @@
     "yarn": "^1.5"
   },
   "resolutions": {
-    "shelljs": "^0.8.5",
     "@mdx-js/react": "^3.1.0",
-    "ansi-html": "0.0.8"
-  }
+    "ansi-html": "0.0.8",
+    "mermaid": "^11.10.0",
+    "on-headers": "^1.1.0",
+    "shelljs": "^0.8.5"
+    }
 }
