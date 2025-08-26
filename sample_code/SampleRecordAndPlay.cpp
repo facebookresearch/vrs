@@ -62,6 +62,8 @@ Look at the sample apps for more advanced record format definitions.
 
 */
 
+namespace {
+
 /// \brief Definition of some trivial metadata
 ///
 /// Look at SampleRecordFormatDataLayout.cpp for more complex examples.
@@ -286,5 +288,7 @@ class PlaybackSample {
     }
   }
 };
+
+} // namespace
 
 } // namespace vrs_sample_code
