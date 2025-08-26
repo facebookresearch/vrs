@@ -27,8 +27,8 @@ var searchData=
   ['matrix4di_24',['Matrix4Di',['../namespacevrs.html#ae543bb254d8fbf76ecab8e9c15118f2d',1,'vrs']]],
   ['matrixnd_25',['MatrixND',['../structvrs_1_1_matrix_n_d.html',1,'vrs']]],
   ['meshrecordableclass_26',['MeshRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a5775094fd3f300afaa2f3a52d3a52bad',1,'vrs']]],
-  ['mightcontainaudio_27',['mightcontainaudio',['../classvrs_1_1_multi_record_file_reader.html#a406b19bd218168b58b9e104194dcb1ce',1,'vrs::MultiRecordFileReader::mightContainAudio()'],['../classvrs_1_1_record_file_reader.html#a6fc3f6e58aba6d53e66dabeff41deb8b',1,'vrs::RecordFileReader::mightContainAudio()']]],
-  ['mightcontainimages_28',['mightcontainimages',['../classvrs_1_1_multi_record_file_reader.html#a1c1fd382ea3cf00fccff0a156fb66cfc',1,'vrs::MultiRecordFileReader::mightContainImages()'],['../classvrs_1_1_record_file_reader.html#aa8ee554269ef5e43590070c735778fe0',1,'vrs::RecordFileReader::mightContainImages()']]],
+  ['mightcontainaudio_27',['mightcontainaudio',['../classvrs_1_1_record_file_reader.html#a6fc3f6e58aba6d53e66dabeff41deb8b',1,'vrs::RecordFileReader::mightContainAudio()'],['../classvrs_1_1_multi_record_file_reader.html#a406b19bd218168b58b9e104194dcb1ce',1,'vrs::MultiRecordFileReader::mightContainAudio()']]],
+  ['mightcontainimages_28',['mightcontainimages',['../classvrs_1_1_record_file_reader.html#aa8ee554269ef5e43590070c735778fe0',1,'vrs::RecordFileReader::mightContainImages()'],['../classvrs_1_1_multi_record_file_reader.html#a1c1fd382ea3cf00fccff0a156fb66cfc',1,'vrs::MultiRecordFileReader::mightContainImages()']]],
   ['misc_20helpers_29',['Misc Helpers',['../md_vrs_2_read_me.html#autotoc_md6',1,'']]],
   ['mocaprecordableclass_30',['MocapRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a15d6099d80c765ce3ce0c18013b64b48',1,'vrs']]],
   ['monoaudiorecordableclass_31',['MonoAudioRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a87d299e3d75e6dd7d7d77cbcad6e321b',1,'vrs']]],
@@ -44,6 +44,5 @@ var searchData=
   ['mycameradatalayoutdata_41',['MyCameraDataLayoutData',['../classvrs__sample__code_1_1_my_camera_data_layout_data.html',1,'vrs_sample_code']]],
   ['mycameradatalayoutlegacydata_42',['MyCameraDataLayoutLegacyData',['../classvrs__sample__code_1_1_my_camera_data_layout_legacy_data.html',1,'vrs_sample_code']]],
   ['mycamerarecordable_43',['MyCameraRecordable',['../classvrs__sample__code_1_1_my_camera_recordable.html',1,'vrs_sample_code']]],
-  ['mycamerastreamplayer_44',['MyCameraStreamPlayer',['../classvrs__sample__code_1_1_my_camera_stream_player.html',1,'vrs_sample_code']]],
-  ['mymetadata_45',['MyMetadata',['../classvrs__sample__code_1_1_my_metadata.html',1,'vrs_sample_code']]]
+  ['mycamerastreamplayer_44',['MyCameraStreamPlayer',['../classvrs__sample__code_1_1_my_camera_stream_player.html',1,'vrs_sample_code']]]
 ];

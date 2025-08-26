@@ -11,6 +11,5 @@ var searchData=
   ['mycameradatalayoutdata_8',['MyCameraDataLayoutData',['../classvrs__sample__code_1_1_my_camera_data_layout_data.html',1,'vrs_sample_code']]],
   ['mycameradatalayoutlegacydata_9',['MyCameraDataLayoutLegacyData',['../classvrs__sample__code_1_1_my_camera_data_layout_legacy_data.html',1,'vrs_sample_code']]],
   ['mycamerarecordable_10',['MyCameraRecordable',['../classvrs__sample__code_1_1_my_camera_recordable.html',1,'vrs_sample_code']]],
-  ['mycamerastreamplayer_11',['MyCameraStreamPlayer',['../classvrs__sample__code_1_1_my_camera_stream_player.html',1,'vrs_sample_code']]],
-  ['mymetadata_12',['MyMetadata',['../classvrs__sample__code_1_1_my_metadata.html',1,'vrs_sample_code']]]
+  ['mycamerastreamplayer_11',['MyCameraStreamPlayer',['../classvrs__sample__code_1_1_my_camera_stream_player.html',1,'vrs_sample_code']]]
 ];
