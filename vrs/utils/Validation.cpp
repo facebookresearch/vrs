@@ -647,6 +647,8 @@ static void printDifferences(
   cout << "\n";
 }
 
+namespace {
+
 class RecordHolder : public StreamPlayer {
  public:
   bool processRecordHeader(const CurrentRecord& record, DataReference& outDataReference) override {
@@ -745,6 +747,8 @@ class RecordMaster : public StreamPlayer {
   size_t readCounter_{};
   vector<char> buffer_;
 };
+
+} // namespace
 
 bool compareVRSfiles(
     FilteredFileReader& first,
