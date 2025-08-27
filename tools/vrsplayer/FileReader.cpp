@@ -95,63 +95,7 @@ using namespace vrs;
 
 namespace vrsp {
 
-const int32_t kPageSize = 10;
-const int32_t kBigPageSize = 100;
-
-static int64_t kReadCurrentFrame = DispatchAction(Action::ShowFrame).bundle();
-static int64_t kReadCurrentFrameFast = DispatchAction(Action::ShowFrameFast).bundle();
-static int64_t kReadPreviousFrame = DispatchAction(Action::ChangeFrame, -1).bundle();
-static int64_t kReadNextFrame = DispatchAction(Action::ChangeFrame, 1).bundle();
-static int64_t kReadPreviousPage = DispatchAction(Action::ChangeFrame, -kPageSize).bundle();
-static int64_t kReadNextPage = DispatchAction(Action::ChangeFrame, kPageSize).bundle();
-static int64_t kReadPreviousBigPage = DispatchAction(Action::ChangeFrame, -kBigPageSize).bundle();
-static int64_t kReadNextBigPage = DispatchAction(Action::ChangeFrame, kBigPageSize).bundle();
-
-FileReader::FileReader(QObject* parent) : QObject(parent) {
-  isSliderActive_ = false;
-  slowTimer_.setSingleShot(false);
-  connect(&slowTimer_, &QTimer::timeout, this, &FileReader::updatePosition);
-  slowTimer_.start(33);
-
-  // start background thread
-  thread_ = std::thread{[this]() mutable { this->playThreadActivity(); }};
-}
-
-FileReader::~FileReader() {
-  closeFile();
-  if (thread_.joinable()) {
-    runThread_ = false;
-    waitEvent_.dispatchEvent();
-    thread_.join();
-  }
-}
-
-bool FileReader::isAtBegin() const {
-  return fileReader_ != nullptr && nextRecord_ <= firstDataRecordIndex_;
-}
-
-bool FileReader::isAtEnd() const {
-  return fileReader_ != nullptr && nextRecord_ >= fileReader_->getIndex().size();
-}
-
-void FileReader::closeFile() {
-  stop();
-  setState(FileReaderState::NoMedia);
-  if (fileConfig_) {
-    saveConfiguration();
-    fileConfig_.reset();
-  }
-  unique_lock<recursive_mutex> guard{mutex_};
-  playerUi_->getPlayerWindow()->setAudioConfiguration(0, 0);
-  fileReader_.reset();
-  imageReaders_.clear();
-  audioReaders_.clear();
-  lastReadRecords_.clear();
-  if (videoFrames_ != nullptr) {
-    clearLayout(videoFrames_, true);
-  }
-  lastMaxPerRow_ = 0;
-}
+namespace {
 
 class OpenProgressDialog : public ProgressLogger {
   static const int kStepScale = 100;
@@ -210,6 +154,92 @@ class OpenProgressDialog : public ProgressLogger {
   double nextCancelCheckTime_;
   bool keepGoing_;
 };
+
+// Helper to prefetch a frameset, making sure we cancel the sequence on exit
+class Prefetcher {
+ public:
+  Prefetcher(RecordFileReader& reader, const set<size_t>& frameSet, bool isLocalFile)
+      : reader_{reader} {
+    if (!isLocalFile) {
+      const auto& index = reader_.getIndex();
+      records_.reserve(frameSet.size());
+      for (size_t frameIndex : frameSet) {
+        records_.emplace_back(&index[frameIndex]);
+      }
+      reader_.prefetchRecordSequence(records_);
+    }
+  }
+  ~Prefetcher() {
+    if (!records_.empty()) {
+      records_.clear();
+      reader_.prefetchRecordSequence(records_);
+    }
+  }
+
+ private:
+  RecordFileReader& reader_;
+  vector<const IndexRecord::RecordInfo*> records_;
+};
+
+} // namespace
+
+const int32_t kPageSize = 10;
+const int32_t kBigPageSize = 100;
+
+static int64_t kReadCurrentFrame = DispatchAction(Action::ShowFrame).bundle();
+static int64_t kReadCurrentFrameFast = DispatchAction(Action::ShowFrameFast).bundle();
+static int64_t kReadPreviousFrame = DispatchAction(Action::ChangeFrame, -1).bundle();
+static int64_t kReadNextFrame = DispatchAction(Action::ChangeFrame, 1).bundle();
+static int64_t kReadPreviousPage = DispatchAction(Action::ChangeFrame, -kPageSize).bundle();
+static int64_t kReadNextPage = DispatchAction(Action::ChangeFrame, kPageSize).bundle();
+static int64_t kReadPreviousBigPage = DispatchAction(Action::ChangeFrame, -kBigPageSize).bundle();
+static int64_t kReadNextBigPage = DispatchAction(Action::ChangeFrame, kBigPageSize).bundle();
+
+FileReader::FileReader(QObject* parent) : QObject(parent) {
+  isSliderActive_ = false;
+  slowTimer_.setSingleShot(false);
+  connect(&slowTimer_, &QTimer::timeout, this, &FileReader::updatePosition);
+  slowTimer_.start(33);
+
+  // start background thread
+  thread_ = std::thread{[this]() mutable { this->playThreadActivity(); }};
+}
+
+FileReader::~FileReader() {
+  closeFile();
+  if (thread_.joinable()) {
+    runThread_ = false;
+    waitEvent_.dispatchEvent();
+    thread_.join();
+  }
+}
+
+bool FileReader::isAtBegin() const {
+  return fileReader_ != nullptr && nextRecord_ <= firstDataRecordIndex_;
+}
+
+bool FileReader::isAtEnd() const {
+  return fileReader_ != nullptr && nextRecord_ >= fileReader_->getIndex().size();
+}
+
+void FileReader::closeFile() {
+  stop();
+  setState(FileReaderState::NoMedia);
+  if (fileConfig_) {
+    saveConfiguration();
+    fileConfig_.reset();
+  }
+  unique_lock<recursive_mutex> guard{mutex_};
+  playerUi_->getPlayerWindow()->setAudioConfiguration(0, 0);
+  fileReader_.reset();
+  imageReaders_.clear();
+  audioReaders_.clear();
+  lastReadRecords_.clear();
+  if (videoFrames_ != nullptr) {
+    clearLayout(videoFrames_, true);
+  }
+  lastMaxPerRow_ = 0;
+}
 
 static QString getFileName(const FileSpec& spec) {
   if (!spec.fileName.empty()) {
@@ -859,32 +889,6 @@ void FileReader::playAction(DispatchAction action) {
   }
   mediaStateChanged(state_);
 }
-
-// Helper to prefetch a frameset, making sure we cancel the sequence on exit
-class Prefetcher {
- public:
-  Prefetcher(RecordFileReader& reader, const set<size_t>& frameSet, bool isLocalFile)
-      : reader_{reader} {
-    if (!isLocalFile) {
-      const auto& index = reader_.getIndex();
-      records_.reserve(frameSet.size());
-      for (size_t frameIndex : frameSet) {
-        records_.emplace_back(&index[frameIndex]);
-      }
-      reader_.prefetchRecordSequence(records_);
-    }
-  }
-  ~Prefetcher() {
-    if (!records_.empty()) {
-      records_.clear();
-      reader_.prefetchRecordSequence(records_);
-    }
-  }
-
- private:
-  RecordFileReader& reader_;
-  vector<const IndexRecord::RecordInfo*> records_;
-};
 
 bool FileReader::playFrameSet(const set<size_t>& frameSet, Seek strategy) {
   Prefetcher prefetcher(*fileReader_, frameSet, isLocalFile_);
