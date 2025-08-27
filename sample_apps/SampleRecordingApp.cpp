@@ -37,13 +37,13 @@ namespace vrs_sample_apps {
 
 namespace {
 
-static double now() {
+double now() {
   using namespace std::chrono;
   return duration_cast<duration<double>>(steady_clock::now().time_since_epoch()).count();
 }
 
 // Use your own clock source.
-static double getTimestampSec() {
+double getTimestampSec() {
   static double kStartTime = now();
   return (now() - kStartTime) * 500; // arbitrarily spread timestamps over more time
 }
