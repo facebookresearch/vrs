@@ -92,4 +92,14 @@ int filterMerge(
     unique_ptr<ThrottledFileDelegate> throttledFileDelegate =
         std::make_unique<ThrottledFileDelegate>());
 
+/// Merge records from multiple files into a new file, using multiple filtered readers.
+/// Alternate version that takes a list of FilteredFileReaders, instead of a vector of pointers.
+int filterMerge(
+    FilteredFileReader& recordFilter,
+    list<FilteredFileReader>& moreRecordFilters,
+    const string& pathToCopy,
+    const CopyOptions& copyOptions,
+    unique_ptr<ThrottledFileDelegate> throttledFileDelegate =
+        std::make_unique<ThrottledFileDelegate>());
+
 } // namespace vrs::utils

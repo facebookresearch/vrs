@@ -563,11 +563,7 @@ int VrsCommand::doCopyMerge() {
     if (!openOtherVrsFiles(kCopyOpsDetails)) {
       return EXIT_FAILURE;
     }
-    vector<FilteredFileReader*> recordFilters;
-    for (auto& recordFilter : otherFilteredReaders) {
-      recordFilters.push_back(&recordFilter);
-    }
-    statusCode = filterMerge(filteredReader, recordFilters, targetPath, copyOptions);
+    statusCode = filterMerge(filteredReader, otherFilteredReaders, targetPath, copyOptions);
   }
   if (statusCode != 0) {
     cerr << commandName << " failed: " << errorCodeToMessage(statusCode) << "\n";

@@ -308,4 +308,24 @@ int filterMerge(
   return mergeResult;
 }
 
+int filterMerge(
+    FilteredFileReader& firstRecordFilter,
+    list<FilteredFileReader>& moreRecordFilters,
+    const string& pathToCopy,
+    const CopyOptions& copyOptions,
+    unique_ptr<ThrottledFileDelegate> throttledFileDelegate) {
+  vector<FilteredFileReader*> moreRecordFiltersPointers;
+  moreRecordFiltersPointers.reserve(moreRecordFilters.size());
+  for (auto& recordFilter : moreRecordFilters) {
+    moreRecordFiltersPointers.push_back(&recordFilter);
+  }
+
+  return filterMerge(
+      firstRecordFilter,
+      moreRecordFiltersPointers,
+      pathToCopy,
+      copyOptions,
+      std::move(throttledFileDelegate));
+}
+
 } // namespace vrs::utils
