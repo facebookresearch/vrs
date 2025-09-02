@@ -36,8 +36,8 @@ EventChannel::EventChannel(string name, NotificationMode notificationMode)
       numEntering_{0},
       numListeners_{0},
       inDestruction_{false},
-      mostRecentEvents_{nullptr, 0, 0, 0.0},
-      pendingWakeupsCount_{0} {}
+      pendingWakeupsCount_{0},
+      mostRecentEvents_{0, 0, 0.0} {}
 
 EventChannel::~EventChannel() {
   unique_lock<mutex> lock(mutex_);
@@ -56,10 +56,9 @@ EventChannel::~EventChannel() {
   }
 }
 
-void EventChannel::dispatchEvent(void* pointer, int64_t value) {
+void EventChannel::dispatchEvent(int64_t value) {
   unique_lock<mutex> lock(mutex_);
 
-  mostRecentEvents_.pointer = pointer;
   mostRecentEvents_.value = value;
   mostRecentEvents_.timestampSec = vrs::os::getTimestampSec();
   if (numListeners_ == 0) {
@@ -71,10 +70,6 @@ void EventChannel::dispatchEvent(void* pointer, int64_t value) {
     pendingWakeupsCount_ = 1;
     wakeupCondition_.notify_one();
   }
-}
-
-void EventChannel::dispatchEvent(int64_t value) {
-  dispatchEvent(nullptr, value);
 }
 
 EventChannel::Status
@@ -101,7 +96,7 @@ EventChannel::waitForEvent(Event& event, double timeoutSec, double lookBackSec) 
   double timeDiff = currentTime - mostRecentEvents_.timestampSec;
   // If the most recent event is within the look-back range of multiple listeners, then exchange
   // guarantees only one listener can get that past event.
-  uint32_t numEventsSinceLastWait = numEventsSinceLastWait_.exchange(0);
+  int64_t numEventsSinceLastWait = numEventsSinceLastWait_.exchange(0);
   if ((timeDiff < lookBackSec) && (numEventsSinceLastWait > 0)) {
     // Fulfill the wait request with a past event.
     event = mostRecentEvents_;
@@ -140,7 +135,7 @@ EventChannel::waitForEvent(Event& event, double timeoutSec, double lookBackSec) 
   return status;
 }
 
-uint32_t EventChannel::getNumEventsSinceLastWait() const {
+int64_t EventChannel::getNumEventsSinceLastWait() const {
   return numEventsSinceLastWait_.load();
 }
 

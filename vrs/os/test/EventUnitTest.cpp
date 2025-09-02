@@ -56,7 +56,7 @@ struct EventTest : public testing::Test {
     EXPECT_NE(nullptr, testEventChannel);
   }
 
-  void addEventInstance(double a_sleep_time_sec, void* data) {
+  void addEventInstance(double a_sleep_time_sec, int64_t data = 0) {
     eventParams.emplace_back(a_sleep_time_sec, data);
   }
 
@@ -106,7 +106,7 @@ struct EventTest : public testing::Test {
   bool launched{false};
   unique_ptr<thread> dispatchThread;
   vector<unique_ptr<thread>> waitThreads;
-  vector<pair<double, void*>> eventParams;
+  vector<pair<double, int64_t>> eventParams;
   EventChannel::Event event{};
 };
 
@@ -137,16 +137,16 @@ void waitOnEvents(void* data, const vector<double>& waitIntervals) {
 }
 
 void EventTest::runWaitAndDispatch(EventChannel::NotificationMode mode) {
-  int a = 0;
+  const int64_t a = 123456789;
   setupEvent(mode);
-  addEventInstance(wait_time_sec, &a);
+  addEventInstance(wait_time_sec, a);
   startDispatchThread();
   launch();
 
   EXPECT_EQ(
       EventChannel::Status::SUCCESS,
       testEventChannel->waitForEvent(event, EventChannel::kInfiniteTimeout, 0.0));
-  EXPECT_EQ(&a, event.pointer);
+  EXPECT_EQ(a, event.value);
 }
 
 TEST_F(EventTest, WaitAndDispatchUnicast) {
@@ -159,7 +159,7 @@ TEST_F(EventTest, WaitAndDispatchBroadcast) {
 
 void EventTest::runDispatchAndWait(EventChannel::NotificationMode mode) {
   setupEvent(mode);
-  addEventInstance(0.0, nullptr);
+  addEventInstance(0.0);
   startDispatchThread();
   launch();
   this_thread::sleep_for(chrono::duration<double>(wait_time_sec));
@@ -178,7 +178,7 @@ TEST_F(EventTest, DispatchAndWaitBroadcast) {
 
 void EventTest::runDispatchAndWaitWithLookback(EventChannel::NotificationMode mode) {
   setupEvent(mode);
-  addEventInstance(0.0, nullptr);
+  addEventInstance(0.0);
   EXPECT_EQ(0, testEventChannel->getNumEventsSinceLastWait());
   startDispatchThread();
   launch();
@@ -204,8 +204,8 @@ void EventTest::runNumPastEvents(EventChannel::NotificationMode mode) {
   setupEvent(mode);
   EXPECT_EQ(0, testEventChannel->getNumEventsSinceLastWait());
 
-  addEventInstance(0.0, nullptr); // we will miss this event
-  addEventInstance(0.0, nullptr); // we can get this event with look-back long enough
+  addEventInstance(0.0); // we will miss this event
+  addEventInstance(0.0); // we can get this event with look-back long enough
   startDispatchThread();
   launch();
   this_thread::sleep_for(chrono::duration<double>(wait_time_sec));
@@ -247,9 +247,9 @@ TEST_F(EventTest, MultipleListenersUnicast) {
 
   size_t numWaiters = 30;
 
-  addEventInstance(0.5, nullptr); // In 0.5 seconds, all the listeners should be waiting already.
+  addEventInstance(0.5); // In 0.5 seconds, all the listeners should be waiting already.
   for (auto i = 0; i < numWaiters; ++i) {
-    addEventInstance(0.0, nullptr); // Each waiter needs their own event (plus this thread's wait)
+    addEventInstance(0.0); // Each waiter needs their own event (plus this thread's wait)
   }
   startDispatchThread(true);
 
@@ -268,7 +268,7 @@ TEST_F(EventTest, MultipleListenersUnicast) {
 TEST_F(EventTest, MultipleListenersBroadcast) {
   setupEvent(EventChannel::NotificationMode::BROADCAST);
 
-  addEventInstance(0.5, nullptr); // In 0.5 seconds, all the listeners should be waiting already.
+  addEventInstance(0.5); // In 0.5 seconds, all the listeners should be waiting already.
   startDispatchThread();
 
   vector<double> waitIntervals(1, 0.0);

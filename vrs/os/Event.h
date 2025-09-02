@@ -38,9 +38,8 @@ class EventChannel {
 
   /// Event represents an instance of an event.
   struct Event {
-    void* pointer;
     int64_t value;
-    int32_t numMissedEvents;
+    int64_t numMissedEvents;
     double timestampSec;
   };
 
@@ -51,10 +50,8 @@ class EventChannel {
   ~EventChannel();
 
   /// Fires an event instance to listener(s).
-  /// @param pointer: pointer to the data to pass along with the event
   /// @param value: an int64_t value to pass along with the event
-  void dispatchEvent(void* pointer = nullptr, int64_t value = 0);
-  void dispatchEvent(int64_t value);
+  void dispatchEvent(int64_t value = 0);
 
   /// Wait to get an instance of event, in future or in past.
   /// The number of past events is in returned Param. The counter in event is then set to 0
@@ -72,7 +69,7 @@ class EventChannel {
   /// Return the number of past event since last waiting of event without actually waiting
   /// for that event.
   /// @return Number of past events
-  uint32_t getNumEventsSinceLastWait() const;
+  int64_t getNumEventsSinceLastWait() const;
 
   /// Return the name of this event type.
   /// @return Name of this even type
@@ -87,14 +84,14 @@ class EventChannel {
   NotificationMode notificationMode_;
 
   std::mutex mutex_; // guards all of the following variables
-  std::atomic_uint_fast32_t numEventsSinceLastWait_; // mutex_ only needed for write
+  std::atomic_int_fast64_t numEventsSinceLastWait_; // mutex_ only needed for write
 
   uint32_t numEntering_; // count waiting for previous dispatch to complete
   uint32_t numListeners_; // count waiting for dispatch
   bool inDestruction_; // true if destructor is running
 
-  Event mostRecentEvents_;
   uint32_t pendingWakeupsCount_;
+  Event mostRecentEvents_;
 
   // Notify when entering waitForEvent can continue, which is when
   // pendingWakeupsCount_ becomes zero and numEntering_ is non-zero.
