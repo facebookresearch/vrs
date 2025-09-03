@@ -33,8 +33,8 @@ jobs:
               libeigen3-dev
 
           elif [ "$RUNNER_OS" == "macOS" ]; then
-            # Force update cmake
-            brew uninstall cmake; brew install cmake
+            # Update or install cmake
+            brew upgrade cmake || brew install cmake
             # Install deps, but use pre-installed git, ninja
             brew install googletest glog fmt \
                 jpeg-turbo libpng \
