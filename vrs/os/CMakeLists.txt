@@ -30,7 +30,6 @@ target_link_libraries(vrs_os
   PRIVATE
     vrs_platform
     vrs_logging
-    Boost::system
     Boost::filesystem
     Boost::date_time
     Threads::Threads

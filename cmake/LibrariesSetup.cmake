@@ -17,11 +17,11 @@ if (EXISTS "$ENV{HOME}/homebrew")
   list(APPEND CMAKE_FIND_ROOT_PATH "$ENV{HOME}/homebrew")
 endif()
 
-find_package(Boost REQUIRED
-  COMPONENTS
+find_package(Boost
+  REQUIRED COMPONENTS
     filesystem
     date_time
-    system
+  OPTIONAL_COMPONENTS system
 )
 
 find_package(Threads REQUIRED)
