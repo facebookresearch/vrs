@@ -103,7 +103,7 @@ TEST_F(ChunkedFileTester, LinkedFileTest) {
   // all the chunks are found & indexed
   string linkedFile = os::getTempFolder() + "chunks_link.vrs";
   EXPECT_EQ(::symlink(kChunkedFile.c_str(), linkedFile.c_str()), 0); // create a link
-  EXPECT_EQ(file.openFile(linkedFile), 0);
+  ASSERT_EQ(file.openFile(linkedFile), 0);
   EXPECT_EQ(file.getRecordCount(), 306);
   EXPECT_EQ(file.getFileChunks().size(), 3);
   EXPECT_EQ(file.getStreamsSignature(), kChunkedFileStreamSignature);
