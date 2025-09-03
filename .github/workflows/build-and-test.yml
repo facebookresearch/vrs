@@ -33,13 +33,16 @@ jobs:
               libeigen3-dev
 
           elif [ "$RUNNER_OS" == "macOS" ]; then
-              brew install cmake git ninja googletest glog fmt \
-                  jpeg-turbo libpng \
-                  lz4 zstd xxhash \
-                  boost \
-                  opus \
-                  qt5 portaudio \
-                  eigen
+            # Force update cmake
+            brew uninstall cmake; brew install cmake
+            # Install deps, but use pre-installed git, ninja
+            brew install googletest glog fmt \
+                jpeg-turbo libpng \
+                lz4 zstd xxhash \
+                boost \
+                opus \
+                qt5 portaudio \
+                eigen
 
           else
               echo "$RUNNER_OS not supported"
