@@ -49,7 +49,7 @@ PixelFormat mapToPixelFormat(AVPixelFormat fmt);
 AVCodecID mapToAVCodecID(VideoCodecFormat id);
 VideoCodecFormat mapToVideoCodecFormat(AVCodecID id);
 int64_t mapQualityToCRF(int quality, int64_t maxCRF, int64_t defaultCRF);
-void convertAVFrameToFrame(const AVFrame* const avframe, Frame& frame);
+void convertAVFrameToFrame(const AVFrame* avframe, Frame& frame);
 const char* convertExceptionToError(const std::exception& exception, XprsResult& error);
 bool checkFileType(std::string filename, std::string filetype);
 uint32_t parseH26xHeaders(uint8_t* ptr, uint32_t size, bool isH264);
