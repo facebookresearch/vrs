@@ -240,22 +240,23 @@ class DecodeChecker : public VideoRecordFormatStreamPlayer {
   void processRecord(const CurrentRecord& record, uint32_t readSize) override {
     processSuccess = true;
     RecordFormatStreamPlayer::processRecord(record, readSize);
-    size_t unreadBytes = record.reader->getUnreadBytes();
-    if (unreadBytes > 0) {
+    if (!processSuccess) {
+      THROTTLED_LOGW(
+          record.fileReader,
+          "{} - {} record #{} could not be decoded.",
+          record.streamId.getNumericName(),
+          Record::typeName(record.recordType),
+          record.fileReader->getRecordIndex(record.recordInfo));
+    } else if (record.reader->getUnreadBytes() > 0) {
       processSuccess = false;
       THROTTLED_LOGW(
           record.fileReader,
-          "{} - {}: {} bytes unread out of {} bytes.",
+          "{} - {} record #{}: {} bytes unread out of {} bytes.",
           record.streamId.getNumericName(),
           Record::typeName(record.recordType),
-          unreadBytes,
+          record.fileReader->getRecordIndex(record.recordInfo),
+          record.reader->getUnreadBytes(),
           record.recordSize);
-    } else if (!processSuccess) {
-      THROTTLED_LOGW(
-          record.fileReader,
-          "{} - {}: could not be decoded.",
-          record.streamId.getNumericName(),
-          Record::typeName(record.recordType));
     }
     if (!processSuccess) {
       errorCount_++;

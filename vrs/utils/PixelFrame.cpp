@@ -369,6 +369,15 @@ bool PixelFrame::decompressImage(VideoFrameHandler* videoFrameHandler) {
 }
 
 bool PixelFrame::readRawFrame(RecordReader* reader, const ImageContentBlockSpec& inputImageSpec) {
+  if (inputImageSpec.getBlockSize() > reader->getUnreadBytes()) {
+    THROTTLED_LOGE(
+        reader->getRef(),
+        "Image {} needs {} bytes, only {} available. Recording bug?",
+        inputImageSpec.asString(),
+        inputImageSpec.getBlockSize(),
+        reader->getUnreadBytes());
+    return false;
+  }
   // Read multiplane images as is
   if (inputImageSpec.getPlaneCount() != 1) {
     init(inputImageSpec);

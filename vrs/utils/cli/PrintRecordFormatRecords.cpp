@@ -96,6 +96,11 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
       imageCount_++;
       if (printoutType_ == PrintoutType::Compact || printoutType_ == PrintoutType::Details) {
         fmt::print(" - Image block, {}, {} bytes.\n", cb.asString(), cb.getBlockSize());
+        if (cb.getBlockSize() > record.reader->getUnreadBytes()) {
+          fmt::print(
+              "   Warning! There are only {} bytes left in this record, not enough for this image. Recording bug?\n",
+              record.reader->getUnreadBytes());
+        }
       } else if (printoutType_ != PrintoutType::None) {
         fmt::print("{{\"image\":\"{}\"}}\n", cb.asString());
       }
