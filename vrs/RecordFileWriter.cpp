@@ -1099,7 +1099,7 @@ int RecordFileWriter::writeRecordsMultiThread(
   deque<CompressionJob*> results; // to avoid allocation at every iteration
 
   while (!recordsToCompress.empty() || !writeQueue.empty() || !compressionResults.empty()) {
-    double waitTime = 0.05;
+    int waitTimeMs = 50;
     // See if we can find a new compressor for that job
     while (!recordsToCompress.empty() && !availableJobs.empty()) {
       SortRecord nextRecord = *recordsToCompress.begin();
@@ -1117,7 +1117,7 @@ int RecordFileWriter::writeRecordsMultiThread(
       } else {
         compressionResults.emplace(nextRecord, &noCompressionJob);
       }
-      waitTime = 0;
+      waitTimeMs = 0;
     }
     map<SortRecord, CompressionJob*>::iterator resultsIter;
     // process completed compression job
@@ -1140,10 +1140,10 @@ int RecordFileWriter::writeRecordsMultiThread(
       }
       compressionResults.erase(resultsIter);
       writeQueue.pop_front();
-      waitTime = 0;
+      waitTimeMs = 0;
     }
     // Check if we have a results to process
-    if (compressionThreadsData.resultsQueue.waitForJobs(results, waitTime)) {
+    if (compressionThreadsData.resultsQueue.waitForJobsMs(results, waitTimeMs)) {
       for (CompressionJob* job : results) {
         compressionResults.emplace(job->getSortRecord(), job);
       }

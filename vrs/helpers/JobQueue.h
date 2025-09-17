@@ -18,14 +18,13 @@
 
 #include <algorithm>
 #include <atomic>
+#include <chrono>
 #include <condition_variable>
 #include <deque>
 #include <functional>
 #include <memory>
 #include <mutex>
 #include <thread>
-
-#include <vrs/os/Time.h>
 
 namespace vrs {
 
@@ -35,6 +34,16 @@ namespace vrs {
 
 template <class T>
 class JobQueue {
+  using milliseconds = std::chrono::milliseconds;
+  using steady_clock = std::chrono::steady_clock;
+  using time_point = std::chrono::time_point<std::chrono::steady_clock>;
+
+  template <class Rep, class Period>
+  constexpr milliseconds toMilliseconds(
+      const std::chrono::duration<Rep, Period>& duration) noexcept {
+    return std::chrono::duration_cast<milliseconds>(duration);
+  }
+
  public:
   void sendJob(const T& value) {
     std::unique_lock<std::mutex> locker(mutex_);
@@ -47,18 +56,26 @@ class JobQueue {
     condition_.notify_one();
   }
   /// Wait for a job up to a specified wait time, or until the queue was ended
-  bool waitForJob(T& outValue, double waitTime) {
-    if (waitTime <= 0) {
+  bool waitForJob(T& outValue, double waitTimeSec) {
+    if (waitTimeSec <= 0) {
       return getJob(outValue);
     }
-    double limit = os::getTimestampSec() + waitTime;
+    int64_t waitTimeMs(static_cast<int64_t>(waitTimeSec * 1000.0));
+    return waitForJobMs(outValue, waitTimeMs);
+  }
+  /// Wait for a job up to a specified wait time, or until the queue was ended
+  bool waitForJobMs(T& outValue, int64_t waitTimeMs) {
+    if (waitTimeMs <= 0) {
+      return getJob(outValue);
+    }
+    time_point limit = steady_clock::now() + milliseconds(waitTimeMs);
     std::unique_lock<std::mutex> locker(mutex_);
     return waitForJobLocked(outValue, locker, limit);
   }
   /// Wait for a job until one is available, or the queue was ended
   bool waitForJob(T& outValue) {
     while (!hasEnded_) {
-      if (waitForJob(outValue, 5)) {
+      if (waitForJobMs(outValue, 5000)) {
         return true;
       }
     }
@@ -67,26 +84,34 @@ class JobQueue {
   /// get a pending job, if any, but don't wait
   bool getJob(T& outValue) {
     std::unique_lock<std::mutex> locker(mutex_);
-    if (queue_.empty()) {
+    if (hasEnded_ || queue_.empty()) {
       return false;
     }
     outValue = std::move(queue_.front());
     queue_.pop_front();
     return true;
   }
-  bool waitForJobs(std::deque<T>& jobs, double waitTime) {
+  bool waitForJobs(std::deque<T>& jobs, double waitTimeSec) {
+    int64_t waitTimeMs(static_cast<int64_t>(waitTimeSec * 1000.0));
+    return waitForJobsMs(jobs, waitTimeMs);
+  }
+  bool waitForJobsMs(std::deque<T>& jobs, int64_t waitTimeMs) {
     jobs.clear();
-    if (waitTime > 0) {
-      waitTime += os::getTimestampSec();
+    time_point limit{};
+    if (waitTimeMs > 0) {
+      limit = steady_clock::now() + milliseconds(waitTimeMs);
     }
     std::unique_lock<std::mutex> locker(mutex_);
+    if (hasEnded_) {
+      return false;
+    }
     if (!queue_.empty()) {
       jobs.swap(queue_);
       return true;
     }
-    if (waitTime > 0) {
+    if (waitTimeMs > 0) {
       jobs.resize(1);
-      if (waitForJobLocked(jobs.front(), locker, waitTime)) {
+      if (waitForJobLocked(jobs.front(), locker, limit)) {
         return true;
       }
       jobs.clear();
@@ -134,12 +159,8 @@ class JobQueue {
   }
 
  protected:
-  bool waitForJobLocked(T& outValue, std::unique_lock<std::mutex>& locker, double limitTime) {
-    double actualWaitTime = 0;
-    while (!hasEnded_ && queue_.empty() &&
-           (actualWaitTime = limitTime - os::getTimestampSec()) >= 0) {
-      condition_.wait_for(locker, std::chrono::duration<double>(actualWaitTime));
-    }
+  bool waitForJobLocked(T& outValue, std::unique_lock<std::mutex>& locker, time_point limitTime) {
+    condition_.wait_until(locker, limitTime, [this]() { return hasEnded_ || !queue_.empty(); });
     if (hasEnded_ || queue_.empty()) {
       return false;
     }

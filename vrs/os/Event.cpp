@@ -17,6 +17,7 @@
 #include <vrs/os/Event.h>
 
 #include <condition_variable>
+#include <thread>
 #include <utility>
 
 #include <vrs/os/Time.h>
@@ -51,8 +52,7 @@ EventChannel::~EventChannel() {
     // pending waitForEvent-s it is better to wake them up than to crash.
     wakeupCondition_.notify_all();
     enterCondition_.notify_all();
-    condition_variable dummyCond;
-    dummyCond.wait_for(lock, chrono::duration<double>(0.001));
+    this_thread::sleep_for(chrono::milliseconds(1));
   }
 }
 
