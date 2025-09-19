@@ -368,7 +368,10 @@ bool PixelFrame::decompressImage(VideoFrameHandler* videoFrameHandler) {
   return false;
 }
 
-bool PixelFrame::readRawFrame(RecordReader* reader, const ImageContentBlockSpec& inputImageSpec) {
+bool PixelFrame::readRawFrame(
+    RecordReader* reader,
+    const ImageContentBlockSpec& inputImageSpec,
+    bool preserveStride) {
   if (inputImageSpec.getBlockSize() > reader->getUnreadBytes()) {
     THROTTLED_LOGE(
         reader->getRef(),
@@ -386,7 +389,7 @@ bool PixelFrame::readRawFrame(RecordReader* reader, const ImageContentBlockSpec&
   // remove stride of single plane raw images
   ImageContentBlockSpec noStrideSpec{
       inputImageSpec.getPixelFormat(), inputImageSpec.getWidth(), inputImageSpec.getHeight()};
-  if (inputImageSpec.getStride() == noStrideSpec.getStride()) {
+  if (preserveStride || inputImageSpec.getStride() == noStrideSpec.getStride()) {
     init(inputImageSpec);
     return VERIFY_SUCCESS(reader->read(wdata(), size()));
   }

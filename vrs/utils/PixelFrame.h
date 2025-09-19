@@ -175,7 +175,10 @@ class PixelFrame {
   readRawFrame(T& framePtr, RecordReader* reader, const ImageContentBlockSpec& inputImageSpec) {
     return init(framePtr, inputImageSpec).readRawFrame(reader, inputImageSpec);
   }
-  bool readRawFrame(RecordReader* reader, const ImageContentBlockSpec& inputImageSpec);
+  bool readRawFrame(
+      RecordReader* reader,
+      const ImageContentBlockSpec& inputImageSpec,
+      bool preserveStride = false);
 
   /// Decode compressed image data, except for video codec compression.
   bool readCompressedFrame(const vector<uint8_t>& pixels, ImageFormat imageFormat);
