@@ -90,6 +90,7 @@ const unordered_map<RecordableTypeId, const char*>& getRecordableTypeIdRegistry(
       {RecordableTypeId::AmbientLightRecordableClass, "Ambient Light Sensor (ALS) Data Class"},
       {RecordableTypeId::ElevationRecordableClass, "Elevation Data Class"},
       {RecordableTypeId::BatteryRecordableClass, "Battery Data Class"},
+      {RecordableTypeId::AlsFlickerDetectionRecordableClass, "Light Flicker Detection Data Class"},
 
       {RecordableTypeId::SlamImuData, "IMU Data (SLAM)"},
       {RecordableTypeId::SlamMagnetometerData, "Magnetometer Data (SLAM)"},

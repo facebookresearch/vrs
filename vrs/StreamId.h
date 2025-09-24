@@ -182,6 +182,7 @@ enum class RecordableTypeId : uint16_t {
   AmbientLightRecordableClass = 500, ///< Ambient light data streams.
   ElevationRecordableClass = 501, ///< Elevation data streams.
   BatteryRecordableClass = 502, ///< Battery data streams.
+  AlsFlickerDetectionRecordableClass = 503, ///< ALS light flicker detection data streams.
 
   // << Test, Samples and other fake devices >>
   SampleDeviceRecordableClass = 998, ///< For sample device streams.
