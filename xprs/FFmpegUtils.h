@@ -73,7 +73,7 @@ class CodecException : public std::exception {
   int error() const noexcept;
 
  private:
-  const char* fileName(const char* path);
+  static const char* fileName(const char* path);
 
   mutable std::string errString;
   std::string _file;
