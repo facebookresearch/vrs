@@ -244,11 +244,15 @@ static bool readPngFrameWithWuff(PixelFrame& frame, const vector<uint8_t>& pngBu
 
 #endif
 
+namespace {
+
 struct SourceBuffer {
   explicit SourceBuffer(const vector<uint8_t>& abuffer) : buffer{abuffer} {}
   const vector<uint8_t>& buffer;
   size_t readSize = 0;
 };
+
+} // namespace
 
 bool PixelFrame::readPngFrame(RecordReader* reader, uint32_t sizeBytes) {
   if (sizeBytes < kPngSigBytes) {
