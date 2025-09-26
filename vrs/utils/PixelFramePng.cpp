@@ -337,8 +337,8 @@ bool PixelFrame::readPngFrame(const vector<uint8_t>& pngBuffer, bool decodePixel
       // for any other possible bitdepth we will convert to 8 bit (see below)
       init(PixelFormat::GREY8, imgWidth, imgHeight);
     }
-  } else if (colorType == PNG_COLOR_TYPE_RGB) {
-    if (channels != 3) {
+  } else if (colorType == PNG_COLOR_TYPE_RGB || colorType == PNG_COLOR_TYPE_PALETTE) {
+    if (colorType == PNG_COLOR_TYPE_RGB && channels != 3) {
       XR_LOGE("{} channels color images make no sense with PNG_COLOR_TYPE_RGB...", channels);
       return false;
     }
