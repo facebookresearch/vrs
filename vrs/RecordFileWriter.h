@@ -93,7 +93,7 @@ class RecordFileWriter {
   RecordFileWriter();
   RecordFileWriter(const RecordFileWriter&) = delete;
   RecordFileWriter(RecordFileWriter&&) = delete;
-  virtual ~RecordFileWriter();
+  virtual ~RecordFileWriter() noexcept;
 
   RecordFileWriter& operator=(const RecordFileWriter&) = delete;
   RecordFileWriter& operator=(RecordFileWriter&&) = delete;

@@ -1195,16 +1195,29 @@ int RecordFileWriter::completeAndCloseFile() {
   return error;
 }
 
-RecordFileWriter::~RecordFileWriter() {
-  if (writerThreadData_ != nullptr) {
-    RecordFileWriter::waitForFileClosed(); // overrides not available in constructors & destructors
-    delete writerThreadData_;
+RecordFileWriter::~RecordFileWriter() noexcept {
+  try {
+    if (writerThreadData_ != nullptr) {
+      RecordFileWriter::waitForFileClosed(); // overloads not available in destructors
+      delete writerThreadData_;
+    }
+  } catch (const std::exception& e) {
+    XR_LOGE("Caught exception in ~RecordFileWriter while cleaning up writer thread: {}", e.what());
+  } catch (...) {
+    XR_LOGE("Unknown exception in ~RecordFileWriter while cleaning up writer thread");
   }
-  if (purgeThreadData_ != nullptr) {
-    purgeThreadData_->shouldEndThread = true;
-    purgeThreadData_->purgeEventChannel.dispatchEvent();
-    purgeThreadData_->purgeThread.join();
-    delete purgeThreadData_;
+
+  try {
+    if (purgeThreadData_ != nullptr) {
+      purgeThreadData_->shouldEndThread = true;
+      purgeThreadData_->purgeEventChannel.dispatchEvent();
+      purgeThreadData_->purgeThread.join();
+      delete purgeThreadData_;
+    }
+  } catch (const std::exception& e) {
+    XR_LOGE("Caught exception in ~RecordFileWriter while cleaning up purge thread: {}", e.what());
+  } catch (...) {
+    XR_LOGE("Unknown exception in ~RecordFileWriter while cleaning up purge thread");
   }
 }
 
