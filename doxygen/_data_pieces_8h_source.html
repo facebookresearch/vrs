@@ -288,32 +288,38 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>}</div>
 </div>
 <div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span> </div>
-<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>} <span class="comment">// namespace vrs</span></div>
-<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span> </div>
-<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span><span class="comment">// These are required pretty much every single time we use DataLayout. Just include them all.</span></div>
-<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span><span class="preprocessor">#include &quot;DataPieceTypes.h&quot;</span></div>
+<div class="foldopen" id="foldopen00275" data-start="{" data-end="}">
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno"><a class="line" href="namespacevrs.html#a7c465fe752ea40d3af9bb0071a199289">  275</a></span><span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code hl_function" href="namespacevrs.html#a7c465fe752ea40d3af9bb0071a199289">unalignedCopy</a>(<span class="keywordtype">void</span>* dst, <span class="keyword">const</span> <span class="keywordtype">void</span>* src, <span class="keywordtype">size_t</span> size) {</div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>  memcpy(<span class="keyword">reinterpret_cast&lt;</span><span class="keywordtype">char</span>*<span class="keyword">&gt;</span>(dst), <span class="keyword">reinterpret_cast&lt;</span><span class="keyword">const </span><span class="keywordtype">char</span>*<span class="keyword">&gt;</span>(src), size);</div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>}</div>
+</div>
 <div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span> </div>
-<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span><span class="preprocessor">#ifndef DATA_PIECES_ARRAY_H</span></div>
-<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span><span class="preprocessor">#include &quot;DataPieceArray.h&quot;</span></div>
-<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span> </div>
-<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span><span class="preprocessor">#ifndef DATA_PIECES_STRING_H</span></div>
-<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span><span class="preprocessor">#include &quot;DataPieceString.h&quot;</span></div>
-<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span> </div>
-<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span><span class="preprocessor">#ifndef DATA_PIECES_STRING_MAP_H</span></div>
-<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span><span class="preprocessor">#include &quot;DataPieceStringMap.h&quot;</span></div>
-<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span> </div>
-<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span><span class="preprocessor">#ifndef DATA_PIECES_VALUE_H</span></div>
-<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span><span class="preprocessor">#include &quot;DataPieceValue.h&quot;</span></div>
-<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span> </div>
-<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span><span class="preprocessor">#ifndef DATA_PIECES_VECTOR_H</span></div>
-<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span><span class="preprocessor">#include &quot;DataPieceVector.h&quot;</span></div>
-<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span> </div>
-<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span><span class="preprocessor">#endif </span><span class="comment">// DATA_PIECES_H</span></div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>} <span class="comment">// namespace vrs</span></div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span> </div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span><span class="comment">// These are required pretty much every single time we use DataLayout. Just include them all.</span></div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span><span class="preprocessor">#include &quot;DataPieceTypes.h&quot;</span></div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span> </div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span><span class="preprocessor">#ifndef DATA_PIECES_ARRAY_H</span></div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span><span class="preprocessor">#include &quot;DataPieceArray.h&quot;</span></div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span> </div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span><span class="preprocessor">#ifndef DATA_PIECES_STRING_H</span></div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span><span class="preprocessor">#include &quot;DataPieceString.h&quot;</span></div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span> </div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span><span class="preprocessor">#ifndef DATA_PIECES_STRING_MAP_H</span></div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span><span class="preprocessor">#include &quot;DataPieceStringMap.h&quot;</span></div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span> </div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span><span class="preprocessor">#ifndef DATA_PIECES_VALUE_H</span></div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span><span class="preprocessor">#include &quot;DataPieceValue.h&quot;</span></div>
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span> </div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span><span class="preprocessor">#ifndef DATA_PIECES_VECTOR_H</span></div>
+<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span><span class="preprocessor">#include &quot;DataPieceVector.h&quot;</span></div>
+<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span> </div>
+<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span><span class="preprocessor">#endif </span><span class="comment">// DATA_PIECES_H</span></div>
 <div class="ttc" id="aclassvrs_1_1_data_layout_html"><div class="ttname"><a href="classvrs_1_1_data_layout.html">vrs::DataLayout</a></div><div class="ttdoc">The DataLayout class describes the data stored inside a DataLayoutContentBlock.</div><div class="ttdef"><b>Definition</b> DataLayout.h:209</div></div>
 <div class="ttc" id="aclassvrs_1_1_data_layout_html_a28316f2660ae5807081e9bf4ecd29fd3"><div class="ttname"><a href="classvrs_1_1_data_layout.html#a28316f2660ae5807081e9bf4ecd29fd3">vrs::DataLayout::kVariableSize</a></div><div class="ttdeci">static const size_t kVariableSize</div><div class="ttdoc">Special value used for a DataPiece size, telling that that DataPiece has a variable size.</div><div class="ttdef"><b>Definition</b> DataLayout.h:225</div></div>
 <div class="ttc" id="aclassvrs_1_1_data_layout_html_a92ad484922bc554f7589b9d90fc1d37b"><div class="ttname"><a href="classvrs_1_1_data_layout.html#a92ad484922bc554f7589b9d90fc1d37b">vrs::DataLayout::isMapped</a></div><div class="ttdeci">bool isMapped() const</div><div class="ttdef"><b>Definition</b> DataLayout.h:350</div></div>
@@ -358,6 +364,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="ttc" id="anamespacevrs_html"><div class="ttname"><a href="namespacevrs.html">vrs</a></div><div class="ttdef"><b>Definition</b> Compressor.cpp:113</div></div>
 <div class="ttc" id="anamespacevrs_html_a0ff4cc79bae39464050a6ce835c3fbc8"><div class="ttname"><a href="namespacevrs.html#a0ff4cc79bae39464050a6ce835c3fbc8">vrs::writeUnaligned</a></div><div class="ttdeci">void writeUnaligned(void *ptr, const T &amp;value)</div><div class="ttdoc">Helper to make dereferencing a pointer to write an unaligned POD object safe.</div><div class="ttdef"><b>Definition</b> DataPieces.h:270</div></div>
 <div class="ttc" id="anamespacevrs_html_a52adfb4a6a2708965e7171ba3b9d9eb1"><div class="ttname"><a href="namespacevrs.html#a52adfb4a6a2708965e7171ba3b9d9eb1">vrs::getTypeName</a></div><div class="ttdeci">const string &amp; getTypeName()</div><div class="ttdoc">Get the name of the type &lt;T&gt;.</div></div>
+<div class="ttc" id="anamespacevrs_html_a7c465fe752ea40d3af9bb0071a199289"><div class="ttname"><a href="namespacevrs.html#a7c465fe752ea40d3af9bb0071a199289">vrs::unalignedCopy</a></div><div class="ttdeci">void unalignedCopy(void *dst, const void *src, size_t size)</div><div class="ttdoc">ASAN can trip when pointers are not aligned, but pointing to larger types. Make asan happy.</div><div class="ttdef"><b>Definition</b> DataPieces.h:275</div></div>
 <div class="ttc" id="anamespacevrs_html_aa8237f9e14403fbeef9f3a2f7e88dd84"><div class="ttname"><a href="namespacevrs.html#aa8237f9e14403fbeef9f3a2f7e88dd84">vrs::readUnaligned</a></div><div class="ttdeci">T readUnaligned(const void *ptr)</div><div class="ttdoc">Helper to make dereferencing a pointer to read an unaligned POD object safe.</div><div class="ttdef"><b>Definition</b> DataPieces.h:264</div></div>
 <div class="ttc" id="anamespacevrs_html_afb0b040e753b40173e69f247afa430a2"><div class="ttname"><a href="namespacevrs.html#afb0b040e753b40173e69f247afa430a2">vrs::DataPieceType</a></div><div class="ttdeci">DataPieceType</div><div class="ttdoc">Specifier for a type of DataPiece.</div><div class="ttdef"><b>Definition</b> DataLayout.h:57</div></div>
 <div class="ttc" id="astructvrs_1_1_data_piece_1_1_maker_bundle_html"><div class="ttname"><a href="structvrs_1_1_data_piece_1_1_maker_bundle.html">vrs::DataPiece::MakerBundle</a></div><div class="ttdef"><b>Definition</b> DataLayout.cpp:1167</div></div>

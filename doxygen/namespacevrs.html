@@ -860,6 +860,10 @@ template&lt;class T &gt; </td></tr>
 <tr class="memitem:a0ff4cc79bae39464050a6ce835c3fbc8"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>writeUnaligned</b> (void *ptr, const T &amp;value)</td></tr>
 <tr class="memdesc:a0ff4cc79bae39464050a6ce835c3fbc8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper to make dereferencing a pointer to write an unaligned POD object safe. <br /></td></tr>
 <tr class="separator:a0ff4cc79bae39464050a6ce835c3fbc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c465fe752ea40d3af9bb0071a199289" id="r_a7c465fe752ea40d3af9bb0071a199289"><td class="memItemLeft" align="right" valign="top"><a id="a7c465fe752ea40d3af9bb0071a199289" name="a7c465fe752ea40d3af9bb0071a199289"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>unalignedCopy</b> (void *dst, const void *src, size_t size)</td></tr>
+<tr class="memdesc:a7c465fe752ea40d3af9bb0071a199289"><td class="mdescLeft">&#160;</td><td class="mdescRight">ASAN can trip when pointers are not aligned, but pointing to larger types. Make asan happy. <br /></td></tr>
+<tr class="separator:a7c465fe752ea40d3af9bb0071a199289"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7122beba91b5ac34b8c4aebd2c26cf0c" id="r_a7122beba91b5ac34b8c4aebd2c26cf0c"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs.html#a7122beba91b5ac34b8c4aebd2c26cf0c">errorCodeToMessage</a> (int errorCode)</td></tr>
 <tr class="separator:a7122beba91b5ac34b8c4aebd2c26cf0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7a5f29230c8013cd36049068852326e0" id="r_a7a5f29230c8013cd36049068852326e0"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs.html#a7a5f29230c8013cd36049068852326e0">errorCodeToMessageWithCode</a> (int errorCode)</td></tr>
