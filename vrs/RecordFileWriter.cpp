@@ -879,7 +879,7 @@ int RecordFileWriter::createFile(const string& filePath, bool splitHead) {
     return error;
   }
   fileHeader_.init();
-  fileHeader_.descriptionRecordOffset.set(sizeof(fileHeader_));
+  fileHeader_.descriptionRecordOffset = sizeof(fileHeader_);
   IF_ERROR_LOG_CLOSE_AND_RETURN(head.write(fileHeader_))
   map<StreamId, const StreamTags*> streamTags;
   for (auto* recordable : getRecordables()) {

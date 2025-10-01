@@ -269,7 +269,7 @@ int RecordFileReader::doOpenFile(
     XR_LOGE("Couldn't read file header: {}", errorCodeToMessageWithCode(error));
     return error;
   }
-  recordHeaderSize_ = fileHeader.recordHeaderSize.get();
+  recordHeaderSize_ = fileHeader.recordHeaderSize;
   if (!fileHeader.looksLikeAVRSFile()) {
     closeFile();
     if (!checkSignatureOnly) {
@@ -291,10 +291,10 @@ int RecordFileReader::doOpenFile(
   }
   string detailsCacheFilePath;
   FileCache* fileCache = FileCache::getFileCache();
-  bool tryToUseCache = file_->isRemoteFileSystem() && fileHeader.creationId.get() != 0;
+  bool tryToUseCache = file_->isRemoteFileSystem() && fileHeader.creationId != 0;
   if (!tryToUseCache || fileCache == nullptr ||
       fileCache->getFile(
-          "vrs_details_" + to_string(fileHeader.creationId.get()) + '_' +
+          "vrs_details_" + to_string(fileHeader.creationId) + '_' +
               to_string(file_->getTotalSize()),
           detailsCacheFilePath) != 0 ||
       FileDetailsCache::read(
@@ -382,22 +382,22 @@ int RecordFileReader::readFileDetails(
     bool autoWriteFixedIndex,
     FileFormat::FileHeader& fileHeader) {
   int error = 0;
-  int64_t firstUserRecordOffset = fileHeader.firstUserRecordOffset.get();
+  int64_t firstUserRecordOffset = fileHeader.firstUserRecordOffset;
   if (autoPrefetch_) {
     file_->prefetchReadSequence({{0, max<size_t>(kMinHeaderRead, firstUserRecordOffset)}});
   }
   if (firstUserRecordOffset == 0) {
     // firstUserRecordOffset was only created when we added support for early index records.
-    firstUserRecordOffset = fileHeader.fileHeaderSize.get();
+    firstUserRecordOffset = fileHeader.fileHeaderSize;
   }
   // Read the description record
-  int64_t descriptionRecordOffset = fileHeader.descriptionRecordOffset.get();
+  int64_t descriptionRecordOffset = fileHeader.descriptionRecordOffset;
   if (descriptionRecordOffset > 0) {
     if (file_->setPos(descriptionRecordOffset) == 0) {
       uint32_t descriptionSize = 0;
       LOG_PROGRESS(
           DescriptionRecord::readDescriptionRecord(
-              *file_, fileHeader.recordHeaderSize.get(), descriptionSize, streamTags_, fileTags_),
+              *file_, fileHeader.recordHeaderSize, descriptionSize, streamTags_, fileTags_),
           error,
           []() { return "Read description record"; });
       if (error != 0) {
@@ -1142,8 +1142,7 @@ bool RecordFileReader::isRecordAvailableOrPrefetch(const IndexRecord::RecordInfo
     XR_LOGE("Record #{} Record header doesn't look right.", getRecordIndex(&recordInfo));
     return false;
   }
-  uint32_t recordSize = recordHeader.recordSize.get();
-  return file_->isAvailableOrPrefetch(recordSize - sizeof(recordHeader));
+  return file_->isAvailableOrPrefetch(recordHeader.recordSize - sizeof(recordHeader));
 }
 
 int RecordFileReader::readRecord(const IndexRecord::RecordInfo& recordInfo) {
@@ -1192,7 +1191,7 @@ int RecordFileReader::readRecord(
         errorCodeToMessageWithCode(error));
     return error;
   }
-  uint32_t recordSize = recordHeader.recordSize.get();
+  uint32_t recordSize = recordHeader.recordSize;
   if (recordSize < recordHeaderSize_) {
     XR_LOGE(
         "Record #{} Record size too small. Expected: {} Actual: {}",
@@ -1208,13 +1207,13 @@ int RecordFileReader::readRecord(
     integrityCheck = false;
     XR_LOGE("Record #{} sanity check failed.", static_cast<int>(&recordInfo - &getIndex()[0]));
   }
-  if (recordInfo.timestamp != recordHeader.timestamp.get()) {
+  if (recordInfo.timestamp != recordHeader.timestamp) {
     integrityCheck = false;
     XR_LOGE(
         "Record #{} Timestamp does not match. Expected: {} Actual: {}",
         static_cast<int>(&recordInfo - &getIndex()[0]),
         recordInfo.timestamp,
-        recordHeader.timestamp.get());
+        recordHeader.timestamp);
   }
 
   if (recordInfo.recordType != recordHeader.getRecordType()) {
@@ -1251,7 +1250,7 @@ int RecordFileReader::readRecord(
       break;
     case CompressionType::Lz4:
     case CompressionType::Zstd:
-      uncompressedDataSize = recordHeader.uncompressedSize.get();
+      uncompressedDataSize = recordHeader.uncompressedSize;
       reader = compressedRecordReader_.init(*file_, dataSize, uncompressedDataSize);
       compressedRecordReader_.initCompressionType(compressionType);
       break;
@@ -1263,10 +1262,10 @@ int RecordFileReader::readRecord(
       return UNSUPPORTED_VRS_FILE;
   }
   CurrentRecord header{
-      recordHeader.timestamp.get(),
+      recordHeader.timestamp,
       recordHeader.getStreamId(),
       recordHeader.getRecordType(),
-      recordHeader.formatVersion.get(),
+      recordHeader.formatVersion,
       uncompressedDataSize,
       reader,
       &recordInfo,

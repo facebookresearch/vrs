@@ -62,23 +62,19 @@ namespace FileFormat {
 template <class T>
 class LittleEndian final {
  public:
-  /// Default constructor, using T's default initializer.
   LittleEndian() = default;
+  explicit LittleEndian(T value) : value_{value} {}
 
-  /// Constructor with an init value.
-  explicit LittleEndian(T value) {
-    set(value);
-  }
-
-  /// Getter.
-  /// @return Value in host's endianness.
-  T get() const {
+  inline T operator()() const {
     return value_;
   }
-  /// Setter.
-  /// @param value: Value in host's endianness.
-  void set(T value) {
+  inline operator T() const {
+    return value_;
+  }
+
+  inline LittleEndian& operator=(T value) {
     value_ = value;
+    return *this;
   }
 
  private:
@@ -133,7 +129,7 @@ struct FileHeader {
 };
 
 // Re-interpret legacy recordable Type id
-RecordableTypeId readRecordableTypeId(const FileFormat::LittleEndian<int32_t>& recordableTypeId);
+RecordableTypeId readRecordableTypeId(int32_t recordableTypeId);
 
 /// \brief Every record starts with this header, and is followed by a raw data blob,
 /// which semantic is private to the data type handler.
@@ -161,44 +157,44 @@ struct RecordHeader {
 
   /// Set the record's type.
   /// @param type: Type of the record, as an enum.
-  void setRecordType(Record::Type type) {
-    recordType.set(static_cast<uint8_t>(type));
+  inline void setRecordType(Record::Type type) {
+    recordType = static_cast<uint8_t>(type);
   }
 
   /// Get the record type, as an enum.
   /// @return The record type.
-  Record::Type getRecordType() const {
-    return static_cast<Record::Type>(recordType.get());
+  inline Record::Type getRecordType() const {
+    return static_cast<Record::Type>(recordType());
   }
 
   /// Set the recordable type id for this record.
   /// @param typeId: Recordable type id.
-  void setRecordableTypeId(RecordableTypeId typeId) {
-    recordableTypeId.set(static_cast<int32_t>(typeId));
+  inline void setRecordableTypeId(RecordableTypeId typeId) {
+    recordableTypeId = static_cast<int32_t>(typeId);
   }
 
   /// Get the recordable type id if for this record.
   /// @return A recordable type id.
-  RecordableTypeId getRecordableTypeId() const {
+  inline RecordableTypeId getRecordableTypeId() const {
     return readRecordableTypeId(recordableTypeId);
   }
 
   /// Get the stream id for this record.
   /// @return The stream id for this record.
-  StreamId getStreamId() const {
-    return {getRecordableTypeId(), recordableInstanceId.get()};
+  inline StreamId getStreamId() const {
+    return {getRecordableTypeId(), static_cast<uint16_t>(recordableInstanceId)};
   }
 
   /// Get the compression type used when writing the payload of this record.
   /// @return Compression type.
-  CompressionType getCompressionType() const {
-    return static_cast<CompressionType>(compressionType.get());
+  inline CompressionType getCompressionType() const {
+    return static_cast<CompressionType>(compressionType());
   }
 
   /// Set the compression type used when writing the payload of this record.
   /// @param type: Compression type.
-  void setCompressionType(CompressionType type) {
-    this->compressionType.set(static_cast<uint8_t>(type));
+  inline void setCompressionType(CompressionType type) {
+    this->compressionType = static_cast<uint8_t>(type);
   }
 
   /// Initialize this header, for use as a regular record.

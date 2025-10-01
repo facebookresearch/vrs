@@ -160,7 +160,7 @@ int writeClassicIndexRecord(
       kClassicIndexFormatVersion, uncompressedSize, outLastRecordSize, CompressionType::None);
   // If the record was pre-allocated, then that's its actual size.
   if (preallocatedByteSize > 0) {
-    indexRecordHeader.recordSize.set(static_cast<uint32_t>(preallocatedByteSize));
+    indexRecordHeader.recordSize = static_cast<uint32_t>(preallocatedByteSize);
   }
   // Write the index record a first time. When compressing, we don't know the actual size until
   // after we wrote it, so we will need to rewrite it... :-(
@@ -204,7 +204,7 @@ int writeClassicIndexRecord(
         kClassicIndexFormatVersion, thisSize, outLastRecordSize, CompressionType::Zstd);
     // If the record was pre-allocated, that's its actual size, even if we don't use it all.
     if (preallocatedByteSize > 0) {
-      indexRecordHeader.recordSize.set(static_cast<uint32_t>(preallocatedByteSize));
+      indexRecordHeader.recordSize = static_cast<uint32_t>(preallocatedByteSize);
       if (kLogStats) {
         MAYBE_UNUSED size_t usablePreallocatedSize =
             preallocatedByteSize - sizeof(indexRecordHeader);
@@ -219,12 +219,12 @@ int writeClassicIndexRecord(
             thisSize * 100.f / uncompressedSize);
       }
     }
-    indexRecordHeader.uncompressedSize.set(uncompressedSize);
+    indexRecordHeader.uncompressedSize = uncompressedSize;
     IF_ERROR_LOG_AND_RETURN(file.setPos(indexRecordOffset));
     IF_ERROR_LOG_AND_RETURN(file.overwrite(indexRecordHeader));
     IF_ERROR_LOG_AND_RETURN(file.setPos(nextRecordOffset));
   }
-  outLastRecordSize = indexRecordHeader.recordSize.get();
+  outLastRecordSize = indexRecordHeader.recordSize;
   return 0;
 }
 
@@ -257,8 +257,7 @@ int IndexRecord::Reader::readRecord(int64_t firstUserRecordOffset, int64_t& outU
   hasSplitHeadChunk_ = false;
   sortErrorCount_ = 0;
   droppedRecordCount_ = 0;
-  int error =
-      readRecord(fileHeader_.indexRecordOffset.get(), firstUserRecordOffset, outUsedFileSize);
+  int error = readRecord(fileHeader_.indexRecordOffset, firstUserRecordOffset, outUsedFileSize);
   if (error == 0) {
     if (sortErrorCount_ > 0) {
       XR_LOGW("{} record(s) not sorted properly. Sorting index.", sortErrorCount_);
@@ -286,7 +285,7 @@ int IndexRecord::Reader::readRecord(
     return INDEX_RECORD_ERROR;
   }
   // maybe headers are larger now: allocate a possibly larger buffer than FileFormat::RecordHeader
-  uint32_t recordHeaderSize = fileHeader_.recordHeaderSize.get();
+  uint32_t recordHeaderSize = fileHeader_.recordHeaderSize;
   vector<uint8_t> headerBuffer(recordHeaderSize);
   FileFormat::RecordHeader* recordHeader =
       reinterpret_cast<FileFormat::RecordHeader*>(headerBuffer.data());
@@ -301,7 +300,7 @@ int IndexRecord::Reader::readRecord(
         recordHeaderSize);
     return file_.getLastError();
   }
-  if (recordHeader->recordSize.get() < recordHeaderSize) {
+  if (recordHeader->recordSize < recordHeaderSize) {
     XR_LOGE("Record size too small. Corrupt?");
     return INDEX_RECORD_ERROR;
   }
@@ -309,16 +308,12 @@ int IndexRecord::Reader::readRecord(
     XR_LOGE("Record header sanity check failed. Corrupt?");
     return INDEX_RECORD_ERROR;
   }
-  size_t indexByteSize = recordHeader->recordSize.get() - static_cast<uint32_t>(recordHeaderSize);
-  if (recordHeader->formatVersion.get() == kClassicIndexFormatVersion) {
+  size_t indexByteSize = recordHeader->recordSize - static_cast<uint32_t>(recordHeaderSize);
+  if (recordHeader->formatVersion == kClassicIndexFormatVersion) {
     return readClassicIndexRecord(
-        indexByteSize,
-        recordHeader->uncompressedSize.get(),
-        firstUserRecordOffset,
-        outUsedFileSize);
-  } else if (recordHeader->formatVersion.get() == kSplitIndexFormatVersion) {
-    return readSplitIndexRecord(
-        indexByteSize, recordHeader->uncompressedSize.get(), outUsedFileSize);
+        indexByteSize, recordHeader->uncompressedSize, firstUserRecordOffset, outUsedFileSize);
+  } else if (recordHeader->formatVersion == kSplitIndexFormatVersion) {
+    return readSplitIndexRecord(indexByteSize, recordHeader->uncompressedSize, outUsedFileSize);
   }
   XR_LOGW("Unsupported index format.");
   return UNSUPPORTED_INDEX_FORMAT_VERSION;
@@ -398,17 +393,17 @@ int IndexRecord::Reader::readClassicIndexRecord(
             "Unexpected index record entry: Stream Id: {} Type: {} Size: {} Timestamp: {}",
             record.getStreamId().getNumericName(),
             toString(record.getRecordType()),
-            record.recordSize.get(),
-            record.timestamp.get());
+            record.recordSize,
+            record.timestamp);
         return INDEX_RECORD_ERROR;
       }
-      int64_t nextFileOffset = fileOffset + record.recordSize.get();
+      int64_t nextFileOffset = fileOffset + record.recordSize;
       if (nextFileOffset > totalFileSize_) {
         droppedRecordCount_ = static_cast<int32_t>(recordStructs.size() - index_.size());
         break; // The file is too short, and this record goes beyond the end...
       }
       index_.emplace_back(
-          record.timestamp.get(), fileOffset, record.getStreamId(), record.getRecordType());
+          record.timestamp, fileOffset, record.getStreamId(), record.getRecordType());
       if (index_.size() > 1 && index_.back() < index_[index_.size() - 2]) {
         sortErrorCount_++;
       }
@@ -445,7 +440,7 @@ int IndexRecord::Reader::readSplitIndexRecord(
     int64_t& outUsedFileSize) {
   // The index record's size is only updated after the index body is fully written,
   // because we will add to the index while the file is written
-  int64_t firstUserRecordOffset = fileHeader_.firstUserRecordOffset.get();
+  int64_t firstUserRecordOffset = fileHeader_.firstUserRecordOffset;
   bool noRecords = (firstUserRecordOffset == totalFileSize_);
   int64_t currentPos = file_.getPos();
   int64_t chunkStart{}, chunkSize{};
@@ -539,30 +534,30 @@ int IndexRecord::Reader::readSplitIndexRecord(
     }
   }
   index_.reserve(recordStructs.size());
-  const uint32_t recordHeaderSize = fileHeader_.recordHeaderSize.get();
+  const uint32_t recordHeaderSize = fileHeader_.recordHeaderSize;
   for (const DiskRecordInfo& record : recordStructs) {
     Record::Type recordType = record.getRecordType();
-    if (record.recordSize.get() < recordHeaderSize || !isValid(recordType)) {
+    if (record.recordSize < recordHeaderSize || !isValid(recordType)) {
       XR_LOGE(
           "Unexpected index record entry: Stream Id: {} Type: {} Size: {} Timestamp: {}",
           record.getStreamId().getNumericName(),
           toString(recordType),
-          record.recordSize.get(),
-          record.timestamp.get());
+          record.recordSize,
+          record.timestamp);
       return INDEX_RECORD_ERROR;
     }
-    int64_t followingRecordOffset = outUsedFileSize + record.recordSize.get();
+    int64_t followingRecordOffset = outUsedFileSize + record.recordSize;
     if (droppedRecordCount_ > 0 || followingRecordOffset > totalFileSize_) {
       droppedRecordCount_++;
     } else {
-      double timestamp = record.timestamp.get();
+      double timestamp = record.timestamp;
       StreamId streamId = record.getStreamId();
       index_.emplace_back(timestamp, outUsedFileSize, streamId, recordType);
       if (index_.size() > 1 && index_.back() < index_[index_.size() - 2]) {
         sortErrorCount_++;
       }
       if (diskIndex_) {
-        diskIndex_->emplace_back(timestamp, record.recordSize.get(), streamId, recordType);
+        diskIndex_->emplace_back(timestamp, record.recordSize, streamId, recordType);
       }
       streamIds_.insert(streamId);
       outUsedFileSize = followingRecordOffset;
@@ -603,12 +598,12 @@ int IndexRecord::Reader::rebuildIndex(bool writeFixedIndex) {
     XR_LOGE("No file open");
     return NO_FILE_OPEN;
   }
-  size_t fileHeaderSize = fileHeader_.fileHeaderSize.get();
+  size_t fileHeaderSize = fileHeader_.fileHeaderSize;
   if (fileHeaderSize < sizeof(FileFormat::FileHeader)) {
     XR_LOGE("Reindexing: File header too small");
     return REINDEXING_ERROR;
   }
-  size_t recordHeaderSize = fileHeader_.recordHeaderSize.get();
+  size_t recordHeaderSize = fileHeader_.recordHeaderSize;
   if (recordHeaderSize < sizeof(FileFormat::RecordHeader)) {
     XR_LOGE("Reindexing: Record header too small");
     return REINDEXING_ERROR;
@@ -665,7 +660,7 @@ int IndexRecord::Reader::rebuildIndex(bool writeFixedIndex) {
       error = REINDEXING_ERROR;
       break;
     }
-    uint32_t headerPreviousRecordSize = recordHeader->previousRecordSize.get();
+    uint32_t headerPreviousRecordSize = recordHeader->previousRecordSize;
     if (headerPreviousRecordSize != previousRecordSize && !(hasSplitHeadChunk_ && index_.empty())) {
       XR_LOGW(
           "Reindexing: record #{}. Previous record size is {}, expected {}.",
@@ -676,7 +671,7 @@ int IndexRecord::Reader::rebuildIndex(bool writeFixedIndex) {
       error = REINDEXING_ERROR;
       break;
     }
-    uint32_t recordSize = recordHeader->recordSize.get();
+    uint32_t recordSize = recordHeader->recordSize;
     if (recordSize < recordHeaderSize) {
       XR_LOGW(
           "Reindexing: record #{} too small. {} bytes, expected at least {} bytes.",
@@ -695,9 +690,9 @@ int IndexRecord::Reader::rebuildIndex(bool writeFixedIndex) {
     RecordableTypeId recordableTypeId = recordHeader->getRecordableTypeId();
     uint32_t dataSize = recordSize - static_cast<uint32_t>(recordHeaderSize);
     if (recordableTypeId == RecordableTypeId::VRSIndex &&
-        recordHeader->formatVersion.get() == kSplitIndexFormatVersion) {
+        recordHeader->formatVersion == kSplitIndexFormatVersion) {
       int64_t fileSizeUsed = 0;
-      readSplitIndexRecord(0, recordHeader->uncompressedSize.get(), fileSizeUsed);
+      readSplitIndexRecord(0, recordHeader->uncompressedSize, fileSizeUsed);
       if (!index_.empty()) {
         XR_LOGW("Found {} records in the split index.", index_.size());
         // we can skip all the records found in the index
@@ -740,20 +735,20 @@ int IndexRecord::Reader::rebuildIndex(bool writeFixedIndex) {
       Record::Type recordType = recordHeader->getRecordType();
       if (isValid(recordType)) {
         streamIds_.insert(streamId);
-        index_.emplace_back(recordHeader->timestamp.get(), absolutePosition, streamId, recordType);
+        index_.emplace_back(recordHeader->timestamp, absolutePosition, streamId, recordType);
         if (index_.size() > 1 && index_.back() < index_[index_.size() - 2]) {
           sortErrorCount_++;
         }
         if (diskIndex_) {
           diskIndex_->emplace_back(
-              recordHeader->timestamp.get(), recordHeader->recordSize.get(), streamId, recordType);
+              recordHeader->timestamp, recordHeader->recordSize, streamId, recordType);
         }
       } else {
         // We're probably in the weeds already
         XR_LOGW(
             "Reindexing: record #{}. Invalid record type: {}",
             index_.size(),
-            static_cast<int>(recordHeader->recordType.get()));
+            static_cast<int>(recordHeader->recordType));
         distrustLastRecord = true;
         error = REINDEXING_ERROR;
         break;
@@ -775,17 +770,17 @@ int IndexRecord::Reader::rebuildIndex(bool writeFixedIndex) {
   if (error != 0 || distrustLastRecord) {
     // Printout the content of the broken header, for diagnostic purposes.
     XR_LOGI("Record #{} Header:", index_.size());
-    XR_LOGI("Record Size: {}, expected {}", recordHeader->recordSize.get(), previousRecordSize);
-    XR_LOGI("Previous Record Size: {}", recordHeader->previousRecordSize.get());
-    XR_LOGI("Compression Type: {}", static_cast<int>(recordHeader->compressionType.get()));
-    XR_LOGI("Uncompressed Size: {}", recordHeader->uncompressedSize.get());
-    XR_LOGI("Timestamp: {}", recordHeader->timestamp.get());
+    XR_LOGI("Record Size: {}, expected {}", recordHeader->recordSize, previousRecordSize);
+    XR_LOGI("Previous Record Size: {}", recordHeader->previousRecordSize);
+    XR_LOGI("Compression Type: {}", static_cast<int>(recordHeader->compressionType));
+    XR_LOGI("Uncompressed Size: {}", recordHeader->uncompressedSize);
+    XR_LOGI("Timestamp: {}", recordHeader->timestamp);
     XR_LOGI("StreamId: {}", recordHeader->getStreamId().getName());
     XR_LOGI(
         "Record Type: {} ({})",
         toString(recordHeader->getRecordType()),
-        static_cast<int>(recordHeader->recordType.get()));
-    XR_LOGI("Format Version: {}", recordHeader->formatVersion.get());
+        static_cast<int>(recordHeader->recordType));
+    XR_LOGI("Format Version: {}", recordHeader->formatVersion);
   }
   if (distrustLastRecord && !index_.empty()) {
     XR_LOGW(
@@ -810,25 +805,25 @@ int IndexRecord::Reader::rebuildIndex(bool writeFixedIndex) {
     BREAK_ON_ERROR(writeFile->reopenForUpdates());
     if (hasSplitHeadChunk_) {
       // re-write the index in the first chunk & update headers
-      BREAK_ON_ERROR(writeFile->setPos(fileHeader_.indexRecordOffset.get()));
+      BREAK_ON_ERROR(writeFile->setPos(fileHeader_.indexRecordOffset));
       BREAK_ON_ERROR(writeFile->read(recordHeader, recordHeaderSize));
       BREAK_ON_FALSE(recordHeader->getRecordableTypeId() == RecordableTypeId::VRSIndex);
       // Because mixing reads & writes requires a setpos, and that the read may have taken us
       // in the next chunk, we need to rewrite the record index, to overwrite the record
-      BREAK_ON_ERROR(writeFile->setPos(fileHeader_.indexRecordOffset.get()));
+      BREAK_ON_ERROR(writeFile->setPos(fileHeader_.indexRecordOffset));
       BREAK_ON_ERROR(writeFile->write(recordHeader, recordHeaderSize));
       uint32_t writtenIndexSize = 0;
       BREAK_ON_ERROR(writeDiskInfos(
           *writeFile, *diskIndex_, writtenIndexSize, compressor, kDefaultCompression));
       BREAK_ON_ERROR(writeFile->truncate());
-      fileHeader_.firstUserRecordOffset.set(writeFile->getPos());
+      fileHeader_.firstUserRecordOffset = writeFile->getPos();
       BREAK_ON_ERROR(writeFile->setPos(0));
       BREAK_ON_ERROR(writeFile->write(fileHeader_));
       recordHeader->setCompressionType(CompressionType::Zstd);
-      recordHeader->recordSize.set(static_cast<uint32_t>(recordHeaderSize + writtenIndexSize));
-      recordHeader->uncompressedSize.set(
-          static_cast<uint32_t>(sizeof(DiskRecordInfo) * index_.size()));
-      BREAK_ON_ERROR(writeFile->setPos(fileHeader_.indexRecordOffset.get()));
+      recordHeader->recordSize = static_cast<uint32_t>(recordHeaderSize + writtenIndexSize);
+      recordHeader->uncompressedSize =
+          static_cast<uint32_t>(sizeof(DiskRecordInfo) * index_.size());
+      BREAK_ON_ERROR(writeFile->setPos(fileHeader_.indexRecordOffset));
       BREAK_ON_ERROR(writeFile->write(recordHeader, recordHeaderSize));
       XR_LOGI("Successfully updated the split index with {} records.", diskIndex_->size());
     } else {
@@ -844,9 +839,9 @@ int IndexRecord::Reader::rebuildIndex(bool writeFixedIndex) {
       BREAK_ON_ERROR(writeFile->setPos(0));
       size_t minUpdateSize = offsetof(FileFormat::FileHeader, indexRecordOffset) +
           sizeof(fileHeader_.indexRecordOffset);
-      fileHeader_.indexRecordOffset.set(absolutePosition);
+      fileHeader_.indexRecordOffset = absolutePosition;
       recordHeader->setCompressionType(CompressionType::None);
-      recordHeader->uncompressedSize.set(0);
+      recordHeader->uncompressedSize = 0;
       BREAK_ON_ERROR(writeFile->overwrite(&fileHeader_, minUpdateSize));
       XR_LOGI("Successfully created an index for {} records.", diskIndex_->size());
     }
@@ -872,12 +867,12 @@ int IndexRecord::Writer::preallocateClassicIndexRecord(
       kCompressionLevels[firstCompressionPresetIndex(preliminaryIndex.size())]));
   preallocatedIndexRecordSize_ = outLastRecordSize;
   // Re-write the file header immediately, in case writing is interrupted early
-  fileHeader_.firstUserRecordOffset.set(file.getPos());
+  fileHeader_.firstUserRecordOffset = file.getPos();
   IF_ERROR_LOG_AND_RETURN(file.setPos(0));
   IF_ERROR_LOG_AND_RETURN(file.overwrite(fileHeader_));
-  IF_ERROR_LOG_AND_RETURN(file.setPos(fileHeader_.firstUserRecordOffset.get()));
+  IF_ERROR_LOG_AND_RETURN(file.setPos(fileHeader_.firstUserRecordOffset));
   // Only save the index record's offset now, because we don't want to commit it to disk yet
-  fileHeader_.indexRecordOffset.set(indexRecordOffset);
+  fileHeader_.indexRecordOffset = indexRecordOffset;
   return 0;
 }
 
@@ -887,7 +882,7 @@ int IndexRecord::Writer::finalizeClassicIndexRecord(
     uint32_t& outLastRecordSize) {
   bool indexRecordWritten = false;
   int64_t descriptionRecordToIndexRecord =
-      fileHeader_.indexRecordOffset.get() - fileHeader_.descriptionRecordOffset.get();
+      fileHeader_.indexRecordOffset - fileHeader_.descriptionRecordOffset;
   // If space for the index record was pre-allocated, let's try to use it!
   if (preallocatedIndexRecordSize_ > 0 && descriptionRecordToIndexRecord > 0) {
     // We pre-allocated some space, using a preliminary index, which happens during copy operations.
@@ -897,7 +892,7 @@ int IndexRecord::Writer::finalizeClassicIndexRecord(
     // It's OK to possibly iterate, because copies are not real-time/capture operations.
     size_t retryIndex = firstCompressionPresetIndex(writtenRecords_.size());
     do {
-      if (file.setPos(fileHeader_.indexRecordOffset.get()) == 0) {
+      if (file.setPos(fileHeader_.indexRecordOffset) == 0) {
         uint32_t lastRecordSize = static_cast<uint32_t>(descriptionRecordToIndexRecord);
         if (writeClassicIndexRecord(
                 file,
@@ -928,7 +923,7 @@ int IndexRecord::Writer::finalizeClassicIndexRecord(
   // write the index at the end of the file if we need to
   int error = 0;
   if (!indexRecordWritten && (error = file.setPos(endOfRecordsOffset)) == 0) {
-    fileHeader_.indexRecordOffset.set(endOfRecordsOffset);
+    fileHeader_.indexRecordOffset = endOfRecordsOffset;
     error = writeClassicIndexRecord(
         file, streamIds_, writtenRecords_, outLastRecordSize, compressor_, kDefaultCompression);
   }
@@ -948,9 +943,9 @@ int Writer::createSplitIndexRecord(uint32_t& outLastRecordSize) {
   splitIndexRecordHeader_.initIndexHeader(
       kSplitIndexFormatVersion, 0, outLastRecordSize, CompressionType::Zstd);
   WRITE_OR_LOG_AND_RETURN(file, &splitIndexRecordHeader_, sizeof(splitIndexRecordHeader_));
-  outLastRecordSize = splitIndexRecordHeader_.recordSize.get();
+  outLastRecordSize = splitIndexRecordHeader_.recordSize;
   // Update & rewrite the file's header to tell where the index record is
-  fileHeader_.indexRecordOffset.set(startOfIndex);
+  fileHeader_.indexRecordOffset = startOfIndex;
   IF_ERROR_LOG_AND_RETURN(file.setPos(0));
   IF_ERROR_LOG_AND_RETURN(file.overwrite(fileHeader_));
   // Move back after the index record's header
@@ -1011,17 +1006,17 @@ int Writer::completeSplitIndexRecord() {
     // and the file's header to point to the first user record
     int64_t endOfIndexOffset = file.getPos();
     // rewrite the index record's record header
-    splitIndexRecordHeader_.recordSize.set(
-        static_cast<uint32_t>(sizeof(FileFormat::RecordHeader) + writtenBytesCount_));
+    splitIndexRecordHeader_.recordSize =
+        static_cast<uint32_t>(sizeof(FileFormat::RecordHeader) + writtenBytesCount_);
     if (splitIndexRecordHeader_.getCompressionType() != CompressionType::None) {
-      splitIndexRecordHeader_.uncompressedSize.set(
-          static_cast<uint32_t>(writtenIndexCount_ * sizeof(DiskRecordInfo)));
+      splitIndexRecordHeader_.uncompressedSize =
+          static_cast<uint32_t>(writtenIndexCount_ * sizeof(DiskRecordInfo));
     }
-    IF_ERROR_LOG_AND_RETURN(file.setPos(fileHeader_.indexRecordOffset.get()));
+    IF_ERROR_LOG_AND_RETURN(file.setPos(fileHeader_.indexRecordOffset));
     WRITE_OR_LOG_AND_RETURN(file, &splitIndexRecordHeader_, sizeof(splitIndexRecordHeader_));
     if (XR_VERIFY(endOfIndexOffset > 0)) {
       // update & rewrite the file's header
-      fileHeader_.firstUserRecordOffset.set(endOfIndexOffset);
+      fileHeader_.firstUserRecordOffset = endOfIndexOffset;
       IF_ERROR_LOG_AND_RETURN(file.setPos(0));
       IF_ERROR_LOG_AND_RETURN(file.overwrite(fileHeader_));
     } else {

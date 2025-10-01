@@ -307,14 +307,14 @@ int DescriptionRecord::readDescriptionRecord(
         recordHeaderSize);
     return file.getLastError();
   }
-  outDescriptionRecordSize = recordHeader->recordSize.get();
+  outDescriptionRecordSize = recordHeader->recordSize;
   if (outDescriptionRecordSize < recordHeaderSize + sizeof(uint32_t)) {
     XR_LOGD("Record size too small. Corrupt?");
     outDescriptionRecordSize = 0;
     return NOT_ENOUGH_DATA;
   }
   uint32_t dataSizeLeft = outDescriptionRecordSize - static_cast<uint32_t>(recordHeaderSize);
-  switch (recordHeader->formatVersion.get()) {
+  switch (recordHeader->formatVersion) {
     case kLegacyDescriptionFormatVersion: {
       map<StreamId, string> descriptions;
       IF_ERROR_LOG_AND_RETURN(readMap(file, descriptions, dataSizeLeft));

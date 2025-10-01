@@ -58,15 +58,15 @@ struct DiskStreamId {
   FileFormat::LittleEndian<int32_t> typeId;
   FileFormat::LittleEndian<uint16_t> instanceId;
 
-  RecordableTypeId getTypeId() const {
+  inline RecordableTypeId getTypeId() const {
     return FileFormat::readRecordableTypeId(typeId);
   }
 
-  uint16_t getInstanceId() const {
-    return instanceId.get();
+  inline uint16_t getInstanceId() const {
+    return static_cast<uint16_t>(instanceId);
   }
 
-  StreamId getStreamId() const {
+  inline StreamId getStreamId() const {
     return {getTypeId(), getInstanceId()};
   }
 };
@@ -90,11 +90,11 @@ struct DiskRecordInfo {
   FileFormat::LittleEndian<uint8_t> recordType;
   DiskStreamId streamId;
 
-  Record::Type getRecordType() const {
-    return static_cast<Record::Type>(recordType.get());
+  inline Record::Type getRecordType() const {
+    return static_cast<Record::Type>(recordType());
   }
 
-  StreamId getStreamId() const {
+  inline StreamId getStreamId() const {
     return streamId.getStreamId();
   }
 };

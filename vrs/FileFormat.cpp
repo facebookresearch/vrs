@@ -58,11 +58,11 @@ void FileHeader::init() {
 }
 
 void FileHeader::init(uint32_t magic1, uint32_t magic2, uint32_t magic3, uint32_t formatVersion) {
-  magicHeader1.set(magic1);
-  magicHeader2.set(magic2);
-  magicHeader3.set(magic3);
-  fileHeaderSize.set(sizeof(FileHeader));
-  recordHeaderSize.set(sizeof(RecordHeader));
+  magicHeader1 = magic1;
+  magicHeader2 = magic2;
+  magicHeader3 = magic3;
+  fileHeaderSize = sizeof(FileHeader);
+  recordHeaderSize = sizeof(RecordHeader);
   uint64_t id = static_cast<uint64_t>(
       duration_cast<nanoseconds>(system_clock::now().time_since_epoch()).count());
   // The 64 bit creationId might be used to identify the file to cache its index: it must be unique.
@@ -77,8 +77,8 @@ void FileHeader::init(uint32_t magic1, uint32_t magic2, uint32_t magic3, uint32_
   uint32_t randomBits = distribution(engine);
   const uint64_t c30bits = (1 << 30) - 1; // 30 lsb set
   id = (id & ~c30bits) | (randomBits & c30bits);
-  creationId.set(id);
-  fileFormatVersion.set(formatVersion);
+  creationId = id;
+  fileFormatVersion = formatVersion;
 }
 
 bool FileHeader::looksLikeAVRSFile() const {
@@ -87,35 +87,34 @@ bool FileHeader::looksLikeAVRSFile() const {
 
 bool FileHeader::looksLikeOurFiles(uint32_t magic1, uint32_t magic2, uint32_t magic3) const {
   // Check magic values
-  if (magicHeader1.get() != magic1 || magicHeader2.get() != magic2 ||
-      magicHeader3.get() != magic3) {
+  if (magicHeader1 != magic1 || magicHeader2 != magic2 || magicHeader3 != magic3) {
     return false;
   }
   // file & record headers are required to only grow
-  if (fileHeaderSize.get() < sizeof(FileHeader) || recordHeaderSize.get() < sizeof(RecordHeader)) {
+  if (fileHeaderSize < sizeof(FileHeader) || recordHeaderSize < sizeof(RecordHeader)) {
     return false;
   }
   // It's extremely unlikely that the file & record headers will grow "a lot": filter based on that
   const size_t maxHeaderGrowth = 200;
-  return fileHeaderSize.get() <= sizeof(FileHeader) + maxHeaderGrowth &&
-      recordHeaderSize.get() <= sizeof(RecordHeader) + maxHeaderGrowth;
+  return fileHeaderSize <= sizeof(FileHeader) + maxHeaderGrowth &&
+      recordHeaderSize <= sizeof(RecordHeader) + maxHeaderGrowth;
 }
 
 bool FileHeader::isFormatSupported() const {
-  uint32_t version = fileFormatVersion.get();
+  uint32_t version = fileFormatVersion;
   return version == kOriginalFileFormatVersion || version == kFrontIndexFileFormatVersion ||
       version == kZstdFormatVersion;
 }
 
 void FileHeader::enableFrontIndexRecordSupport() {
-  fileFormatVersion.set(kFrontIndexFileFormatVersion);
+  fileFormatVersion = kFrontIndexFileFormatVersion;
 }
 
 int64_t FileHeader::getEndOfUserRecordsOffset(int64_t fileSize) const {
   if (looksLikeAVRSFile()) {
     // index maybe before or after the user records
-    if (indexRecordOffset.get() > firstUserRecordOffset.get()) {
-      return min<int64_t>(fileSize, indexRecordOffset.get());
+    if (indexRecordOffset > firstUserRecordOffset) {
+      return min<int64_t>(fileSize, indexRecordOffset);
     }
   }
   return fileSize;
@@ -132,15 +131,15 @@ RecordHeader::RecordHeader(
     uint32_t previousRecordSize,
     uint32_t recordSize,
     uint32_t uncompressedSize) {
-  this->recordSize.set(recordSize);
-  this->previousRecordSize.set(previousRecordSize);
-  this->recordableTypeId.set(static_cast<int32_t>(streamId.getTypeId()));
-  this->formatVersion.set(formatVersion);
-  this->timestamp.set(timestamp);
-  this->recordableInstanceId.set(streamId.getInstanceId());
+  this->recordSize = recordSize;
+  this->previousRecordSize = previousRecordSize;
+  this->recordableTypeId = static_cast<int32_t>(streamId.getTypeId());
+  this->formatVersion = formatVersion;
+  this->timestamp = timestamp;
+  this->recordableInstanceId = streamId.getInstanceId();
   setRecordType(recordType);
   setCompressionType(compressionType);
-  this->uncompressedSize.set(uncompressedSize);
+  this->uncompressedSize = uncompressedSize;
 }
 
 void RecordHeader::initHeader(
@@ -152,15 +151,15 @@ void RecordHeader::initHeader(
     uint32_t _previousRecordSize,
     uint32_t _recordSize,
     uint32_t _uncompressedSize) {
-  this->recordSize.set(_recordSize);
-  this->previousRecordSize.set(_previousRecordSize);
-  this->recordableTypeId.set(static_cast<int32_t>(_streamId.getTypeId()));
-  this->formatVersion.set(_formatVersion);
-  this->timestamp.set(_timestamp);
-  this->recordableInstanceId.set(_streamId.getInstanceId());
+  this->recordSize = _recordSize;
+  this->previousRecordSize = _previousRecordSize;
+  this->recordableTypeId = static_cast<int32_t>(_streamId.getTypeId());
+  this->formatVersion = _formatVersion;
+  this->timestamp = _timestamp;
+  this->recordableInstanceId = _streamId.getInstanceId();
   setRecordType(_recordType);
   setCompressionType(_compressionType);
-  this->uncompressedSize.set(_uncompressedSize);
+  this->uncompressedSize = _uncompressedSize;
 }
 
 void RecordHeader::initIndexHeader(
@@ -169,11 +168,11 @@ void RecordHeader::initIndexHeader(
     uint32_t _previousRecordSize,
     CompressionType _compressionType) {
   setRecordType(Record::Type::DATA);
-  recordSize.set(sizeof(RecordHeader) + indexSize);
-  this->previousRecordSize.set(_previousRecordSize);
-  this->formatVersion.set(_formatVersion);
-  this->recordableTypeId.set(static_cast<int32_t>(RecordableTypeId::VRSIndex));
-  this->timestamp.set(Record::kMaxTimestamp);
+  recordSize = sizeof(RecordHeader) + indexSize;
+  this->previousRecordSize = _previousRecordSize;
+  this->formatVersion = _formatVersion;
+  this->recordableTypeId = static_cast<int32_t>(RecordableTypeId::VRSIndex);
+  this->timestamp = Record::kMaxTimestamp;
   setCompressionType(_compressionType);
 }
 
@@ -182,26 +181,30 @@ void RecordHeader::initDescriptionHeader(
     uint32_t descriptionRecordSize,
     uint32_t _previousRecordSize) {
   setRecordType(Record::Type::DATA);
-  recordSize.set(descriptionRecordSize);
-  this->previousRecordSize.set(_previousRecordSize);
-  this->formatVersion.set(_formatVersion);
-  this->recordableTypeId.set(static_cast<int32_t>(RecordableTypeId::VRSDescription));
-  this->timestamp.set(Record::kMaxTimestamp);
+  recordSize = descriptionRecordSize;
+  this->previousRecordSize = _previousRecordSize;
+  this->formatVersion = _formatVersion;
+  this->recordableTypeId = static_cast<int32_t>(RecordableTypeId::VRSDescription);
+  this->timestamp = Record::kMaxTimestamp;
+}
+
+template <typename ENUM, class LITTLEENDIAN>
+bool littleEndianIsValid_cast(LITTLEENDIAN& littleEndian) {
+  return enumIsValid_cast<ENUM>(littleEndian());
 }
 
 bool RecordHeader::isSanityCheckOk() const {
-  if (!XR_VERIFY(recordSize.get() >= sizeof(RecordHeader)) ||
-      !XR_VERIFY(
-          previousRecordSize.get() == 0 || previousRecordSize.get() >= sizeof(RecordHeader))) {
+  if (!XR_VERIFY(recordSize >= sizeof(RecordHeader)) ||
+      !XR_VERIFY(previousRecordSize == 0 || previousRecordSize >= sizeof(RecordHeader))) {
     return false;
   }
-  if (!XR_VERIFY(enumIsValid_cast<Record::Type>(recordType.get()))) {
+  if (!XR_VERIFY(littleEndianIsValid_cast<Record::Type>(recordType))) {
     return false;
   }
-  uint32_t uncompressedPayload = uncompressedSize.get(); // doesn't include header already
+  uint32_t uncompressedPayload = uncompressedSize; // doesn't include header already
   if (uncompressedPayload > 0) {
     if (getRecordableTypeId() != RecordableTypeId::VRSIndex) {
-      uint32_t compressedPayload = recordSize.get() - sizeof(RecordHeader);
+      uint32_t compressedPayload = recordSize - sizeof(RecordHeader);
       // we did not always check that compression actually helped, and smaller sizes do worse
       uint32_t maxIncrease = (uncompressedPayload < 200)
           ? max<size_t>(50, uncompressedPayload / 2) // 50 bytes or 50%
@@ -210,15 +213,15 @@ bool RecordHeader::isSanityCheckOk() const {
         return false;
       }
     }
-    if (!XR_VERIFY(enumIsValid_cast<CompressionType>(compressionType.get()))) {
+    if (!XR_VERIFY(littleEndianIsValid_cast<CompressionType>(compressionType))) {
       return false;
     }
   }
   return true;
 }
 
-RecordableTypeId readRecordableTypeId(const FileFormat::LittleEndian<int32_t>& recordableTypeId) {
-  int32_t rawTypeId = recordableTypeId.get();
+RecordableTypeId readRecordableTypeId(int32_t recordableTypeId) {
+  int32_t rawTypeId = recordableTypeId;
   // reinterpret ids for test & sample devices in their legacy space...
   int32_t kLegacyTestDevices = 100000;
   if (rawTypeId >= kLegacyTestDevices) {
@@ -246,29 +249,29 @@ bool printVRSFileInternals(unique_ptr<FileHandler>& file) {
     return false;
   }
   bool returnValue = true;
-  uint32_t fileFormatVersion = fileHeader.fileFormatVersion.get();
+  uint32_t fileFormatVersion = fileHeader.fileFormatVersion;
   cout << "File format version: '" << char(fileFormatVersion & 0xff)
        << char((fileFormatVersion >> 8) & 0xff) << char((fileFormatVersion >> 16) & 0xff)
        << char((fileFormatVersion >> 24) & 0xff) << "', "
        << (fileHeader.isFormatSupported() ? "supported." : "NOT SUPPORTED.") << "\n";
-  cout << "Creation ID: " << hex << fileHeader.creationId.get() << dec << ".\n";
-  time_t creationTimeSec = static_cast<time_t>(fileHeader.creationId.get() / 1000000000);
+  cout << "Creation ID: " << hex << fileHeader.creationId << dec << ".\n";
+  time_t creationTimeSec = static_cast<time_t>(fileHeader.creationId / 1000000000);
   cout << "Creation date: " << put_time(localtime(&creationTimeSec), "%c %Z.") << '\n';
-  cout << "File header size: " << fileHeader.fileHeaderSize.get() << " bytes";
-  if (fileHeader.fileHeaderSize.get() == sizeof(fileHeader)) {
+  cout << "File header size: " << fileHeader.fileHeaderSize << " bytes";
+  if (fileHeader.fileHeaderSize == sizeof(fileHeader)) {
     cout << ", as expected.\n";
   } else {
     cout << ", compared to " << sizeof(fileHeader) << " bytes expected.\n";
   }
-  cout << "Record header size: " << fileHeader.recordHeaderSize.get() << " bytes";
-  if (fileHeader.recordHeaderSize.get() == sizeof(FileFormat::RecordHeader)) {
+  cout << "Record header size: " << fileHeader.recordHeaderSize << " bytes";
+  if (fileHeader.recordHeaderSize == sizeof(FileFormat::RecordHeader)) {
     cout << ", as expected.\n";
   } else {
     cout << ", compared to " << sizeof(FileFormat::RecordHeader) << " bytes expected.\n";
   }
   bool descriptionRecordAfterFileHeader =
-      fileHeader.descriptionRecordOffset.get() == fileHeader.fileHeaderSize.get();
-  cout << "Description record offset: " << fileHeader.descriptionRecordOffset.get() << ", "
+      fileHeader.descriptionRecordOffset == fileHeader.fileHeaderSize;
+  cout << "Description record offset: " << fileHeader.descriptionRecordOffset << ", "
        << (descriptionRecordAfterFileHeader ? "right after the file header, as expected."
                                             : "NOT RIGHT AFTER THE FILE HEADER")
        << "\n";
@@ -278,20 +281,18 @@ bool printVRSFileInternals(unique_ptr<FileHandler>& file) {
 
   // Check description record header
   FileFormat::RecordHeader descriptionRecordHeader;
-  IF_ERROR_LOG(file->setPos(fileHeader.descriptionRecordOffset.get()));
+  IF_ERROR_LOG(file->setPos(fileHeader.descriptionRecordOffset));
   IF_ERROR_LOG(file->read(descriptionRecordHeader));
 
   cout << "Description record size: "
-       << helpers::humanReadableFileSize(descriptionRecordHeader.recordSize.get()) << ".\n";
-  int64_t indexRecordOffset = fileHeader.indexRecordOffset.get();
+       << helpers::humanReadableFileSize(descriptionRecordHeader.recordSize) << ".\n";
+  int64_t indexRecordOffset = fileHeader.indexRecordOffset;
   cout << "Index record offset: " << indexRecordOffset << ", ";
-  if (indexRecordOffset ==
-      fileHeader.fileHeaderSize.get() + descriptionRecordHeader.recordSize.get()) {
+  if (indexRecordOffset == fileHeader.fileHeaderSize + descriptionRecordHeader.recordSize) {
     cout << "right after the description record (Ready for streaming).\n";
   } else {
     if (indexRecordOffset == 0) {
-      indexRecordOffset =
-          fileHeader.fileHeaderSize.get() + descriptionRecordHeader.recordSize.get();
+      indexRecordOffset = fileHeader.fileHeaderSize + descriptionRecordHeader.recordSize;
       cout << "anticipated at " << indexRecordOffset << ", after the description record.\n";
     } else {
       cout << "NOT after the description record. Not great for streaming.\n";
@@ -303,18 +304,18 @@ bool printVRSFileInternals(unique_ptr<FileHandler>& file) {
   IF_ERROR_LOG(file->setPos(indexRecordOffset));
   IF_ERROR_LOG(file->read(indexRecordHeader));
 
-  cout << "Index Record size: "
-       << helpers::humanReadableFileSize(indexRecordHeader.recordSize.get()) << ".\n";
-  if (indexRecordHeader.recordSize.get() == fileHeader.recordHeaderSize.get()) {
+  cout << "Index Record size: " << helpers::humanReadableFileSize(indexRecordHeader.recordSize)
+       << ".\n";
+  if (indexRecordHeader.recordSize == fileHeader.recordHeaderSize) {
     cout << "This index record looks empty\n";
-  } else if (indexRecordHeader.recordSize.get() < fileHeader.recordHeaderSize.get()) {
+  } else if (indexRecordHeader.recordSize < fileHeader.recordHeaderSize) {
     cerr << "This is smaller than a record header, so something's really off!\n";
     returnValue = false;
   } else if (
       indexRecordHeader.getCompressionType() != CompressionType::None ||
-      indexRecordHeader.uncompressedSize.get() != 0) {
+      indexRecordHeader.uncompressedSize != 0) {
     cout << "Index Record uncompressed size: "
-         << helpers::humanReadableFileSize(indexRecordHeader.uncompressedSize.get())
+         << helpers::humanReadableFileSize(indexRecordHeader.uncompressedSize)
          << ", compressed with " << toString(indexRecordHeader.getCompressionType()) << ".\n";
   }
   int64_t offsetBefore = file->getPos();
@@ -323,7 +324,7 @@ bool printVRSFileInternals(unique_ptr<FileHandler>& file) {
   ProgressLogger logger;
   IndexRecord::Reader indexReader(*file, fileHeader, &logger, streamIds, records);
   int64_t usedFileSize{};
-  int status = indexReader.readRecord(fileHeader.firstUserRecordOffset.get(), usedFileSize);
+  int status = indexReader.readRecord(fileHeader.firstUserRecordOffset, usedFileSize);
   if (status != 0) {
     cerr << "Can't read index record, error " << errorCodeToMessageWithCode(status) << "\n";
     returnValue = false;
@@ -332,19 +333,19 @@ bool printVRSFileInternals(unique_ptr<FileHandler>& file) {
     cout << "Index Record contains " << records.size() << " records, "
          << helpers::humanReadableFileSize(records.size() * sizeof(IndexRecord::DiskRecordInfo))
          << " worth of data, " << helpers::humanReadableFileSize(indexReadSize) << " compressed";
-    if (indexRecordHeader.uncompressedSize.get() > 0) {
-      double ratio = ((indexRecordHeader.uncompressedSize.get() - indexReadSize) * 100.0) /
-          indexRecordHeader.uncompressedSize.get();
+    if (indexRecordHeader.uncompressedSize > 0) {
+      double ratio = ((indexRecordHeader.uncompressedSize - indexReadSize) * 100.0) /
+          indexRecordHeader.uncompressedSize;
       cout << fmt::format(", {:.2f}% saved", ratio);
     }
-    if (indexRecordHeader.recordSize.get() > indexReadSize) {
-      double usage = (indexReadSize * 100.0) / indexRecordHeader.recordSize.get();
+    if (indexRecordHeader.recordSize > indexReadSize) {
+      double usage = (indexReadSize * 100.0) / indexRecordHeader.recordSize;
       cout << fmt::format(", record {:.2f}% used", usage);
     }
     cout << ".\n";
   }
   int64_t endOfSplitIndexRecordOffset = 0;
-  uint32_t indexFormatVersion = indexRecordHeader.formatVersion.get();
+  uint32_t indexFormatVersion = indexRecordHeader.formatVersion;
   cout << "Index Record format version: ";
   if (indexFormatVersion == vrs::IndexRecord::kClassicIndexFormatVersion) {
     cout << "Classic.\n";
@@ -390,15 +391,15 @@ bool printVRSFileInternals(unique_ptr<FileHandler>& file) {
     returnValue = false;
   }
 
-  int64_t firstUserRecordOffset = fileHeader.firstUserRecordOffset.get();
+  int64_t firstUserRecordOffset = fileHeader.firstUserRecordOffset;
   cout << "First user record offset: " << firstUserRecordOffset << ", ";
   if (firstUserRecordOffset == 0) {
     cout << "value not set";
     if (indexFormatVersion == vrs::IndexRecord::kClassicIndexFormatVersion) {
       cout << ", which is expected with legacy files, pre-streaming optimizations.\n";
       int64_t endOfDescriptionRecord =
-          fileHeader.descriptionRecordOffset.get() + descriptionRecordHeader.recordSize.get();
-      if (endOfDescriptionRecord < fileHeader.indexRecordOffset.get()) {
+          fileHeader.descriptionRecordOffset + descriptionRecordHeader.recordSize;
+      if (endOfDescriptionRecord < fileHeader.indexRecordOffset) {
         cout << "First user record at " << endOfDescriptionRecord
              << ", after the description record.\n";
         firstUserRecordOffset = endOfDescriptionRecord;
@@ -430,7 +431,7 @@ bool printVRSFileInternals(unique_ptr<FileHandler>& file) {
     FileFormat::RecordHeader firstUserRecord;
     IF_ERROR_LOG(file->setPos(firstUserRecordOffset));
     IF_ERROR_LOG(file->read(firstUserRecord));
-    cout << "Size of record before first user record: " << firstUserRecord.previousRecordSize.get()
+    cout << "Size of record before first user record: " << firstUserRecord.previousRecordSize
          << " bytes.\n";
   }
 

@@ -53,11 +53,11 @@ struct DiskStreamId {
   FileFormat::LittleEndian<uint16_t> instanceId;
 
   RecordableTypeId getTypeId() const {
-    return static_cast<RecordableTypeId>(typeId.get());
+    return static_cast<RecordableTypeId>(typeId());
   }
 
   uint16_t getInstanceId() const {
-    return instanceId.get();
+    return instanceId;
   }
 
   StreamId getStreamId() const {
@@ -80,7 +80,7 @@ struct DiskRecordInfo {
   FileFormat::LittleEndian<uint8_t> recordType;
 
   Record::Type getRecordType() const {
-    return static_cast<Record::Type>(recordType.get());
+    return static_cast<Record::Type>(recordType());
   }
 
   StreamId getStreamId() const {
@@ -184,23 +184,23 @@ int readIndexData(
   IF_ERROR_LOG_AND_RETURN(file.read(recordableCount));
   if (!XR_VERIFY(
           indexSize >= sizeof(recordableCount) +
-              sizeof(IndexRecord::DiskStreamId) * recordableCount.get() + sizeof(diskIndexSize))) {
+              sizeof(IndexRecord::DiskStreamId) * recordableCount + sizeof(diskIndexSize))) {
     return FAILURE;
   }
-  vector<IndexRecord::DiskStreamId> diskStreams(recordableCount.get());
+  vector<IndexRecord::DiskStreamId> diskStreams(recordableCount);
   IF_ERROR_LOG_AND_RETURN(
-      file.read(diskStreams.data(), sizeof(IndexRecord::DiskStreamId) * recordableCount.get()));
+      file.read(diskStreams.data(), sizeof(IndexRecord::DiskStreamId) * recordableCount));
   for (auto& id : diskStreams) {
     outStreamIds.insert(id.getStreamId());
   }
   IF_ERROR_LOG_AND_RETURN(file.read(diskIndexSize));
   outIndex.resize(0);
-  outIndex.reserve(diskIndexSize.get());
+  outIndex.reserve(diskIndexSize);
   Decompressor decompressor;
   vector<DiskRecordInfo> diskRecords;
   size_t indexByteSize = indexSize - sizeof(recordableCount) -
-      sizeof(IndexRecord::DiskStreamId) * recordableCount.get() - sizeof(diskIndexSize);
-  while (outIndex.size() < diskIndexSize.get() && indexByteSize > 0) {
+      sizeof(IndexRecord::DiskStreamId) * recordableCount - sizeof(diskIndexSize);
+  while (outIndex.size() < diskIndexSize && indexByteSize > 0) {
     size_t frameSize = 0;
     IF_ERROR_LOG_AND_RETURN(decompressor.initFrame(file, frameSize, indexByteSize));
     if (!XR_VERIFY(frameSize % sizeof(DiskRecordInfo) == 0)) {
@@ -210,14 +210,13 @@ int readIndexData(
     IF_ERROR_LOG_AND_RETURN(
         decompressor.readFrame(file, diskRecords.data(), frameSize, indexByteSize));
     for (auto& diskRecord : diskRecords) {
+      double timestamp = diskRecord.timestamp;
+      int64_t recordOffset = diskRecord.recordOffset;
       outIndex.emplace_back(
-          diskRecord.timestamp.get(),
-          diskRecord.recordOffset.get(),
-          diskRecord.getStreamId(),
-          static_cast<Record::Type>(diskRecord.recordType.get()));
+          timestamp, recordOffset, diskRecord.getStreamId(), diskRecord.getRecordType());
     }
   }
-  if (!XR_VERIFY(indexByteSize == 0 && outIndex.size() == diskIndexSize.get())) {
+  if (!XR_VERIFY(indexByteSize == 0 && outIndex.size() == diskIndexSize)) {
     return FAILURE;
   }
   return 0;
@@ -237,10 +236,10 @@ int write(
   FileFormat::FileHeader fileHeader;
   fileHeader.init(kMagicHeader1, kMagicHeader2, kMagicHeader3, kOriginalFileFormatVersion);
   if (!fileHasIndex) {
-    fileHeader.future4.set(FILE_HAS_NO_INDEX);
+    fileHeader.future4 = FILE_HAS_NO_INDEX;
   }
   WRITE_OR_LOG_AND_RETURN(file, &fileHeader, sizeof(fileHeader));
-  fileHeader.descriptionRecordOffset.set(file.getPos());
+  fileHeader.descriptionRecordOffset = file.getPos();
   map<StreamId, const StreamTags*> streamTagsMap;
   for (auto& rtags : streamTags) {
     streamTagsMap[rtags.first] = &rtags.second;
@@ -248,18 +247,17 @@ int write(
   uint32_t descriptionSize = 0;
   IF_ERROR_LOG_AND_RETURN(
       DescriptionRecord::writeDescriptionRecord(file, streamTagsMap, fileTags, descriptionSize));
-  fileHeader.indexRecordOffset.set(file.getPos());
+  fileHeader.indexRecordOffset = file.getPos();
   if (!XR_VERIFY(
-          fileHeader.descriptionRecordOffset.get() + descriptionSize ==
-          fileHeader.indexRecordOffset.get())) {
+          fileHeader.descriptionRecordOffset + descriptionSize == fileHeader.indexRecordOffset)) {
     return FAILURE;
   }
   size_t indexSize = 0;
   IF_ERROR_LOG_AND_RETURN(writeIndexData(file, streamIds, recordIndex, indexSize));
-  fileHeader.firstUserRecordOffset.set(file.getPos());
+  fileHeader.firstUserRecordOffset = file.getPos();
   if (!XR_VERIFY(
-          fileHeader.indexRecordOffset.get() + static_cast<int64_t>(indexSize) ==
-          fileHeader.firstUserRecordOffset.get())) {
+          fileHeader.indexRecordOffset + static_cast<int64_t>(indexSize) ==
+          fileHeader.firstUserRecordOffset)) {
     return FAILURE;
   }
   IF_ERROR_LOG_AND_RETURN(file.setPos(0));
@@ -279,11 +277,11 @@ int read(
   int64_t fileSize = file.getTotalSize();
   FileFormat::FileHeader fileHeader;
   IF_ERROR_LOG_AND_RETURN(file.read(fileHeader));
-  const int64_t descriptionOffset = fileHeader.descriptionRecordOffset.get();
-  const int64_t indexRecordOffset = fileHeader.indexRecordOffset.get();
-  const int64_t endOfFileOffset = fileHeader.firstUserRecordOffset.get();
+  const int64_t descriptionOffset = fileHeader.descriptionRecordOffset;
+  const int64_t indexRecordOffset = fileHeader.indexRecordOffset;
+  const int64_t endOfFileOffset = fileHeader.firstUserRecordOffset;
   if (!XR_VERIFY(fileHeader.looksLikeOurFiles(kMagicHeader1, kMagicHeader2, kMagicHeader3)) ||
-      !XR_VERIFY(fileHeader.fileFormatVersion.get() == kOriginalFileFormatVersion) ||
+      !XR_VERIFY(fileHeader.fileFormatVersion == kOriginalFileFormatVersion) ||
       !XR_VERIFY(descriptionOffset == sizeof(fileHeader) && descriptionOffset < fileSize) ||
       !XR_VERIFY(indexRecordOffset > descriptionOffset && indexRecordOffset < fileSize) ||
       !XR_VERIFY(endOfFileOffset > indexRecordOffset && endOfFileOffset == fileSize)) {
@@ -292,13 +290,13 @@ int read(
   IF_ERROR_LOG_AND_RETURN(file.setPos(descriptionOffset));
   uint32_t descriptionSize = 0;
   IF_ERROR_LOG_AND_RETURN(DescriptionRecord::readDescriptionRecord(
-      file, fileHeader.recordHeaderSize.get(), descriptionSize, outStreamTags, outFileTags));
+      file, fileHeader.recordHeaderSize, descriptionSize, outStreamTags, outFileTags));
   if (!XR_VERIFY(descriptionOffset + descriptionSize == indexRecordOffset)) {
     return FAILURE;
   }
   size_t indexSize = static_cast<size_t>(endOfFileOffset - indexRecordOffset);
   IF_ERROR_LOG_AND_RETURN(readIndexData(file, outStreamIds, outRecordIndex, indexSize));
-  outFileHasIndex = (fileHeader.future4.get() & FILE_HAS_NO_INDEX) == 0;
+  outFileHasIndex = (fileHeader.future4 & FILE_HAS_NO_INDEX) == 0;
   return 0;
 }
 
