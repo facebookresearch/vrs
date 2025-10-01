@@ -285,6 +285,17 @@ TEST_F(RecordTester, sortRecordSortTest) {
   checkSortOrder(records);
 }
 
+#if defined(__has_feature)
+#if __has_feature(address_sanitizer)
+#define ASAN_ENABLED 1
+#endif
+#endif
+
+#if defined(__SANITIZE_ADDRESS__)
+#define ASAN_ENABLED 1
+#endif
+
+#if !defined(ASAN_ENABLED)
 static uint8_t f(uint8_t k) {
   return 3 * k + 1;
 }
@@ -298,6 +309,8 @@ union ArrayUnion {
   uint8_t initialized_bytes[kSize];
 };
 
+// This test deliberately accesses memory beyond the size, but within the capacity of the vector.
+// We only run this test when ASAN is not enabled, because ASAN will catch the error.
 TEST_F(RecordTester, initRecordTest) {
   vector<Record::uninitialized_byte> buffer;
   buffer.reserve(100);
@@ -340,6 +353,7 @@ TEST_F(RecordTester, initRecordTest) {
   EXPECT_EQ(sizeof(u.initialized_bytes), kSize);
   EXPECT_EQ(sizeof(u), kSize);
 }
+#endif
 
 namespace {
 class TestRecordable : public Recordable {

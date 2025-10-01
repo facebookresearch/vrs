@@ -90,12 +90,12 @@ class DataPieceArray : public DataPiece {
     const T* const ptr =
         (count <= count_) ? layout_.getFixedData<T>(offset_, bytesRequested) : nullptr;
     if (ptr != nullptr && bytesRequested > 0) {
-      memcpy(outValues, ptr, bytesRequested);
+      unalignedCopy(outValues, ptr, bytesRequested);
       return true;
     }
     const size_t defaultReadCount = min<size_t>(count, defaultValues_.size());
     if (defaultReadCount > 0) {
-      memcpy(outValues, defaultValues_.data(), defaultReadCount * sizeof(T));
+      unalignedCopy(outValues, defaultValues_.data(), defaultReadCount * sizeof(T));
     }
     // blank values set set by default values
     for (size_t k = defaultValues_.size(); k < count; k++) {
@@ -130,7 +130,7 @@ class DataPieceArray : public DataPiece {
     const T* const ptr = layout_.getFixedData<T>(offset_, getFixedSize());
     if (ptr != nullptr) {
       outValues.resize(count_);
-      memcpy(outValues.data(), ptr, getFixedSize());
+      unalignedCopy(outValues.data(), ptr, getFixedSize());
       return true;
     }
     outValues = defaultValues_;
@@ -148,7 +148,7 @@ class DataPieceArray : public DataPiece {
     T* const ptr = layout_.getFixedData<T>(offset_, getFixedSize());
     if (ptr != nullptr) {
       if (count > 0) {
-        memcpy(ptr, values, sizeof(T) * min<size_t>(count, count_));
+        unalignedCopy(ptr, values, sizeof(T) * min<size_t>(count, count_));
       }
       T v{};
       while (count < count_) {
@@ -205,7 +205,7 @@ class DataPieceArray : public DataPiece {
     defaultValues_.resize(count_);
     size_t copySize = min(count, count_) * sizeof(T);
     if (copySize > 0) {
-      memcpy(defaultValues_.data(), defaultValues, copySize);
+      unalignedCopy(defaultValues_.data(), defaultValues, copySize);
     }
     for (; count < count_; count++) {
       defaultValues_[count] = T{};

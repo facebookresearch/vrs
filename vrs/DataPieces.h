@@ -271,6 +271,11 @@ void writeUnaligned(void* ptr, const T& value) {
   reinterpret_cast<UnalignedValue<T>*>(ptr)->value = value;
 }
 
+/// ASAN can trip when pointers are not aligned, but pointing to larger types. Make asan happy.
+inline void unalignedCopy(void* dst, const void* src, size_t size) {
+  memcpy(reinterpret_cast<char*>(dst), reinterpret_cast<const char*>(src), size);
+}
+
 } // namespace vrs
 
 // These are required pretty much every single time we use DataLayout. Just include them all.

@@ -61,7 +61,7 @@ class DataPieceVector : public DataPiece {
   size_t collectVariableData(int8_t* data, size_t bufferSize) override {
     const size_t writtenSize = min(bufferSize, getVariableSize());
     if (writtenSize > 0) {
-      memcpy(data, stagedValues_.data(), writtenSize);
+      unalignedCopy(data, stagedValues_.data(), writtenSize);
     }
     return writtenSize;
   }
@@ -93,7 +93,7 @@ class DataPieceVector : public DataPiece {
   void stage(const T* values, size_t count) {
     stagedValues_.resize(count);
     if (count > 0) {
-      memcpy(stagedValues_.data(), values, count * sizeof(T));
+      unalignedCopy(stagedValues_.data(), values, count * sizeof(T));
     }
   }
   /// Stage an array of values.
@@ -111,7 +111,7 @@ class DataPieceVector : public DataPiece {
     const T* ptr = layout_.getVarData<T>(offset_, count);
     if (ptr != nullptr && count > 0) {
       outValues.resize(count);
-      memcpy(outValues.data(), ptr, count * sizeof(T));
+      unalignedCopy(outValues.data(), ptr, count * sizeof(T));
       return true;
     }
     if (pieceIndex_ != DataLayout::kNotFound) {
@@ -130,7 +130,7 @@ class DataPieceVector : public DataPiece {
   void setDefault(const T* defaultValues, size_t count) {
     defaultValues_.resize(count);
     if (count > 0) {
-      memcpy(defaultValues_.data(), defaultValues, count * sizeof(T));
+      unalignedCopy(defaultValues_.data(), defaultValues, count * sizeof(T));
     }
   }
   /// Specify a default value returned by get() when the DataPiece is not mapped.
