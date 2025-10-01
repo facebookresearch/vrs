@@ -167,7 +167,7 @@ int writeClassicIndexRecord(
   WRITE_OR_LOG_AND_RETURN(file, &indexRecordHeader, sizeof(indexRecordHeader));
 
   // Write the count of streams, and one DiskStreamId struct for each
-  FileFormat::LittleEndian<uint32_t> recordableCount{static_cast<uint32_t>(streamIds.size())};
+  uint32_t recordableCount{static_cast<uint32_t>(streamIds.size())};
   WRITE_OR_LOG_AND_RETURN(file, &recordableCount, sizeof(recordableCount));
   vector<DiskStreamId> diskStreams;
   diskStreams.reserve(streamIds.size());
@@ -178,7 +178,7 @@ int writeClassicIndexRecord(
   WRITE_OR_LOG_AND_RETURN(file, diskStreams.data(), writeSize);
   diskStreams.clear();
 
-  FileFormat::LittleEndian<uint32_t> recordCount{static_cast<uint32_t>(records.size())};
+  uint32_t recordCount{static_cast<uint32_t>(records.size())};
   WRITE_OR_LOG_AND_RETURN(file, &recordCount, sizeof(recordCount));
 
   uint32_t writtenBytes = 0;
@@ -335,11 +335,10 @@ int IndexRecord::Reader::readClassicIndexRecord(
     return INDEX_RECORD_ERROR;
   }
   size_t preludeSize = sizeof(uint32_t) * kCountersCount; // discount counters
-  FileFormat::LittleEndian<uint32_t> typeCountRaw;
-  if (file_.read(typeCountRaw) != 0) {
+  uint32_t typeCount{};
+  if (file_.read(typeCount) != 0) {
     return file_.getLastError();
   }
-  uint32_t typeCount = typeCountRaw.get();
   if (typeCount > 0) {
     const size_t readSize = sizeof(DiskStreamId) * typeCount;
     if (readSize > indexRecordPayloadSize - preludeSize) {
@@ -356,11 +355,10 @@ int IndexRecord::Reader::readClassicIndexRecord(
       streamIds_.insert(StreamId{diskStruct.getTypeId(), diskStruct.getInstanceId()});
     }
   }
-  FileFormat::LittleEndian<uint32_t> recordCountRaw;
-  if (file_.read(recordCountRaw) != 0) {
+  uint32_t recordCount{};
+  if (file_.read(recordCount) != 0) {
     return file_.getLastError();
   }
-  uint32_t recordCount = recordCountRaw.get();
   const size_t indexSize = indexRecordPayloadSize - preludeSize;
   if (recordCount > 0) {
     if (recordCount > kMaxRecordCount) {

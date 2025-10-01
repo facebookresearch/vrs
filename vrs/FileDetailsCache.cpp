@@ -150,7 +150,7 @@ int writeIndexData(
     const vector<IndexRecord::RecordInfo>& index,
     size_t& outIndexSize) {
   // Write the count of streams, and one IndexRecord::DiskStreamId struct for each
-  FileFormat::LittleEndian<uint32_t> recordableCount{static_cast<uint32_t>(streamIds.size())};
+  uint32_t recordableCount = static_cast<uint32_t>(streamIds.size());
   WRITE_OR_LOG_AND_RETURN(file, &recordableCount, sizeof(recordableCount));
   vector<IndexRecord::DiskStreamId> diskStreams;
   diskStreams.reserve(streamIds.size());
@@ -160,7 +160,7 @@ int writeIndexData(
   size_t recordableWriteSize = sizeof(IndexRecord::DiskStreamId) * streamIds.size();
   WRITE_OR_LOG_AND_RETURN(file, diskStreams.data(), recordableWriteSize);
 
-  FileFormat::LittleEndian<uint32_t> recordInfoCount{static_cast<uint32_t>(index.size())};
+  uint32_t recordInfoCount = static_cast<uint32_t>(index.size());
   WRITE_OR_LOG_AND_RETURN(file, &recordInfoCount, sizeof(recordInfoCount));
 
   uint32_t recordInfoSize = 0;

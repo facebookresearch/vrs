@@ -147,21 +147,19 @@ jsonToNameAndTags(const string& jsonStr, string& outName, map<string, string>& o
 }
 
 static int writeSize(WriteFileHandler& file, size_t size) {
-  FileFormat::LittleEndian<uint32_t> diskSize(static_cast<uint32_t>(size));
+  uint32_t diskSize = static_cast<uint32_t>(size);
   WRITE_OR_LOG_AND_RETURN(file, &diskSize, sizeof(diskSize));
   return 0;
 }
 
 static int readSize(FileHandler& file, uint32_t& outSize, uint32_t& dataSizeLeft) {
-  FileFormat::LittleEndian<uint32_t> diskSize;
-  if (dataSizeLeft < sizeof(diskSize)) {
+  if (dataSizeLeft < sizeof(uint32_t)) {
     return NOT_ENOUGH_DATA;
   }
-  if (file.read(diskSize) != 0) {
+  if (file.read(outSize) != 0) {
     return file.getLastError();
   }
-  outSize = diskSize.get();
-  dataSizeLeft -= sizeof(diskSize);
+  dataSizeLeft -= sizeof(uint32_t);
   return 0;
 }
 

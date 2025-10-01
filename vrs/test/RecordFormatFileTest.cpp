@@ -58,7 +58,6 @@ using ::vrs::DataReference;
 using ::vrs::Point3Df;
 using ::vrs::Point4Df;
 using ::vrs::datalayout_conventions::ImageSpecType;
-using ::vrs::FileFormat::LittleEndian;
 
 const int32_t kCalibrationDataSize = 22;
 const uint32_t kConfigurationVersion = 5;
@@ -68,10 +67,10 @@ const uint32_t kConfigurationVersion = 5;
 struct VRSDataV2 {
   enum : uint32_t { kVersion = 2 };
 
-  LittleEndian<double> captureTimestamp;
-  LittleEndian<double> arrivalTimestamp;
-  LittleEndian<uint64_t> frameCounter;
-  LittleEndian<uint32_t> cameraUniqueId;
+  double captureTimestamp{};
+  double arrivalTimestamp{};
+  uint64_t frameCounter{};
+  uint32_t cameraUniqueId{};
 };
 
 struct VRSDataV3 : VRSDataV2 {
@@ -79,13 +78,13 @@ struct VRSDataV3 : VRSDataV2 {
 
   void upgradeFrom(uint32_t formatVersion) {
     if (formatVersion < kVersion) {
-      streamId.set(0);
-      gainHAL.set(0);
+      streamId = 0;
+      gainHAL = 0;
     }
   }
 
-  LittleEndian<int32_t> streamId;
-  LittleEndian<uint32_t> gainHAL;
+  int32_t streamId{};
+  uint32_t gainHAL{};
 };
 
 struct VRSDataV4 : VRSDataV3 {
@@ -94,11 +93,11 @@ struct VRSDataV4 : VRSDataV3 {
   void upgradeFrom(uint32_t formatVersion) {
     if (formatVersion < kVersion) {
       VRSDataV3::upgradeFrom(formatVersion);
-      exposureDuration.set(0);
+      exposureDuration = 0;
     }
   }
 
-  LittleEndian<double> exposureDuration;
+  double exposureDuration{};
 };
 
 constexpr float kGainMultiplierConvertor = 16.0;
@@ -109,11 +108,11 @@ struct VRSDataV5 : VRSDataV4 {
   void upgradeFrom(uint32_t formatVersion) {
     if (formatVersion < kVersion) {
       VRSDataV4::upgradeFrom(formatVersion);
-      gain.set(gainHAL.get() / kGainMultiplierConvertor);
+      gain = gainHAL / kGainMultiplierConvertor;
     }
   }
 
-  LittleEndian<float> gain;
+  float gain{};
 };
 
 struct VRSData : VRSDataV5 {
@@ -140,23 +139,23 @@ struct VRSData : VRSDataV5 {
   void upgradeFrom(uint32_t formatVersion) {
     if (formatVersion < kVersion) {
       VRSDataV5::upgradeFrom(formatVersion);
-      temperature.set(-1.0);
+      temperature = -1.0;
     }
   }
 
-  LittleEndian<float> temperature;
+  float temperature{};
 };
 
 struct VRSConfiguration {
   VRSConfiguration() = default;
 
-  LittleEndian<uint32_t> width;
-  LittleEndian<uint32_t> height;
-  LittleEndian<uint32_t> bytesPerPixels;
-  LittleEndian<uint32_t> format;
-  LittleEndian<uint32_t> cameraId;
-  LittleEndian<uint16_t> cameraSerial;
-  LittleEndian<float> calibration[kCalibrationDataSize];
+  uint32_t width{};
+  uint32_t height{};
+  uint32_t bytesPerPixels{};
+  uint32_t format{};
+  uint32_t cameraId{};
+  uint16_t cameraSerial{};
+  float calibration[kCalibrationDataSize]{};
 };
 
 #pragma pack(pop)
@@ -327,18 +326,18 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
     if (configurationCount_ % 2 == 0) {
       // VRS 1.0 style record creation
       SantaCruzCamera::VRSConfiguration vrsConfig;
-      vrsConfig.width.set(640 + configurationCount_);
-      vrsConfig.height.set(480 + configurationCount_);
-      vrsConfig.bytesPerPixels.set(1);
-      vrsConfig.format.set(1);
-      vrsConfig.cameraId.set(123456);
-      vrsConfig.cameraSerial.set(11);
-      vrsConfig.calibration[0].set(1);
-      vrsConfig.calibration[1].set(2);
-      vrsConfig.calibration[2].set(3);
-      vrsConfig.calibration[3].set(4);
-      vrsConfig.calibration[4].set(5);
-      vrsConfig.calibration[5].set(6);
+      vrsConfig.width = 640 + configurationCount_;
+      vrsConfig.height = 480 + configurationCount_;
+      vrsConfig.bytesPerPixels = 1;
+      vrsConfig.format = 1;
+      vrsConfig.cameraId = 123456;
+      vrsConfig.cameraSerial = 11;
+      vrsConfig.calibration[0] = 1;
+      vrsConfig.calibration[1] = 2;
+      vrsConfig.calibration[2] = 3;
+      vrsConfig.calibration[3] = 4;
+      vrsConfig.calibration[4] = 5;
+      vrsConfig.calibration[5] = 6;
       return createRecord(
           kTime + fixedImageCount_ - 0.1,
           Record::Type::CONFIGURATION,
@@ -377,10 +376,10 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
     if (fixedImageCount_ % 2 == 0) {
       // VRS 1.0 style record creation
       SantaCruzCamera::VRSDataV2 data;
-      data.captureTimestamp.set(0.5 * fixedImageCount_);
-      data.arrivalTimestamp.set(kTime + 0.1 * fixedImageCount_);
-      data.frameCounter.set(fixedImageCount_);
-      data.cameraUniqueId.set(123456 + fixedImageCount_);
+      data.captureTimestamp = 0.5 * fixedImageCount_;
+      data.arrivalTimestamp = kTime + 0.1 * fixedImageCount_;
+      data.frameCounter = fixedImageCount_;
+      data.cameraUniqueId = 123456 + fixedImageCount_;
       createRecord(
           kTime + fixedImageCount_++,
           Record::Type::DATA,
