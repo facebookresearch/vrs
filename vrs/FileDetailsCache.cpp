@@ -49,11 +49,11 @@ struct DiskStreamId {
   explicit DiskStreamId(StreamId id)
       : typeId(static_cast<uint16_t>(id.getTypeId())), instanceId(id.getInstanceId()) {}
 
-  FileFormat::LittleEndian<uint16_t> typeId;
-  FileFormat::LittleEndian<uint16_t> instanceId;
+  uint16_t typeId;
+  uint16_t instanceId;
 
   RecordableTypeId getTypeId() const {
-    return static_cast<RecordableTypeId>(typeId());
+    return static_cast<RecordableTypeId>(typeId);
   }
 
   uint16_t getInstanceId() const {
@@ -74,13 +74,13 @@ struct DiskRecordInfo {
         streamId(record.streamId),
         recordType(static_cast<uint8_t>(record.recordType)) {}
 
-  FileFormat::LittleEndian<double> timestamp;
-  FileFormat::LittleEndian<int64_t> recordOffset;
+  double timestamp{};
+  int64_t recordOffset{};
   DiskStreamId streamId;
-  FileFormat::LittleEndian<uint8_t> recordType;
+  uint8_t recordType{};
 
   Record::Type getRecordType() const {
-    return static_cast<Record::Type>(recordType());
+    return static_cast<Record::Type>(recordType);
   }
 
   StreamId getStreamId() const {
@@ -176,8 +176,8 @@ int readIndexData(
     set<StreamId>& outStreamIds,
     vector<IndexRecord::RecordInfo>& outIndex,
     size_t indexSize) {
-  FileFormat::LittleEndian<uint32_t> recordableCount;
-  FileFormat::LittleEndian<uint32_t> diskIndexSize;
+  uint32_t recordableCount{};
+  uint32_t diskIndexSize{};
   if (!XR_VERIFY(indexSize >= sizeof(recordableCount))) {
     return FAILURE;
   }
