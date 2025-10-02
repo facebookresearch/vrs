@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['magicheader1_0',['magicHeader1',['../structvrs_1_1_file_format_1_1_file_header.html#a504e7470a5bd84919148b55e32dce4ec',1,'vrs::FileFormat::FileHeader']]],
-  ['magicheader2_1',['magicHeader2',['../structvrs_1_1_file_format_1_1_file_header.html#a0d5f02da01fafd72a0459239bc7daa85',1,'vrs::FileFormat::FileHeader']]],
-  ['magicheader3_2',['magicHeader3',['../structvrs_1_1_file_format_1_1_file_header.html#a296e4b71d574fcefba5d52738c32f743',1,'vrs::FileFormat::FileHeader']]],
+  ['magicheader1_0',['magicHeader1',['../structvrs_1_1_file_format_1_1_file_header.html#a5b92ed589ddfac528643b8906ed60929',1,'vrs::FileFormat::FileHeader']]],
+  ['magicheader2_1',['magicHeader2',['../structvrs_1_1_file_format_1_1_file_header.html#a520849eb42d0e467e63adeceb02964aa',1,'vrs::FileFormat::FileHeader']]],
+  ['magicheader3_2',['magicHeader3',['../structvrs_1_1_file_format_1_1_file_header.html#add91b78dd3192780a3faa2b3886d3b45',1,'vrs::FileFormat::FileHeader']]],
   ['magnetometerrecordableclass_3',['MagnetometerRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5ac541be7a0ac36d13795ab1a0752e2721',1,'vrs']]],
   ['make_4',['make',['../classvrs_1_1_write_file_handler.html#ad3182545fe0003b80eabd95e20edbc40',1,'vrs::WriteFileHandler']]],
   ['makefilecache_5',['makeFileCache',['../classvrs_1_1_file_cache.html#ada9643b298fe348672b1133cf7513ca0',1,'vrs::FileCache']]],

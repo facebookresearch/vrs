@@ -14,7 +14,7 @@ var searchData=
   ['in_20this_20folder_11',['in this folder',['../md_vrs_2_read_me.html',1,'What is in this folder?'],['../md_sample__code_2_read_me.html',1,'What is in this folder?'],['../md_sample__apps_2_read_me.html',1,'What is in this folder?']]],
   ['index_12',['index',['../structvrs_1_1_json_format_profile_spec.html#ae44dddd1e2bc079d8dded1ad13ef6194',1,'vrs::JsonFormatProfileSpec']]],
   ['indexentry_13',['IndexEntry',['../classvrs_1_1_data_layout_1_1_index_entry.html',1,'vrs::DataLayout']]],
-  ['indexrecordoffset_14',['indexRecordOffset',['../structvrs_1_1_file_format_1_1_file_header.html#aaca900f3ea693347b13d7d9071cddf98',1,'vrs::FileFormat::FileHeader']]],
+  ['indexrecordoffset_14',['indexRecordOffset',['../structvrs_1_1_file_format_1_1_file_header.html#ac71eb6f0d3fd3f9212fb025780a46a9f',1,'vrs::FileFormat::FileHeader']]],
   ['init_15',['init',['../structvrs_1_1_file_format_1_1_file_header.html#a72fac16a473a2de9034d74c313d8982e',1,'vrs::FileFormat::FileHeader::init()'],['../classvrs_1_1_record_reader.html#a5d29dedbcc6b0b61f57ba90099827359',1,'vrs::RecordReader::init()'],['../structvrs_1_1_file_format_1_1_file_header.html#ad879b005b0c9b9eb153fc359de08ee96',1,'vrs::FileFormat::FileHeader::init()']]],
   ['initcreatedthreadcallback_16',['InitCreatedThreadCallback',['../namespacevrs.html#a142c4b247fe86fb372c27f77d46e96b4',1,'vrs']]],
   ['initdatapiecestodefaultvalue_17',['initDataPiecesToDefaultValue',['../classvrs_1_1_data_layout.html#a561f1f664ed47811b3e2198cb5fffa12',1,'vrs::DataLayout']]],

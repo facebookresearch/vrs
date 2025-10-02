@@ -52,7 +52,7 @@ var searchData=
   ['delegateopen_49',['delegateopen',['../classvrs_1_1_file_handler_factory.html#a8cc1b86d81f9a65dd1fc6a9caeaaa1e7',1,'vrs::FileHandlerFactory::delegateOpen()'],['../classvrs_1_1_file_delegator.html#a20ed43d0540c28802acdec6c33001cc6',1,'vrs::FileDelegator::delegateOpen()'],['../classvrs_1_1_file_handler.html#a29c9ecdcaec465eded60d96890b23670',1,'vrs::FileHandler::delegateOpen()']]],
   ['depth32f_50',['DEPTH32F',['../namespacevrs.html#a0fbbb88591f21313dd46736fba5a7aa5a19f22a1cbc2e2733484acbf9fc1bb4cd',1,'vrs']]],
   ['depthcamerarecordableclass_51',['DepthCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a519f9fba435216fcd1f0bd8abbd03b48',1,'vrs']]],
-  ['descriptionrecordoffset_52',['descriptionRecordOffset',['../structvrs_1_1_file_format_1_1_file_header.html#a92fa19d34229048dab7bea743e7d7ec9',1,'vrs::FileFormat::FileHeader']]],
+  ['descriptionrecordoffset_52',['descriptionRecordOffset',['../structvrs_1_1_file_format_1_1_file_header.html#a9e869e076f5fddd7ae44308f137a13bb',1,'vrs::FileFormat::FileHeader']]],
   ['diagnosticrecordableclass_53',['DiagnosticRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a9fb0d260894af0faff2e4ea087e51763',1,'vrs']]],
   ['directwriterecorddata_54',['DirectWriteRecordData',['../classvrs_1_1_direct_write_record_data.html',1,'vrs']]],
   ['disablefilecache_55',['disableFileCache',['../classvrs_1_1_file_cache.html#a1fd3bb879d9a325e53ba07d680eb9476',1,'vrs::FileCache']]],
