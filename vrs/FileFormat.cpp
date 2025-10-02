@@ -188,17 +188,12 @@ void RecordHeader::initDescriptionHeader(
   this->timestamp = Record::kMaxTimestamp;
 }
 
-template <typename ENUM, class LITTLEENDIAN>
-bool littleEndianIsValid_cast(LITTLEENDIAN& littleEndian) {
-  return enumIsValid_cast<ENUM>(littleEndian());
-}
-
 bool RecordHeader::isSanityCheckOk() const {
   if (!XR_VERIFY(recordSize >= sizeof(RecordHeader)) ||
       !XR_VERIFY(previousRecordSize == 0 || previousRecordSize >= sizeof(RecordHeader))) {
     return false;
   }
-  if (!XR_VERIFY(littleEndianIsValid_cast<Record::Type>(recordType))) {
+  if (!XR_VERIFY(enumIsValid_cast<Record::Type>(recordType))) {
     return false;
   }
   uint32_t uncompressedPayload = uncompressedSize; // doesn't include header already
@@ -213,7 +208,7 @@ bool RecordHeader::isSanityCheckOk() const {
         return false;
       }
     }
-    if (!XR_VERIFY(littleEndianIsValid_cast<CompressionType>(compressionType))) {
+    if (!XR_VERIFY(enumIsValid_cast<CompressionType>(compressionType))) {
       return false;
     }
   }

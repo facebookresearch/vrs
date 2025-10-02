@@ -388,22 +388,25 @@ int IndexRecord::Reader::readClassicIndexRecord(
     index_.reserve(recordStructs.size());
     int64_t fileOffset = firstUserRecordOffset;
     for (auto record : recordStructs) {
+      double timestamp = record.timestamp;
+      Record::Type recordType = record.getRecordType();
+      uint32_t recordSize = record.recordSize;
+      StreamId streamId = record.getStreamId();
       if (!isValid(record.getRecordType())) {
         XR_LOGE(
             "Unexpected index record entry: Stream Id: {} Type: {} Size: {} Timestamp: {}",
-            record.getStreamId().getNumericName(),
-            toString(record.getRecordType()),
-            record.recordSize,
-            record.timestamp);
+            streamId.getNumericName(),
+            toString(recordType),
+            recordSize,
+            timestamp);
         return INDEX_RECORD_ERROR;
       }
-      int64_t nextFileOffset = fileOffset + record.recordSize;
+      int64_t nextFileOffset = fileOffset + recordSize;
       if (nextFileOffset > totalFileSize_) {
         droppedRecordCount_ = static_cast<int32_t>(recordStructs.size() - index_.size());
         break; // The file is too short, and this record goes beyond the end...
       }
-      index_.emplace_back(
-          record.timestamp, fileOffset, record.getStreamId(), record.getRecordType());
+      index_.emplace_back(timestamp, fileOffset, streamId, recordType);
       if (index_.size() > 1 && index_.back() < index_[index_.size() - 2]) {
         sortErrorCount_++;
       }
@@ -536,28 +539,29 @@ int IndexRecord::Reader::readSplitIndexRecord(
   index_.reserve(recordStructs.size());
   const uint32_t recordHeaderSize = fileHeader_.recordHeaderSize;
   for (const DiskRecordInfo& record : recordStructs) {
+    double timestamp = record.timestamp;
+    StreamId streamId = record.getStreamId();
+    uint32_t recordSize = record.recordSize;
     Record::Type recordType = record.getRecordType();
-    if (record.recordSize < recordHeaderSize || !isValid(recordType)) {
+    if (recordSize < recordHeaderSize || !isValid(recordType)) {
       XR_LOGE(
           "Unexpected index record entry: Stream Id: {} Type: {} Size: {} Timestamp: {}",
-          record.getStreamId().getNumericName(),
+          streamId.getNumericName(),
           toString(recordType),
-          record.recordSize,
-          record.timestamp);
+          recordSize,
+          timestamp);
       return INDEX_RECORD_ERROR;
     }
-    int64_t followingRecordOffset = outUsedFileSize + record.recordSize;
+    int64_t followingRecordOffset = outUsedFileSize + recordSize;
     if (droppedRecordCount_ > 0 || followingRecordOffset > totalFileSize_) {
       droppedRecordCount_++;
     } else {
-      double timestamp = record.timestamp;
-      StreamId streamId = record.getStreamId();
       index_.emplace_back(timestamp, outUsedFileSize, streamId, recordType);
       if (index_.size() > 1 && index_.back() < index_[index_.size() - 2]) {
         sortErrorCount_++;
       }
       if (diskIndex_) {
-        diskIndex_->emplace_back(timestamp, record.recordSize, streamId, recordType);
+        diskIndex_->emplace_back(timestamp, recordSize, streamId, recordType);
       }
       streamIds_.insert(streamId);
       outUsedFileSize = followingRecordOffset;
@@ -731,17 +735,17 @@ int IndexRecord::Reader::rebuildIndex(bool writeFixedIndex) {
     if (recordableTypeId != RecordableTypeId::VRSIndex &&
         recordableTypeId != RecordableTypeId::VRSDescription) {
       // We read/skipped that record: it's "good", as far as we can tell. Add it to the index!
+      double timestamp = recordHeader->timestamp;
       StreamId streamId{recordHeader->getStreamId()};
       Record::Type recordType = recordHeader->getRecordType();
       if (isValid(recordType)) {
         streamIds_.insert(streamId);
-        index_.emplace_back(recordHeader->timestamp, absolutePosition, streamId, recordType);
+        index_.emplace_back(timestamp, absolutePosition, streamId, recordType);
         if (index_.size() > 1 && index_.back() < index_[index_.size() - 2]) {
           sortErrorCount_++;
         }
         if (diskIndex_) {
-          diskIndex_->emplace_back(
-              recordHeader->timestamp, recordHeader->recordSize, streamId, recordType);
+          diskIndex_->emplace_back(timestamp, recordSize, streamId, recordType);
         }
       } else {
         // We're probably in the weeds already

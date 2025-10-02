@@ -56,48 +56,23 @@ namespace vrs {
 namespace FileFormat {
 #pragma pack(push, 1)
 
-/// \brief Placeholder layer for endianness support, if we ever need it.
-///
-/// All it currently does is enforce that we read & write native types through get & set methods.
-template <class T>
-class LittleEndian final {
- public:
-  LittleEndian() = default;
-  explicit LittleEndian(T value) : value_{value} {}
-
-  inline T operator()() const {
-    return value_;
-  }
-  inline operator T() const {
-    return value_;
-  }
-
-  inline LittleEndian& operator=(T value) {
-    value_ = value;
-    return *this;
-  }
-
- private:
-  T value_{};
-};
-
 /// Every file starts with this header, which may grow but not shrink!
 struct FileHeader {
-  LittleEndian<uint32_t> magicHeader1; ///< magic value #1
-  LittleEndian<uint32_t> magicHeader2; ///< magic value #2
-  LittleEndian<uint64_t> creationId; ///< A timestamp, hopefully unique, to match files (future).
-  LittleEndian<uint32_t> fileHeaderSize; ///< This header size, in bytes.
-  LittleEndian<uint32_t> recordHeaderSize; ///< Record headers' size, in bytes (same for all).
-  LittleEndian<int64_t> indexRecordOffset; ///< Index record offset in the whole file.
-  LittleEndian<int64_t> descriptionRecordOffset; ///< Description record offset in the whole file.
-  LittleEndian<int64_t>
-      firstUserRecordOffset; ///< Offset of the first user record in the file. If 0, the first
-                             ///< record is just after the description record (original behavior)
-  LittleEndian<uint64_t> future2; ///< For future use
-  LittleEndian<uint64_t> future3; ///< For future use
-  LittleEndian<uint64_t> future4; ///< For future use
-  LittleEndian<uint32_t> magicHeader3; ///< magic value #3
-  LittleEndian<uint32_t> fileFormatVersion; ///< file format version.
+  uint32_t magicHeader1{}; ///< magic value #1
+  uint32_t magicHeader2{}; ///< magic value #2
+  uint64_t creationId{}; ///< A timestamp, hopefully unique, to match files (future).
+  uint32_t fileHeaderSize{}; ///< This header size, in bytes.
+  uint32_t recordHeaderSize{}; ///< Record headers' size, in bytes (same for all).
+  int64_t indexRecordOffset{}; ///< Index record offset in the whole file.
+  int64_t descriptionRecordOffset{}; ///< Description record offset in the whole file.
+  int64_t
+      firstUserRecordOffset{}; ///< Offset of the first user record in the file. If 0, the first
+                               ///< record is just after the description record (original behavior)
+  uint64_t future2{}; ///< For future use
+  uint64_t future3{}; ///< For future use
+  uint64_t future4{}; ///< For future use
+  uint32_t magicHeader3{}; ///< magic value #3
+  uint32_t fileFormatVersion{}; ///< file format version.
 
   /// Initialize the structure's fixed values with default values for a regular VRS file.
   void init();
@@ -144,16 +119,15 @@ struct RecordHeader {
       uint32_t previousRecordSize,
       uint32_t recordSize,
       uint32_t uncompressedSize);
-  LittleEndian<uint32_t> recordSize; ///< byte count to the next record, header + data
-  LittleEndian<uint32_t> previousRecordSize; ///< byte count to the previous record, header + data
-  LittleEndian<int32_t> recordableTypeId; ///< record handler type id
-  LittleEndian<uint32_t> formatVersion; ///< data format version, as declared by the data producer
-  LittleEndian<double> timestamp; ///< record presentation time stamp
-  LittleEndian<uint16_t> recordableInstanceId; ///< record handle instance id
-  LittleEndian<uint8_t> recordType; ///< See Record::Type
-  LittleEndian<uint8_t> compressionType; ///< compression used, or 0 for none
-  LittleEndian<uint32_t>
-      uncompressedSize; ///< uncompressed payload size without header. 0 if not compressed.
+  uint32_t recordSize{}; ///< byte count to the next record, header + data
+  uint32_t previousRecordSize{}; ///< byte count to the previous record, header + data
+  int32_t recordableTypeId{}; ///< record handler type id
+  uint32_t formatVersion{}; ///< data format version, as declared by the data producer
+  double timestamp{}; ///< record presentation time stamp
+  uint16_t recordableInstanceId{}; ///< record handle instance id
+  uint8_t recordType{}; ///< See Record::Type
+  uint8_t compressionType{}; ///< compression used, or 0 for none
+  uint32_t uncompressedSize{}; ///< uncompressed payload size without header. 0 if not compressed.
 
   /// Set the record's type.
   /// @param type: Type of the record, as an enum.
@@ -164,7 +138,7 @@ struct RecordHeader {
   /// Get the record type, as an enum.
   /// @return The record type.
   inline Record::Type getRecordType() const {
-    return static_cast<Record::Type>(recordType());
+    return static_cast<Record::Type>(recordType);
   }
 
   /// Set the recordable type id for this record.
@@ -188,7 +162,7 @@ struct RecordHeader {
   /// Get the compression type used when writing the payload of this record.
   /// @return Compression type.
   inline CompressionType getCompressionType() const {
-    return static_cast<CompressionType>(compressionType());
+    return static_cast<CompressionType>(compressionType);
   }
 
   /// Set the compression type used when writing the payload of this record.
