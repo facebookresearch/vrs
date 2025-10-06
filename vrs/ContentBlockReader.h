@@ -74,7 +74,7 @@ class ImageBlockReader : public ContentBlockReader {
   ImageBlockReader(const RecordFormat& recordFormat, size_t blockIndex)
       : ContentBlockReader(recordFormat, blockIndex) {}
 
-  bool readBlock(const CurrentRecord&, RecordFormatStreamPlayer&) override;
+  bool readBlock(const CurrentRecord& /*unused*/, RecordFormatStreamPlayer& /*unused*/) override;
 
  protected:
   bool
@@ -91,7 +91,7 @@ class AudioBlockReader : public ContentBlockReader {
   AudioBlockReader(const RecordFormat& recordFormat, size_t blockIndex)
       : ContentBlockReader(recordFormat, blockIndex) {}
 
-  bool readBlock(const CurrentRecord&, RecordFormatStreamPlayer&) override;
+  bool readBlock(const CurrentRecord& /*unused*/, RecordFormatStreamPlayer& /*unused*/) override;
 
  protected:
   bool readAudioContentBlock(const CurrentRecord&, RecordFormatStreamPlayer&, const ContentBlock&);
@@ -119,7 +119,7 @@ class CustomBlockReader : public ContentBlockReader {
   CustomBlockReader(const RecordFormat& recordFormat, size_t blockIndex)
       : ContentBlockReader(recordFormat, blockIndex) {}
 
-  bool readBlock(const CurrentRecord&, RecordFormatStreamPlayer&) override;
+  bool readBlock(const CurrentRecord& /*unused*/, RecordFormatStreamPlayer& /*unused*/) override;
 };
 
 /// \brief Specialized version of ContentBlockReader to handle data that could not be handled by
@@ -130,7 +130,7 @@ class UnsupportedBlockReader : public ContentBlockReader {
   UnsupportedBlockReader(const RecordFormat& recordFormat, size_t blockIndex)
       : ContentBlockReader(recordFormat, blockIndex) {}
 
-  bool readBlock(const CurrentRecord&, RecordFormatStreamPlayer&) override;
+  bool readBlock(const CurrentRecord& /*unused*/, RecordFormatStreamPlayer& /*unused*/) override;
 };
 
 /// \brief Specialized version of ContentBlockReader to handle an empty content block.
@@ -143,7 +143,7 @@ class EmptyBlockReader : public ContentBlockReader {
   EmptyBlockReader(const RecordFormat& recordFormat, size_t blockIndex)
       : ContentBlockReader(recordFormat, blockIndex) {}
 
-  bool readBlock(const CurrentRecord&, RecordFormatStreamPlayer&) override;
+  bool readBlock(const CurrentRecord& /*unused*/, RecordFormatStreamPlayer& /*unused*/) override;
 };
 
 /// \brief Specialized version of ContentBlockReader to handle DataLayout blocks.
@@ -156,7 +156,7 @@ class DataLayoutBlockReader : public ContentBlockReader {
       unique_ptr<DataLayout>&& blockLayout)
       : ContentBlockReader(recordFormat, blockIndex), blockLayout_{std::move(blockLayout)} {}
 
-  bool readBlock(const CurrentRecord&, RecordFormatStreamPlayer&) override;
+  bool readBlock(const CurrentRecord& /*unused*/, RecordFormatStreamPlayer& /*unused*/) override;
 
   /// Convenience methods to map a desired layout to the block's layout, if we have one.
   /// @param desiredLayout Layout to map to the block's layout.
