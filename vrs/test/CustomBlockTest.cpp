@@ -70,6 +70,15 @@ struct CustomBlob {
   vector<uint8_t> blob;
 };
 
+// Datalayout for configuration records (optional in practice)
+class ConfigurationDataLayout : public AutoDataLayout {
+ public:
+  DataPieceString customBlockThriftSpec{"thrift_spec"};
+  DataPieceString calibration{"some_calibration_json"};
+
+  AutoDataLayoutEnd endLayout;
+};
+
 // Datalayout giving specs of both an image block and a custom block size
 // Attention! The custom block must be immediately after the metadata block
 class ImageAndCustomBlockMetadata : public AutoDataLayout {
@@ -139,12 +148,13 @@ class DataRecordDataSource : public DataSource {
 class CustomStreams : public Recordable {
  public:
   CustomStreams() : Recordable(RecordableTypeId::UnitTest1) {
-    // Record with 1 custom content block, which size is determined using the size of the record
+    // Record with 1 datalayout + 1 custom content block,
+    // which size is determined using the size left in the record
     addRecordFormat(
         Record::Type::CONFIGURATION,
         kConfigurationVersion,
-        CustomContentBlock("thrift:definition:imu_payload"), // Single custom block, no size needed
-        {});
+        configDataLayout_.getContentBlock() + CustomContentBlock("thrift:definition:imu_payload"),
+        {&configDataLayout_});
     // Record with a datalayout containing the next content block's size and the spec of an image,
     // then a custom block size (which size was in the datalayout just before -- no choice),
     // then an image which spec (and size) were described in the datalayout,
@@ -172,12 +182,14 @@ class CustomStreams : public Recordable {
   }
 
   const Record* createConfigurationRecord() override {
+    configDataLayout_.customBlockThriftSpec.stage("my thrift spec");
+    configDataLayout_.calibration.stage("my calibration");
     CustomBlob config(kConfigCustomBlockSize0);
     return createRecord(
         kStartTimestamp,
         Record::Type::CONFIGURATION,
         kConfigurationVersion,
-        DataSource(config.blob));
+        DataSource(configDataLayout_, config.blob));
   }
 
   const Record* createStateRecord() override {
@@ -214,6 +226,7 @@ class CustomStreams : public Recordable {
   }
 
  private:
+  ConfigurationDataLayout configDataLayout_;
   ImageAndCustomBlockMetadata imageAndCustomBlockMetadata_;
   CustomBlockSizeMetadata customBlockSizeMetadata_;
   CustomBlockSizeMetadata customBlockSizeMetadata2_;
@@ -223,8 +236,10 @@ class CustomStreamPlayer : public RecordFormatStreamPlayer {
  public:
   bool onDataLayoutRead(const CurrentRecord& record, size_t blockIndex, DataLayout& dl) override {
     if (record.recordType == Record::Type::CONFIGURATION) {
-      GTEST_NONFATAL_FAILURE_("No datalayout expected for config records");
-      return false;
+      ConfigurationDataLayout& data = getExpectedLayout<ConfigurationDataLayout>(dl, blockIndex);
+      EXPECT_STREQ(data.customBlockThriftSpec.get().c_str(), "my thrift spec");
+      EXPECT_STREQ(data.calibration.get().c_str(), "my calibration");
+      return true;
     } else if (record.recordType == Record::Type::STATE) {
       EXPECT_EQ(blockIndex, 0);
       ImageAndCustomBlockMetadata& data =
@@ -263,7 +278,7 @@ class CustomStreamPlayer : public RecordFormatStreamPlayer {
     EXPECT_EQ(record.reader->read(customData), 0);
     CustomBlob::checkData(customData);
     if (record.recordType == Record::Type::CONFIGURATION) {
-      EXPECT_EQ(blockIndex, 0);
+      EXPECT_EQ(blockIndex, 1);
       configCustom0Count++;
       EXPECT_EQ(contentBlock.getCustomContentBlockFormat(), "thrift:definition:imu_payload");
     } else if (record.recordType == Record::Type::STATE) {
