@@ -129,19 +129,17 @@ PixelFormat getPixelFormatFromName(const char* pixelFormatName) {
       sizeof(pixelFormatArray) / sizeof(pixelFormatArray[0]) == int(PixelFormat::COUNT) - 1,
       "Array size does not match enum size");
 
-  static const std::unordered_map<const char*, PixelFormat> pixelFormatMap(
-      std::begin(pixelFormatArray), std::end(pixelFormatArray));
-
   if (pixelFormatName == nullptr) {
     return PixelFormat::UNKNOWN;
   }
 
-  auto it = pixelFormatMap.find(pixelFormatName);
-  if (it != pixelFormatMap.end()) {
-    return it->second;
-  } else {
-    return PixelFormat::UNKNOWN;
+  for (const auto& pair : pixelFormatArray) {
+    if (std::strcmp(pixelFormatName, pair.first) == 0) {
+      return pair.second;
+    }
   }
+
+  return PixelFormat::UNKNOWN;
 }
 
 int getNumPlanes(xprs::PixelFormat pixelFmt) {
