@@ -17,6 +17,7 @@
 #pragma once
 
 #include <deque>
+#include <map>
 #include <memory>
 
 #include <vrs/Compressor.h>
@@ -74,6 +75,9 @@ struct CopyOptions {
   bool mergeStreams = false;
   // Control if the index record should be pre-allocated early in the file (good for streaming).
   bool preallocateIndex = true;
+
+  // Additional optional parameters, eg for when RecordFilterCopier objects are created.
+  map<string, string> miscParams;
 
   // Count the number of records copied. Set during the copy/merge operation.
   mutable uint32_t outRecordCopiedCount = 0;
