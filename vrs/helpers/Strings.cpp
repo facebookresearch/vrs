@@ -16,6 +16,7 @@
 
 #include "Strings.h"
 
+#include <charconv>
 #include <climits>
 #include <cmath>
 #include <cstring>
@@ -308,11 +309,10 @@ bool getBool(const map<string, string>& m, const string& field, bool& outValue) 
 bool getInt(const map<string, string>& m, const string& field, int& outValue) {
   const auto iter = m.find(field);
   if (iter != m.end() && !iter->second.empty()) {
-    try {
-      outValue = stoi(iter->second);
+    const char* strEnd = iter->second.c_str() + iter->second.length();
+    auto result = from_chars(iter->second.c_str(), strEnd, outValue);
+    if (result.ec == errc{} && result.ptr == strEnd) {
       return true;
-    } catch (logic_error&) {
-      /* do nothing */
     }
   }
   return false;
@@ -321,11 +321,10 @@ bool getInt(const map<string, string>& m, const string& field, int& outValue) {
 bool getInt64(const map<string, string>& m, const string& field, int64_t& outValue) {
   const auto iter = m.find(field);
   if (iter != m.end() && !iter->second.empty()) {
-    try {
-      outValue = stoll(iter->second);
+    const char* strEnd = iter->second.c_str() + iter->second.length();
+    auto result = from_chars(iter->second.c_str(), strEnd, outValue);
+    if (result.ec == errc{} && result.ptr == strEnd) {
       return true;
-    } catch (logic_error&) {
-      /* do nothing */
     }
   }
   return false;
@@ -359,18 +358,13 @@ bool getDouble(const map<string, string>& m, const string& field, double& outVal
 }
 
 bool readUInt32(const char*& str, uint32_t& outValue) {
-  char* newStr = nullptr;
-  errno = 0;
-  long long int readInt = strtoll(str, &newStr, 10);
-  if (readInt < 0 || (readInt == LLONG_MAX && errno == ERANGE) ||
-      readInt > numeric_limits<uint32_t>::max() || str == newStr) {
-    return false;
+  auto result = from_chars(str, str + strlen(str), outValue);
+  if (result.ec == errc{} && result.ptr > str) {
+    str = result.ptr;
+    return true;
   }
 
-  outValue = static_cast<uint32_t>(readInt);
-
-  str = newStr;
-  return true;
+  return false;
 }
 
 inline char safetolower(char c) {
@@ -387,8 +381,15 @@ bool readByteSize(const string& strSize, uint64_t& outByteSize) {
     outByteSize = 0;
     return false;
   }
-  char* next = nullptr;
-  outByteSize = std::strtoull(strSize.c_str(), &next, 10);
+
+  auto result = from_chars(strSize.c_str(), strSize.c_str() + strSize.length(), outByteSize);
+  if (result.ec != errc{}) {
+    outByteSize = 0;
+    return false;
+  }
+
+  const char* next = result.ptr;
+
   if (*next == 0) {
     return true;
   }
@@ -460,9 +461,9 @@ size_t split(
 
 bool readUInt64(const std::string& str, uint64_t& outValue) {
   if (!str.empty() && safeisdigit(str.front())) {
-    char* next = nullptr;
-    outValue = std::strtoull(str.c_str(), &next, 10);
-    if (*next == 0 && (outValue != ULLONG_MAX || errno == 0)) {
+    const char* strEnd = str.c_str() + str.length();
+    auto result = from_chars(str.c_str(), strEnd, outValue);
+    if (result.ec == errc{} && result.ptr == strEnd) {
       return true;
     }
   }
