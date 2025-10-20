@@ -46,17 +46,35 @@ class ZeroFilter : public RecordFilterCopier {
     verbatimCopy_[tupleId] = verbatimCopy;
     return verbatimCopy;
   }
-  void filterImage(const CurrentRecord&, size_t, const ContentBlock&, vector<uint8_t>& pixels)
-      override {
-    if (!pixels.empty()) {
-      memset(pixels.data(), 0, pixels.size());
-    }
+
+  bool onImageRead(const CurrentRecord& rec, size_t idx, const ContentBlock& cb) override {
+    return handleImageOrAudio(rec, idx, cb);
   }
-  void filterAudio(const CurrentRecord&, size_t, const ContentBlock&, vector<uint8_t>& audioSamples)
-      override {
-    if (!audioSamples.empty()) {
-      memset(audioSamples.data(), 0, audioSamples.size());
+
+  bool onAudioRead(const CurrentRecord& rec, size_t idx, const ContentBlock& cb) override {
+    return handleImageOrAudio(rec, idx, cb);
+  }
+
+  bool handleImageOrAudio(const CurrentRecord& rec, size_t idx, const ContentBlock& cb) {
+    size_t blockSize = cb.getBlockSize();
+    if (blockSize == ContentBlock::kSizeUnknown) {
+      return onUnsupportedBlock(rec, idx, cb);
     }
+    if (blockSize == rec.reader->getUnreadBytes()) {
+      // This is the last content block: we can avoid reading/decoding it
+      unique_ptr<ContentBlockChunk> chunk =
+          make_unique<ContentBlockChunk>(cb, vector<uint8_t>(blockSize));
+      chunks_.emplace_back(std::move(chunk));
+      return false;
+    }
+    // very rare in practice: we need to read the data, so we can read what's after it
+    unique_ptr<ContentBlockChunk> chunk = make_unique<ContentBlockChunk>(cb, rec);
+    auto& buffer = chunk->getBuffer();
+    if (!buffer.empty()) {
+      memset(buffer.data(), 0, buffer.size());
+    }
+    chunks_.emplace_back(std::move(chunk));
+    return true;
   }
 
  protected:
