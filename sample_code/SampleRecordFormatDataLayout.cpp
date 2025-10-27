@@ -32,6 +32,8 @@ namespace vrs_sample_code {
 
 using datalayout_conventions::ImageSpecType;
 
+namespace {
+
 /*
  * This sample code demonstrates the use of the RecordFormat & DataLayout.
  * For sample code showing how to setup a RecordFileReader or a RecordFileWriter,
@@ -243,5 +245,7 @@ class MyCameraStreamPlayer : public RecordFormatStreamPlayer {
     return true; // read next blocks, if any
   }
 };
+
+} // namespace
 
 } // namespace vrs_sample_code
