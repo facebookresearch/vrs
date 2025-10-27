@@ -87,8 +87,8 @@ static void error_exit(j_common_ptr cinfo) {
 
 bool PixelFrame::readJpegFrame(const vector<uint8_t>& jpegBuf, bool decodePixels) {
   // setup libjpeg
-  struct jpeg_decompress_struct cinfo {};
-  struct jpeg_error_mgr jerr {};
+  struct jpeg_decompress_struct cinfo{};
+  struct jpeg_error_mgr jerr{};
   cinfo.err = jpeg_std_error(&jerr);
   jerr.error_exit = error_exit;
   jpeg_create_decompress(&cinfo);
@@ -103,8 +103,8 @@ bool PixelFrame::readJpegFrameFromFile(const std::string& path, bool decodePixel
   }
 
   // setup libjpeg
-  struct jpeg_decompress_struct cinfo {};
-  struct jpeg_error_mgr jerr {};
+  struct jpeg_decompress_struct cinfo{};
+  struct jpeg_error_mgr jerr{};
   cinfo.err = jpeg_std_error(&jerr);
   jerr.error_exit = error_exit;
   jpeg_create_decompress(&cinfo);

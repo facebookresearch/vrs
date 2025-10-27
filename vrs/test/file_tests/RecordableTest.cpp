@@ -469,11 +469,12 @@ class RecordableTest : public Recordable, StreamPlayer {
     vector<Thread_param> threadParams;
     for (uint32_t threadIndex = 0; threadIndex < kThreadCount; threadIndex++) {
       counters[threadIndex] = 0;
-      threadParams.push_back(Thread_param{
-          &fileWriter,
-          threadIndex,
-          counters + threadIndex,
-          counters + ((threadIndex + 1) % kThreadCount)});
+      threadParams.push_back(
+          Thread_param{
+              &fileWriter,
+              threadIndex,
+              counters + threadIndex,
+              counters + ((threadIndex + 1) % kThreadCount)});
     }
     vector<thread> threads;
     for (uint32_t threadIndex = 0; threadIndex < kThreadCount; threadIndex++) {

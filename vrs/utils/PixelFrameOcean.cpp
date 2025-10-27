@@ -154,15 +154,16 @@ bool PixelFrame::msssimCompare(const PixelFrame& other, double& msssim) {
       !XR_VERIFY(getWidth() == other.getWidth()) || !XR_VERIFY(getHeight() == other.getHeight())) {
     return false;
   }
-  return XR_VERIFY(Ocean::CV::ImageQuality::multiScaleStructuralSimilarity8BitPerChannel(
-      rdata(),
-      other.rdata(),
-      getWidth(),
-      getHeight(),
-      getChannelCountPerPixel(),
-      getStride() - getDefaultStride(),
-      other.getStride() - other.getDefaultStride(),
-      msssim));
+  return XR_VERIFY(
+      Ocean::CV::ImageQuality::multiScaleStructuralSimilarity8BitPerChannel(
+          rdata(),
+          other.rdata(),
+          getWidth(),
+          getHeight(),
+          getChannelCountPerPixel(),
+          getStride() - getDefaultStride(),
+          other.getStride() - other.getDefaultStride(),
+          msssim));
 }
 
 bool PixelFrame::normalizeToPixelFormatWithOcean(

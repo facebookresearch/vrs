@@ -989,8 +989,14 @@ static bool printSegColors(
         PixelFrame::RGBColor c = colors[color];
         if (classSegmentation) {
           const char* className = PixelFrame::getSegmentationClassName(color);
-          line.append(fmt::format(
-              "{:>3} \x1b[48;2;{};{};{}m      \x1b[0m {:<25}", color, c.r, c.g, c.b, className));
+          line.append(
+              fmt::format(
+                  "{:>3} \x1b[48;2;{};{};{}m      \x1b[0m {:<25}",
+                  color,
+                  c.r,
+                  c.g,
+                  c.b,
+                  className));
         } else {
           line.append(fmt::format("\x1b[48;2;{};{};{}m      \x1b[0m {:<7}", c.r, c.g, c.b, color));
         }

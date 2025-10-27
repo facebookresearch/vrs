@@ -242,9 +242,10 @@ class AudioStream : public Recordable {
       // Use blocks of different sizes, to exercise the system!
       uint32_t variation = 0;
       while (sampleCount_ < ipAudioData_.sampleCount) {
-        createDataRecords(min<uint32_t>(
-            fullRecordSize_ + (style_ == LayoutStyle::OpusStereo ? 0 : variation++),
-            ipAudioData_.sampleCount - sampleCount_));
+        createDataRecords(
+            min<uint32_t>(
+                fullRecordSize_ + (style_ == LayoutStyle::OpusStereo ? 0 : variation++),
+                ipAudioData_.sampleCount - sampleCount_));
       }
     }
   }

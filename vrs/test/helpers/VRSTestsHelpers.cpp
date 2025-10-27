@@ -278,15 +278,16 @@ int threadedCreateRecords(CreateParams& p) {
       fileWriter.addRecordable(camera);
       fileWriter.setTag(p.getCameraStreamTag(cameraIndex), camera->getSerialNumber());
       counters[cameraIndex] = 0;
-      threadParams.push_back(ThreadParam{
-          fileWriter,
-          *cameras[cameraIndex],
-          os::getTimestampSec(),
-          counters[cameraIndex],
-          counters[(cameraIndex + 1) % kCameraCount],
-          fatalError,
-          p.fileConfig,
-          (p.testOptions & TestOptions::REALTIME) != 0});
+      threadParams.push_back(
+          ThreadParam{
+              fileWriter,
+              *cameras[cameraIndex],
+              os::getTimestampSec(),
+              counters[cameraIndex],
+              counters[(cameraIndex + 1) % kCameraCount],
+              fatalError,
+              p.fileConfig,
+              (p.testOptions & TestOptions::REALTIME) != 0});
     }
   }
   fileWriter.setCompressionThreadPoolSize(p.fileWriterThreadCount);

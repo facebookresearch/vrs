@@ -306,14 +306,15 @@ void PlayerUI::resizeToDefault() {
   window()->setMaximumSize(fullSize);
   // resize to default size & center on the current screen
   window()->resize(fullSize * kDefaultScreenOccupationRatio);
-  window()->setGeometry(QStyle::alignedRect(
-      Qt::LeftToRight,
-      Qt::AlignCenter,
-      window()->size(),
+  window()->setGeometry(
+      QStyle::alignedRect(
+          Qt::LeftToRight,
+          Qt::AlignCenter,
+          window()->size(),
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
-      qApp->desktop()->availableGeometry(window())));
+          qApp->desktop()->availableGeometry(window())));
 #else
-      screen()->geometry()));
+          screen()->geometry()));
 #endif
 }
 

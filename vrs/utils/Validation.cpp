@@ -798,8 +798,9 @@ bool compareVRSfiles(
   for (const auto& iter : idMap) {
     holders.emplace_back(make_unique<RecordHolder>());
     second.reader.setStreamPlayer(iter.second, holders.back().get());
-    checkers.emplace_back(make_unique<RecordMaster>(
-        diffCounter, noError, iter.second, second.reader, holders.back().get()));
+    checkers.emplace_back(
+        make_unique<RecordMaster>(
+            diffCounter, noError, iter.second, second.reader, holders.back().get()));
     first.reader.setStreamPlayer(iter.first, checkers.back().get());
   }
   size_t decodedCount = 0;

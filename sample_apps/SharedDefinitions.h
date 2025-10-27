@@ -83,8 +83,7 @@ constexpr const char* kAudioStreamFlavor = "sample/audio";
 constexpr const char* kMotionStreamFlavor = "sample/motion";
 
 // Some arbitrary definitions to play with
-#define CALIBRATION_VALUES \
-  { 23, 53, 343, 3, 12, 8 }
+#define CALIBRATION_VALUES {23, 53, 343, 3, 12, 8}
 constexpr double kMotionValue = 25;
 
 } // namespace vrs_sample_apps

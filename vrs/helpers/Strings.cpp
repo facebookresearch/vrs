@@ -258,7 +258,7 @@ string humanReadableTimestamp(double seconds, uint8_t precision) {
 string humanReadableDateTime(double secondsSinceEpoch) {
   string date(std::size("YYYY-MM-DD HH:MM:SS"), 0);
   time_t creationTimeSec = static_cast<time_t>(secondsSinceEpoch);
-  struct tm ltm {};
+  struct tm ltm{};
 #if IS_WINDOWS_PLATFORM()
   localtime_s(&ltm, &creationTimeSec); // because "Windows"
 #else

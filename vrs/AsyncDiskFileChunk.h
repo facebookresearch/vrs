@@ -175,7 +175,7 @@ class AsyncBuffer : public AlignedBuffer {
   AsyncOVERLAPPED ov_;
   static void CompletedWriteRoutine(DWORD dwErr, DWORD cbBytesWritten, LPOVERLAPPED lpOverlapped);
 #else
-  struct aiocb aiocb_ {};
+  struct aiocb aiocb_{};
   static void SigEvNotifyFunction(union sigval val);
 #endif
   complete_write_callback on_complete_ = nullptr;

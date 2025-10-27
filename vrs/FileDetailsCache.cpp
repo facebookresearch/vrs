@@ -289,8 +289,9 @@ int read(
   }
   IF_ERROR_LOG_AND_RETURN(file.setPos(descriptionOffset));
   uint32_t descriptionSize = 0;
-  IF_ERROR_LOG_AND_RETURN(DescriptionRecord::readDescriptionRecord(
-      file, fileHeader.recordHeaderSize, descriptionSize, outStreamTags, outFileTags));
+  IF_ERROR_LOG_AND_RETURN(
+      DescriptionRecord::readDescriptionRecord(
+          file, fileHeader.recordHeaderSize, descriptionSize, outStreamTags, outFileTags));
   if (!XR_VERIFY(descriptionOffset + descriptionSize == indexRecordOffset)) {
     return FAILURE;
   }

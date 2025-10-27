@@ -57,8 +57,9 @@ void RecordFormatStreamPlayer::onAttachedToFileReader(RecordFileReader& fileRead
 bool RecordFormatStreamPlayer::processRecordHeader(
     const CurrentRecord& record,
     DataReference& ref) {
-  const auto& decoders = readers_.find(tuple<StreamId, Record::Type, uint32_t>(
-      record.streamId, record.recordType, record.formatVersion));
+  const auto& decoders = readers_.find(
+      tuple<StreamId, Record::Type, uint32_t>(
+          record.streamId, record.recordType, record.formatVersion));
   if (decoders == readers_.end() || decoders->second.recordFormat.getUsedBlocksCount() == 0) {
     if (record.recordSize > 0) {
       XR_LOGE(

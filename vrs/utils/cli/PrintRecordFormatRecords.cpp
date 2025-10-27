@@ -35,8 +35,9 @@ class DataLayoutPrinter : public RecordFormatStreamPlayer {
     if (printing_) {
       recordCount_++;
       if (printoutType_ == PrintoutType::Compact || printoutType_ == PrintoutType::Details) {
-        const auto& decoder = readers_.find(tuple<StreamId, Record::Type, uint32_t>(
-            record.streamId, record.recordType, record.formatVersion));
+        const auto& decoder = readers_.find(
+            tuple<StreamId, Record::Type, uint32_t>(
+                record.streamId, record.recordType, record.formatVersion));
         string recordFormat;
         if (decoder != readers_.end()) {
           recordFormat = decoder->second.recordFormat.asString();

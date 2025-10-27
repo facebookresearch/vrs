@@ -80,11 +80,12 @@ bool AudioTrackExtractor::onAudioRead(
         audioBlockSpec.getSampleFrameStride(),
         audioBlockSpec.getSampleRate());
     if (wavFile_.isOpened()) {
-      return stop(fmt::format(
-          "Audio format changed from {} to {} at time {}",
-          fileAudioSpec_.asString(),
-          rawSpec.asString(),
-          humanReadableTimestamp(record.timestamp)));
+      return stop(
+          fmt::format(
+              "Audio format changed from {} to {} at time {}",
+              fileAudioSpec_.asString(),
+              rawSpec.asString(),
+              humanReadableTimestamp(record.timestamp)));
     }
     int status = AudioExtractor::createWavFile(wavFilePath_, audioBlockSpec, wavFile_);
     if (status != 0) {
@@ -126,18 +127,20 @@ bool AudioTrackExtractor::onAudioRead(
   audio_.resize(audioBlock.getBlockSize());
   int status = record.reader->read(audio_);
   if (status != 0) {
-    return stop(fmt::format(
-        "Can't read record at {}: {}",
-        humanReadableTimestamp(record.timestamp),
-        errorCodeToMessage(status)));
+    return stop(
+        fmt::format(
+            "Can't read record at {}: {}",
+            humanReadableTimestamp(record.timestamp),
+            errorCodeToMessage(status)));
   }
 
   status = AudioExtractor::writeWavAudioData(wavFile_, audioBlockSpec, audio_);
   if (status != 0) {
-    return stop(fmt::format(
-        "Can't write to wav file at {}: {}",
-        humanReadableTimestamp(record.timestamp),
-        errorCodeToMessage(status)));
+    return stop(
+        fmt::format(
+            "Can't write to wav file at {}: {}",
+            humanReadableTimestamp(record.timestamp),
+            errorCodeToMessage(status)));
   }
 
   return !stop_;

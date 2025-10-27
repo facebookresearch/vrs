@@ -178,13 +178,14 @@ class VXDecoder : public vrs::utils::DecoderI {
       Frame sourceFrame(sourceFrameType, conversionBuffer_.data(), Frame::CM_USE_KEEP_LAYOUT);
       const FrameType targetFrameType(w, h, FrameType::FORMAT_RGB24, FrameType::ORIGIN_UPPER_LEFT);
       Frame targetFrame(targetFrameType, outDecodedFrame, Frame::CM_USE_KEEP_LAYOUT);
-      XR_VERIFY(CV::FrameConverter::Comfort::convert(
-          sourceFrame,
-          targetFrameType.pixelFormat(),
-          targetFrameType.pixelOrigin(),
-          targetFrame,
-          CV::FrameConverter::CP_ALWAYS_COPY,
-          getWorkers(w * h)));
+      XR_VERIFY(
+          CV::FrameConverter::Comfort::convert(
+              sourceFrame,
+              targetFrameType.pixelFormat(),
+              targetFrameType.pixelOrigin(),
+              targetFrame,
+              CV::FrameConverter::CP_ALWAYS_COPY,
+              getWorkers(w * h)));
       XR_VERIFY(!targetFrame.isPlaneOwner()); // Beware of Ocean's backstabbing behaviors!
     } else if (frame.fmt == xprs::PixelFormat::YUV420P && vrsPixelFormat == PixelFormat::RGB8) {
       const uint32_t w = outputImageSpec.getWidth();
@@ -204,13 +205,14 @@ class VXDecoder : public vrs::utils::DecoderI {
       Frame sourceFrame(sourceFrameType, sourcePlaneInitializers);
       const FrameType targetFrameType(w, h, FrameType::FORMAT_RGB24, FrameType::ORIGIN_UPPER_LEFT);
       Frame targetFrame(targetFrameType, outDecodedFrame, Frame::CM_USE_KEEP_LAYOUT);
-      XR_VERIFY(CV::FrameConverter::Comfort::convert(
-          sourceFrame,
-          targetFrameType.pixelFormat(),
-          targetFrameType.pixelOrigin(),
-          targetFrame,
-          CV::FrameConverter::CP_ALWAYS_COPY,
-          getWorkers(w * h)));
+      XR_VERIFY(
+          CV::FrameConverter::Comfort::convert(
+              sourceFrame,
+              targetFrameType.pixelFormat(),
+              targetFrameType.pixelOrigin(),
+              targetFrame,
+              CV::FrameConverter::CP_ALWAYS_COPY,
+              getWorkers(w * h)));
       XR_VERIFY(!targetFrame.isPlaneOwner()); // Beware of Ocean's backstabbing behaviors!
     } else if (
         frame.fmt == xprs::PixelFormat::NV12 && vrsPixelFormat == PixelFormat::YUV_I420_SPLIT) {
@@ -242,13 +244,14 @@ class VXDecoder : public vrs::utils::DecoderI {
           {vPlane, Frame::CM_USE_KEEP_LAYOUT, uvStride - outputImageSpec.getDefaultStride2()},
       };
       Frame targetFrame(targetFrameType, targetPlaneInitializers);
-      XR_VERIFY(CV::FrameConverter::Comfort::convert(
-          sourceFrame,
-          targetFrameType.pixelFormat(),
-          targetFrameType.pixelOrigin(),
-          targetFrame,
-          CV::FrameConverter::CP_ALWAYS_COPY,
-          getWorkers(w * h)));
+      XR_VERIFY(
+          CV::FrameConverter::Comfort::convert(
+              sourceFrame,
+              targetFrameType.pixelFormat(),
+              targetFrameType.pixelOrigin(),
+              targetFrame,
+              CV::FrameConverter::CP_ALWAYS_COPY,
+              getWorkers(w * h)));
       if (targetFrame.isPlaneOwner()) {
         memcpy(yPlane, targetFrame.data<void>(0), w * h);
         memcpy(uPlane, targetFrame.data<void>(1), uvSize);
@@ -294,13 +297,14 @@ class VXDecoder : public vrs::utils::DecoderI {
       Frame sourceFrame(sourceFrameType, srcPlaneInitializers);
       const FrameType targetFrameType(w, h, FrameType::FORMAT_RGB24, FrameType::ORIGIN_UPPER_LEFT);
       Frame targetFrame(targetFrameType, outDecodedFrame, Frame::CM_USE_KEEP_LAYOUT);
-      XR_VERIFY(CV::FrameConverter::Comfort::convert(
-          sourceFrame,
-          targetFrameType.pixelFormat(),
-          targetFrameType.pixelOrigin(),
-          targetFrame,
-          CV::FrameConverter::CP_ALWAYS_COPY,
-          getWorkers(w * h)));
+      XR_VERIFY(
+          CV::FrameConverter::Comfort::convert(
+              sourceFrame,
+              targetFrameType.pixelFormat(),
+              targetFrameType.pixelOrigin(),
+              targetFrame,
+              CV::FrameConverter::CP_ALWAYS_COPY,
+              getWorkers(w * h)));
       XR_VERIFY(!targetFrame.isPlaneOwner()); // Beware of Ocean's backstabbing behaviors!
     } else {
       uint32_t planeCount = outputImageSpec.getPlaneCount();
