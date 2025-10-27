@@ -11,7 +11,7 @@ var searchData=
   ['makeopen_8',['makeOpen',['../classvrs_1_1_file_handler.html#add6171cbf9bdf447b5d83554caa28953',1,'vrs::FileHandler']]],
   ['makerbundle_9',['MakerBundle',['../structvrs_1_1_data_piece_1_1_maker_bundle.html',1,'vrs::DataPiece']]],
   ['maketagset_10',['makeTagSet',['../namespacevrs_1_1tag__conventions.html#a10efe48b49b0cccf675fc6db2b7db2e2',1,'vrs::tag_conventions']]],
-  ['manualdatalayout_11',['manualdatalayout',['../classvrs_1_1_manual_data_layout.html#af41c635ff5854aa462eed1641f9d4cc2',1,'vrs::ManualDataLayout::ManualDataLayout(const string &amp;json)'],['../classvrs_1_1_manual_data_layout.html#ab8c25b6a67093747d75492b73ce8f618',1,'vrs::ManualDataLayout::ManualDataLayout()'],['../classvrs_1_1_manual_data_layout.html#a024707731ba68a5d945f7b0a32f66923',1,'vrs::ManualDataLayout::ManualDataLayout(const DataLayout &amp;layout)'],['../classvrs_1_1_manual_data_layout.html',1,'vrs::ManualDataLayout']]],
+  ['manualdatalayout_11',['manualdatalayout',['../classvrs_1_1_manual_data_layout.html',1,'vrs::ManualDataLayout'],['../classvrs_1_1_manual_data_layout.html#a024707731ba68a5d945f7b0a32f66923',1,'vrs::ManualDataLayout::ManualDataLayout(const DataLayout &amp;layout)'],['../classvrs_1_1_manual_data_layout.html#ab8c25b6a67093747d75492b73ce8f618',1,'vrs::ManualDataLayout::ManualDataLayout()'],['../classvrs_1_1_manual_data_layout.html#af41c635ff5854aa462eed1641f9d4cc2',1,'vrs::ManualDataLayout::ManualDataLayout(const string &amp;json)']]],
   ['maplayout_12',['mapLayout',['../classvrs_1_1_data_layout.html#ad4518e893adf3740ca410f599423ba94',1,'vrs::DataLayout']]],
   ['mappeddatalayout_5f_13',['mappedDataLayout_',['../classvrs_1_1_data_layout.html#af07462306150f59648155162db10c7bb',1,'vrs::DataLayout']]],
   ['maprecordableclass_14',['MapRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a86e4083da740085253230c31545ba4ac',1,'vrs']]],
@@ -39,10 +39,5 @@ var searchData=
   ['mouserecordableclass_36',['MouseRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a163618e879ed2730013bfa67fb28cc03',1,'vrs']]],
   ['mouthcamerarecordableclass_37',['MouthCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a24c75ba495c9cea9e2a0c7fbfcc820cb',1,'vrs']]],
   ['mu_5flaw_38',['MU_LAW',['../namespacevrs.html#a52303127bf307e1191fcb9b2ee2841d4ac977d3bb3090c7c7a6dfebc95d84fc5e',1,'vrs']]],
-  ['multirecordfilereader_39',['MultiRecordFileReader',['../classvrs_1_1_multi_record_file_reader.html',1,'vrs']]],
-  ['mycameradatalayoutconfiguration_40',['MyCameraDataLayoutConfiguration',['../classvrs__sample__code_1_1_my_camera_data_layout_configuration.html',1,'vrs_sample_code']]],
-  ['mycameradatalayoutdata_41',['MyCameraDataLayoutData',['../classvrs__sample__code_1_1_my_camera_data_layout_data.html',1,'vrs_sample_code']]],
-  ['mycameradatalayoutlegacydata_42',['MyCameraDataLayoutLegacyData',['../classvrs__sample__code_1_1_my_camera_data_layout_legacy_data.html',1,'vrs_sample_code']]],
-  ['mycamerarecordable_43',['MyCameraRecordable',['../classvrs__sample__code_1_1_my_camera_recordable.html',1,'vrs_sample_code']]],
-  ['mycamerastreamplayer_44',['MyCameraStreamPlayer',['../classvrs__sample__code_1_1_my_camera_stream_player.html',1,'vrs_sample_code']]]
+  ['multirecordfilereader_39',['MultiRecordFileReader',['../classvrs_1_1_multi_record_file_reader.html',1,'vrs']]]
 ];

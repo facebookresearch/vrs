@@ -90,15 +90,6 @@ $(function() {
  <a href="classvrs_1_1_recordable.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_recordable_8h_source.html">Recordable.h</a>&gt;</code></p>
-<div class="dynheader">
-Inheritance diagram for vrs::Recordable:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="classvrs_1_1_recordable.png" usemap="#vrs::Recordable_map" alt=""/>
-  <map id="vrs::Recordable_map" name="vrs::Recordable_map">
-<area href="classvrs__sample__code_1_1_my_camera_recordable.html" title="Class to generate a stream of sample records." alt="vrs_sample_code::MyCameraRecordable" shape="rect" coords="0,56,244,80"/>
-  </map>
-</div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public Types</h2></td></tr>
@@ -368,8 +359,6 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>RecordFileWriter</b>
 </div><div class="memdoc">
 <p>Configuration records describe how the device recorded is configured/setup. The configuration of a recordable is probably not changed by data flowing through. A framerate, a resolution, are probably part of the configuration. An exposure setting as well, unless it is automatically adjusted as data flows through. The <a class="el" href="classvrs_1_1_record_file_writer.html" title="The class to create VRS files.">RecordFileWriter</a> will call this method to make sure a configuration record is captured, when a record file is created asynchronously. </p>
 
-<p>Implemented in <a class="el" href="classvrs__sample__code_1_1_my_camera_recordable.html#adc772d673632e2c823cee2754c7a1224">vrs_sample_code::MyCameraRecordable</a>.</p>
-
 </div>
 </div>
 <a id="a091810514fe0eef740fdff4f9a82b749" name="a091810514fe0eef740fdff4f9a82b749"></a>
@@ -459,8 +448,6 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>RecordFileWriter</b>
 </div><div class="memdoc">
 <p>State records describe the internal state of the device, if it's stateful. It is probably the result of previous calculation/processing of data.</p>
 <p>State records should not to be confused with the configuration of the device. A position tracking algorithm probably has a state: the last position it determined, which will be used to calculate the next state when the next data come in. State data typically changes as data flows, according to that data. A camera probably has no state, but probably has a configuration. The <a class="el" href="classvrs_1_1_record_file_writer.html" title="The class to create VRS files.">RecordFileWriter</a> will call this method to make sure a configuration record is captured, when a record file is created asynchronously. </p>
-
-<p>Implemented in <a class="el" href="classvrs__sample__code_1_1_my_camera_recordable.html#a302ccaab585ecb270f830de8372dfc86">vrs_sample_code::MyCameraRecordable</a>.</p>
 
 </div>
 </div>
