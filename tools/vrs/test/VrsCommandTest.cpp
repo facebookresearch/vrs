@@ -20,10 +20,9 @@
 #include <gtest/gtest.h>
 
 #include <TestDataDir/TestDataDir.h>
+#include <vrs/VrsCommand.h>
 #include <vrs/os/Utils.h>
 #include <vrs/utils/RecordFileInfo.h>
-
-#include <vrs/VrsCommand.h>
 
 using namespace std;
 using namespace vrs;
