@@ -22,10 +22,10 @@
 #include <mutex>
 #include <utility>
 
-#include "DataSource.h"
-#include "ForwardDefinitions.h"
-#include "RecordManager.h"
-#include "StreamId.h"
+#include <vrs/DataSource.h>
+#include <vrs/ForwardDefinitions.h>
+#include <vrs/RecordManager.h>
+#include <vrs/StreamId.h>
 
 namespace vrs {
 

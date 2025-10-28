@@ -20,8 +20,8 @@
 #include <string>
 #include <vector>
 
-#include "ForwardDefinitions.h"
-#include "WriteFileHandler.h"
+#include <vrs/ForwardDefinitions.h>
+#include <vrs/WriteFileHandler.h>
 
 namespace vrs {
 

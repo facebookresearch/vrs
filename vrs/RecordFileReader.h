@@ -24,14 +24,14 @@
 #include <thread>
 #include <vector>
 
-#include "FileFormat.h"
-#include "FileHandler.h"
-#include "IndexRecord.h"
-#include "Record.h"
-#include "RecordFormat.h"
-#include "RecordReaders.h"
-#include "Recordable.h"
-#include "StreamId.h"
+#include <vrs/FileFormat.h>
+#include <vrs/FileHandler.h>
+#include <vrs/IndexRecord.h>
+#include <vrs/Record.h>
+#include <vrs/RecordFormat.h>
+#include <vrs/RecordReaders.h>
+#include <vrs/Recordable.h>
+#include <vrs/StreamId.h>
 
 namespace vrs {
 

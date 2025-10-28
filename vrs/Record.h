@@ -19,10 +19,9 @@
 #include <memory>
 #include <vector>
 
+#include <vrs/ForwardDefinitions.h>
+#include <vrs/StreamId.h>
 #include <vrs/helpers/EnumTemplates.hpp>
-
-#include "ForwardDefinitions.h"
-#include "StreamId.h"
 
 namespace vrs {
 

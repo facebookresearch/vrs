@@ -16,10 +16,10 @@
 
 #pragma once
 
-#include "DataLayout.h"
-#include "DataPieces.h"
-#include "ForwardDefinitions.h"
-#include "RecordFormat.h"
+#include <vrs/DataLayout.h>
+#include <vrs/DataPieces.h>
+#include <vrs/ForwardDefinitions.h>
+#include <vrs/RecordFormat.h>
 
 namespace vrs {
 

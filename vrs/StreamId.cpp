@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "StreamId.h"
+#include <vrs/StreamId.h>
 
 #include <string>
 #include <unordered_map>
@@ -166,7 +166,7 @@ const unordered_map<RecordableTypeId, const char*>& getRecordableTypeIdRegistry(
   /// Recordable Class Ids -- end
 
 #if IS_VRS_FB_INTERNAL()
-#include "StreamId_fb.h"
+#include <vrs/StreamId_fb.h>
 #endif
 
       // Pretend devices for testing

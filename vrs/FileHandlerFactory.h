@@ -21,7 +21,7 @@
 #include <mutex>
 #include <string>
 
-#include "ForwardDefinitions.h"
+#include <vrs/ForwardDefinitions.h>
 
 namespace vrs {
 

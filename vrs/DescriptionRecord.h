@@ -19,8 +19,8 @@
 #include <map>
 #include <string>
 
-#include "ForwardDefinitions.h"
-#include "WriteFileHandler.h"
+#include <vrs/ForwardDefinitions.h>
+#include <vrs/WriteFileHandler.h>
 
 namespace vrs {
 

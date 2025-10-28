@@ -24,7 +24,7 @@
 #include <string>
 #include <vector>
 
-#include "ForwardDefinitions.h"
+#include <vrs/ForwardDefinitions.h>
 
 namespace vrs {
 

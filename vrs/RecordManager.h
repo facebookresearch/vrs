@@ -20,8 +20,8 @@
 #include <memory>
 #include <mutex>
 
-#include "ForwardDefinitions.h"
-#include "Record.h"
+#include <vrs/ForwardDefinitions.h>
+#include <vrs/Record.h>
 
 namespace vrs {
 

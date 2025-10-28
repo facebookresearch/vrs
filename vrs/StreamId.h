@@ -200,7 +200,7 @@ enum class RecordableTypeId : uint16_t {
   SlamMagnetometerData = 1203, ///< Legacy magnetometer data stream.
 
 #if IS_VRS_FB_INTERNAL()
-#include "StreamId_fb.h"
+#include <vrs/StreamId_fb.h>
 #endif
 
   // Test devices start at 65500.

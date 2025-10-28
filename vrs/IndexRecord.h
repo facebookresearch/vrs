@@ -19,12 +19,12 @@
 #include <deque>
 #include <set>
 
-#include "Compressor.h"
-#include "DiskFile.h"
-#include "FileFormat.h"
-#include "ForwardDefinitions.h"
-#include "NewChunkHandler.h"
-#include "Record.h"
+#include <vrs/Compressor.h>
+#include <vrs/DiskFile.h>
+#include <vrs/FileFormat.h>
+#include <vrs/ForwardDefinitions.h>
+#include <vrs/NewChunkHandler.h>
+#include <vrs/Record.h>
 
 namespace vrs {
 
