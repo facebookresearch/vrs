@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "RecordFileInfo.h"
+#include <vrs/utils/RecordFileInfo.h>
 
 #include <iomanip>
 #include <sstream>

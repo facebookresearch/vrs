@@ -18,7 +18,7 @@
 
 #include <mutex>
 
-#include "RecordFormat.h"
+#include <vrs/RecordFormat.h>
 
 namespace vrs {
 

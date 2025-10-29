@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "DataExtractor.h"
+#include <vrs/utils/DataExtractor.h>
 
 #include <utility>
 
@@ -28,9 +28,8 @@
 #include <vrs/helpers/Rapidjson.hpp>
 #include <vrs/helpers/Throttler.h>
 #include <vrs/os/Utils.h>
-
-#include "PixelFrame.h"
-#include "RecordFileInfo.h"
+#include <vrs/utils/PixelFrame.h>
+#include <vrs/utils/RecordFileInfo.h>
 
 const char* kReadMeContent =
 #include "DataExtractorReadMe.hpp"

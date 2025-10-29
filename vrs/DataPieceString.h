@@ -20,7 +20,7 @@
 #define DATA_PIECES_STRING_H
 
 #ifndef DATA_PIECES_H
-#include "DataPieces.h"
+#include <vrs/DataPieces.h>
 #endif
 
 namespace vrs {

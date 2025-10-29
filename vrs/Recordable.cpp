@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-#include "Recordable.h"
+#include <vrs/Recordable.h>
 
 #define DEFAULT_LOG_CHANNEL "Recordable"
 #include <logging/Checks.h>
 #include <logging/Log.h>
 
+#include <vrs/DataLayout.h>
+#include <vrs/RecordFormat.h>
 #include <vrs/os/System.h>
-
-#include "DataLayout.h"
-#include "RecordFormat.h"
 
 using namespace std;
 

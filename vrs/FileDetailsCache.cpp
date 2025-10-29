@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-#include "FileDetailsCache.h"
+#include <vrs/FileDetailsCache.h>
 
 #define DEFAULT_LOG_CHANNEL "FileDetailsCache"
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/Compressor.h>
+#include <vrs/Decompressor.h>
+#include <vrs/DescriptionRecord.h>
+#include <vrs/DiskFile.h>
+#include <vrs/ErrorCode.h>
+#include <vrs/FileFormat.h>
+#include <vrs/IndexRecord.h>
+#include <vrs/Recordable.h>
 #include <vrs/helpers/FileMacros.h>
-
-#include "Compressor.h"
-#include "Decompressor.h"
-#include "DescriptionRecord.h"
-#include "DiskFile.h"
-#include "ErrorCode.h"
-#include "FileFormat.h"
-#include "IndexRecord.h"
-#include "Recordable.h"
 
 namespace vrs {
 namespace FileDetailsCache {

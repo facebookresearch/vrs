@@ -18,8 +18,8 @@
 
 #include <limits>
 
-#include "DataLayout.h"
-#include "RecordFormatStreamPlayer.h"
+#include <vrs/DataLayout.h>
+#include <vrs/RecordFormatStreamPlayer.h>
 
 namespace vrs {
 

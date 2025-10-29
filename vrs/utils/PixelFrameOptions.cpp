@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-#include "PixelFrameOptions.h"
+#include <vrs/utils/PixelFrameOptions.h>
 
 #include <cmath>
 
 #include <ocean/base/Frame.h>
 #include <ocean/cv/FrameInterpolator.h>
 
-#include "PixelFrame.h"
-#include "PixelFrameOcean.h"
+#include <vrs/utils/PixelFrame.h>
+#include <vrs/utils/PixelFrameOcean.h>
 
 namespace {
 

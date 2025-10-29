@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-#include "FileHandler.h"
+#include <vrs/FileHandler.h>
 
 #define DEFAULT_LOG_CHANNEL "FileHandler"
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/DiskFile.h>
+#include <vrs/ErrorCode.h>
+#include <vrs/FileHandlerFactory.h>
 #include <vrs/helpers/EnumStringConverter.h>
 #include <vrs/helpers/Rapidjson.hpp>
 #include <vrs/helpers/Strings.h>
 #include <vrs/os/Utils.h>
 #include <vrs/utils/xxhash/xxhash.h>
-
-#include "DiskFile.h"
-#include "ErrorCode.h"
-#include "FileHandlerFactory.h"
 
 using namespace std;
 

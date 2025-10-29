@@ -19,12 +19,11 @@
 #include <cerrno>
 #include <cstdio>
 
+#include <vrs/ErrorCode.h>
+#include <vrs/FileHandler.h>
 #include <vrs/helpers/Strings.h>
 #include <vrs/os/CompilerAttributes.h>
 #include <vrs/os/Utils.h>
-
-#include "ErrorCode.h"
-#include "FileHandler.h"
 
 namespace vrs {
 

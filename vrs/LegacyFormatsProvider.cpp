@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-#include "LegacyFormatsProvider.h"
+#include <vrs/LegacyFormatsProvider.h>
 
 #define DEFAULT_LOG_CHANNEL "LegacyFormatsProvider"
 #include <logging/Log.h>
 
-#include "DataLayout.h"
-#include "DataPieces.h"
+#include <vrs/DataLayout.h>
+#include <vrs/DataPieces.h>
 
 using namespace std;
 

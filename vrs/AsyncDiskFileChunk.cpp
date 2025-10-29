@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "AsyncDiskFileChunk.h"
+#include <vrs/AsyncDiskFileChunk.h>
 
 #if VRS_ASYNC_DISKFILE_SUPPORTED()
 

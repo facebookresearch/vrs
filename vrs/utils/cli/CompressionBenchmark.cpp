@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "CompressionBenchmark.h"
+#include <vrs/utils/cli/CompressionBenchmark.h>
 
 #include <iomanip>
 #include <iostream>

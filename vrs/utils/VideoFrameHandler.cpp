@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "VideoFrameHandler.h"
+#include <vrs/utils/VideoFrameHandler.h>
 
 #define DEFAULT_LOG_CHANNEL "VideoFrameHandler"
 #include <logging/Log.h>
@@ -22,8 +22,7 @@
 #include <vrs/ErrorCode.h>
 #include <vrs/RecordFileReader.h>
 #include <vrs/helpers/FileMacros.h>
-
-#include "PixelFrame.h"
+#include <vrs/utils/PixelFrame.h>
 
 using namespace std;
 

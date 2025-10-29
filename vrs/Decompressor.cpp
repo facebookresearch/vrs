@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "Decompressor.h"
+#include <vrs/Decompressor.h>
 
 #include <cstring>
 
@@ -28,12 +28,11 @@
 #include <logging/Checks.h>
 #include <logging/Log.h>
 
+#include <vrs/ErrorCode.h>
+#include <vrs/FileHandler.h>
+#include <vrs/Record.h>
 #include <vrs/helpers/FileMacros.h>
 #include <vrs/helpers/Throttler.h>
-
-#include "ErrorCode.h"
-#include "FileHandler.h"
-#include "Record.h"
 
 using namespace std;
 

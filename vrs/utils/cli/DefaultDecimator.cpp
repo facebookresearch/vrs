@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "DefaultDecimator.h"
+#include <vrs/utils/cli/DefaultDecimator.h>
 
 #include <cmath>
 

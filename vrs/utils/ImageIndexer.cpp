@@ -27,7 +27,7 @@
 #include <vrs/utils/PixelFrame.h>
 #include <vrs/utils/VideoRecordFormatStreamPlayer.h>
 
-#include "ImageIndexer.h"
+#include <vrs/utils/ImageIndexer.h>
 
 using namespace std;
 using namespace vrs;

@@ -16,10 +16,9 @@
 
 #pragma once
 
+#include <vrs/ErrorCode.h>
+#include <vrs/FileHandler.h>
 #include <vrs/os/CompilerAttributes.h>
-
-#include "ErrorCode.h"
-#include "FileHandler.h"
 
 namespace vrs {
 

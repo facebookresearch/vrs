@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "IndexRecord.h"
+#include <vrs/IndexRecord.h>
 
 #include <algorithm>
 #include <array>
@@ -24,15 +24,14 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/Compressor.h>
+#include <vrs/Decompressor.h>
+#include <vrs/ErrorCode.h>
+#include <vrs/FileHandler.h>
+#include <vrs/ProgressLogger.h>
 #include <vrs/helpers/FileMacros.h>
 #include <vrs/os/CompilerAttributes.h>
 #include <vrs/os/Time.h>
-
-#include "Compressor.h"
-#include "Decompressor.h"
-#include "ErrorCode.h"
-#include "FileHandler.h"
-#include "ProgressLogger.h"
 
 namespace {
 using namespace std;

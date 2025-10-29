@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "AudioBlock.h"
+#include <vrs/utils/AudioBlock.h>
 
 #ifdef OPUS_IS_AVAILABLE
 extern "C" {

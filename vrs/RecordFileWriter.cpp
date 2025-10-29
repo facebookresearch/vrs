@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "RecordFileWriter.h"
+#include <vrs/RecordFileWriter.h>
 
 #include <algorithm>
 #include <functional>
@@ -26,18 +26,17 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/DescriptionRecord.h>
+#include <vrs/ErrorCode.h>
+#include <vrs/FileFormat.h>
+#include <vrs/FileHandlerFactory.h>
+#include <vrs/IndexRecord.h>
+#include <vrs/Recordable.h>
+#include <vrs/TagsRecord.h>
 #include <vrs/helpers/JobQueue.h>
 #include <vrs/os/Event.h>
 #include <vrs/os/Time.h>
 #include <vrs/os/Utils.h>
-
-#include "DescriptionRecord.h"
-#include "ErrorCode.h"
-#include "FileFormat.h"
-#include "FileHandlerFactory.h"
-#include "IndexRecord.h"
-#include "Recordable.h"
-#include "TagsRecord.h"
 
 using namespace std;
 

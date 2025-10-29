@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#include "RecordFormatStreamPlayer.h"
+#include <vrs/RecordFormatStreamPlayer.h>
 
-#include "RecordFileReader.h"
+#include <vrs/RecordFileReader.h>
 
 #define DEFAULT_LOG_CHANNEL "RecordFormatStreamPlayer"
 #include <logging/Log.h>

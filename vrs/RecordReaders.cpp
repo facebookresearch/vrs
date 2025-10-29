@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-#include "RecordReaders.h"
+#include <vrs/RecordReaders.h>
 
 #define DEFAULT_LOG_CHANNEL "VRSRecordReaders"
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/ErrorCode.h>
+#include <vrs/FileHandler.h>
+#include <vrs/Record.h>
 #include <vrs/helpers/FileMacros.h>
 #include <vrs/helpers/Throttler.h>
-
-#include "ErrorCode.h"
-#include "FileHandler.h"
-#include "Record.h"
 
 namespace {
 

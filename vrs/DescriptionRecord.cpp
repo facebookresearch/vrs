@@ -18,20 +18,19 @@
 #pragma warning(disable : 4503) // decorated name length exceeded, name was truncated
 #endif
 
-#include "DescriptionRecord.h"
+#include <vrs/DescriptionRecord.h>
 
 #define DEFAULT_LOG_CHANNEL "VRSDescriptionRecord"
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/ErrorCode.h>
+#include <vrs/FileHandler.h>
+#include <vrs/IndexRecord.h>
+#include <vrs/Recordable.h>
 #include <vrs/helpers/FileMacros.h>
 #include <vrs/helpers/Serialization.h>
 #include <vrs/utils/xxhash/xxhash.h>
-
-#include "ErrorCode.h"
-#include "FileHandler.h"
-#include "IndexRecord.h"
-#include "Recordable.h"
 
 namespace vrs {
 

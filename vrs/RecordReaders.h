@@ -16,9 +16,9 @@
 
 #pragma once
 
-#include "DataReference.h"
-#include "Decompressor.h"
-#include "ErrorCode.h"
+#include <vrs/DataReference.h>
+#include <vrs/Decompressor.h>
+#include <vrs/ErrorCode.h>
 
 namespace vrs {
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "RecordFileReader.h"
+#include <vrs/RecordFileReader.h>
 
 #include <algorithm>
 
@@ -22,25 +22,24 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/DataLayout.h>
+#include <vrs/DescriptionRecord.h>
+#include <vrs/DiskFile.h>
+#include <vrs/ErrorCode.h>
+#include <vrs/FileCache.h>
+#include <vrs/FileDetailsCache.h>
+#include <vrs/FileHandlerFactory.h>
+#include <vrs/IndexRecord.h>
+#include <vrs/LegacyFormatsProvider.h>
+#include <vrs/ProgressLogger.h>
+#include <vrs/StreamPlayer.h>
+#include <vrs/TagsRecord.h>
+#include <vrs/TelemetryLogger.h>
 #include <vrs/helpers/FileMacros.h>
 #include <vrs/helpers/Strings.h>
 #include <vrs/os/CompilerAttributes.h>
 #include <vrs/os/Time.h>
 #include <vrs/os/Utils.h>
-
-#include "DataLayout.h"
-#include "DescriptionRecord.h"
-#include "DiskFile.h"
-#include "ErrorCode.h"
-#include "FileCache.h"
-#include "FileDetailsCache.h"
-#include "FileHandlerFactory.h"
-#include "IndexRecord.h"
-#include "LegacyFormatsProvider.h"
-#include "ProgressLogger.h"
-#include "StreamPlayer.h"
-#include "TagsRecord.h"
-#include "TelemetryLogger.h"
 
 using namespace std;
 

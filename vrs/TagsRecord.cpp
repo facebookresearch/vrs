@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-#include "TagsRecord.h"
+#include <vrs/TagsRecord.h>
 
 #define DEFAULT_LOG_CHANNEL "TagsRecord"
 #include <logging/Log.h>
 
-#include "DescriptionRecord.h"
-#include "RecordFormat.h"
-#include "Recordable.h"
+#include <vrs/DescriptionRecord.h>
+#include <vrs/RecordFormat.h>
+#include <vrs/Recordable.h>
 
 namespace vrs {
 

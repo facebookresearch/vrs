@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "FileFormat.h"
+#include <vrs/FileFormat.h>
 
 #include <ctime>
 
@@ -28,12 +28,11 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/ErrorCode.h>
+#include <vrs/IndexRecord.h>
+#include <vrs/ProgressLogger.h>
 #include <vrs/helpers/FileMacros.h>
 #include <vrs/helpers/Strings.h>
-
-#include "ErrorCode.h"
-#include "IndexRecord.h"
-#include "ProgressLogger.h"
 
 using namespace std;
 using namespace std::chrono;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "ImageExtractor.h"
+#include <vrs/utils/ImageExtractor.h>
 
 #include <fstream>
 #include <thread>

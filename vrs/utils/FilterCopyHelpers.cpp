@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "FilterCopyHelpers.h"
+#include <vrs/utils/FilterCopyHelpers.h>
 
 #define DEFAULT_LOG_CHANNEL "FilterCopyHelpers"
 #include <logging/Log.h>

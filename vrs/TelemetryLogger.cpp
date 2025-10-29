@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "TelemetryLogger.h"
+#include <vrs/TelemetryLogger.h>
 
 #include <mutex>
 #include <vector>

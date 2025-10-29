@@ -20,10 +20,10 @@
 #include <map>
 #include <tuple>
 
-#include "ContentBlockReader.h"
-#include "DataLayout.h"
-#include "RecordFormat.h"
-#include "StreamPlayer.h"
+#include <vrs/ContentBlockReader.h>
+#include <vrs/DataLayout.h>
+#include <vrs/RecordFormat.h>
+#include <vrs/StreamPlayer.h>
 
 namespace vrs {
 

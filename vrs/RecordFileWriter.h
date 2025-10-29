@@ -22,14 +22,14 @@
 #include <set>
 #include <thread>
 
-#include "Compressor.h"
-#include "DiskFile.h"
-#include "FileFormat.h"
-#include "IndexRecord.h"
-#include "NewChunkHandler.h"
-#include "Record.h"
-#include "Recordable.h"
-#include "WriteFileHandler.h"
+#include <vrs/Compressor.h>
+#include <vrs/DiskFile.h>
+#include <vrs/FileFormat.h>
+#include <vrs/IndexRecord.h>
+#include <vrs/NewChunkHandler.h>
+#include <vrs/Record.h>
+#include <vrs/Recordable.h>
+#include <vrs/WriteFileHandler.h>
 
 namespace vrs {
 

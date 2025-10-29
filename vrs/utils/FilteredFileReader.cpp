@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "FilteredFileReader.h"
+#include <vrs/utils/FilteredFileReader.h>
 
 #include <cmath>
 

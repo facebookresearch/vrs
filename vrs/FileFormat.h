@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "Record.h"
+#include <vrs/Record.h>
 
 /// Writing headers to disk, you must control endianness and have no padding so that you can read a
 /// file written by any system, using any other system.

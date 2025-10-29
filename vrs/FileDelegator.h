@@ -18,9 +18,8 @@
 
 #include <memory>
 
+#include <vrs/FileSpec.h>
 #include <vrs/os/CompilerAttributes.h>
-
-#include "FileSpec.h"
 
 namespace vrs {
 

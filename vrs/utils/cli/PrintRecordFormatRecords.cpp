@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "PrintRecordFormatRecords.h"
+#include <vrs/utils/cli/PrintRecordFormatRecords.h>
 
 #include <iostream>
 

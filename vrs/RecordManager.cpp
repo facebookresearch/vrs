@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-#include "RecordManager.h"
+#include <vrs/RecordManager.h>
 
 #include <algorithm>
 
+#include <vrs/Compressor.h>
+#include <vrs/DataSource.h>
+#include <vrs/FileFormat.h>
 #include <vrs/os/Time.h>
-
-#include "Compressor.h"
-#include "DataSource.h"
-#include "FileFormat.h"
 
 using namespace std;
 

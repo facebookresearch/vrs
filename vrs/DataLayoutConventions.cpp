@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#include "DataLayoutConventions.h"
+#include <vrs/DataLayoutConventions.h>
 
-#include "RecordFormat.h"
+#include <vrs/RecordFormat.h>
 
 namespace vrs {
 namespace datalayout_conventions {

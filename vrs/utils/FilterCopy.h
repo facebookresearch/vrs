@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "FilteredFileReader.h"
+#include <vrs/utils/FilteredFileReader.h>
 
 namespace vrs::utils {
 

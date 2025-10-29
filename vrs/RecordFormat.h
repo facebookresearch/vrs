@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include "Record.h"
+#include <vrs/Record.h>
 
 namespace vrs {
 

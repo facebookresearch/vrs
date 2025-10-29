@@ -20,7 +20,7 @@
 
 #include <vrs/RecordFormatStreamPlayer.h>
 
-#include "VideoFrameHandler.h"
+#include <vrs/utils/VideoFrameHandler.h>
 
 namespace vrs::utils {
 

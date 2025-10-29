@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "XprsDecoder.h"
+#include <vrs/utils/xprs/XprsDecoder.h>
 
 #include <cstring>
 

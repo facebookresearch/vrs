@@ -21,8 +21,7 @@
 
 #include <vrs/ForwardDefinitions.h>
 #include <vrs/StreamPlayer.h>
-
-#include "DecoderFactory.h"
+#include <vrs/utils/DecoderFactory.h>
 
 namespace vrs::utils {
 

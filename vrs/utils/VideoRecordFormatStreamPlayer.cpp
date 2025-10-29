@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-#include "VideoRecordFormatStreamPlayer.h"
+#include <vrs/utils/VideoRecordFormatStreamPlayer.h>
 
 #define DEFAULT_LOG_CHANNEL "VideoRecordFormatStreamPlayer"
 #include <logging/Checks.h>
 
 #include <vrs/IndexRecord.h>
-
-#include "PixelFrame.h"
+#include <vrs/utils/PixelFrame.h>
 
 namespace vrs::utils {
 

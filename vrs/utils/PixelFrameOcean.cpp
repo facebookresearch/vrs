@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include "PixelFrameOcean.h"
-#include "PixelFrame.h"
+#include <vrs/utils/PixelFrame.h>
+#include <vrs/utils/PixelFrameOcean.h>
 
 #include <ocean/base/Frame.h>
 #include <ocean/base/WorkerPool.h>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "AudioTrackExtractor.h"
+#include <vrs/utils/AudioTrackExtractor.h>
 
 #include <limits>
 #include <utility>
@@ -29,8 +29,7 @@
 #include <vrs/helpers/Rapidjson.hpp>
 #include <vrs/helpers/Strings.h>
 #include <vrs/os/Utils.h>
-
-#include "AudioExtractor.h"
+#include <vrs/utils/AudioExtractor.h>
 
 using namespace std;
 using namespace vrs;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "AudioBlock.h"
+#include <vrs/utils/AudioBlock.h>
 
 #define DEFAULT_LOG_CHANNEL "AudioBlock"
 #include <logging/Checks.h>

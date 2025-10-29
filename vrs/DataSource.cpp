@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-#include "DataSource.h"
+#include <vrs/DataSource.h>
 
 #include <cstring>
 
 #include <logging/Checks.h>
 
-#include "DataLayout.h"
+#include <vrs/DataLayout.h>
 
 namespace vrs {
 

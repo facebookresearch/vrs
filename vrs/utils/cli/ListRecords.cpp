@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "ListRecords.h"
+#include <vrs/utils/cli/ListRecords.h>
 
 #include <fmt/format.h>
 

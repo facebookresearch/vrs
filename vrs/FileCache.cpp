@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-#include "FileCache.h"
+#include <vrs/FileCache.h>
 
+#include <vrs/ErrorCode.h>
 #include <vrs/os/Platform.h>
 #include <vrs/os/Utils.h>
-
-#include "ErrorCode.h"
 
 using namespace std;
 

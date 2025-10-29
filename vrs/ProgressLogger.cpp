@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "ProgressLogger.h"
+#include <vrs/ProgressLogger.h>
 
 #include <iomanip>
 #include <sstream>

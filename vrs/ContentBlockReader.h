@@ -18,9 +18,9 @@
 
 #include <memory>
 
-#include "DataLayout.h"
-#include "DataLayoutConventions.h"
-#include "StreamPlayer.h"
+#include <vrs/DataLayout.h>
+#include <vrs/DataLayoutConventions.h>
+#include <vrs/StreamPlayer.h>
 
 namespace vrs {
 

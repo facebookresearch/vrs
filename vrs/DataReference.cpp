@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-#include "DataReference.h"
+#include <vrs/DataReference.h>
 
 #include <cstring>
 
-#include "FileHandler.h"
+#include <vrs/FileHandler.h>
 
 namespace vrs {
 

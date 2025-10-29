@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "AudioExtractor.h"
+#include <vrs/utils/AudioExtractor.h>
 
 #include <array>
 #include <iostream>

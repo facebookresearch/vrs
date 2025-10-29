@@ -18,9 +18,8 @@
 
 #include <cstdio>
 
+#include <vrs/WriteFileHandler.h>
 #include <vrs/os/Platform.h>
-
-#include "WriteFileHandler.h"
 
 namespace vrs {
 

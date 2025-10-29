@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "TagConventions.h"
+#include <vrs/TagConventions.h>
 
 #include <vrs/helpers/Rapidjson.hpp>
 #include <vrs/os/System.h>

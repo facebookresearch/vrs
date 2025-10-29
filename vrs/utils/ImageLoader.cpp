@@ -24,7 +24,7 @@
 #include <vrs/utils/PixelFrame.h>
 #include <vrs/utils/VideoRecordFormatStreamPlayer.h>
 
-#include "ImageLoader.h"
+#include <vrs/utils/ImageLoader.h>
 
 using namespace std;
 

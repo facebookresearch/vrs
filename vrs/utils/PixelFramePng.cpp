@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "PixelFrame.h"
+#include <vrs/utils/PixelFrame.h>
 
 #include <png.h>
 #include <cerrno>

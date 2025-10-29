@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "DataLayout.h"
+#include <vrs/DataLayout.h>
 
 // disabled warning C4800 in MSVC:
 // This warning is about static casting values to bool in
@@ -31,16 +31,15 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/DataLayoutConventions.h>
+#include <vrs/DataPieces.h>
+#include <vrs/RecordFormat.h>
 #include <vrs/helpers/EnumStringConverter.h>
 #include <vrs/helpers/Rapidjson.hpp>
 #include <vrs/helpers/Strings.h>
 #include <vrs/os/CompilerAttributes.h>
 #include <vrs/os/Platform.h>
 #include <vrs/os/System.h>
-
-#include "DataLayoutConventions.h"
-#include "DataPieces.h"
-#include "RecordFormat.h"
 
 namespace vrs {
 

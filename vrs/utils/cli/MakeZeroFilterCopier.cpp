@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "MakeZeroFilterCopier.h"
+#include <vrs/utils/cli/MakeZeroFilterCopier.h>
 
 using namespace std;
 

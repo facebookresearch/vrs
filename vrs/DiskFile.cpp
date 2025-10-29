@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "DiskFile.h"
+#include <vrs/DiskFile.h>
 
 #include <algorithm>
 #include <memory>
@@ -28,18 +28,17 @@
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
+#include <vrs/Compressor.h>
+#include <vrs/Decompressor.h>
+#include <vrs/DiskFileChunk.hpp>
+#include <vrs/ErrorCode.h>
 #include <vrs/helpers/FileMacros.h>
 #include <vrs/helpers/Strings.h>
 #include <vrs/os/Platform.h>
 #include <vrs/os/Utils.h>
 
-#include "Compressor.h"
-#include "Decompressor.h"
-#include "DiskFileChunk.hpp"
-#include "ErrorCode.h"
-
 #if VRS_ASYNC_DISKFILE_SUPPORTED()
-#include "AsyncDiskFileChunk.h"
+#include <vrs/AsyncDiskFileChunk.h>
 #endif
 
 using namespace std;

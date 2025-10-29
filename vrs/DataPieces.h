@@ -24,7 +24,7 @@
 #include <map>
 #include <ostream>
 
-#include "DataLayout.h"
+#include <vrs/DataLayout.h>
 
 namespace vrs {
 
@@ -279,26 +279,26 @@ inline void unalignedCopy(void* dst, const void* src, size_t size) {
 } // namespace vrs
 
 // These are required pretty much every single time we use DataLayout. Just include them all.
-#include "DataPieceTypes.h"
+#include <vrs/DataPieceTypes.h>
 
 #ifndef DATA_PIECES_ARRAY_H
-#include "DataPieceArray.h"
+#include <vrs/DataPieceArray.h>
 #endif
 
 #ifndef DATA_PIECES_STRING_H
-#include "DataPieceString.h"
+#include <vrs/DataPieceString.h>
 #endif
 
 #ifndef DATA_PIECES_STRING_MAP_H
-#include "DataPieceStringMap.h"
+#include <vrs/DataPieceStringMap.h>
 #endif
 
 #ifndef DATA_PIECES_VALUE_H
-#include "DataPieceValue.h"
+#include <vrs/DataPieceValue.h>
 #endif
 
 #ifndef DATA_PIECES_VECTOR_H
-#include "DataPieceVector.h"
+#include <vrs/DataPieceVector.h>
 #endif
 
 #endif // DATA_PIECES_H

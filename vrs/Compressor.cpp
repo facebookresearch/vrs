@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "Compressor.h"
+#include <vrs/Compressor.h>
 
 #include <cstring>
 
@@ -27,12 +27,11 @@
 #define DEFAULT_LOG_CHANNEL "VRSCompressor"
 #include <logging/Log.h>
 
+#include <vrs/ErrorCode.h>
+#include <vrs/FileHandler.h>
+#include <vrs/Record.h>
 #include <vrs/helpers/EnumStringConverter.h>
 #include <vrs/helpers/FileMacros.h>
-
-#include "ErrorCode.h"
-#include "FileHandler.h"
-#include "Record.h"
 
 namespace {
 
