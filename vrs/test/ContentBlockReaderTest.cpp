@@ -83,13 +83,6 @@ TEST_F(ContentBlockReaderTest, rawImageSpecTest) {
 TEST_F(ContentBlockReaderTest, customCodecImageSpecTest) {
   class Spec : public AutoDataLayout {
    public:
-    DataLayout& set(PixelFormat format, uint32_t w = 0, uint32_t h = 0) {
-      pixelFormat.set(format);
-      width.set(w);
-      height.set(h);
-      codecQuality.set(ImageContentBlockSpec::kQualityUndefined);
-      return *this;
-    }
     DataLayout& set(
         const string& cname,
         uint32_t quality = ImageContentBlockSpec::kQualityUndefined,
