@@ -76,13 +76,6 @@ struct VRSDataV2 {
 struct VRSDataV3 : VRSDataV2 {
   enum : uint32_t { kVersion = 3 };
 
-  void upgradeFrom(uint32_t formatVersion) {
-    if (formatVersion < kVersion) {
-      streamId = 0;
-      gainHAL = 0;
-    }
-  }
-
   int32_t streamId{};
   uint32_t gainHAL{};
 };
@@ -90,58 +83,17 @@ struct VRSDataV3 : VRSDataV2 {
 struct VRSDataV4 : VRSDataV3 {
   enum : uint32_t { kVersion = 4 };
 
-  void upgradeFrom(uint32_t formatVersion) {
-    if (formatVersion < kVersion) {
-      VRSDataV3::upgradeFrom(formatVersion);
-      exposureDuration = 0;
-    }
-  }
-
   double exposureDuration{};
 };
 
-constexpr float kGainMultiplierConvertor = 16.0;
-
 struct VRSDataV5 : VRSDataV4 {
   enum : uint32_t { kVersion = 5 };
-
-  void upgradeFrom(uint32_t formatVersion) {
-    if (formatVersion < kVersion) {
-      VRSDataV4::upgradeFrom(formatVersion);
-      gain = gainHAL / kGainMultiplierConvertor;
-    }
-  }
 
   float gain{};
 };
 
 struct VRSData : VRSDataV5 {
   enum : uint32_t { kVersion = 6 };
-
-  bool canHandle(
-      const CurrentRecord& record,
-      void* imageData,
-      uint32_t imageSize,
-      DataReference& outDataReference) {
-    uint32_t formatVersion = record.formatVersion;
-    uint32_t payloadSize = record.recordSize;
-    if ((formatVersion == kVersion && sizeof(VRSData) + imageSize == payloadSize) ||
-        (formatVersion == VRSDataV5::kVersion && sizeof(VRSDataV5) + imageSize == payloadSize) ||
-        (formatVersion == VRSDataV4::kVersion && sizeof(VRSDataV4) + imageSize == payloadSize) ||
-        (formatVersion == VRSDataV3::kVersion && sizeof(VRSDataV3) + imageSize == payloadSize) ||
-        (formatVersion == VRSDataV2::kVersion && sizeof(VRSDataV2) + imageSize == payloadSize)) {
-      outDataReference.useRawData(this, payloadSize - imageSize, imageData, imageSize);
-      return true;
-    }
-    return false;
-  }
-
-  void upgradeFrom(uint32_t formatVersion) {
-    if (formatVersion < kVersion) {
-      VRSDataV5::upgradeFrom(formatVersion);
-      temperature = -1.0;
-    }
-  }
 
   float temperature{};
 };
@@ -204,13 +156,6 @@ class DataLayoutData : public AutoDataLayout {
   DataPieceValue<double> exposureDuration{"exposure_duration", 0};
   // v5
   DataPieceValue<float> gain{"gain", 0}; // complex default value: force calling a method
- public:
-  float getGain() {
-    if (gain.isAvailable()) {
-      return gain.get();
-    }
-    return gainHAL.get() / kGainMultiplierConvertor;
-  }
   // v6
   DataPieceValue<float> temperature{"temperature", -1};
 
