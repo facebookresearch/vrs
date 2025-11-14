@@ -36,12 +36,12 @@ using std::vector;
 /// Additional properties may be specified in the extras field, which has helper methods.
 struct FileSpec {
   FileSpec() = default;
-  FileSpec(string filehandler, const vector<string>& chunks)
-      : fileHandlerName{std::move(filehandler)}, chunks{chunks} {}
-  FileSpec(string filehandler, const vector<string>&& chunks)
-      : fileHandlerName{std::move(filehandler)}, chunks{chunks} {}
-  explicit FileSpec(const vector<string>& chunks) : chunks{chunks} {}
-  explicit FileSpec(vector<string>&& chunks) : chunks{std::move(chunks)} {}
+  FileSpec(string filehandler, const vector<string>& chunksIn)
+      : fileHandlerName{std::move(filehandler)}, chunks{chunksIn} {}
+  FileSpec(string filehandler, const vector<string>&& chunksIn)
+      : fileHandlerName{std::move(filehandler)}, chunks{chunksIn} {}
+  explicit FileSpec(const vector<string>& chunksIn) : chunks{chunksIn} {}
+  explicit FileSpec(vector<string>&& chunksIn) : chunks{std::move(chunksIn)} {}
 
   /// clear all the fields.
   void clear();
