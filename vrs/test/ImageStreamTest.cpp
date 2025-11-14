@@ -449,6 +449,7 @@ struct CustomCodecImageTest5 {
     static ImageContentBlockSpec getRecordFormatImageContentBlock() {
       return {ImageFormat::CUSTOM_CODEC, "my_custom_codec"};
     }
+    // NOLINTNEXTLINE(clang-diagnostic-unused-member-function)
     vector<uint8_t> makeImage(int index) {
       counter_.set(index);
       ImageContentBlockSpec spec = DataRecord::getRecordFormatImageContentBlock();
@@ -460,6 +461,7 @@ struct CustomCodecImageTest5 {
       return image_;
     }
 
+    // NOLINTNEXTLINE(clang-diagnostic-unused-member-function)
     static bool onImageRead(const CurrentRecord& record, size_t idx, const ContentBlock& cb) {
       string foundFormat = cb.image().asString();
       string expectedFormat = getRecordFormatImageContentBlock().asString();
@@ -473,6 +475,7 @@ struct CustomCodecImageTest5 {
   class ConfigRecord : public AutoDataLayout {
    public:
     AutoDataLayoutEnd end;
+    // NOLINTNEXTLINE(clang-diagnostic-unused-member-function)
     void init() {}
   };
 };
