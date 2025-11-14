@@ -640,14 +640,14 @@ using RecordFormatMap = map<pair<Record::Type, uint32_t>, RecordFormat>;
 class ContentBlockId {
  public:
   ContentBlockId(
-      RecordableTypeId typeId,
-      Record::Type recordType,
-      uint32_t formatVersion,
-      size_t blockIndex)
-      : typeId(typeId),
-        recordType(recordType),
-        formatVersion(formatVersion),
-        blockIndex(blockIndex) {}
+      RecordableTypeId typeIdIn,
+      Record::Type recordTypeIn,
+      uint32_t formatVersionIn,
+      size_t blockIndexIn)
+      : typeId(typeIdIn),
+        recordType(recordTypeIn),
+        formatVersion(formatVersionIn),
+        blockIndex(blockIndexIn) {}
 
   RecordableTypeId getRecordableTypeId() const {
     return typeId;

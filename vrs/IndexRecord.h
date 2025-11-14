@@ -74,16 +74,20 @@ struct DiskStreamId {
 /// \brief Helper class to store details about a single VRS record on disk.
 struct DiskRecordInfo {
   DiskRecordInfo() = default;
-  DiskRecordInfo(double timestamp, uint32_t recordSize, StreamId streamId, Record::Type recordType)
-      : timestamp(timestamp),
-        recordSize(recordSize),
-        recordType(static_cast<uint8_t>(recordType)),
-        streamId(streamId) {}
-  DiskRecordInfo(StreamId streamId, Record* record)
+  DiskRecordInfo(
+      double timestampIn,
+      uint32_t recordSizeIn,
+      StreamId streamIdIn,
+      Record::Type recordTypeIn)
+      : timestamp(timestampIn),
+        recordSize(recordSizeIn),
+        recordType(static_cast<uint8_t>(recordTypeIn)),
+        streamId(streamIdIn) {}
+  DiskRecordInfo(StreamId streamIdIn, Record* record)
       : timestamp(record->getTimestamp()),
         recordSize(static_cast<uint32_t>(record->getSize())),
         recordType(static_cast<uint8_t>(record->getRecordType())),
-        streamId(streamId) {}
+        streamId(streamIdIn) {}
 
   double timestamp{};
   uint32_t recordSize{};
@@ -104,8 +108,15 @@ struct DiskRecordInfo {
 /// \brief Helper class to hold the details about a single VRS record in memory.
 struct RecordInfo {
   RecordInfo() = default;
-  RecordInfo(double timestamp, int64_t fileOffset, StreamId streamId, Record::Type recordType)
-      : timestamp(timestamp), fileOffset(fileOffset), streamId(streamId), recordType(recordType) {}
+  RecordInfo(
+      double timestampIn,
+      int64_t fileOffsetIn,
+      StreamId streamIdIn,
+      Record::Type recordTypeIn)
+      : timestamp(timestampIn),
+        fileOffset(fileOffsetIn),
+        streamId(streamIdIn),
+        recordType(recordTypeIn) {}
 
   double timestamp{}; ///< timestamp of the record
   int64_t fileOffset{}; ///< absolute byte offset of the record in the whole file

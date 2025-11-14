@@ -265,7 +265,7 @@ class RecordFileWriter {
   /// Helper class to sort records by time.
   /// @internal
   struct SortRecord {
-    SortRecord(Record* record, StreamId streamId) : record(record), streamId(streamId) {}
+    SortRecord(Record* recordIn, StreamId streamIdIn) : record(recordIn), streamId(streamIdIn) {}
 
     /// we are sorting records primarily by timestamp, but this order is a total order
     bool operator<(const SortRecord& rhs) const {
