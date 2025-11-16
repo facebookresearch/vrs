@@ -30,6 +30,10 @@ class XXH64Digester {
  public:
   XXH64Digester();
   ~XXH64Digester();
+  XXH64Digester(const XXH64Digester&) = delete;
+  XXH64Digester& operator=(const XXH64Digester&) = delete;
+  XXH64Digester(XXH64Digester&&) = delete;
+  XXH64Digester& operator=(XXH64Digester&&) = delete;
   void clear();
   XXH64Digester& ingest(const void* data, size_t len);
   template <class T>
