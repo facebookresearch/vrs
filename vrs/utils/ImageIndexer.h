@@ -94,7 +94,7 @@ struct DirectImageReferencePlus : public DirectImageReference {
         dataRecordIndex{dataRecordIndex} {}
 
   StreamId streamId;
-  uint32_t dataRecordIndex;
+  uint32_t dataRecordIndex; // data record index within the stream
 };
 
 /// Get the list of references for all the images found in a VRS file.
