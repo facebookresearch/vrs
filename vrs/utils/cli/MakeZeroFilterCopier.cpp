@@ -16,6 +16,8 @@
 
 #include <vrs/utils/cli/MakeZeroFilterCopier.h>
 
+#include <vrs/helpers/Strings.h>
+
 using namespace std;
 
 namespace vrs::utils {
@@ -29,7 +31,38 @@ class ZeroFilter : public RecordFilterCopier {
       vrs::RecordFileWriter& fileWriter,
       vrs::StreamId id,
       const CopyOptions& copyOptions)
-      : RecordFilterCopier(fileReader, fileWriter, id, copyOptions) {}
+      : RecordFilterCopier(fileReader, fileWriter, id, copyOptions) {
+    helpers::getBool(copyOptions.miscParams, kRemoveContentBlocks, removeContentBlocks_);
+    if (removeContentBlocks_) {
+      removeImageAndAudioContentBlockDefinitions();
+      getWriter().setTag("image-and-audio-content-blocks-removed", "true");
+    }
+  }
+
+  void removeImageAndAudioContentBlockDefinitions() {
+    map<string, string>& vrsTags = getWriter().getVRSTags();
+    RecordFormatMap recordFormats;
+    RecordFormat::getRecordFormats(vrsTags, recordFormats);
+    for (const auto& iter : recordFormats) {
+      RecordFormat updatedRecordFormat;
+      bool removedBlock = false;
+      const auto& recordFormat = iter.second;
+      for (size_t contentBlockIndex = 0; contentBlockIndex < recordFormat.getUsedBlocksCount();
+           contentBlockIndex++) {
+        const ContentBlock& cb = recordFormat.getContentBlock(contentBlockIndex);
+        if (cb.getContentType() == ContentType::IMAGE ||
+            cb.getContentType() == ContentType::AUDIO) {
+          removedBlock = true;
+        } else {
+          updatedRecordFormat + cb;
+        }
+      }
+      if (removedBlock) {
+        vrsTags[RecordFormat::getRecordFormatTagName(iter.first.first, iter.first.second)] =
+            updatedRecordFormat.asString();
+      }
+    }
+  }
 
   bool shouldCopyVerbatim(const CurrentRecord& record) override {
     auto tupleId = tuple<Record::Type, uint32_t>(record.recordType, record.formatVersion);
@@ -62,6 +95,9 @@ class ZeroFilter : public RecordFilterCopier {
       return onUnsupportedBlock(rec, idx, cb);
     }
     if (blockSize == rec.reader->getUnreadBytes()) {
+      if (removeContentBlocks_) {
+        return false;
+      }
       // This is the last content block: we can avoid reading/decoding it
       unique_ptr<ContentBlockChunk> chunk =
           make_unique<ContentBlockChunk>(cb, vector<uint8_t>(blockSize));
@@ -70,16 +106,19 @@ class ZeroFilter : public RecordFilterCopier {
     }
     // very rare in practice: we need to read the data, so we can read what's after it
     unique_ptr<ContentBlockChunk> chunk = make_unique<ContentBlockChunk>(cb, rec);
-    auto& buffer = chunk->getBuffer();
-    if (!buffer.empty()) {
-      memset(buffer.data(), 0, buffer.size());
+    if (!removeContentBlocks_) {
+      auto& buffer = chunk->getBuffer();
+      if (!buffer.empty()) {
+        memset(buffer.data(), 0, buffer.size());
+      }
+      chunks_.emplace_back(std::move(chunk));
     }
-    chunks_.emplace_back(std::move(chunk));
     return true;
   }
 
  protected:
   map<tuple<Record::Type, uint32_t>, bool> verbatimCopy_;
+  bool removeContentBlocks_ = false;
 };
 
 } // namespace

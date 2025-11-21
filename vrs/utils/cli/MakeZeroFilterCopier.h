@@ -20,6 +20,8 @@
 
 namespace vrs::utils {
 
+constexpr const char* kRemoveContentBlocks = "remove";
+
 unique_ptr<StreamPlayer> makeZeroFilterCopier(
     RecordFileReader& fileReader,
     RecordFileWriter& fileWriter,
