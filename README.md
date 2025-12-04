@@ -54,7 +54,7 @@ _These instructions are validated using Ubuntu 20.04, whereas Ubuntu 18.04 doesn
   ```
   sudo apt-get install cmake git ninja-build ccache libgtest-dev libfmt-dev libjpeg-dev libturbojpeg-dev libpng-dev
   sudo apt-get install liblz4-dev libzstd-dev libxxhash-dev nasm yasm libeigen3-dev
-  sudo apt-get install libboost-system-dev libboost-date-time-dev
+  sudo apt-get install libboost-dev
   sudo apt-get install qtbase5-dev portaudio19-dev libopus-dev
   sudo apt-get install npm doxygen
   ```

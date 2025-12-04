@@ -16,17 +16,16 @@
 
 #include <vrs/os/Semaphore.h>
 
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include <chrono>
 
 namespace vrs {
 namespace os {
 
 bool Semaphore::timedWait(double timeSec) {
-  using namespace boost::posix_time;
-  long integralTime = static_cast<long>(std::floor(timeSec));
-  long microSeconds = static_cast<long>((timeSec - integralTime) * 1000000);
-  return interprocess_semaphore::timed_wait(
-      microsec_clock::universal_time() + seconds(integralTime) + microseconds(microSeconds));
+  auto timeout = std::chrono::steady_clock::now() +
+      std::chrono::duration_cast<std::chrono::steady_clock::duration>(
+                     std::chrono::duration<double>(timeSec));
+  return interprocess_semaphore::timed_wait(timeout);
 }
 
 } // namespace os
