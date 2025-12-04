@@ -20,10 +20,6 @@ target_include_directories(vrs_oss_portability
     $<BUILD_INTERFACE:${VRS_SOURCE_DIR}/vrs/oss>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
-target_link_libraries(vrs_oss_portability
-  INTERFACE
-    Boost::filesystem
-)
 
 install(TARGETS vrs_oss_portability EXPORT VRSLibTargets
   LIBRARY DESTINATION lib

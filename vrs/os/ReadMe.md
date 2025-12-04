@@ -1,7 +1,7 @@
 # What is in this folder?
 
-The `vrs/os` module provides a number of operating system abstractions. It exists in part because `std::filesystem` is in its infancy. While `std::filesystem` has made great progress recently, it still has teething issues, and worse, it is still not available on every system we need VRS to support.
+The `vrs/os` module provides a number of operating system abstractions. It exists to provide consistent filesystem and OS-level operations across different platforms.
 
-For open source targets, `vrs/os` mostly relies on boost, which provides the most robust and complete implementation.
+For open source targets, `vrs/os` relies on C++17's `std::filesystem`, which provides robust and standardized filesystem operations.
 
-Even after a robust version of `std::filesystem` is broadly available on common platforms and we can stop depending on boost, we will continue to rely on `vrs/os` to help build support for VRS in more challenging environments/emerging operating systems, where support will be slow to come, if it ever does, even for boost.
+The `vrs/os` module will continue to evolve to support VRS in challenging environments and emerging operating systems, where platform-specific adaptations may be needed.
