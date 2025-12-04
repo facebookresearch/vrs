@@ -16,6 +16,6 @@
 
 #pragma once
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
-namespace filesystem = boost::filesystem;
+namespace filesystem = std::filesystem;

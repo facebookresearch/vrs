@@ -26,9 +26,8 @@
 using namespace std;
 
 #if IS_VRS_OSS_TARGET_PLATFORM()
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
-namespace sys = boost::system;
+#include <filesystem>
+namespace fs = std::filesystem;
 #endif
 
 namespace vrs {
@@ -43,31 +42,31 @@ int getFilesAndFolders(const string& path, vector<string>& inOutFiles, vector<st
     outFolders->clear();
   }
 #if IS_VRS_OSS_TARGET_PLATFORM()
-  sys::error_code ec;
+  std::error_code ec;
   fs::path fspath(path);
   fs::file_status status = fs::status(fspath);
   if (!exists(status)) {
     return ENOENT; // file not found
-  } else if (status.type() == fs::file_type::directory_file) {
+  } else if (status.type() == fs::file_type::directory) {
     for (fs::directory_iterator it(fspath, ec), eit; it != eit; it.increment(ec)) {
       if (ec) {
         return ec.value() != 0 ? ec.value() : -1;
       }
       if (!fs::is_symlink(it->symlink_status())) {
         status = it->status();
-        if (status.type() == fs::file_type::regular_file) {
+        if (status.type() == fs::file_type::regular) {
 #if IS_MAC_PLATFORM()
           if (it->path().filename() == ".DS_Store") {
             continue;
           }
 #endif
           inOutFiles.emplace_back(it->path().generic_string());
-        } else if (outFolders && status.type() == fs::file_type::directory_file) {
+        } else if (outFolders && status.type() == fs::file_type::directory) {
           outFolders->emplace_back(it->path().generic_string());
         }
       }
     }
-  } else if (status.type() == fs::file_type::regular_file) {
+  } else if (status.type() == fs::file_type::regular) {
     inOutFiles.emplace_back(path);
   }
   sort(inOutFiles.begin(), inOutFiles.end(), beforefileName);
