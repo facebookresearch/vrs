@@ -59,11 +59,11 @@
 #endif // !IS_WINDOWS_PLATFORM()
 
 #if IS_VRS_OSS_CODE()
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
-using fs_error_code = boost::system::error_code;
-constexpr auto kNotFoundFileType = boost::filesystem::file_type::file_not_found;
-constexpr auto kRegularFileType = boost::filesystem::file_type::regular_file;
+#include <filesystem>
+namespace fs = std::filesystem;
+using fs_error_code = std::error_code;
+constexpr auto kNotFoundFileType = std::filesystem::file_type::not_found;
+constexpr auto kRegularFileType = std::filesystem::file_type::regular;
 #endif
 
 using std::string;
@@ -230,7 +230,7 @@ const string& getTempFolder() {
 /// Returns true if the source was really a link, but you can *always* use outLinkedPath.
 bool getLinkedTarget(const string& sourcePath, string& outLinkedPath) {
   fs::path source(sourcePath);
-  if (fs::symlink_status(source).type() == fs::symlink_file) {
+  if (fs::is_symlink(source)) {
     // Note: apply canonical() instead of readlink()
     // so that relative paths in symlinks are resolved properly
     outLinkedPath = fs::canonical(source).string();
@@ -338,12 +338,19 @@ string makeUniqueFolder(const string& baseName, size_t randomSuffixLength) {
 
 #if IS_VRS_OSS_CODE()
 
+static std::string_view stripLeadingSlash(std::string_view path) {
+  if (!path.empty() && (path[0] == '/' || path[0] == '\\')) {
+    return path.substr(1);
+  }
+  return path;
+}
+
 string pathJoin(const string& a, const string& b) {
-  return (fs::path(a) / b).generic_string();
+  return (fs::path(a) / stripLeadingSlash(b)).generic_string();
 }
 
 string pathJoin(const string& a, const string& b, const string& c) {
-  return (fs::path(a) / b / c).generic_string();
+  return (fs::path(a) / stripLeadingSlash(b) / stripLeadingSlash(c)).generic_string();
 }
 
 int makeDir(const string& dir) {

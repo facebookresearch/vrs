@@ -19,9 +19,7 @@ endif()
 
 find_package(Boost
   REQUIRED COMPONENTS
-    filesystem
     date_time
-  OPTIONAL_COMPONENTS system
 )
 
 find_package(Threads REQUIRED)
