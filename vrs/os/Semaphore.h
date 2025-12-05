@@ -18,7 +18,8 @@
 
 #include <vrs/os/Platform.h>
 
-#include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <chrono>
+
 #include <boost/interprocess/sync/interprocess_semaphore.hpp>
 
 namespace vrs {
@@ -32,7 +33,6 @@ class Semaphore : private boost::interprocess::interprocess_semaphore {
   using boost::interprocess::interprocess_semaphore::wait;
 
   bool timedWait(double timeSec);
-  bool timed_wait(const boost::posix_time::ptime& absTime) = delete;
 };
 
 } // namespace os

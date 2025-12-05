@@ -30,7 +30,6 @@ target_link_libraries(vrs_os
   PRIVATE
     vrs_platform
     vrs_logging
-    Boost::date_time
     Threads::Threads
 )
 target_compile_definitions(vrs_os INTERFACE OSS_BUILD_MODE)
