@@ -17,6 +17,7 @@
 #pragma once
 
 #include <string>
+#include <utility>
 
 #include <fmt/format.h>
 
@@ -102,8 +103,8 @@ struct CreateParams {
   using CustomCreateFileFunction =
       function<int(CreateParams& createParams, RecordFileWriter& fileWriter)>;
 
-  explicit CreateParams(const string& _path, const FileConfig& _fileConfig = kClassicFileConfig)
-      : path{_path}, fileConfig{_fileConfig} {}
+  explicit CreateParams(string _path, const FileConfig& _fileConfig = kClassicFileConfig)
+      : path{std::move(_path)}, fileConfig{_fileConfig} {}
 
   // Required params
   string path;

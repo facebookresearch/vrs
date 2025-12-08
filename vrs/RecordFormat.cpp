@@ -209,10 +209,10 @@ DEFINE_ENUM_CONVERTERS(AudioFormat);
 DEFINE_ENUM_CONVERTERS(AudioSampleFormat);
 
 ImageContentBlockSpec::ImageContentBlockSpec(
-    const ImageContentBlockSpec& imageSpec,
+    ImageContentBlockSpec imageSpec,
     double keyFrameTimestamp,
     uint32_t keyFrameIndex)
-    : ImageContentBlockSpec(imageSpec) {
+    : ImageContentBlockSpec(std::move(imageSpec)) {
   keyFrameTimestamp_ = keyFrameTimestamp;
   keyFrameIndex_ = keyFrameIndex;
 }

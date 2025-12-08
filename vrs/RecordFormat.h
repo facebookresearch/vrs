@@ -148,7 +148,7 @@ class ImageContentBlockSpec {
   ImageContentBlockSpec(const ImageContentBlockSpec&) = default;
   ImageContentBlockSpec(ImageContentBlockSpec&&) noexcept = default;
   ImageContentBlockSpec(
-      const ImageContentBlockSpec& imageSpec,
+      ImageContentBlockSpec imageSpec,
       double keyFrameTimestamp,
       uint32_t keyFrameIndex);
 
