@@ -140,6 +140,7 @@ namespace vrscli {
 
 void printHelp(const string& appName) {
   cout
+      << "Help for the " << appName << " command line tool, built " __DATE__ ":\n\n"
       << CMD("Get details about a VRS file", "[ file.vrs ] [filter-options]")
 
       << "\n"
