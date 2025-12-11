@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include <inttypes.h>
+#include <cinttypes>
 #include <string>
 #include <string_view>
 #include <vector>
