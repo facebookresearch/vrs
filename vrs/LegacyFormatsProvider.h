@@ -98,7 +98,12 @@ class RecordFormatRegistrar {
 /// For this, you can inject RecordFormat and DataLayout definitions using this class.
 class LegacyFormatsProvider {
  public:
+  LegacyFormatsProvider() = default;
   virtual ~LegacyFormatsProvider();
+  LegacyFormatsProvider(const LegacyFormatsProvider&) = delete;
+  LegacyFormatsProvider& operator=(const LegacyFormatsProvider&) = delete;
+  LegacyFormatsProvider(LegacyFormatsProvider&&) = delete;
+  LegacyFormatsProvider& operator=(LegacyFormatsProvider&&) = delete;
 
   /// Method to implement to provide legacy definitions for a specific device type.
   /// When this method is called, call the addRecordFormat() method with the definitions.
