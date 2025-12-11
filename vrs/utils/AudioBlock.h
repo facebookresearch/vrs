@@ -32,24 +32,34 @@ struct AudioCompressionHandler {
   OpusMSEncoder* encoder{};
   AudioContentBlockSpec encoderSpec;
 
+  AudioCompressionHandler() = default;
   bool create(const AudioContentBlockSpec& spec);
   int compress(const void* samples, uint32_t sampleCount, void* outOpusBytes, size_t maxBytes);
 
   ~AudioCompressionHandler();
+  AudioCompressionHandler(const AudioCompressionHandler&) = delete;
+  AudioCompressionHandler& operator=(const AudioCompressionHandler&) = delete;
+  AudioCompressionHandler(AudioCompressionHandler&&) = delete;
+  AudioCompressionHandler& operator=(AudioCompressionHandler&&) = delete;
 };
 
 struct AudioDecompressionHandler {
   OpusMSDecoder* decoder{};
   AudioContentBlockSpec decoderSpec;
 
+  AudioDecompressionHandler() = default;
   ~AudioDecompressionHandler();
+  AudioDecompressionHandler(const AudioDecompressionHandler&) = delete;
+  AudioDecompressionHandler& operator=(const AudioDecompressionHandler&) = delete;
+  AudioDecompressionHandler(AudioDecompressionHandler&&) = delete;
+  AudioDecompressionHandler& operator=(AudioDecompressionHandler&&) = delete;
 };
 
 /// Helper class to read & convert audio blocks.
 class AudioBlock {
  public:
   AudioBlock() = default;
-  AudioBlock(AudioBlock& other) = default;
+  AudioBlock(const AudioBlock& other) = default;
   AudioBlock(AudioBlock&& other) noexcept = default;
   AudioBlock(const AudioContentBlockSpec& spec, vector<uint8_t>&& frameBytes);
   explicit AudioBlock(const AudioContentBlockSpec& spec);
