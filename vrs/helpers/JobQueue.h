@@ -84,7 +84,7 @@ class JobQueue {
   /// get a pending job, if any, but don't wait
   bool getJob(T& outValue) {
     std::unique_lock<std::mutex> locker(mutex_);
-    if (hasEnded_ || queue_.empty()) {
+    if (queue_.empty()) {
       return false;
     }
     outValue = std::move(queue_.front());
@@ -102,14 +102,11 @@ class JobQueue {
       limit = steady_clock::now() + milliseconds(waitTimeMs);
     }
     std::unique_lock<std::mutex> locker(mutex_);
-    if (hasEnded_) {
-      return false;
-    }
     if (!queue_.empty()) {
       jobs.swap(queue_);
       return true;
     }
-    if (waitTimeMs > 0) {
+    if (!hasEnded_ && waitTimeMs > 0) {
       jobs.resize(1);
       if (waitForJobLocked(jobs.front(), locker, limit)) {
         return true;
@@ -127,9 +124,12 @@ class JobQueue {
     queue_.clear();
     hasEnded_ = false;
   }
-  void endQueue() {
+  void endQueue(bool clearQueue = true) {
     std::unique_lock<std::mutex> locker(mutex_);
     hasEnded_ = true;
+    if (clearQueue) {
+      queue_.clear();
+    }
     condition_.notify_all();
   }
   bool hasEnded() const {
