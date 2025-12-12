@@ -43,11 +43,12 @@ var searchData=
   ['processstateheader_40',['processStateHeader',['../classvrs_1_1_stream_player.html#afed607fa60ace09c281a07bbaff3b860',1,'vrs::StreamPlayer']]],
   ['progresslogger_41',['progresslogger',['../classvrs_1_1_progress_logger.html',1,'vrs::ProgressLogger'],['../classvrs_1_1_progress_logger.html#af022240666843d6101652b4db5eb0ec5',1,'vrs::ProgressLogger::ProgressLogger()']]],
   ['properties_42',['properties',['../structvrs_1_1_json_format_profile_spec.html#ae1c71f2ee9b45bb0fe2da10bb614a4bf',1,'vrs::JsonFormatProfileSpec']]],
-  ['public_43',['Public',['../namespacevrs.html#ab5a2876628d1cfe8288aa4d4b557d433a3d067bedfe2f4677470dd6ccf64d05ed',1,'vrs']]],
-  ['publicnames_44',['publicNames',['../structvrs_1_1_json_format_profile_spec.html#a875f410006a2682b3a5f4bd1de586fda',1,'vrs::JsonFormatProfileSpec']]],
-  ['purgecache_45',['purgecache',['../classvrs_1_1_record_manager.html#af554e9dac61108218c37dd95b5708240',1,'vrs::RecordManager::purgeCache()'],['../classvrs_1_1_file_handler.html#ad49c80e3f6764c5f5627c61e8d00a3a3',1,'vrs::FileHandler::purgeCache()']]],
-  ['purgefilecache_46',['purgefilecache',['../classvrs_1_1_record_file_reader.html#a09e29787a837db9844b460fb1aa38eca',1,'vrs::RecordFileReader::purgeFileCache()'],['../classvrs_1_1_multi_record_file_reader.html#a36c8eec112569f67ebb9a213f61178d9',1,'vrs::MultiRecordFileReader::purgeFileCache()']]],
-  ['purgeoldrecords_47',['purgeoldrecords',['../classvrs_1_1_record_manager.html#a5a2b2380b4e3af398631f0471dc09a28',1,'vrs::RecordManager::purgeOldRecords()'],['../classvrs_1_1_record_file_writer.html#a0c39b244d61c2784ac96504c2da8c94d',1,'vrs::RecordFileWriter::purgeOldRecords()']]],
-  ['purgethreaddata_48',['PurgeThreadData',['../structvrs_1_1_record_file_writer___1_1_purge_thread_data.html',1,'vrs::RecordFileWriter_']]],
-  ['purgethreaddata_5f_49',['purgeThreadData_',['../classvrs_1_1_record_file_writer.html#a625e8d8842c54f6c6b95242f3ef705a5',1,'vrs::RecordFileWriter']]]
+  ['proximitysensorrecordableclass_43',['ProximitySensorRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5aebfd8cfce9dce0cc700d3ba8163207a6',1,'vrs']]],
+  ['public_44',['Public',['../namespacevrs.html#ab5a2876628d1cfe8288aa4d4b557d433a3d067bedfe2f4677470dd6ccf64d05ed',1,'vrs']]],
+  ['publicnames_45',['publicNames',['../structvrs_1_1_json_format_profile_spec.html#a875f410006a2682b3a5f4bd1de586fda',1,'vrs::JsonFormatProfileSpec']]],
+  ['purgecache_46',['purgecache',['../classvrs_1_1_record_manager.html#af554e9dac61108218c37dd95b5708240',1,'vrs::RecordManager::purgeCache()'],['../classvrs_1_1_file_handler.html#ad49c80e3f6764c5f5627c61e8d00a3a3',1,'vrs::FileHandler::purgeCache()']]],
+  ['purgefilecache_47',['purgefilecache',['../classvrs_1_1_record_file_reader.html#a09e29787a837db9844b460fb1aa38eca',1,'vrs::RecordFileReader::purgeFileCache()'],['../classvrs_1_1_multi_record_file_reader.html#a36c8eec112569f67ebb9a213f61178d9',1,'vrs::MultiRecordFileReader::purgeFileCache()']]],
+  ['purgeoldrecords_48',['purgeoldrecords',['../classvrs_1_1_record_manager.html#a5a2b2380b4e3af398631f0471dc09a28',1,'vrs::RecordManager::purgeOldRecords()'],['../classvrs_1_1_record_file_writer.html#a0c39b244d61c2784ac96504c2da8c94d',1,'vrs::RecordFileWriter::purgeOldRecords()']]],
+  ['purgethreaddata_49',['PurgeThreadData',['../structvrs_1_1_record_file_writer___1_1_purge_thread_data.html',1,'vrs::RecordFileWriter_']]],
+  ['purgethreaddata_5f_50',['purgeThreadData_',['../classvrs_1_1_record_file_writer.html#a625e8d8842c54f6c6b95242f3ef705a5',1,'vrs::RecordFileWriter']]]
 ];
