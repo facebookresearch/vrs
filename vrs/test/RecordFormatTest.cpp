@@ -878,7 +878,7 @@ TEST_F(RecordFormatTest, testCompare) {
       ImageContentBlockSpec(
           ImageFormat::UNDEFINED, PixelFormat::UNDEFINED, 0, 0, 0, 0, {}, kQUndefined));
 
-  ImageContentBlockSpec copy{def};
+  const ImageContentBlockSpec& copy{def};
   EXPECT_EQ(def, copy);
 
   ImageContentBlockSpec exp(ImageFormat::VIDEO, PixelFormat::GREY10, 10, 20, 25, 0, "test", 12);

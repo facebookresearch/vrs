@@ -54,7 +54,7 @@ TEST_F(DeviceSimulator, classicIndex) {
   set<string> serialNumbers;
   for (uint32_t k = 0; k < kCameraCount; ++k) {
     string tagName = CreateParams::getCameraStreamTag(k);
-    string serialNumber = reader.getTag(tagName);
+    const string& serialNumber = reader.getTag(tagName);
     EXPECT_FALSE(serialNumber.empty());
     serialNumbers.insert(serialNumber);
     EXPECT_TRUE(reader.getStreamForSerialNumber(serialNumber).isValid());
