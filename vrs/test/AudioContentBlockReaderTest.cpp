@@ -142,20 +142,16 @@ class AudioStream : public Recordable {
       case LayoutStyle::Classic:
       case LayoutStyle::NoSize:
         return createRecord(getTimestampSec(), Record::Type::CONFIGURATION, 1, DataSource(config_));
-        break;
       case LayoutStyle::FullSpecData:
         return nullptr;
-        break;
       case LayoutStyle::OpusStereo:
         config_.audioFormat.set(AudioFormat::OPUS);
         config_.stereoPairCount.set(ipAudioData_.stereoPairCount);
         return createRecord(getTimestampSec(), Record::Type::CONFIGURATION, 1, DataSource(config_));
-        break;
       case LayoutStyle::OpusStereoNoSampleCount:
         config_.audioFormat.set(AudioFormat::OPUS);
         config_.stereoPairCount.set(ipAudioData_.stereoPairCount);
         return createRecord(getTimestampSec(), Record::Type::CONFIGURATION, 1, DataSource(config_));
-        break;
     }
     return nullptr;
   }

@@ -585,12 +585,10 @@ uint32_t ImageContentBlockSpec::getDefaultStride2() const {
     case PixelFormat::YUV_I420_SPLIT:
       // second and third planes use one byte per 2-2 squares: half the width, half the height
       return (getWidth() + 1) / 2;
-      break;
     case PixelFormat::YUV_420_NV21:
     case PixelFormat::YUV_420_NV12:
       // one pair U+V for each 2x2 block of pixels
       return getWidth() + (getWidth() % 2);
-      break;
     default:
       return 0;
   }
