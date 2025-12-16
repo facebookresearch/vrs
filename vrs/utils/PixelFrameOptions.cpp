@@ -18,6 +18,9 @@
 
 #include <cmath>
 
+#define DEFAULT_LOG_CHANNEL "PixelFrameOptions"
+#include <logging/Verify.h>
+
 #include <ocean/base/Frame.h>
 #include <ocean/cv/FrameInterpolator.h>
 
@@ -134,22 +137,24 @@ std::unique_ptr<PixelFrame> ResizeOptions::resize(const PixelFrame& sourceFrame)
       std::make_unique<PixelFrame>(pixelFormat, computedWidth, computedHeight);
 
   auto sourceOceanFrame =
-      createOceanFrameFromVRS(sourceSpec, sourceFrame.rdata(), oceanPixelFormat);
-  if (!sourceOceanFrame) {
+      createReadOnlyOceanFrame(sourceSpec, sourceFrame.rdata(), oceanPixelFormat);
+  if (!XR_VERIFY(sourceOceanFrame != nullptr, "Failed to create source Ocean frame")) {
     return nullptr;
   }
 
   const ImageContentBlockSpec& targetSpec = targetFrame->getSpec();
   auto targetOceanFrame =
-      createOceanFrameFromVRS(targetSpec, targetFrame->wdata(), oceanPixelFormat);
-  if (!targetOceanFrame) {
+      createWritableOceanFrame(targetSpec, targetFrame->wdata(), oceanPixelFormat);
+  if (!XR_VERIFY(targetOceanFrame != nullptr, "Failed to create target Ocean frame")) {
     return nullptr;
   }
 
-  if (!Ocean::CV::FrameInterpolator::resize(
-          *sourceOceanFrame,
-          *targetOceanFrame,
-          Ocean::CV::FrameInterpolator::ResizeMethod::RM_AUTOMATIC)) {
+  if (!XR_VERIFY(
+          Ocean::CV::FrameInterpolator::resize(
+              *sourceOceanFrame,
+              *targetOceanFrame,
+              Ocean::CV::FrameInterpolator::ResizeMethod::RM_AUTOMATIC),
+          "Failed to resize frame")) {
     return nullptr;
   }
 

@@ -44,9 +44,15 @@ Ocean::FrameType::PixelFormat vrsToOceanPixelFormat(vrs::PixelFormat targetPixel
 /// @param data: Pointer to the raw image data buffer
 /// @param oceanPixelFormat: The Ocean pixel format to use (for single-plane formats)
 /// @return A unique_ptr to an Ocean::Frame with properly initialized planes, or nullptr on failure
-std::unique_ptr<Ocean::Frame> createOceanFrameFromVRS(
+std::unique_ptr<Ocean::Frame> createReadOnlyOceanFrame(
     const ImageContentBlockSpec& imageSpec,
     const uint8_t* data,
+    Ocean::FrameType::PixelFormat oceanPixelFormat);
+
+/// Same as above, but for target frames, with a buffer you can write to.
+std::unique_ptr<Ocean::Frame> createWritableOceanFrame(
+    const ImageContentBlockSpec& imageSpec,
+    uint8_t* data,
     Ocean::FrameType::PixelFormat oceanPixelFormat);
 
 } // namespace vrs::utils

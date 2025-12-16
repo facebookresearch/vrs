@@ -28,6 +28,7 @@
 #include <vrs/RecordFormatStreamPlayer.h>
 #include <vrs/os/Utils.h>
 #include <vrs/utils/PixelFrame.h>
+#include <vrs/utils/PixelFrameOptions.h>
 
 using namespace std;
 using namespace vrs;
@@ -197,3 +198,26 @@ TEST_F(PixelFrameTest, jpegTest) {
   EXPECT_EQ(frame.getBuffer(), frame2.getBuffer());
 }
 #endif
+
+TEST_F(PixelFrameTest, resizeOptionsResizeFormats) {
+  constexpr uint32_t kSourceWidth = 32;
+  constexpr uint32_t kSourceHeight = 24;
+
+  ResizeOptions resizeOptions = ResizeOptions::withRatio(0.5f);
+
+  // Iterate over all pixel formats
+  for (uint8_t i = 0; i < static_cast<uint8_t>(PixelFormat::COUNT); ++i) {
+    PixelFormat format = static_cast<PixelFormat>(i);
+    if (!ResizeOptions::canResize(format)) {
+      continue;
+    }
+
+    PixelFrame sourceFrame(format, kSourceWidth, kSourceHeight);
+
+    unique_ptr<PixelFrame> resizedFrame = resizeOptions.resize(sourceFrame);
+    ASSERT_NE(resizedFrame, nullptr) << "resize() should return a valid PixelFrame";
+    EXPECT_EQ(resizedFrame->getSpec().getWidth(), kSourceWidth / 2);
+    EXPECT_EQ(resizedFrame->getSpec().getHeight(), kSourceHeight / 2);
+    EXPECT_EQ(resizedFrame->getSpec().getPixelFormat(), format);
+  }
+}
