@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-13, macos-latest, ubuntu-latest, windows-2022] #macOS-13 is macIntel, macOS-latest is macSilicon
+        os: [macos-14, macos-latest, ubuntu-latest, windows-2022] # note: macos builds are arm only
     steps:
       - name : Setup repo
         uses: actions/checkout@v4
