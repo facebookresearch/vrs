@@ -26,6 +26,10 @@ class AudioTrackExtractor : public RecordFormatStreamPlayer {
  public:
   AudioTrackExtractor(string wavFilePath, bool& outStop);
   ~AudioTrackExtractor() override;
+  AudioTrackExtractor(const AudioTrackExtractor&) = delete;
+  AudioTrackExtractor& operator=(const AudioTrackExtractor&) = delete;
+  AudioTrackExtractor(AudioTrackExtractor&&) = delete;
+  AudioTrackExtractor& operator=(AudioTrackExtractor&&) = delete;
 
   bool onAudioRead(const CurrentRecord& record, size_t, const ContentBlock& audioBlock) override;
   bool onUnsupportedBlock(const CurrentRecord& record, size_t, const ContentBlock& cb) override;

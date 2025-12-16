@@ -39,6 +39,10 @@ class DataExtractor {
   /// @param outputFolder: absolute or relative path to a folder for the extracted data.
   DataExtractor(RecordFileReader& reader, const string& outputFolder);
   ~DataExtractor();
+  DataExtractor(const DataExtractor&) = delete;
+  DataExtractor& operator=(const DataExtractor&) = delete;
+  DataExtractor(DataExtractor&&) = delete;
+  DataExtractor& operator=(DataExtractor&&) = delete;
 
   /// Tell which streams should be extracted. By default, no stream will be extracted.
   /// @param id: A stream identifier, found in 'reader.getStreams()'.

@@ -31,6 +31,10 @@ class AudioExtractor : public RecordFormatStreamPlayer {
   AudioExtractor(string folderPath, StreamId id, uint32_t& counter);
 
   ~AudioExtractor() override;
+  AudioExtractor(const AudioExtractor&) = delete;
+  AudioExtractor& operator=(const AudioExtractor&) = delete;
+  AudioExtractor(AudioExtractor&&) = delete;
+  AudioExtractor& operator=(AudioExtractor&&) = delete;
 
   bool onAudioRead(const CurrentRecord& record, size_t, const ContentBlock& audioBlock) override;
   bool onUnsupportedBlock(const CurrentRecord& record, size_t, const ContentBlock& cb) override;

@@ -40,6 +40,10 @@ class DecoderI {
  public:
   DecoderI() = default;
   virtual ~DecoderI();
+  DecoderI(const DecoderI&) = delete;
+  DecoderI& operator=(const DecoderI&) = delete;
+  DecoderI(DecoderI&&) = delete;
+  DecoderI& operator=(DecoderI&&) = delete;
   /// Decode compressed image to a frame
   virtual int decode(
       const vector<uint8_t>& encodedFrame,
