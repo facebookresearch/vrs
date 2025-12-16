@@ -25,7 +25,7 @@ class Picture;
 
 class InternalDecoder {
  public:
-  virtual ~InternalDecoder() {}
+  virtual ~InternalDecoder() = default;
   virtual void open() = 0;
   virtual void decode(uint8_t* buffer, size_t size, Picture& pix) = 0;
   virtual bool isHwAccelerated() {

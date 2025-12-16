@@ -42,7 +42,7 @@ CVideoDecoder::CVideoDecoder(const VideoCodec& codec) : _timeStamp{0} {
   _decoder = nullptr;
 }
 
-CVideoDecoder::~CVideoDecoder() {}
+CVideoDecoder::~CVideoDecoder() = default;
 
 XprsResult CVideoDecoder::init(bool disableHwAcceleration) {
   XprsResult result = XprsResult::OK;

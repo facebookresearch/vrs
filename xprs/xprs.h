@@ -451,7 +451,7 @@ constexpr int INPUT_BUFFER_PADDING_SIZE = 64;
  */
 class IVideoEncoder {
  public:
-  virtual ~IVideoEncoder() {}
+  virtual ~IVideoEncoder() = default;
 
   /**
    * Invalidate the current encoder configuration, if any, and initialize a new encoder.
@@ -483,7 +483,7 @@ class IVideoEncoder {
  */
 class IVideoDecoder {
  public:
-  virtual ~IVideoDecoder() {}
+  virtual ~IVideoDecoder() = default;
 
   /**
    * Initialize the decoder.
@@ -533,7 +533,7 @@ struct MuxerVideoStreamConfig {
  */
 class IVideoMuxer {
  public:
-  virtual ~IVideoMuxer() {}
+  virtual ~IVideoMuxer() = default;
 
   /**
    * Specify the output media file path.
