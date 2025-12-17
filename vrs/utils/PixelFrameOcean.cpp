@@ -142,10 +142,16 @@ Ocean::FrameType::PixelFormat vrsToOceanPixelFormat(vrs::PixelFormat targetPixel
       return Ocean::FrameType::FORMAT_Y10_PACKED;
     case vrs::PixelFormat::GREY16:
       return Ocean::FrameType::FORMAT_Y16;
+    case vrs::PixelFormat::BGR8:
+      return Ocean::FrameType::FORMAT_BGR24;
     case vrs::PixelFormat::RGB8:
       return Ocean::FrameType::FORMAT_RGB24;
     case vrs::PixelFormat::RGBA8:
       return Ocean::FrameType::FORMAT_RGBA32;
+    case vrs::PixelFormat::DEPTH32F:
+      return Ocean::FrameType::genericPixelFormat<float, 1u>();
+    case vrs::PixelFormat::RAW10_BAYER_RGGB:
+      return Ocean::FrameType::FORMAT_RGGB10_PACKED;
     case vrs::PixelFormat::YUY2:
       return Ocean::FrameType::FORMAT_YUYV16;
     case vrs::PixelFormat::YUV_I420_SPLIT:
