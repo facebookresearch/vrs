@@ -174,6 +174,7 @@ enum class RecordableTypeId : uint16_t {
   SpeechRecordableClass = 383, ///< For speech/ASR data streams.
   QuaternionRecordableClass = 384, ///< For quaternion data streams
   UltrasonicRecordableClass = 385, ///< For ultrasonic data streams
+  Detection2dRecordableClass = 386, ///< For 2D detection data streams (bboxes, scores, labels).
 
   // << Annotations >>
   AnnotationRecordableClass = 400, ///< For annotation streams.
