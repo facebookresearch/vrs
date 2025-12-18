@@ -5,10 +5,11 @@ var searchData=
   ['default_2',['Default',['../namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7ba7a1920d61156abc05a60135aefe8bc67',1,'vrs']]],
   ['depth32f_3',['DEPTH32F',['../namespacevrs.html#a0fbbb88591f21313dd46736fba5a7aa5a19f22a1cbc2e2733484acbf9fc1bb4cd',1,'vrs']]],
   ['depthcamerarecordableclass_4',['DepthCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a519f9fba435216fcd1f0bd8abbd03b48',1,'vrs']]],
-  ['diagnosticrecordableclass_5',['DiagnosticRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a9fb0d260894af0faff2e4ea087e51763',1,'vrs']]],
-  ['disparitycamerarecordableclass_6',['DisparityCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a2c4d3978e5822776894a283e6ddf9f1f',1,'vrs']]],
-  ['displayobservercamerarecordableclass_7',['DisplayObserverCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5af72adc94cf96525939e58be4712a2ae8',1,'vrs']]],
-  ['displayrecordableclass_8',['DisplayRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a0c7ec518a11e2d65058025033de26896',1,'vrs']]],
-  ['distancerecordableclass_9',['DistanceRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a9c00a9a5feb99214ab2cffba803d4b52',1,'vrs']]],
-  ['downwardcamerarecordableclass_10',['DownwardCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5ab79d21580765888097a635fede6fc338',1,'vrs']]]
+  ['detection2drecordableclass_5',['Detection2dRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5ae1d9f4838c312b7c5dc2ea534ceb5064',1,'vrs']]],
+  ['diagnosticrecordableclass_6',['DiagnosticRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a9fb0d260894af0faff2e4ea087e51763',1,'vrs']]],
+  ['disparitycamerarecordableclass_7',['DisparityCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a2c4d3978e5822776894a283e6ddf9f1f',1,'vrs']]],
+  ['displayobservercamerarecordableclass_8',['DisplayObserverCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5af72adc94cf96525939e58be4712a2ae8',1,'vrs']]],
+  ['displayrecordableclass_9',['DisplayRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a0c7ec518a11e2d65058025033de26896',1,'vrs']]],
+  ['distancerecordableclass_10',['DistanceRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a9c00a9a5feb99214ab2cffba803d4b52',1,'vrs']]],
+  ['downwardcamerarecordableclass_11',['DownwardCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5ab79d21580765888097a635fede6fc338',1,'vrs']]]
 ];
