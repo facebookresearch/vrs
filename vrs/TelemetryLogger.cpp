@@ -40,17 +40,22 @@ std::atomic<TelemetryLogger*>& TelemetryLogger::getCurrentLogger() {
 }
 
 void TelemetryLogger::setLogger(unique_ptr<TelemetryLogger> telemetryLogger) {
-  static mutex sMutex;
-  lock_guard<mutex> lock(sMutex);
-  auto& sCurrentLogger = getCurrentLogger();
-  sCurrentLogger.load(std::memory_order_relaxed)->stop();
-  static vector<unique_ptr<TelemetryLogger>> sLoggers;
-  if (telemetryLogger) {
-    telemetryLogger->start();
-    sCurrentLogger.exchange(telemetryLogger.get());
-    sLoggers.push_back(std::move(telemetryLogger));
-  } else {
-    sCurrentLogger.exchange(getDefaultLogger());
+  TelemetryLogger* newLogger = telemetryLogger.get();
+  {
+    static mutex sMutex;
+    lock_guard<mutex> lock(sMutex);
+    auto& sCurrentLogger = getCurrentLogger();
+    sCurrentLogger.load(std::memory_order_relaxed)->stop();
+    static vector<unique_ptr<TelemetryLogger>> sLoggers;
+    if (telemetryLogger) {
+      sCurrentLogger.exchange(telemetryLogger.get());
+      sLoggers.push_back(std::move(telemetryLogger));
+    } else {
+      sCurrentLogger.exchange(getDefaultLogger());
+    }
+  }
+  if (newLogger != nullptr) {
+    newLogger->start();
   }
 }
 
