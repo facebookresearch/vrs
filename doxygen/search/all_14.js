@@ -18,7 +18,7 @@ var searchData=
   ['unittest1_15',['UnitTest1',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5af0cf646be82c38dfedcd57e266247eb8',1,'vrs']]],
   ['unittest2_16',['UnitTest2',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a9fcebce7c0416116fc553c5914da7d7c',1,'vrs']]],
   ['unittestrecordableclass_17',['UnitTestRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5ad07e5ad74acdea9a8a863780f9a35732',1,'vrs']]],
-  ['unsetextra_18',['unsetExtra',['../structvrs_1_1_file_spec.html#ad9eaeb8a4dd43d2fced0359e20cdc397',1,'vrs::FileSpec']]],
+  ['unsetextra_18',['unsetExtra',['../structvrs_1_1_file_spec.html#a376288f92d89cf8f4a2df807a0a6ccaa',1,'vrs::FileSpec']]],
   ['unsupportedblockreader_19',['UnsupportedBlockReader',['../classvrs_1_1_unsupported_block_reader.html',1,'vrs']]],
   ['updatenextprogresstime_20',['updateNextProgressTime',['../classvrs_1_1_progress_logger.html#a98f9ef96c839cda15fec7ea2d2b422a2',1,'vrs::ProgressLogger']]],
   ['updatestep_21',['updateStep',['../classvrs_1_1_progress_logger.html#ac37490c6358267f5976a411cba44bd8e',1,'vrs::ProgressLogger']]],

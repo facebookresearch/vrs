@@ -41,7 +41,7 @@ var searchData=
   ['fourcharcode_38',['fourCharCode',['../namespacevrs_1_1_file_format.html#a2334b3b96dac72f21afcb6ca3029ce4e',1,'vrs::FileFormat']]],
   ['fromnumericname_39',['fromNumericName',['../classvrs_1_1_stream_id.html#a3809517b98d689aeaceb038a124ab44e',1,'vrs::StreamId']]],
   ['fromnumericnameplus_40',['fromNumericNamePlus',['../classvrs_1_1_stream_id.html#a6fa4ca2888eaca5f3da7dc59ccb024d0',1,'vrs::StreamId']]],
-  ['frompathjsonuri_41',['fromPathJsonUri',['../structvrs_1_1_file_spec.html#a5732993a13eaa89580fb81017c66c322',1,'vrs::FileSpec']]],
+  ['frompathjsonuri_41',['fromPathJsonUri',['../structvrs_1_1_file_spec.html#ae3b8e3fe3ca78c4e6310310691e14fa8',1,'vrs::FileSpec']]],
   ['future2_42',['future2',['../structvrs_1_1_file_format_1_1_file_header.html#abcac65ea19ed664749373c205ef1a6a5',1,'vrs::FileFormat::FileHeader']]],
   ['future3_43',['future3',['../structvrs_1_1_file_format_1_1_file_header.html#a961ae408d87ca0c4b3667035e4eb4949',1,'vrs::FileFormat::FileHeader']]],
   ['future4_44',['future4',['../structvrs_1_1_file_format_1_1_file_header.html#aa516e351318621e9ce6cc7122ffc0798',1,'vrs::FileFormat::FileHeader']]]

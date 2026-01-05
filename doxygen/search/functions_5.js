@@ -13,5 +13,5 @@ var searchData=
   ['fourcharcode_10',['fourCharCode',['../namespacevrs_1_1_file_format.html#a2334b3b96dac72f21afcb6ca3029ce4e',1,'vrs::FileFormat']]],
   ['fromnumericname_11',['fromNumericName',['../classvrs_1_1_stream_id.html#a3809517b98d689aeaceb038a124ab44e',1,'vrs::StreamId']]],
   ['fromnumericnameplus_12',['fromNumericNamePlus',['../classvrs_1_1_stream_id.html#a6fa4ca2888eaca5f3da7dc59ccb024d0',1,'vrs::StreamId']]],
-  ['frompathjsonuri_13',['fromPathJsonUri',['../structvrs_1_1_file_spec.html#a5732993a13eaa89580fb81017c66c322',1,'vrs::FileSpec']]]
+  ['frompathjsonuri_13',['fromPathJsonUri',['../structvrs_1_1_file_spec.html#ae3b8e3fe3ca78c4e6310310691e14fa8',1,'vrs::FileSpec']]]
 ];
