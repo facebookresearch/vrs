@@ -18,12 +18,14 @@
 
 #include <map>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
 namespace vrs {
 using std::map;
 using std::string;
+using std::string_view;
 using std::vector;
 
 /// \brief Generalized file descriptor class, allowing the efficient representation of complex
@@ -51,7 +53,7 @@ struct FileSpec {
   bool isDiskFile() const;
 
   static int parseUri(
-      const string& uri,
+      string_view uri,
       string& outScheme,
       string& outPath,
       map<string, string>& outQueryParams);
@@ -62,7 +64,7 @@ struct FileSpec {
   /// @param defaultFileHandlerName: provide a default FileHandler name. DiskFile by default.
   /// @return A status code, 0 meaning apparent success. Note that the validation is superficial,
   /// a file might not exists, the requested filehandler may not be available, etc.
-  int fromPathJsonUri(const string& pathJsonUri, const string& defaultFileHandlerName = {});
+  int fromPathJsonUri(string_view pathJsonUri, string_view defaultFileHandlerName = {});
 
   /// Reverse operation as fromPathJsonUri, as possible
   string toPathJsonUri() const;
@@ -71,7 +73,7 @@ struct FileSpec {
   // @param jsonStr: ex. {"storage": "mystorage", "chunks":["chunk1", "chunk2"],
   // "filename":"file.vrs"}.
   // @return True if parsing the json succeeded.
-  bool fromJson(const string& jsonStr);
+  bool fromJson(string_view jsonStr);
 
   // Generate json string from a file spec.
   // @return jsonStr: ex. {"storage": "mystorage", "chunks":["chunk1", "chunk2"],
@@ -99,40 +101,41 @@ struct FileSpec {
   bool operator==(const FileSpec& rhs) const;
 
   /// Get an extra parameter, or the empty string.
-  const string& getExtra(const string& name) const;
+  const string& getExtra(string_view name) const;
   /// Get an extra parameter value, and know if a match was found.
-  bool getExtra(const string& name, string& outValue) const;
+  bool getExtra(string_view name, string& outValue) const;
   /// Tell if an extra parameter is defined.
-  bool hasExtra(const string& name) const;
+  bool hasExtra(string_view name) const;
   /// Get an extra parameter interpreted as an int, or a default value if not available,
   /// or in case of type conversion error.
-  int getExtraAsInt(const string& name, int defaultValue = 0) const;
+  int getExtraAsInt(string_view name, int defaultValue = 0) const;
   /// Get an extra parameter interpreted as an int64, or a default value if not available,
   /// or in case of type conversion error.
-  int64_t getExtraAsInt64(const string& name, int64_t defaultValue = 0) const;
+  int64_t getExtraAsInt64(string_view name, int64_t defaultValue = 0) const;
   /// Get an extra parameter interpreted as an uint64, or a default value if not available,
   /// or in case of type conversion error.
-  uint64_t getExtraAsUInt64(const string& name, uint64_t defaultValue = 0) const;
+  uint64_t getExtraAsUInt64(string_view name, uint64_t defaultValue = 0) const;
   /// Get an extra parameter interpreted as a double, or a default value if not available,
   /// or in case of type conversion error.
-  double getExtraAsDouble(const string& name, double defaultValue = 0) const;
+  double getExtraAsDouble(string_view name, double defaultValue = 0) const;
   /// Get an extra parameter interpreted as a bool, or a default value if not available.
   /// The value is evaluated to be true if it is either "1" or "true", o/w this returns false.
-  bool getExtraAsBool(const string& name, bool defaultValue = false) const;
+  bool getExtraAsBool(string_view name, bool defaultValue = false) const;
 
-  static int decodeQuery(const string& query, string& outKey, string& outValue);
-  static int urldecode(const string& in, string& out);
+  static int decodeQuery(string_view query, string& outKey, string& outValue);
+  static int urldecode(string_view in, string& out);
 
-  void setExtra(const string& name, const string& value);
-  void setExtra(const string& name, const char* value);
-  void setExtra(const string& name, bool value);
+  void setExtra(string_view name, string_view value);
+  void setExtra(string_view name, const char* value);
+  void setExtra(string_view name, bool value);
+  void setExtra(string_view name, const string& value);
   template <typename T>
-  void setExtra(const string& name, T value) {
-    extras[name] = std::to_string(value);
+  void setExtra(string_view name, T value) {
+    extras[string(name)] = std::to_string(value);
   }
 
   /// Unset an extra parameter
-  void unsetExtra(const string& name);
+  void unsetExtra(string_view name);
 
   string fileHandlerName;
   string fileName;

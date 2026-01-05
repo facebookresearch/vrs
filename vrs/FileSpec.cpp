@@ -18,6 +18,7 @@
 
 #include <cctype>
 #include <cstring>
+#include <string_view>
 
 #include <tuple>
 
@@ -38,11 +39,53 @@ using namespace std;
 
 namespace vrs {
 
-static const char* kChunkField = "chunks";
-static const char* kChunkSizesField = "chunk_sizes";
-static const char* kFileHandlerField = "storage";
-static const char* kFileNameField = "filename";
-static const char* kUriField = "source_uri";
+namespace {
+
+constexpr const char* kChunkField = "chunks";
+constexpr const char* kChunkSizesField = "chunk_sizes";
+constexpr const char* kFileHandlerField = "storage";
+constexpr const char* kFileNameField = "filename";
+constexpr const char* kUriField = "source_uri";
+
+// Validates URI scheme according to RFC 3986.
+// Schema must start with a letter and contain only alphanumeric characters, '.', '-', '+', or '_'.
+// Returns true if valid, false otherwise.
+bool validateUriSchema(string_view uri, size_t colonPos) {
+  for (size_t p = 0; p < colonPos; p++) {
+    unsigned char c = static_cast<unsigned char>(uri[p]);
+    if (p == 0) {
+      if (!isalpha(c)) {
+        XR_LOGE("Invalid URI scheme for '{}'", uri);
+        return false;
+      }
+    } else {
+      if (!isalnum(c) && c != '.' && c != '-' && c != '+' && c != '_') {
+        XR_LOGE("Invalid character '{}' in URI scheme of '{}'", c, uri);
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+// Parses query parameters from a URI query string (portion after '?').
+// Parameters are separated by '&' or ';' and formatted as key=value.
+void parseQueryParams(string_view uri, size_t queryStart, map<string, string>& outQueryParams) {
+  size_t start = queryStart + 1;
+  for (size_t p = start; p < uri.size(); p++) {
+    unsigned char c = static_cast<unsigned char>(uri[p]);
+    if (c == '&' || c == ';' || p == uri.size() - 1) {
+      string key, value;
+      size_t length = (c == '&' || c == ';') ? p - start : p - start + 1;
+      if (FileSpec::decodeQuery(uri.substr(start, length), key, value) == 0) {
+        outQueryParams[key] = value;
+      }
+      start = p + 1;
+    }
+  }
+}
+
+} // namespace
 
 void FileSpec::clear() {
   fileHandlerName.clear();
@@ -67,12 +110,12 @@ bool FileSpec::isDiskFile() const {
 }
 
 int FileSpec::parseUri(
-    const string& uri,
+    string_view uri,
     string& outScheme,
     string& outPath,
     map<string, string>& outQueryParams) {
   // Parse URI following https://en.wikipedia.org/wiki/Uniform_Resource_Identifier.
-  // URI should look like <schema>:<path>?<query> while <schema> corresponds to file handler name.
+  // URI should look like <scheme>:<path>?<query> while <scheme> corresponds to file handler name.
   // The query should be used to specify additional fields for each file handler.
   outScheme.clear();
   outPath.clear();
@@ -80,58 +123,39 @@ int FileSpec::parseUri(
 
   auto colon = uri.find(':');
   if (colon == 0) {
-    XR_LOGE("Schema doesn't exist in uri before ':': {}", uri);
+    XR_LOGE("Schema required before ':': {}", uri);
     return INVALID_URI_FORMAT;
   }
-  // validate url schema
-  for (size_t p = 0; p < colon && colon != string::npos; p++) {
-    unsigned char c = static_cast<unsigned char>(uri[p]);
-    // from https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Generic_syntax
-    if (p == 0) {
-      if (!isalpha(c)) {
-        XR_LOGE("Schema of URI '{}' should start with a letter", uri);
-        return INVALID_URI_FORMAT;
-      }
-    } else {
-      if (!isalnum(c) && c != '.' && c != '-' && c != '+' && c != '_') {
-        XR_LOGE("Schema contains an invalid character {}: {}", c, uri);
-        return INVALID_URI_FORMAT;
-      }
-    }
+
+  // Validate scheme if present
+  if (colon != string_view::npos && !validateUriSchema(uri, colon)) {
+    return INVALID_URI_FORMAT;
   }
 
   auto query = uri.find('?');
 
-  // length of path should be longer than 0
-  if (query <= colon + 1 || (query == string::npos && colon >= uri.size() - 1)) {
-    XR_LOGE("Cannot parse input string '{}'. This is not a URI.", uri);
+  // Path length must be greater than 0
+  if (query <= colon + 1 || (query == string_view::npos && colon >= uri.size() - 1)) {
+    XR_LOGE("'{}' is not a valid URI.", uri);
     return INVALID_URI_FORMAT;
   }
 
-  if (query != string::npos) {
-    size_t start = query + 1;
-    for (size_t p = start; p < uri.size(); p++) {
-      unsigned char c = static_cast<unsigned char>(uri[p]);
-      if (c == '&' || c == ';' || p == uri.size() - 1) {
-        string key, value;
-        size_t length = (c == '&' || c == ';') ? p - start : p - start + 1;
-        if (FileSpec::decodeQuery(uri.substr(start, length), key, value) == 0) {
-          outQueryParams[key] = value;
-        }
-        start = p + 1;
-      }
-    }
+  // Parse query parameters if present
+  if (query != string_view::npos) {
+    parseQueryParams(uri, query, outQueryParams);
   }
 
-  if (colon != string::npos && colon > 0) {
-    outScheme = uri.substr(0, colon);
+  // Extract scheme
+  if (colon != string_view::npos && colon > 0) {
+    outScheme = string(uri.substr(0, colon));
   }
 
-  string path =
-      (colon != string::npos) ? uri.substr(colon + 1, query - colon - 1) : uri.substr(0, query);
+  // Extract and decode path
+  string_view path = (colon != string_view::npos) ? uri.substr(colon + 1, query - colon - 1)
+                                                  : uri.substr(0, query);
   int status = FileSpec::urldecode(path, outPath);
   if (status != 0) {
-    XR_LOGE("Path contains invalid character {}", path);
+    XR_LOGE("Invalid character in URI '{}'", path);
     outScheme.clear();
     outPath.clear();
     outQueryParams.clear();
@@ -141,7 +165,7 @@ int FileSpec::parseUri(
   return SUCCESS;
 }
 
-int FileSpec::fromPathJsonUri(const string& pathJsonUri, const string& defaultFileHandlerName) {
+int FileSpec::fromPathJsonUri(string_view pathJsonUri, string_view defaultFileHandlerName) {
   clear();
   if (pathJsonUri.empty()) {
     return INVALID_PARAMETER;
@@ -149,7 +173,7 @@ int FileSpec::fromPathJsonUri(const string& pathJsonUri, const string& defaultFi
     return fromJson(pathJsonUri) ? SUCCESS : FILEPATH_PARSE_ERROR;
   }
   auto colon = pathJsonUri.find(':');
-  bool isUri = colon != string::npos && colon > 1;
+  bool isUri = colon != string_view::npos && colon > 1;
   for (size_t p = 0; p < colon && isUri; p++) {
     unsigned char c = static_cast<unsigned char>(pathJsonUri[p]);
     // from https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Generic_syntax
@@ -158,11 +182,11 @@ int FileSpec::fromPathJsonUri(const string& pathJsonUri, const string& defaultFi
   if (!isUri) {
     // Check if there might be URI parameter in the path, and try to parse it that way.
     auto uriParams = pathJsonUri.find('?');
-    bool hasParams = uriParams != string::npos && uriParams > 1 &&
+    bool hasParams = uriParams != string_view::npos && uriParams > 1 &&
         isalpha(static_cast<unsigned char>(pathJsonUri[uriParams + 1])) &&
-        pathJsonUri.find('=', uriParams + 2) != string::npos;
+        pathJsonUri.find('=', uriParams + 2) != string_view::npos;
     fileHandlerName =
-        defaultFileHandlerName.empty() ? DiskFile::staticName() : defaultFileHandlerName;
+        defaultFileHandlerName.empty() ? DiskFile::staticName() : string(defaultFileHandlerName);
     if (hasParams) {
       uri = pathJsonUri;
       if (FileHandlerFactory::getInstance().parseUri(*this, 0) == SUCCESS) {
@@ -170,10 +194,10 @@ int FileSpec::fromPathJsonUri(const string& pathJsonUri, const string& defaultFi
       }
       uri.clear();
     }
-    chunks = {pathJsonUri};
+    chunks = {string(pathJsonUri)};
     return SUCCESS;
   } else {
-    fileHandlerName = pathJsonUri.substr(0, colon);
+    fileHandlerName = string(pathJsonUri.substr(0, colon));
   }
   uri = pathJsonUri;
 
@@ -194,10 +218,10 @@ string FileSpec::toPathJsonUri() const {
   return empty() ? "" : toJson();
 }
 
-bool FileSpec::fromJson(const string& jsonStr) {
+bool FileSpec::fromJson(string_view jsonStr) {
   using namespace vrs_rapidjson;
   JDocument document;
-  jParse(document, jsonStr);
+  jParse(document, string(jsonStr));
   if (document.IsObject()) {
     getJString(fileName, document, kFileNameField);
     getJString(fileHandlerName, document, kFileHandlerField);
@@ -380,14 +404,14 @@ bool FileSpec::operator==(const FileSpec& rhs) const {
   return tie(*this) == tie(rhs);
 }
 
-const string& FileSpec::getExtra(const string& name) const {
+const string& FileSpec::getExtra(string_view name) const {
   static const string kEmptyString;
-  const auto extra = extras.find(name);
+  const auto extra = extras.find(string(name));
   return (extra == extras.end()) ? kEmptyString : extra->second;
 }
 
-bool FileSpec::getExtra(const string& name, string& outValue) const {
-  const auto extra = extras.find(name);
+bool FileSpec::getExtra(string_view name, string& outValue) const {
+  const auto extra = extras.find(string(name));
   if (extra == extras.end()) {
     return false;
   }
@@ -395,42 +419,42 @@ bool FileSpec::getExtra(const string& name, string& outValue) const {
   return true;
 }
 
-bool FileSpec::hasExtra(const string& name) const {
-  return extras.find(name) != extras.end();
+bool FileSpec::hasExtra(string_view name) const {
+  return extras.find(string(name)) != extras.end();
 }
 
-int FileSpec::getExtraAsInt(const string& name, int defaultValue) const {
+int FileSpec::getExtraAsInt(string_view name, int defaultValue) const {
   int result = 0;
-  return helpers::getInt(extras, name, result) ? result : defaultValue;
+  return helpers::getInt(extras, string(name), result) ? result : defaultValue;
 }
 
-int64_t FileSpec::getExtraAsInt64(const string& name, int64_t defaultValue) const {
+int64_t FileSpec::getExtraAsInt64(string_view name, int64_t defaultValue) const {
   int64_t result = 0;
-  return helpers::getInt64(extras, name, result) ? result : defaultValue;
+  return helpers::getInt64(extras, string(name), result) ? result : defaultValue;
 }
 
-uint64_t FileSpec::getExtraAsUInt64(const string& name, uint64_t defaultValue) const {
+uint64_t FileSpec::getExtraAsUInt64(string_view name, uint64_t defaultValue) const {
   uint64_t result = 0;
-  return helpers::getUInt64(extras, name, result) ? result : defaultValue;
+  return helpers::getUInt64(extras, string(name), result) ? result : defaultValue;
 }
 
-double FileSpec::getExtraAsDouble(const string& name, double defaultValue) const {
+double FileSpec::getExtraAsDouble(string_view name, double defaultValue) const {
   double result = 0;
-  return helpers::getDouble(extras, name, result) ? result : defaultValue;
+  return helpers::getDouble(extras, string(name), result) ? result : defaultValue;
 }
 
-bool FileSpec::getExtraAsBool(const string& name, bool defaultValue) const {
+bool FileSpec::getExtraAsBool(string_view name, bool defaultValue) const {
   bool result = false;
-  return helpers::getBool(extras, name, result) ? result : defaultValue;
+  return helpers::getBool(extras, string(name), result) ? result : defaultValue;
 }
 
-void FileSpec::unsetExtra(const string& name) {
-  extras.erase(name);
+void FileSpec::unsetExtra(string_view name) {
+  extras.erase(string(name));
 }
 
-int FileSpec::decodeQuery(const string& query, string& outKey, string& outValue) {
+int FileSpec::decodeQuery(string_view query, string& outKey, string& outValue) {
   auto equal = query.find('=');
-  if (equal == string::npos) {
+  if (equal == string_view::npos) {
     XR_LOGW("'=' doesn't exist in query: {}", query);
     return INVALID_URI_FORMAT;
   }
@@ -438,15 +462,15 @@ int FileSpec::decodeQuery(const string& query, string& outKey, string& outValue)
     XR_LOGW("Key doesn't exist in query: {}", query);
     return INVALID_URI_FORMAT;
   }
-  string key = query.substr(0, equal);
+  string_view key = query.substr(0, equal);
   int status = FileSpec::urldecode(key, outKey);
   if (status != 0) {
     XR_LOGW("Failed to decode key in query {} : {}", key, query);
     return status;
   }
 
-  string value = query.substr(equal + 1);
-  if (value.find('=') != string::npos) {
+  string_view value = query.substr(equal + 1);
+  if (value.find('=') != string_view::npos) {
     XR_LOGW("More than one '=' in query: {}", query);
     return INVALID_URI_FORMAT;
   }
@@ -471,7 +495,7 @@ inline char xdigitToChar(char xdigit) {
   return (xdigit <= '9') ? xdigit - '0' : 10 + xdigit - ((xdigit <= 'Z') ? 'A' : 'a');
 }
 
-int FileSpec::urldecode(const string& in, string& out) {
+int FileSpec::urldecode(string_view in, string& out) {
   out.clear();
   out.reserve(in.size());
   for (size_t p = 0; p < in.size(); p++) {
@@ -489,16 +513,20 @@ int FileSpec::urldecode(const string& in, string& out) {
   return 0;
 }
 
-void FileSpec::setExtra(const string& name, const string& value) {
-  extras[name] = value;
+void FileSpec::setExtra(string_view name, string_view value) {
+  extras[string(name)] = string(value);
 }
 
-void FileSpec::setExtra(const string& name, const char* value) {
-  extras[name] = value;
+void FileSpec::setExtra(string_view name, const char* value) {
+  extras[string(name)] = value;
 }
 
-void FileSpec::setExtra(const string& name, bool value) {
-  extras[name] = value ? "1" : "0";
+void FileSpec::setExtra(string_view name, bool value) {
+  extras[string(name)] = value ? "1" : "0";
+}
+
+void FileSpec::setExtra(string_view name, const string& value) {
+  extras[string(name)] = value;
 }
 
 } // namespace vrs
