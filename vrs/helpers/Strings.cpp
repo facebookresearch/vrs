@@ -163,31 +163,31 @@ string humanReadableDuration(double seconds) {
     bool showNext = false;
     if (seconds > kYear) {
       int years = static_cast<int>(seconds / kYear);
-      str.append(to_string(years)).append((years == 1) ? " year, " : " years, ");
+      fmt::format_to(back_inserter(str), "{}{}", years, (years == 1) ? " year, " : " years, ");
       seconds -= years * kYear;
       showNext = true;
     }
     if (showNext || seconds > kWeek) {
       int weeks = static_cast<int>(seconds / kWeek);
-      str.append(to_string(weeks)).append((weeks == 1) ? " week, " : " weeks, ");
+      fmt::format_to(back_inserter(str), "{}{}", weeks, (weeks == 1) ? " week, " : " weeks, ");
       seconds -= weeks * kWeek;
       showNext = true;
     }
     if (showNext || seconds > kDay) {
       int days = static_cast<int>(seconds / kDay);
-      str.append(to_string(days)).append((days == 1) ? " day, " : " days, ");
+      fmt::format_to(back_inserter(str), "{}{}", days, (days == 1) ? " day, " : " days, ");
       seconds -= days * kDay;
       showNext = true;
     }
     if (showNext || seconds > kHour) {
       int hours = static_cast<int>(seconds / kHour);
-      str.append(to_string(hours)).append("h ");
+      fmt::format_to(back_inserter(str), "{}h ", hours);
       seconds -= hours * kHour;
       showNext = true;
     }
     if (showNext || seconds > kMinute) {
       int minutes = static_cast<int>(seconds / kMinute);
-      str.append(to_string(minutes)).append("m ");
+      fmt::format_to(back_inserter(str), "{}m ", minutes);
       seconds -= minutes * kMinute;
       showNext = true;
     }

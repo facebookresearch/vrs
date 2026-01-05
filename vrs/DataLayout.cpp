@@ -1304,14 +1304,24 @@ void DataPieceArray<T>::print(ostream& out, const string& indent) const {
   bool isDefault = !hasValue && !getDefault().empty();
   string str;
   str.reserve(200 + values.size() * 40);
-  str.append(getLabel()).append(" (").append(getElementTypeName());
-  str.append("[").append(to_string(count_)).append("]) @ ");
   if (getOffset() == DataLayout::kNotFound) {
-    str.append("<unavailable>");
+    fmt::format_to(
+        back_inserter(str),
+        "{} ({}[{}]) @ <unavailable>+{}",
+        getLabel(),
+        getElementTypeName(),
+        count_,
+        getFixedSize());
   } else {
-    str.append(to_string(getOffset()));
+    fmt::format_to(
+        back_inserter(str),
+        "{} ({}[{}]) @ {}+{}",
+        getLabel(),
+        getElementTypeName(),
+        count_,
+        getOffset(),
+        getFixedSize());
   }
-  str.append("+").append(to_string(getFixedSize()));
   if (isRequired()) {
     str.append(" required");
   }
@@ -1458,11 +1468,17 @@ void DataPieceVector<T>::print(ostream& out, const string& indent) const {
   bool isDefault = !get(values);
   string str;
   str.reserve(200 + values.size() * 40);
-  str.append(getLabel()).append(" (vector<").append(getElementTypeName()).append(">) @ ");
   if (getOffset() == DataLayout::kNotFound) {
-    str.append("<unavailable>");
+    fmt::format_to(
+        back_inserter(str), "{} (vector<{}>) @ <unavailable>", getLabel(), getElementTypeName());
   } else {
-    str.append(to_string(getOffset())).append("x").append(to_string(values.size()));
+    fmt::format_to(
+        back_inserter(str),
+        "{} (vector<{}>) @ {}x{}",
+        getLabel(),
+        getElementTypeName(),
+        getOffset(),
+        values.size());
   }
   if (isRequired()) {
     str.append(" required");
@@ -1787,11 +1803,10 @@ void DataPieceString::print(ostream& out, const string& indent) const {
   string value = helpers::make_printable(get());
   string str;
   str.reserve(100 + value.size());
-  str.append(getLabel()).append(" (string) @ ");
   if (getOffset() == DataLayout::kNotFound) {
-    str.append("<unavailable>");
+    fmt::format_to(back_inserter(str), "{} (string) @ <unavailable>", getLabel());
   } else {
-    str.append(to_string(getOffset()));
+    fmt::format_to(back_inserter(str), "{} (string) @ {}", getLabel(), getOffset());
   }
   if (isRequired()) {
     str.append(" required");
