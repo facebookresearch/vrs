@@ -21,7 +21,9 @@
 #include <memory>
 #include <set>
 #include <string>
+#include <string_view>
 #include <thread>
+#include <type_traits>
 #include <vector>
 
 #include <vrs/FileFormat.h>
@@ -38,7 +40,14 @@ namespace vrs {
 using std::map;
 using std::set;
 using std::string;
+using std::string_view;
 using std::vector;
+
+/// Helper to enable overloads for types that convert to string but not directly to string_view.
+template <typename T>
+using EnableIfStringConvertible = std::enable_if_t<
+    !std::is_convertible_v<const T&, string_view> && std::is_convertible_v<T, string>,
+    int>;
 
 class DataLayout;
 class StreamPlayer;
@@ -79,7 +88,7 @@ class RecordFileReader {
   /// Note: will reset the object if needed.
   /// @param filePath: Absolute or relative path of the file to check.
   /// @return True if the file is probably a VRS file, false otherwise (or if no file is found).
-  bool isVrsFile(const string& filePath);
+  bool isVrsFile(string_view filePath);
   /// Checks if a file is most probably a VRS file by checking its header for VRS file's format
   /// magic numbers.
   /// Note: will reset the object if needed.
@@ -94,7 +103,12 @@ class RecordFileReader {
   /// @param autoWriteFixedIndex: If the index was rebuilt, patch the original file in place.
   /// @return 0 on success and you can read the file, or some non-zero error code, in which case,
   /// further read calls will fail.
-  int openFile(const string& filePath, bool autoWriteFixedIndex = false);
+  int openFile(string_view filePath, bool autoWriteFixedIndex = false);
+  /// Template overload for types that convert to string but not directly to string_view.
+  template <typename T, EnableIfStringConvertible<T> = 0>
+  inline int openFile(const T& filePath, bool autoWriteFixedIndex = false) {
+    return openFile(string_view(static_cast<string>(filePath)), autoWriteFixedIndex);
+  }
   /// Open a record file.
   /// Use one RecordFileReader object per file you want to read.
   /// @param fileSpec: File spec of the local or remote file to check.
@@ -543,7 +557,7 @@ class RecordFileReader {
   /// the local file is a VRS file, by reading the file's header and checking VRS signatures.
   /// @return A status code, 0 meaning success.
   static int
-  vrsFilePathToFileSpec(const string& filePath, FileSpec& outFileSpec, bool checkLocalFile = false);
+  vrsFilePathToFileSpec(string_view filePath, FileSpec& outFileSpec, bool checkLocalFile = false);
 
   class RecordTypeCounter : public std::array<uint32_t, enumCount<Record::Type>()> {
     using ParentType = std::array<uint32_t, enumCount<Record::Type>()>;

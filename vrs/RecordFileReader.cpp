@@ -115,14 +115,14 @@ int RecordFileReader::openFile(const FileSpec& fileSpec, bool autoWriteFixedInde
   return doOpenFile(fileSpec, autoWriteFixedIndex, /* checkSignatureOnly */ false);
 }
 
-int RecordFileReader::openFile(const string& filePath, bool autoWriteFixedIndex) {
+int RecordFileReader::openFile(string_view filePath, bool autoWriteFixedIndex) {
   FileSpec fileSpec;
   IF_ERROR_RETURN(vrsFilePathToFileSpec(filePath, fileSpec));
   return doOpenFile(fileSpec, autoWriteFixedIndex, /* checkSignatureOnly */ false);
 }
 
 int RecordFileReader::vrsFilePathToFileSpec(
-    const string& filePath,
+    string_view filePath,
     FileSpec& outFileSpec,
     bool checkLocalFile) {
   IF_ERROR_RETURN(outFileSpec.fromPathJsonUri(filePath));
@@ -198,7 +198,7 @@ bool RecordFileReader::isVrsFile(const FileSpec& fileSpec) {
   return doOpenFile(fileSpec, /* autoWriteFixedIndex */ false, /* checkSignatureOnly */ true) == 0;
 }
 
-bool RecordFileReader::isVrsFile(const string& filePath) {
+bool RecordFileReader::isVrsFile(string_view filePath) {
   FileSpec fileSpec;
   if (fileSpec.fromPathJsonUri(filePath) != 0) {
     return false;

@@ -179,9 +179,10 @@ const unordered_map<RecordableTypeId, const char*>& getRecordableTypeIdRegistry(
   return sRegistry;
 }
 
-StreamId fromNumericNameWithSeparator(const string& numericName, uint8_t separator) {
+StreamId fromNumericNameWithSeparator(string_view numericName, uint8_t separator) {
   // Quick parsing of "NNN-DDD", two uint numbers separated by a separator.
-  const auto* s = reinterpret_cast<const uint8_t*>(numericName.c_str());
+  const auto* s = reinterpret_cast<const uint8_t*>(numericName.data());
+  const auto* end = s + numericName.size();
   if (*s < '0' || *s > '9') {
     return {}; // must start with a digit
   }
@@ -190,14 +191,14 @@ StreamId fromNumericNameWithSeparator(const string& numericName, uint8_t separat
     recordableTypeId = 10 * recordableTypeId + (*s - '0');
   }
   if (*s++ == separator) {
-    if (*s < '0' || *s > '9') {
+    if (s >= end || *s < '0' || *s > '9') {
       return {}; // instance id must start with a digit
     }
     uint16_t index = 0;
-    while (*s >= '0' && *s <= '9') {
+    while (s < end && *s >= '0' && *s <= '9') {
       index = 10 * index + (*s++ - '0');
     }
-    if (*s == 0) {
+    if (s == end) {
       return {static_cast<RecordableTypeId>(recordableTypeId), index};
     }
   }
@@ -233,11 +234,11 @@ string StreamId::getNumericName() const {
   return to_string(static_cast<int>(typeId_)) + '-' + to_string(instanceId_);
 }
 
-StreamId StreamId::fromNumericName(const string& numericName) {
+StreamId StreamId::fromNumericName(string_view numericName) {
   return fromNumericNameWithSeparator(numericName, '-');
 }
 
-StreamId StreamId::fromNumericNamePlus(const string& numericName) {
+StreamId StreamId::fromNumericNamePlus(string_view numericName) {
   return fromNumericNameWithSeparator(numericName, '+');
 }
 

@@ -18,12 +18,14 @@
 
 #include <cstdint>
 #include <string>
+#include <string_view>
 
 #include <vrs/os/Platform.h>
 
 namespace vrs {
 
 using std::string;
+using std::string_view;
 
 /// \brief VRS stream type or class identifier enum.
 ///
@@ -304,12 +306,12 @@ class StreamId {
   /// Convert from a stream ID numeric string representation
   /// @param numericName: a stream ID name in numeric representation, e.g., "1100-1"
   /// @return A stream ID. Use isValid() to know if the conversion succeeded.
-  static StreamId fromNumericName(const string& numericName);
+  static StreamId fromNumericName(string_view numericName);
   /// Convert from a stream ID numeric string representation with a '+' sign between numbers
   /// Useful to parse relative stream IDs, which need a file for complete resolution.
   /// @param numericName: a stream ID name in numeric representation, e.g., "1100+1"
   /// @return A stream ID. Use isValid() to know if the conversion succeeded.
-  static StreamId fromNumericNamePlus(const string& numericName);
+  static StreamId fromNumericNamePlus(string_view numericName);
 
   /// A recording might be using a type id not known by the current version of the code.
   /// This should not be problem, but in some situation, in particular display purposes in
