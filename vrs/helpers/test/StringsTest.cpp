@@ -58,6 +58,46 @@ TEST_F(StringsHelpersTester, trim) {
   EXPECT_STREQ(helpers::trim("\rhello \t\n\rhello", " \t\n\r").c_str(), "hello \t\n\rhello");
 }
 
+TEST_F(StringsHelpersTester, trimView) {
+  using namespace vrs::helpers;
+
+  EXPECT_EQ(trimView(""), "");
+  EXPECT_EQ(trimView(" "), "");
+  EXPECT_EQ(trimView("\t"), "");
+  EXPECT_EQ(trimView(" \t "), "");
+  EXPECT_EQ(trimView(" he l\tlo "), "he l\tlo");
+  EXPECT_EQ(trimView(" hello"), "hello");
+  EXPECT_EQ(trimView("hello "), "hello");
+  EXPECT_EQ(trimView("hello\t"), "hello");
+
+  EXPECT_EQ(trimView(" hello ", " "), "hello");
+  EXPECT_EQ(trimView(" hello ", ""), " hello ");
+  EXPECT_EQ(trimView("hello\r", " \t\n\r"), "hello");
+  EXPECT_EQ(trimView("\n", " \t\n\r"), "");
+  EXPECT_EQ(trimView(" ", " \t\n\r"), "");
+  EXPECT_EQ(trimView("\t", " \t\n\r"), "");
+  EXPECT_EQ(trimView("\n", " \t\n\r"), "");
+  EXPECT_EQ(trimView("\r", " \t\n\r"), "");
+  EXPECT_EQ(trimView("\rhello \t\n\rhello", " \t\n\r"), "hello \t\n\rhello");
+
+  // Test that trimView returns a view into the original string (zero allocation)
+  string original = "  hello world  ";
+  string_view result = trimView(original);
+  EXPECT_EQ(result, "hello world");
+  EXPECT_EQ(result.data(), original.data() + 2);
+  EXPECT_EQ(result.size(), 11);
+
+  // Test with string_view input
+  string_view sv = "  test  ";
+  EXPECT_EQ(trimView(sv), "test");
+
+  // Test edge cases
+  EXPECT_EQ(trimView("   "), "");
+  EXPECT_EQ(trimView("hello"), "hello");
+  EXPECT_EQ(trimView("a"), "a");
+  EXPECT_EQ(trimView(" a "), "a");
+}
+
 TEST_F(StringsHelpersTester, startsWith) {
   using namespace vrs::helpers;
   EXPECT_TRUE(startsWith("hello", ""));
@@ -532,6 +572,108 @@ TEST_F(StringsHelpersTester, splitTest) {
   expectedTokens = {"he", "o e", "e is coo", "o", ".", "e bo", "de", "ait"};
   helpers::split(str, 'l', actualTokens, true, " ");
   EXPECT_EQ(actualTokens, expectedTokens);
+}
+
+TEST_F(StringsHelpersTester, splitViewsTest) {
+  using namespace vrs::helpers;
+
+  // Basic test - same behavior as split()
+  string str =
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, "
+      "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+  vector<string_view> expectedTokens{
+      "Lorem ipsum dolor sit amet",
+      " consectetur adipiscing elit",
+      " sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."};
+  vector<string_view> actualTokens;
+
+  EXPECT_EQ(splitViews(str, ',', actualTokens), 3);
+  EXPECT_EQ(actualTokens, expectedTokens);
+
+  // No match - entire string as single token
+  expectedTokens = {str};
+  EXPECT_EQ(splitViews(str, '_', actualTokens), 1);
+  EXPECT_EQ(actualTokens, expectedTokens);
+
+  // Multiple delimiters with empty tokens
+  str = "hello elle is cool lol. le bol de lait";
+  expectedTokens = {"he", "", "o e", "", "e is coo", " ", "o", ". ", "e bo", " de ", "ait"};
+  EXPECT_EQ(splitViews(str, 'l', actualTokens), 11);
+  EXPECT_EQ(actualTokens, expectedTokens);
+
+  // Skip empty tokens
+  expectedTokens = {"he", "o e", "e is coo", " ", "o", ". ", "e bo", " de ", "ait"};
+  EXPECT_EQ(splitViews(str, 'l', actualTokens, true), 9);
+  EXPECT_EQ(actualTokens, expectedTokens);
+
+  // Skip empty + trim whitespace
+  expectedTokens = {"he", "o e", "e is coo", "o", ".", "e bo", "de", "ait"};
+  EXPECT_EQ(splitViews(str, 'l', actualTokens, true, " "), 8);
+  EXPECT_EQ(actualTokens, expectedTokens);
+
+  // Test that views point to the original string (zero allocation verification)
+  string original = "one,two,three";
+  splitViews(original, ',', actualTokens);
+  EXPECT_EQ(actualTokens.size(), 3);
+  EXPECT_EQ(actualTokens[0], "one");
+  EXPECT_EQ(actualTokens[1], "two");
+  EXPECT_EQ(actualTokens[2], "three");
+  // Verify data pointers reference the original string
+  EXPECT_EQ(actualTokens[0].data(), original.data());
+  EXPECT_EQ(actualTokens[1].data(), original.data() + 4);
+  EXPECT_EQ(actualTokens[2].data(), original.data() + 8);
+
+  // Empty string
+  EXPECT_EQ(splitViews("", ',', actualTokens), 1);
+  EXPECT_EQ(actualTokens.size(), 1);
+  EXPECT_EQ(actualTokens[0], "");
+
+  // Empty string with skipEmpty
+  EXPECT_EQ(splitViews("", ',', actualTokens, true), 0);
+  EXPECT_EQ(actualTokens.size(), 0);
+
+  // Single delimiter
+  EXPECT_EQ(splitViews(",", ',', actualTokens), 2);
+  EXPECT_EQ(actualTokens.size(), 2);
+  EXPECT_EQ(actualTokens[0], "");
+  EXPECT_EQ(actualTokens[1], "");
+
+  // Single delimiter with skipEmpty
+  EXPECT_EQ(splitViews(",", ',', actualTokens, true), 0);
+  EXPECT_EQ(actualTokens.size(), 0);
+
+  // Multiple delimiters
+  EXPECT_EQ(splitViews(",,,", ',', actualTokens), 4);
+  EXPECT_EQ(actualTokens.size(), 4);
+
+  // Delimiter at start
+  EXPECT_EQ(splitViews(",abc", ',', actualTokens), 2);
+  EXPECT_EQ(actualTokens[0], "");
+  EXPECT_EQ(actualTokens[1], "abc");
+
+  // Delimiter at end
+  EXPECT_EQ(splitViews("abc,", ',', actualTokens), 2);
+  EXPECT_EQ(actualTokens[0], "abc");
+  EXPECT_EQ(actualTokens[1], "");
+
+  // Test with string_view input directly
+  string_view sv = "a:b:c";
+  EXPECT_EQ(splitViews(sv, ':', actualTokens), 3);
+  EXPECT_EQ(actualTokens[0], "a");
+  EXPECT_EQ(actualTokens[1], "b");
+  EXPECT_EQ(actualTokens[2], "c");
+
+  // Test trimming with different characters
+  EXPECT_EQ(splitViews(" a , b , c ", ',', actualTokens, false, " "), 3);
+  EXPECT_EQ(actualTokens[0], "a");
+  EXPECT_EQ(actualTokens[1], "b");
+  EXPECT_EQ(actualTokens[2], "c");
+
+  // Test that clears previous output
+  actualTokens = {"old", "values"};
+  splitViews("new", ',', actualTokens);
+  EXPECT_EQ(actualTokens.size(), 1);
+  EXPECT_EQ(actualTokens[0], "new");
 }
 
 #define CHECK_BEFORE(a, b)                    \

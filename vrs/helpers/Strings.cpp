@@ -52,6 +52,16 @@ string trim(const string& text, const char* whiteChars) {
   return text;
 }
 
+string_view trimView(string_view text, const char* whiteChars) {
+  while (!text.empty() && strchr(whiteChars, text.back()) != nullptr) {
+    text.remove_suffix(1);
+  }
+  while (!text.empty() && strchr(whiteChars, text.front()) != nullptr) {
+    text.remove_prefix(1);
+  }
+  return text;
+}
+
 bool startsWith(const string_view& text, const string_view& prefix) {
   return text.length() >= prefix.length() &&
       vrs::helpers::strncasecmp(text.data(), prefix.data(), prefix.length()) == 0;
@@ -376,21 +386,22 @@ inline char safeisdigit(char c) {
 }
 
 // Interpret strings with units such as "5KB" or "23mb"
-bool readByteSize(const string& strSize, uint64_t& outByteSize) {
+bool readByteSize(string_view strSize, uint64_t& outByteSize) {
   if (strSize.empty()) {
     outByteSize = 0;
     return false;
   }
 
-  auto result = from_chars(strSize.c_str(), strSize.c_str() + strSize.length(), outByteSize);
+  auto result = from_chars(strSize.data(), strSize.data() + strSize.size(), outByteSize);
   if (result.ec != errc{}) {
     outByteSize = 0;
     return false;
   }
 
   const char* next = result.ptr;
+  const char* end = strSize.data() + strSize.size();
 
-  if (*next == 0) {
+  if (next == end) {
     return true;
   }
   uint64_t factor = 1;
@@ -411,14 +422,14 @@ bool readByteSize(const string& strSize, uint64_t& outByteSize) {
       factor <<= 10;
       break;
     case 'b':
-      if (next[1] == 0) {
+      if (next + 1 == end) {
         return true;
       }
       break;
     default:
       break;
   }
-  if (factor == 1 || safetolower(next[1]) != 'b' || next[2] != 0) {
+  if (factor == 1 || next + 2 != end || safetolower(next[1]) != 'b') {
     return false;
   }
   outByteSize *= factor;
@@ -459,10 +470,41 @@ size_t split(
   return outTokens.size();
 }
 
-bool readUInt64(const std::string& str, uint64_t& outValue) {
+size_t splitViews(
+    string_view inputString,
+    char delimiter,
+    vector<string_view>& outTokens,
+    bool skipEmpty,
+    const char* trimChars) {
+  outTokens.clear();
+  size_t start = 0;
+  size_t end{};
+
+  while ((end = inputString.find(delimiter, start)) != string_view::npos) {
+    string_view token = inputString.substr(start, end - start);
+    if (trimChars != nullptr) {
+      token = trimView(token, trimChars);
+    }
+    if (!(token.empty() && skipEmpty)) {
+      outTokens.push_back(token);
+    }
+    start = end + 1;
+  }
+  // Handle the last token (after the last delimiter)
+  string_view token = inputString.substr(start);
+  if (trimChars != nullptr) {
+    token = trimView(token, trimChars);
+  }
+  if (!(token.empty() && skipEmpty)) {
+    outTokens.push_back(token);
+  }
+  return outTokens.size();
+}
+
+bool readUInt64(string_view str, uint64_t& outValue) {
   if (!str.empty() && safeisdigit(str.front())) {
-    const char* strEnd = str.c_str() + str.length();
-    auto result = from_chars(str.c_str(), strEnd, outValue);
+    const char* strEnd = str.data() + str.size();
+    auto result = from_chars(str.data(), strEnd, outValue);
     if (result.ec == errc{} && result.ptr == strEnd) {
       return true;
     }
