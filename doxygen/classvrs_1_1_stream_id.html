@@ -132,10 +132,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;</b> (con
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a3809517b98d689aeaceb038a124ab44e" id="r_a3809517b98d689aeaceb038a124ab44e"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_stream_id.html#a3809517b98d689aeaceb038a124ab44e">fromNumericName</a> (const string &amp;numericName)</td></tr>
-<tr class="separator:a3809517b98d689aeaceb038a124ab44e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6fa4ca2888eaca5f3da7dc59ccb024d0" id="r_a6fa4ca2888eaca5f3da7dc59ccb024d0"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_stream_id.html#a6fa4ca2888eaca5f3da7dc59ccb024d0">fromNumericNamePlus</a> (const string &amp;numericName)</td></tr>
-<tr class="separator:a6fa4ca2888eaca5f3da7dc59ccb024d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7ffb4687d3ba35aaf9938361ca1f3cd0" id="r_a7ffb4687d3ba35aaf9938361ca1f3cd0"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_stream_id.html#a7ffb4687d3ba35aaf9938361ca1f3cd0">fromNumericName</a> (string_view numericName)</td></tr>
+<tr class="separator:a7ffb4687d3ba35aaf9938361ca1f3cd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a587e6fb42dcee06d11c5b31bd0dbd25e" id="r_a587e6fb42dcee06d11c5b31bd0dbd25e"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_stream_id.html#a587e6fb42dcee06d11c5b31bd0dbd25e">fromNumericNamePlus</a> (string_view numericName)</td></tr>
+<tr class="separator:a587e6fb42dcee06d11c5b31bd0dbd25e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aec15be76b5f44e60d2265a793063d294" id="r_aec15be76b5f44e60d2265a793063d294"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_stream_id.html#aec15be76b5f44e60d2265a793063d294">isKnownTypeId</a> (<a class="el" href="namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5">RecordableTypeId</a> typeId)</td></tr>
 <tr class="separator:aec15be76b5f44e60d2265a793063d294"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad85821cc3baf7d6a75105e31a37b084e" id="r_ad85821cc3baf7d6a75105e31a37b084e"><td class="memItemLeft" align="right" valign="top"><a id="ad85821cc3baf7d6a75105e31a37b084e" name="ad85821cc3baf7d6a75105e31a37b084e"></a>
@@ -149,8 +149,8 @@ static <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>&#160;</td><
 <p>Note that instance ids are not meant to be controlled, set, or defined by the recording code.</p>
 <p>During recording, VRS generates a unique instance id when a recordable is created, to ensure that each recordable has a unique stream id in the whole system. In particular, by design, if you stop recording, destroy the recordables and create new ones, the instance ids generated will keep increasing. Therefore, when discovering the streams in a VRS file, specific instance ids can't be used to recognize different instances of particular RecordableTypeId. Instead, use recordable tags or flavors. The APIs <a class="el" href="classvrs_1_1_record_file_reader.html#ad5b17a801f4af270df7bf3e5a311d23e">RecordFileReader::getStreamForTag()</a> and <a class="el" href="classvrs_1_1_record_file_reader.html#a31723e14ae3e1498eaaf9624753305c4">RecordFileReader::getStreamForFlavor()</a> can then quickly determine the <a class="el" href="classvrs_1_1_stream_id.html" title="VRS stream identifier class.">StreamId</a> for each of the streams in the file. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a3809517b98d689aeaceb038a124ab44e" name="a3809517b98d689aeaceb038a124ab44e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3809517b98d689aeaceb038a124ab44e">&#9670;&#160;</a></span>fromNumericName()</h2>
+<a id="a7ffb4687d3ba35aaf9938361ca1f3cd0" name="a7ffb4687d3ba35aaf9938361ca1f3cd0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7ffb4687d3ba35aaf9938361ca1f3cd0">&#9670;&#160;</a></span>fromNumericName()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -161,7 +161,7 @@ static <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>&#160;</td><
         <tr>
           <td class="memname"><a class="el" href="classvrs_1_1_stream_id.html">StreamId</a> vrs::StreamId::fromNumericName </td>
           <td>(</td>
-          <td class="paramtype">const string &amp;&#160;</td>
+          <td class="paramtype">string_view&#160;</td>
           <td class="paramname"><em>numericName</em></td><td>)</td>
           <td></td>
         </tr>
@@ -182,8 +182,8 @@ static <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>&#160;</td><
 
 </div>
 </div>
-<a id="a6fa4ca2888eaca5f3da7dc59ccb024d0" name="a6fa4ca2888eaca5f3da7dc59ccb024d0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6fa4ca2888eaca5f3da7dc59ccb024d0">&#9670;&#160;</a></span>fromNumericNamePlus()</h2>
+<a id="a587e6fb42dcee06d11c5b31bd0dbd25e" name="a587e6fb42dcee06d11c5b31bd0dbd25e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a587e6fb42dcee06d11c5b31bd0dbd25e">&#9670;&#160;</a></span>fromNumericNamePlus()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -194,7 +194,7 @@ static <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>&#160;</td><
         <tr>
           <td class="memname"><a class="el" href="classvrs_1_1_stream_id.html">StreamId</a> vrs::StreamId::fromNumericNamePlus </td>
           <td>(</td>
-          <td class="paramtype">const string &amp;&#160;</td>
+          <td class="paramtype">string_view&#160;</td>
           <td class="paramname"><em>numericName</em></td><td>)</td>
           <td></td>
         </tr>

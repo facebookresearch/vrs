@@ -54,6 +54,6 @@ var searchData=
   ['issanitycheckok_51',['isSanityCheckOk',['../structvrs_1_1_file_format_1_1_record_header.html#ab0a77e99987a8ed4b74054c0efc21962',1,'vrs::FileFormat::RecordHeader']]],
   ['isvalid_52',['isValid',['../classvrs_1_1_stream_id.html#a611065420d3fec26556c0e1df316f4f3',1,'vrs::StreamId']]],
   ['isvardataindexvalid_53',['isVarDataIndexValid',['../classvrs_1_1_data_layout.html#aa02e21cb0c063a1bd598f1de3731f28a',1,'vrs::DataLayout']]],
-  ['isvrsfile_54',['isvrsfile',['../classvrs_1_1_record_file_reader.html#a1fc82245fcc52a27bc2dc8810316d798',1,'vrs::RecordFileReader::isVrsFile(const FileSpec &amp;fileSpec)'],['../classvrs_1_1_record_file_reader.html#a12b4fb530ccc1076a1a342afdea7d6f0',1,'vrs::RecordFileReader::isVrsFile(const string &amp;filePath)']]],
+  ['isvrsfile_54',['isvrsfile',['../classvrs_1_1_record_file_reader.html#a1fc82245fcc52a27bc2dc8810316d798',1,'vrs::RecordFileReader::isVrsFile(const FileSpec &amp;fileSpec)'],['../classvrs_1_1_record_file_reader.html#a724c05e9520f9fabbf100f90b90fdf55',1,'vrs::RecordFileReader::isVrsFile(string_view filePath)']]],
   ['iswriting_55',['isWriting',['../classvrs_1_1_record_file_writer.html#adf3a7ed71bdec9326a781aba2789828f',1,'vrs::RecordFileWriter']]]
 ];

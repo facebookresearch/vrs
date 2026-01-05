@@ -108,12 +108,17 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a08c031e7138344f3db4fb7702496d381" id="r_a08c031e7138344f3db4fb7702496d381"><td class="memItemLeft" align="right" valign="top"><a id="a08c031e7138344f3db4fb7702496d381" name="a08c031e7138344f3db4fb7702496d381"></a>
 <a class="el" href="classvrs_1_1_record_file_reader.html">RecordFileReader</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="classvrs_1_1_record_file_reader.html">RecordFileReader</a> &amp;&amp;)=delete</td></tr>
 <tr class="separator:a08c031e7138344f3db4fb7702496d381"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a12b4fb530ccc1076a1a342afdea7d6f0" id="r_a12b4fb530ccc1076a1a342afdea7d6f0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a12b4fb530ccc1076a1a342afdea7d6f0">isVrsFile</a> (const string &amp;filePath)</td></tr>
-<tr class="separator:a12b4fb530ccc1076a1a342afdea7d6f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a724c05e9520f9fabbf100f90b90fdf55" id="r_a724c05e9520f9fabbf100f90b90fdf55"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a724c05e9520f9fabbf100f90b90fdf55">isVrsFile</a> (string_view filePath)</td></tr>
+<tr class="separator:a724c05e9520f9fabbf100f90b90fdf55"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1fc82245fcc52a27bc2dc8810316d798" id="r_a1fc82245fcc52a27bc2dc8810316d798"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a1fc82245fcc52a27bc2dc8810316d798">isVrsFile</a> (const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;fileSpec)</td></tr>
 <tr class="separator:a1fc82245fcc52a27bc2dc8810316d798"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4610b633871a23d53b95e50310d23ad1" id="r_a4610b633871a23d53b95e50310d23ad1"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a4610b633871a23d53b95e50310d23ad1">openFile</a> (const string &amp;filePath, bool autoWriteFixedIndex=false)</td></tr>
-<tr class="separator:a4610b633871a23d53b95e50310d23ad1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97e3fd26ea29f492439f179d47c9a6c4" id="r_a97e3fd26ea29f492439f179d47c9a6c4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a97e3fd26ea29f492439f179d47c9a6c4">openFile</a> (string_view filePath, bool autoWriteFixedIndex=false)</td></tr>
+<tr class="separator:a97e3fd26ea29f492439f179d47c9a6c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37ff62ed08d1941eb43f62364177ed5d" id="r_a37ff62ed08d1941eb43f62364177ed5d"><td class="memTemplParams" colspan="2"><a id="a37ff62ed08d1941eb43f62364177ed5d" name="a37ff62ed08d1941eb43f62364177ed5d"></a>
+template&lt;typename T , <a class="el" href="namespacevrs.html#a285f77136ffb7d2a7655325ebd5c03e0">EnableIfStringConvertible</a>&lt; T &gt;  = 0&gt; </td></tr>
+<tr class="memitem:a37ff62ed08d1941eb43f62364177ed5d"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><b>openFile</b> (const T &amp;filePath, bool autoWriteFixedIndex=false)</td></tr>
+<tr class="memdesc:a37ff62ed08d1941eb43f62364177ed5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Template overload for types that convert to string but not directly to string_view. <br /></td></tr>
+<tr class="separator:a37ff62ed08d1941eb43f62364177ed5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acef03ae06668f360654370a86a8461e7" id="r_acef03ae06668f360654370a86a8461e7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#acef03ae06668f360654370a86a8461e7">openFile</a> (const <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;fileSpec, bool autoWriteFixedIndex=false)</td></tr>
 <tr class="separator:acef03ae06668f360654370a86a8461e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1451e3277ae56e63d37bb58160b16ea3" id="r_a1451e3277ae56e63d37bb58160b16ea3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a1451e3277ae56e63d37bb58160b16ea3">isOpened</a> () const</td></tr>
@@ -255,13 +260,13 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>buildRecordBoundaries
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a39729fdb368d109746548f815bfc0184" id="r_a39729fdb368d109746548f815bfc0184"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#a39729fdb368d109746548f815bfc0184">vrsFilePathToFileSpec</a> (const string &amp;filePath, <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;outFileSpec, bool checkLocalFile=false)</td></tr>
-<tr class="separator:a39729fdb368d109746548f815bfc0184"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac04b6ff9051064d96684045d34cafa86" id="r_ac04b6ff9051064d96684045d34cafa86"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_reader.html#ac04b6ff9051064d96684045d34cafa86">vrsFilePathToFileSpec</a> (string_view filePath, <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;outFileSpec, bool checkLocalFile=false)</td></tr>
+<tr class="separator:ac04b6ff9051064d96684045d34cafa86"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The class to read VRS files. </p>
 <p>Recipe:</p><ul>
-<li>open a VRS file using <a class="el" href="classvrs_1_1_record_file_reader.html#a4610b633871a23d53b95e50310d23ad1">openFile()</a>.</li>
+<li>open a VRS file using <a class="el" href="classvrs_1_1_record_file_reader.html#a97e3fd26ea29f492439f179d47c9a6c4">openFile()</a>.</li>
 <li>get info about the VRS file using <a class="el" href="classvrs_1_1_record_file_reader.html#abde34c6a7e0b5ff0601d286f95868248">getTags()</a>. (optional: the writer may provide recording context info).</li>
 <li>find out which streams it contains using <a class="el" href="classvrs_1_1_record_file_reader.html#ae26a12f1ed757f84563313d444189cca">getStreams()</a>.</li>
 <li>attach record players to the streams you care about, using <a class="el" href="classvrs_1_1_record_file_reader.html#a0697eaae250d06338ef03a53916ea23d">setStreamPlayer()</a>.</li>
@@ -1551,8 +1556,8 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a12b4fb530ccc1076a1a342afdea7d6f0" name="a12b4fb530ccc1076a1a342afdea7d6f0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a12b4fb530ccc1076a1a342afdea7d6f0">&#9670;&#160;</a></span>isVrsFile() <span class="overload">[2/2]</span></h2>
+<a id="a724c05e9520f9fabbf100f90b90fdf55" name="a724c05e9520f9fabbf100f90b90fdf55"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a724c05e9520f9fabbf100f90b90fdf55">&#9670;&#160;</a></span>isVrsFile() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1560,7 +1565,7 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">bool vrs::RecordFileReader::isVrsFile </td>
           <td>(</td>
-          <td class="paramtype">const string &amp;&#160;</td>
+          <td class="paramtype">string_view&#160;</td>
           <td class="paramname"><em>filePath</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1662,8 +1667,8 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a4610b633871a23d53b95e50310d23ad1" name="a4610b633871a23d53b95e50310d23ad1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4610b633871a23d53b95e50310d23ad1">&#9670;&#160;</a></span>openFile() <span class="overload">[2/2]</span></h2>
+<a id="a97e3fd26ea29f492439f179d47c9a6c4" name="a97e3fd26ea29f492439f179d47c9a6c4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a97e3fd26ea29f492439f179d47c9a6c4">&#9670;&#160;</a></span>openFile() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1671,7 +1676,7 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">int vrs::RecordFileReader::openFile </td>
           <td>(</td>
-          <td class="paramtype">const string &amp;&#160;</td>
+          <td class="paramtype">string_view&#160;</td>
           <td class="paramname"><em>filePath</em>, </td>
         </tr>
         <tr>
@@ -2062,8 +2067,8 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a39729fdb368d109746548f815bfc0184" name="a39729fdb368d109746548f815bfc0184"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a39729fdb368d109746548f815bfc0184">&#9670;&#160;</a></span>vrsFilePathToFileSpec()</h2>
+<a id="ac04b6ff9051064d96684045d34cafa86" name="ac04b6ff9051064d96684045d34cafa86"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac04b6ff9051064d96684045d34cafa86">&#9670;&#160;</a></span>vrsFilePathToFileSpec()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2074,7 +2079,7 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">int vrs::RecordFileReader::vrsFilePathToFileSpec </td>
           <td>(</td>
-          <td class="paramtype">const string &amp;&#160;</td>
+          <td class="paramtype">string_view&#160;</td>
           <td class="paramname"><em>filePath</em>, </td>
         </tr>
         <tr>

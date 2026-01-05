@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['uniquestreamid_0',['UniqueStreamId',['../classvrs_1_1_multi_record_file_reader.html#a95c324393b94d95ab8558c25d4c6a999',1,'vrs::MultiRecordFileReader']]]
+  ['sortedrecords_0',['SortedRecords',['../classvrs_1_1_record_file_writer.html#af2b0906c714818a9887e09fb7f9189ea',1,'vrs::RecordFileWriter']]]
 ];

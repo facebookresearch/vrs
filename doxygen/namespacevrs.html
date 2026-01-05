@@ -425,6 +425,11 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>Matrix4Di</b> = <a c
 <tr class="memitem:afaf41da73e6cff8399c0a75a0f412f9c" id="r_afaf41da73e6cff8399c0a75a0f412f9c"><td class="memItemLeft" align="right" valign="top"><a id="afaf41da73e6cff8399c0a75a0f412f9c" name="afaf41da73e6cff8399c0a75a0f412f9c"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>DiskFile</b> = <a class="el" href="classvrs_1_1_disk_file_t.html">DiskFileT</a>&lt; <a class="el" href="classvrs_1_1_disk_file_chunk.html">DiskFileChunk</a> &gt;</td></tr>
 <tr class="separator:afaf41da73e6cff8399c0a75a0f412f9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a285f77136ffb7d2a7655325ebd5c03e0" id="r_a285f77136ffb7d2a7655325ebd5c03e0"><td class="memTemplParams" colspan="2"><a id="a285f77136ffb7d2a7655325ebd5c03e0" name="a285f77136ffb7d2a7655325ebd5c03e0"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a285f77136ffb7d2a7655325ebd5c03e0"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>EnableIfStringConvertible</b> = std::enable_if_t&lt; !std::is_convertible_v&lt; const T &amp;, string_view &gt; &amp;&amp;std::is_convertible_v&lt; T, string &gt;, int &gt;</td></tr>
+<tr class="memdesc:a285f77136ffb7d2a7655325ebd5c03e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper to enable overloads for types that convert to string but not directly to string_view. <br /></td></tr>
+<tr class="separator:a285f77136ffb7d2a7655325ebd5c03e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a142c4b247fe86fb372c27f77d46e96b4" id="r_a142c4b247fe86fb372c27f77d46e96b4"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs.html#a142c4b247fe86fb372c27f77d46e96b4">InitCreatedThreadCallback</a> = std::function&lt; void(std::thread &amp;, <a class="el" href="namespacevrs.html#ac78cdeb41c8573010548993b9d2f00c6">ThreadRole</a>, int)&gt;</td></tr>
 <tr class="separator:a142c4b247fe86fb372c27f77d46e96b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a04d155e698e82b4cd67ec9312fadefb0" id="r_a04d155e698e82b4cd67ec9312fadefb0"><td class="memItemLeft" align="right" valign="top"><a id="a04d155e698e82b4cd67ec9312fadefb0" name="a04d155e698e82b4cd67ec9312fadefb0"></a>
@@ -986,6 +991,9 @@ constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"><b>kPr
 <tr class="separator:a9f75733e7ab755bebd0312e0d65e6053"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeaa6dfb4043915615738bd17a262a10a" id="r_aeaa6dfb4043915615738bd17a262a10a"><td class="memItemLeft" align="right" valign="top">constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs.html#aeaa6dfb4043915615738bd17a262a10a">kFailFastOnIncompleteIndex</a> = &quot;fail_fast_on_incomplete_index&quot;</td></tr>
 <tr class="separator:aeaa6dfb4043915615738bd17a262a10a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acdfd2160be53a8b712f0b1fee54d9fb8" id="r_acdfd2160be53a8b712f0b1fee54d9fb8"><td class="memItemLeft" align="right" valign="top"><a id="acdfd2160be53a8b712f0b1fee54d9fb8" name="acdfd2160be53a8b712f0b1fee54d9fb8"></a>
+constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"><b>cTagsObjectName</b> = &quot;tags&quot;</td></tr>
+<tr class="separator:acdfd2160be53a8b712f0b1fee54d9fb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Writing headers to disk, you must control endianness and have no padding so that you can read a file written by any system, using any other system.</p>
