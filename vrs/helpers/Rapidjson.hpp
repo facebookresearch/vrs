@@ -19,6 +19,7 @@
 #include <cmath>
 #include <cstring>
 
+#include <string_view>
 #include <type_traits>
 #include <vector>
 
@@ -35,6 +36,7 @@ using std::is_same;
 using std::is_signed;
 using std::max;
 using std::string;
+using std::string_view;
 
 /// rapidjson::Document's default MemoryPoolAllocator crashes on some platforms
 /// as documented in https://github.com/cocos2d/cocos2d-x/issues/16492
@@ -45,24 +47,15 @@ using JMemberIterator = JDocument::MemberIterator;
 using JValue = vrs_rapidjson::GenericValue<JUtf8Encoding, JCrtAllocator>;
 using JStringRef = vrs_rapidjson::GenericStringRef<char>;
 
-inline JStringRef jStringRef(const char* str) {
+inline JStringRef jStringRef(string_view str) {
   // NOLINTNEXTLINE(modernize-return-braced-init-list)
-  return JStringRef(str, strlen(str));
+  return JStringRef(str.data(), str.size());
 }
-inline JStringRef jStringRef(const string& str) {
+inline JValue jStringCopy(string_view str, JDocument::AllocatorType& allocator) {
   // NOLINTNEXTLINE(modernize-return-braced-init-list)
-  return JStringRef(str.c_str(), str.size());
+  return JValue(str.data(), str.size(), allocator);
 }
-inline JValue jStringCopy(const char* str, JDocument::AllocatorType& allocator) {
-  // NOLINTNEXTLINE(modernize-return-braced-init-list)
-  return JValue(str, strlen(str), allocator);
-}
-inline JValue jStringCopy(const string& str, JDocument::AllocatorType& allocator) {
-  // NOLINTNEXTLINE(modernize-return-braced-init-list)
-  return JValue(str.c_str(), str.size(), allocator);
-}
-template <class T>
-inline void jParse(JDocument& document, const T& str) {
+inline void jParse(JDocument& document, string_view str) {
   document.Parse(str.data(), str.size());
 }
 
@@ -78,13 +71,18 @@ struct JsonWrapper {
   JValue& value;
   JDocument::AllocatorType& alloc;
 
+  inline static JValue jValue(string_view str) {
+    // NOLINTNEXTLINE(modernize-return-braced-init-list)
+    return JValue(str.data(), static_cast<vrs_rapidjson::SizeType>(str.length()));
+  }
+
   template <typename T>
   inline JValue jValue(const T& v) {
     return JValue(v);
   }
 
   template <typename T>
-  inline JValue jValue(const std::vector<T>& vect) {
+  inline JValue jValue(const vector<T>& vect) {
     JValue jv(vrs_rapidjson::kArrayType);
     jv.Reserve(static_cast<vrs_rapidjson::SizeType>(vect.size()), alloc);
     for (const auto& v : vect) {
@@ -120,6 +118,11 @@ struct JsonWrapper {
 
   template <typename JSTR>
   inline void addMember(const JSTR& name, const char* str) {
+    value.AddMember(jStringRef(name), jStringRef(str), alloc);
+  }
+
+  template <typename JSTR>
+  inline void addMember(const JSTR& name, string_view str) {
     value.AddMember(jStringRef(name), jStringRef(str), alloc);
   }
 
