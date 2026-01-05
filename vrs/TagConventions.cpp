@@ -37,7 +37,7 @@ void tag_conventions::addTagSet(RecordFileWriter& writer, const vector<string>& 
   writer.setTag(kTagSet, makeTagSet(tags));
 }
 
-static const char* cTagsObjectName = "tags";
+constexpr const char* cTagsObjectName = "tags";
 
 string tag_conventions::makeTagSet(const vector<string>& tags) {
   using namespace vrs_rapidjson;

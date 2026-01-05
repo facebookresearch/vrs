@@ -82,10 +82,11 @@ using namespace std;
  *   }
  */
 
+namespace {
 // We used to store the device name, including the device instance number, which doesn't make sense,
 // as the instance number may change. Let's remove the instance number. Also useful to make tag
 // compares work as expected.
-static string stripInstanceId(const string& oldName) {
+string stripInstanceId(const string& oldName) {
   if (oldName.size() < 4) {
     return oldName; // "x #1" is the shortest imaginable.
   }
@@ -102,10 +103,10 @@ static string stripInstanceId(const string& oldName) {
   return oldName.substr(0, suffix);
 }
 
-static const char* kNameLabel = "name";
-static const char* kTagsLabel = "tags";
+constexpr const char* kNameLabel = "name";
+constexpr const char* kTagsLabel = "tags";
 
-static void jsonToTags(const string& jsonTags, map<string, string>& outTags) {
+void jsonToTags(const string& jsonTags, map<string, string>& outTags) {
   using namespace vrs_rapidjson;
   outTags.clear();
   Document document;
@@ -120,8 +121,7 @@ static void jsonToTags(const string& jsonTags, map<string, string>& outTags) {
   }
 }
 
-static bool
-jsonToNameAndTags(const string& jsonStr, string& outName, map<string, string>& outTags) {
+bool jsonToNameAndTags(const string& jsonStr, string& outName, map<string, string>& outTags) {
   using namespace vrs_rapidjson;
   Document document;
   document.Parse(jsonStr.c_str(), jsonStr.size());
@@ -145,13 +145,13 @@ jsonToNameAndTags(const string& jsonStr, string& outName, map<string, string>& o
   return true;
 }
 
-static int writeSize(WriteFileHandler& file, size_t size) {
+int writeSize(WriteFileHandler& file, size_t size) {
   uint32_t diskSize = static_cast<uint32_t>(size);
   WRITE_OR_LOG_AND_RETURN(file, &diskSize, sizeof(diskSize));
   return 0;
 }
 
-static int readSize(FileHandler& file, uint32_t& outSize, uint32_t& dataSizeLeft) {
+int readSize(FileHandler& file, uint32_t& outSize, uint32_t& dataSizeLeft) {
   if (dataSizeLeft < sizeof(uint32_t)) {
     return NOT_ENOUGH_DATA;
   }
@@ -162,17 +162,17 @@ static int readSize(FileHandler& file, uint32_t& outSize, uint32_t& dataSizeLeft
   return 0;
 }
 
-static size_t stringSize(const string& str) {
+size_t stringSize(const string& str) {
   return sizeof(uint32_t) + str.size();
 }
 
-static int writeString(WriteFileHandler& file, const string& str) {
+int writeString(WriteFileHandler& file, const string& str) {
   IF_ERROR_LOG_AND_RETURN(writeSize(file, str.size()));
   WRITE_OR_LOG_AND_RETURN(file, str.c_str(), str.size());
   return 0;
 }
 
-static int readString(FileHandler& file, string& outString, uint32_t& dataSizeLeft) {
+int readString(FileHandler& file, string& outString, uint32_t& dataSizeLeft) {
   uint32_t charCount = 0;
   IF_ERROR_LOG_AND_RETURN(readSize(file, charCount, dataSizeLeft));
   if (dataSizeLeft < charCount) {
@@ -188,7 +188,7 @@ static int readString(FileHandler& file, string& outString, uint32_t& dataSizeLe
   return 0;
 }
 
-static size_t mapSize(const map<string, string>& m) {
+size_t mapSize(const map<string, string>& m) {
   size_t size = sizeof(uint32_t);
   for (const auto& pair : m) {
     size += stringSize(pair.first) + stringSize(pair.second);
@@ -196,7 +196,7 @@ static size_t mapSize(const map<string, string>& m) {
   return size;
 }
 
-static int writeMap(WriteFileHandler& file, const map<string, string>& m) {
+int writeMap(WriteFileHandler& file, const map<string, string>& m) {
   IF_ERROR_LOG_AND_RETURN(writeSize(file, m.size()));
   for (const auto& pair : m) {
     IF_ERROR_LOG_AND_RETURN(writeString(file, pair.first));
@@ -205,7 +205,7 @@ static int writeMap(WriteFileHandler& file, const map<string, string>& m) {
   return 0;
 }
 
-static int readMap(FileHandler& file, map<string, string>& outMap, uint32_t& sizeLeft) {
+int readMap(FileHandler& file, map<string, string>& outMap, uint32_t& sizeLeft) {
   uint32_t count = 0;
   IF_ERROR_LOG_AND_RETURN(readSize(file, count, sizeLeft));
   while (count-- > 0) {
@@ -218,7 +218,7 @@ static int readMap(FileHandler& file, map<string, string>& outMap, uint32_t& siz
   return 0;
 }
 
-static int readMap(FileHandler& file, map<StreamId, string>& outMap, uint32_t& sizeLeft) {
+int readMap(FileHandler& file, map<StreamId, string>& outMap, uint32_t& sizeLeft) {
   uint32_t count = 0;
   IF_ERROR_LOG_AND_RETURN(readSize(file, count, sizeLeft));
   while (count-- > 0) {
@@ -232,7 +232,7 @@ static int readMap(FileHandler& file, map<StreamId, string>& outMap, uint32_t& s
   return 0;
 }
 
-static size_t mapSize(const map<StreamId, const StreamTags*>& map) {
+size_t mapSize(const map<StreamId, const StreamTags*>& map) {
   size_t size = sizeof(uint32_t);
   for (const auto& pair : map) {
     size +=
@@ -241,7 +241,7 @@ static size_t mapSize(const map<StreamId, const StreamTags*>& map) {
   return size;
 }
 
-static int writeMap(WriteFileHandler& file, const map<StreamId, const StreamTags*>& map) {
+int writeMap(WriteFileHandler& file, const map<StreamId, const StreamTags*>& map) {
   IF_ERROR_LOG_AND_RETURN(writeSize(file, map.size()));
   for (const auto& pair : map) {
     IndexRecord::DiskStreamId id(pair.first);
@@ -252,7 +252,7 @@ static int writeMap(WriteFileHandler& file, const map<StreamId, const StreamTags
   return 0;
 }
 
-static int readMap(FileHandler& file, map<StreamId, StreamTags>& outMap, uint32_t& sizeLeft) {
+int readMap(FileHandler& file, map<StreamId, StreamTags>& outMap, uint32_t& sizeLeft) {
   uint32_t count = 0;
   IF_ERROR_LOG_AND_RETURN(readSize(file, count, sizeLeft));
   while (count-- > 0) {
@@ -267,6 +267,7 @@ static int readMap(FileHandler& file, map<StreamId, StreamTags>& outMap, uint32_
   }
   return 0;
 }
+} // namespace
 
 int DescriptionRecord::writeDescriptionRecord(
     WriteFileHandler& file,

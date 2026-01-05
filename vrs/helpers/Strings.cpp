@@ -287,7 +287,7 @@ string make_printable(const string& str) {
         sanitized.append("\\e"); // esc
       } else {
         // stringstream methods just won't work right, even with Stackoverflow's help...
-        static const char* digits = "0123456789abcdef";
+        constexpr const char* digits = "0123456789abcdef";
         sanitized.append("\\x");
         sanitized.push_back(digits[(c >> 4) & 0xf]);
         sanitized.push_back(digits[c & 0xf]);
