@@ -265,10 +265,10 @@ string toPrettyName(CompressionPreset preset) {
   if (nameIter != sPresetNames.end()) {
     name = nameIter->second;
   } else {
-    name = string("Preset index #") + to_string(static_cast<int>(preset));
+    name = fmt::format("Preset index #{}", static_cast<int>(preset));
   }
   if (preset >= CompressionPreset::FirstZstdPreset && preset <= CompressionPreset::LastZstdPreset) {
-    name += "(" + to_string(zstdPresetToCompressionLevel(preset)) + ")";
+    fmt::format_to(std::back_inserter(name), "({})", zstdPresetToCompressionLevel(preset));
   }
   return name;
 }

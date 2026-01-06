@@ -168,21 +168,21 @@ void computeIncludedStreams(
 
 } // namespace
 
-bool RecordFilterParams::includeStream(const string& streamFilter) {
+bool RecordFilterParams::includeStream(string streamFilter) {
   if (!isValidStreamFilter(streamFilter)) {
     return false;
   }
   streamFilters.emplace_back("+");
-  streamFilters.emplace_back(streamFilter);
+  streamFilters.emplace_back(std::move(streamFilter));
   return true;
 }
 
-bool RecordFilterParams::excludeStream(const string& streamFilter) {
+bool RecordFilterParams::excludeStream(string streamFilter) {
   if (!isValidStreamFilter(streamFilter)) {
     return false;
   }
   streamFilters.emplace_back("-");
-  streamFilters.emplace_back(streamFilter);
+  streamFilters.emplace_back(std::move(streamFilter));
   return true;
 }
 
@@ -203,21 +203,21 @@ bool RecordFilterParams::includeExcludeStream(const string& plusMinusStreamFilte
   return valid;
 }
 
-bool RecordFilterParams::includeType(const string& type) {
+bool RecordFilterParams::includeType(string type) {
   if (stringToType(type) == Record::Type::UNDEFINED) {
     return false;
   }
   typeFilters.emplace_back("+");
-  typeFilters.emplace_back(type);
+  typeFilters.emplace_back(std::move(type));
   return true;
 }
 
-bool RecordFilterParams::excludeType(const string& type) {
+bool RecordFilterParams::excludeType(string type) {
   if (stringToType(type) == Record::Type::UNDEFINED) {
     return false;
   }
   typeFilters.emplace_back("-");
-  typeFilters.emplace_back(type);
+  typeFilters.emplace_back(std::move(type));
   return true;
 }
 

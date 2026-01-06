@@ -71,15 +71,15 @@ bool DataExtractor::DataExtractorStreamPlayer::writeImage(
       uint32_t height = spec.getHeight();
       uint32_t rawstride = spec.getRawStride();
 
-      filenamePostfix = "-" + pixelFormat + "-" + to_string(width) + "x" + to_string(height);
+      filenamePostfix = fmt::format("-{}-{}x{}", pixelFormat, width, height);
       if (rawstride > 0) {
-        filenamePostfix += "-stride_" + to_string(rawstride);
+        fmt::format_to(std::back_inserter(filenamePostfix), "-stride_{}", rawstride);
       }
       break;
     }
     case vrs::ImageFormat::VIDEO: {
       extension = "." + spec.getCodecName();
-      filenamePostfix += "#" + to_string(spec.getKeyFrameIndex());
+      fmt::format_to(std::back_inserter(filenamePostfix), "#{}", spec.getKeyFrameIndex());
       break;
     }
     default:

@@ -485,7 +485,7 @@ string recordsChecksum(const string& path, bool showProgress) {
   FilteredFileReader reader(path);
   int status = reader.openFile();
   if (status != 0) {
-    return "Error " + to_string(status) + ": " + errorCodeToMessage(status);
+    return fmt::format("Error {}: {}", status, errorCodeToMessage(status));
   }
   return checkRecords(reader, CopyOptions(showProgress), CheckType::Checksum);
 }

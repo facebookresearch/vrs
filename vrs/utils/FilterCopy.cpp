@@ -142,7 +142,7 @@ void mergeTags(
           // Because of collisions, we even need to check newTags & outTags...
           while (writtenTags.find(newName) != writtenTags.end() ||
                  newTags.find(newName) != newTags.end() || outTags.find(newName) != outTags.end()) {
-            newName = newTag.first + "_merged-" + to_string(count++);
+            newName = fmt::format("{}_merged-{}", newTag.first, count++);
           }
           outTags[newName] = newTag.second;
         }

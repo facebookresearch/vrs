@@ -66,7 +66,7 @@ bool ProgressLogger::logProgress(
     if (maxProgress > 0 && maxProgress >= progress) {
       updateStep(progress, maxProgress);
       if (progress > 0) {
-        logMessage(stepName + ' ' + to_string(progress * 100 / maxProgress) + "%...");
+        logMessage(fmt::format("{} {}%...", stepName, progress * 100 / maxProgress));
       } else {
         logMessage(stepName + "...");
       }

@@ -81,7 +81,7 @@ TEST_F(RecordTester, streamIdTest) {
   StreamId id(RecordableTypeId::UnitTest1, 1);
   EXPECT_EQ(
       id.getNumericName(),
-      to_string(static_cast<int>(id.getTypeId())) + "-" + to_string(id.getInstanceId()));
+      fmt::format("{}-{}", static_cast<int>(id.getTypeId()), id.getInstanceId()));
   EXPECT_EQ(StreamId::fromNumericName(id.getNumericName()), id);
   EXPECT_EQ(StreamId::fromNumericName("1-0"), StreamId(static_cast<RecordableTypeId>(1), 0));
   EXPECT_EQ(StreamId::fromNumericName("123-2"), StreamId(static_cast<RecordableTypeId>(123), 2));
@@ -99,7 +99,7 @@ TEST_F(RecordTester, streamIdTest) {
 
 TEST_F(RecordTester, streamIdPlusTest) {
   StreamId id(RecordableTypeId::UnitTest1, 1);
-  string numName = to_string((uint32_t)RecordableTypeId::UnitTest1) + "+1";
+  string numName = fmt::format("{}+1", static_cast<uint32_t>(RecordableTypeId::UnitTest1));
   EXPECT_EQ(StreamId::fromNumericNamePlus(numName), id);
   EXPECT_EQ(StreamId::fromNumericNamePlus("1+0"), StreamId(static_cast<RecordableTypeId>(1), 0));
   EXPECT_EQ(

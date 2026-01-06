@@ -226,12 +226,11 @@ string StreamId::getName() const {
 }
 
 string StreamId::getFullName() const {
-  return fmt::format(
-      "{}-{} - {}", to_string(static_cast<int>(typeId_)), to_string(instanceId_), getTypeName());
+  return fmt::format("{}-{} - {}", static_cast<int>(typeId_), instanceId_, getTypeName());
 }
 
 string StreamId::getNumericName() const {
-  return to_string(static_cast<int>(typeId_)) + '-' + to_string(instanceId_);
+  return fmt::format("{}-{}", static_cast<int>(typeId_), instanceId_);
 }
 
 StreamId StreamId::fromNumericName(string_view numericName) {

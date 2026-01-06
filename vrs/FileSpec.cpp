@@ -221,7 +221,7 @@ string FileSpec::toPathJsonUri() const {
 bool FileSpec::fromJson(string_view jsonStr) {
   using namespace vrs_rapidjson;
   JDocument document;
-  jParse(document, string(jsonStr));
+  jParse(document, jsonStr);
   if (document.IsObject()) {
     getJString(fileName, document, kFileNameField);
     getJString(fileHandlerName, document, kFileHandlerField);

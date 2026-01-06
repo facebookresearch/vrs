@@ -119,7 +119,7 @@ string errorCodeToMessage(int errorCode) {
 }
 
 string errorCodeToMessageWithCode(int errorCode) {
-  return errorCodeToMessage(errorCode) + " (#" + to_string(errorCode) + ")";
+  return fmt::format("{} (#{})", errorCodeToMessage(errorCode), errorCode);
 }
 
 ErrorDomain newErrorDomain(const string& domainName) {
@@ -163,9 +163,11 @@ int domainErrorCode(ErrorDomain errorDomain, int64_t errorCode, const char* erro
   }
   // example: "LZ4 decompression error 25: invalid data".
   // Always update the text, in case it changes, to return the last one!
-  sDomainErrorRegistry[newErrorCode] =
-      sDomainErrorRegistry[errorDomainToErrorCodeStart(errorDomain)] + " error " +
-      to_string(errorCode) + ": " + errorMessage;
+  sDomainErrorRegistry[newErrorCode] = fmt::format(
+      "{} error {}: {}",
+      sDomainErrorRegistry[errorDomainToErrorCodeStart(errorDomain)],
+      errorCode,
+      errorMessage);
 
   return newErrorCode;
 }

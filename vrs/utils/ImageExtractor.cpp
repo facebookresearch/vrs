@@ -64,15 +64,15 @@ string ImageNamer::getRawImageFormatAsString(const ImageContentBlockSpec& imageS
       uint32_t height = imageSpec.getHeight();
       uint32_t rawstride = imageSpec.getRawStride();
 
-      filenamePostfix = "-" + pixelFormat + "-" + to_string(width) + "x" + to_string(height);
+      filenamePostfix = fmt::format("-{}-{}x{}", pixelFormat, width, height);
       if (rawstride > 0) {
-        filenamePostfix += "-stride_" + to_string(rawstride);
+        fmt::format_to(std::back_inserter(filenamePostfix), "-stride_{}", rawstride);
       }
       break;
     }
     case ImageFormat::VIDEO: {
       extension = imageSpec.getCodecName();
-      filenamePostfix += "#" + to_string(imageSpec.getKeyFrameIndex());
+      fmt::format_to(std::back_inserter(filenamePostfix), "#{}", imageSpec.getKeyFrameIndex());
       break;
     }
     default:

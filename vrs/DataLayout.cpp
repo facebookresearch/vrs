@@ -1232,9 +1232,9 @@ void DataPieceValue<T>::print(ostream& out, const string& indent) const {
   if (getOffset() == DataLayout::kNotFound) {
     str.append("<unavailable>");
   } else {
-    str.append(std::to_string(getOffset()));
+    fmt::format_to(back_inserter(str), "{}", getOffset());
   }
-  str.append("+").append(std::to_string(getFixedSize()));
+  fmt::format_to(back_inserter(str), "+{}", getFixedSize());
   if (isRequired()) {
     str.append(" required");
   }

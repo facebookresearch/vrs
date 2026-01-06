@@ -37,13 +37,13 @@ struct RecordFilterParams {
   vector<string> typeFilters;
 
   // Add constraints, typically from command line options
-  bool includeStream(const string& streamFilter);
-  bool excludeStream(const string& streamFilter);
+  bool includeStream(string streamFilter);
+  bool excludeStream(string streamFilter);
   // Same as above, but assumes streamFilter starts with '+' to add,
   // or '-', or '~'to remove streams. '~' is useful for CLI tools use cases.
   bool includeExcludeStream(const string& plusMinusStreamFilter);
-  bool includeType(const string& type);
-  bool excludeType(const string& type);
+  bool includeType(string type);
+  bool excludeType(string type);
 
   void getIncludedStreams(RecordFileReader& reader, set<StreamId>& outFilteredSet) const;
   unique_ptr<set<StreamId>> getIncludedStreams(RecordFileReader& reader) const; // if nullptr, all

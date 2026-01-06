@@ -381,9 +381,9 @@ int DiskFileT<FileChunk>::addChunk() {
   // if the first file ends with "_1", the second chunk is numbered "_2", etc.
   if (helpers::endsWith(newChunkPath, "_1")) {
     newChunkPath.pop_back();
-    newChunkPath += to_string(chunks_->size() + 1);
+    fmt::format_to(std::back_inserter(newChunkPath), "{}", chunks_->size() + 1);
   } else {
-    newChunkPath += '_' + to_string(chunks_->size());
+    fmt::format_to(std::back_inserter(newChunkPath), "_{}", chunks_->size());
   }
   return addChunk(newChunkPath);
 }

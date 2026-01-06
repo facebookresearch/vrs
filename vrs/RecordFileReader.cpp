@@ -181,7 +181,7 @@ int RecordFileReader::vrsFilePathToFileSpec(
     root = targetFile + '_';
   }
   for (size_t index = 1; /* nothing to check */; index++) {
-    string chunkName = root + to_string(index);
+    string chunkName = fmt::format("{}{}", root, index);
     if (!os::isFile(chunkName)) {
       break; // it is not an error to not find more chunks, but we stop searching
     }
@@ -293,8 +293,7 @@ int RecordFileReader::doOpenFile(
   bool tryToUseCache = file_->isRemoteFileSystem() && fileHeader.creationId != 0;
   if (!tryToUseCache || fileCache == nullptr ||
       fileCache->getFile(
-          "vrs_details_" + to_string(fileHeader.creationId) + '_' +
-              to_string(file_->getTotalSize()),
+          fmt::format("vrs_details_{}_{}", fileHeader.creationId, file_->getTotalSize()),
           detailsCacheFilePath) != 0 ||
       FileDetailsCache::read(
           detailsCacheFilePath,
@@ -355,8 +354,7 @@ int RecordFileReader::readFileHeader(
   FileCache* fileCache = FileCache::getFileCache();
   string headerCacheFilePath;
   if (fileCache != nullptr && file_->isRemoteFileSystem()) {
-    string fileName =
-        "vrs_header_x" + fileSpec.getXXHash() + "_" + to_string(file_->getTotalSize());
+    string fileName = fmt::format("vrs_header_x{}_{}", fileSpec.getXXHash(), file_->getTotalSize());
     if (fileCache->getFile(fileName, headerCacheFilePath) == 0 &&
         DiskFile::readZstdFile(headerCacheFilePath, &outFileHeader, sizeof(outFileHeader)) == 0 &&
         outFileHeader.looksLikeAVRSFile()) {
@@ -679,7 +677,7 @@ StreamId RecordFileReader::getStreamForTag(
   return {};
 }
 
-StreamId RecordFileReader::getStreamForSerialNumber(const std::string& streamSerialNumber) const {
+StreamId RecordFileReader::getStreamForSerialNumber(const string& streamSerialNumber) const {
   for (auto streamId : streamIds_) {
     if (getSerialNumber(streamId) == streamSerialNumber) {
       return streamId;
