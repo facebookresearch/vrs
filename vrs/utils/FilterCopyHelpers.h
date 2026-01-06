@@ -17,10 +17,10 @@
 #pragma once
 
 #include <deque>
-#include <map>
 #include <memory>
 
 #include <vrs/Compressor.h>
+#include <vrs/FileSpec.h>
 #include <vrs/RecordFormatStreamPlayer.h>
 #include <vrs/Recordable.h>
 #include <vrs/os/Platform.h>
@@ -77,7 +77,7 @@ struct CopyOptions {
   bool preallocateIndex = true;
 
   // Additional optional parameters, eg for when RecordFilterCopier objects are created.
-  map<string, string> miscParams;
+  FileSpec::Extras miscParams;
 
   // Count the number of records copied. Set during the copy/merge operation.
   mutable uint32_t outRecordCopiedCount = 0;

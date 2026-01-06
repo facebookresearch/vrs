@@ -60,7 +60,7 @@ class WriteFileHandler : public FileHandler {
   /// @param newFilePath: a disk path to create the file.
   /// @param options: optional parameters to pass when creating the file.
   /// @return A status code, 0 meaning success.
-  virtual int create(const string& newFilePath, const map<string, string>& options = {}) = 0;
+  virtual int create(const string& newFilePath, const FileSpec::Extras& options = {}) = 0;
 
   /// Create a new file for writing, in split-head file mode, the body part.
   /// @param spec: spec as converted already from initialFilePath, if that helps.

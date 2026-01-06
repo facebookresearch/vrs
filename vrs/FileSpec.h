@@ -37,6 +37,8 @@ using std::vector;
 /// If no file handler name is specified, the object is assumed to a set of local files.
 /// Additional properties may be specified in the extras field, which has helper methods.
 struct FileSpec {
+  using Extras = map<string, string>;
+
   FileSpec() = default;
   FileSpec(string filehandler, const vector<string>& chunksIn)
       : fileHandlerName{std::move(filehandler)}, chunks{chunksIn} {}
@@ -52,11 +54,7 @@ struct FileSpec {
 
   bool isDiskFile() const;
 
-  static int parseUri(
-      string_view uri,
-      string& outScheme,
-      string& outPath,
-      map<string, string>& outQueryParams);
+  static int parseUri(string_view uri, string& outScheme, string& outPath, Extras& outQueryParams);
 
   /// Smart setter that will parse the string given, determining if the string passed is a local
   /// file path, a uri, or a json path.
@@ -142,7 +140,7 @@ struct FileSpec {
   string uri;
   vector<string> chunks;
   vector<int64_t> chunkSizes;
-  map<string, string> extras;
+  Extras extras;
 };
 
 } // namespace vrs

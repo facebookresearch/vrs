@@ -70,7 +70,7 @@ bool validateUriSchema(string_view uri, size_t colonPos) {
 
 // Parses query parameters from a URI query string (portion after '?').
 // Parameters are separated by '&' or ';' and formatted as key=value.
-void parseQueryParams(string_view uri, size_t queryStart, map<string, string>& outQueryParams) {
+void parseQueryParams(string_view uri, size_t queryStart, FileSpec::Extras& outQueryParams) {
   size_t start = queryStart + 1;
   for (size_t p = start; p < uri.size(); p++) {
     unsigned char c = static_cast<unsigned char>(uri[p]);
@@ -113,7 +113,7 @@ int FileSpec::parseUri(
     string_view uri,
     string& outScheme,
     string& outPath,
-    map<string, string>& outQueryParams) {
+    Extras& outQueryParams) {
   // Parse URI following https://en.wikipedia.org/wiki/Uniform_Resource_Identifier.
   // URI should look like <scheme>:<path>?<query> while <scheme> corresponds to file handler name.
   // The query should be used to specify additional fields for each file handler.

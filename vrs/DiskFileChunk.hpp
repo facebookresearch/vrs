@@ -50,7 +50,7 @@ class DiskFileChunk {
   DiskFileChunk& operator=(const DiskFileChunk& other) = delete;
   DiskFileChunk& operator=(DiskFileChunk&& other) = delete;
 
-  int create(const string& newPath, MAYBE_UNUSED const map<string, string>& options) {
+  int create(const string& newPath, MAYBE_UNUSED const FileSpec::Extras& options) {
     close();
     file_ = os::fileOpen(newPath, "wb");
     if (file_ == nullptr) {
@@ -70,7 +70,7 @@ class DiskFileChunk {
     return SUCCESS;
 #endif
   }
-  int open(bool readOnly, MAYBE_UNUSED const map<string, string>& options) {
+  int open(bool readOnly, MAYBE_UNUSED const FileSpec::Extras& options) {
     if (file_ != nullptr) {
       os::fileClose(file_);
     }

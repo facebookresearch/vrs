@@ -195,8 +195,8 @@ class AsyncDiskFileChunk {
 
   ~AsyncDiskFileChunk();
 
-  int create(const std::string& newpath, const std::map<std::string, std::string>& options);
-  int open(bool readOnly, const std::map<std::string, std::string>& options);
+  int create(const std::string& newpath, const FileSpec::Extras& options);
+  int open(bool readOnly, const FileSpec::Extras& options);
   int close();
   int rewind();
   [[nodiscard]] bool eof() const;
@@ -249,7 +249,7 @@ class AsyncDiskFileChunk {
   void pump_buffers_locked();
   int alloc_write_buffers();
   int free_write_buffers();
-  int init_parameters(const std::map<std::string, std::string>& options);
+  int init_parameters(const FileSpec::Extras& options);
 
   AsyncHandle file_{};
   std::string path_; // path of this chunk

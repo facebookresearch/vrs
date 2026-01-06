@@ -109,7 +109,7 @@ bool DiskFileT<FileChunk>::isOpened() const {
 }
 
 template <class FileChunk>
-int DiskFileT<FileChunk>::create(const string& newFilePath, const map<string, string>& options) {
+int DiskFileT<FileChunk>::create(const string& newFilePath, const FileSpec::Extras& options) {
   close();
   readOnly_ = false;
   options_ = options;
@@ -588,7 +588,7 @@ template <class FileChunk>
 int DiskFileT<FileChunk>::parseUri(FileSpec& inOutFileSpec, size_t /*colonIndex*/) const {
   string scheme;
   string path;
-  map<string, string> queryParams;
+  FileSpec::Extras queryParams;
   IF_ERROR_RETURN(FileSpec::parseUri(inOutFileSpec.uri, scheme, path, queryParams));
 
   if (scheme.empty()) {
@@ -630,7 +630,7 @@ AtomicDiskFile::~AtomicDiskFile() {
   AtomicDiskFile::close(); // overrides not available in constructors & destructors
 }
 
-int AtomicDiskFile::create(const std::string& newFilePath, const map<string, string>& options) {
+int AtomicDiskFile::create(const std::string& newFilePath, const FileSpec::Extras& options) {
   finalName_ = newFilePath;
   return DiskFile::create(os::getUniquePath(finalName_, 10), options);
 }

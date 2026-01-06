@@ -570,9 +570,7 @@ AsyncDiskFileChunk::~AsyncDiskFileChunk() {
   }
 }
 
-int AsyncDiskFileChunk::create(
-    const std::string& newpath,
-    const std::map<std::string, std::string>& options) {
+int AsyncDiskFileChunk::create(const std::string& newpath, const FileSpec::Extras& options) {
   close();
 
   path_ = newpath;
@@ -606,7 +604,7 @@ int AsyncDiskFileChunk::create(
   return error;
 }
 
-int AsyncDiskFileChunk::open(bool readOnly, const std::map<std::string, std::string>& options) {
+int AsyncDiskFileChunk::open(bool readOnly, const FileSpec::Extras& options) {
   close();
 
   file_position_ = 0;
@@ -1062,7 +1060,7 @@ int AsyncDiskFileChunk::free_write_buffers() {
   return SUCCESS;
 }
 
-int AsyncDiskFileChunk::init_parameters(const std::map<std::string, std::string>& options) {
+int AsyncDiskFileChunk::init_parameters(const FileSpec::Extras& options) {
   // The VRS_DISKFILECHUNKASYNC_* options are primarily used for running the test suite with
   // different default IO configurations
   if (!helpers::getBool(options, "direct", use_directio_) &&
