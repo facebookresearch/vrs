@@ -24,7 +24,7 @@
 #include <vrs/os/Utils.h>
 
 using namespace std;
-using namespace vrscli;
+using namespace vrs::cli;
 
 int main(int argc, char** argv) {
 // Initialize with XPRS if included

@@ -30,14 +30,14 @@ enum class CheckType { None, Check, Checksum, ChecksumVerbatim, Checksums, HexDu
 /// @param filteredReader: source file with record filtering
 /// @param copyOptions: to disable progress logging. Other parameters are not applicable.
 /// @param checkType: which type of check is expected, except ChecksumVerbatim (see API below).
-std::string checkRecords(
+string checkRecords(
     FilteredFileReader& filteredReader,
     const CopyOptions& copyOptions,
     CheckType checkType);
 
 /// Helpers to simplify unit tests validation
-std::string recordsChecksum(const std::string& path, bool showProgress);
-std::string verbatimChecksum(const std::string& path, bool showProgress);
+string recordsChecksum(const string& path, bool showProgress);
+string verbatimChecksum(const string& path, bool showProgress);
 
 enum class CompareType { None, Compare, CompareVerbatim, COUNT };
 

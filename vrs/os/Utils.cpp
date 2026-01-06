@@ -299,7 +299,7 @@ string sanitizeFileName(const string& filename) {
     }
   }
 #if IS_WINDOWS_PLATFORM()
-  std::vector<const char*> illegalNames = {
+  vector<const char*> illegalNames = {
       "CON",  "PRN",  "AUX",  "NUL",  "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7",
       "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"};
   for (const char* prefix : illegalNames) {
@@ -338,7 +338,7 @@ string makeUniqueFolder(const string& baseName, size_t randomSuffixLength) {
 
 #if IS_VRS_OSS_CODE()
 
-static std::string_view stripLeadingSlash(std::string_view path) {
+static string_view stripLeadingSlash(string_view path) {
   if (!path.empty() && (path[0] == '/' || path[0] == '\\')) {
     return path.substr(1);
   }

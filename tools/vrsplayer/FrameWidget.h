@@ -38,8 +38,9 @@ class PixelFrame;
 namespace vrsp {
 
 using std::map;
-using std::string;
-using std::unique_ptr;
+
+using namespace vrs;
+
 using vrs::utils::PixelFrame;
 
 // Frame Per Second estimator class

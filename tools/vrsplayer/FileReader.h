@@ -48,6 +48,8 @@ Q_DECLARE_METATYPE(FileReaderState)
 
 namespace vrsp {
 
+using std::set;
+
 using ::vrs::ProgressLogger;
 using ::vrs::RecordFileReader;
 
@@ -109,7 +111,7 @@ class FileReader : public QObject {
   void mediaStateChanged(FileReaderState state);
   void durationChanged(double start, double end, int duration);
   void timeChanged(double time, int position);
-  void statusStateChanged(const std::string& status);
+  void statusStateChanged(const string& status);
   void adjustSpeed(int change);
   void updateLayoutMenu(
       int frameCount,
@@ -120,7 +122,7 @@ class FileReader : public QObject {
   void fileChanged(QWidget* widget, const vrs::FileSpec& spec);
 
  public slots:
-  std::vector<FrameWidget*> openFile(const QString& url, QVBoxLayout* videoFrame, QWidget* parent);
+  vector<FrameWidget*> openFile(const QString& url, QVBoxLayout* videoFrame, QWidget* parent);
   void setOverlayColor(const QColor& color);
   void setFontSize(int fontSize);
   void setSolidBackground(bool solid);
@@ -156,20 +158,20 @@ class FileReader : public QObject {
   void setTimeRange(double start, double end, uint32_t firstDataRecordIndex);
   void playThreadActivity();
   void playAction(DispatchAction action);
-  bool playFrameSet(const std::set<size_t>& frameSet, Seek strategy);
-  bool getFrameSet(std::set<size_t>& outSet, size_t start, Direction direction) const;
+  bool playFrameSet(const set<size_t>& frameSet, Seek strategy);
+  bool getFrameSet(set<size_t>& outSet, size_t start, Direction direction) const;
   double getNextRecordDelay();
   void setBlankMode(bool setBlankMode);
   void clearLayout(QLayout* layout, bool deleteWidgets);
   void readFirstRecord(StreamId id, Record::Type recordType);
-  void setErrorText(const std::string& errorText);
+  void setErrorText(const string& errorText);
   bool isAudio(StreamId id) const;
   bool isVideo(StreamId id) const;
   bool isPlaying(StreamId id) const {
     return isAudio(id) || isVisibleVideo(id);
   }
   bool isVisibleVideo(StreamId id) const;
-  std::string getDeviceName(StreamId id);
+  string getDeviceName(StreamId id);
   void sanitizeVisibleStreams(bool reset = false);
   QVariant configurationAsVariant();
   void applyConfiguration(const QVariant& config);
@@ -178,21 +180,21 @@ class FileReader : public QObject {
   int readRecordIfNeeded(const vrs::IndexRecord::RecordInfo& record, size_t recordIndex, bool log);
   QString getInitialSaveLocation();
 
-  std::vector<FrameWidget*> openFile(QVBoxLayout* videoFrames, QWidget* parent);
+  vector<FrameWidget*> openFile(QVBoxLayout* videoFrames, QWidget* parent);
   void closeFile();
 
  private:
   PlayerUI* playerUi_{};
-  std::vector<StreamId> visibleStreams_;
+  vector<StreamId> visibleStreams_;
   QVBoxLayout* videoFrames_{};
   int lastMaxPerRow_{0};
-  std::map<StreamId, std::unique_ptr<FramePlayer>> imageReaders_;
-  std::map<StreamId, std::unique_ptr<AudioPlayer>> audioReaders_;
-  std::map<StreamId, size_t> lastReadRecords_;
+  map<StreamId, unique_ptr<FramePlayer>> imageReaders_;
+  map<StreamId, unique_ptr<AudioPlayer>> audioReaders_;
+  map<StreamId, size_t> lastReadRecords_;
   Record::Type recordType_{Record::Type::UNDEFINED};
   QTimer slowTimer_;
   FileReaderState state_{};
-  std::unique_ptr<RecordFileReader> fileReader_;
+  unique_ptr<RecordFileReader> fileReader_;
   bool isLocalFile_{};
   bool isSliderActive_{};
   bool layoutUpdatesEnabled_{true};
@@ -209,8 +211,8 @@ class FileReader : public QObject {
   std::thread thread_;
 
   // File specific configuration
-  std::unique_ptr<QSettings> fileConfig_;
-  std::map<StreamId, StreamId> fileToConfig_;
+  unique_ptr<QSettings> fileConfig_;
+  map<StreamId, StreamId> fileToConfig_;
   QVariantMap layoutPresets_;
 };
 

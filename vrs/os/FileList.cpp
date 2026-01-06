@@ -33,7 +33,7 @@ namespace fs = std::filesystem;
 namespace vrs {
 namespace os {
 
-static bool beforefileName(const std::string& left, const std::string& right) {
+static bool beforefileName(const string& left, const string& right) {
   return helpers::beforeFileName(left.c_str(), right.c_str());
 }
 

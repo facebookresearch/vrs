@@ -25,25 +25,31 @@
 
 namespace vrsp {
 
-using ::vrs::Record;
+using namespace vrs;
+
+using std::map;
+using std::mutex;
+using std::unique_lock;
+
+using vrs::Record;
 
 class MetaDataCollector {
  public:
   void clearDescription() {
-    std::unique_lock<std::mutex> guard(mutex_);
+    unique_lock<mutex> guard(mutex_);
     descriptions_[Record::Type::CONFIGURATION].clear();
     descriptions_[Record::Type::STATE].clear();
     descriptions_[Record::Type::DATA].clear();
   }
-  void setDescription(Record::Type recordType, size_t blockIndex, const std::string& description) {
+  void setDescription(Record::Type recordType, size_t blockIndex, const string& description) {
     QString str = QString::fromStdString(description);
-    std::unique_lock<std::mutex> guard(mutex_);
+    unique_lock<mutex> guard(mutex_);
     descriptions_[recordType][blockIndex] = str;
   }
   QString getDescription(Record::Type type) const {
     QString description;
     if (!descriptions_.empty()) {
-      std::unique_lock<std::mutex> guard(mutex_);
+      unique_lock<mutex> guard(mutex_);
       auto descriptions = descriptions_.find(type);
       if (descriptions != descriptions_.end()) {
         for (const auto& d : descriptions->second) {
@@ -53,19 +59,19 @@ class MetaDataCollector {
     }
     return description;
   }
-  std::map<size_t, QString> getDescriptions(Record::Type recordType) {
-    std::unique_lock<std::mutex> guard(mutex_);
+  map<size_t, QString> getDescriptions(Record::Type recordType) {
+    unique_lock<mutex> guard(mutex_);
     return descriptions_[recordType];
   }
-  void setDescriptions(Record::Type recordType, const std::map<size_t, QString>& descriptions) {
-    std::unique_lock<std::mutex> guard(mutex_);
+  void setDescriptions(Record::Type recordType, const map<size_t, QString>& descriptions) {
+    unique_lock<mutex> guard(mutex_);
     descriptions_[recordType] = descriptions;
   }
 
  private:
-  mutable std::mutex mutex_;
+  mutable mutex mutex_;
   // Each record type can have multiple metadata blocks
-  std::map<Record::Type, std::map<size_t, QString>> descriptions_;
+  map<Record::Type, map<size_t, QString>> descriptions_;
 };
 
 } // namespace vrsp

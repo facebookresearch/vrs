@@ -34,6 +34,9 @@
 /// See definition of TESTEDTOOL_EXE used to test this class in vrs/test/BUCK.
 
 namespace vrs {
+
+using std::string;
+
 namespace test {
 
 namespace bp = vrs::os::process;
@@ -41,12 +44,12 @@ namespace bp = vrs::os::process;
 class TestProcess {
  public:
   explicit TestProcess(const char* processName) : processName_{processName} {}
-  bool start(const std::string& arg, bp::ipstream& sout) {
+  bool start(const string& arg, bp::ipstream& sout) {
     return start(arg, &sout);
   }
-  bool start(const std::string& arg, bp::ipstream* sout = nullptr);
+  bool start(const string& arg, bp::ipstream* sout = nullptr);
 
-  static std::string getJsonOutput(bp::ipstream& output);
+  static string getJsonOutput(bp::ipstream& output);
 
   int runProcess();
 
@@ -56,7 +59,7 @@ class TestProcess {
 
   static bool looksLikeAFbCentOSServer();
 
-  static bool findBinary(std::string& inOutName);
+  static bool findBinary(string& inOutName);
 };
 
 } // namespace test

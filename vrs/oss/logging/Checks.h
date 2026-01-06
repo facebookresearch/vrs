@@ -21,9 +21,12 @@
 #include <fmt/core.h>
 
 namespace vrs {
+
+using std::string;
+
 namespace logging {
 
-void logAndAbort(const char* condition, const std::string& message = {});
+void logAndAbort(const char* condition, const string& message = {});
 
 } // namespace logging
 } // namespace vrs

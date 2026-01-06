@@ -46,7 +46,7 @@ namespace tag_conventions {
   /// Add a unique session id tag, generated then.
   /// @param writer: the file writer to add the tag to.
   /// @return The generated session ID.
-  std::string addUniqueSessionId(RecordFileWriter& writer);
+  string addUniqueSessionId(RecordFileWriter& writer);
   /// Add a capture time tag, using the current time.
   /// @param writer: the file writer to add the tag to.
   void addCaptureTime(RecordFileWriter& writer);

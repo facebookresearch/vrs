@@ -28,7 +28,7 @@ using namespace std;
 namespace vrs {
 namespace logging {
 
-void log(Level level, const char* channel, const std::string& message) {
+void log(Level level, const char* channel, const string& message) {
   const fmt::color kNoColor = static_cast<fmt::color>(0xFFFFFFFF);
   fmt::color c = kNoColor;
   const char* logLevel = "";
@@ -65,14 +65,13 @@ void log_every_n_seconds(
     Level level,
     int nSeconds,
     const char* channel,
-    const std::string& message) {
+    const string& message) {
   using namespace std::chrono;
   static mutex sMutex;
   unique_lock<mutex> lock(sMutex);
   static map<tuple<const char*, int>, int64_t> sLastTime;
   int64_t& lastTime = sLastTime[{file, line}];
-  int64_t now =
-      duration_cast<std::chrono::milliseconds>(steady_clock::now().time_since_epoch()).count();
+  int64_t now = duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
   if (lastTime + nSeconds * 1000 < now) {
     log(level, channel, message);
     lastTime = now;

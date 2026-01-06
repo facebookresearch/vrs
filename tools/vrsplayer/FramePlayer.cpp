@@ -232,7 +232,7 @@ void FramePlayer::mediaStateChanged(FileReaderState state) {
   }
 }
 
-bool FramePlayer::saveFrameNowOrOnNextRead(const std::string& path) {
+bool FramePlayer::saveFrameNowOrOnNextRead(const string& path) {
   if (imageFormat_ == vrs::ImageFormat::VIDEO) {
     // Save the frame visible in the Widget
     if (widget_->saveImage(path) == 0) {

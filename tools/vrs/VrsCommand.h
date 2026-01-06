@@ -24,9 +24,10 @@
 #include <vrs/utils/cli/DefaultDecimator.h>
 #include <vrs/utils/cli/PrintRecordFormatRecords.h>
 
-namespace vrscli {
-void printHelp(const std::string& appName);
-void printSamples(const std::string& appName);
+namespace vrs::cli {
+
+void printHelp(const string& appName);
+void printSamples(const string& appName);
 
 enum class Command {
   None,
@@ -64,7 +65,7 @@ enum class Command {
 struct VrsCommand {
   VrsCommand();
 
-  bool parseCommand(const std::string& appName, const char* cmdName);
+  bool parseCommand(const string& appName, const char* cmdName);
 
   /// Parse a "logical" command line argument, which may have one or more parts.
   /// @param appName: Name of the application binary for error messages
@@ -81,14 +82,13 @@ struct VrsCommand {
   /// On the other hand, if the argument and possible sub-arguments were valid,
   /// outStatusCode is unchanged (presumably, it's still set to EXIT_SUCCESS),
   /// and the next argument parameter to parse is at argn + 1.
-  bool
-  parseArgument(const std::string& appName, int& argn, int argc, char** argv, int& outStatusCode);
+  bool parseArgument(const string& appName, int& argn, int argc, char** argv, int& outStatusCode);
 
   /// Handle a parameter not recognized by parseArgument and potential additional parsing.
   /// Unrecognized arguments are expected to be additional file paths for merge operations.
   /// @param appName: Name of the application binary for error messages
   /// @param arg: the argument.
-  bool processUnrecognizedArgument(const std::string& appName, const std::string& arg);
+  bool processUnrecognizedArgument(const string& appName, const string& arg);
 
   /// Try to open the file given as part of the arguments.
   /// @return True if the file was opened successfully (meaning, it's a VRS file, valid so far).
@@ -97,14 +97,12 @@ struct VrsCommand {
   /// Try to open the additional file paths.
   /// @return True if the file was opened successfully (meaning, it's a VRS file, valid so far).
   /// Returns false otherwise.
-  bool openOtherVrsFile(
-      vrs::utils::FilteredFileReader& filteredReader,
-      vrs::RecordFileInfo::Details details);
+  bool openOtherVrsFile(utils::FilteredFileReader& filteredReader, RecordFileInfo::Details details);
   /// Some operations can take multiple VRS files as input. This opens the other VRS files,
   /// while applying the filters on those as well.
-  bool openOtherVrsFiles(vrs::RecordFileInfo::Details details);
+  bool openOtherVrsFiles(RecordFileInfo::Details details);
   /// Apply the recorded filters
-  void applyFilters(vrs::utils::FilteredFileReader& filteredReader);
+  void applyFilters(utils::FilteredFileReader& filteredReader);
   /// Run the commands requested using the member variables below
   /// @return 0, if no error should be signaled back to the caller of the tool,
   /// or some non-zero value if an error should be signaled.
@@ -115,33 +113,33 @@ struct VrsCommand {
   /// Perform Copy, Merge operation
   int doCopyMerge();
 
-  static bool isRemoteFileSystem(const std::string& path);
+  static bool isRemoteFileSystem(const string& path);
 
   /// Main operation
   Command cmd = Command::None;
 
   /// Source file and its filters
-  vrs::utils::FilteredFileReader filteredReader;
-  vrs::utils::RecordFilterParams filters;
-  std::unique_ptr<vrs::utils::DefaultDecimator::Params> decimationParams;
+  utils::FilteredFileReader filteredReader;
+  utils::RecordFilterParams filters;
+  unique_ptr<utils::DefaultDecimator::Params> decimationParams;
   /// Helper to use when setting up decimation, to make sure it's created & initialized before use
-  vrs::utils::DefaultDecimator::Params& getDecimatorParams();
+  utils::DefaultDecimator::Params& getDecimatorParams();
 
   /// Force showing the tool's help documentation
   bool showHelp = false;
 
   /// Misc flags and options for copy and merge operations, but also other operations.
-  vrs::utils::CopyOptions copyOptions;
-  vrs::utils::MakeStreamFilterFunction copyMakeStreamFilterFunction = vrs::utils::makeCopier;
+  utils::CopyOptions copyOptions;
+  utils::MakeStreamFilterFunction copyMakeStreamFilterFunction = utils::makeCopier;
 
   /// Target location for copy, merge, extract operations specified with the '--to' option
-  std::string targetPath;
+  string targetPath;
 
   /// Additional input files for merge operations
-  std::list<vrs::utils::FilteredFileReader> otherFilteredReaders;
+  list<utils::FilteredFileReader> otherFilteredReaders;
 
   /// Extract raw images as ".raw" files instead of converting them to png.
   bool extractImagesRaw = false;
 };
 
-} // namespace vrscli
+} // namespace vrs::cli

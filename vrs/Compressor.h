@@ -65,14 +65,14 @@ enum class CompressionPreset {
 
 };
 
-std::string toPrettyName(CompressionPreset preset);
-std::string toString(CompressionPreset preset);
+string toPrettyName(CompressionPreset preset);
+string toString(CompressionPreset preset);
 template <>
-CompressionPreset toEnum<CompressionPreset>(const std::string& presetName);
+CompressionPreset toEnum<CompressionPreset>(const string& presetName);
 
-std::string toString(CompressionType compressionType);
+string toString(CompressionType compressionType);
 template <>
-CompressionType toEnum<CompressionType>(const std::string& compressionTypeName);
+CompressionType toEnum<CompressionType>(const string& compressionTypeName);
 
 /// \brief Helper class to compress data using lz4 or zstd presets.
 ///

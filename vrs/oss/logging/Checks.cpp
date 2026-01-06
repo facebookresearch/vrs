@@ -42,7 +42,7 @@
 namespace vrs {
 namespace logging {
 
-void logAndAbort(const char* condition, const std::string& message) {
+void logAndAbort(const char* condition, const string& message) {
   fmt::print(stderr, fg(fmt::color::red), "Check '{}' failed. {}\n", condition, message);
   XR_ABORT_IMPL(message);
 }

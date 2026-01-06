@@ -235,7 +235,7 @@ unique_ptr<set<StreamId>> RecordFilterParams::getIncludedStreams(RecordFileReade
   return filteredSet;
 }
 
-string RecordFilterParams::getStreamFiltersConfiguration(std::string_view configName) const {
+string RecordFilterParams::getStreamFiltersConfiguration(string_view configName) const {
   string streams;
   if (!streamFilters.empty()) {
     streams.reserve(configName.size() + streamFilters.size() * 10 + 10);

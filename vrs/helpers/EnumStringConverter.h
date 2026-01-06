@@ -26,6 +26,9 @@
 
 namespace vrs {
 
+using std::string;
+using std::string_view;
+
 /*
  * Helper template class to convert enums to strings & back, in trivial cases.
  * Requirements:
@@ -38,7 +41,7 @@ namespace vrs {
  *   // your enum:
  *   enum class Cars : size_t { Unknown, Renault, Peugeot, Citroen };
  *   // The corresponding names:
- *   static std::string_view sCarNames[] = {"Unknown", "Renault", "Peugeot", "Citroen"};
+ *   static string_view sCarNames[] = {"Unknown", "Renault", "Peugeot", "Citroen"};
  *   // Build the converter:
  *   struct CarConverter : public
  *       EnumStringConverter<Cars, cCarNames, array_size(sCarNames), Cars::Unknown, Cars::Unknown>
@@ -50,7 +53,7 @@ namespace vrs {
 
 template <
     class E, // an enum (or enum class that can be cast to/from size_t)
-    const std::string_view NAMES[], // static array of names
+    const string_view NAMES[], // static array of names
     size_t NAMES_COUNT, // size of the static array of names (use array_size)
     E DEFAULT_ENUM, // enum to use when name to enum fails
     E DEFAULT_NAME = DEFAULT_ENUM, // enum to use when enum to name fails
@@ -58,9 +61,9 @@ template <
 struct EnumStringConverter {
   static constexpr size_t cNamesCount = NAMES_COUNT;
 
-  static std::string_view toStringView(E value);
-  inline static std::string toString(E value) {
-    return std::string(toStringView(value));
+  static string_view toStringView(E value);
+  inline static string toString(E value) {
+    return string(toStringView(value));
   }
   inline static const char* toCString(E value) {
     // valid, because NAMES is a static array initialized with const char* values
@@ -68,21 +71,21 @@ struct EnumStringConverter {
   }
 
   // Case sensitive string to enum conversion
-  static E toEnum(std::string_view name);
-  inline static E toEnum(const std::string& name) {
-    return toEnum(std::string_view(name));
+  static E toEnum(string_view name);
+  inline static E toEnum(const string& name) {
+    return toEnum(string_view(name));
   }
   inline static E toEnum(const char* name) {
-    return toEnum(std::string_view(name));
+    return toEnum(string_view(name));
   }
 
   // Case insensitive string to enum conversion
-  static E toEnumNoCase(std::string_view name);
-  inline static E toEnumNoCase(const std::string& name) {
-    return toEnumNoCase(std::string_view(name));
+  static E toEnumNoCase(string_view name);
+  inline static E toEnumNoCase(const string& name) {
+    return toEnumNoCase(string_view(name));
   }
   inline static E toEnumNoCase(const char* name) {
-    return toEnumNoCase(std::string_view(name));
+    return toEnumNoCase(string_view(name));
   }
 };
 
@@ -123,13 +126,12 @@ struct EnumStringConverter {
 // Implementation moved outside class to reduce template instantiation overhead
 template <
     class E,
-    const std::string_view NAMES[],
+    const string_view NAMES[],
     size_t NAMES_COUNT,
     E DEFAULT_ENUM,
     E DEFAULT_NAME,
     bool USE_INDEX_ZERO>
-std::string_view
-EnumStringConverter<E, NAMES, NAMES_COUNT, DEFAULT_ENUM, DEFAULT_NAME, USE_INDEX_ZERO>::
+string_view EnumStringConverter<E, NAMES, NAMES_COUNT, DEFAULT_ENUM, DEFAULT_NAME, USE_INDEX_ZERO>::
     toStringView(E value) {
   const size_t index = static_cast<size_t>(value);
   if (index < cNamesCount) {
@@ -141,13 +143,13 @@ EnumStringConverter<E, NAMES, NAMES_COUNT, DEFAULT_ENUM, DEFAULT_NAME, USE_INDEX
 
 template <
     class E,
-    const std::string_view NAMES[],
+    const string_view NAMES[],
     size_t NAMES_COUNT,
     E DEFAULT_ENUM,
     E DEFAULT_NAME,
     bool USE_INDEX_ZERO>
 E EnumStringConverter<E, NAMES, NAMES_COUNT, DEFAULT_ENUM, DEFAULT_NAME, USE_INDEX_ZERO>::toEnum(
-    std::string_view name) {
+    string_view name) {
   for (size_t k = USE_INDEX_ZERO ? 0 : 1; k < cNamesCount; k++) {
     if (name == NAMES[k]) {
       return static_cast<E>(k);
@@ -158,13 +160,13 @@ E EnumStringConverter<E, NAMES, NAMES_COUNT, DEFAULT_ENUM, DEFAULT_NAME, USE_IND
 
 template <
     class E,
-    const std::string_view NAMES[],
+    const string_view NAMES[],
     size_t NAMES_COUNT,
     E DEFAULT_ENUM,
     E DEFAULT_NAME,
     bool USE_INDEX_ZERO>
 E EnumStringConverter<E, NAMES, NAMES_COUNT, DEFAULT_ENUM, DEFAULT_NAME, USE_INDEX_ZERO>::
-    toEnumNoCase(std::string_view name) {
+    toEnumNoCase(string_view name) {
   for (size_t k = USE_INDEX_ZERO ? 0 : 1; k < cNamesCount; k++) {
     if (name.size() == NAMES[k].size() &&
         vrs::helpers::strncasecmp(name.data(), NAMES[k].data(), name.size()) == 0) {

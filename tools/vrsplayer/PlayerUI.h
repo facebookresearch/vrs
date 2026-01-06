@@ -106,7 +106,7 @@ class PlayerUI : public QWidget {
   void timeChanged(double time, int position);
   void recordTypeChanged(int index);
   void speedControlChanged(int index);
-  void setStatusText(const std::string& statusText);
+  void setStatusText(const string& statusText);
   bool eventFilter(QObject* obj, QEvent* event) override;
 
  private:
@@ -117,7 +117,7 @@ class PlayerUI : public QWidget {
   bool solidBackground_{false};
   FileReader fileReader_;
   QVBoxLayout* videoFrames_{nullptr};
-  std::vector<FrameWidget*> frames_;
+  vector<FrameWidget*> frames_;
   QAbstractButton* backwardButton_{nullptr};
   QAbstractButton* stopButton_{nullptr};
   QAbstractButton* playPauseButton_{nullptr};

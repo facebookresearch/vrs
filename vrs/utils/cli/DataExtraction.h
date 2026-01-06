@@ -32,7 +32,7 @@ class ImageNamer;
 /// @param imageNamer: an optional helper to customize how extracted images are named.
 /// @return A status code, 0 meaning success.
 void extractImages(
-    const std::string& path,
+    const string& path,
     FilteredFileReader& filteredReader,
     bool extractImagesRaw = false,
     ImageNamer* imageNamer = nullptr);
@@ -42,12 +42,12 @@ void extractImages(
 /// @param folderPath: path to a folder where to extract the files
 /// @param filteredReader: filtered reader for the file to read from.
 /// @return A status code, 0 meaning success.
-int extractAudio(const std::string& folderPath, FilteredFileReader& filteredReader);
+int extractAudio(const string& folderPath, FilteredFileReader& filteredReader);
 
 /// Helper for cli tool to extract images, audio and metadata into files.
 /// @param folderPath: path to a folder where to extract the files
 /// @param filteredReader: filtered reader for the file to read from.
 /// @return A status code, 0 meaning success.
-int extractAll(const std::string& outputFolder, FilteredFileReader& filteredReader);
+int extractAll(const string& outputFolder, FilteredFileReader& filteredReader);
 
 } // namespace vrs::utils

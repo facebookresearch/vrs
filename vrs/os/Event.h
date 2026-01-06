@@ -25,6 +25,8 @@
 namespace vrs {
 namespace os {
 
+using std::string;
+
 /// EventChannel represents a type of event, which can dispatch instances of event.
 class EventChannel {
  public:
@@ -46,7 +48,7 @@ class EventChannel {
   /// Construct EventChannel.
   /// @param notificationMode: whether event can be unicasted or broadcasted
   /// @param name: name of event. name should better be unique but nothing enforces that.
-  EventChannel(std::string name, NotificationMode notificationMode);
+  EventChannel(string name, NotificationMode notificationMode);
   ~EventChannel();
 
   /// Fires an event instance to listener(s).
@@ -73,14 +75,14 @@ class EventChannel {
 
   /// Return the name of this event type.
   /// @return Name of this even type
-  std::string getName() const;
+  string getName() const;
 
   /// Return if single or multiple listeners will be notified by one dispatch.
   /// @return: mode of notification
   NotificationMode getNotificationMode() const;
 
  private:
-  std::string name_;
+  string name_;
   NotificationMode notificationMode_;
 
   std::mutex mutex_; // guards all of the following variables

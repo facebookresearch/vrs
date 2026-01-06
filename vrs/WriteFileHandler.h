@@ -22,9 +22,6 @@
 
 namespace vrs {
 
-using std::string;
-using std::vector;
-
 /// \brief The WriteFileHandler interface adds write operations to the FileHandler interface.
 ///
 /// There are two classes of WriteFileHandler implementations:

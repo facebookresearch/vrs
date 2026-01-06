@@ -23,6 +23,7 @@
 namespace vrs {
 
 using std::string;
+using std::unique_ptr;
 
 /// Context description for telemetry events.
 struct OperationContext {
@@ -48,7 +49,7 @@ struct OperationContext {
 /// General purpose telemetry event.
 struct LogEvent {
   LogEvent() = default;
-  LogEvent(std::string type, OperationContext opContext, std::string message, string serverReply)
+  LogEvent(string type, OperationContext opContext, string message, string serverReply)
       : type{std::move(type)},
         operationContext{std::move(opContext)},
         message{std::move(message)},
@@ -60,10 +61,10 @@ struct LogEvent {
   LogEvent& operator=(const LogEvent& rhs) = default;
   LogEvent& operator=(LogEvent&& rhs) noexcept = default;
 
-  std::string type;
+  string type;
   OperationContext operationContext;
-  std::string message;
-  std::string serverReply;
+  string message;
+  string serverReply;
 };
 
 /// \brief Telemetry event specialized to report cloud traffic
@@ -155,7 +156,7 @@ class TelemetryLogger {
   /// Change active telemetry logger.
   /// The new logger will be started after assignment, and the old one will be stopped after.
   /// @param telemetryLogger: new TelemetryLogger, or nullptr for default logger.
-  static void setLogger(std::unique_ptr<TelemetryLogger> telemetryLogger = nullptr);
+  static void setLogger(unique_ptr<TelemetryLogger> telemetryLogger = nullptr);
 
   /// methods for clients to use without having to get an instance, etc
   static inline void error(
@@ -177,7 +178,7 @@ class TelemetryLogger {
     getInstance()->logEvent(LogEvent(kInfoType, operationContext, message, serverMessage));
   }
   static inline void event(
-      const std::string& eventType,
+      const string& eventType,
       const OperationContext& operationContext,
       const string& message,
       const string& serverMessage = {}) {

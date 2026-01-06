@@ -59,7 +59,7 @@
 
 namespace {
 using namespace vrs;
-std::string_view sStateNames[] = {"UNDEFINED", "NO_MEDIA", "PAUSED", "PLAYING", "ERROR"};
+string_view sStateNames[] = {"UNDEFINED", "NO_MEDIA", "PAUSED", "PLAYING", "ERROR"};
 ENUM_STRING_CONVERTER(FileReaderState, sStateNames, FileReaderState::Undefined);
 
 QString kLastMaxPerRow("last_max_per_row");

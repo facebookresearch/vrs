@@ -46,7 +46,7 @@ bool AsyncWindowsHandle::isOpened() const {
   return h_ != INVALID_HANDLE_VALUE;
 }
 
-int AsyncWindowsHandle::open(const std::string& path, const char* modes, int flags) {
+int AsyncWindowsHandle::open(const string& path, const char* modes, int flags) {
   // O_DIRECT is roughly equivalent to (FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH)
   // We always open with FILE_FLAG_OVERLAPPED
 
@@ -236,7 +236,7 @@ int AsyncWindowsHandle::seek(int64_t pos, int origin, int64_t& outFilepos) {
 
 #else
 
-int AsyncFileDescriptor::open(const std::string& path, const char* modes, int flags) {
+int AsyncFileDescriptor::open(const string& path, const char* modes, int flags) {
   assert(!isOpened());
 
   int permissions = 0666;
@@ -570,7 +570,7 @@ AsyncDiskFileChunk::~AsyncDiskFileChunk() {
   }
 }
 
-int AsyncDiskFileChunk::create(const std::string& newpath, const FileSpec::Extras& options) {
+int AsyncDiskFileChunk::create(const string& newpath, const FileSpec::Extras& options) {
   close();
 
   path_ = newpath;
@@ -832,7 +832,7 @@ int AsyncDiskFileChunk::seek(int64_t pos, int origin) {
   return SUCCESS;
 }
 
-const std::string& AsyncDiskFileChunk::getPath() const {
+const string& AsyncDiskFileChunk::getPath() const {
   return path_;
 }
 

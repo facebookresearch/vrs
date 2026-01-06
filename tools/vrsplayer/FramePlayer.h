@@ -40,16 +40,10 @@ enum class FileReaderState;
 
 namespace vrsp {
 
-using ::std::shared_ptr;
-using ::std::unique_ptr;
-using ::std::vector;
-using ::vrs::ContentBlock;
-using ::vrs::CurrentRecord;
-using ::vrs::DataLayout;
-using ::vrs::StreamId;
-using ::vrs::StreamPlayer;
-using ::vrs::utils::PixelFrame;
-using ::vrs::utils::VideoRecordFormatStreamPlayer;
+using namespace vrs;
+
+using utils::PixelFrame;
+using utils::VideoRecordFormatStreamPlayer;
 
 using ImageJob = unique_ptr<PixelFrame>;
 
@@ -58,7 +52,7 @@ class FramePlayer : public QObject, public VideoRecordFormatStreamPlayer {
  public:
   explicit FramePlayer(StreamId id, FrameWidget* widget_);
 
-  bool processRecordHeader(const CurrentRecord& r, vrs::DataReference& outDataReference) override;
+  bool processRecordHeader(const CurrentRecord& r, DataReference& outDataReference) override;
   bool onDataLayoutRead(const CurrentRecord& r, size_t blockIndex, DataLayout&) override;
   bool onImageRead(const CurrentRecord& r, size_t blockIndex, const ContentBlock&) override;
 
@@ -75,9 +69,9 @@ class FramePlayer : public QObject, public VideoRecordFormatStreamPlayer {
   }
   void setBlankMode(bool blankOn);
 
-  string getFrameName(size_t index, const vrs::IndexRecord::RecordInfo& record);
+  string getFrameName(size_t index, const IndexRecord::RecordInfo& record);
   // Try to save. Returns true if the frame was saved, false if save happens on next frame read
-  bool saveFrameNowOrOnNextRead(const std::string& path);
+  bool saveFrameNowOrOnNextRead(const string& path);
 
   void setEstimatedFps(int estimatedFps) {
     estimatedFps_ = estimatedFps;
@@ -92,9 +86,9 @@ class FramePlayer : public QObject, public VideoRecordFormatStreamPlayer {
   std::mutex videoDecodingMutex_;
   std::mutex frameMutex_;
   std::deque<unique_ptr<PixelFrame>> recycledFrames_;
-  vrs::utils::NormalizeOptions normalizeOptions_;
+  utils::NormalizeOptions normalizeOptions_;
   bool needsConvertedFrame_{false};
-  vrs::ImageFormat imageFormat_{vrs::ImageFormat::UNDEFINED};
+  ImageFormat imageFormat_{ImageFormat::UNDEFINED};
   StreamId id_;
   FrameWidget* widget_;
   MetaDataCollector descriptions_;
@@ -107,11 +101,11 @@ class FramePlayer : public QObject, public VideoRecordFormatStreamPlayer {
   Fps dataFps_;
   FileReaderState state_{};
 
-  vrs::JobQueueWithThread<std::unique_ptr<ImageJob>> imageJobs_;
+  JobQueueWithThread<unique_ptr<ImageJob>> imageJobs_;
 
   void convertFrame(unique_ptr<PixelFrame>& frame);
   static void makeBlankFrame(unique_ptr<PixelFrame>& frame);
-  unique_ptr<PixelFrame> getFrame(vrs::PixelFormat format);
+  unique_ptr<PixelFrame> getFrame(PixelFormat format);
   void recycle(unique_ptr<PixelFrame>& frame);
   bool saveFrame(const CurrentRecord& record, const ContentBlock& contentBlock);
 };

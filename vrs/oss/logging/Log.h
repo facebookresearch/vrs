@@ -21,6 +21,9 @@
 #include <fmt/core.h>
 
 namespace vrs {
+
+using std::string;
+
 namespace logging {
 
 enum class Level {
@@ -31,7 +34,7 @@ enum class Level {
 };
 
 /// Logging backend: redirect where you need, depending on the log level and your preferences.
-void log(Level level, const char* channel, const std::string& message);
+void log(Level level, const char* channel, const string& message);
 
 /// Logging backend: redirect where you need, depending on the log level and your preferences
 /// This variant filters out too frequent output, based on the call site and a minimum duration
@@ -43,7 +46,7 @@ void log_every_n_seconds(
     Level level,
     int nSeconds,
     const char* channel,
-    const std::string& message);
+    const string& message);
 
 } // namespace logging
 } // namespace vrs

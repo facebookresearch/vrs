@@ -52,7 +52,7 @@ using vrs::RecordFileInfo::Details;
 
 namespace {
 
-using namespace vrscli;
+using namespace vrs::cli;
 
 string_view sCommands[] = {
     "none",
@@ -136,7 +136,7 @@ const CommandSpec& getCommandSpec(Command cmd) {
 
 #define CMD(H, C) H ":\n  " << appName << " " C "\n"
 
-namespace vrscli {
+namespace vrs::cli {
 
 void printHelp(const string& appName) {
   cout
@@ -286,7 +286,7 @@ VrsCommand::VrsCommand() {
   }
 }
 
-bool VrsCommand::parseCommand(const std::string& appName, const char* cmdName) {
+bool VrsCommand::parseCommand(const string& appName, const char* cmdName) {
   cmd = CommandConverter::toEnum(cmdName);
   if (cmd != Command::None) {
     return XR_VERIFY(getCommandSpec(cmd).cmd == cmd);
@@ -626,4 +626,4 @@ DefaultDecimator::Params& VrsCommand::getDecimatorParams() {
   return *decimationParams;
 }
 
-} // namespace vrscli
+} // namespace vrs::cli

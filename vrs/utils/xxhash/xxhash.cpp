@@ -49,7 +49,7 @@ XXH64Digester& XXH64Digester::ingest(const void* data, size_t len) {
   return *this;
 }
 
-XXH64Digester& XXH64Digester::ingest(const std::map<std::string, std::string>& data) {
+XXH64Digester& XXH64Digester::ingest(const std::map<string, string>& data) {
   const char* kSignature = "map<string, string>";
   ingest(kSignature, strlen(kSignature));
   for (const auto& iter : data) {

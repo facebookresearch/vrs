@@ -29,6 +29,9 @@ class GTEST_TEST_CLASS_NAME_(MultiRecordFileReaderTest, multiFile);
 
 namespace vrs {
 
+using std::pair;
+using std::unique_ptr;
+
 /// @brief Facilitates reading multiple VRS files simultaneously.
 /// Records are sorted by timestamps across all the files, therefore it is essential that
 /// *** all the files must have their timestamps in the same time domain. ***
@@ -58,22 +61,22 @@ class MultiRecordFileReader {
   /// @param paths: VRS file paths to open.
   /// @return 0 on success and you can read all the files, or some non-zero
   /// error code, in which case, further read calls will fail.
-  int open(const std::vector<std::string>& paths);
+  int open(const vector<string>& paths);
 
   /// Open the given VRS files, specified by their FileSpecs.
-  /// See open(const std::vector<std::string>& paths) for more details.
+  /// See open(const vector<string>& paths) for more details.
   /// @param fileSpecs: VRS file specs to open.
   /// @return 0 on success and you can read all the files, or some non-zero
   /// error code, in which case, further read calls will fail.
-  int open(const std::vector<FileSpec>& fileSpecs);
+  int open(const vector<FileSpec>& fileSpecs);
 
   /// Open a single VRS file.
   /// This method is expected to be invoked only once per instance.
   /// @param path: VRS file path to open.
   /// @return 0 on success and you can read the file, or some non-zero error code,
   /// in which case, further read calls will fail.
-  int open(const std::string& path) {
-    return open(std::vector<std::string>{path});
+  int open(const string& path) {
+    return open(vector<string>{path});
   }
 
   /// Open a single VRS file.
@@ -82,7 +85,7 @@ class MultiRecordFileReader {
   /// @return 0 on success and you can read the file, or some non-zero error code,
   /// in which case, further read calls will fail.
   int open(const FileSpec& fileSpec) {
-    return open(std::vector<FileSpec>{fileSpec});
+    return open(vector<FileSpec>{fileSpec});
   }
 
   /// Set the tags that determine whether VRS files are related to each other.
@@ -91,7 +94,7 @@ class MultiRecordFileReader {
   /// Defaults to kCaptureTimeEpoch and kSessionId.
   /// @param tags: Vector of tag names that must match across files.
   /// Can be empty to disable related file checks.
-  void setRelatedFileTags(std::vector<std::string>&& tags);
+  void setRelatedFileTags(vector<string>&& tags);
 
   /// Close the underlying files, if any are open.
   /// @return 0 on success or if no file was open.
@@ -155,7 +158,7 @@ class MultiRecordFileReader {
   /// When a single file is open, the underlying chunks with their sizes are returned.
   /// When multiple files are open, file paths and their sizes are returned.
   /// @return A vector of pairs path-file size in bytes.
-  vector<std::pair<string, int64_t>> getFileChunks() const;
+  vector<pair<string, int64_t>> getFileChunks() const;
 
   /// Streams using << Recordable Class >> ids require a << flavor >>,
   /// which must be provided when the stream was created.
@@ -408,7 +411,7 @@ class MultiRecordFileReader {
   /// Get a clone of the current file handler, for use elsewhere.
   /// @return A copy of the current file handler.
   /// nullptr may be returned if no underlying files are open yet.
-  std::unique_ptr<FileHandler> getFileHandler() const;
+  unique_ptr<FileHandler> getFileHandler() const;
 
   /// Get UniqueStreamId corresponding to the given record.
   /// This must be used as opposed to reading the StreamId from RecordInfo directly since it handles
@@ -475,16 +478,16 @@ class MultiRecordFileReader {
       StreamPlayer* streamPlayer = nullptr);
 
   /// Get the list of RecordFileReader objects used to read all the streams.
-  const std::vector<unique_ptr<RecordFileReader>>& getReaders() const {
+  const vector<unique_ptr<RecordFileReader>>& getReaders() const {
     return readers_;
   }
 
-  static std::unique_ptr<RecordFileReader> reduceToRecordFileReader_TEMPORARY_API_TO_DELETE(
+  static unique_ptr<RecordFileReader> reduceToRecordFileReader_TEMPORARY_API_TO_DELETE(
       MultiRecordFileReader& multiRecordFileReader);
 
  private:
   using StreamIdToUniqueIdMap = map<StreamId, UniqueStreamId>;
-  using StreamIdReaderPair = std::pair<StreamId, RecordFileReader*>;
+  using StreamIdReaderPair = pair<StreamId, RecordFileReader*>;
 
   /// Are we trying to read only a single file? Useful for special casing / optimizing the single
   /// file use case.
@@ -538,9 +541,9 @@ class MultiRecordFileReader {
 
   bool isOpened_{false};
   /// Underlying RecordFileReader - one per VRS file
-  std::vector<unique_ptr<RecordFileReader>> readers_;
+  vector<unique_ptr<RecordFileReader>> readers_;
   /// Index across all underlying VRS files. `nullptr` in single file case for optimization.
-  unique_ptr<std::vector<const IndexRecord::RecordInfo*>> recordIndex_;
+  unique_ptr<vector<const IndexRecord::RecordInfo*>> recordIndex_;
   /// StreamId related mapping to tackle collisions across different files
   /// Not meant to be used when hasSingleFile() == true
   set<UniqueStreamId> uniqueStreamIds_;

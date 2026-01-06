@@ -35,8 +35,10 @@
 namespace vrs {
 namespace os {
 
+using std::string;
+
 /// FILE helpers
-std::FILE* fileOpen(const std::string& path, const char* modes);
+std::FILE* fileOpen(const string& path, const char* modes);
 int fileClose(std::FILE* file);
 size_t fileRead(void* buf, size_t elementSize, size_t elementCount, std::FILE* file);
 size_t fileWrite(const void* buf, size_t elementSize, size_t elementCount, std::FILE* file);
@@ -44,54 +46,53 @@ int64_t fileTell(std::FILE* file);
 int fileSeek(std::FILE* file, int64_t offset, int origin);
 int fileSetSize(std::FILE* file, int64_t size);
 
-inline bool fileWriteString(FILE* f, const std::string& str) {
+inline bool fileWriteString(FILE* f, const string& str) {
   return os::fileWrite(str.c_str(), 1, str.size(), f) == str.size();
 }
 
 /// Misc helpers
-int remove(const std::string& path); // file or folder
-int rename(const std::string& originalName, const std::string& newName); // file or folder
-bool getLinkedTarget(const std::string& sourcePath, std::string& outLinkedPath);
-int hidePath(const std::string& path, bool hide = true); // only does something on Windows
-void shortenPath(std::string& path); // only does something on Windows, maybe...
-std::string sanitizeFileName(const std::string& filename);
-std::string randomName(int length);
-const std::string& getOsTempFolder(); // get the OS's temp (shared) folder
-const std::string& getTempFolder(); // get unique subfolder in the OS's temp folder
-std::string getUniquePath(const std::string& baseName, size_t randomSuffixLength = 5);
-std::string makeUniqueFolder(const std::string& baseName = {}, size_t randomSuffixLength = 10);
+int remove(const string& path); // file or folder
+int rename(const string& originalName, const string& newName); // file or folder
+bool getLinkedTarget(const string& sourcePath, string& outLinkedPath);
+int hidePath(const string& path, bool hide = true); // only does something on Windows
+void shortenPath(string& path); // only does something on Windows, maybe...
+string sanitizeFileName(const string& filename);
+string randomName(int length);
+const string& getOsTempFolder(); // get the OS's temp (shared) folder
+const string& getTempFolder(); // get unique subfolder in the OS's temp folder
+string getUniquePath(const string& baseName, size_t randomSuffixLength = 5);
+string makeUniqueFolder(const string& baseName = {}, size_t randomSuffixLength = 10);
 
 /// Error helpers
 int getLastFileError();
-std::string fileErrorToString(int errnum);
+string fileErrorToString(int errnum);
 
 #if IS_VRS_OSS_CODE()
 
 /// Path joining helpers
-std::string pathJoin(const std::string& a, const std::string& b);
-std::string pathJoin(const std::string& a, const std::string& b, const std::string& c);
+string pathJoin(const string& a, const string& b);
+string pathJoin(const string& a, const string& b, const string& c);
 template <class... Args>
-std::string
-pathJoin(const std::string& a, const std::string& b, const std::string& c, Args... args) {
+string pathJoin(const string& a, const string& b, const string& c, Args... args) {
   return vrs::os::pathJoin(vrs::os::pathJoin(a, b, c), args...);
 }
 
 /// Directory making helpers
-int makeDir(const std::string& dir);
-int makeDirectories(const std::string& dir);
+int makeDir(const string& dir);
+int makeDirectories(const string& dir);
 
 /// File path helpers
-bool isDir(const std::string& path);
-bool isFile(const std::string& path);
-std::vector<std::string> listDir(const std::string& dir);
-bool pathExists(const std::string& path);
-int64_t getFileSize(const std::string& path);
-std::string getFilename(const std::string& path);
-std::string getParentFolder(const std::string& path);
+bool isDir(const string& path);
+bool isFile(const string& path);
+std::vector<string> listDir(const string& dir);
+bool pathExists(const string& path);
+int64_t getFileSize(const string& path);
+string getFilename(const string& path);
+string getParentFolder(const string& path);
 
 /// For testing and other tools
-const std::string& getHomeFolder();
-std::string getCurrentExecutablePath();
+const string& getHomeFolder();
+string getCurrentExecutablePath();
 
 #endif // IS_VRS_OSS_CODE()
 

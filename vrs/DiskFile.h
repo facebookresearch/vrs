@@ -32,7 +32,7 @@ class DiskFileChunk;
 template <class FileChunk>
 class DiskFileT : public WriteFileHandler {
  public:
-  static const std::string& staticName();
+  static const string& staticName();
 
   DiskFileT();
   ~DiskFileT() override;

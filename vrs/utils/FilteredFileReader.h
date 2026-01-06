@@ -47,7 +47,7 @@ struct RecordFilterParams {
 
   void getIncludedStreams(RecordFileReader& reader, set<StreamId>& outFilteredSet) const;
   unique_ptr<set<StreamId>> getIncludedStreams(RecordFileReader& reader) const; // if nullptr, all
-  string getStreamFiltersConfiguration(std::string_view configName) const;
+  string getStreamFiltersConfiguration(string_view configName) const;
 };
 
 /// Class to filter out some parts of a VRS file when reading it.

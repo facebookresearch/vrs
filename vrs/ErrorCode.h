@@ -25,6 +25,8 @@
 
 namespace vrs {
 
+using std::string;
+
 #if IS_APPLE_PLATFORM()
 // http://www.cs.cmu.edu/afs/cs/user/lenzo/html/mac_errors.html
 // Largest error number is 100102 kPOSIXErrorEOPNOTSUPP
@@ -115,19 +117,19 @@ constexpr int errorDomainToErrorCodeStart(ErrorDomain errorDomain) {
 /// This API should work with any int error code returned by any VRS API.
 /// @param errorCode: an error code returned by any VRS API.
 /// @return A string that describes the error.
-std::string errorCodeToMessage(int errorCode);
+string errorCodeToMessage(int errorCode);
 
 /// Convert an int error code into a human readable string for logging.
 /// This API should work with any int error code returned by any VRS API.
 /// This version includes the error code's numeric value.
 /// @param errorCode: an error code returned by any VRS API.
 /// @return A string that describes the error.
-std::string errorCodeToMessageWithCode(int errorCode);
+string errorCodeToMessageWithCode(int errorCode);
 
 /// Create a new error domain, based on a name that's supposed to be unique, such as "CURL"
 /// @param domainName: some unique domain name.
 /// @return A new error domain enum value.
-ErrorDomain newErrorDomain(const std::string& domainName);
+ErrorDomain newErrorDomain(const string& domainName);
 
 /// Create an int error code for a specific error domain and error code within that domain.
 /// @param errorDomain: the error domain of the error code.
@@ -163,7 +165,7 @@ int domainError(EC errorCode) {
   if (iter != registry.end()) {
     return domainErrorCode(getErrorDomain<EC>(), errorCode, iter->second);
   }
-  std::string msg = fmt::format("<Unknown error code '{}'>", static_cast<int>(errorCode));
+  string msg = fmt::format("<Unknown error code '{}'>", static_cast<int>(errorCode));
   return domainErrorCode(getErrorDomain<EC>(), errorCode, msg.c_str());
 }
 

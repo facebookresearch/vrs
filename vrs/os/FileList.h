@@ -22,15 +22,18 @@
 namespace vrs {
 namespace os {
 
+using std::string;
+using std::vector;
+
 /// Get all the files in folder, and maybe its folder too.
 /// @param path: file system path to list, that must be reachable.
 /// @param inOutFiles: on exit, the list of files at that location is appended.
 /// @param outFolders: on exit, if provided, set to the list of folders at that location.
 /// @return A status code, 0 meaning success.
 int getFilesAndFolders(
-    const std::string& path,
-    std::vector<std::string>& inOutFiles,
-    std::vector<std::string>* outFolders = nullptr);
+    const string& path,
+    vector<string>& inOutFiles,
+    vector<string>* outFolders = nullptr);
 
 /// Get a list of files at a location, possibly recursing into subfolders.
 /// @param path: file system path to list, that must be reachable.
@@ -45,10 +48,7 @@ int getFilesAndFolders(
 /// Each time a folder is listed, its immediate files are added first, then the content of each
 /// folder recusively, always sorted alphabetically.
 /// @return A status code, 0 meaning success.
-int getFileList(
-    const std::string& path,
-    std::vector<std::string>& inOutFiles,
-    int maxRecursiveDepth = 0);
+int getFileList(const string& path, vector<string>& inOutFiles, int maxRecursiveDepth = 0);
 
 } // namespace os
 } // namespace vrs

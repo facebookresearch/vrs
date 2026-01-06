@@ -228,7 +228,7 @@ string failure(JDocument& doc, const string& jsonFilePath) {
 }
 } // namespace
 
-string extractAudioTrack(FilteredFileReader& filteredReader, const std::string& filePath) {
+string extractAudioTrack(FilteredFileReader& filteredReader, const string& filePath) {
   const string wavFilePath = filePath + (helpers::endsWith(filePath, ".wav") ? "" : ".wav");
   const string jsonFilePath = wavFilePath + ".json";
   JDocument doc;

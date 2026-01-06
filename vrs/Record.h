@@ -25,6 +25,9 @@
 
 namespace vrs {
 
+using std::unique_ptr;
+using std::vector;
+
 class DataSource;
 class DirectWriteRecordData;
 class Compressor;
@@ -107,7 +110,7 @@ class Record final {
       uint64_t creationOrder);
 
   /// Add some data to write directly at the end of the record when it's written to disk.
-  void addDirectWriteRecordData(std::unique_ptr<DirectWriteRecordData>&& directWriteRecordData);
+  void addDirectWriteRecordData(unique_ptr<DirectWriteRecordData>&& directWriteRecordData);
 
   /// Tell if an attempt should be made to compress the record.
   /// If compression can't reduce the size of the record, then the record is written uncompressed.
@@ -167,10 +170,10 @@ class Record final {
   double timestamp_{};
   Type recordType_{};
   uint32_t formatVersion_{};
-  std::vector<uninitialized_byte> buffer_;
+  vector<uninitialized_byte> buffer_;
   size_t usedBufferSize_{};
   uint64_t creationOrder_{};
-  std::unique_ptr<DirectWriteRecordData> directWriteRecordData_;
+  unique_ptr<DirectWriteRecordData> directWriteRecordData_;
 
   RecordManager& recordManager_;
 };

@@ -26,6 +26,8 @@
 
 namespace vrs {
 
+using std::string;
+
 class XXH64Digester {
  public:
   XXH64Digester();
@@ -43,12 +45,12 @@ class XXH64Digester {
     }
     return *this;
   }
-  XXH64Digester& ingest(const std::map<std::string, std::string>& data);
-  XXH64Digester& ingest(const std::string& str) {
+  XXH64Digester& ingest(const std::map<string, string>& data);
+  XXH64Digester& ingest(const string& str) {
     return ingest(str.c_str(), str.size() + 1);
   }
   uint64_t digest();
-  std::string digestToString();
+  string digestToString();
 
  private:
   XXH64_state_t* xxh_{nullptr};

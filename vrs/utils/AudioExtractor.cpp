@@ -51,7 +51,7 @@ constexpr uint32_t kWavHeaderSize = 44;
 namespace vrs::utils {
 
 int AudioExtractor::createWavFile(
-    const std::string& wavFilePath,
+    const string& wavFilePath,
     const AudioContentBlockSpec& audioBlock,
     DiskFile& outFile) {
   IF_ERROR_RETURN(outFile.create(wavFilePath));
@@ -109,7 +109,7 @@ int AudioExtractor::createWavFile(
 int AudioExtractor::writeWavAudioData(
     DiskFile& inFile,
     const AudioContentBlockSpec& audioBlock,
-    const std::vector<uint8_t>& audio) {
+    const vector<uint8_t>& audio) {
   uint32_t srcOffset = 0;
   uint32_t bytesPerSampleBlock = audioBlock.getBytesPerSample() * audioBlock.getChannelCount();
   uint32_t srcStride = audioBlock.getSampleFrameStride();

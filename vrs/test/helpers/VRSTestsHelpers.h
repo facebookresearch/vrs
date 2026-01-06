@@ -33,7 +33,7 @@ namespace test {
 
 using namespace vrs;
 
-void deleteChunkedFile(const std::string& path);
+void deleteChunkedFile(const string& path);
 void deleteChunkedFile(DiskFile& file);
 
 // backdoor operations for testing
@@ -55,27 +55,27 @@ struct RecordFileWriterTester {
 
 enum TestOptions { REALTIME = 1 << 0, SPLIT_HEADER = 1 << 1, SKIP_FINALIZE_INDEX = 1 << 2 };
 
-static const double kPrerollTime = 0.5;
+constexpr double kPrerollTime = 0.5;
 
-static const uint32_t kFrameWidth = 320;
-static const uint32_t kFrameHeight = 240;
-static const uint32_t kFrameSaveFrequency = 15; // save every X frames
-static const uint32_t kCameraCount = 4;
+constexpr uint32_t kFrameWidth = 320;
+constexpr uint32_t kFrameHeight = 240;
+constexpr uint32_t kFrameSaveFrequency = 15; // save every X frames
+constexpr uint32_t kCameraCount = 4;
 
 constexpr const char* kTopLeftCameraFlavor = "tech/unit_test/top_left";
 constexpr const char* kTopRightCameraFlavor = "tech/unit_test/top_right";
 constexpr const char* kBottomLeftCameraFlavor = "tech/unit_test/bottom_left";
 constexpr const char* kBottomRightCameraFlavor = "tech/unit_test/bottom_right";
 
-static const char* kCameraFlavor[kCameraCount] = {
+constexpr const char* kCameraFlavor[kCameraCount] = {
     kTopLeftCameraFlavor,
     kTopRightCameraFlavor,
     kBottomLeftCameraFlavor,
     kBottomRightCameraFlavor};
 
-static const uint32_t kStateVersion = 1;
-static const uint32_t kConfigurationVersion = 1;
-static const uint32_t kDataVersion = 1;
+constexpr uint32_t kStateVersion = 1;
+constexpr uint32_t kConfigurationVersion = 1;
+constexpr uint32_t kDataVersion = 1;
 
 struct FileConfig {
   FileConfig(uint32_t _frameRate, uint32_t _simulationDurationMs) {

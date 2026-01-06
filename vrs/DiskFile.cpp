@@ -561,7 +561,7 @@ int DiskFileT<FileChunk>::readZstdFile(const string& path, void* data, size_t da
 }
 
 template <class FileChunk>
-string DiskFileT<FileChunk>::readTextFile(const std::string& path) {
+string DiskFileT<FileChunk>::readTextFile(const string& path) {
   DiskFileT file;
   if (file.open(path) == 0) {
     int64_t size = file.getTotalSize();
@@ -577,7 +577,7 @@ string DiskFileT<FileChunk>::readTextFile(const std::string& path) {
 }
 
 template <class FileChunk>
-int DiskFileT<FileChunk>::writeTextFile(const std::string& path, const std::string& text) {
+int DiskFileT<FileChunk>::writeTextFile(const string& path, const string& text) {
   DiskFileT file;
   IF_ERROR_LOG_AND_RETURN(file.create(path));
   IF_ERROR_LOG_AND_RETURN(file.write(text.data(), text.size()));
@@ -630,7 +630,7 @@ AtomicDiskFile::~AtomicDiskFile() {
   AtomicDiskFile::close(); // overrides not available in constructors & destructors
 }
 
-int AtomicDiskFile::create(const std::string& newFilePath, const FileSpec::Extras& options) {
+int AtomicDiskFile::create(const string& newFilePath, const FileSpec::Extras& options) {
   finalName_ = newFilePath;
   return DiskFile::create(os::getUniquePath(finalName_, 10), options);
 }
