@@ -91,15 +91,15 @@ TEST_F(FileHandlerTest, JSONPathWithExtraField) {
   EXPECT_EQ(spec.chunks.size(), 2);
   EXPECT_EQ(spec.fileHandlerName, "mystorage");
   EXPECT_EQ(spec.extras.size(), 1);
-  EXPECT_NE(spec.extras.find("bucketname"), spec.extras.end());
-  EXPECT_EQ(spec.extras["bucketname"], "bucketname1");
+  EXPECT_TRUE(spec.hasExtra("bucketname"));
+  EXPECT_EQ(spec.getExtra("bucketname"), "bucketname1");
 
   EXPECT_TRUE(spec.fromJson(kJSONPathWithMultipleExtraField));
   EXPECT_EQ(spec.extras.size(), 2);
-  EXPECT_NE(spec.extras.find("bucketname"), spec.extras.end());
-  EXPECT_EQ(spec.extras["bucketname"], "bucketname1");
-  EXPECT_NE(spec.extras.find("extra1"), spec.extras.end());
-  EXPECT_EQ(spec.extras["extra1"], "extra1");
+  EXPECT_TRUE(spec.hasExtra("bucketname"));
+  EXPECT_EQ(spec.getExtra("bucketname"), "bucketname1");
+  EXPECT_TRUE(spec.hasExtra("extra1"));
+  EXPECT_EQ(spec.getExtra("extra1"), "extra1");
 }
 
 TEST_F(FileHandlerTest, JSONPathWithChunksAndFileSizes) {
@@ -118,7 +118,8 @@ TEST_F(FileHandlerTest, NonJSONPath) {
 }
 
 TEST_F(FileHandlerTest, ParseURI) {
-  map<string, string> m, expected;
+  vrs::FileSpec::Extras m;
+  vrs::FileSpec::Extras expected;
   string fileHandlerName;
   string path;
   EXPECT_EQ(
@@ -228,4 +229,77 @@ TEST_F(FileHandlerTest, SetAndGetExtras) {
 
   spec.unsetExtra("str");
   EXPECT_FALSE(spec.hasExtra("str"));
+}
+
+TEST_F(FileHandlerTest, GetExtraAsInt64AndUInt64) {
+  vrs::FileSpec spec;
+
+  // Test int64
+  spec.setExtra("int64_pos", "9223372036854775807"); // max int64
+  spec.setExtra("int64_neg", "-9223372036854775808"); // min int64
+  spec.setExtra("int64_small", "12345");
+
+  EXPECT_EQ(spec.getExtraAsInt64("int64_pos"), 9223372036854775807LL);
+  EXPECT_EQ(spec.getExtraAsInt64("int64_neg"), (-9223372036854775807LL - 1));
+  EXPECT_EQ(spec.getExtraAsInt64("int64_small"), 12345LL);
+
+  // Test uint64
+  spec.setExtra("uint64_max", "18446744073709551615"); // max uint64
+  spec.setExtra("uint64_small", "42");
+
+  EXPECT_EQ(spec.getExtraAsUInt64("uint64_max"), 18446744073709551615ULL);
+  EXPECT_EQ(spec.getExtraAsUInt64("uint64_small"), 42ULL);
+
+  // Test defaults for missing keys
+  EXPECT_EQ(spec.getExtraAsInt64("missing", -999), -999);
+  EXPECT_EQ(spec.getExtraAsUInt64("missing", 999), 999ULL);
+}
+
+TEST_F(FileHandlerTest, GetExtraDefaults) {
+  vrs::FileSpec spec;
+
+  // Test that default values are returned for missing keys
+  EXPECT_EQ(spec.getExtraAsInt("missing", -1), -1);
+  EXPECT_EQ(spec.getExtraAsInt64("missing", -1LL), -1LL);
+  EXPECT_EQ(spec.getExtraAsUInt64("missing", 999ULL), 999ULL);
+  EXPECT_EQ(spec.getExtraAsDouble("missing", 3.14), 3.14);
+  EXPECT_TRUE(spec.getExtraAsBool("missing", true));
+  EXPECT_FALSE(spec.getExtraAsBool("missing", false));
+  EXPECT_EQ(spec.getExtra("missing"), "");
+
+  // Test with invalid values - should return defaults
+  spec.setExtra("invalid_int", "not_a_number");
+  spec.setExtra("invalid_double", "abc");
+
+  EXPECT_EQ(spec.getExtraAsInt("invalid_int", 42), 42);
+  EXPECT_EQ(spec.getExtraAsInt64("invalid_int", 42LL), 42LL);
+  EXPECT_EQ(spec.getExtraAsUInt64("invalid_int", 42ULL), 42ULL);
+  EXPECT_EQ(spec.getExtraAsDouble("invalid_double", 1.5), 1.5);
+}
+
+TEST_F(FileHandlerTest, ExtrasHeterogeneousLookup) {
+  vrs::FileSpec spec;
+
+  spec.setExtra("mykey", "myvalue");
+  spec.setExtra("intkey", "123");
+
+  // Test heterogeneous lookup with string_view
+  string_view keyView = "mykey";
+  EXPECT_TRUE(spec.hasExtra(keyView));
+  EXPECT_EQ(spec.getExtra(keyView), "myvalue");
+
+  // Test lookup with const char*
+  EXPECT_TRUE(spec.hasExtra("intkey"));
+  EXPECT_EQ(spec.getExtraAsInt("intkey"), 123);
+
+  // Test lookup with substring (common use case in URI parsing)
+  string fullString = "prefix_mykey_suffix";
+  string_view keyFromSubstring = string_view(fullString).substr(7, 5); // "mykey"
+  EXPECT_TRUE(spec.hasExtra(keyFromSubstring));
+  EXPECT_EQ(spec.getExtra(keyFromSubstring), "myvalue");
+
+  // Test direct map find with string_view (verifies StringMap works)
+  auto it = spec.extras.find(keyView);
+  EXPECT_NE(it, spec.extras.end());
+  EXPECT_EQ(it->second, "myvalue");
 }

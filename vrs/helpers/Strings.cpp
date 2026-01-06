@@ -17,7 +17,6 @@
 #include "Strings.h"
 
 #include <charconv>
-#include <climits>
 #include <cmath>
 #include <cstring>
 #include <ctime>
@@ -307,54 +306,27 @@ string make_printable(const string& str) {
   return sanitized;
 }
 
-bool getBool(const map<string, string>& m, const string& field, bool& outValue) {
+bool getBool(const StringStringMap& m, string_view field, bool& outValue) {
   const auto iter = m.find(field);
-  if (iter != m.end() && !iter->second.empty()) {
-    outValue = iter->second != "0" && iter->second != "false";
-    return true;
-  }
-  return false;
+  return iter != m.end() && readBool(iter->second, outValue);
 }
 
-bool getInt(const map<string, string>& m, const string& field, int& outValue) {
+bool getInt(const StringStringMap& m, string_view field, int& outValue) {
   const auto iter = m.find(field);
-  if (iter != m.end() && !iter->second.empty()) {
-    const char* strEnd = iter->second.c_str() + iter->second.length();
-    auto result = from_chars(iter->second.c_str(), strEnd, outValue);
-    if (result.ec == errc{} && result.ptr == strEnd) {
-      return true;
-    }
-  }
-  return false;
+  return iter != m.end() && readInt(iter->second, outValue);
 }
 
-bool getInt64(const map<string, string>& m, const string& field, int64_t& outValue) {
+bool getInt64(const StringStringMap& m, string_view field, int64_t& outValue) {
   const auto iter = m.find(field);
-  if (iter != m.end() && !iter->second.empty()) {
-    const char* strEnd = iter->second.c_str() + iter->second.length();
-    auto result = from_chars(iter->second.c_str(), strEnd, outValue);
-    if (result.ec == errc{} && result.ptr == strEnd) {
-      return true;
-    }
-  }
-  return false;
+  return iter != m.end() && readInt64(iter->second, outValue);
 }
 
-bool getUInt64(const map<string, string>& m, const string& field, uint64_t& outValue) {
+bool getUInt64(const StringStringMap& m, string_view field, uint64_t& outValue) {
   const auto iter = m.find(field);
   return iter != m.end() && readUInt64(iter->second, outValue);
 }
 
-bool getByteSize(
-    const std::map<std::string, std::string>& m,
-    const std::string& field,
-    uint64_t& outByteSize) {
-  outByteSize = 0;
-  const auto iter = m.find(field);
-  return iter != m.end() && readByteSize(iter->second, outByteSize);
-}
-
-bool getDouble(const map<string, string>& m, const string& field, double& outValue) {
+bool getDouble(const StringStringMap& m, string_view field, double& outValue) {
   const auto iter = m.find(field);
   if (iter != m.end() && !iter->second.empty()) {
     try {
@@ -367,22 +339,58 @@ bool getDouble(const map<string, string>& m, const string& field, double& outVal
   return false;
 }
 
-bool readUInt32(const char*& str, uint32_t& outValue) {
-  auto result = from_chars(str, str + strlen(str), outValue);
-  if (result.ec == errc{} && result.ptr > str) {
-    str = result.ptr;
-    return true;
-  }
+bool getByteSize(const StringStringMap& m, string_view field, uint64_t& outByteSize) {
+  outByteSize = 0;
+  const auto iter = m.find(field);
+  return iter != m.end() && readByteSize(iter->second, outByteSize);
+}
 
+bool readBool(string_view str, bool& outValue) {
+  if (str.empty()) {
+    return false;
+  }
+  // False if "0", "false", "off", or "no" (exact case insensitive match)
+  outValue = str != "0" && strcasecmp(str, "false") != 0 && strcasecmp(str, "off") != 0 &&
+      strcasecmp(str, "no") != 0;
+  return true;
+}
+
+bool readInt(string_view str, int& outValue) {
+  if (str.empty()) {
+    return false;
+  }
+  const char* strEnd = str.data() + str.size();
+  auto result = from_chars(str.data(), strEnd, outValue);
+  return result.ec == errc{} && result.ptr == strEnd;
+}
+
+bool readInt64(string_view str, int64_t& outValue) {
+  if (str.empty()) {
+    return false;
+  }
+  const char* strEnd = str.data() + str.size();
+  auto result = from_chars(str.data(), strEnd, outValue);
+  return result.ec == errc{} && result.ptr == strEnd;
+}
+
+inline char safeisdigit(char c) {
+  return isdigit(static_cast<unsigned char>(c));
+}
+
+bool readUInt64(string_view str, uint64_t& outValue) {
+  if (!str.empty() && safeisdigit(str.front())) {
+    const char* strEnd = str.data() + str.size();
+    auto result = from_chars(str.data(), strEnd, outValue);
+    if (result.ec == errc{} && result.ptr == strEnd) {
+      return true;
+    }
+  }
+  outValue = 0;
   return false;
 }
 
 inline char safetolower(char c) {
   return tolower(static_cast<unsigned char>(c));
-}
-
-inline char safeisdigit(char c) {
-  return isdigit(static_cast<unsigned char>(c));
 }
 
 // Interpret strings with units such as "5KB" or "23mb"
@@ -436,6 +444,15 @@ bool readByteSize(string_view strSize, uint64_t& outByteSize) {
   return true;
 }
 
+bool parseNextUInt32(const char*& str, uint32_t& outValue) {
+  auto result = from_chars(str, str + strlen(str), outValue);
+  if (result.ec == errc{} && result.ptr > str) {
+    str = result.ptr;
+    return true;
+  }
+  return false;
+}
+
 bool replaceAll(string& inOutString, const string& token, const string& replacement) {
   bool replaced = false;
   if (!token.empty()) {
@@ -450,14 +467,14 @@ bool replaceAll(string& inOutString, const string& token, const string& replacem
 }
 
 size_t split(
-    const std::string& inputString,
+    const string& inputString,
     char delimiter,
-    std::vector<std::string>& outTokens,
+    std::vector<string>& outTokens,
     bool skipEmpty,
     const char* trimChars) {
   outTokens.clear();
-  std::stringstream ss(inputString);
-  std::string item;
+  stringstream ss(inputString);
+  string item;
 
   while (getline(ss, item, delimiter)) {
     if (trimChars != nullptr) {
@@ -499,18 +516,6 @@ size_t splitViews(
     outTokens.push_back(token);
   }
   return outTokens.size();
-}
-
-bool readUInt64(string_view str, uint64_t& outValue) {
-  if (!str.empty() && safeisdigit(str.front())) {
-    const char* strEnd = str.data() + str.size();
-    auto result = from_chars(str.data(), strEnd, outValue);
-    if (result.ec == errc{} && result.ptr == strEnd) {
-      return true;
-    }
-  }
-  outValue = 0;
-  return false;
 }
 
 } // namespace helpers

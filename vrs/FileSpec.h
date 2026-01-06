@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <functional>
 #include <map>
 #include <string>
 #include <string_view>
@@ -37,7 +38,9 @@ using std::vector;
 /// If no file handler name is specified, the object is assumed to a set of local files.
 /// Additional properties may be specified in the extras field, which has helper methods.
 struct FileSpec {
-  using Extras = map<string, string>;
+  /// Map type with heterogeneous lookup support for string keys.
+  /// Allows lookup using string_view without creating temporary string objects.
+  using Extras = map<string, string, std::less<>>;
 
   FileSpec() = default;
   FileSpec(string filehandler, const vector<string>& chunksIn)

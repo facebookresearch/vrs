@@ -1274,7 +1274,7 @@ bool RecordFormat::parseRecordFormatTagName(
     return false;
   }
   str += 1;
-  bool parseSuccess = helpers::readUInt32(str, outFormatVersion);
+  bool parseSuccess = helpers::parseNextUInt32(str, outFormatVersion);
   if (!parseSuccess) {
     XR_LOGE("Failed to parse '{}'.", str);
   }

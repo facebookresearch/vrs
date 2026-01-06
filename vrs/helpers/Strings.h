@@ -17,6 +17,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include <map>
 #include <string>
 #include <string_view>
@@ -32,6 +33,13 @@
  * Compatibility helpers along with non-fully standardized string utilities.
  */
 namespace vrs {
+
+using std::string;
+using std::string_view;
+
+/// Map type with heterogeneous lookup support for string keys.
+/// Allows lookup using string_view without creating temporary string objects.
+using StringStringMap = std::map<string, string, std::less<>>;
 
 namespace helpers {
 
@@ -53,27 +61,37 @@ inline int strncasecmp(const char* first, const char* second, size_t size) {
 }
 #endif
 
-inline int strcasecmp(const std::string& first, const char* second) {
+inline int strcasecmp(const string& first, const char* second) {
   return strcasecmp(first.c_str(), second);
 }
 
-inline int strcasecmp(const std::string& first, const std::string& second) {
+inline int strcasecmp(const string& first, const string& second) {
   return strcasecmp(first.c_str(), second.c_str());
 }
 
-inline int strcasecmp(const char* first, const std::string& second) {
+inline int strcasecmp(const char* first, const string& second) {
   return strcasecmp(first, second.c_str());
 }
 
-inline int strncasecmp(const std::string& first, const char* second, size_t size) {
+inline int strcasecmp(string_view first, string_view second) {
+  int cmp =
+      helpers::strncasecmp(first.data(), second.data(), std::min(first.size(), second.size()));
+  if (cmp != 0 || first.size() == second.size()) {
+    return cmp;
+  }
+  // If prefixes are equal case-insensitively, longer string is greater
+  return (first.size() < second.size()) ? -1 : 1;
+}
+
+inline int strncasecmp(const string& first, const char* second, size_t size) {
   return strncasecmp(first.c_str(), second, size);
 }
 
-inline int strncasecmp(const std::string& first, const std::string& second, size_t size) {
+inline int strncasecmp(const string& first, const string& second, size_t size) {
   return strncasecmp(first.c_str(), second.c_str(), size);
 }
 
-inline int strncasecmp(const char* first, const std::string& second, size_t size) {
+inline int strncasecmp(const char* first, const string& second, size_t size) {
   return strncasecmp(first, second.c_str(), size);
 }
 
@@ -84,7 +102,7 @@ inline int strncasecmp(const char* first, const std::string& second, size_t size
 /// beforeFileName("image01.png", "image1.png") are both false!
 bool beforeFileName(const char* left, const char* right);
 
-inline bool beforefileName(const std::string& left, const std::string& right) {
+inline bool beforefileName(const string& left, const string& right) {
   return beforeFileName(left.c_str(), right.c_str());
 }
 
@@ -93,26 +111,26 @@ inline bool beforefileName(const std::string& left, const std::string& right) {
 /// @param text: some utf8 text string to trim
 /// @param whiteChars: a series of 1-byte chars to remove
 /// @return the trimmed string
-std::string trim(const std::string& text, const char* whiteChars = " \t");
+string trim(const string& text, const char* whiteChars = " \t");
 
 /// Returns a view of the string from which all the characters in whiteChars
 /// at the beginning or at the end have been removed. Zero allocation.
 /// @param text: some utf8 text string_view to trim
 /// @param whiteChars: a series of 1-byte chars to remove
 /// @return a string_view of the trimmed portion (no allocation)
-std::string_view trimView(std::string_view text, const char* whiteChars = " \t");
+string_view trimView(string_view text, const char* whiteChars = " \t");
 
 /// Tell if a text string starts with the provided prefix.
 /// @param text: the text to test
 /// @param prefix: the prefix to test
 /// @return True if text starts with prefix. Case insensitive.
-bool startsWith(const std::string_view& text, const std::string_view& prefix);
+bool startsWith(const string_view& text, const string_view& prefix);
 
 /// Tell if a text string ends with the provided suffix.
 /// @param text: the text to test
 /// @param prefix: the suffix to test
 /// @return True if text ends with suffix. Case insensitive.
-bool endsWith(const std::string_view& text, const std::string_view& suffix);
+bool endsWith(const string_view& text, const string_view& suffix);
 
 /// Replace all occurrences of a string within another string
 /// @param inOutString: the string to modify with the replacement(s)
@@ -120,41 +138,42 @@ bool endsWith(const std::string_view& text, const std::string_view& suffix);
 /// @param replacement: text to replace token with
 /// The function can't fail. Only full instances of token in the original string will be replaced.
 /// @return true if at least once instance of token was found and replaced.
-bool replaceAll(std::string& inOutString, const std::string& token, const std::string& replacement);
+bool replaceAll(string& inOutString, const string& token, const string& replacement);
 
 /// Helper to get a field of a string map interpreted as a bool.
 /// @param m: the map to search.
 /// @param field: the name of the field.
 /// @param outValue: on exit, set to the value retrieved.
 /// @return True if the field was found and outValue was set.
-bool getBool(const std::map<std::string, std::string>& m, const std::string& field, bool& outValue);
+bool getBool(const StringStringMap& m, string_view field, bool& outValue);
 
 /// Helper to get a field of a string map interpreted as an int.
 /// @param m: the map to search.
 /// @param field: the name of the field.
 /// @param outValue: on exit, set to the value retrieved.
 /// @return True if the field was found and outValue was set.
-bool getInt(const std::map<std::string, std::string>& m, const std::string& field, int& outValue);
+bool getInt(const StringStringMap& m, string_view field, int& outValue);
 
 /// Helper to get a field of a string map interpreted as an int64_t.
 /// @param m: the map to search.
 /// @param field: the name of the field.
 /// @param outValue: on exit, set to the value retrieved.
 /// @return True if the field was found and outValue was set.
-bool getInt64(
-    const std::map<std::string, std::string>& m,
-    const std::string& field,
-    int64_t& outValue);
+bool getInt64(const StringStringMap& m, string_view field, int64_t& outValue);
 
 /// Helper to get a field of a string map interpreted as an uint64_t.
 /// @param m: the map to search.
 /// @param field: the name of the field.
 /// @param outValue: on exit, set to the value retrieved.
 /// @return True if the field was found and outValue was set.
-bool getUInt64(
-    const std::map<std::string, std::string>& m,
-    const std::string& field,
-    uint64_t& outValue);
+bool getUInt64(const StringStringMap& m, string_view field, uint64_t& outValue);
+
+/// Helper to get a field of a string map interpreted as a double.
+/// @param m: the map to search.
+/// @param field: the name of the field.
+/// @param outValue: on exit, set to the value retrieved.
+/// @return True if the field was found and outValue was set.
+bool getDouble(const StringStringMap& m, string_view field, double& outValue);
 
 /// Helper to get a field of a string map interpreted as an uint64_t, with potential unit,
 /// such as KB, MB, GB, TB, EB...
@@ -162,46 +181,59 @@ bool getUInt64(
 /// @param field: the name of the field.
 /// @param outByteSize: on exit, set to the value retrieved, or 0.
 /// @return True if the field was found and outByteSize was set.
-bool getByteSize(
-    const std::map<std::string, std::string>& m,
-    const std::string& field,
-    uint64_t& outByteSize);
+bool getByteSize(const StringStringMap& m, string_view field, uint64_t& outByteSize);
 
-/// Helper to get a field of a string map interpreted as a double.
-/// @param m: the map to search.
-/// @param field: the name of the field.
-/// @param outValue: on exit, set to the value retrieved.
-/// @return True if the field was found and outValue was set.
-bool getDouble(
-    const std::map<std::string, std::string>& m,
-    const std::string& field,
-    double& outValue);
+/// Helper method to parse a string or string_view containing a bool value.
+/// @param str: the string or string_view that needs to be parsed.
+/// @param outValue: the parsed value. False if "0", "false", "off", or "no" (case insensitive).
+///                  True for all other non-empty strings.
+/// @return True if the string was non-empty and outValue was set.
+bool readBool(string_view str, bool& outValue);
 
-// reads an uint32_t value, moves the string pointer & returns true on success
-bool readUInt32(const char*& str, uint32_t& outValue);
+/// Helper method to parse a string or string_view containing an int value strictly.
+/// @param str: the string or string_view that needs to be parsed.
+/// @param outValue: the parsed value.
+/// @return True if the string was parsed successfully and the string was a number only.
+bool readInt(string_view str, int& outValue);
+
+/// Helper method to parse a string or string_view containing an int64 value strictly.
+/// @param str: the string or string_view that needs to be parsed.
+/// @param outValue: the parsed value.
+/// @return True if the string was parsed successfully and the string was a number only.
+bool readInt64(string_view str, int64_t& outValue);
 
 /// Helper method to parse a string or string_view containing an uint64 value strictly.
 /// @param str: the string or string_view that needs to be parsed.
 /// @param outValue: the parsed value.
 /// @return True if the string was parsed successfully and the string was a number only.
-bool readUInt64(std::string_view str, uint64_t& outValue);
+bool readUInt64(string_view str, uint64_t& outValue);
 
 // Reads a number of bytes with optional KB, MB, GB, TB, EB suffixes
 // Returns true on success, false on failure, setting outByteSize to 0.
 // Note: ignores unrecognized suffixes.
-bool readByteSize(std::string_view strSize, uint64_t& outByteSize);
+bool readByteSize(string_view strSize, uint64_t& outByteSize);
+
+/// Helper method to parse the next uint32 value from a character stream.
+/// Unlike the strict read* functions, this function:
+/// - Advances the input pointer past the digits that were consumed
+/// - Allows partial parsing (stops at first non-digit character)
+/// - Returns true if at least one digit was consumed
+/// @param str: reference to a character pointer, advanced past the parsed digits on success.
+/// @param outValue: the parsed value.
+/// @return True if at least one digit was parsed and consumed.
+bool parseNextUInt32(const char*& str, uint32_t& outValue);
 
 /// Helper method to print a file size in a human readable way,
 /// using B, KB, MB, GB, TB...
-std::string humanReadableFileSize(int64_t bytes);
+string humanReadableFileSize(int64_t bytes);
 template <class T>
-std::string humanReadableFileSize(T bytes) {
+string humanReadableFileSize(T bytes) {
   return humanReadableFileSize(static_cast<int64_t>(bytes));
 }
 
 /// Helper method to print a count of seconds in a human readable way,
 /// using a count of years, weeks, days, hours, minutes, seconds, as appropriate.
-std::string humanReadableDuration(double seconds);
+string humanReadableDuration(double seconds);
 
 /// Helper method to print a count of seconds with a certain precision, when that makes sense.
 /// @param seconds: the count of seconds.
@@ -209,17 +241,17 @@ std::string humanReadableDuration(double seconds);
 /// @return The count of seconds printed optimized for human consumption, using a given number of
 /// digits past 0, so we always show up to ms, us or ns, but uses the scientific notation for very
 /// small or very large numbers.
-std::string humanReadableTimestamp(double seconds, uint8_t precision = 3);
+string humanReadableTimestamp(double seconds, uint8_t precision = 3);
 
 /// Helper to print the date and time from an EPOCH timestamp (seconds since EPOCH).
 /// @param secondsSinceEpoch: timestamp in seconds since EPOCH.
 /// @return a human readable date and time.
-std::string humanReadableDateTime(double secondsSinceEpoch);
+string humanReadableDateTime(double secondsSinceEpoch);
 
 /// Helper method to make a string printable to expose control characters.
 /// This conversion is meant to make string problems visible, rather than be a proper encoding,
 /// for instance, you can't differentiate between "\n" and string that would contain a newline char.
-std::string make_printable(const std::string& str);
+string make_printable(const string& str);
 
 /// Helper method to split a string based on the delimiter.
 /// @param inputString: the string that needs to be split.
@@ -230,9 +262,9 @@ std::string make_printable(const std::string& str);
 /// @return The number of tokens extracted.
 /// If outValues contained values on entry, these are cleared.
 size_t split(
-    const std::string& inputString,
+    const string& inputString,
     char delimiter,
-    std::vector<std::string>& outTokens,
+    std::vector<string>& outTokens,
     bool skipEmpty = false,
     const char* trimChars = nullptr);
 
@@ -247,9 +279,9 @@ size_t split(
 /// @return The number of tokens extracted.
 /// If outTokens contained values on entry, these are cleared.
 size_t splitViews(
-    std::string_view inputString,
+    string_view inputString,
     char delimiter,
-    std::vector<std::string_view>& outTokens,
+    std::vector<string_view>& outTokens,
     bool skipEmpty = false,
     const char* trimChars = nullptr);
 

@@ -406,12 +406,12 @@ bool FileSpec::operator==(const FileSpec& rhs) const {
 
 const string& FileSpec::getExtra(string_view name) const {
   static const string kEmptyString;
-  const auto extra = extras.find(string(name));
+  const auto extra = extras.find(name);
   return (extra == extras.end()) ? kEmptyString : extra->second;
 }
 
 bool FileSpec::getExtra(string_view name, string& outValue) const {
-  const auto extra = extras.find(string(name));
+  const auto extra = extras.find(name);
   if (extra == extras.end()) {
     return false;
   }
@@ -420,36 +420,39 @@ bool FileSpec::getExtra(string_view name, string& outValue) const {
 }
 
 bool FileSpec::hasExtra(string_view name) const {
-  return extras.find(string(name)) != extras.end();
+  return extras.find(name) != extras.end();
 }
 
 int FileSpec::getExtraAsInt(string_view name, int defaultValue) const {
   int result = 0;
-  return helpers::getInt(extras, string(name), result) ? result : defaultValue;
+  return helpers::getInt(extras, name, result) ? result : defaultValue;
 }
 
 int64_t FileSpec::getExtraAsInt64(string_view name, int64_t defaultValue) const {
   int64_t result = 0;
-  return helpers::getInt64(extras, string(name), result) ? result : defaultValue;
+  return helpers::getInt64(extras, name, result) ? result : defaultValue;
 }
 
 uint64_t FileSpec::getExtraAsUInt64(string_view name, uint64_t defaultValue) const {
   uint64_t result = 0;
-  return helpers::getUInt64(extras, string(name), result) ? result : defaultValue;
+  return helpers::getUInt64(extras, name, result) ? result : defaultValue;
 }
 
 double FileSpec::getExtraAsDouble(string_view name, double defaultValue) const {
   double result = 0;
-  return helpers::getDouble(extras, string(name), result) ? result : defaultValue;
+  return helpers::getDouble(extras, name, result) ? result : defaultValue;
 }
 
 bool FileSpec::getExtraAsBool(string_view name, bool defaultValue) const {
   bool result = false;
-  return helpers::getBool(extras, string(name), result) ? result : defaultValue;
+  return helpers::getBool(extras, name, result) ? result : defaultValue;
 }
 
 void FileSpec::unsetExtra(string_view name) {
-  extras.erase(string(name));
+  auto it = extras.find(name);
+  if (it != extras.end()) {
+    extras.erase(it);
+  }
 }
 
 int FileSpec::decodeQuery(string_view query, string& outKey, string& outValue) {

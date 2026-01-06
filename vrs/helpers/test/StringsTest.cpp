@@ -31,6 +31,44 @@ TEST_F(StringsHelpersTester, strcasecmpTest) {
   EXPECT_NE(helpers::strcasecmp("hello", "Hella"), 0);
 }
 
+TEST_F(StringsHelpersTester, strcasecmpStringViewTest) {
+  using namespace std;
+
+  // Equal strings with different cases
+  EXPECT_EQ(helpers::strcasecmp(string_view("hello"), string_view("Hello")), 0);
+  EXPECT_EQ(helpers::strcasecmp(string_view("hello"), string_view("HELLO")), 0);
+  EXPECT_EQ(helpers::strcasecmp(string_view("HELLO"), string_view("hello")), 0);
+  EXPECT_EQ(helpers::strcasecmp(string_view("HeLLo"), string_view("hEllO")), 0);
+
+  // Empty strings
+  EXPECT_EQ(helpers::strcasecmp(string_view(""), string_view("")), 0);
+  EXPECT_LT(helpers::strcasecmp(string_view(""), string_view("a")), 0);
+  EXPECT_GT(helpers::strcasecmp(string_view("a"), string_view("")), 0);
+
+  // Different lengths with same prefix - longer string is greater
+  EXPECT_LT(helpers::strcasecmp(string_view("hello"), string_view("helloo")), 0);
+  EXPECT_GT(helpers::strcasecmp(string_view("helloo"), string_view("hello")), 0);
+  EXPECT_LT(helpers::strcasecmp(string_view("HELLO"), string_view("helloWorld")), 0);
+  EXPECT_GT(helpers::strcasecmp(string_view("HelloWorld"), string_view("hello")), 0);
+
+  // Different content - ordering tests
+  EXPECT_LT(helpers::strcasecmp(string_view("apple"), string_view("Banana")), 0);
+  EXPECT_GT(helpers::strcasecmp(string_view("banana"), string_view("Apple")), 0);
+  EXPECT_LT(helpers::strcasecmp(string_view("abc"), string_view("ABD")), 0);
+  EXPECT_GT(helpers::strcasecmp(string_view("abd"), string_view("ABC")), 0);
+
+  // Mixed with string_view from substrings (common use case)
+  string fullString = "prefix_Hello_suffix";
+  string_view extracted = string_view(fullString).substr(7, 5); // "Hello"
+  EXPECT_EQ(helpers::strcasecmp(extracted, string_view("HELLO")), 0);
+  EXPECT_EQ(helpers::strcasecmp(string_view("hello"), extracted), 0);
+
+  // Single character comparisons
+  EXPECT_EQ(helpers::strcasecmp(string_view("A"), string_view("a")), 0);
+  EXPECT_LT(helpers::strcasecmp(string_view("A"), string_view("B")), 0);
+  EXPECT_GT(helpers::strcasecmp(string_view("b"), string_view("A")), 0);
+}
+
 TEST_F(StringsHelpersTester, strncasecmpTest) {
   EXPECT_EQ(helpers::strncasecmp("hello New-York", "Hello Paris", 6), 0);
   EXPECT_LT(helpers::strncasecmp("hello New-York", "Hello Paris", 7), 0);
@@ -250,9 +288,49 @@ TEST_F(StringsHelpersTester, humanReadableFileSizeTest) {
   EXPECT_EQ(humanReadableFileSize(-kB * kB * kB), "-1.00 GiB");
 }
 
+TEST_F(StringsHelpersTester, StringStringMapHeterogeneousLookup) {
+  // Test that StringStringMap supports heterogeneous lookup with string_view
+  // This is the key feature enabled by std::less<> comparator
+
+  StringStringMap m = {{"key1", "value1"}, {"key2", "value2"}, {"key3", "value3"}};
+
+  // Test lookup with string_view (no temporary string created)
+  string_view sv1 = "key1";
+  string_view sv2 = "key2";
+  string_view sv_missing = "missing";
+
+  // find() with string_view
+  auto it1 = m.find(sv1);
+  EXPECT_NE(it1, m.end());
+  EXPECT_EQ(it1->second, "value1");
+
+  auto it2 = m.find(sv2);
+  EXPECT_NE(it2, m.end());
+  EXPECT_EQ(it2->second, "value2");
+
+  auto it_missing = m.find(sv_missing);
+  EXPECT_EQ(it_missing, m.end());
+
+  // count() with string_view
+  EXPECT_EQ(m.count(sv1), 1);
+  EXPECT_EQ(m.count(sv_missing), 0);
+
+  // Test lookup with const char* (also heterogeneous)
+  auto it3 = m.find("key3");
+  EXPECT_NE(it3, m.end());
+  EXPECT_EQ(it3->second, "value3");
+
+  // Test lookup with substring of another string (common use case)
+  string fullString = "prefix_key1_suffix";
+  string_view keyFromSubstring = string_view(fullString).substr(7, 4); // "key1"
+  auto it_sub = m.find(keyFromSubstring);
+  EXPECT_NE(it_sub, m.end());
+  EXPECT_EQ(it_sub->second, "value1");
+}
+
 TEST_F(StringsHelpersTester, getValueTest) {
-  using namespace vrs::helpers;
-  map<string, string> m = {
+  using namespace helpers;
+  StringStringMap m = {
       {"bool_true", "1"},
       {"bool_false", "false"},
       {"bool_0", "0"},
@@ -328,8 +406,8 @@ TEST_F(StringsHelpersTester, getValueTest) {
 
 // Enhanced tests for getInt - Added for from_chars migration
 TEST_F(StringsHelpersTester, getInt_EdgeCases) {
-  using namespace vrs::helpers;
-  map<string, string> m;
+  using namespace helpers;
+  StringStringMap m;
   int value = 0;
 
   // Valid negative
@@ -378,8 +456,8 @@ TEST_F(StringsHelpersTester, getInt_EdgeCases) {
 
 // Enhanced tests for getInt64 - Added for from_chars migration
 TEST_F(StringsHelpersTester, getInt64_EdgeCases) {
-  using namespace vrs::helpers;
-  map<string, string> m;
+  using namespace helpers;
+  StringStringMap m;
   int64_t value = 0;
 
   // Max int64
@@ -455,49 +533,184 @@ TEST_F(StringsHelpersTester, humanReadableTimestampTest) {
   EXPECT_EQ(humanReadableTimestamp(50000000000.3, 3), "5.000000000e+10");
 }
 
-TEST_F(StringsHelpersTester, readUnsignedInt32) {
+TEST_F(StringsHelpersTester, parseNextUInt32) {
   using namespace vrs::helpers;
   uint32_t outInt = 0;
   const char* strInt = "123";
-  readUInt32(strInt, outInt);
+  parseNextUInt32(strInt, outInt);
   EXPECT_EQ(outInt, 123);
 
   const char* strWord = "vrs";
-  EXPECT_EQ(readUInt32(strWord, outInt), false);
+  EXPECT_EQ(parseNextUInt32(strWord, outInt), false);
 }
 
-TEST_F(StringsHelpersTester, readUInt32_EdgeCases) {
+TEST_F(StringsHelpersTester, parseNextUInt32_EdgeCases) {
   using namespace vrs::helpers;
   uint32_t value = 0;
 
   // Partial parse - should stop at first non-digit
   const char* readFrom = "123abc";
-  EXPECT_TRUE(readUInt32(readFrom, value));
+  EXPECT_TRUE(parseNextUInt32(readFrom, value));
   EXPECT_EQ(value, 123);
   EXPECT_EQ(string(readFrom), "abc");
 
   // Max uint32 value
   readFrom = "4294967295";
-  EXPECT_TRUE(readUInt32(readFrom, value));
+  EXPECT_TRUE(parseNextUInt32(readFrom, value));
   EXPECT_EQ(value, 4294967295U);
 
   // Empty string
   readFrom = "";
-  EXPECT_FALSE(readUInt32(readFrom, value));
+  EXPECT_FALSE(parseNextUInt32(readFrom, value));
 
   // Leading zeros
   readFrom = "000123";
-  EXPECT_TRUE(readUInt32(readFrom, value));
+  EXPECT_TRUE(parseNextUInt32(readFrom, value));
   EXPECT_EQ(value, 123);
 
   // Zero
   readFrom = "0";
-  EXPECT_TRUE(readUInt32(readFrom, value));
+  EXPECT_TRUE(parseNextUInt32(readFrom, value));
   EXPECT_EQ(value, 0);
 
   // Overflow - exceeds uint32 max
   readFrom = "4294967296";
-  EXPECT_FALSE(readUInt32(readFrom, value));
+  EXPECT_FALSE(parseNextUInt32(readFrom, value));
+}
+
+TEST_F(StringsHelpersTester, readBool) {
+  using namespace vrs::helpers;
+  bool value = false;
+
+  // True values
+  EXPECT_TRUE(readBool("1", value));
+  EXPECT_TRUE(value);
+
+  EXPECT_TRUE(readBool("true", value));
+  EXPECT_TRUE(value);
+
+  EXPECT_TRUE(readBool("TRUE", value));
+  EXPECT_TRUE(value);
+
+  EXPECT_TRUE(readBool("True", value));
+  EXPECT_TRUE(value);
+
+  EXPECT_TRUE(readBool("yes", value));
+  EXPECT_TRUE(value);
+
+  EXPECT_TRUE(readBool("on", value));
+  EXPECT_TRUE(value);
+
+  EXPECT_TRUE(readBool("anything", value));
+  EXPECT_TRUE(value);
+
+  // False values - "0"
+  EXPECT_TRUE(readBool("0", value));
+  EXPECT_FALSE(value);
+
+  // False values - "false" variations
+  EXPECT_TRUE(readBool("false", value));
+  EXPECT_FALSE(value);
+
+  EXPECT_TRUE(readBool("FALSE", value));
+  EXPECT_FALSE(value);
+
+  EXPECT_TRUE(readBool("False", value));
+  EXPECT_FALSE(value);
+
+  // False values - "off" variations
+  EXPECT_TRUE(readBool("off", value));
+  EXPECT_FALSE(value);
+
+  EXPECT_TRUE(readBool("OFF", value));
+  EXPECT_FALSE(value);
+
+  EXPECT_TRUE(readBool("Off", value));
+  EXPECT_FALSE(value);
+
+  // False values - "no" variations
+  EXPECT_TRUE(readBool("no", value));
+  EXPECT_FALSE(value);
+
+  EXPECT_TRUE(readBool("NO", value));
+  EXPECT_FALSE(value);
+
+  EXPECT_TRUE(readBool("No", value));
+  EXPECT_FALSE(value);
+
+  // Strings that start with false values but don't match exactly should be true
+  EXPECT_TRUE(readBool("falsely", value)); // doesn't match "false" exactly
+  EXPECT_TRUE(value);
+
+  EXPECT_TRUE(readBool("offline", value)); // doesn't match "off" exactly
+  EXPECT_TRUE(value);
+
+  EXPECT_TRUE(readBool("nope", value)); // doesn't match "no" exactly
+  EXPECT_TRUE(value);
+
+  EXPECT_TRUE(readBool("none", value)); // doesn't match "no" exactly
+  EXPECT_TRUE(value);
+
+  // Empty string returns false (no value set)
+  value = true;
+  EXPECT_FALSE(readBool("", value));
+  EXPECT_TRUE(value); // value unchanged
+
+  // Test with string_view from substring
+  string original = "enabled=1";
+  string_view sv = original;
+  sv = sv.substr(8); // "1"
+  EXPECT_TRUE(readBool(sv, value));
+  EXPECT_TRUE(value);
+}
+
+// Enhanced tests for getBool
+TEST_F(StringsHelpersTester, getBool_EdgeCases) {
+  using namespace helpers;
+  StringStringMap m;
+  bool value = false;
+
+  // Various true values
+  m["true1"] = "1";
+  EXPECT_TRUE(getBool(m, "true1", value));
+  EXPECT_TRUE(value);
+
+  m["true_yes"] = "yes";
+  EXPECT_TRUE(getBool(m, "true_yes", value));
+  EXPECT_TRUE(value);
+
+  m["true_anything"] = "anything";
+  EXPECT_TRUE(getBool(m, "true_anything", value));
+  EXPECT_TRUE(value);
+
+  // Various false values
+  m["false_0"] = "0";
+  EXPECT_TRUE(getBool(m, "false_0", value));
+  EXPECT_FALSE(value);
+
+  m["false_str"] = "false";
+  EXPECT_TRUE(getBool(m, "false_str", value));
+  EXPECT_FALSE(value);
+
+  m["false_upper"] = "FALSE";
+  EXPECT_TRUE(getBool(m, "false_upper", value));
+  EXPECT_FALSE(value);
+
+  m["false_mixed"] = "FaLsE";
+  EXPECT_TRUE(getBool(m, "false_mixed", value));
+  EXPECT_FALSE(value);
+
+  // Empty value should return false
+  m["empty"] = "";
+  EXPECT_FALSE(getBool(m, "empty", value));
+
+  // Missing key should return false
+  EXPECT_FALSE(getBool(m, "missing", value));
+
+  // Heterogeneous lookup with string_view
+  string_view sv = "true1";
+  EXPECT_TRUE(getBool(m, sv, value));
+  EXPECT_TRUE(value);
 }
 
 TEST_F(StringsHelpersTester, readUInt64) {
@@ -513,6 +726,189 @@ TEST_F(StringsHelpersTester, readUInt64) {
   EXPECT_FALSE(readUInt64("-1", value));
   EXPECT_FALSE(readUInt64("123vrs", value));
   EXPECT_FALSE(readUInt64("vrs", value));
+}
+
+TEST_F(StringsHelpersTester, readByteSize) {
+  using namespace vrs::helpers;
+  uint64_t value = 0;
+
+  // Plain numbers
+  EXPECT_TRUE(readByteSize("0", value));
+  EXPECT_EQ(value, 0);
+
+  EXPECT_TRUE(readByteSize("1234", value));
+  EXPECT_EQ(value, 1234);
+
+  EXPECT_TRUE(readByteSize("999999999", value));
+  EXPECT_EQ(value, 999999999);
+
+  // Byte suffix
+  EXPECT_TRUE(readByteSize("100B", value));
+  EXPECT_EQ(value, 100);
+
+  EXPECT_TRUE(readByteSize("100b", value));
+  EXPECT_EQ(value, 100);
+
+  // Kilobyte
+  EXPECT_TRUE(readByteSize("1KB", value));
+  EXPECT_EQ(value, 1024);
+
+  EXPECT_TRUE(readByteSize("1kb", value));
+  EXPECT_EQ(value, 1024);
+
+  EXPECT_TRUE(readByteSize("10KB", value));
+  EXPECT_EQ(value, 10 * 1024);
+
+  // Megabyte
+  EXPECT_TRUE(readByteSize("1MB", value));
+  EXPECT_EQ(value, 1024ULL * 1024);
+
+  EXPECT_TRUE(readByteSize("1mb", value));
+  EXPECT_EQ(value, 1024ULL * 1024);
+
+  EXPECT_TRUE(readByteSize("256MB", value));
+  EXPECT_EQ(value, 256ULL * 1024 * 1024);
+
+  // Gigabyte
+  EXPECT_TRUE(readByteSize("1GB", value));
+  EXPECT_EQ(value, 1024ULL * 1024 * 1024);
+
+  EXPECT_TRUE(readByteSize("1gb", value));
+  EXPECT_EQ(value, 1024ULL * 1024 * 1024);
+
+  EXPECT_TRUE(readByteSize("8GB", value));
+  EXPECT_EQ(value, 8ULL * 1024 * 1024 * 1024);
+
+  // Terabyte
+  EXPECT_TRUE(readByteSize("1TB", value));
+  EXPECT_EQ(value, 1024ULL * 1024 * 1024 * 1024);
+
+  EXPECT_TRUE(readByteSize("1tb", value));
+  EXPECT_EQ(value, 1024ULL * 1024 * 1024 * 1024);
+
+  // Exabyte
+  EXPECT_TRUE(readByteSize("1EB", value));
+  EXPECT_EQ(value, 1024ULL * 1024 * 1024 * 1024 * 1024);
+
+  EXPECT_TRUE(readByteSize("5EB", value));
+  EXPECT_EQ(value, 5ULL * 1024 * 1024 * 1024 * 1024 * 1024);
+
+  // Invalid inputs
+  EXPECT_FALSE(readByteSize("", value));
+  EXPECT_EQ(value, 0);
+
+  EXPECT_FALSE(readByteSize("abc", value));
+  EXPECT_EQ(value, 0);
+
+  EXPECT_FALSE(readByteSize("-1KB", value));
+  EXPECT_EQ(value, 0);
+
+  // Test with string_view
+  string original = "size=512MB";
+  string_view sv = original;
+  sv = sv.substr(5); // "512MB"
+  EXPECT_TRUE(readByteSize(sv, value));
+  EXPECT_EQ(value, 512ULL * 1024 * 1024);
+}
+
+TEST_F(StringsHelpersTester, readInt) {
+  using namespace vrs::helpers;
+  int value = 0;
+
+  // Valid positive
+  EXPECT_TRUE(readInt("123", value));
+  EXPECT_EQ(value, 123);
+
+  // Valid negative
+  EXPECT_TRUE(readInt("-456", value));
+  EXPECT_EQ(value, -456);
+
+  // Valid zero
+  EXPECT_TRUE(readInt("0", value));
+  EXPECT_EQ(value, 0);
+
+  // Max int32
+  EXPECT_TRUE(readInt("2147483647", value));
+  EXPECT_EQ(value, 2147483647);
+
+  // Min int32
+  EXPECT_TRUE(readInt("-2147483648", value));
+  EXPECT_EQ(value, -2147483648);
+
+  // Invalid - overflow
+  EXPECT_FALSE(readInt("2147483648", value));
+
+  // Invalid - underflow
+  EXPECT_FALSE(readInt("-2147483649", value));
+
+  // Invalid - partial parse (trailing chars)
+  EXPECT_FALSE(readInt("123abc", value));
+
+  // Invalid - non-numeric
+  EXPECT_FALSE(readInt("abc", value));
+
+  // Invalid - empty string
+  EXPECT_FALSE(readInt("", value));
+
+  // Invalid - whitespace only
+  EXPECT_FALSE(readInt("   ", value));
+
+  // Invalid - leading whitespace
+  EXPECT_FALSE(readInt(" 123", value));
+
+  // Test with string_view from substring
+  string original = "value=42";
+  string_view sv = original;
+  sv = sv.substr(6); // "42"
+  EXPECT_TRUE(readInt(sv, value));
+  EXPECT_EQ(value, 42);
+}
+
+TEST_F(StringsHelpersTester, readInt64) {
+  using namespace vrs::helpers;
+  int64_t value = 0;
+
+  // Valid positive
+  EXPECT_TRUE(readInt64("123", value));
+  EXPECT_EQ(value, 123);
+
+  // Valid negative
+  EXPECT_TRUE(readInt64("-456", value));
+  EXPECT_EQ(value, -456);
+
+  // Valid zero
+  EXPECT_TRUE(readInt64("0", value));
+  EXPECT_EQ(value, 0);
+
+  // Max int64
+  EXPECT_TRUE(readInt64("9223372036854775807", value));
+  EXPECT_EQ(value, 9223372036854775807LL);
+
+  // Min int64
+  EXPECT_TRUE(readInt64("-9223372036854775808", value));
+  EXPECT_EQ(value, (-9223372036854775807LL - 1));
+
+  // Invalid - overflow
+  EXPECT_FALSE(readInt64("9223372036854775808", value));
+
+  // Invalid - underflow
+  EXPECT_FALSE(readInt64("-9223372036854775809", value));
+
+  // Invalid - partial parse (trailing chars)
+  EXPECT_FALSE(readInt64("123abc", value));
+
+  // Invalid - non-numeric
+  EXPECT_FALSE(readInt64("abc", value));
+
+  // Invalid - empty string
+  EXPECT_FALSE(readInt64("", value));
+
+  // Test with string_view from substring
+  string original = "offset=-9876543210";
+  string_view sv = original;
+  sv = sv.substr(7); // "-9876543210"
+  EXPECT_TRUE(readInt64(sv, value));
+  EXPECT_EQ(value, -9876543210LL);
 }
 
 TEST_F(StringsHelpersTester, replaceAllTest) {
