@@ -136,7 +136,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>  <a class="code hl_class" href="classvrs_1_1_disk_file_chunk.html">DiskFileChunk</a>&amp; operator=(<span class="keyword">const</span> <a class="code hl_class" href="classvrs_1_1_disk_file_chunk.html">DiskFileChunk</a>&amp; other) = <span class="keyword">delete</span>;</div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>  <a class="code hl_class" href="classvrs_1_1_disk_file_chunk.html">DiskFileChunk</a>&amp; operator=(<a class="code hl_class" href="classvrs_1_1_disk_file_chunk.html">DiskFileChunk</a>&amp;&amp; other) = <span class="keyword">delete</span>;</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>  <span class="keywordtype">int</span> create(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; newPath, MAYBE_UNUSED <span class="keyword">const</span> map&lt;string, string&gt;&amp; options) {</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>  <span class="keywordtype">int</span> create(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; newPath, MAYBE_UNUSED <span class="keyword">const</span> <a class="code hl_typedef" href="structvrs_1_1_file_spec.html#a76464a53f34587c44a663a3ba7e956dd">FileSpec::Extras</a>&amp; options) {</div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    close();</div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    file_ = os::fileOpen(newPath, <span class="stringliteral">&quot;wb&quot;</span>);</div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    <span class="keywordflow">if</span> (file_ == <span class="keyword">nullptr</span>) {</div>
@@ -156,7 +156,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    <span class="keywordflow">return</span> SUCCESS;</div>
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>  }</div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>  <span class="keywordtype">int</span> open(<span class="keywordtype">bool</span> readOnly, MAYBE_UNUSED <span class="keyword">const</span> map&lt;string, string&gt;&amp; options) {</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>  <span class="keywordtype">int</span> open(<span class="keywordtype">bool</span> readOnly, MAYBE_UNUSED <span class="keyword">const</span> <a class="code hl_typedef" href="structvrs_1_1_file_spec.html#a76464a53f34587c44a663a3ba7e956dd">FileSpec::Extras</a>&amp; options) {</div>
 <div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    <span class="keywordflow">if</span> (file_ != <span class="keyword">nullptr</span>) {</div>
 <div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>      os::fileClose(file_);</div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    }</div>
@@ -237,6 +237,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>} <span class="comment">// namespace vrs</span></div>
 <div class="ttc" id="aclassvrs_1_1_disk_file_chunk_html"><div class="ttname"><a href="classvrs_1_1_disk_file_chunk.html">vrs::DiskFileChunk</a></div><div class="ttdef"><b>Definition</b> DiskFileChunk.hpp:30</div></div>
 <div class="ttc" id="anamespacevrs_html"><div class="ttname"><a href="namespacevrs.html">vrs</a></div><div class="ttdef"><b>Definition</b> Compressor.cpp:112</div></div>
+<div class="ttc" id="astructvrs_1_1_file_spec_html_a76464a53f34587c44a663a3ba7e956dd"><div class="ttname"><a href="structvrs_1_1_file_spec.html#a76464a53f34587c44a663a3ba7e956dd">vrs::FileSpec::Extras</a></div><div class="ttdeci">map&lt; string, string, std::less&lt;&gt; &gt; Extras</div><div class="ttdef"><b>Definition</b> FileSpec.h:43</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

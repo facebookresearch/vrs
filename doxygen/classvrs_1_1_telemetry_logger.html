@@ -110,8 +110,8 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>start</b> ()<
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a6d91723c0d86e9445399036cf3b93445" id="r_a6d91723c0d86e9445399036cf3b93445"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_telemetry_logger.html#a6d91723c0d86e9445399036cf3b93445">setLogger</a> (std::unique_ptr&lt; <a class="el" href="classvrs_1_1_telemetry_logger.html">TelemetryLogger</a> &gt; telemetryLogger=nullptr)</td></tr>
-<tr class="separator:a6d91723c0d86e9445399036cf3b93445"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2e5a85b6b568a50530b82bf0b9602458" id="r_a2e5a85b6b568a50530b82bf0b9602458"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_telemetry_logger.html#a2e5a85b6b568a50530b82bf0b9602458">setLogger</a> (unique_ptr&lt; <a class="el" href="classvrs_1_1_telemetry_logger.html">TelemetryLogger</a> &gt; telemetryLogger=nullptr)</td></tr>
+<tr class="separator:a2e5a85b6b568a50530b82bf0b9602458"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acf7f0886a08a2a79e2014b4ac1fa0fe5" id="r_acf7f0886a08a2a79e2014b4ac1fa0fe5"><td class="memItemLeft" align="right" valign="top"><a id="acf7f0886a08a2a79e2014b4ac1fa0fe5" name="acf7f0886a08a2a79e2014b4ac1fa0fe5"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>error</b> (const <a class="el" href="structvrs_1_1_operation_context.html">OperationContext</a> &amp;operationContext, const string &amp;message, const string &amp;serverMessage={})</td></tr>
 <tr class="memdesc:acf7f0886a08a2a79e2014b4ac1fa0fe5"><td class="mdescLeft">&#160;</td><td class="mdescRight">methods for clients to use without having to get an instance, etc <br /></td></tr>
@@ -122,9 +122,9 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><b>warning</b> (c
 <tr class="memitem:aa26202591a40826aaa79369d4e656de0" id="r_aa26202591a40826aaa79369d4e656de0"><td class="memItemLeft" align="right" valign="top"><a id="aa26202591a40826aaa79369d4e656de0" name="aa26202591a40826aaa79369d4e656de0"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>info</b> (const <a class="el" href="structvrs_1_1_operation_context.html">OperationContext</a> &amp;operationContext, const string &amp;message, const string &amp;serverMessage={})</td></tr>
 <tr class="separator:aa26202591a40826aaa79369d4e656de0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03146be92b9de29f13e5b866e7643b96" id="r_a03146be92b9de29f13e5b866e7643b96"><td class="memItemLeft" align="right" valign="top"><a id="a03146be92b9de29f13e5b866e7643b96" name="a03146be92b9de29f13e5b866e7643b96"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>event</b> (const std::string &amp;eventType, const <a class="el" href="structvrs_1_1_operation_context.html">OperationContext</a> &amp;operationContext, const string &amp;message, const string &amp;serverMessage={})</td></tr>
-<tr class="separator:a03146be92b9de29f13e5b866e7643b96"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a24614276fa8c8e914cad5c4dee50d4af" id="r_a24614276fa8c8e914cad5c4dee50d4af"><td class="memItemLeft" align="right" valign="top"><a id="a24614276fa8c8e914cad5c4dee50d4af" name="a24614276fa8c8e914cad5c4dee50d4af"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>event</b> (const string &amp;eventType, const <a class="el" href="structvrs_1_1_operation_context.html">OperationContext</a> &amp;operationContext, const string &amp;message, const string &amp;serverMessage={})</td></tr>
+<tr class="separator:a24614276fa8c8e914cad5c4dee50d4af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3509a88dd7126591969d4de07b80bb4a" id="r_a3509a88dd7126591969d4de07b80bb4a"><td class="memItemLeft" align="right" valign="top"><a id="a3509a88dd7126591969d4de07b80bb4a" name="a3509a88dd7126591969d4de07b80bb4a"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>traffic</b> (const <a class="el" href="structvrs_1_1_operation_context.html">OperationContext</a> &amp;operationContext, const <a class="el" href="structvrs_1_1_traffic_event.html">TrafficEvent</a> &amp;event)</td></tr>
 <tr class="separator:a3509a88dd7126591969d4de07b80bb4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -148,8 +148,8 @@ static constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"
 <div class="textblock"><p><a class="el" href="classvrs_1_1_telemetry_logger.html" title="TelemetryLogger to report important events.">TelemetryLogger</a> to report important events. </p>
 <p>Telemetry building block infra to report events from VRS operations. The default implementation simply logs using XR_LOGI and XR_LOGE, XR_LOGW, but can easily be augmented to implement telemetry in a central database. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a6d91723c0d86e9445399036cf3b93445" name="a6d91723c0d86e9445399036cf3b93445"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6d91723c0d86e9445399036cf3b93445">&#9670;&#160;</a></span>setLogger()</h2>
+<a id="a2e5a85b6b568a50530b82bf0b9602458" name="a2e5a85b6b568a50530b82bf0b9602458"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2e5a85b6b568a50530b82bf0b9602458">&#9670;&#160;</a></span>setLogger()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -160,7 +160,7 @@ static constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"
         <tr>
           <td class="memname">void vrs::TelemetryLogger::setLogger </td>
           <td>(</td>
-          <td class="paramtype">std::unique_ptr&lt; <a class="el" href="classvrs_1_1_telemetry_logger.html">TelemetryLogger</a> &gt;&#160;</td>
+          <td class="paramtype">unique_ptr&lt; <a class="el" href="classvrs_1_1_telemetry_logger.html">TelemetryLogger</a> &gt;&#160;</td>
           <td class="paramname"><em>telemetryLogger</em> = <code>nullptr</code></td><td>)</td>
           <td></td>
         </tr>

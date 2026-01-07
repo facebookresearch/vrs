@@ -12,12 +12,13 @@ var searchData=
   ['endlayout_9',['endLayout',['../classvrs_1_1_manual_data_layout.html#a6463defc156ea5ac909bafa04be58b55',1,'vrs::ManualDataLayout']]],
   ['error_10',['error',['../classvrs_1_1_telemetry_logger.html#acf7f0886a08a2a79e2014b4ac1fa0fe5',1,'vrs::TelemetryLogger']]],
   ['errorcode_11',['ErrorCode',['../namespacevrs.html#a2fa96820cabc73dbe1ee5094dbc2458e',1,'vrs']]],
-  ['errorcodetomessage_12',['errorCodeToMessage',['../namespacevrs.html#a7122beba91b5ac34b8c4aebd2c26cf0c',1,'vrs']]],
-  ['errorcodetomessagewithcode_13',['errorCodeToMessageWithCode',['../namespacevrs.html#a7a5f29230c8013cd36049068852326e0',1,'vrs']]],
+  ['errorcodetomessage_12',['errorCodeToMessage',['../namespacevrs.html#a5cdef444c4d796ae6299799fd4b65571',1,'vrs']]],
+  ['errorcodetomessagewithcode_13',['errorCodeToMessageWithCode',['../namespacevrs.html#a9594bf03bcdc70cb1809087f8ce10668',1,'vrs']]],
   ['errordomain_14',['ErrorDomain',['../namespacevrs.html#a2278749cac618182a91e5841f06f66c3',1,'vrs']]],
   ['errordomaintoerrorcodestart_15',['errorDomainToErrorCodeStart',['../namespacevrs.html#a157a15fd819db4643d72317a6ca3e129',1,'vrs']]],
   ['eventrecordableclass_16',['EventRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a51b34261622abb0e084e161ec148fcca',1,'vrs']]],
   ['externalcompact_17',['ExternalCompact',['../namespacevrs.html#ab5a2876628d1cfe8288aa4d4b557d433a0e8d54de4c26fd67bd91dd4f295b47e1',1,'vrs']]],
   ['externalpretty_18',['ExternalPretty',['../namespacevrs.html#ab5a2876628d1cfe8288aa4d4b557d433a5b497216e012891fb7a93dcf072a8356',1,'vrs']]],
-  ['eyecamerarecordableclass_19',['EyeCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5ad1cba9cdd661a9c56ebebb65f99137b3',1,'vrs']]]
+  ['extras_19',['Extras',['../structvrs_1_1_file_spec.html#a76464a53f34587c44a663a3ba7e956dd',1,'vrs::FileSpec']]],
+  ['eyecamerarecordableclass_20',['EyeCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5ad1cba9cdd661a9c56ebebb65f99137b3',1,'vrs']]]
 ];

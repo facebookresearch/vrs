@@ -76,6 +76,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
@@ -89,6 +90,11 @@ $(function() {
 
 <p><code>#include &lt;<a class="el" href="_file_spec_8h_source.html">FileSpec.h</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a76464a53f34587c44a663a3ba7e956dd" id="r_a76464a53f34587c44a663a3ba7e956dd"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvrs_1_1_file_spec.html#a76464a53f34587c44a663a3ba7e956dd">Extras</a> = map&lt; string, string, std::less&lt;&gt; &gt;</td></tr>
+<tr class="separator:a76464a53f34587c44a663a3ba7e956dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a4a6ad94f426b10838e711c2ec7f955e2" id="r_a4a6ad94f426b10838e711c2ec7f955e2"><td class="memItemLeft" align="right" valign="top"><a id="a4a6ad94f426b10838e711c2ec7f955e2" name="a4a6ad94f426b10838e711c2ec7f955e2"></a>
@@ -202,9 +208,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>unsetExtra</b> (strin
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a0e4db5fc09f8142b3de82aba38fa228f" id="r_a0e4db5fc09f8142b3de82aba38fa228f"><td class="memItemLeft" align="right" valign="top"><a id="a0e4db5fc09f8142b3de82aba38fa228f" name="a0e4db5fc09f8142b3de82aba38fa228f"></a>
-static int&#160;</td><td class="memItemRight" valign="bottom"><b>parseUri</b> (string_view uri, string &amp;outScheme, string &amp;outPath, map&lt; string, string &gt; &amp;outQueryParams)</td></tr>
-<tr class="separator:a0e4db5fc09f8142b3de82aba38fa228f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4258aa76c51a280d8eeda0df6fe7815e" id="r_a4258aa76c51a280d8eeda0df6fe7815e"><td class="memItemLeft" align="right" valign="top"><a id="a4258aa76c51a280d8eeda0df6fe7815e" name="a4258aa76c51a280d8eeda0df6fe7815e"></a>
+static int&#160;</td><td class="memItemRight" valign="bottom"><b>parseUri</b> (string_view uri, string &amp;outScheme, string &amp;outPath, <a class="el" href="structvrs_1_1_file_spec.html#a76464a53f34587c44a663a3ba7e956dd">Extras</a> &amp;outQueryParams)</td></tr>
+<tr class="separator:a4258aa76c51a280d8eeda0df6fe7815e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5dae72a75f792f1bd2c4bec98d0a6df0" id="r_a5dae72a75f792f1bd2c4bec98d0a6df0"><td class="memItemLeft" align="right" valign="top"><a id="a5dae72a75f792f1bd2c4bec98d0a6df0" name="a5dae72a75f792f1bd2c4bec98d0a6df0"></a>
 static int&#160;</td><td class="memItemRight" valign="bottom"><b>decodeQuery</b> (string_view query, string &amp;outKey, string &amp;outValue)</td></tr>
 <tr class="separator:a5dae72a75f792f1bd2c4bec98d0a6df0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -229,14 +235,30 @@ vector&lt; string &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>chu
 <tr class="memitem:ad51685b1cffb875e3ba4d5989a97bc67" id="r_ad51685b1cffb875e3ba4d5989a97bc67"><td class="memItemLeft" align="right" valign="top"><a id="ad51685b1cffb875e3ba4d5989a97bc67" name="ad51685b1cffb875e3ba4d5989a97bc67"></a>
 vector&lt; int64_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>chunkSizes</b></td></tr>
 <tr class="separator:ad51685b1cffb875e3ba4d5989a97bc67"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af83aab5392938a791e15456d1aa10ff9" id="r_af83aab5392938a791e15456d1aa10ff9"><td class="memItemLeft" align="right" valign="top"><a id="af83aab5392938a791e15456d1aa10ff9" name="af83aab5392938a791e15456d1aa10ff9"></a>
-map&lt; string, string &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>extras</b></td></tr>
-<tr class="separator:af83aab5392938a791e15456d1aa10ff9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5114f2cc8e9597d4eb02b5ca5e6e447d" id="r_a5114f2cc8e9597d4eb02b5ca5e6e447d"><td class="memItemLeft" align="right" valign="top"><a id="a5114f2cc8e9597d4eb02b5ca5e6e447d" name="a5114f2cc8e9597d4eb02b5ca5e6e447d"></a>
+<a class="el" href="structvrs_1_1_file_spec.html#a76464a53f34587c44a663a3ba7e956dd">Extras</a>&#160;</td><td class="memItemRight" valign="bottom"><b>extras</b></td></tr>
+<tr class="separator:a5114f2cc8e9597d4eb02b5ca5e6e447d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Generalized file descriptor class, allowing the efficient representation of complex file objects, maybe multi-chunks, with additional optional properties. </p>
 <p>File specification struct, to describe a file object in more details than just a single path, possibly with multiple chunks, with a special file handler, an explicit file name (useful when the chunks are urls), and possibly a source uri. If no file handler name is specified, the object is assumed to a set of local files. Additional properties may be specified in the extras field, which has helper methods. </p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a id="a76464a53f34587c44a663a3ba7e956dd" name="a76464a53f34587c44a663a3ba7e956dd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a76464a53f34587c44a663a3ba7e956dd">&#9670;&#160;</a></span>Extras</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="structvrs_1_1_file_spec.html#a76464a53f34587c44a663a3ba7e956dd">vrs::FileSpec::Extras</a> =  map&lt;string, string, std::less&lt;&gt; &gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Map type with heterogeneous lookup support for string keys. Allows lookup using string_view without creating temporary string objects. </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a id="ae3b8e3fe3ca78c4e6310310691e14fa8" name="ae3b8e3fe3ca78c4e6310310691e14fa8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae3b8e3fe3ca78c4e6310310691e14fa8">&#9670;&#160;</a></span>fromPathJsonUri()</h2>
 

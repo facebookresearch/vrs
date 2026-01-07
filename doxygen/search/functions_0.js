@@ -5,7 +5,7 @@ var searchData=
   ['addchunk_2',['addchunk',['../classvrs_1_1_disk_file_t.html#abac5192bf096be66db2973f7c86fbec0',1,'vrs::DiskFileT::addChunk()'],['../classvrs_1_1_write_file_handler.html#acc15477a0e4cac5307cd4d97ba9f94c9',1,'vrs::WriteFileHandler::addChunk()']]],
   ['adddevice_3',['addDevice',['../namespacevrs_1_1tag__conventions.html#ad54ca81705a9275b739472459494fe6c',1,'vrs::tag_conventions']]],
   ['adddeviceid_4',['addDeviceId',['../namespacevrs_1_1tag__conventions.html#af6414b6b6430f35cc640116adc42226f',1,'vrs::tag_conventions']]],
-  ['adddirectwriterecorddata_5',['addDirectWriteRecordData',['../classvrs_1_1_record.html#a4f3649abe19e063c5c4a1b298746d77e',1,'vrs::Record']]],
+  ['adddirectwriterecorddata_5',['addDirectWriteRecordData',['../classvrs_1_1_record.html#ad0c2a67d58ce88a76696fb9dee33aa4c',1,'vrs::Record']]],
   ['addfirmwaredetails_6',['addFirmwareDetails',['../namespacevrs_1_1tag__conventions.html#ad9135ebbeceb88923b448684130e210a',1,'vrs::tag_conventions']]],
   ['addframedata_7',['addFrameData',['../classvrs_1_1_compressor.html#a9210b6c2c1205e2ad6292ed1f5835dbb',1,'vrs::Compressor']]],
   ['addlegacyrecordformat_8',['addlegacyrecordformat',['../classvrs_1_1_record_format_registrar.html#a6f1f36f52b7518cd4ac54182967e57df',1,'vrs::RecordFormatRegistrar::addLegacyRecordFormat()'],['../classvrs_1_1_legacy_formats_provider.html#ab6595f29152bf85c091be234df374fba',1,'vrs::LegacyFormatsProvider::addLegacyRecordFormat()']]],
