@@ -21,7 +21,6 @@
 
 #include <string_view>
 #include <type_traits>
-#include <vector>
 
 #include <logging/Checks.h>
 
@@ -111,23 +110,20 @@ struct JsonWrapper {
     return jv;
   }
 
-  template <typename JSTR>
-  inline void addMember(const JSTR& name, JValue& v) {
+  inline void addMember(string_view name, JValue& v) {
     value.AddMember(jStringRef(name), v, alloc);
   }
 
-  template <typename JSTR>
-  inline void addMember(const JSTR& name, const char* str) {
+  inline void addMember(string_view name, const char* str) {
     value.AddMember(jStringRef(name), jStringRef(str), alloc);
   }
 
-  template <typename JSTR>
-  inline void addMember(const JSTR& name, string_view str) {
+  inline void addMember(string_view name, string_view str) {
     value.AddMember(jStringRef(name), jStringRef(str), alloc);
   }
 
-  template <typename JSTR, typename T>
-  inline void addMember(const JSTR& name, const T& v) {
+  template <typename T>
+  inline void addMember(string_view name, const T& v) {
     value.AddMember(jStringRef(name), jValue(v), alloc);
   }
 };
@@ -144,8 +140,8 @@ inline JValue JsonWrapper::jValue<string>(const string& str) {
   return jstring;
 }
 
-template <typename T, typename JSTR>
-inline void serializeMap(const map<string, T>& amap, JsonWrapper& rj, const JSTR& name) {
+template <typename T>
+inline void serializeMap(const map<string, T>& amap, JsonWrapper& rj, string_view name) {
   if (amap.size() > 0) {
     JValue mapValues(vrs_rapidjson::kObjectType);
     for (const auto& element : amap) {
@@ -156,9 +152,8 @@ inline void serializeMap(const map<string, T>& amap, JsonWrapper& rj, const JSTR
 }
 
 // when the map<string, string> will live as long as the json serialization (avoid string copies)
-template <typename JSTR>
 inline void
-serializeStringRefMap(const map<string, string>& stringMap, JsonWrapper& rj, const JSTR& name) {
+serializeStringRefMap(const map<string, string>& stringMap, JsonWrapper& rj, string_view name) {
   if (!stringMap.empty()) {
     JValue mapValues(vrs_rapidjson::kObjectType);
     for (const auto& element : stringMap) {
@@ -168,8 +163,8 @@ serializeStringRefMap(const map<string, string>& stringMap, JsonWrapper& rj, con
   }
 }
 
-template <typename T, typename JSTR>
-inline void serializeVector(const vector<T>& vect, JsonWrapper& rj, const JSTR& name) {
+template <typename T>
+inline void serializeVector(const vector<T>& vect, JsonWrapper& rj, string_view name) {
   if (!vect.empty()) {
     JValue arrayValues(vrs_rapidjson::kArrayType);
     arrayValues.Reserve(static_cast<vrs_rapidjson::SizeType>(vect.size()), rj.alloc);
@@ -181,9 +176,8 @@ inline void serializeVector(const vector<T>& vect, JsonWrapper& rj, const JSTR& 
 }
 
 // when the vector<string> will live as long as the json serialization (avoid string copies)
-template <typename JSTR>
 inline void
-serializeStringRefVector(const vector<string>& vect, JsonWrapper& rj, const JSTR& name) {
+serializeStringRefVector(const vector<string>& vect, JsonWrapper& rj, string_view name) {
   if (!vect.empty()) {
     JValue arrayValues(vrs_rapidjson::kArrayType);
     arrayValues.Reserve(static_cast<vrs_rapidjson::SizeType>(vect.size()), rj.alloc);
@@ -265,10 +259,10 @@ inline bool getFromJValue(const JValue& value, MatrixND<T, N>& outMatrix) {
   return true;
 }
 
-template <typename T, typename JSTR>
-inline bool getJMap(map<string, T>& outMap, const JValue& piece, const JSTR& name) {
+template <typename T>
+inline bool getJMap(map<string, T>& outMap, const JValue& piece, string_view name) {
   outMap.clear();
-  const JValue::ConstMemberIterator properties = piece.FindMember(name);
+  const JValue::ConstMemberIterator properties = piece.FindMember(jStringRef(name));
   if (properties != piece.MemberEnd() && properties->value.IsObject()) {
     for (JValue::ConstMemberIterator itr = properties->value.MemberBegin();
          itr != properties->value.MemberEnd();
@@ -283,10 +277,10 @@ inline bool getJMap(map<string, T>& outMap, const JValue& piece, const JSTR& nam
   return false;
 }
 
-template <typename T, typename JSTR>
-inline bool getJVector(vector<T>& outVector, const JValue& piece, const JSTR& name) {
+template <typename T>
+inline bool getJVector(vector<T>& outVector, const JValue& piece, string_view name) {
   outVector.clear();
-  const JValue::ConstMemberIterator properties = piece.FindMember(name);
+  const JValue::ConstMemberIterator properties = piece.FindMember(jStringRef(name));
   if (properties != piece.MemberEnd() && properties->value.IsArray()) {
     outVector.reserve(properties->value.GetArray().Size());
     for (JValue::ConstValueIterator itr = properties->value.Begin(); itr != properties->value.End();
@@ -301,9 +295,8 @@ inline bool getJVector(vector<T>& outVector, const JValue& piece, const JSTR& na
   return false;
 }
 
-template <typename JSTR>
-inline bool getJString(string& outString, const JValue& piece, const JSTR& name) {
-  const JValue::ConstMemberIterator member = piece.FindMember(name);
+inline bool getJString(string& outString, const JValue& piece, string_view name) {
+  const JValue::ConstMemberIterator member = piece.FindMember(jStringRef(name));
   if (member != piece.MemberEnd() && member->value.IsString()) {
     outString = member->value.GetString();
     return true;
@@ -312,9 +305,8 @@ inline bool getJString(string& outString, const JValue& piece, const JSTR& name)
   return false;
 }
 
-template <typename JSTR>
-inline bool getJInt64(int64_t& outInt64, const JValue& piece, const JSTR& name) {
-  const JValue::ConstMemberIterator member = piece.FindMember(name);
+inline bool getJInt64(int64_t& outInt64, const JValue& piece, string_view name) {
+  const JValue::ConstMemberIterator member = piece.FindMember(jStringRef(name));
   if (member != piece.MemberEnd() && member->value.IsInt64()) {
     outInt64 = member->value.GetInt64();
     return true;
@@ -323,9 +315,8 @@ inline bool getJInt64(int64_t& outInt64, const JValue& piece, const JSTR& name) 
   return false;
 }
 
-template <typename JSTR>
-inline bool getJInt(int& outInt, const JValue& piece, const JSTR& name) {
-  const JValue::ConstMemberIterator member = piece.FindMember(name);
+inline bool getJInt(int& outInt, const JValue& piece, string_view name) {
+  const JValue::ConstMemberIterator member = piece.FindMember(jStringRef(name));
   if (member != piece.MemberEnd() && member->value.IsInt()) {
     outInt = member->value.GetInt();
     return true;
@@ -334,9 +325,8 @@ inline bool getJInt(int& outInt, const JValue& piece, const JSTR& name) {
   return false;
 }
 
-template <typename JSTR>
-inline bool getJDouble(double& outDouble, const JValue& piece, const JSTR& name) {
-  const JValue::ConstMemberIterator member = piece.FindMember(name);
+inline bool getJDouble(double& outDouble, const JValue& piece, string_view name) {
+  const JValue::ConstMemberIterator member = piece.FindMember(jStringRef(name));
   if (member != piece.MemberEnd() && member->value.IsDouble()) {
     outDouble = member->value.GetDouble();
     return true;
