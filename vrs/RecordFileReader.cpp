@@ -38,6 +38,7 @@
 #include <vrs/helpers/FileMacros.h>
 #include <vrs/helpers/Strings.h>
 #include <vrs/os/CompilerAttributes.h>
+#include <vrs/os/Platform.h>
 #include <vrs/os/Time.h>
 #include <vrs/os/Utils.h>
 
@@ -65,6 +66,10 @@ bool fullRecordCompare(const IndexRecord::RecordInfo& lhs, const IndexRecord::Re
         (lhs.streamId == rhs.streamId &&
          (before(lhs.recordType, rhs.recordType) ||
           (lhs.recordType == rhs.recordType && lhs.fileOffset < rhs.fileOffset)))));
+}
+
+string durationMs(double startTime) {
+  return fmt::format("{}", static_cast<int64_t>((os::getTimestampSec() - startTime) * 1000));
 }
 
 } // namespace
@@ -231,22 +236,18 @@ int RecordFileReader::doOpenFile(
   LOG_PROGRESS(FileHandlerFactory::getInstance().delegateOpen(fileSpec, file_), error, [&]() {
     return "Opening " + fileSpec.getEasyPath();
   });
-  // log remote file handler names with success/failure status
-  if (file_ && file_->isRemoteFileSystem()) {
-    OperationContext context{"RecordFileReader::doOpenFile", fileSpec.getSourceLocation()};
-    if (error != 0) {
-      TelemetryLogger::error(context, errorCodeToMessageWithCode(error));
-    } else {
-      TelemetryLogger::info(context, "success");
-    }
-  }
+  OperationContext context{"RecordFileReader::doOpenFile", fileSpec.getSourceLocation()};
   if (error != 0) {
+    TelemetryLogger::error(context, errorCodeToMessageWithCode(error), durationMs(beforeTime));
     XR_LOGE(
         "Could not open the file '{}': {}",
         fileSpec.getEasyPath(),
         errorCodeToMessageWithCode(error));
     closeFile();
     return error;
+  }
+  if (IS_MAC_PLATFORM() || IS_WINDOWS_PLATFORM()) {
+    TelemetryLogger::info(context, to_string(file_->getTotalSize()), durationMs(beforeTime));
   }
   if (file_->getTotalSize() < static_cast<int64_t>(sizeof(FileFormat::FileHeader))) {
     XR_LOGE(
