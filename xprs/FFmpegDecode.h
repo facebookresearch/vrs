@@ -29,9 +29,9 @@ namespace xprs {
 class VideoDecode : public InternalDecoder {
  public:
   explicit VideoDecode(const char* avcodecName, bool disableHwAcceleration = false);
-  virtual ~VideoDecode() override;
-  virtual void open() override;
-  virtual void decode(uint8_t* buffer, size_t size, Picture& pix) override;
+  ~VideoDecode() override;
+  void open() override;
+  void decode(uint8_t* buffer, size_t size, Picture& pix) override;
   bool isHwAccelerated() override {
     return _hwEnabled;
   }

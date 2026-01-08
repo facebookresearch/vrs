@@ -69,7 +69,7 @@ class CodecException : public std::exception {
  public:
   CodecException(const char* file, int line, const char* msg);
   CodecException(const char* file, int line, int error);
-  const char* what() const noexcept;
+  const char* what() const noexcept override;
   int error() const noexcept;
 
  private:
