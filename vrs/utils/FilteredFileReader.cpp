@@ -452,7 +452,7 @@ bool RecordFilter::resolveRelativeTimeConstraints(double startTimestamp, double 
     if (aroundTime) {
       // maxTime is actually a duration centered around minTime: interpret both
       double baseTime = minTime;
-      double diameter = abs(maxTime) / 2;
+      double diameter = std::abs(maxTime) / 2;
       minTime = baseTime - diameter;
       maxTime = baseTime + diameter;
     } else if (relativeMaxTime) {

@@ -70,7 +70,7 @@ bool isCloserThan(
     const IndexRecord::RecordInfo& closer,
     double timestamp,
     const IndexRecord::RecordInfo& farther) {
-  return abs(closer.timestamp - timestamp) < abs(farther.timestamp - timestamp);
+  return std::abs(closer.timestamp - timestamp) < std::abs(farther.timestamp - timestamp);
 }
 
 const IndexRecord::RecordInfo* getNearestRecordByTime(
@@ -88,7 +88,7 @@ const IndexRecord::RecordInfo* getNearestRecordByTime(
       closest = &record;
     }
   }
-  if (closest != nullptr && (abs(closest->timestamp - timestamp) > epsilon)) {
+  if (closest != nullptr && (std::abs(closest->timestamp - timestamp) > epsilon)) {
     closest = nullptr;
   }
   EXPECT_TRUE(!streamId.isValid() || closest == nullptr || streamId == closest->streamId);

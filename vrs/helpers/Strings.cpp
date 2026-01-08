@@ -239,7 +239,7 @@ string humanReadableTimestamp(double seconds, uint8_t precision) {
       format = f9;
     }
   }
-  double atimestamp = abs(seconds);
+  double atimestamp = std::abs(seconds);
   if (atimestamp < cTinyLimit) {
     if (atimestamp > 0) {
       format = e3;
