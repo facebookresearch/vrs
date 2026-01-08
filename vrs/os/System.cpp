@@ -79,7 +79,7 @@ string getOsFingerPrint() {
 
 #elif IS_LINUX_PLATFORM()
   string osFingerprintString;
-  struct utsname linuxNames;
+  struct utsname linuxNames{};
   if (uname(&linuxNames) == 0) {
     osFingerprintString = fmt::format(
         "{} {}, {}, {}",
@@ -132,7 +132,7 @@ uint32_t getTerminalWidth(uint32_t setValue) {
         (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi) ? csbi.dwSize.X
                                                                             : kDefaultWidth);
 #elif IS_LINUX_PLATFORM() || IS_MAC_PLATFORM()
-    struct winsize w;
+    struct winsize w{};
     width = ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == 0 ? w.ws_col : kDefaultWidth;
 
 #else
