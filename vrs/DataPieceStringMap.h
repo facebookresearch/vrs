@@ -27,7 +27,6 @@ namespace vrs {
 
 using std::ostream;
 using std::string;
-using std::vector;
 
 /// \brief DataPiece map container, with string keys and values of type T.
 ///

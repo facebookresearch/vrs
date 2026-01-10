@@ -24,7 +24,6 @@
 
 namespace vrs {
 
-using std::is_base_of;
 using std::is_pointer;
 using std::vector;
 
