@@ -39,7 +39,6 @@ struct RecordFileWriterTester;
 
 using std::function;
 using std::map;
-using std::multiset;
 using std::pair;
 using std::set;
 using std::string;

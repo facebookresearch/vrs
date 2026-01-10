@@ -30,7 +30,6 @@
 
 namespace vrs {
 
-using std::map;
 using std::string;
 using std::vector;
 
