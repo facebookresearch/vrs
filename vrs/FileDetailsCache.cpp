@@ -187,8 +187,7 @@ int readIndexData(
     return FAILURE;
   }
   vector<IndexRecord::DiskStreamId> diskStreams(recordableCount);
-  IF_ERROR_LOG_AND_RETURN(
-      file.read(diskStreams.data(), sizeof(IndexRecord::DiskStreamId) * recordableCount));
+  IF_ERROR_LOG_AND_RETURN(file.read(diskStreams));
   for (auto& id : diskStreams) {
     outStreamIds.insert(id.getStreamId());
   }

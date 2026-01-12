@@ -339,9 +339,8 @@ int IndexRecord::Reader::readClassicIndexRecord(
       XR_LOGE("Index record too small. Corrupt file or index?");
       return INDEX_RECORD_ERROR;
     }
-    vector<DiskStreamId> diskStreams;
-    diskStreams.resize(typeCount);
-    if (file_.read(diskStreams.data(), readSize) != 0) {
+    vector<DiskStreamId> diskStreams(typeCount);
+    if (file_.read(diskStreams) != 0) {
       return file_.getLastError();
     }
     preludeSize += static_cast<uint32_t>(readSize);

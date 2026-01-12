@@ -59,7 +59,7 @@ static int loadFrameFromMemory(
     uint64_t hash) {
   vector<char> buffer(image.dataSize);
   file.setPos(image.dataOffset);
-  EXPECT_EQ(file.read(buffer.data(), buffer.size()), 0);
+  EXPECT_EQ(file.read(buffer), 0);
   PixelFrame frame;
   if (!loadImage(buffer, frame, image)) {
     return 2;

@@ -71,6 +71,11 @@ class DiskFileT : public WriteFileHandler {
   int read(T& object) {
     return read(&object, sizeof(object));
   }
+  /// Helper to read a vector of trivially copyable objects, in a chunk aware way.
+  template <typename T, std::enable_if_t<std::is_trivially_copyable<T>::value, int> = 0>
+  int read(vector<T>& vec) {
+    return read(vec.data(), vec.size() * sizeof(T));
+  }
   /// Get the number of bytes actually moved by the last read or write operation.
   size_t getLastRWSize() const override;
 

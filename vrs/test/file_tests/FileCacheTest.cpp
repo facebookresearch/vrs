@@ -174,7 +174,7 @@ TEST_F(FileCacheTest, memoryVrsFileTest) {
   ASSERT_EQ(file.open(kTestFile), 0);
   int64_t size = file.getTotalSize();
   vrsfile.resize(size);
-  ASSERT_EQ(file.read(vrsfile.data(), size), 0);
+  ASSERT_EQ(file.read(vrsfile), 0);
 
   RecordFileReader reader;
   reader.setFileHandler(make_unique<utils::BufferFileHandler>(vrsfile));

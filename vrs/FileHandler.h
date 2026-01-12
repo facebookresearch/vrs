@@ -158,6 +158,11 @@ class FileHandler : public FileDelegator {
   int read(T& object) {
     return read(&object, sizeof(object));
   }
+  /// Helper to read a vector of trivially copyable objects, in a chunk aware way.
+  template <typename T, std::enable_if_t<std::is_trivially_copyable<T>::value, int> = 0>
+  int read(vector<T>& vec) {
+    return read(vec.data(), vec.size() * sizeof(T));
+  }
   /// Get the number of bytes actually moved during the last read or write operation.
   /// @return The number of bytes last read or written during the last read or write call.
   virtual size_t getLastRWSize() const = 0;
