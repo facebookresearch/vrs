@@ -54,7 +54,6 @@ using ::vrs::AutoDataLayout;
 using ::vrs::AutoDataLayoutEnd;
 using ::vrs::DataPieceArray;
 using ::vrs::DataPieceValue;
-using ::vrs::DataReference;
 using ::vrs::Point3Df;
 using ::vrs::Point4Df;
 using ::vrs::datalayout_conventions::ImageSpecType;
