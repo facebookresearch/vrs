@@ -149,6 +149,11 @@ template&lt;typename T , std::enable_if_t&lt; std::is_trivially_copyable&lt; T &
 <tr class="memitem:a862ed4edd6b651c810c71593e4d2f6c1"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><b>read</b> (T &amp;object)</td></tr>
 <tr class="memdesc:a862ed4edd6b651c810c71593e4d2f6c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper to read trivially copyable objects, in a chunk aware way. <br /></td></tr>
 <tr class="separator:a862ed4edd6b651c810c71593e4d2f6c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa0120d84dcaedc263f42a78e477118b4" id="r_aa0120d84dcaedc263f42a78e477118b4"><td class="memTemplParams" colspan="2"><a id="aa0120d84dcaedc263f42a78e477118b4" name="aa0120d84dcaedc263f42a78e477118b4"></a>
+template&lt;typename T , std::enable_if_t&lt; std::is_trivially_copyable&lt; T &gt;::value, int &gt;  = 0&gt; </td></tr>
+<tr class="memitem:aa0120d84dcaedc263f42a78e477118b4"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><b>read</b> (vector&lt; T &gt; &amp;vec)</td></tr>
+<tr class="memdesc:aa0120d84dcaedc263f42a78e477118b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper to read a vector of trivially copyable objects, in a chunk aware way. <br /></td></tr>
+<tr class="separator:aa0120d84dcaedc263f42a78e477118b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac1c2ac008404ab6a71f5b41a13c187e8" id="r_ac1c2ac008404ab6a71f5b41a13c187e8"><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#ac1c2ac008404ab6a71f5b41a13c187e8">getLastRWSize</a> () const =0</td></tr>
 <tr class="separator:ac1c2ac008404ab6a71f5b41a13c187e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afe53e88b396758690f2c8754bcb39556" id="r_afe53e88b396758690f2c8754bcb39556"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#afe53e88b396758690f2c8754bcb39556">isReadOnly</a> () const</td></tr>
