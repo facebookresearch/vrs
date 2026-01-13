@@ -18,6 +18,7 @@
 
 #include <cstring>
 
+#include <iterator>
 #include <map>
 #include <mutex>
 
