@@ -19,6 +19,7 @@
 #include <cassert>
 
 #include <array>
+#include <iterator>
 #include <limits>
 #include <sstream>
 #include <utility>

@@ -16,6 +16,7 @@
 
 #include <vrs/utils/DataExtractor.h>
 
+#include <iterator>
 #include <utility>
 
 #include <fmt/format.h>

@@ -17,6 +17,7 @@
 #include <vrs/utils/ImageExtractor.h>
 
 #include <fstream>
+#include <iterator>
 #include <thread>
 
 #include <fmt/format.h>

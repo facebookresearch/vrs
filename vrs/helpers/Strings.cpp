@@ -22,6 +22,7 @@
 #include <ctime>
 
 #include <algorithm>
+#include <iterator>
 #include <sstream>
 
 #include <fmt/format.h>

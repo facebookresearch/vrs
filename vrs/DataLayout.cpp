@@ -24,6 +24,7 @@
 #endif
 
 #include <iomanip>
+#include <iterator>
 #include <mutex>
 #include <sstream>
 
