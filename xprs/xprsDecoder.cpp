@@ -69,6 +69,38 @@ XprsResult CVideoDecoder::init(bool disableHwAcceleration) {
 }
 
 #ifdef __APPLE__
+
+// kCVPixelFormatType_422YpCbCr8BiPlanarVideoRange and
+// kCVPixelFormatType_444YpCbCr8BiPlanarVideoRange were introduced in macOS 15.0 / iOS 18.0 SDK
+#if (defined(__MAC_OS_X_VERSION_MAX_ALLOWED) && __MAC_OS_X_VERSION_MAX_ALLOWED >= 150000) ||   \
+    (defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 180000) || \
+    (defined(__TV_OS_VERSION_MAX_ALLOWED) && __TV_OS_VERSION_MAX_ALLOWED >= 180000) ||         \
+    (defined(__WATCH_OS_VERSION_MAX_ALLOWED) && __WATCH_OS_VERSION_MAX_ALLOWED >= 110000)
+#define XPRS_HAS_422_BIPLANAR_FORMATS() 1
+#define XPRS_HAS_444_BIPLANAR_FORMATS() 1
+#else
+#define XPRS_HAS_422_BIPLANAR_FORMATS() 0
+#define XPRS_HAS_444_BIPLANAR_FORMATS() 0
+#endif
+
+static bool is422BiplanarFormat(OSType pixelFormat) {
+#if XPRS_HAS_422_BIPLANAR_FORMATS()
+  return pixelFormat == kCVPixelFormatType_422YpCbCr8BiPlanarVideoRange ||
+      pixelFormat == kCVPixelFormatType_422YpCbCr8BiPlanarFullRange;
+#else
+  return false;
+#endif
+}
+
+static bool is444BiplanarFormat(OSType pixelFormat) {
+#if XPRS_HAS_444_BIPLANAR_FORMATS()
+  return pixelFormat == kCVPixelFormatType_444YpCbCr8BiPlanarVideoRange ||
+      pixelFormat == kCVPixelFormatType_444YpCbCr8BiPlanarFullRange;
+#else
+  return false;
+#endif
+}
+
 static PixelFormat convertVideoToolboxPixelFormat(OSType videotoolboxFormat) {
   switch (videotoolboxFormat) {
     case kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange:
@@ -79,13 +111,13 @@ static PixelFormat convertVideoToolboxPixelFormat(OSType videotoolboxFormat) {
     case kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange:
     case kCVPixelFormatType_420YpCbCr10BiPlanarFullRange:
       return PixelFormat::NV1210LE;
-    case kCVPixelFormatType_422YpCbCr8BiPlanarVideoRange:
-    case kCVPixelFormatType_422YpCbCr8BiPlanarFullRange:
-      return PixelFormat::YUV422P;
-    case kCVPixelFormatType_444YpCbCr8BiPlanarVideoRange:
-    case kCVPixelFormatType_444YpCbCr8BiPlanarFullRange:
-      return PixelFormat::YUV444P;
     default:
+      if (is422BiplanarFormat(videotoolboxFormat)) {
+        return PixelFormat::YUV422P;
+      }
+      if (is444BiplanarFormat(videotoolboxFormat)) {
+        return PixelFormat::YUV444P;
+      }
       return PixelFormat::UNKNOWN;
   }
 }
@@ -114,10 +146,7 @@ void CVideoDecoder::convertAVFrame(const AVFrame* avframe, Frame& frameOut) {
       pixelFormat != kCVPixelFormatType_420YpCbCr8BiPlanarFullRange &&
       pixelFormat != kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange &&
       pixelFormat != kCVPixelFormatType_420YpCbCr10BiPlanarFullRange &&
-      pixelFormat != kCVPixelFormatType_422YpCbCr8BiPlanarVideoRange &&
-      pixelFormat != kCVPixelFormatType_422YpCbCr8BiPlanarFullRange &&
-      pixelFormat != kCVPixelFormatType_444YpCbCr8BiPlanarVideoRange &&
-      pixelFormat != kCVPixelFormatType_444YpCbCr8BiPlanarFullRange) {
+      !is422BiplanarFormat(pixelFormat) && !is444BiplanarFormat(pixelFormat)) {
     return;
   }
 
@@ -135,17 +164,16 @@ void CVideoDecoder::convertAVFrame(const AVFrame* avframe, Frame& frameOut) {
   // Default to 420 format
   size_t uvHeight = height / 2;
   size_t frameSize = width * height * 3 / 2;
-  if (pixelFormat == kCVPixelFormatType_422YpCbCr8BiPlanarVideoRange ||
-      pixelFormat == kCVPixelFormatType_422YpCbCr8BiPlanarFullRange) {
+  if (is422BiplanarFormat(pixelFormat)) {
     // 422 doubles vertical chroma samples compared to 420
     frameSize = width * height * 2;
     uvHeight = height;
-  } else if (
-      pixelFormat == kCVPixelFormatType_444YpCbCr8BiPlanarVideoRange ||
-      pixelFormat == kCVPixelFormatType_444YpCbCr8BiPlanarFullRange) {
+  } else if (is444BiplanarFormat(pixelFormat)) {
     // 444 doubles both vertical and horizontal chroma samples compared to 420
     frameSize = width * height * 3;
     uvHeight = height;
+  } else {
+    // 420 format - use default values above
   }
   frameSize *= bytes;
   if (_buffer.size() < frameSize) {
@@ -160,8 +188,7 @@ void CVideoDecoder::convertAVFrame(const AVFrame* avframe, Frame& frameOut) {
     }
 
     // Convert biplanar 422 and 444 to triplanar
-    if (pixelFormat == kCVPixelFormatType_422YpCbCr8BiPlanarVideoRange ||
-        pixelFormat == kCVPixelFormatType_422YpCbCr8BiPlanarFullRange) {
+    if (is422BiplanarFormat(pixelFormat)) {
       uint8_t* uvPlane = (uint8_t*)CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 1);
       uint8_t* uPlane = _buffer.data() + width * height;
       uint8_t* vPlane = uPlane + (width * uvHeight / 2);
@@ -179,9 +206,7 @@ void CVideoDecoder::convertAVFrame(const AVFrame* avframe, Frame& frameOut) {
       frameOut.planes[2] = vPlane;
       frameOut.stride[2] = width / 2;
 
-    } else if (
-        pixelFormat == kCVPixelFormatType_444YpCbCr8BiPlanarVideoRange ||
-        pixelFormat == kCVPixelFormatType_444YpCbCr8BiPlanarFullRange) {
+    } else if (is444BiplanarFormat(pixelFormat)) {
       uint8_t* uvPlane = (uint8_t*)CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 1);
       uint8_t* uPlane = _buffer.data() + width * height;
       uint8_t* vPlane = uPlane + (width * height);
