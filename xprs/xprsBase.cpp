@@ -62,7 +62,7 @@ const char* getNameFromVideoCodecFormat(VideoCodecFormat standard) {
 XprsResult getVideoCodecFormatFromName(
     VideoCodecFormat& standard,
     const VideoCodecName& videoCodecStr) {
-  for (uint32_t s = static_cast<uint32_t>(VideoCodecFormat::FIRST);
+  for (auto s = static_cast<uint32_t>(VideoCodecFormat::FIRST);
        s < static_cast<uint32_t>(VideoCodecFormat::LAST);
        ++s) {
     if (videoCodecStr == SUPPORTED_CODEC_FORMATS[s]) {

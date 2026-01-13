@@ -187,7 +187,7 @@ int64_t mapQualityToCRF(int quality, int64_t maxCRF, int64_t defaultCRF) {
 void convertAVFrameToFrame(const AVFrame* const avframe, Frame& frame) {
   frame.ptsMs = avframe->pts;
 
-  AVPixelFormat pixFmt = AVPixelFormat(avframe->format);
+  auto pixFmt = AVPixelFormat(avframe->format);
   frame.fmt = mapToPixelFormat(pixFmt);
   // set the number of planes
   const XprsCsp cs = getCsInfo(frame.fmt);
@@ -205,7 +205,7 @@ void convertAVFrameToFrame(const AVFrame* const avframe, Frame& frame) {
 }
 
 const char* convertExceptionToError(const std::exception& exception, XprsResult& error) {
-  const CodecException* cErr = dynamic_cast<const CodecException*>(&exception);
+  const auto* cErr = dynamic_cast<const CodecException*>(&exception);
   if (cErr) {
     error = XprsResult::ERR_FFMPEG;
     return cErr->what();
