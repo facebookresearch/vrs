@@ -72,7 +72,7 @@ bool parse(VrsCommand& command, const vector<string>& args) {
     argvs.emplace_back(const_cast<char*>(arg.c_str()));
   }
   if (!command.parseCommand(args[0], argvs[++argn])) {
-    return EXIT_FAILURE;
+    return false;
   }
   const string appName{"vrs"};
   while (++argn < static_cast<int>(argvs.size())) {

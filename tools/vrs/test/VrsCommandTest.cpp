@@ -41,7 +41,7 @@ static bool parse(VrsCommand& command, vector<string>& args, int& argn, int& out
     argvs[index] = const_cast<char*>(args[index].c_str());
   }
   if (!command.parseCommand(args[0], argvs[++argn])) {
-    return EXIT_FAILURE;
+    return false;
   }
   const string appName{args[0]};
   while (++argn < static_cast<int>(argvs.size())) {
