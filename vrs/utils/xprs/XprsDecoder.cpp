@@ -112,7 +112,7 @@ class VXDecoder : public vrs::utils::DecoderI {
       const ImageContentBlockSpec& outputImageSpec) override {
     xprs::Frame frame;
     IF_ERROR_RETURN(xprsDecode(encodedFrame, frame));
-    // xprs decodes to an internal buffer. We must copy/convert that pidel data to outDecodedFrame
+    // xprs decodes to an internal buffer. We must copy/convert that pixel data to outDecodedFrame
     PixelFormat vrsPixelFormat = xprsToVrsPixelFormat(frame.fmt, outputImageSpec.getPixelFormat());
     if (vrsPixelFormat == PixelFormat::UNDEFINED) {
       XR_LOGE("Unsupported xprs pixel format: xprs::{}", getPixelFormatName(frame.fmt));
