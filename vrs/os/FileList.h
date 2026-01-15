@@ -46,7 +46,7 @@ int getFilesAndFolders(
 /// If maxRecursiveDepth is 0, only the folder's immediate content is listed.
 /// If maxRecursiveDepth is 1, its immediate subfolders are also listed, etc.
 /// Each time a folder is listed, its immediate files are added first, then the content of each
-/// folder recusively, always sorted alphabetically.
+/// folder recursively, always sorted alphabetically.
 /// @return A status code, 0 meaning success.
 int getFileList(const string& path, vector<string>& inOutFiles, int maxRecursiveDepth = 0);
 

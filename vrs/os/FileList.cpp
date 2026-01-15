@@ -33,7 +33,7 @@ namespace fs = std::filesystem;
 namespace vrs {
 namespace os {
 
-static bool beforefileName(const string& left, const string& right) {
+static bool beforeFileName(const string& left, const string& right) {
   return helpers::beforeFileName(left.c_str(), right.c_str());
 }
 
@@ -69,7 +69,7 @@ int getFilesAndFolders(const string& path, vector<string>& inOutFiles, vector<st
   } else if (status.type() == fs::file_type::regular) {
     inOutFiles.emplace_back(path);
   }
-  sort(inOutFiles.begin(), inOutFiles.end(), beforefileName);
+  sort(inOutFiles.begin(), inOutFiles.end(), beforeFileName);
   if (outFolders) {
     sort(outFolders->begin(), outFolders->end());
   }
@@ -89,7 +89,6 @@ int getFileList(const string& path, vector<string>& inOutFiles, int maxRecursive
   }
   if (--maxRecursiveDepth >= 0) {
     for (const string& subfolder : subfolders) {
-      string subRelativePrefix;
       status = getFileList(subfolder, inOutFiles, maxRecursiveDepth);
       if (status != 0) {
         return status;

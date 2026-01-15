@@ -74,7 +74,7 @@ class EventChannel {
   int64_t getNumEventsSinceLastWait() const;
 
   /// Return the name of this event type.
-  /// @return Name of this even type
+  /// @return Name of this event type
   string getName() const;
 
   /// Return if single or multiple listeners will be notified by one dispatch.
