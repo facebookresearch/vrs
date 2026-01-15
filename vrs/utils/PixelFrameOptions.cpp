@@ -30,7 +30,7 @@
 namespace {
 
 inline uint32_t alignValue(float value, uint32_t alignment) {
-  uint32_t uintValue = static_cast<uint32_t>(lround(value));
+  uint32_t uintValue = static_cast<uint32_t>(std::lround(value));
   return alignment > 1 ? ((uintValue + alignment - 1) / alignment) * alignment : uintValue;
 }
 
