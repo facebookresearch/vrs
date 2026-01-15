@@ -28,7 +28,7 @@
 
 namespace vrs {
 
-/// Helper class to handler a queue of jobs between threads.
+/// Helper class to handle a queue of jobs between threads.
 /// This class doesn't know about threads, but its APIs are thread-safe,
 /// allowing for both concurrent job producers, and concurrent job consumers.
 
@@ -136,7 +136,7 @@ class JobQueue {
     return hasEnded_;
   }
   /// Cancel/remove queued jobs that match a criteria.
-  /// Optionaly pass them to a "clean-up" function before they're removed from the queue.
+  /// Optionally pass them to a "clean-up" function before they're removed from the queue.
   void cancelQueuedJobs(
       std::function<bool(const T&)> selector,
       std::function<void(const T&)> cleanup = nullptr) {

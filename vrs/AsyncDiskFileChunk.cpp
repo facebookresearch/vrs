@@ -159,7 +159,7 @@ int AsyncWindowsHandle::_readwrite(
   }
 
   // N.B. this does not create an hEvent for the OVERLAPPED structure, instead using the file
-  // handle. This is only a valid thing to do if there are NO other IO operations occuring during
+  // handle. This is only a valid thing to do if there are NO other IO operations occurring during
   // this one. The calls to flushWriteBuffer() before calling this ensures this is the case.
   OVERLAPPED ov = {};
   ov.Offset = (DWORD)offset;
@@ -503,7 +503,7 @@ void AsyncBuffer::SigEvNotifyFunction(union sigval val) {
     io_return = aio_return(&self->aiocb_);
     if (io_return < 0) {
       throw std::runtime_error(
-          "aio_return returned a negative number despire aio_error indicating success");
+          "aio_return returned a negative number despite aio_error indicating success");
     }
   } else if (io_errno == EINPROGRESS) {
     throw std::runtime_error("aio_error()==EINPROGRESS on a completed aio_write");
@@ -730,7 +730,7 @@ int AsyncDiskFileChunk::write(const void* buffer, size_t count, size_t& outWritt
       towrite = current_buffer_->size();
       switch (ioengine_) {
         case IoEngine::AIO: {
-          // Other async IO engines like uring or libaio would go here in the fugure, and the
+          // Other async IO engines like uring or libaio would go here in the future, and the
           // `start_write` call would dispatch it
           std::unique_lock lock{buffers_mutex_};
           buffers_queued_.emplace_back(

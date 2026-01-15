@@ -57,7 +57,7 @@ using ImageSpecType = uint32_t;
 /// static for a single record, this won't create any surprise, but if you use different
 /// configuration record formats, this might make the search fail (the last record doesn't
 /// include the spec), or return the values for a record that is no longer the last one,
-/// though it is guarantied to be the last one of that format.
+/// though it is guaranteed to be the last one of that format.
 ///
 /// Note that the values used are *not* static, so that if the configuration changes,
 /// the latest value is used, without having to search each time we have a new image block.
@@ -118,7 +118,7 @@ constexpr const char* kAudioSampleFormat = "audio_sample_format";
 constexpr const char* kAudioSampleFrameStride = "audio_sample_stride";
 /// DataLayout convention name for the audio channel count: mono = 1, stereo = 2, etc.
 constexpr const char* kAudioChannelCount = "audio_channel_count";
-/// DataLayout convention name for the sample rate (samples per seconde).
+/// DataLayout convention name for the sample rate (samples per second).
 constexpr const char* kAudioSampleRate = "audio_sample_rate";
 /// DataLayout convention name for a count of audio sample frames.
 constexpr const char* kAudioSampleCount = "audio_sample_count";

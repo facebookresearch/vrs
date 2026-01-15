@@ -277,7 +277,7 @@ class StreamId {
     return !operator==(rhs);
   }
 
-  /// Compare operator, so that we can use StreamId in containers, with a guarantied behavior.
+  /// Compare operator, so that we can use StreamId in containers, with a guaranteed behavior.
   bool operator<(const StreamId& rhs) const {
     return typeId_ < rhs.typeId_ || (typeId_ == rhs.typeId_ && instanceId_ < rhs.instanceId_);
   }

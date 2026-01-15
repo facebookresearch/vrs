@@ -293,7 +293,7 @@ class AsyncDiskFileChunk {
   std::atomic<int> async_error_ = SUCCESS;
 
   // Operational parameters initialized from the FileSpec extra params/options at create/open
-  // time. These can be tuned by the user via uri parameeters.
+  // time. These can be tuned by the user via uri parameters.
   IoEngine ioengine_ = IoEngine::AIO;
   bool use_directio_ = true;
   // How many asyncio buffers to allocate and fill

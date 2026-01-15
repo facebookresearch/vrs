@@ -63,10 +63,10 @@ constexpr Enum enumNext(Enum value) {
 
 /// Helper define to loop over all enum values.
 /// Assumptions:
-/// - The first enum value has the numberic value 1.
+/// - The first enum value has the numeric value 1.
 /// - The enum has a value named "COUNT" (capitalization matters) that counts the enum values.
 /// - Every value between 1 and COUNT-1 maps to a valid enum value we want to use.
-/// These assummptions are usually correct with VRS enums, because 0 is typically an
+/// These assumptions are usually correct with VRS enums, because 0 is typically an
 /// uninitialized/undefined state.
 #define FOR_EACH_ENUM(ENUM, VARIABLE)                                                \
   for (ENUM(VARIABLE) = vrs::enumFirst<ENUM>(); (VARIABLE) <= vrs::enumLast<ENUM>(); \

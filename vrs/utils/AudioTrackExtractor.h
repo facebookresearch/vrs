@@ -47,7 +47,7 @@ class AudioTrackExtractor : public RecordFormatStreamPlayer {
 
   // path to the output wav file
   const string wavFilePath_;
-  // flag set to true when an error occured, and file decoding should probably stop
+  // flag set to true when an error occurred, and file decoding should probably stop
   bool& stop_;
   // used to track compatibility of successive audio blocks within a stream;
   // if format changes, we close the wav file and start a new one

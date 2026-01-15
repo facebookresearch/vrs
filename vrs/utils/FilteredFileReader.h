@@ -185,4 +185,4 @@ struct FilteredFileReader {
       ThrottledWriter* throttledWriter = nullptr);
 };
 
-}; // namespace vrs::utils
+} // namespace vrs::utils

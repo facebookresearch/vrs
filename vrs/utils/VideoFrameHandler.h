@@ -28,7 +28,7 @@ namespace vrs::utils {
 constexpr uint32_t kInvalidFrameIndex = std::numeric_limits<uint32_t>::max();
 
 /// Helper class to handler decoding video codec frames.
-/// Designed to be used in a RecordFormatPlayaable object.
+/// Designed to be used in a RecordFormatPlayable object.
 /// VideoRecordFormatStreamPlayer uses this class, and might be the only class that needs to.
 class VideoFrameHandler {
  public:

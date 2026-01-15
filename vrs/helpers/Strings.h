@@ -128,7 +128,7 @@ bool startsWith(const string_view& text, const string_view& prefix);
 
 /// Tell if a text string ends with the provided suffix.
 /// @param text: the text to test
-/// @param prefix: the suffix to test
+/// @param suffix: the suffix to test
 /// @return True if text ends with suffix. Case insensitive.
 bool endsWith(const string_view& text, const string_view& suffix);
 
