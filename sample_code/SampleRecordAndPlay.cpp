@@ -230,7 +230,7 @@ class RecordSample {
 
 // VRS file playback
 
-/// Sample stream player to print metadata received from a stram.
+/// Sample stream player to print metadata received from a stream.
 class StreamPlayerDemo : public RecordFormatStreamPlayer {
   bool onDataLayoutRead(const CurrentRecord& record, size_t blockIndex, DataLayout& readData)
       override {
