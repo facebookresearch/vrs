@@ -234,13 +234,14 @@ inline bool getFromJValue(const JValue& value, string& outValue) {
 template <typename T, size_t N>
 inline bool getFromJValue(const JValue& value, PointND<T, N>& outPoint) {
   using vrs_rapidjson::SizeType;
-  if (value.IsArray() && value.Size() == N) {
-    for (size_t n = 0; n < N; ++n) {
-      if (!getJValueAs<float, T>(value[static_cast<SizeType>(n)], outPoint.dim[n]) &&
-          !getJValueAs<double, T>(value[static_cast<SizeType>(n)], outPoint.dim[n]) &&
-          !getJValueAs<int32_t, T>(value[static_cast<SizeType>(n)], outPoint.dim[n])) {
-        return false;
-      }
+  if (!value.IsArray() || value.Size() != N) {
+    return false;
+  }
+  for (size_t n = 0; n < N; ++n) {
+    if (!getJValueAs<float, T>(value[static_cast<SizeType>(n)], outPoint.dim[n]) &&
+        !getJValueAs<double, T>(value[static_cast<SizeType>(n)], outPoint.dim[n]) &&
+        !getJValueAs<int32_t, T>(value[static_cast<SizeType>(n)], outPoint.dim[n])) {
+      return false;
     }
   }
   return true;

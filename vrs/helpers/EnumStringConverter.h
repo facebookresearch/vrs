@@ -44,7 +44,7 @@ using std::string_view;
  *   static string_view sCarNames[] = {"Unknown", "Renault", "Peugeot", "Citroen"};
  *   // Build the converter:
  *   struct CarConverter : public
- *       EnumStringConverter<Cars, cCarNames, array_size(sCarNames), Cars::Unknown, Cars::Unknown>
+ *       EnumStringConverter<Cars, sCarNames, array_size(sCarNames), Cars::Unknown, Cars::Unknown>
  * {};
  *
  *   To convert a car enum to a string:  CarConverter::toString(Cars::Peugeot);
