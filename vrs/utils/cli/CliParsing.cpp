@@ -110,7 +110,7 @@ void printCopyOptionsHelp() {
          "  [ --chunk-size <nb>[M|G] ]: Split output file into chunks of <nb> MiB (default) or GiB.\n"
          "  [ --compression=<level> ]: Set lz4 or zstd record compression level.\n"
          "    levels: none, default, fast, tight, zfast, zlight, zmedium, ztight, zmax.\n"
-         "  [ --late-index ]: Write index at end of file (smaller file, but worsse for streaming).\n";
+         "  [ --late-index ]: Write index at end of file (smaller file, but worse for streaming).\n";
 }
 
 bool parseTagOverrideOptions(
@@ -221,7 +221,7 @@ bool parseTimeAndStreamFilters(
         outStatusCode = EXIT_FAILURE;
       }
     } else {
-      cerr << appName << ": error. '--range' requires two numeric parameters.\n";
+      cerr << appName << ": error. '--around' requires two numeric parameters.\n";
       outStatusCode = EXIT_FAILURE;
     }
   } else if (arg == "-" || arg == "+") {

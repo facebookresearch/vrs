@@ -26,4 +26,4 @@ namespace vrs::utils {
 /// @param filteredReader: file to examine, with filters.
 std::string printRecordFormats(FilteredFileReader& filteredReader);
 
-}; // namespace vrs::utils
+} // namespace vrs::utils
