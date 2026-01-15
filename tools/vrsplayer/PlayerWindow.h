@@ -37,7 +37,10 @@ enum class AudioMode {
 };
 
 class PlayerWindow : public QMainWindow {
- Q_OBJECT public : explicit PlayerWindow(QApplication& app);
+  Q_OBJECT
+
+ public:
+  explicit PlayerWindow(QApplication& app);
 
   void createMenus();
 

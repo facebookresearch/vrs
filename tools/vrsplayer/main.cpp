@@ -53,7 +53,7 @@ void platformConfig() {
   auto fontdir = qgetenv("QT_QPA_FONTDIR");
   if (fontdir.isEmpty()) {
     // search some common font directories
-    array<QDir, 3> dirs{
+    array<QDir, 2> dirs{
         QString{"/usr/share/fonts/truetype/"},
         QString{"/usr/share/fonts/gnu-free/"},
     };
