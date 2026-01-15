@@ -3,14 +3,14 @@ sidebar_position: 7
 title: Image Support
 ---
 
-_This page describes how VRS handles content blocks using the Datalayout Conventions._
+_This page describes how VRS handles content blocks using the DataLayout Conventions._
 
 Prerequisite: Understanding how `RecordFormat` works.
 
 Image content blocks can be any of the following different subtypes:
 
 - `image/raw`\
-   The image is stored as a buffer of raw pixels, which might a compacted pixel format such as [RAW10](https://developer.android.com/reference/android/graphics/ImageFormat#RAW10), but not compressed using a `PixelFormat`.\
+   The image is stored as a buffer of raw pixels, which might be a compacted pixel format such as [RAW10](https://developer.android.com/reference/android/graphics/ImageFormat#RAW10), but not compressed using a `PixelFormat`.\
    The exact [list of pixel formats](https://github.com/facebookresearch/vrs/blob/main/vrs/RecordFormat.h#L63-L92) grows over time.
 - `image/png`, `image/jpg`, `image/jxl`, and `image/custom_codec`\
    The image is compressed using png, jpeg, jpeg-xl, or a custom codec. The payload of the image content block contains exactly what regular file of that image type would contain\
@@ -82,7 +82,7 @@ png, jpg, and jxl payloads are exactly the same as png, jpg, and jxl files, whic
 - Required properties: codec name.
 - Optional properties: width, height, pixel format, codec name, keyframe timestamp, keyframe index.
 
-The only property VRS itself requires is a codec name for an image content block to be recognized. However, a particular custom codec may require additional properties, such as width, height, and pixel format. Whether a custom codec requires that information or not an implementation detail of each specific custom codec. VRS does not support any particular custom codec by default, they are meant for experimentations and special cases.
+The only property VRS itself requires is a codec name for an image content block to be recognized. However, a particular custom codec may require additional properties, such as width, height, and pixel format. Whether a custom codec requires that information or not is an implementation detail of each specific custom codec. VRS does not support any particular custom codec by default, they are meant for experimentation and special cases.
 
 ### `image/video`
 
@@ -118,7 +118,7 @@ The image data itself can be read using the `RecordReader` object provided by th
 
 ### `image/raw` images
 
-Allocate or reuse a buffer where you can read the image data. Be careful to properly handle the image’s stride and stride2. `stride` describes the stride of the first plane (the number of bytes separating the first byte of each successive lines), while `stride2` describes the stride of all the following planes, if the images is stored in a multi-plane format.
+Allocate or reuse a buffer where you can read the image data. Be careful to properly handle the image’s stride and stride2. `stride` describes the stride of the first plane (the number of bytes separating the first byte of each successive line), while `stride2` describes the stride of all the following planes, if the image is stored in a multi-plane format.
 
 ### `image/png`, `image/jpg`, and `image/jxl` images
 

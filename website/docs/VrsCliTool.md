@@ -7,7 +7,7 @@ import Link from '@docusaurus/Link';
 
 The `vrs` command line tool is a Swiss army knife utility to manipulate VRS files in different ways.
 
-The VRS file format that is designed for very efficient and robust data collection of large volumes of sensor data in realtime. The priorities are:
+The VRS file format is designed for very efficient and robust data collection of large volumes of sensor data in realtime. The priorities are:
 
 - any data written to disk is "safe".
 - write to a single file, but file chunking is supported if requested.
