@@ -43,8 +43,8 @@ PlayerUI* VideoTime::sPlayerUI = nullptr;
 #define PA_TIME (Pa_GetStreamTime(sAudioStream))
 
 static string getAudioDeviceName() {
-  PaDeviceIndex defaultOutpuDeviceIndex = Pa_GetDefaultOutputDevice();
-  const PaDeviceInfo* info = Pa_GetDeviceInfo(defaultOutpuDeviceIndex);
+  PaDeviceIndex defaultOutputDeviceIndex = Pa_GetDefaultOutputDevice();
+  const PaDeviceInfo* info = Pa_GetDeviceInfo(defaultOutputDeviceIndex);
   return info ? info->name : "<unknown audio device>";
 }
 

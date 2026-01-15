@@ -79,14 +79,14 @@ bool AudioPlayer::onAudioRead(const CurrentRecord& record, size_t blkIdx, const 
 }
 
 bool AudioPlayer::setupAudioOutput(const AudioContentBlockSpec& audioSpec) {
-  PaDeviceIndex defaultOutpuDeviceIndex = Pa_GetDefaultOutputDevice();
-  const PaDeviceInfo* info = Pa_GetDeviceInfo(defaultOutpuDeviceIndex);
+  PaDeviceIndex defaultOutputDeviceIndex = Pa_GetDefaultOutputDevice();
+  const PaDeviceInfo* info = Pa_GetDeviceInfo(defaultOutputDeviceIndex);
   sampleFormat_ = audioSpec.getSampleFormat();
   audioChannelCount_ = audioSpec.getChannelCount();
   paChannelCount_ = min<uint32_t>(audioSpec.getChannelCount(), info->maxOutputChannels);
 
   PaStreamParameters output;
-  output.device = defaultOutpuDeviceIndex;
+  output.device = defaultOutputDeviceIndex;
   output.channelCount = paChannelCount_;
   output.sampleFormat = paCustomFormat;
   switch (sampleFormat_) {
