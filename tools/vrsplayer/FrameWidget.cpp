@@ -88,8 +88,8 @@ void FrameWidget::paintEvent(QPaintEvent* evt) {
     painter.setFont(font);
   }
   bool hasImage = false;
-  { // mutex scoope
-    unique_lock<mutex> lock;
+  { // mutex scope
+    unique_lock<mutex> lock(mutex_);
     PixelFrame* image = image_.get();
     if (image != nullptr) {
       QImage::Format qformat{};
@@ -180,7 +180,7 @@ int FrameWidget::heightForWidth(int w) const {
 }
 
 void FrameWidget::swapImage(unique_ptr<PixelFrame>& image) {
-  unique_lock<mutex> lock;
+  unique_lock<mutex> lock(mutex_);
   imageFps_.newFrame();
   bool resize = image && image->qsize() != imageSize_;
   image_.swap(image);
@@ -193,7 +193,7 @@ void FrameWidget::swapImage(unique_ptr<PixelFrame>& image) {
 }
 
 int FrameWidget::saveImage(const std::string& path) {
-  unique_lock<mutex> lock;
+  unique_lock<mutex> lock(mutex_);
   if (image_) {
     return image_->writeAsPng(path);
   }
@@ -265,7 +265,7 @@ void FrameWidget::ShowContextMenu(const QPoint& pos) {
 
 void FrameWidget::blank() {
   {
-    unique_lock<mutex> lock;
+    unique_lock<mutex> lock(mutex_);
     if (image_) {
       image_->blankFrame();
     }
