@@ -33,8 +33,6 @@ using ::vrs::ContentBlock;
 using ::vrs::CurrentRecord;
 using ::vrs::DataLayout;
 using ::vrs::RecordFormatStreamPlayer;
-using ::vrs::StreamId;
-using ::vrs::StreamPlayer;
 using ::vrs::utils::AudioBlock;
 
 class AudioPlayer : public QObject, public RecordFormatStreamPlayer {

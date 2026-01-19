@@ -50,7 +50,6 @@ namespace vrsp {
 
 using std::set;
 
-using ::vrs::ProgressLogger;
 using ::vrs::RecordFileReader;
 
 using vrs::os::EventChannel;
