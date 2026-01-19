@@ -50,6 +50,10 @@ class EventChannel {
   /// @param name: name of event. name should better be unique but nothing enforces that.
   EventChannel(string name, NotificationMode notificationMode);
   ~EventChannel();
+  EventChannel(const EventChannel&) = delete;
+  EventChannel& operator=(const EventChannel&) = delete;
+  EventChannel(EventChannel&&) = delete;
+  EventChannel& operator=(EventChannel&&) = delete;
 
   /// Fires an event instance to listener(s).
   /// @param value: an int64_t value to pass along with the event
