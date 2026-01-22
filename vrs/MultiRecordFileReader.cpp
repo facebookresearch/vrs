@@ -44,7 +44,7 @@ MultiRecordFileReader::MultiRecordFileReader()
 /// Checks whether a given record belogs to the given reader
 static bool belongsTo(const IndexRecord::RecordInfo* record, const RecordFileReader& reader) {
   const auto& index = reader.getIndex();
-  return !index.empty() && record >= &index[0] && record <= &index[index.size() - 1];
+  return !index.empty() && record >= index.data() && record <= &index[index.size() - 1];
 }
 
 static bool timestampLT(const IndexRecord::RecordInfo* lhs, double rhsTimestamp) {
