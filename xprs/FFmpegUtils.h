@@ -38,7 +38,7 @@ using PacketList = std::vector<AVPacket*>;
 class Picture {
  public:
   Picture();
-  Picture(AVFrame* avFrame) {
+  explicit Picture(AVFrame* avFrame) {
     _avFrame = avFrame;
   }
   ~Picture();

@@ -31,7 +31,7 @@ namespace xprs {
 
 class CVideoDecoder : public IVideoDecoder, public VideoCodec {
  public:
-  CVideoDecoder(const VideoCodec& codec);
+  explicit CVideoDecoder(const VideoCodec& codec);
   ~CVideoDecoder() override;
   XprsResult init(bool disableHwAcceleration = false) override;
   XprsResult decodeFrame(Frame& frameOut, const Buffer& compressed) override;
