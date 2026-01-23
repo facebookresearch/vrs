@@ -35,6 +35,7 @@ class CVideoDecoder : public IVideoDecoder, public VideoCodec {
   ~CVideoDecoder() override;
   XprsResult init(bool disableHwAcceleration = false) override;
   XprsResult decodeFrame(Frame& frameOut, const Buffer& compressed) override;
+  void flush() override;
 
  private:
   void convertAVFrame(const AVFrame* avframe, Frame& frame);

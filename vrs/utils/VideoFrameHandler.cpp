@@ -40,6 +40,15 @@ int VideoFrameHandler::tryToDecodeFrame(
       (requestedKeyFrameTimestamp_ == decodedKeyFrameTimestamp_ &&
        requestedKeyFrameIndex_ == decodedKeyFrameIndex_ + 1);
   if (videoGoodState_) {
+    // Flush decoder when seeking backward to a keyframe within the same group.
+    // This clears the DPB to avoid duplicate POC errors when re-decoding frames
+    // we've already seen. Only flush for backward seeks, not forward reading.
+    bool sameKeyframeGroup = requestedKeyFrameTimestamp_ == decodedKeyFrameTimestamp_;
+    bool atKeyframeWithPriorState =
+        requestedKeyFrameIndex_ == 0 && decodedKeyFrameIndex_ != kInvalidFrameIndex;
+    if (sameKeyframeGroup && atKeyframeWithPriorState && decoder_ != nullptr) {
+      decoder_->flush();
+    }
     decodedKeyFrameTimestamp_ = requestedKeyFrameTimestamp_;
     decodedKeyFrameIndex_ = requestedKeyFrameIndex_;
     // XR_LOGI("Reading frame {}/{}", requestedKeyFrameTimestamp_, requestedKeyFrameIndex_);

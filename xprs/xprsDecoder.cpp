@@ -285,4 +285,10 @@ XprsResult CVideoDecoder::decodeFrame(Frame& frameOut, const Buffer& compressed)
   return result;
 }
 
+void CVideoDecoder::flush() {
+  if (_decoder) {
+    _decoder->flush();
+  }
+}
+
 } // namespace xprs

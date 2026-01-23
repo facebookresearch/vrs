@@ -340,6 +340,11 @@ class VXDecoder : public vrs::utils::DecoderI {
   xprs::PixelFormat lastXprsPixelFormat() const {
     return xprsPixelFormat_;
   }
+  void flush() override {
+    if (xprsDecoder_) {
+      xprsDecoder_->flush();
+    }
+  }
 
  protected:
   unique_ptr<xprs::IVideoDecoder> xprsDecoder_{};

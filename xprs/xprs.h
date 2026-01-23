@@ -506,6 +506,13 @@ class IVideoDecoder {
    * @return XprsResult
    */
   virtual XprsResult decodeFrame(Frame& frameOut, const Buffer& compressed) = 0;
+
+  /**
+   * Flush the decoder's internal state (decoded picture buffer).
+   * Call this when seeking backward within the same keyframe group to avoid duplicate POC errors.
+   * The default implementation does nothing; subclasses should override if they support flushing.
+   */
+  virtual void flush() {}
 };
 
 /**

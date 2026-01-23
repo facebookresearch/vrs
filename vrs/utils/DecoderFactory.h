@@ -49,6 +49,10 @@ class DecoderI {
       const vector<uint8_t>& encodedFrame,
       void* outDecodedFrame,
       const ImageContentBlockSpec& outputImageSpec) = 0;
+  /// Flush the decoder's internal state (e.g., decoded picture buffer).
+  /// Call this when seeking backward to avoid duplicate POC errors.
+  /// Default implementation does nothing.
+  virtual void flush() {}
 };
 
 using DecoderMaker = std::function<std::unique_ptr<DecoderI>(

@@ -35,6 +35,7 @@ class VideoDecode : public InternalDecoder {
   bool isHwAccelerated() override {
     return _hwEnabled;
   }
+  void flush() override;
 
  private:
   const AVCodec* _avCodec;

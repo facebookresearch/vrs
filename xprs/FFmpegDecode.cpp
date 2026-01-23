@@ -105,4 +105,10 @@ void VideoDecode::decode(uint8_t* buffer, size_t size, Picture& pix) {
   }
 }
 
+void VideoDecode::flush() {
+  if (_avContext != nullptr) {
+    avcodec_flush_buffers(_avContext);
+  }
+}
+
 } // namespace xprs

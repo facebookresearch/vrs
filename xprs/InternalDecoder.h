@@ -31,6 +31,9 @@ class InternalDecoder {
   virtual bool isHwAccelerated() {
     return false;
   }
+  /// Flush the decoder's internal state (e.g., decoded picture buffer).
+  /// Call this when seeking backward to avoid duplicate POC errors.
+  virtual void flush() {}
 };
 
 } // namespace xprs
