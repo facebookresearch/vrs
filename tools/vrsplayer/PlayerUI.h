@@ -17,7 +17,6 @@
 #pragma once
 
 #include <functional>
-#include <vector>
 
 #include <QtCore/qglobal.h>
 #include <qcolor.h>
