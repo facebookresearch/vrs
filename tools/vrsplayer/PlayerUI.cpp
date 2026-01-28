@@ -492,8 +492,13 @@ void PlayerUI::mediaStateChanged(FileReaderState state) {
 }
 
 void PlayerUI::timeChanged(double time, int position) {
-  time_->setText(fmt::format("{:.3f}", time).c_str());
-  positionSlider_->setValue(position);
+  if (position >= 0) {
+    time_->setText(fmt::format("{:.3f}", time).c_str());
+    positionSlider_->setValue(position);
+  } else {
+    time_->setText("No image or audio data");
+    positionSlider_->setValue(0);
+  }
 }
 
 void PlayerUI::recordTypeChanged(int index) {
@@ -514,11 +519,14 @@ void PlayerUI::speedControlChanged(int index) {
 
 void PlayerUI::durationChanged(double start, double end, int range) {
   positionSlider_->setRange(0, range);
-  string tip = fmt::format(
-      "Start: {:.3f}\nEnd: {:.3f}\nDuration: {}",
-      start,
-      end,
-      vrs::helpers::humanReadableDuration(end - start).c_str());
+  string tip;
+  if (start <= end) {
+    tip = fmt::format(
+        "Start: {:.3f}\nEnd: {:.3f}\nDuration: {}",
+        start,
+        end,
+        vrs::helpers::humanReadableDuration(end - start).c_str());
+  }
   time_->setToolTip(QString::fromUtf8(tip.c_str()));
 }
 

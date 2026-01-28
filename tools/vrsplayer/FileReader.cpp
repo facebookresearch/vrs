@@ -449,7 +449,7 @@ vector<FrameWidget*> FileReader::openFile(QVBoxLayout* videoFrames, QWidget* wid
       }
     }
   } else {
-    setTimeRange(0, 0, 0);
+    setTimeRange(0, -1, 0);
   }
   time_.setTime(startTime_);
   nextRecord_ = firstDataRecordIndex_;
@@ -968,7 +968,7 @@ void FileReader::updatePosition() {
   unique_lock<recursive_mutex> guard{mutex_};
   if (fileReader_ == nullptr || (imageReaders_.empty() && audioReaders_.empty())) {
     lastShownTime_ = std::numeric_limits<double>::quiet_NaN();
-    timeChanged(0, 0);
+    timeChanged(0, -1);
   } else {
     if (state_ == FileReaderState::Playing && nextRecord_ >= fileReader_->getIndex().size()) {
       pause();
@@ -1304,9 +1304,14 @@ void FileReader::setTimeRange(double start, double end, uint32_t firstDataRecord
   startTime_ = start;
   endTime_ = end;
   firstDataRecordIndex_ = firstDataRecordIndex;
-  durationChanged(start, end, rawTimeToPosition(endTime_ - startTime_));
-  cout << "Player time range: " << helpers::humanReadableTimestamp(startTime_) << " - "
-       << helpers::humanReadableTimestamp(end) << '\n';
+  if (start <= end) {
+    durationChanged(start, end, rawTimeToPosition(endTime_ - startTime_));
+    cout << "Player time range: " << helpers::humanReadableTimestamp(startTime_) << " - "
+         << helpers::humanReadableTimestamp(end) << '\n';
+  } else {
+    XR_LOGW("Found no image or audio data.");
+    durationChanged(0, -1, 0);
+  }
 }
 
 } // namespace vrsp
