@@ -29,7 +29,7 @@
     "@mdx-js/react": "^3.1.0",
     "@svgr/webpack": "^5.5.0",
     "@types/react": "^18.3.3",
-    "axios": "^1.12.0",
+    "axios": "^1.13.5",
     "clsx": "^2.1.1",
     "docusaurus-plugin-internaldocs-fb": "^1.19.2",
     "dompurify": "^3.2.4",
