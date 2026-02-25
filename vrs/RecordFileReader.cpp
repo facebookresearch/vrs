@@ -231,16 +231,10 @@ int RecordFileReader::doOpenFile(
   LOG_PROGRESS(FileHandlerFactory::getInstance().delegateOpen(fileSpec, file_), error, [&]() {
     return "Opening " + fileSpec.getEasyPath();
   });
-  // log remote file handler names with success/failure status
-  if (file_ && file_->isRemoteFileSystem()) {
-    OperationContext context{"RecordFileReader::doOpenFile", fileSpec.getSourceLocation()};
-    if (error != 0) {
-      TelemetryLogger::error(context, errorCodeToMessageWithCode(error));
-    } else {
-      TelemetryLogger::info(context, "success");
-    }
-  }
-  if (error != 0) {
+  OperationContext context{"RecordFileReader::doOpenFile", fileSpec.getSourceLocation()};
+  if (error != 0 || file_ == nullptr) {
+    error = (error != 0) ? error : VRSERROR_INTERNAL_ERROR; // should never happen
+    TelemetryLogger::error(context, errorCodeToMessageWithCode(error));
     XR_LOGE(
         "Could not open the file '{}': {}",
         fileSpec.getEasyPath(),
@@ -248,6 +242,7 @@ int RecordFileReader::doOpenFile(
     closeFile();
     return error;
   }
+  TelemetryLogger::info(context, "success", to_string(file_->getTotalSize()));
   if (file_->getTotalSize() < static_cast<int64_t>(sizeof(FileFormat::FileHeader))) {
     XR_LOGE(
         "File '{}' is too small to be a valid VRS file ({} bytes).",
