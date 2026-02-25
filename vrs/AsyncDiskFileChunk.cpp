@@ -40,7 +40,7 @@ struct IoEngineTypeConverter : public vrs::EnumStringConverter<
 
 namespace vrs {
 
-#ifdef _WIN32
+#if IS_WINDOWS_PLATFORM()
 
 bool AsyncWindowsHandle::isOpened() const {
   return h_ != INVALID_HANDLE_VALUE;
@@ -360,7 +360,7 @@ AlignedBuffer::AlignedBuffer(size_t size, size_t memalign, size_t lenalign) : ca
   if (lenalign && 0 != (capacity_ % lenalign)) {
     throw std::runtime_error("Capacity is not a multiple of lenalign");
   }
-#ifdef _WIN32
+#if IS_WINDOWS_PLATFORM()
   aligned_buffer_ = _aligned_malloc(capacity_, memalign);
 #else
   if (0 != posix_memalign(&aligned_buffer_, memalign, capacity_)) {
@@ -380,7 +380,7 @@ void AlignedBuffer::free() {
   if (aligned_buffer_ == nullptr) {
     return;
   }
-#if defined(_WIN32)
+#if IS_WINDOWS_PLATFORM()
   _aligned_free(aligned_buffer_);
 #else
   ::free(aligned_buffer_);
@@ -422,7 +422,7 @@ int AsyncBuffer::start_write(
   ssize_t io_return = 0;
   int io_errno = SUCCESS;
 
-#ifdef _WIN32
+#if IS_WINDOWS_PLATFORM()
   ov_.self = this;
   ov_.ov = {};
   ov_.ov.Offset = (DWORD)offset;
@@ -435,7 +435,7 @@ int AsyncBuffer::start_write(
     }
   }
 
-#else
+#elif POSIX_AIO_SUPPORTED()
   aiocb_ = {};
   aiocb_.aio_fildes = file.fd_;
   aiocb_.aio_offset = offset;
@@ -461,16 +461,32 @@ int AsyncBuffer::start_write(
   // Note that the return value of aio_write is a subset of the aio_return (which is what a normal
   // completion calls). `aio_write` will either return -1 and set perror (same as aio_return), or
   // will return 0
+#else
+  // no POSIX AIO, use synchronous pwrite as fallback
+  on_complete_ = std::move(on_complete);
+  ssize_t written = ::pwrite(file.fd_, AlignedBuffer::data(), size(), offset);
+  if (written < 0) {
+    io_return = -1;
+    io_errno = errno;
+  } else {
+    io_return = written;
+    io_errno = SUCCESS;
+  }
+  // Call completion callback synchronously
+  on_complete_(io_return, io_errno);
+  return io_return < 0 ? -1 : 0;
 #endif
 
+#if POSIX_AIO_SUPPORTED() || IS_WINDOWS_PLATFORM()
   if (io_return != 0) {
     // If aio_write failed call the completion callback immediately to free the buffer
     on_complete_(io_return, io_errno);
   }
-  return io_return;
+  return static_cast<int>(io_return);
+#endif
 }
 
-#ifdef _WIN32
+#if IS_WINDOWS_PLATFORM()
 void AsyncBuffer::CompletedWriteRoutine(
     DWORD dwErr,
     DWORD cbBytesWritten,
@@ -491,7 +507,7 @@ void AsyncBuffer::CompletedWriteRoutine(
 
   self->complete_write(io_return, io_errno);
 }
-#else
+#elif POSIX_AIO_SUPPORTED()
 void AsyncBuffer::SigEvNotifyFunction(union sigval val) {
   auto* self = reinterpret_cast<AsyncBuffer*>(val.sival_ptr);
 
@@ -525,7 +541,7 @@ void AsyncBuffer::SigEvNotifyFunction(union sigval val) {
 
   self->complete_write(io_return, io_errno);
 }
-#endif
+#endif // IS_WINDOWS_PLATFORM / POSIX_AIO_SUPPORTED
 
 AsyncDiskFileChunk::AsyncDiskFileChunk(AsyncDiskFileChunk&& other) noexcept {
   file_ = std::move(other.file_);
@@ -592,13 +608,6 @@ int AsyncDiskFileChunk::create(const string& newpath, const FileSpec::Extras& op
           newpath);
       supported_flags_ &= ~O_DIRECT;
     }
-  }
-
-  if (error == 0) {
-#if IS_ANDROID_PLATFORM()
-    const size_t kBufferingSize = 128 * 1024;
-    error = setvbuf(file_.fd_, nullptr, _IOFBF, kBufferingSize);
-#endif
   }
 
   return error;
@@ -933,11 +942,6 @@ int AsyncDiskFileChunk::ensureOpen_(int requested_flags) {
   }
   current_flags_ = requested_flags;
 
-#if IS_ANDROID_PLATFORM()
-  const size_t kBufferingSize = 128 * 1024;
-  IF_ERROR_LOG(setvbuf(newFd, nullptr, _IOFBF, kBufferingSize));
-#endif
-
   return SUCCESS;
 }
 
@@ -1074,7 +1078,7 @@ int AsyncDiskFileChunk::init_parameters(const FileSpec::Extras& options) {
   // through the tsan version) crashes when it tries to access the tsan thread state for tracking
   // the allocation. Force the use of the non-aio APIs in this case.
   ioengine_ = IoEngine::Sync;
-#else
+#elif POSIX_AIO_SUPPORTED()
   {
     ioengine_ = IoEngine::AIO; // default, unless overridden
     auto it = options.find("ioengine");
@@ -1083,6 +1087,20 @@ int AsyncDiskFileChunk::init_parameters(const FileSpec::Extras& options) {
       // closely as possible, except `sync`, which acts like the basic DiskFileChunk.hpp, which
       // synchronously writes the buffer to disk write away, no buffering in this class.
       ioengine_ = IoEngineTypeConverter::toEnum(it->second);
+    }
+  }
+#else
+  // No POSIX AIO available (e.g., Android NDK does not provide <aio.h>).
+  // Default to PSync (O_DIRECT + pwrite) which bypasses page cache without needing POSIX AIO.
+  {
+    ioengine_ = IoEngine::PSync;
+    auto it = options.find("ioengine");
+    if (it != options.end()) {
+      ioengine_ = IoEngineTypeConverter::toEnum(it->second);
+      if (ioengine_ == IoEngine::AIO) {
+        XR_LOGCW(VRS_DISKFILECHUNK, "AIO engine not available, falling back to PSync");
+        ioengine_ = IoEngine::PSync;
+      }
     }
   }
 #endif
@@ -1110,7 +1128,7 @@ int AsyncDiskFileChunk::init_parameters(const FileSpec::Extras& options) {
   mem_align_ = 4 * 1024;
   offset_align_ = 4 * 1024;
 
-#ifdef STATX_DIOALIGN
+#if defined(STATX_DIOALIGN) && POSIX_AIO_SUPPORTED()
   // Current kernel versions deployed around Meta don't have statx. Rely on the defaults/users
   // to set this up correctly for now.
   {
@@ -1135,64 +1153,65 @@ int AsyncDiskFileChunk::init_parameters(const FileSpec::Extras& options) {
       XR_LOGCE(VRS_DISKFILECHUNK, "failed to get alignment info");
       return DISKFILE_NOT_OPEN;
     }
+  }
 #endif
 
-    // Allow overrides, but don't bother checking that they are powers of two or anything, on
-    // the assumption that the underlying write() calls will fail if they're bad values.
+  // Allow overrides, but don't bother checking that they are powers of two or anything, on
+  // the assumption that the underlying write() calls will fail if they're bad values.
 
-    uint64_t temp_u64 = 0;
-    mem_align_ = helpers::getByteSize(options, "mem_align", temp_u64) ? temp_u64 : mem_align_;
-    mem_align_ = std::clamp<size_t>(mem_align_, 1, 16 * 1024);
-    offset_align_ =
-        helpers::getByteSize(options, "offset_align", temp_u64) ? temp_u64 : offset_align_;
-    offset_align_ = std::clamp<size_t>(offset_align_, 1, 16 * 1024);
+  uint64_t temp_u64 = 0;
+  mem_align_ = helpers::getByteSize(options, "mem_align", temp_u64) ? temp_u64 : mem_align_;
+  mem_align_ = std::clamp<size_t>(mem_align_, 1, 16 * 1024);
+  offset_align_ =
+      helpers::getByteSize(options, "offset_align", temp_u64) ? temp_u64 : offset_align_;
+  offset_align_ = std::clamp<size_t>(offset_align_, 1, 16 * 1024);
 
-    // The defaults below might not be optimal for your rig.
-    // They can still be overwritten with the parameter names below from the input URI.
-    // fio testing showed each worker using 32MB buffers for non-pre-allocated disk was pretty
-    // good. Avoids using more than 128 outstanding IO requests at a time, beyond which IO calls
-    // were blocking.
+  // The defaults below might not be optimal for your rig.
+  // They can still be overwritten with the parameter names below from the input URI.
+  // fio testing showed each worker using 32MB buffers for non-pre-allocated disk was pretty
+  // good. Avoids using more than 128 outstanding IO requests at a time, beyond which IO calls
+  // were blocking.
 
-    buffer_size_ =
-        helpers::getByteSize(options, "buffer_size", temp_u64) ? temp_u64 : 32 * 1024 * 1024;
-    buffer_size_ = std::clamp<size_t>(buffer_size_, 512, 512 * 1024 * 1024);
-    num_buffers_ = helpers::getUInt64(options, "buffer_count", temp_u64) ? temp_u64 : 4;
-    num_buffers_ = std::clamp<size_t>(num_buffers_, 1, 512);
+  buffer_size_ =
+      helpers::getByteSize(options, "buffer_size", temp_u64) ? temp_u64 : 32 * 1024 * 1024;
+  buffer_size_ = std::clamp<size_t>(buffer_size_, 512, 512 * 1024 * 1024);
+  num_buffers_ = helpers::getUInt64(options, "buffer_count", temp_u64) ? temp_u64 : 4;
+  num_buffers_ = std::clamp<size_t>(num_buffers_, 1, 512);
 
-    if (ioengine_ == IoEngine::PSync && num_buffers_ > 1) {
-      XR_LOGCW(
-          VRS_DISKFILECHUNK,
-          "The psync ioengine can only make use of a single buffer, not {}.",
-          num_buffers_);
-      num_buffers_ = 1;
-    }
-
-    // fio testing showed that we really only need to keep a couple of these at a time
-    iodepth_ = helpers::getUInt64(options, "iodepth", temp_u64) ? temp_u64 : num_buffers_;
-    iodepth_ = std::clamp<size_t>(iodepth_, 1, 512);
-
-    if ((buffer_size_ % offset_align_ != 0) || (buffer_size_ % mem_align_ != 0)) {
-      XR_LOGCE(
-          VRS_DISKFILECHUNK,
-          "buffer_size={} doesn't conform to offset_align={} or mem_align={}",
-          helpers::humanReadableFileSize(buffer_size_),
-          helpers::humanReadableFileSize(offset_align_),
-          helpers::humanReadableFileSize(mem_align_));
-      return DISKFILE_INVALID_STATE;
-    }
-    XR_LOGCI(
+  if (ioengine_ == IoEngine::PSync && num_buffers_ > 1) {
+    XR_LOGCW(
         VRS_DISKFILECHUNK,
-        "asyncdiskfile configuration: IOEngine={} DirectIO={} iodepth={} buffer_count={} "
-        "buffer_size={} offset_align={} mem_align={}",
-        IoEngineTypeConverter::toString(ioengine_),
-        use_directio_,
-        iodepth_,
-        num_buffers_,
+        "The psync ioengine can only make use of a single buffer, not {}.",
+        num_buffers_);
+    num_buffers_ = 1;
+  }
+
+  // fio testing showed that we really only need to keep a couple of these at a time
+  iodepth_ = helpers::getUInt64(options, "iodepth", temp_u64) ? temp_u64 : num_buffers_;
+  iodepth_ = std::clamp<size_t>(iodepth_, 1, 512);
+
+  if ((buffer_size_ % offset_align_ != 0) || (buffer_size_ % mem_align_ != 0)) {
+    XR_LOGCE(
+        VRS_DISKFILECHUNK,
+        "buffer_size={} doesn't conform to offset_align={} or mem_align={}",
         helpers::humanReadableFileSize(buffer_size_),
         helpers::humanReadableFileSize(offset_align_),
         helpers::humanReadableFileSize(mem_align_));
-    return SUCCESS;
+    return DISKFILE_INVALID_STATE;
   }
+  XR_LOGCI(
+      VRS_DISKFILECHUNK,
+      "asyncdiskfile configuration: IOEngine={} DirectIO={} iodepth={} buffer_count={} "
+      "buffer_size={} offset_align={} mem_align={}",
+      IoEngineTypeConverter::toString(ioengine_),
+      use_directio_,
+      iodepth_,
+      num_buffers_,
+      helpers::humanReadableFileSize(buffer_size_),
+      helpers::humanReadableFileSize(offset_align_),
+      helpers::humanReadableFileSize(mem_align_));
+  return SUCCESS;
+}
 
 } // namespace vrs
 

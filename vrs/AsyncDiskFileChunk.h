@@ -23,11 +23,19 @@
 #include <cassert>
 #include <cstdio>
 
-#ifdef _WIN32
+// POSIX AIO (aio_write/aio_error/aio_return) is available on Linux/Mac but not Android NDK.
+// When AIO is not available, fallback to PSync (O_DIRECT + pwrite) which bypasses page cache
+// without needing POSIX AIO.
+#define POSIX_AIO_SUPPORTED() (IS_MAC_PLATFORM() || IS_LINUX_PLATFORM())
+
+#if IS_WINDOWS_PLATFORM()
 #define VC_EXTRALEAN
 #include <Windows.h>
-#else
+#elif POSIX_AIO_SUPPORTED()
 #include <aio.h>
+#include <fcntl.h>
+#include <unistd.h>
+#else
 #include <fcntl.h>
 #include <unistd.h>
 #endif
@@ -47,7 +55,7 @@
 
 namespace vrs {
 
-#ifdef _WIN32
+#if IS_WINDOWS_PLATFORM()
 // Windows doesn't normally define these.
 using ssize_t = int64_t;
 #define O_DIRECT 0x80000000U
@@ -150,7 +158,7 @@ class AlignedBuffer {
 };
 
 class AsyncBuffer;
-#ifdef _WIN32
+#if IS_WINDOWS_PLATFORM()
 struct AsyncOVERLAPPED {
   OVERLAPPED ov;
   // Allows the completion routine to recover a pointer to the containing AsyncBuffer
@@ -171,10 +179,10 @@ class AsyncBuffer : public AlignedBuffer {
   start_write(const AsyncHandle& file, int64_t offset, complete_write_callback on_complete);
 
  private:
-#ifdef _WIN32
+#if IS_WINDOWS_PLATFORM()
   AsyncOVERLAPPED ov_;
   static void CompletedWriteRoutine(DWORD dwErr, DWORD cbBytesWritten, LPOVERLAPPED lpOverlapped);
-#else
+#elif POSIX_AIO_SUPPORTED()
   struct aiocb aiocb_{};
   static void SigEvNotifyFunction(union sigval val);
 #endif
