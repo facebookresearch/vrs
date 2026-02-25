@@ -227,34 +227,35 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span> </div>
 <div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span><span class="keyword">using </span>DiskFile = DiskFileT&lt;DiskFileChunk&gt;;</div>
 <div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span> </div>
-<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span><span class="preprocessor">#if (IS_LINUX_PLATFORM() &amp;&amp; IS_X86_PLATFORM()) || (IS_WINDOWS_PLATFORM() &amp;&amp; IS_VRS_FB_INTERNAL())</span></div>
-<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span><span class="preprocessor">#define VRS_ASYNC_DISKFILE_SUPPORTED() true</span></div>
-<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span> </div>
-<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span><span class="keyword">class </span>AsyncDiskFileChunk;</div>
-<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span><span class="keyword">using </span>AsyncDiskFile = DiskFileT&lt;AsyncDiskFileChunk&gt;;</div>
-<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span> </div>
-<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span><span class="preprocessor">#define VRS_ASYNC_DISKFILE_SUPPORTED() false</span></div>
-<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span> </div>
-<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span> </div>
-<div class="foldopen" id="foldopen00205" data-start="{" data-end="};">
-<div class="line"><a id="l00205" name="l00205"></a><span class="lineno"><a class="line" href="classvrs_1_1_atomic_disk_file.html">  205</a></span><span class="keyword">class </span><a class="code hl_class" href="classvrs_1_1_atomic_disk_file.html">AtomicDiskFile</a> : <span class="keyword">public</span> <a class="code hl_class" href="classvrs_1_1_disk_file_t.html">DiskFile</a> {</div>
-<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span> <span class="keyword">public</span>:</div>
-<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>  <a class="code hl_class" href="classvrs_1_1_atomic_disk_file.html">~AtomicDiskFile</a>() <span class="keyword">override</span>;</div>
-<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span> </div>
-<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>  <span class="keywordtype">int</span> <a class="code hl_function" href="classvrs_1_1_atomic_disk_file.html#a0fd2286c3852c5a37ecbad741a87b5cd">create</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; newFilePath, <span class="keyword">const</span> <a class="code hl_typedef" href="structvrs_1_1_file_spec.html#a76464a53f34587c44a663a3ba7e956dd">FileSpec::Extras</a>&amp; options = {}) <span class="keyword">override</span>;</div>
-<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>  <span class="keywordtype">int</span> <a class="code hl_function" href="classvrs_1_1_atomic_disk_file.html#a0d9a0ead2a2bef7b8e6865aa6c8794a9">close</a>() <span class="keyword">override</span>;</div>
-<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span> </div>
-<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>  <span class="keywordtype">void</span> abort();</div>
-<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span> </div>
-<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span> <span class="keyword">private</span>:</div>
-<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>  <span class="keywordtype">string</span> finalName_;</div>
-<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>};</div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span><span class="preprocessor">#if (IS_LINUX_PLATFORM() &amp;&amp; IS_X86_PLATFORM()) || IS_ANDROID_PLATFORM() || \</span></div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span><span class="preprocessor">    (IS_WINDOWS_PLATFORM() &amp;&amp; IS_VRS_FB_INTERNAL())</span></div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span><span class="preprocessor">#define VRS_ASYNC_DISKFILE_SUPPORTED() true</span></div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span> </div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span><span class="keyword">class </span>AsyncDiskFileChunk;</div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span><span class="keyword">using </span>AsyncDiskFile = DiskFileT&lt;AsyncDiskFileChunk&gt;;</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span> </div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span><span class="preprocessor">#else</span></div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span><span class="preprocessor">#define VRS_ASYNC_DISKFILE_SUPPORTED() false</span></div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span> </div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span> </div>
+<div class="foldopen" id="foldopen00206" data-start="{" data-end="};">
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno"><a class="line" href="classvrs_1_1_atomic_disk_file.html">  206</a></span><span class="keyword">class </span><a class="code hl_class" href="classvrs_1_1_atomic_disk_file.html">AtomicDiskFile</a> : <span class="keyword">public</span> <a class="code hl_class" href="classvrs_1_1_disk_file_t.html">DiskFile</a> {</div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span> <span class="keyword">public</span>:</div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>  <a class="code hl_class" href="classvrs_1_1_atomic_disk_file.html">~AtomicDiskFile</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span> </div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>  <span class="keywordtype">int</span> <a class="code hl_function" href="classvrs_1_1_atomic_disk_file.html#a0fd2286c3852c5a37ecbad741a87b5cd">create</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; newFilePath, <span class="keyword">const</span> <a class="code hl_typedef" href="structvrs_1_1_file_spec.html#a76464a53f34587c44a663a3ba7e956dd">FileSpec::Extras</a>&amp; options = {}) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>  <span class="keywordtype">int</span> <a class="code hl_function" href="classvrs_1_1_atomic_disk_file.html#a0d9a0ead2a2bef7b8e6865aa6c8794a9">close</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span> </div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>  <span class="keywordtype">void</span> abort();</div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span> </div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span> <span class="keyword">private</span>:</div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>  <span class="keywordtype">string</span> finalName_;</div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>};</div>
 </div>
-<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span> </div>
-<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>} <span class="comment">// namespace vrs</span></div>
-<div class="ttc" id="aclassvrs_1_1_atomic_disk_file_html"><div class="ttname"><a href="classvrs_1_1_atomic_disk_file.html">vrs::AtomicDiskFile</a></div><div class="ttdef"><b>Definition</b> DiskFile.h:205</div></div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span> </div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>} <span class="comment">// namespace vrs</span></div>
+<div class="ttc" id="aclassvrs_1_1_atomic_disk_file_html"><div class="ttname"><a href="classvrs_1_1_atomic_disk_file.html">vrs::AtomicDiskFile</a></div><div class="ttdef"><b>Definition</b> DiskFile.h:206</div></div>
 <div class="ttc" id="aclassvrs_1_1_atomic_disk_file_html_a0d9a0ead2a2bef7b8e6865aa6c8794a9"><div class="ttname"><a href="classvrs_1_1_atomic_disk_file.html#a0d9a0ead2a2bef7b8e6865aa6c8794a9">vrs::AtomicDiskFile::close</a></div><div class="ttdeci">int close() override</div><div class="ttdef"><b>Definition</b> DiskFile.cpp:639</div></div>
 <div class="ttc" id="aclassvrs_1_1_atomic_disk_file_html_a0fd2286c3852c5a37ecbad741a87b5cd"><div class="ttname"><a href="classvrs_1_1_atomic_disk_file.html#a0fd2286c3852c5a37ecbad741a87b5cd">vrs::AtomicDiskFile::create</a></div><div class="ttdeci">int create(const string &amp;newFilePath, const FileSpec::Extras &amp;options={}) override</div><div class="ttdef"><b>Definition</b> DiskFile.cpp:634</div></div>
 <div class="ttc" id="aclassvrs_1_1_disk_file_t_html"><div class="ttname"><a href="classvrs_1_1_disk_file_t.html">vrs::DiskFileT</a></div><div class="ttdoc">FileHandler implementation for disk files, with chunked file support.</div><div class="ttdef"><b>Definition</b> DiskFile.h:33</div></div>
