@@ -20,10 +20,20 @@
 
 #if IS_VRS_OSS_CODE()
 
-#if defined(_MSC_VER) && !defined(__clang__)
+#if defined(_MSC_VER)
 
 #define VISIBILITY_DEFAULT __declspec(dllexport)
 #define VISIBILITY_HIDDEN
+
+#else // !_MSC_VER
+
+#define VISIBILITY_DEFAULT __attribute__((visibility("default")))
+#define VISIBILITY_HIDDEN __attribute__((visibility("hidden")))
+
+#endif // !_MSC_VER
+
+#if defined(_MSC_VER) && !defined(__clang__)
+
 #define FORCE_INLINE __forceinline
 #define NOINLINE __declspec(noinline)
 #define RESTRICT __restrict
@@ -38,8 +48,6 @@
 
 #else // !_MSC_VER || __clang__
 
-#define VISIBILITY_DEFAULT __attribute__((visibility("default")))
-#define VISIBILITY_HIDDEN __attribute__((visibility("hidden")))
 #define FORCE_INLINE __attribute__((always_inline)) inline
 #define NOINLINE __attribute__((noinline))
 #define RESTRICT __restrict__
