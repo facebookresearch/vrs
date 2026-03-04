@@ -82,71 +82,45 @@ const char* CodecException::fileName(const char* path) {
 }
 
 CodecPreset mapToCodecPreset(const char* preset, AVCodecID id, const char* avcodecName) {
-  CodecPreset result{nullptr};
-
-  if (strcmp(preset, "slow") == 0) {
-    switch (id) {
-      case AV_CODEC_ID_H264:
-        if (avcodecName &&
-            (avcodecName == kNvH264EncoderName || avcodecName == kNvH265EncoderName)) {
-          result.preset = "slow";
-        } else {
-          result.preset = "slower";
-        }
-        break;
-      case AV_CODEC_ID_H265:
-        result.preset = "slower";
-        break;
-      case AV_CODEC_ID_VP9:
-        result.cpuUsed = 1;
-        break;
-      case AV_CODEC_ID_AV1:
-        result.preset = "8";
-        break;
-      default:
-        break;
-    }
-  } else if (preset == nullptr || strcmp(preset, "medium") == 0) {
-    switch (id) {
-      case AV_CODEC_ID_H264:
-        result.preset = "medium";
-        break;
-      case AV_CODEC_ID_H265:
-        result.preset = "medium";
-        break;
-      case AV_CODEC_ID_VP9:
-        result.cpuUsed = 4;
-        break;
-      case AV_CODEC_ID_AV1:
-        result.preset = "10";
-        break;
-      default:
-        break;
-    }
+  // Map speed string to index: 0=slow, 1=medium, 2=fast
+  int speed = 1;
+  if (preset == nullptr || strcmp(preset, "medium") == 0) {
+    speed = 1;
+  } else if (strcmp(preset, "slow") == 0) {
+    speed = 0;
   } else if (strcmp(preset, "fast") == 0) {
-    switch (id) {
-      case AV_CODEC_ID_H264:
-        if (avcodecName &&
-            (avcodecName == kNvH264EncoderName || avcodecName == kNvH265EncoderName)) {
-          result.preset = "fast";
-        } else {
-          result.preset = "superfast";
-        }
-        break;
-      case AV_CODEC_ID_H265:
-        result.preset = "superfast";
-        break;
-      case AV_CODEC_ID_VP9:
-        result.cpuUsed = 5;
-        break;
-      case AV_CODEC_ID_AV1:
-        result.preset = "12";
-        break;
-      default:
-        break;
-    }
+    speed = 2;
   } else {
     throw INVOKE_CODEC_EXCEPTION_MESSAGE("unknown preset");
+  }
+
+  bool isNv =
+      avcodecName && (avcodecName == kNvH264EncoderName || avcodecName == kNvH265EncoderName);
+
+  // Preset tables indexed by speed: [slow, medium, fast]
+  static constexpr const char* kH264Presets[] = {"slower", "medium", "superfast"};
+  static constexpr const char* kH264NvPresets[] = {"slow", "medium", "fast"};
+  static constexpr const char* kH265Presets[] = {"slower", "medium", "superfast"};
+  static constexpr const char* kAV1Presets[] = {"8", "10", "12"};
+  static constexpr int kVP9CpuUsed[] = {1, 4, 5};
+
+  CodecPreset result{nullptr};
+  // NOLINTNEXTLINE(clang-diagnostic-switch-enum)
+  switch (id) {
+    case AV_CODEC_ID_H264:
+      result.preset = isNv ? kH264NvPresets[speed] : kH264Presets[speed];
+      break;
+    case AV_CODEC_ID_H265:
+      result.preset = kH265Presets[speed];
+      break;
+    case AV_CODEC_ID_VP9:
+      result.cpuUsed = kVP9CpuUsed[speed];
+      break;
+    case AV_CODEC_ID_AV1:
+      result.preset = kAV1Presets[speed];
+      break;
+    default:
+      break;
   }
 
   return result;
