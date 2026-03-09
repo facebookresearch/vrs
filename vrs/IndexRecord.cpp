@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <array>
+#include <limits>
 #include <map>
 
 #define DEFAULT_LOG_CHANNEL "VRSIndexRecord"
@@ -487,6 +488,18 @@ int IndexRecord::Reader::readSplitIndexRecord(
   }
   outUsedFileSize = firstUserRecordOffset;
   size_t sizeToRead = (uncompressedSize == 0) ? indexByteSize : uncompressedSize;
+  // Validate that claimed uncompressedSize doesn't exceed the VRS format's inherent limit.
+  // Record sizes are stored as uint32_t in the VRS format, so uncompressedSize cannot
+  // legitimately exceed UINT32_MAX. This prevents malicious inputs claiming implausibly
+  // large sizes while working correctly with all valid VRS files including zero-vrs variants.
+  constexpr uint64_t kMaxUncompressedSize = std::numeric_limits<uint32_t>::max();
+  if (static_cast<uint64_t>(uncompressedSize) > kMaxUncompressedSize) {
+    XR_LOGE(
+        "Claimed uncompressed size {} exceeds maximum possible value {}. Corrupt index?",
+        uncompressedSize,
+        kMaxUncompressedSize);
+    return INDEX_RECORD_ERROR;
+  }
   const size_t extraBytes = sizeToRead % sizeof(IndexRecord::DiskRecordInfo);
   if (extraBytes > 0) {
     XR_LOGW("The index record has {} extra bytes that we will ignore.", extraBytes);
@@ -694,17 +707,18 @@ int IndexRecord::Reader::rebuildIndex(bool writeFixedIndex) {
     if (recordableTypeId == RecordableTypeId::VRSIndex &&
         recordHeader->formatVersion == kSplitIndexFormatVersion) {
       int64_t fileSizeUsed = 0;
+      const int64_t minNextPosition = absolutePosition + recordSize;
       readSplitIndexRecord(0, recordHeader->uncompressedSize, fileSizeUsed);
       if (!index_.empty()) {
         XR_LOGW("Found {} records in the split index.", index_.size());
         // we can skip all the records found in the index
-        absolutePosition = fileSizeUsed;
+        absolutePosition = std::max(fileSizeUsed, minNextPosition);
         previousRecordSize = static_cast<uint32_t>(absolutePosition - index_.back().fileOffset);
       } else {
         // reading the split index failed: reindex from scratch
         streamIds_.clear();
         index_.clear();
-        absolutePosition = fileSizeUsed > 0 ? fileSizeUsed : absolutePosition + recordSize;
+        absolutePosition = fileSizeUsed > minNextPosition ? fileSizeUsed : minNextPosition;
         // The first user record of a split header file has no data in the index at creation.
         previousRecordSize = static_cast<uint32_t>(recordHeaderSize);
       }
