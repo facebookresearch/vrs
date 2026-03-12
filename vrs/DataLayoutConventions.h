@@ -115,12 +115,18 @@ constexpr const char* kAudioFormat = "audio_format";
 constexpr const char* kAudioSampleFormat = "audio_sample_format";
 /// DataLayout convention name for the padded number of bytes per sample frame.
 /// A sample frame is made of kAudioChannelCount synchronous audio channel samples.
+/// For stereo int16: stride = 2 channels * 2 bytes = 4.
 constexpr const char* kAudioSampleFrameStride = "audio_sample_stride";
 /// DataLayout convention name for the audio channel count: mono = 1, stereo = 2, etc.
 constexpr const char* kAudioChannelCount = "audio_channel_count";
 /// DataLayout convention name for the sample rate (samples per second).
 constexpr const char* kAudioSampleRate = "audio_sample_rate";
 /// DataLayout convention name for a count of audio sample frames.
+/// A sample frame contains one sample per channel (e.g., for stereo int16 audio,
+/// one frame = 2 int16 values = 4 bytes). This is NOT the total number of individual
+/// samples across all channels.
+/// Expected content block size = sampleCount * channelCount * bytesPerSample.
+/// Example: 3840 frames of stereo int16 = 3840 * 2 * 2 = 15360 bytes.
 constexpr const char* kAudioSampleCount = "audio_sample_count";
 /// DataLayout convention name for a count of audio coupled stream count.
 constexpr const char* kAudioStereoPairCount = "audio_stereo_pair_count";

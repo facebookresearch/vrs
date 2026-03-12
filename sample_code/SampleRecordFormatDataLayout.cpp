@@ -45,18 +45,33 @@ namespace {
  *  - metadata associated with each camera frame, itself as raw pixels:
  *    Data records = 1 DataLayout block + 1 image/raw block
  *
+ * IMPORTANT: Image and audio field names MUST use the convention constants from
+ * DataLayoutConventions.h (e.g. kImageWidth, kImageHeight, kImagePixelFormat for
+ * images; kAudioSampleRate, kAudioChannelCount, kAudioSampleFormat for audio).
+ * VRS tools (vrstool, vrs2mp4, ContentBlockReader) look up fields by these exact
+ * names to interpret content blocks. Using custom names like "width" instead of
+ * datalayout_conventions::kImageWidth will produce files that VRS tooling cannot
+ * read. See DataLayoutConventions.h for the full set of conventions, including
+ * the pre-built ImageSpec and AudioSpec classes.
  */
 
 /// Definition of the configuration records' metadata.
+/// Image spec fields use convention names from DataLayoutConventions.h so that
+/// VRS tooling (vrstool, vrs2mp4, ContentBlockReader) can automatically determine
+/// the image dimensions and pixel format from configuration records.
+/// See also: datalayout_conventions::ImageSpec for a ready-made layout with all
+/// standard image fields.
 class MyCameraDataLayoutConfiguration : public AutoDataLayout {
  public:
-  // Spec of a raw image, stored in data records (controlled by most recent config record)
+  // Image spec fields — these names are conventions that VRS tooling relies on.
+  // Using custom names (e.g. "width") instead of kImageWidth will break tooling.
   DataPieceValue<ImageSpecType> width{datalayout_conventions::kImageWidth};
   DataPieceValue<ImageSpecType> height{datalayout_conventions::kImageHeight};
   // Prefer to specify a storage type when storing an enum, to make the storage format explicit.
   DataPieceEnum<PixelFormat, ImageSpecType> pixelFormat{datalayout_conventions::kImagePixelFormat};
 
-  // Additional configuration information for the camera
+  // Additional custom fields — these do NOT need convention names since they
+  // are application-specific and not interpreted by VRS tooling.
   DataPieceValue<uint32_t> cameraId{"camera_id"};
   DataPieceString cameraRole{"camera_role"};
   DataPieceValue<Point3Dd> cameraPosition{"camera_position"};
