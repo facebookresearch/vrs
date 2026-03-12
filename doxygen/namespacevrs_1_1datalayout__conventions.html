@@ -167,9 +167,7 @@ constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"><b>kAu
 constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"><b>kAudioSampleRate</b> = &quot;audio_sample_rate&quot;</td></tr>
 <tr class="memdesc:aa712e2f00c9fc4da7ba48a2b048d1878"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> convention name for the sample rate (samples per second). <br /></td></tr>
 <tr class="separator:aa712e2f00c9fc4da7ba48a2b048d1878"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a38d3f097f9d1a4bd98352ea7eb7ceb" id="r_a7a38d3f097f9d1a4bd98352ea7eb7ceb"><td class="memItemLeft" align="right" valign="top"><a id="a7a38d3f097f9d1a4bd98352ea7eb7ceb" name="a7a38d3f097f9d1a4bd98352ea7eb7ceb"></a>
-constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"><b>kAudioSampleCount</b> = &quot;audio_sample_count&quot;</td></tr>
-<tr class="memdesc:a7a38d3f097f9d1a4bd98352ea7eb7ceb"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> convention name for a count of audio sample frames. <br /></td></tr>
+<tr class="memitem:a7a38d3f097f9d1a4bd98352ea7eb7ceb" id="r_a7a38d3f097f9d1a4bd98352ea7eb7ceb"><td class="memItemLeft" align="right" valign="top">constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs_1_1datalayout__conventions.html#a7a38d3f097f9d1a4bd98352ea7eb7ceb">kAudioSampleCount</a> = &quot;audio_sample_count&quot;</td></tr>
 <tr class="separator:a7a38d3f097f9d1a4bd98352ea7eb7ceb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2aee48c9d4b0d4a5cdb86f86423d9507" id="r_a2aee48c9d4b0d4a5cdb86f86423d9507"><td class="memItemLeft" align="right" valign="top"><a id="a2aee48c9d4b0d4a5cdb86f86423d9507" name="a2aee48c9d4b0d4a5cdb86f86423d9507"></a>
 constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"><b>kAudioStereoPairCount</b> = &quot;audio_stereo_pair_count&quot;</td></tr>
@@ -183,6 +181,29 @@ constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"><b>kNe
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Name and type conventions used to map <a class="el" href="classvrs_1_1_content_block_reader.html" title="Abstract class to handle the interpretation of a record format&#39;s content block.">ContentBlockReader</a> needs to <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> data. </p>
 </div><h2 class="groupheader">Variable Documentation</h2>
+<a id="a7a38d3f097f9d1a4bd98352ea7eb7ceb" name="a7a38d3f097f9d1a4bd98352ea7eb7ceb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7a38d3f097f9d1a4bd98352ea7eb7ceb">&#9670;&#160;</a></span>kAudioSampleCount</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr const char* vrs::datalayout_conventions::kAudioSampleCount = &quot;audio_sample_count&quot;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p><a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> convention name for a count of audio sample frames. A sample frame contains one sample per channel (e.g., for stereo int16 audio, one frame = 2 int16 values = 4 bytes). This is NOT the total number of individual samples across all channels. Expected content block size = sampleCount * channelCount * bytesPerSample. Example: 3840 frames of stereo int16 = 3840 * 2 * 2 = 15360 bytes. </p>
+
+</div>
+</div>
 <a id="adc129fbb5854ca0cc9a17ba0d463a054" name="adc129fbb5854ca0cc9a17ba0d463a054"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#adc129fbb5854ca0cc9a17ba0d463a054">&#9670;&#160;</a></span>kAudioSampleFrameStride</h2>
 
@@ -202,7 +223,7 @@ constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"><b>kNe
   </tr>
 </table>
 </div><div class="memdoc">
-<p><a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> convention name for the padded number of bytes per sample frame. A sample frame is made of kAudioChannelCount synchronous audio channel samples. </p>
+<p><a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> convention name for the padded number of bytes per sample frame. A sample frame is made of kAudioChannelCount synchronous audio channel samples. For stereo int16: stride = 2 channels * 2 bytes = 4. </p>
 
 </div>
 </div>
