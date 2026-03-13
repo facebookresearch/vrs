@@ -559,7 +559,6 @@ uint32_t ImageContentBlockSpec::getPlaneCount(PixelFormat pixelFormat) {
     default:
       return 1;
   }
-  return 1;
 }
 
 bool ImageContentBlockSpec::sanityCheckStrides() const {
@@ -597,7 +596,6 @@ uint32_t ImageContentBlockSpec::getDefaultStride2() const {
     default:
       return 0;
   }
-  return 0;
 }
 
 uint32_t ImageContentBlockSpec::getPlaneHeight(uint32_t planeIndex) const {
@@ -617,7 +615,6 @@ uint32_t ImageContentBlockSpec::getPlaneHeight(uint32_t planeIndex) const {
     default:
       return 0;
   }
-  return 0;
 }
 
 size_t ImageContentBlockSpec::getBlockSize() const {
