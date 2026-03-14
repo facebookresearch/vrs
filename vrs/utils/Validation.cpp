@@ -242,18 +242,20 @@ class DecodeChecker : public VideoRecordFormatStreamPlayer {
     if (!processSuccess) {
       THROTTLED_LOGW(
           record.fileReader,
-          "{} - {} record #{} could not be decoded.",
+          "{} - {} record #{} at {:.3f} could not be decoded.",
           record.streamId.getNumericName(),
           Record::typeName(record.recordType),
-          record.fileReader->getRecordIndex(record.recordInfo));
+          record.fileReader->getRecordIndex(record.recordInfo),
+          record.timestamp);
     } else if (record.reader->getUnreadBytes() > 0) {
       processSuccess = false;
       THROTTLED_LOGW(
           record.fileReader,
-          "{} - {} record #{}: {} bytes unread out of {} bytes.",
+          "{} - {} record #{} at {:.3f}: {} bytes unread out of {} bytes.",
           record.streamId.getNumericName(),
           Record::typeName(record.recordType),
           record.fileReader->getRecordIndex(record.recordInfo),
+          record.timestamp,
           record.reader->getUnreadBytes(),
           record.recordSize);
     }
