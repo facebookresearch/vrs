@@ -455,7 +455,7 @@ PixelFormat PixelFrame::getNormalizedPixelFormat(
       sourcePixelFormat == PixelFormat::GREY16) {
     format = PixelFormat::RGB8;
 #if IS_VRS_FB_INTERNAL()
-  } else if (format == PixelFormat::BAYER8_RGGB) {
+  } else if (format == PixelFormat::BAYER8_RGGB || format == PixelFormat::BAYER8_BGGR) {
     format = PixelFormat::RGB8;
 #endif
   } else {
@@ -668,6 +668,7 @@ bool PixelFrame::normalizeFrame(
     case PixelFormat::DEPTH32F:
     case PixelFormat::SCALAR64F:
     case PixelFormat::BAYER8_RGGB:
+    case PixelFormat::BAYER8_BGGR:
       format = PixelFormat::GREY8;
       componentCount = 1;
       break;
@@ -724,7 +725,7 @@ bool PixelFrame::normalizeFrame(
   } else if (srcFormat == PixelFormat::SCALAR64F) {
     // normalize double pixels to grey8
     normalizeBuffer<double>(rdata(), outNormalizedFrame.wdata(), getWidth() * getHeight());
-  } else if (srcFormat == PixelFormat::BAYER8_RGGB) {
+  } else if (srcFormat == PixelFormat::BAYER8_RGGB || srcFormat == PixelFormat::BAYER8_BGGR) {
     // display as grey8(copy) for now
     const uint8_t* srcPtr = rdata();
     uint8_t* outPtr = outNormalizedFrame.wdata();

@@ -84,11 +84,11 @@ static_assert(static_cast<int>(ImageFormat::JXL) == 5, "ImageFormat enum values 
 
 // These text names may NEVER BE CHANGED, as they are used in data layout definitions!!
 string_view sPixelFormatNames[] = {
-    "undefined",        "grey8",        "bgr8",         "depth32f",    "rgb8",
-    "yuv_i420_split",   "rgba8",        "rgb10",        "rgb12",       "grey10",
-    "grey12",           "grey16",       "rgb32F",       "scalar64F",   "yuy2",
-    "rgb_ir_4x4",       "rgba32F",      "bayer8_rggb",  "raw10",       "raw10_bayer_rggb",
-    "raw10_bayer_bggr", "yuv_420_nv21", "yuv_420_nv12", "grey10packed"};
+    "undefined",        "grey8",        "bgr8",         "depth32f",     "rgb8",
+    "yuv_i420_split",   "rgba8",        "rgb10",        "rgb12",        "grey10",
+    "grey12",           "grey16",       "rgb32F",       "scalar64F",    "yuy2",
+    "rgb_ir_4x4",       "rgba32F",      "bayer8_rggb",  "raw10",        "raw10_bayer_rggb",
+    "raw10_bayer_bggr", "yuv_420_nv21", "yuv_420_nv12", "grey10packed", "bayer8_bggr"};
 ENUM_STRING_CONVERTER(PixelFormat, sPixelFormatNames, PixelFormat::UNDEFINED);
 
 // Enum values may NEVER BE CHANGED, as they are used in data layout definitions!!
@@ -476,6 +476,7 @@ uint8_t ImageContentBlockSpec::getChannelCountPerPixel(PixelFormat pixel) {
     case PixelFormat::DEPTH32F:
     case PixelFormat::SCALAR64F:
     case PixelFormat::BAYER8_RGGB:
+    case PixelFormat::BAYER8_BGGR:
     case PixelFormat::RAW10_BAYER_RGGB:
     case PixelFormat::RAW10_BAYER_BGGR:
     case PixelFormat::RAW10:
@@ -511,6 +512,7 @@ size_t ImageContentBlockSpec::getBytesPerPixel(PixelFormat pixel) {
     case PixelFormat::GREY8:
     case PixelFormat::RGB_IR_RAW_4X4:
     case PixelFormat::BAYER8_RGGB:
+    case PixelFormat::BAYER8_BGGR:
       return 1;
     case PixelFormat::GREY10:
     case PixelFormat::GREY12:

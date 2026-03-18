@@ -115,6 +115,6 @@ TEST_F(FilteredFileReaderTest, includeExcludeStreams) {
     filters.includeStream("214");
     filters.excludeStream("100-test/synthetic/raw10");
     filteredReader.applyFilters(filters);
-    EXPECT_EQ(filteredReader.filter.streams.size(), 19);
+    EXPECT_EQ(filteredReader.filter.streams.size(), 20);
   }
 }
