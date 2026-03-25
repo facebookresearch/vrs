@@ -50,6 +50,7 @@
 #include <linux/limits.h>
 #endif
 #include <sys/stat.h>
+#include <sys/statvfs.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -485,6 +486,33 @@ string getCurrentExecutablePath() {
 #endif // IS_LINUX_PLATFORM() || IS_ANDROID_PLATFORM()
 }
 #endif
+
+int getFreeDiskSpace(const string& targetPath, int64_t& outFreeSpace) {
+  outFreeSpace = -1;
+  string dir = targetPath;
+  if (!dir.empty() && !isDir(dir)) {
+    dir = getParentFolder(targetPath);
+  }
+  if (dir.empty()) {
+    dir = ".";
+  }
+#if IS_WINDOWS_PLATFORM()
+  ULARGE_INTEGER freeBytesAvailable{};
+  std::wstring wdir = osUtf8ToWstring(dir);
+  if (!GetDiskFreeSpaceExW(wdir.c_str(), &freeBytesAvailable, nullptr, nullptr)) {
+    return static_cast<int>(GetLastError());
+  }
+  outFreeSpace = static_cast<int64_t>(freeBytesAvailable.QuadPart);
+  return 0;
+#else
+  struct statvfs st{};
+  if (statvfs(dir.c_str(), &st) != 0) {
+    return errno;
+  }
+  outFreeSpace = static_cast<int64_t>(st.f_bavail) * static_cast<int64_t>(st.f_frsize);
+  return 0;
+#endif
+}
 
 } // namespace os
 } // namespace vrs

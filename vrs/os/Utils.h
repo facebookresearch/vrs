@@ -63,6 +63,14 @@ const string& getTempFolder(); // get unique subfolder in the OS's temp folder
 string getUniquePath(const string& baseName, size_t randomSuffixLength = 5);
 string makeUniqueFolder(const string& baseName = {}, size_t randomSuffixLength = 10);
 
+/// Get how much free disk space is currently available at a specific location.
+/// @param targetPath can be a file or directory path. If a directory, its free space is queried
+/// directly; if a file, its parent directory's free space is queried.
+/// @param outFreeSpace set to the free space in bytes on success, or -1 on failure.
+/// @return 0 on success, or a platform-specific error code
+/// (GetLastError() on Windows, errno on POSIX).
+int getFreeDiskSpace(const string& targetPath, int64_t& outFreeSpace);
+
 /// Error helpers
 int getLastFileError();
 string fileErrorToString(int errnum);
