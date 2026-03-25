@@ -106,7 +106,6 @@ bool AudioBlock::decompressAudio(AudioDecompressionHandler& handler) {
     default:
       return false;
   }
-  return false;
 }
 
 } // namespace vrs::utils
