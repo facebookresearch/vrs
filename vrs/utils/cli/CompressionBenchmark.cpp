@@ -16,8 +16,7 @@
 
 #include <vrs/utils/cli/CompressionBenchmark.h>
 
-#include <iomanip>
-#include <iostream>
+#include <fmt/core.h>
 
 #include <vrs/ErrorCode.h>
 #include <vrs/helpers/Strings.h>
@@ -30,9 +29,20 @@ using namespace vrs::utils;
 
 namespace vrs::utils {
 
+namespace {
+
+constexpr const char* kRowFormat = "{:<18}  {:>9} {:>6}    {:>10}  {:>10}  {:>9}  {:>8}\n";
+constexpr int kRowWidth = 18 + 2 + 9 + 1 + 6 + 4 + 10 + 2 + 10 + 2 + 9 + 2 + 8;
+
+void printSeparator() {
+  fmt::print("{:-<{}}\n", "", kRowWidth);
+}
+
+} // namespace
+
 int compressionBenchmark(FilteredFileReader& source, const CopyOptions& inOptions) {
   if (!source.spec.isDiskFile()) {
-    cerr << "Benchmarks only available for local files.\n";
+    fmt::print(stderr, "Benchmarks only available for local files.\n");
     return FAILURE;
   }
   const string sourcePath = source.getPathOrUri();
@@ -45,60 +55,91 @@ int compressionBenchmark(FilteredFileReader& source, const CopyOptions& inOption
   // first, do a copy, with no compression at all, to get a baseline size
   FilteredFileReader master(masterPath);
   CopyOptions options{inOptions};
+  options.showProgress = false;
   options.setCompressionPreset(CompressionPreset::None);
   filterCopy(source, masterPath, options);
+  master.reader.setOpenProgressLogger(nullptr);
   int error = master.reader.openFile(masterPath);
   if (error == 0) {
     master.applyRecordableFilters({});
     master.applyTypeFilters({});
     int64_t sourceSize = master.reader.getTotalSourceSize();
-    cout << os::getFilename(masterPath) << "\t" << helpers::humanReadableFileSize(sourceSize)
-         << "\n";
+    fmt::print(
+        "Source: {} ({})\n\n",
+        os::getFilename(masterPath),
+        helpers::humanReadableFileSize(sourceSize));
     string copyPath = sourceBasename + "-comp.vrs";
     double firstCompressionDuration = 0;
+    fmt::print(kRowFormat, "Preset", "Size", "Ratio", "Comp", "Decomp", "Time", "Relative");
+    printSeparator();
+    CompressionPreset lastPreset = CompressionPreset::Undefined;
+    string decompPath = sourceBasename + "-decomp.vrs";
     for (int preset = static_cast<int>(CompressionPreset::CompressedFirst);
          preset <= static_cast<int>(CompressionPreset::CompressedLast);
          preset++) {
-      options.setCompressionPreset(static_cast<CompressionPreset>(preset));
+      auto currentPreset = static_cast<CompressionPreset>(preset);
+      // Print a separator between codec families
+      if (lastPreset != CompressionPreset::Undefined &&
+          lastPreset <= CompressionPreset::LastLz4Preset &&
+          currentPreset >= CompressionPreset::FirstZstdPreset) {
+        printSeparator();
+      }
+      lastPreset = currentPreset;
+      options.setCompressionPreset(currentPreset);
       double timeBefore = os::getTimestampSec();
       filterCopy(master, copyPath, options);
       double duration = os::getTimestampSec() - timeBefore;
-      RecordFileReader outputFile;
-      int copyError = outputFile.openFile(copyPath);
+      // Open compressed file to get its size and measure decompression speed
+      FilteredFileReader compReader(copyPath);
+      compReader.reader.setOpenProgressLogger(nullptr);
+      int copyError = compReader.reader.openFile(copyPath);
       if (copyError == 0) {
-        int64_t copySize = outputFile.getTotalSourceSize();
-        int64_t change = sourceSize - copySize;
-        cout << vrs::toPrettyName(options.getCompression()) << "\t";
-        int64_t processingSpeed = static_cast<int64_t>(sourceSize / duration);
-        cout << helpers::humanReadableFileSize(processingSpeed) << "/s\t";
-        if (change == 0) {
-          cout << "No file size change.\n";
-        } else {
-          if (change < 0) {
-            cout << "File size increase\t";
-            change = -change;
-          }
-          processingSpeed = static_cast<int64_t>(change / duration);
-          cout << helpers::humanReadableFileSize(change) << "\t" << fixed << setprecision(2)
-               << 100. * change / sourceSize << "%\t" << duration << " s\t"
-               << helpers::humanReadableFileSize(processingSpeed) << "/s";
-        }
-        // Printout speed ratio, first compression to the current compression
+        compReader.applyRecordableFilters({});
+        compReader.applyTypeFilters({});
+        int64_t copySize = compReader.reader.getTotalSourceSize();
+        string presetName = vrs::toPrettyName(options.getCompression());
+        string compSpeed =
+            helpers::humanReadableFileSize(static_cast<int64_t>(sourceSize / duration)) + "/s";
+        // Measure decompression speed
+        CopyOptions decompOptions;
+        decompOptions.showProgress = false;
+        decompOptions.setCompressionPreset(CompressionPreset::None);
+        double decompBefore = os::getTimestampSec();
+        filterCopy(compReader, decompPath, decompOptions);
+        double decompDuration = os::getTimestampSec() - decompBefore;
+        string decompSpeed =
+            helpers::humanReadableFileSize(static_cast<int64_t>(sourceSize / decompDuration)) +
+            "/s";
+        remove(decompPath.c_str());
+        string sizeLabel = helpers::humanReadableFileSize(copySize);
+        string ratio = fmt::format("{:.2f}x", static_cast<double>(sourceSize) / copySize);
+        string time = fmt::format("{:.2f} s", duration);
+        string relative;
         if (firstCompressionDuration <= 0) {
           firstCompressionDuration = duration;
-          cout << "\t" << 1. << " (ref)"; // reference time: "1"...
+          relative = "1.00";
         } else {
-          cout << "\t" << duration / firstCompressionDuration;
+          relative = fmt::format("{:.2f}", duration / firstCompressionDuration);
         }
-        cout << "\n";
+        fmt::print(
+            kRowFormat, presetName, sizeLabel, ratio, compSpeed, decompSpeed, time, relative);
       } else {
-        cerr << "Error compressing '" << copyPath << "'. Error #" << copyError << ": "
-             << errorCodeToMessage(copyError) << "\n";
+        fmt::print(
+            stderr,
+            "Error compressing '{}'. Error #{}: {}\n",
+            copyPath,
+            copyError,
+            errorCodeToMessage(copyError));
       }
     }
+    printSeparator();
   } else {
-    cerr << "Could not copy '" << masterPath << "' for compression experiment. Error #" << error
-         << ": " << errorCodeToMessage(error) << "\n";
+    fmt::print(
+        stderr,
+        "Could not copy '{}' for compression experiment. Error #{}: {}\n",
+        masterPath,
+        error,
+        errorCodeToMessage(error));
   }
   remove(masterPath.c_str());
   return error;
