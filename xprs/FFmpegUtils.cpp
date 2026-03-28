@@ -20,6 +20,8 @@
 #include "FFmpegUtils.h"
 
 #include <cstring>
+
+#include <array>
 #include <sstream>
 
 #include "Codecs.h"
@@ -98,11 +100,12 @@ CodecPreset mapToCodecPreset(const char* preset, AVCodecID id, const char* avcod
       avcodecName && (avcodecName == kNvH264EncoderName || avcodecName == kNvH265EncoderName);
 
   // Preset tables indexed by speed: [slow, medium, fast]
-  static constexpr const char* kH264Presets[] = {"slower", "medium", "superfast"};
-  static constexpr const char* kH264NvPresets[] = {"slow", "medium", "fast"};
-  static constexpr const char* kH265Presets[] = {"slower", "medium", "superfast"};
-  static constexpr const char* kAV1Presets[] = {"8", "10", "12"};
-  static constexpr int kVP9CpuUsed[] = {1, 4, 5};
+  constexpr std::array<const char*, 3> kH264Presets = {"slower", "medium", "superfast"};
+  constexpr std::array<const char*, 3> kH264NvPresets = {"slow", "medium", "fast"};
+  constexpr std::array<const char*, 3> kH265Presets = {"slower", "medium", "superfast"};
+  constexpr std::array<const char*, 3> kH265NvPresets = {"slow", "medium", "fast"};
+  constexpr std::array<const char*, 3> kAV1Presets = {"8", "10", "12"};
+  constexpr std::array<int, 3> kVP9CpuUsed = {1, 4, 5};
 
   CodecPreset result{nullptr};
   // NOLINTNEXTLINE(clang-diagnostic-switch-enum)
@@ -111,7 +114,7 @@ CodecPreset mapToCodecPreset(const char* preset, AVCodecID id, const char* avcod
       result.preset = isNv ? kH264NvPresets[speed] : kH264Presets[speed];
       break;
     case AV_CODEC_ID_H265:
-      result.preset = kH265Presets[speed];
+      result.preset = isNv ? kH265NvPresets[speed] : kH265Presets[speed];
       break;
     case AV_CODEC_ID_VP9:
       result.cpuUsed = kVP9CpuUsed[speed];
