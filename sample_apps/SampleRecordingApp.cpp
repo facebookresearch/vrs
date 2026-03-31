@@ -57,11 +57,6 @@ double getTimestampSec() {
 /// The meta datya captures some sensor data such as exposure and the camera's temperature, and
 /// maybe some counters (frame counter,  camera time, etc).
 class ImageStream : public Recordable {
-  // Record format version numbers describe the overall record format.
-  // Note DataLayout field changes do *not* require to change the record format version.
-  static const uint32_t kConfigurationRecordFormatVersion = 1;
-  static const uint32_t kDataRecordFormatVersion = 1;
-
  public:
   ImageStream() : Recordable(RecordableTypeId::ForwardCameraRecordableClass, kCameraStreamFlavor) {
     // Tell how the records of this stream should be compressed (or not)
@@ -69,13 +64,13 @@ class ImageStream : public Recordable {
     // Extremly important: Define the format of this stream's records
     addRecordFormat(
         Record::Type::CONFIGURATION,
-        kConfigurationRecordFormatVersion,
+        config_.kVersion,
         // the following describe config records' format: a single datalayout content block
         config_.getContentBlock(),
         {&config_});
     addRecordFormat(
         Record::Type::DATA,
-        kDataRecordFormatVersion,
+        data_.kVersion,
         // the following describe data records' format: a datalayout content block + pixel data
         data_.getContentBlock() + ContentBlock(ImageFormat::RAW),
         {&data_});
@@ -88,10 +83,7 @@ class ImageStream : public Recordable {
 
     // create a record using that data
     return createRecord(
-        getTimestampSec(),
-        Record::Type::CONFIGURATION,
-        kConfigurationRecordFormatVersion,
-        DataSource(config_));
+        getTimestampSec(), Record::Type::CONFIGURATION, config_.kVersion, DataSource(config_));
   }
   const Record* createStateRecord() override {
     // Best practice is to always create a record when asked, with a reasonable timestamp,
@@ -115,7 +107,7 @@ class ImageStream : public Recordable {
     createRecord(
         getTimestampSec(),
         Record::Type::DATA,
-        kDataRecordFormatVersion,
+        data_.kVersion,
         DataSource(data_, {pixels.data(), pixels.size()}));
   }
 
@@ -176,9 +168,6 @@ class AudioStream : public Recordable {
 /// Stream of metadata of some sort.
 /// Both configuration & data records contain a single datalayout content block.
 class MotionStream : public Recordable {
-  static const uint32_t kConfigurationRecordFormatVersion = 1;
-  static const uint32_t kDataRecordFormatVersion = 1;
-
  public:
   MotionStream() : Recordable(RecordableTypeId::MotionRecordableClass, kMotionStreamFlavor) {
     // Tell how the records of this stream should be compressed (or not)
@@ -186,13 +175,13 @@ class MotionStream : public Recordable {
     // Extremly important: Define the format of this stream's records
     addRecordFormat(
         Record::Type::CONFIGURATION,
-        kConfigurationRecordFormatVersion,
+        config_.kVersion,
         // the following describe config records' format: a single datalayout content block
         config_.getContentBlock(),
         {&config_});
     addRecordFormat(
         Record::Type::DATA,
-        kDataRecordFormatVersion,
+        data_.kVersion,
         // the following describe data records' format: a single datalayout content block
         data_.getContentBlock(),
         {&data_});
@@ -201,10 +190,7 @@ class MotionStream : public Recordable {
     // Set the fields of config_, as necessary...
     config_.motionStreamParam.set(kMotionValue);
     return createRecord(
-        getTimestampSec(),
-        Record::Type::CONFIGURATION,
-        kConfigurationRecordFormatVersion,
-        DataSource(config_));
+        getTimestampSec(), Record::Type::CONFIGURATION, config_.kVersion, DataSource(config_));
   }
   const Record* createStateRecord() override {
     // Best practice is to always create a record when asked, with a reasonable timestamp,
@@ -213,8 +199,7 @@ class MotionStream : public Recordable {
   }
   void createDataRecord(const vector<Matrix3Dd>& motionData) {
     data_.motionData.stage(motionData);
-    createRecord(
-        getTimestampSec(), Record::Type::DATA, kDataRecordFormatVersion, DataSource(data_));
+    createRecord(getTimestampSec(), Record::Type::DATA, data_.kVersion, DataSource(data_));
   }
 
  private:

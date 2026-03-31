@@ -77,6 +77,10 @@ class MyCameraDataLayoutConfiguration : public AutoDataLayout {
   DataPieceValue<Point3Dd> cameraPosition{"camera_position"};
 
   AutoDataLayoutEnd endLayout;
+  // Record format version number, describing the overall record format.
+  // Stored in the DataLayout for convenience, using the namespace the class provides for clarity.
+  // DataLayout field changes do *not* require changing the record format version.
+  constexpr static uint32_t kVersion = 1;
 };
 
 /// Definition of the data records' metadata.
@@ -129,6 +133,7 @@ class MyCameraDataLayoutData : public AutoDataLayout {
   DataPieceStringMap<string> aStringStringMap{"some_string_string_map"};
 
   AutoDataLayoutEnd endLayout;
+  constexpr static uint32_t kVersion = 1;
 };
 
 /// Definition of some obsolete metadata.
@@ -143,22 +148,14 @@ class MyCameraDataLayoutLegacyData : public AutoDataLayout {
 
 /// Class to generate a stream of sample records.
 class MyCameraRecordable : public Recordable {
-  // Record format version numbers describe the overall record format.
-  // Note DataLayout field changes do *not* require to change the record format version.
-  static const uint32_t kConfigurationRecordFormatVersion = 1;
-  static const uint32_t kDataRecordFormatVersion = 1;
-
  public:
   MyCameraRecordable() : Recordable(RecordableTypeId::SampleDevice) {
     // Ideal place to define the record format & data layout descriptions
     addRecordFormat(
-        Record::Type::CONFIGURATION,
-        kConfigurationRecordFormatVersion,
-        config_.getContentBlock(),
-        {&config_});
+        Record::Type::CONFIGURATION, config_.kVersion, config_.getContentBlock(), {&config_});
     addRecordFormat(
         Record::Type::DATA,
-        kDataRecordFormatVersion,
+        data_.kVersion,
         data_.getContentBlock() + ContentBlock(ImageFormat::RAW),
         {&data_});
   }
@@ -173,10 +170,7 @@ class MyCameraRecordable : public Recordable {
 
     // create a record using that data
     return createRecord(
-        os::getTimestampSec(),
-        Record::Type::CONFIGURATION,
-        kConfigurationRecordFormatVersion,
-        DataSource(config_));
+        os::getTimestampSec(), Record::Type::CONFIGURATION, config_.kVersion, DataSource(config_));
   }
   const Record* createStateRecord() override {
     // Best practice is to always create a record when asked, with a reasonable timestamp,
@@ -194,7 +188,7 @@ class MyCameraRecordable : public Recordable {
     createRecord(
         os::getTimestampSec(),
         Record::Type::DATA,
-        kDataRecordFormatVersion,
+        data_.kVersion,
         DataSource(data_, {pixelData, config_.width.get() * config_.height.get()}));
   }
 

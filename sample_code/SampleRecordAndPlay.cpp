@@ -72,6 +72,10 @@ class MyMetadata : public AutoDataLayout {
   DataPieceValue<uint32_t> sensorValue{"my_sensor"};
 
   AutoDataLayoutEnd endLayout;
+  // Record format version number, private to this stream (no risk of collision with other streams).
+  // Stored in the DataLayout for convenience, using the namespace the class provides for clarity.
+  // Only bump when the RecordFormat structure changes, not for DataLayout field changes.
+  constexpr static uint32_t kVersion = 1;
 };
 
 constexpr const char* kSampleFlavor = "team/vrs/sample";
@@ -101,19 +105,13 @@ class RecordableDemo : public Recordable {
      with meaningful and system-coherent timestamps.
   */
 
-  // Come up with your own data format version codes (numbers will work just fine!)
-  // These numbers are completely private (no risk to collide with another Recordable)
-  // You are responsible for versionning the data you save & read.
-
-  static const uint32_t kDataRecordFormatVersion = 1;
-
  public:
   // declare your device's unique id in RecordableTypeId.h
   RecordableDemo() : Recordable(RecordableTypeId::ImageStream, kSampleFlavor) {
     // define your RecordFormat & DataLayout definitions for this stream
     addRecordFormat(
         Record::Type::DATA, // the type of records this definition applies to
-        kDataRecordFormatVersion, // a record format version
+        metadata_.kVersion, // a record format version
         metadata_.getContentBlock(), // the RecordFormat definition
         {&metadata_}); // the DataLayout definition for the datalayout content block declared above.
   }
@@ -141,8 +139,7 @@ class RecordableDemo : public Recordable {
     metadata_.sensorValue.set(sensorValue); // Record the value we want to save in the record
     // Use the same time source for ALL your records in the entire file!
     double someTimeInSec = os::getTimestampSec();
-    createRecord(
-        someTimeInSec, Record::Type::DATA, kDataRecordFormatVersion, DataSource(metadata_));
+    createRecord(someTimeInSec, Record::Type::DATA, metadata_.kVersion, DataSource(metadata_));
   }
 
   // pseudocode helper function

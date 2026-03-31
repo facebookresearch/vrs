@@ -42,6 +42,13 @@ struct CameraStreamConfig : public AutoDataLayout {
   DataPieceVector<float> cameraCalibration{"camera_calibration"};
 
   AutoDataLayoutEnd endLayout;
+
+  // Record format version number, describing the overall record format.
+  // Stored in the DataLayout for convenience, using the namespace the class provides for clarity.
+  // DataLayout field changes do *not* require changing the record format version.
+  // The version only needs to change when the RecordFormat structure changes
+  // (e.g., adding/removing content blocks).
+  constexpr static uint32_t kVersion = 1;
 };
 
 /// Sample metadata for data records of an image stream.
@@ -53,6 +60,8 @@ struct CameraStreamData : public AutoDataLayout {
   DataPieceValue<float> cameraTemperature{"camera_temperature"};
 
   AutoDataLayoutEnd endLayout;
+
+  constexpr static uint32_t kVersion = 1;
 };
 
 /// Sample metadata for configuration records of a metadata stream.
@@ -60,6 +69,8 @@ struct MotionStreamConfig : public AutoDataLayout {
   DataPieceValue<double> motionStreamParam{"some_motion_stream_param"};
 
   AutoDataLayoutEnd endLayout;
+
+  constexpr static uint32_t kVersion = 1;
 };
 
 /// Sample metadata for data records of a metadata stream.
@@ -67,6 +78,8 @@ struct MotionStreamData : public AutoDataLayout {
   DataPieceVector<Matrix3Dd> motionData{"motion_data"};
 
   AutoDataLayoutEnd endLayout;
+
+  constexpr static uint32_t kVersion = 1;
 };
 
 // Some constants for our audio streams
