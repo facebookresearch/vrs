@@ -21,6 +21,8 @@
 #include <algorithm>
 #include <unordered_set>
 
+#include <vrs/utils/PixelConversions.h>
+
 #define DEFAULT_LOG_CHANNEL "PixelFrame"
 #include <logging/Log.h>
 #include <logging/Verify.h>
@@ -42,156 +44,6 @@ namespace {
 utils::Throttler& getThrottler() {
   static utils::Throttler sThrottler;
   return sThrottler;
-}
-
-const uint8_t kNaNPixel = 0;
-
-/// normalize float or double to grey8, with dynamic range calculation
-template <class Float>
-void normalizeBuffer(const uint8_t* pixelPtr, uint8_t* outPtr, uint32_t pixelCount) {
-  const Float* srcPtr = reinterpret_cast<const Float*>(pixelPtr);
-  Float min = 0;
-  Float max = 0;
-  bool nan = false;
-  uint32_t firstPixelIndex = 0;
-  while (firstPixelIndex < pixelCount && isnan(srcPtr[firstPixelIndex])) {
-    nan = true;
-    firstPixelIndex++;
-  }
-  if (firstPixelIndex < pixelCount) {
-    min = max = srcPtr[firstPixelIndex];
-    for (uint32_t pixelIndex = firstPixelIndex + 1; pixelIndex < pixelCount; ++pixelIndex) {
-      const Float pixel = srcPtr[pixelIndex];
-      if (isnan(pixel)) {
-        nan = true;
-      } else if (pixel < min) {
-        min = pixel;
-      } else if (pixel > max) {
-        max = pixel;
-      }
-    }
-  }
-  if (min >= max) {
-    // for constant input, blank the image
-    memset(outPtr, 0, pixelCount);
-  } else {
-    const Float factor = numeric_limits<uint8_t>::max() / (max - min);
-    if (nan) {
-      for (uint32_t pixelIndex = 0; pixelIndex < pixelCount; ++pixelIndex) {
-        const Float pixel = srcPtr[pixelIndex];
-        outPtr[pixelIndex] =
-            isnan(pixel) ? kNaNPixel : static_cast<uint8_t>((pixel - min) * factor);
-      }
-    } else {
-      for (uint32_t pixelIndex = 0; pixelIndex < pixelCount; ++pixelIndex) {
-        const Float pixel = srcPtr[pixelIndex];
-        outPtr[pixelIndex] = static_cast<uint8_t>((pixel - min) * factor);
-      }
-    }
-  }
-}
-
-/// normalize float to grey8, with interpolation for provided range, which values might exceed
-void normalizeBufferWithRange(
-    const uint8_t* pixelPtr,
-    uint8_t* outPtr,
-    uint32_t pixelCount,
-    float min,
-    float max) {
-  const float* srcPtr = reinterpret_cast<const float*>(pixelPtr);
-  const float factor = numeric_limits<uint8_t>::max() / (max - min);
-  for (uint32_t pixelIndex = 0; pixelIndex < pixelCount; ++pixelIndex) {
-    const float pixel = srcPtr[pixelIndex];
-    outPtr[pixelIndex] = isnan(pixel)
-        ? kNaNPixel
-        : (pixel <= min       ? 0
-               : pixel >= max ? 255
-                              : static_cast<uint8_t>((pixel - min) * factor));
-  }
-}
-
-struct Triplet {
-  uint8_t r, g, b;
-};
-struct TripletF {
-  float r, g, b;
-};
-
-void normalizeRGBXfloatToRGB8(
-    const uint8_t* pixelPtr,
-    uint8_t* outPtr,
-    uint32_t pixelCount,
-    size_t channelCount) {
-  const float* srcPtr = reinterpret_cast<const float*>(pixelPtr);
-  TripletF min{0, 0, 0};
-  TripletF max{0, 0, 0};
-  // initialize min & max for each dimension.
-  Triplet init{0, 0, 0};
-  for (uint32_t pixelIndex = 0; pixelIndex < pixelCount && (init.r + init.g + init.b) < 3;
-       ++pixelIndex, srcPtr += channelCount) {
-    const TripletF* pixel = reinterpret_cast<const TripletF*>(srcPtr);
-    if (init.r == 0 && !isnan(pixel->r)) {
-      min.r = max.r = pixel->r;
-      init.r = 1;
-    }
-    if (init.g == 0 && !isnan(pixel->g)) {
-      min.g = max.g = pixel->g;
-      init.g = 1;
-    }
-    if (init.b == 0 && !isnan(pixel->b)) {
-      min.b = max.b = pixel->b;
-      init.b = 1;
-    }
-  }
-  bool nan = false;
-  srcPtr = reinterpret_cast<const float*>(pixelPtr);
-  for (uint32_t pixelIndex = 0; pixelIndex < pixelCount; ++pixelIndex, srcPtr += channelCount) {
-    const TripletF* pixel = reinterpret_cast<const TripletF*>(srcPtr);
-    if (isnan(pixel->r)) {
-      nan = true;
-    } else if (pixel->r < min.r) {
-      min.r = pixel->r;
-    } else if (pixel->r > max.r) {
-      max.r = pixel->r;
-    }
-    if (isnan(pixel->g)) {
-      nan = true;
-    } else if (pixel->g < min.g) {
-      min.g = pixel->g;
-    } else if (pixel->g > max.g) {
-      max.g = pixel->g;
-    }
-    if (isnan(pixel->b)) {
-      nan = true;
-    } else if (pixel->b < min.b) {
-      min.b = pixel->b;
-    } else if (pixel->b > max.b) {
-      max.b = pixel->b;
-    }
-  }
-  const float factorR = max.r > min.r ? numeric_limits<uint8_t>::max() / (max.r - min.r) : 0;
-  const float factorG = max.g > min.g ? numeric_limits<uint8_t>::max() / (max.g - min.g) : 0;
-  const float factorB = max.b > min.b ? numeric_limits<uint8_t>::max() / (max.b - min.b) : 0;
-  srcPtr = reinterpret_cast<const float*>(pixelPtr);
-  if (nan) {
-    for (uint32_t pixelIndex = 0; pixelIndex < pixelCount;
-         ++pixelIndex, srcPtr += channelCount, outPtr += 3) {
-      const TripletF* pixel = reinterpret_cast<const TripletF*>(srcPtr);
-      Triplet* out = reinterpret_cast<Triplet*>(outPtr);
-      out->r = isnan(pixel->r) ? kNaNPixel : static_cast<uint8_t>((pixel->r - min.r) * factorR);
-      out->g = isnan(pixel->g) ? kNaNPixel : static_cast<uint8_t>((pixel->g - min.g) * factorG);
-      out->b = isnan(pixel->b) ? kNaNPixel : static_cast<uint8_t>((pixel->b - min.b) * factorB);
-    }
-  } else {
-    for (uint32_t pixelIndex = 0; pixelIndex < pixelCount;
-         ++pixelIndex, srcPtr += channelCount, outPtr += 3) {
-      const TripletF* pixel = reinterpret_cast<const TripletF*>(srcPtr);
-      Triplet* out = reinterpret_cast<Triplet*>(outPtr);
-      out->r = static_cast<uint8_t>((pixel->r - min.r) * factorR);
-      out->g = static_cast<uint8_t>((pixel->g - min.g) * factorG);
-      out->b = static_cast<uint8_t>((pixel->b - min.b) * factorB);
-    }
-  }
 }
 
 mutex& getUsedColorsMutex() {
@@ -474,19 +326,7 @@ bool PixelFrame::inplaceRgbaToRgb() {
   uint32_t width = getWidth();
   uint32_t height = getHeight();
   ImageContentBlockSpec rgbSpec(PixelFormat::RGB8, width, height);
-  size_t stride = getStride();
-  size_t rgbStride = rgbSpec.getStride();
-  for (uint32_t h = 0; h < height; ++h) {
-    const uint8_t* srcPtr = rdata() + h * stride;
-    uint8_t* outPtr = wdata() + h * rgbStride;
-    for (uint32_t w = 0; w < width; ++w) {
-      outPtr[0] = srcPtr[0];
-      outPtr[1] = srcPtr[1];
-      outPtr[2] = srcPtr[2];
-      outPtr += 3;
-      srcPtr += 4;
-    }
-  }
+  pixel_conversions::convertRgbaToRgb(rdata(), getStride(), wdata(), rgbSpec.getStride(), width, height);
   imageSpec_ = rgbSpec;
   frameBytes_.resize(imageSpec_.getHeight() * imageSpec_.getStride());
   return true;
@@ -499,24 +339,9 @@ bool PixelFrame::convertRgbaToRgb(std::shared_ptr<PixelFrame>& outRgbFrame) cons
   uint32_t width = getWidth();
   uint32_t height = getHeight();
   init(outRgbFrame, ImageContentBlockSpec(PixelFormat::RGB8, width, height));
-  size_t srcStride = getStride();
-  size_t outStride = outRgbFrame->getStride();
-  for (uint32_t h = 0; h < height; ++h) {
-    const uint8_t* srcPtr = rdata() + h * srcStride;
-    uint8_t* outPtr = outRgbFrame->wdata() + h * outStride;
-    for (uint32_t w = 0; w < width; ++w) {
-      outPtr[0] = srcPtr[0];
-      outPtr[1] = srcPtr[1];
-      outPtr[2] = srcPtr[2];
-      outPtr += 3;
-      srcPtr += 4;
-    }
-  }
+  pixel_conversions::convertRgbaToRgb(
+      rdata(), getStride(), outRgbFrame->wdata(), outRgbFrame->getStride(), width, height);
   return true;
-}
-
-inline uint8_t clipToUint8(int value) {
-  return value < 0 ? 0 : (value > 255 ? 255 : static_cast<uint8_t>(value));
 }
 
 bool PixelFrame::normalizeFrame(
@@ -548,7 +373,7 @@ bool PixelFrame::normalizeFrame(
       normalizedPixelFormat == PixelFormat::GREY8) {
     if (options.min < options.max) {
       outNormalizedFrame.init(normalizedPixelFormat, getWidth(), getHeight());
-      normalizeBufferWithRange(
+      pixel_conversions::normalizeBufferWithRange(
           rdata(), outNormalizedFrame.wdata(), getWidth() * getHeight(), options.min, options.max);
       return true;
     }
@@ -703,36 +528,22 @@ bool PixelFrame::normalizeFrame(
   outNormalizedFrame.init(format, getWidth(), getHeight());
   if (srcFormat == PixelFormat::BGR8) {
     // swap R & B
-    const uint8_t* srcPtr = rdata();
-    uint8_t* outPtr = outNormalizedFrame.wdata();
-    const uint32_t pixelCount = getWidth() * getHeight();
-    for (uint32_t i = 0; i < pixelCount; ++i) {
-      outPtr[2] = srcPtr[0];
-      outPtr[1] = srcPtr[1];
-      outPtr[0] = srcPtr[2];
-      srcPtr += 3;
-      outPtr += 3;
-    }
+    pixel_conversions::convertBgr8ToRgb8(rdata(), outNormalizedFrame.wdata(), getWidth() * getHeight());
   } else if (srcFormat == PixelFormat::RGB32F) {
     // normalize float pixels to rgb8
-    normalizeRGBXfloatToRGB8(rdata(), outNormalizedFrame.wdata(), getWidth() * getHeight(), 3);
+    pixel_conversions::normalizeRGBXfloatToRGB8(rdata(), outNormalizedFrame.wdata(), getWidth() * getHeight(), 3);
   } else if (srcFormat == PixelFormat::RGBA32F) {
     // normalize float pixels to rgb8, drop alpha channel
-    normalizeRGBXfloatToRGB8(rdata(), outNormalizedFrame.wdata(), getWidth() * getHeight(), 4);
+    pixel_conversions::normalizeRGBXfloatToRGB8(rdata(), outNormalizedFrame.wdata(), getWidth() * getHeight(), 4);
   } else if (srcFormat == PixelFormat::DEPTH32F) {
     // normalize float pixels to grey8
-    normalizeBuffer<float>(rdata(), outNormalizedFrame.wdata(), getWidth() * getHeight());
+    pixel_conversions::normalizeBuffer<float>(rdata(), outNormalizedFrame.wdata(), getWidth() * getHeight());
   } else if (srcFormat == PixelFormat::SCALAR64F) {
     // normalize double pixels to grey8
-    normalizeBuffer<double>(rdata(), outNormalizedFrame.wdata(), getWidth() * getHeight());
+    pixel_conversions::normalizeBuffer<double>(rdata(), outNormalizedFrame.wdata(), getWidth() * getHeight());
   } else if (srcFormat == PixelFormat::BAYER8_RGGB || srcFormat == PixelFormat::BAYER8_BGGR) {
     // display as grey8(copy) for now
-    const uint8_t* srcPtr = rdata();
-    uint8_t* outPtr = outNormalizedFrame.wdata();
-    const uint32_t pixelCount = getWidth() * getHeight() * componentCount;
-    for (uint32_t i = 0; i < pixelCount; ++i) {
-      outPtr[i] = srcPtr[i];
-    }
+    memcpy(outNormalizedFrame.wdata(), rdata(), getWidth() * getHeight() * componentCount);
   } else if (
       srcFormat == PixelFormat::RAW10 || srcFormat == PixelFormat::RAW10_BAYER_RGGB ||
       srcFormat == PixelFormat::RAW10_BAYER_BGGR) {
@@ -750,25 +561,8 @@ bool PixelFrame::normalizeFrame(
     } else {
       // source: 4 bytes with 8 msb data, 1 byte with 4x 2 lsb of data
       // convert to GREY8 by copying 4 bytes of msb data, and dropping the 5th of lsb data...
-      const uint8_t* srcPtr = rdata();
-      const size_t srcStride = getStride();
-      uint8_t* outPtr = outNormalizedFrame.wdata();
-      const size_t outStride = outNormalizedFrame.getStride();
-      const uint32_t width = getWidth();
-      for (uint32_t h = 0; h < getHeight(); h++, srcPtr += srcStride, outPtr += outStride) {
-        const uint8_t* lineSrcPtr = srcPtr;
-        uint8_t* lineOutPtr = outPtr;
-        for (uint32_t group = 0; group < width / 4; group++, lineSrcPtr += 5, lineOutPtr += 4) {
-          lineOutPtr[0] = lineSrcPtr[0];
-          lineOutPtr[1] = lineSrcPtr[1];
-          lineOutPtr[2] = lineSrcPtr[2];
-          lineOutPtr[3] = lineSrcPtr[3];
-        }
-        // width is most probably a multiple of 4. In case it isn't...
-        for (uint32_t remainder = 0; remainder < width % 4; remainder++) {
-          lineOutPtr[remainder] = lineSrcPtr[remainder];
-        }
-      }
+      pixel_conversions::convertRaw10ToGrey8(
+          rdata(), getStride(), outNormalizedFrame.wdata(), outNormalizedFrame.getStride(), getWidth(), getHeight());
     }
   } else if (srcFormat == PixelFormat::GREY10PACKED) {
     if (format == PixelFormat::GREY16) {
@@ -798,63 +592,20 @@ bool PixelFrame::normalizeFrame(
     }
   } else if (srcFormat == PixelFormat::RGB_IR_RAW_4X4) {
     // This is a placeholder implementation that simply writes out the source data in R, G and B.
-    const uint8_t* srcPtr = rdata();
-    const size_t srcStride = getStride();
-    uint8_t* outPtr = outNormalizedFrame.wdata();
-    const size_t outStride = outNormalizedFrame.getStride();
-    const uint32_t width = getWidth();
-    for (uint32_t h = 0; h < getHeight(); h++, srcPtr += srcStride, outPtr += outStride) {
-      const uint8_t* lineSrcPtr = srcPtr;
-      uint8_t* lineOutPtr = outPtr;
-      for (uint32_t w = 0; w < width; w++, lineSrcPtr++, lineOutPtr += 3) {
-        lineOutPtr[0] = lineSrcPtr[0];
-        lineOutPtr[1] = lineSrcPtr[0];
-        lineOutPtr[2] = lineSrcPtr[0];
-      }
-    }
+    pixel_conversions::convertGreyToRgb8(
+        rdata(), getStride(), outNormalizedFrame.wdata(), outNormalizedFrame.getStride(), getWidth(), getHeight());
   } else if (srcFormat == PixelFormat::YUY2) {
     // Unoptimized default version of YUY2 to RGB8 conversion
-    const uint8_t* srcPtr = rdata();
-    const size_t srcStride = getStride();
-    uint8_t* outPtr = outNormalizedFrame.wdata();
-    const size_t outStride = outNormalizedFrame.getStride();
-    const uint32_t width = getWidth();
-    for (uint32_t h = 0; h < getHeight(); h++, srcPtr += srcStride, outPtr += outStride) {
-      const uint8_t* lineSrcPtr = srcPtr;
-      uint8_t* lineOutPtr = outPtr;
-      for (uint32_t w = 0; w < width / 2; w++, lineSrcPtr += 4, lineOutPtr += 6) {
-        int y0 = lineSrcPtr[0];
-        int u0 = lineSrcPtr[1];
-        int y1 = lineSrcPtr[2];
-        int v0 = lineSrcPtr[3];
-        int c = y0 - 16;
-        int d = u0 - 128;
-        int e = v0 - 128;
-        lineOutPtr[2] = clipToUint8((298 * c + 516 * d + 128) >> 8); // blue
-        lineOutPtr[1] = clipToUint8((298 * c - 100 * d - 208 * e + 128) >> 8); // green
-        lineOutPtr[0] = clipToUint8((298 * c + 409 * e + 128) >> 8); // red
-        c = y1 - 16;
-        lineOutPtr[5] = clipToUint8((298 * c + 516 * d + 128) >> 8); // blue
-        lineOutPtr[4] = clipToUint8((298 * c - 100 * d - 208 * e + 128) >> 8); // green
-        lineOutPtr[3] = clipToUint8((298 * c + 409 * e + 128) >> 8); // red
-      }
-    }
+    pixel_conversions::convertYuy2ToRgb8(
+        rdata(), getStride(), outNormalizedFrame.wdata(), outNormalizedFrame.getStride(), getWidth(), getHeight());
   } else if (format == PixelFormat::GREY16 && bitsToShift > 0) {
     // 12/10 bit pixel scaling to 16 bit
-    const uint16_t* srcPtr = data<uint16_t>();
-    uint16_t* outPtr = outNormalizedFrame.data<uint16_t>();
-    const uint32_t pixelCount = getWidth() * getHeight() * componentCount;
-    for (uint32_t i = 0; i < pixelCount; ++i) {
-      outPtr[i] = static_cast<uint16_t>(srcPtr[i] << bitsToShift);
-    }
+    pixel_conversions::upscalePixels16(
+        data<uint16_t>(), outNormalizedFrame.data<uint16_t>(), getWidth() * getHeight() * componentCount, bitsToShift);
   } else if (XR_VERIFY(this->size() == 2 * outNormalizedFrame.size())) {
     // 16/12/10 bit pixel reduction to 8 bit
-    const uint16_t* srcPtr = data<uint16_t>();
-    uint8_t* outPtr = outNormalizedFrame.wdata();
-    const uint32_t pixelCount = getWidth() * getHeight() * componentCount;
-    for (uint32_t i = 0; i < pixelCount; ++i) {
-      outPtr[i] = (srcPtr[i] >> bitsToShift) & 0xFF;
-    }
+    pixel_conversions::downscalePixels16To8(
+        data<uint16_t>(), outNormalizedFrame.wdata(), getWidth() * getHeight() * componentCount, bitsToShift);
   }
   return true;
 }
