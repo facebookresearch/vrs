@@ -250,6 +250,27 @@ struct EncoderConfig {
   std::string preset = "medium";
 
   /**
+   * Target average bitrate in bits/sec. When set to a value > 0, the encoder uses
+   * bitrate-controlled mode instead of CRF (Constant Rate Factor) mode. In bitrate-controlled
+   * mode, the quality setting is ignored. 0 = CRF mode (default).
+   */
+  int64_t bitrate = 0;
+
+  /**
+   * Maximum bitrate ceiling in bits/sec. Controls the peak bitrate the encoder may use.
+   * - bitrate == 0: CRF mode (maxBitrate is ignored).
+   * - bitrate > 0, maxBitrate == 0: defaults to maxBitrate = bitrate (strict CBR).
+   * - bitrate > 0, maxBitrate > bitrate: capped VBR — target average is bitrate, peak is
+   *   maxBitrate.
+   */
+  int64_t maxBitrate = 0;
+
+  /**
+   * Frame rate used for bitrate buffer size calculations. Only relevant when bitrate > 0.
+   */
+  int32_t framerate = 25;
+
+  /**
    * Suppress verbose debugging message.
    */
   bool suppressNonFatalMessage = false;
