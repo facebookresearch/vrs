@@ -59,7 +59,12 @@ jobs:
         shell: bash
         run: |
           if [ "$RUNNER_OS" == "macOS" ]; then
-              export QT_DIR=$(find /usr/local/Cellar/qt\@5 -name "5.*" -depth 1)
+              # Homebrew installs to /opt/homebrew on ARM, /usr/local on Intel
+              QT5_CELLAR="/opt/homebrew/Cellar/qt@5"
+              if [ ! -d "$QT5_CELLAR" ]; then
+                QT5_CELLAR="/usr/local/Cellar/qt@5"
+              fi
+              export QT_DIR=$(find "$QT5_CELLAR" -name "5.*" -depth 1 2>/dev/null)
           fi
           mkdir build
           cmake -S . -B build -G Ninja -DBUILD_WITH_XPRS:BOOL="${{ matrix.XPRS_FLAG }}"
