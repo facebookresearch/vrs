@@ -466,3 +466,38 @@ TEST(PixelConversionsTest, convertYuy2ToRgb8_clamping) {
   EXPECT_EQ(rgb[4], 225); // G1
   EXPECT_EQ(rgb[5], 20); // B1
 }
+
+TEST(PixelConversionsTest, upscalePixels16) {
+  // Upscale 10-bit (max 1023) to 16-bit by shifting left 6
+  const vector<uint16_t> src = {0, 1, 512, 1023, 100};
+  vector<uint16_t> dst(src.size(), 0);
+  pixel_conversions::upscalePixels16(src.data(), dst.data(), static_cast<uint32_t>(src.size()), 6);
+  for (size_t i = 0; i < src.size(); ++i) {
+    EXPECT_EQ(dst[i], static_cast<uint16_t>(src[i] << 6)) << "index=" << i;
+  }
+}
+
+TEST(PixelConversionsTest, downscalePixels16To8) {
+  // Downscale 16-bit to 8-bit by shifting right 8
+  const vector<uint16_t> src = {0, 255, 256, 65535, 32768, 1, 128};
+  vector<uint8_t> dst(src.size(), 0);
+  pixel_conversions::downscalePixels16To8(
+      src.data(), dst.data(), static_cast<uint32_t>(src.size()), 8);
+  for (size_t i = 0; i < src.size(); ++i) {
+    EXPECT_EQ(dst[i], static_cast<uint8_t>((src[i] >> 8) & 0xFF)) << "index=" << i;
+  }
+}
+
+TEST(PixelConversionsTest, downscalePixels16To8_variousShifts) {
+  // Test different shift amounts (2, 4, 8) used for GREY10, GREY12, GREY16
+  for (uint16_t shift : {2, 4, 8}) {
+    const vector<uint16_t> src = {0, 1000, 4095, 65535};
+    vector<uint8_t> dst(src.size(), 0xFF);
+    pixel_conversions::downscalePixels16To8(
+        src.data(), dst.data(), static_cast<uint32_t>(src.size()), shift);
+    for (size_t i = 0; i < src.size(); ++i) {
+      EXPECT_EQ(dst[i], static_cast<uint8_t>((src[i] >> shift) & 0xFF))
+          << "shift=" << shift << " index=" << i;
+    }
+  }
+}
