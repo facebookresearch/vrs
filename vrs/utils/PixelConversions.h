@@ -22,6 +22,7 @@
 namespace vrs::utils::pixel_conversions {
 
 /// Convert RGBA8 rows to RGB8 rows, dropping the alpha channel.
+/// Optimized with 64-bit wide reads/writes when pointers are 8-byte aligned.
 void convertRgbaToRgb(
     const uint8_t* src,
     size_t srcStride,

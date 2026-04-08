@@ -199,6 +199,102 @@ TEST_F(PixelFrameTest, jpegTest) {
 }
 #endif
 
+/// Helper: create an RGBA8 PixelFrame filled with a known pattern.
+/// Each pixel is {R=pixelIndex*3+1, G=pixelIndex*3+2, B=pixelIndex*3+3, A=0xFF}.
+static PixelFrame makeRgbaFrame(uint32_t width, uint32_t height) {
+  PixelFrame frame(PixelFormat::RGBA8, width, height);
+  uint8_t* dst = frame.wdata();
+  uint32_t stride = frame.getStride();
+  uint8_t counter = 1;
+  for (uint32_t h = 0; h < height; ++h) {
+    uint8_t* row = dst + h * stride;
+    for (uint32_t w = 0; w < width; ++w) {
+      row[w * 4 + 0] = counter++;
+      row[w * 4 + 1] = counter++;
+      row[w * 4 + 2] = counter++;
+      row[w * 4 + 3] = 0xFF; // alpha
+    }
+  }
+  return frame;
+}
+
+/// Verify that an RGB8 frame contains the expected R,G,B values from makeRgbaFrame's pattern,
+/// i.e., the alpha channel was dropped and the RGB values are preserved.
+static void
+verifyRgbFrame(const PixelFrame& rgbFrame, uint32_t expectedWidth, uint32_t expectedHeight) {
+  ASSERT_EQ(rgbFrame.getPixelFormat(), PixelFormat::RGB8);
+  ASSERT_EQ(rgbFrame.getWidth(), expectedWidth);
+  ASSERT_EQ(rgbFrame.getHeight(), expectedHeight);
+  const uint8_t* src = rgbFrame.rdata();
+  uint32_t stride = rgbFrame.getStride();
+  uint8_t counter = 1;
+  for (uint32_t h = 0; h < expectedHeight; ++h) {
+    const uint8_t* row = src + h * stride;
+    for (uint32_t w = 0; w < expectedWidth; ++w) {
+      EXPECT_EQ(row[w * 3 + 0], counter++) << "R mismatch at pixel (" << w << ", " << h << ")";
+      EXPECT_EQ(row[w * 3 + 1], counter++) << "G mismatch at pixel (" << w << ", " << h << ")";
+      EXPECT_EQ(row[w * 3 + 2], counter++) << "B mismatch at pixel (" << w << ", " << h << ")";
+    }
+  }
+}
+
+TEST_F(PixelFrameTest, inplaceRgbaToRgbBasic) {
+  constexpr uint32_t kWidth = 16;
+  constexpr uint32_t kHeight = 4;
+  PixelFrame frame = makeRgbaFrame(kWidth, kHeight);
+  ASSERT_EQ(frame.getPixelFormat(), PixelFormat::RGBA8);
+  EXPECT_TRUE(frame.inplaceRgbaToRgb());
+  verifyRgbFrame(frame, kWidth, kHeight);
+}
+
+TEST_F(PixelFrameTest, convertRgbaToRgbBasic) {
+  constexpr uint32_t kWidth = 16;
+  constexpr uint32_t kHeight = 4;
+  PixelFrame frame = makeRgbaFrame(kWidth, kHeight);
+  shared_ptr<PixelFrame> rgbFrame;
+  EXPECT_TRUE(frame.convertRgbaToRgb(rgbFrame));
+  ASSERT_NE(rgbFrame, nullptr);
+  verifyRgbFrame(*rgbFrame, kWidth, kHeight);
+  // Source frame is unchanged
+  EXPECT_EQ(frame.getPixelFormat(), PixelFormat::RGBA8);
+}
+
+TEST_F(PixelFrameTest, rgbaToRgbRejectsNonRgba) {
+  PixelFrame grey(PixelFormat::GREY8, 4, 4);
+  EXPECT_FALSE(grey.inplaceRgbaToRgb());
+  PixelFrame rgb(PixelFormat::RGB8, 4, 4);
+  shared_ptr<PixelFrame> out;
+  EXPECT_FALSE(rgb.convertRgbaToRgb(out));
+}
+
+// Test widths that exercise all code paths in convertRgbaToRgbRows:
+// - 8-pixel vectorized loop
+// - 2-pixel scalar cleanup
+// - 1-pixel trailing cleanup
+TEST_F(PixelFrameTest, rgbaToRgbOddWidths) {
+  for (uint32_t width : {1, 2, 3, 7, 9, 15, 17}) {
+    PixelFrame inplace = makeRgbaFrame(width, 2);
+    EXPECT_TRUE(inplace.inplaceRgbaToRgb()) << "width=" << width;
+    verifyRgbFrame(inplace, width, 2);
+    PixelFrame source = makeRgbaFrame(width, 2);
+    shared_ptr<PixelFrame> converted;
+    EXPECT_TRUE(source.convertRgbaToRgb(converted)) << "width=" << width;
+    verifyRgbFrame(*converted, width, 2);
+  }
+}
+
+TEST_F(PixelFrameTest, rgbaToRgbInplaceAndConvertMatch) {
+  constexpr uint32_t kWidth = 19;
+  constexpr uint32_t kHeight = 5;
+  PixelFrame inplace = makeRgbaFrame(kWidth, kHeight);
+  PixelFrame source = makeRgbaFrame(kWidth, kHeight);
+  ASSERT_TRUE(inplace.inplaceRgbaToRgb());
+  shared_ptr<PixelFrame> converted;
+  ASSERT_TRUE(source.convertRgbaToRgb(converted));
+  ASSERT_EQ(inplace.getSpec(), converted->getSpec());
+  EXPECT_EQ(inplace.getBuffer(), converted->getBuffer());
+}
+
 TEST_F(PixelFrameTest, resizeOptionsResizeFormats) {
   constexpr uint32_t kSourceWidth = 32;
   constexpr uint32_t kSourceHeight = 24;

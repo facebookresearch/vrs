@@ -16,6 +16,8 @@
 
 #include <vrs/utils/PixelConversions.h>
 
+#include <vrs/os/CompilerAttributes.h>
+
 #include <cmath>
 #include <cstring>
 #include <limits>
@@ -25,6 +27,25 @@ using namespace std;
 namespace vrs::utils::pixel_conversions {
 
 const uint8_t kNaNPixel = 0;
+
+namespace {
+template <size_t Alignment>
+MAYBE_UNUSED inline bool isAligned(const void* ptr) {
+  return (reinterpret_cast<uintptr_t>(ptr) % Alignment) == 0;
+}
+template <>
+MAYBE_UNUSED inline bool isAligned<2>(const void* ptr) {
+  return (reinterpret_cast<uintptr_t>(ptr) & 1) == 0;
+}
+template <>
+MAYBE_UNUSED inline bool isAligned<4>(const void* ptr) {
+  return (reinterpret_cast<uintptr_t>(ptr) & 3) == 0;
+}
+template <>
+MAYBE_UNUSED inline bool isAligned<8>(const void* ptr) {
+  return (reinterpret_cast<uintptr_t>(ptr) & 7) == 0;
+}
+} // namespace
 
 void convertRgbaToRgb(
     const uint8_t* src,
@@ -36,12 +57,48 @@ void convertRgbaToRgb(
   for (uint32_t h = 0; h < height; ++h) {
     const uint8_t* srcPtr = src + h * srcStride;
     uint8_t* outPtr = dst + h * dstStride;
-    for (uint32_t w = 0; w < width; ++w) {
+    uint32_t w = 0;
+    // Use wide 64-bit operations only if both line pointers are 8-byte aligned.
+    // Within the line, the 8-pixel loop advances src by 32 and dst by 24 bytes,
+    // both multiples of 8, so alignment is maintained across iterations.
+    if (isAligned<8>(srcPtr) && isAligned<8>(outPtr)) {
+      // Process 8 RGBA pixels (32 bytes) -> 8 RGB pixels (24 bytes) per iteration.
+      for (; w + 7 < width; w += 8, srcPtr += 32, outPtr += 24) {
+        const uint64_t s0 = *reinterpret_cast<const uint64_t*>(srcPtr + 0); // p0,p1
+        const uint64_t s1 = *reinterpret_cast<const uint64_t*>(srcPtr + 8); // p2,p3
+        const uint64_t s2 = *reinterpret_cast<const uint64_t*>(srcPtr + 16); // p4,p5
+        const uint64_t s3 = *reinterpret_cast<const uint64_t*>(srcPtr + 24); // p6,p7
+        // Extract 6 RGB bytes from each 64-bit pair (drop alpha bytes at bit 24 and 56).
+        const uint64_t rgbs01 = (s0 & 0x0000000000FFFFFFull) | ((s0 >> 8) & 0x0000FFFFFF000000ull);
+        const uint64_t rgbs23 = (s1 & 0x0000000000FFFFFFull) | ((s1 >> 8) & 0x0000FFFFFF000000ull);
+        const uint64_t rgbs45 = (s2 & 0x0000000000FFFFFFull) | ((s2 >> 8) & 0x0000FFFFFF000000ull);
+        const uint64_t rgbs67 = (s3 & 0x0000000000FFFFFFull) | ((s3 >> 8) & 0x0000FFFFFF000000ull);
+        // Pack 24 output bytes into 3x64-bit words and store.
+        const uint64_t d0 = rgbs01 | ((rgbs23 & 0x000000000000FFFFull) << 48);
+        const uint64_t d1 =
+            ((rgbs23 >> 16) & 0x00000000FFFFFFFFull) | ((rgbs45 & 0x00000000FFFFFFFFull) << 32);
+        const uint64_t d2 = ((rgbs45 >> 32) & 0x000000000000FFFFull) | (rgbs67 << 16);
+        *reinterpret_cast<uint64_t*>(outPtr + 0) = d0;
+        *reinterpret_cast<uint64_t*>(outPtr + 8) = d1;
+        *reinterpret_cast<uint64_t*>(outPtr + 16) = d2;
+      }
+      // Process 2 pixels at a time with 64-bit read + 6-byte scalar write.
+      // srcPtr advances by 8 (still 8-aligned); outPtr writes are byte-level.
+      for (; w + 1 < width; w += 2, srcPtr += 8, outPtr += 6) {
+        const uint64_t v = *reinterpret_cast<const uint64_t*>(srcPtr);
+        outPtr[0] = static_cast<uint8_t>(v >> 0);
+        outPtr[1] = static_cast<uint8_t>(v >> 8);
+        outPtr[2] = static_cast<uint8_t>(v >> 16);
+        outPtr[3] = static_cast<uint8_t>(v >> 32);
+        outPtr[4] = static_cast<uint8_t>(v >> 40);
+        outPtr[5] = static_cast<uint8_t>(v >> 48);
+      }
+    }
+    // Scalar tail: handles all remaining pixels, or all pixels if unaligned.
+    for (; w < width; ++w, srcPtr += 4, outPtr += 3) {
       outPtr[0] = srcPtr[0];
       outPtr[1] = srcPtr[1];
       outPtr[2] = srcPtr[2];
-      outPtr += 3;
-      srcPtr += 4;
     }
   }
 }
