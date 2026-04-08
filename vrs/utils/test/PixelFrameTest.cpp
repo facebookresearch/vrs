@@ -445,6 +445,27 @@ TEST(PixelConversionsTest, convertYuy2ToRgb8_knownValues) {
   EXPECT_EQ(rgb[5], 130); // B1
 }
 
+TEST(PixelConversionsTest, convertYuy2ToRgb8_unaligned) {
+  // Same input as knownValues, but force a misaligned source pointer to exercise
+  // the byte-read fallback path (non-uint32_t reads).
+  constexpr uint32_t kWidth = 2;
+  constexpr uint32_t kHeight = 1;
+  alignas(4) uint8_t storage[8]; // force 4-byte alignment of the base
+  uint8_t* yuy2 = storage + 1; // guaranteed misaligned (4n+1)
+  yuy2[0] = 128; // Y0
+  yuy2[1] = 128; // U
+  yuy2[2] = 128; // Y1
+  yuy2[3] = 128; // V
+  uint8_t rgb[6] = {};
+  pixel_conversions::convertYuy2ToRgb8(yuy2, 4, rgb, 6, kWidth, kHeight);
+  EXPECT_EQ(rgb[0], 130);
+  EXPECT_EQ(rgb[1], 130);
+  EXPECT_EQ(rgb[2], 130);
+  EXPECT_EQ(rgb[3], 130);
+  EXPECT_EQ(rgb[4], 130);
+  EXPECT_EQ(rgb[5], 130);
+}
+
 TEST(PixelConversionsTest, convertYuy2ToRgb8_clamping) {
   // Y0=0, U=0, Y1=255, V=255 → tests both low and high clamping
   constexpr uint32_t kWidth = 2;
