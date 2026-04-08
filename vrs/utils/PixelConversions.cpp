@@ -106,12 +106,48 @@ void convertRgbaToRgb(
 void convertBgr8ToRgb8(const uint8_t* src, uint8_t* dst, uint32_t pixelCount) {
   const uint8_t* srcPtr = src;
   uint8_t* outPtr = dst;
-  for (uint32_t i = 0; i < pixelCount; ++i) {
+  uint32_t i = 0;
+  // Process 8 pixels (24 bytes = 3x uint64_t) per iteration when 8-byte aligned.
+  // Both src and dst advance by 24 bytes (3x 8), so alignment is maintained.
+  if (isAligned<8>(srcPtr) && isAligned<8>(outPtr)) {
+    for (; i + 7 < pixelCount; i += 8, srcPtr += 24, outPtr += 24) {
+      // Little-endian byte layout across 3 x uint64_t words:
+      //   s0: [B0 G0 R0 | B1 G1 R1 | B2 G2]
+      //   s1: [R2 | B3 G3 R3 | B4 G4 R4 | B5]
+      //   s2: [G5 R5 | B6 G6 R6 | B7 G7 R7]
+      // Swap B↔R within each pixel to produce RGB output:
+      //   d0: [R0 G0 B0 | R1 G1 B1 | R2 G2]
+      //   d1: [B2 | R3 G3 B3 | R4 G4 B4 | R5]
+      //   d2: [G5 B5 | R6 G6 B6 | R7 G7 B7]
+      const uint64_t s0 = *reinterpret_cast<const uint64_t*>(srcPtr);
+      const uint64_t s1 = *reinterpret_cast<const uint64_t*>(srcPtr + 8);
+      const uint64_t s2 = *reinterpret_cast<const uint64_t*>(srcPtr + 16);
+      // d0: swap bytes 0↔2 (pixel 0), 3↔5 (pixel 1); byte 6 from s1[0]; byte 7 unchanged.
+      const uint64_t d0 = ((s0 >> 16) & 0x000000000000FFull) | (s0 & 0x0000000000FF00ull) |
+          ((s0 << 16) & 0x00000000FF0000ull) | ((s0 >> 16) & 0x000000FF000000ull) |
+          (s0 & 0x0000FF00000000ull) | ((s0 << 16) & 0x00FF0000000000ull) |
+          ((s1 << 48) & 0xFF000000000000ull) | (s0 & 0xFF00000000000000ull);
+      // d1: byte 0 from s0[6]; swap bytes 1↔3 (pixel 3), 4↔6 (pixel 4); byte 7 from s2[1].
+      const uint64_t d1 = ((s0 >> 48) & 0x00000000000000FFull) |
+          ((s1 >> 16) & 0x000000000000FF00ull) | (s1 & 0x0000000000FF0000ull) |
+          ((s1 << 16) & 0x00000000FF000000ull) | ((s1 >> 16) & 0x000000FF00000000ull) |
+          (s1 & 0x0000FF0000000000ull) | ((s1 << 16) & 0x00FF000000000000ull) |
+          ((s2 << 48) & 0xFF00000000000000ull);
+      // d2: byte 0 unchanged; byte 1 from s1[7]; swap bytes 2↔4 (pixel 6), 5↔7 (pixel 7).
+      const uint64_t d2 = (s2 & 0x00000000000000FFull) | ((s1 >> 48) & 0x000000000000FF00ull) |
+          ((s2 >> 16) & 0x0000000000FF0000ull) | (s2 & 0x00000000FF000000ull) |
+          ((s2 << 16) & 0x000000FF00000000ull) | ((s2 >> 16) & 0x0000FF0000000000ull) |
+          (s2 & 0x00FF000000000000ull) | ((s2 << 16) & 0xFF00000000000000ull);
+      *reinterpret_cast<uint64_t*>(outPtr) = d0;
+      *reinterpret_cast<uint64_t*>(outPtr + 8) = d1;
+      *reinterpret_cast<uint64_t*>(outPtr + 16) = d2;
+    }
+  }
+  // Scalar tail: handles remaining pixels or all pixels if unaligned.
+  for (; i < pixelCount; ++i, srcPtr += 3, outPtr += 3) {
     outPtr[0] = srcPtr[2];
     outPtr[1] = srcPtr[1];
     outPtr[2] = srcPtr[0];
-    srcPtr += 3;
-    outPtr += 3;
   }
 }
 

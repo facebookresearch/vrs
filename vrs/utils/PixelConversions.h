@@ -32,6 +32,7 @@ void convertRgbaToRgb(
     uint32_t height);
 
 /// Convert BGR8 pixels to RGB8 pixels by swapping R and B channels.
+/// Unrolled to process 8 pixels per iteration for reduced loop overhead.
 void convertBgr8ToRgb8(const uint8_t* src, uint8_t* dst, uint32_t pixelCount);
 
 /// Convert RAW10 to GREY8 by extracting the 8 MSB from each 5-byte group.

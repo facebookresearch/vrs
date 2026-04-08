@@ -30,6 +30,8 @@
 #include <vrs/utils/PixelFrame.h>
 #include <vrs/utils/PixelFrameOptions.h>
 
+#include <vrs/utils/PixelConversions.h>
+
 using namespace std;
 using namespace vrs;
 using namespace vrs::utils;
@@ -315,5 +317,42 @@ TEST_F(PixelFrameTest, resizeOptionsResizeFormats) {
     EXPECT_EQ(resizedFrame->getSpec().getWidth(), kSourceWidth / 2);
     EXPECT_EQ(resizedFrame->getSpec().getHeight(), kSourceHeight / 2);
     EXPECT_EQ(resizedFrame->getSpec().getPixelFormat(), format);
+  }
+}
+
+// --- PixelConversions unit tests ---
+
+TEST(PixelConversionsTest, convertBgr8ToRgb8_basic) {
+  // 10 pixels: exercises 8-pixel unrolled path + 2-pixel remainder
+  constexpr uint32_t kPixelCount = 10;
+  vector<uint8_t> bgr(kPixelCount * 3);
+  for (uint32_t i = 0; i < kPixelCount; ++i) {
+    bgr[i * 3 + 0] = static_cast<uint8_t>(i * 3 + 1); // B
+    bgr[i * 3 + 1] = static_cast<uint8_t>(i * 3 + 2); // G
+    bgr[i * 3 + 2] = static_cast<uint8_t>(i * 3 + 3); // R
+  }
+  vector<uint8_t> rgb(kPixelCount * 3, 0);
+  pixel_conversions::convertBgr8ToRgb8(bgr.data(), rgb.data(), kPixelCount);
+  for (uint32_t i = 0; i < kPixelCount; ++i) {
+    EXPECT_EQ(rgb[i * 3 + 0], bgr[i * 3 + 2]) << "R mismatch at pixel " << i;
+    EXPECT_EQ(rgb[i * 3 + 1], bgr[i * 3 + 1]) << "G mismatch at pixel " << i;
+    EXPECT_EQ(rgb[i * 3 + 2], bgr[i * 3 + 0]) << "B mismatch at pixel " << i;
+  }
+}
+
+TEST(PixelConversionsTest, convertBgr8ToRgb8_oddCounts) {
+  // Test all counts 0..9 to exercise both unrolled and remainder paths
+  for (uint32_t count = 0; count <= 9; ++count) {
+    vector<uint8_t> bgr(count * 3);
+    for (uint32_t i = 0; i < count * 3; ++i) {
+      bgr[i] = static_cast<uint8_t>(i + 1);
+    }
+    vector<uint8_t> rgb(count * 3, 0xFF);
+    pixel_conversions::convertBgr8ToRgb8(bgr.data(), rgb.data(), count);
+    for (uint32_t i = 0; i < count; ++i) {
+      EXPECT_EQ(rgb[i * 3 + 0], bgr[i * 3 + 2]) << "count=" << count << " pixel=" << i;
+      EXPECT_EQ(rgb[i * 3 + 1], bgr[i * 3 + 1]) << "count=" << count << " pixel=" << i;
+      EXPECT_EQ(rgb[i * 3 + 2], bgr[i * 3 + 0]) << "count=" << count << " pixel=" << i;
+    }
   }
 }
