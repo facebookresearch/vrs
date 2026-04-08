@@ -356,3 +356,50 @@ TEST(PixelConversionsTest, convertBgr8ToRgb8_oddCounts) {
     }
   }
 }
+
+TEST(PixelConversionsTest, convertRaw10ToGrey8_multipleOf4) {
+  // 8 pixels = 2 groups of 4: 10 source bytes → 8 output bytes
+  constexpr uint32_t kWidth = 8;
+  constexpr uint32_t kHeight = 1;
+  // RAW10 stride: 5 bytes per 4 pixels = ceil(8/4)*5 = 10
+  constexpr size_t kSrcStride = 10;
+  vector<uint8_t> raw10(kSrcStride * kHeight);
+  // Group 0: MSB bytes 10,20,30,40; LSB byte ignored
+  raw10[0] = 10;
+  raw10[1] = 20;
+  raw10[2] = 30;
+  raw10[3] = 40;
+  raw10[4] = 0xAA; // LSB byte — should be dropped
+  // Group 1: MSB bytes 50,60,70,80
+  raw10[5] = 50;
+  raw10[6] = 60;
+  raw10[7] = 70;
+  raw10[8] = 80;
+  raw10[9] = 0xBB; // LSB byte — should be dropped
+  vector<uint8_t> grey(kWidth, 0);
+  pixel_conversions::convertRaw10ToGrey8(
+      raw10.data(), kSrcStride, grey.data(), kWidth, kWidth, kHeight);
+  const vector<uint8_t> expected = {10, 20, 30, 40, 50, 60, 70, 80};
+  EXPECT_EQ(grey, expected);
+}
+
+TEST(PixelConversionsTest, convertRaw10ToGrey8_nonMultipleOf4) {
+  // 6 pixels = 1 full group (4) + 2 remainder
+  constexpr uint32_t kWidth = 6;
+  constexpr uint32_t kHeight = 1;
+  // 1 full group (5 bytes) + 2 remainder bytes
+  constexpr size_t kSrcStride = 7;
+  vector<uint8_t> raw10(kSrcStride);
+  raw10[0] = 11;
+  raw10[1] = 22;
+  raw10[2] = 33;
+  raw10[3] = 44;
+  raw10[4] = 0xFF; // LSB — dropped
+  raw10[5] = 55; // remainder pixel 0
+  raw10[6] = 66; // remainder pixel 1
+  vector<uint8_t> grey(kWidth, 0);
+  pixel_conversions::convertRaw10ToGrey8(
+      raw10.data(), kSrcStride, grey.data(), kWidth, kWidth, kHeight);
+  const vector<uint8_t> expected = {11, 22, 33, 44, 55, 66};
+  EXPECT_EQ(grey, expected);
+}

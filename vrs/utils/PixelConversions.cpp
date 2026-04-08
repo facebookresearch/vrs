@@ -163,13 +163,53 @@ void convertRaw10ToGrey8(
   for (uint32_t h = 0; h < height; h++, srcPtr += srcStride, outPtr += dstStride) {
     const uint8_t* lineSrcPtr = srcPtr;
     uint8_t* lineOutPtr = outPtr;
-    for (uint32_t group = 0; group < width / 4; group++, lineSrcPtr += 5, lineOutPtr += 4) {
+    uint32_t group = 0;
+    const uint32_t groupCount = width / 4;
+    uint64_t d = 0;
+    // Process 2 groups (10 src bytes -> 8 dst bytes) at a time with wide writes.
+    // The 10-byte source stride cycles through alignments (e.g. 8->2->4->2->8),
+    // so we branch on alignment inside the loop to always use the widest read possible.
+    // The 8-byte destination stride maintains alignment across iterations.
+    while (group + 1 < groupCount && isAligned<8>(lineOutPtr)) {
+      if (isAligned<8>(lineSrcPtr)) {
+        // 8-byte aligned: 1x uint64_t + 1x uint16_t read
+        const uint64_t v = *reinterpret_cast<const uint64_t*>(lineSrcPtr);
+        const uint16_t v1 = *reinterpret_cast<const uint16_t*>(lineSrcPtr + 8);
+        // v: [M0 M1 M2 M3 L0 M4 M5 M6], v1: [M7 L1]
+        d = (v & 0x00000000FFFFFFFFull) | ((v >> 8) & 0x00FFFFFF00000000ull) |
+            (static_cast<uint64_t>(v1 & 0xFF) << 56);
+      } else if (isAligned<4>(lineSrcPtr)) {
+        // 4-byte aligned: 2x uint32_t + 1 byte read
+        const uint32_t g0 = *reinterpret_cast<const uint32_t*>(lineSrcPtr); // [M0 M1 M2 M3]
+        const uint32_t g1 = *reinterpret_cast<const uint32_t*>(lineSrcPtr + 4); // [L0 M4 M5 M6]
+        d = static_cast<uint64_t>(g0) | (static_cast<uint64_t>(g1 >> 8) << 32) |
+            (static_cast<uint64_t>(lineSrcPtr[8]) << 56);
+      } else if (isAligned<2>(lineSrcPtr)) {
+        // 2-byte aligned: 5x uint16_t reads
+        const uint16_t w0 = *reinterpret_cast<const uint16_t*>(lineSrcPtr); // [M0 M1]
+        const uint16_t w1 = *reinterpret_cast<const uint16_t*>(lineSrcPtr + 2); // [M2 M3]
+        const uint16_t w2 = *reinterpret_cast<const uint16_t*>(lineSrcPtr + 4); // [L0 M4]
+        const uint16_t w3 = *reinterpret_cast<const uint16_t*>(lineSrcPtr + 6); // [M5 M6]
+        const uint16_t w4 = *reinterpret_cast<const uint16_t*>(lineSrcPtr + 8); // [M7 L1]
+        d = static_cast<uint64_t>(w0) | (static_cast<uint64_t>(w1) << 16) |
+            (static_cast<uint64_t>(w2 >> 8) << 32) | (static_cast<uint64_t>(w3) << 40) |
+            (static_cast<uint64_t>(w4 & 0xFF) << 56);
+      } else {
+        break; // odd alignment, fall to scalar
+      }
+      *reinterpret_cast<uint64_t*>(lineOutPtr) = d;
+      group += 2;
+      lineSrcPtr += 10;
+      lineOutPtr += 8;
+    }
+    // Scalar fallback: copy 4 MSB bytes per group, skip LSB byte.
+    for (; group < groupCount; group++, lineSrcPtr += 5, lineOutPtr += 4) {
       lineOutPtr[0] = lineSrcPtr[0];
       lineOutPtr[1] = lineSrcPtr[1];
       lineOutPtr[2] = lineSrcPtr[2];
       lineOutPtr[3] = lineSrcPtr[3];
     }
-    // width is most probably a multiple of 4. In case it isn't...
+    // Handle remainder pixels (width not a multiple of 4).
     for (uint32_t remainder = 0; remainder < width % 4; remainder++) {
       lineOutPtr[remainder] = lineSrcPtr[remainder];
     }

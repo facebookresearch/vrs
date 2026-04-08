@@ -36,6 +36,7 @@ void convertRgbaToRgb(
 void convertBgr8ToRgb8(const uint8_t* src, uint8_t* dst, uint32_t pixelCount);
 
 /// Convert RAW10 to GREY8 by extracting the 8 MSB from each 5-byte group.
+/// Optimized with 64-bit wide reads/writes when pointers are aligned.
 void convertRaw10ToGrey8(
     const uint8_t* src,
     size_t srcStride,
