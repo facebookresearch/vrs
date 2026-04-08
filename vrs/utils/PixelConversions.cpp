@@ -374,86 +374,51 @@ void normalizeBufferWithRange(
   }
 }
 
-struct Triplet {
-  uint8_t r, g, b;
-};
-struct TripletF {
-  float r, g, b;
-};
-
 void normalizeRGBXfloatToRGB8(
     const uint8_t* pixelPtr,
     uint8_t* outPtr,
     uint32_t pixelCount,
     size_t channelCount) {
   const float* srcPtr = reinterpret_cast<const float*>(pixelPtr);
-  TripletF min{0, 0, 0};
-  TripletF max{0, 0, 0};
-  // initialize min & max for each dimension.
-  Triplet init{0, 0, 0};
-  for (uint32_t pixelIndex = 0; pixelIndex < pixelCount && (init.r + init.g + init.b) < 3;
-       ++pixelIndex, srcPtr += channelCount) {
-    const TripletF* pixel = reinterpret_cast<const TripletF*>(srcPtr);
-    if (init.r == 0 && !isnan(pixel->r)) {
-      min.r = max.r = pixel->r;
-      init.r = 1;
-    }
-    if (init.g == 0 && !isnan(pixel->g)) {
-      min.g = max.g = pixel->g;
-      init.g = 1;
-    }
-    if (init.b == 0 && !isnan(pixel->b)) {
-      min.b = max.b = pixel->b;
-      init.b = 1;
-    }
-  }
+  float channelMin[3] = {0, 0, 0};
+  float channelMax[3] = {0, 0, 0};
+  bool initialized[3] = {false, false, false};
   bool nan = false;
-  srcPtr = reinterpret_cast<const float*>(pixelPtr);
-  for (uint32_t pixelIndex = 0; pixelIndex < pixelCount; ++pixelIndex, srcPtr += channelCount) {
-    const TripletF* pixel = reinterpret_cast<const TripletF*>(srcPtr);
-    if (isnan(pixel->r)) {
-      nan = true;
-    } else if (pixel->r < min.r) {
-      min.r = pixel->r;
-    } else if (pixel->r > max.r) {
-      max.r = pixel->r;
-    }
-    if (isnan(pixel->g)) {
-      nan = true;
-    } else if (pixel->g < min.g) {
-      min.g = pixel->g;
-    } else if (pixel->g > max.g) {
-      max.g = pixel->g;
-    }
-    if (isnan(pixel->b)) {
-      nan = true;
-    } else if (pixel->b < min.b) {
-      min.b = pixel->b;
-    } else if (pixel->b > max.b) {
-      max.b = pixel->b;
+  // Single pass: find per-channel min/max, track NaN presence.
+  for (uint32_t i = 0; i < pixelCount; ++i, srcPtr += channelCount) {
+    for (int ch = 0; ch < 3; ++ch) {
+      const float v = srcPtr[ch];
+      if (isnan(v)) {
+        nan = true;
+      } else if (!initialized[ch]) {
+        channelMin[ch] = channelMax[ch] = v;
+        initialized[ch] = true;
+      } else if (v < channelMin[ch]) {
+        channelMin[ch] = v;
+      } else if (v > channelMax[ch]) {
+        channelMax[ch] = v;
+      }
     }
   }
-  const float factorR = max.r > min.r ? numeric_limits<uint8_t>::max() / (max.r - min.r) : 0;
-  const float factorG = max.g > min.g ? numeric_limits<uint8_t>::max() / (max.g - min.g) : 0;
-  const float factorB = max.b > min.b ? numeric_limits<uint8_t>::max() / (max.b - min.b) : 0;
+  float factor[3];
+  for (int ch = 0; ch < 3; ++ch) {
+    factor[ch] = channelMax[ch] > channelMin[ch]
+        ? numeric_limits<uint8_t>::max() / (channelMax[ch] - channelMin[ch])
+        : 0;
+  }
   srcPtr = reinterpret_cast<const float*>(pixelPtr);
   if (nan) {
-    for (uint32_t pixelIndex = 0; pixelIndex < pixelCount;
-         ++pixelIndex, srcPtr += channelCount, outPtr += 3) {
-      const TripletF* pixel = reinterpret_cast<const TripletF*>(srcPtr);
-      Triplet* out = reinterpret_cast<Triplet*>(outPtr);
-      out->r = isnan(pixel->r) ? kNaNPixel : static_cast<uint8_t>((pixel->r - min.r) * factorR);
-      out->g = isnan(pixel->g) ? kNaNPixel : static_cast<uint8_t>((pixel->g - min.g) * factorG);
-      out->b = isnan(pixel->b) ? kNaNPixel : static_cast<uint8_t>((pixel->b - min.b) * factorB);
+    for (uint32_t i = 0; i < pixelCount; ++i, srcPtr += channelCount, outPtr += 3) {
+      for (int ch = 0; ch < 3; ++ch) {
+        const float v = srcPtr[ch];
+        outPtr[ch] = isnan(v) ? kNaNPixel : static_cast<uint8_t>((v - channelMin[ch]) * factor[ch]);
+      }
     }
   } else {
-    for (uint32_t pixelIndex = 0; pixelIndex < pixelCount;
-         ++pixelIndex, srcPtr += channelCount, outPtr += 3) {
-      const TripletF* pixel = reinterpret_cast<const TripletF*>(srcPtr);
-      Triplet* out = reinterpret_cast<Triplet*>(outPtr);
-      out->r = static_cast<uint8_t>((pixel->r - min.r) * factorR);
-      out->g = static_cast<uint8_t>((pixel->g - min.g) * factorG);
-      out->b = static_cast<uint8_t>((pixel->b - min.b) * factorB);
+    for (uint32_t i = 0; i < pixelCount; ++i, srcPtr += channelCount, outPtr += 3) {
+      for (int ch = 0; ch < 3; ++ch) {
+        outPtr[ch] = static_cast<uint8_t>((srcPtr[ch] - channelMin[ch]) * factor[ch]);
+      }
     }
   }
 }

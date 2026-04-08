@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include <cmath>
 #include <memory>
 #include <string>
 
@@ -500,4 +501,111 @@ TEST(PixelConversionsTest, downscalePixels16To8_variousShifts) {
           << "shift=" << shift << " index=" << i;
     }
   }
+}
+
+TEST(PixelConversionsTest, normalizeBuffer_floatRange) {
+  // 4 float pixels: 0.0, 0.5, 1.0, NaN → should map to 0, 127, 255, 0
+  const float src[] = {0.0f, 0.5f, 1.0f, nanf("")};
+  uint8_t dst[4] = {};
+  pixel_conversions::normalizeBuffer<float>(reinterpret_cast<const uint8_t*>(src), dst, 4);
+  EXPECT_EQ(dst[0], 0); // min
+  EXPECT_EQ(dst[1], 127); // midpoint
+  EXPECT_EQ(dst[2], 255); // max
+  EXPECT_EQ(dst[3], 0); // NaN → 0
+}
+
+TEST(PixelConversionsTest, normalizeBuffer_constantInput) {
+  // All same value → blank output
+  const float src[] = {5.0f, 5.0f, 5.0f};
+  uint8_t dst[3] = {0xFF, 0xFF, 0xFF};
+  pixel_conversions::normalizeBuffer<float>(reinterpret_cast<const uint8_t*>(src), dst, 3);
+  EXPECT_EQ(dst[0], 0);
+  EXPECT_EQ(dst[1], 0);
+  EXPECT_EQ(dst[2], 0);
+}
+
+TEST(PixelConversionsTest, normalizeBufferWithRange_clamping) {
+  const float src[] = {-1.0f, 0.0f, 0.5f, 1.0f, 2.0f, nanf("")};
+  uint8_t dst[6] = {};
+  pixel_conversions::normalizeBufferWithRange(
+      reinterpret_cast<const uint8_t*>(src), dst, 6, 0.0f, 1.0f);
+  EXPECT_EQ(dst[0], 0); // below min → 0
+  EXPECT_EQ(dst[1], 0); // at min → 0
+  EXPECT_EQ(dst[2], 127); // midpoint
+  EXPECT_EQ(dst[3], 255); // at max → 255
+  EXPECT_EQ(dst[4], 255); // above max → 255
+  EXPECT_EQ(dst[5], 0); // NaN → 0
+}
+
+TEST(PixelConversionsTest, normalizeRGBXfloatToRGB8_uniform) {
+  // 2 RGB32F pixels with uniform per-channel ranges: R=[0,1], G=[0,2], B=[0,4]
+  const float src[] = {0.0f, 0.0f, 0.0f, 1.0f, 2.0f, 4.0f};
+  uint8_t dst[6] = {};
+  pixel_conversions::normalizeRGBXfloatToRGB8(reinterpret_cast<const uint8_t*>(src), dst, 2, 3);
+  // Pixel 0: all at min → 0
+  EXPECT_EQ(dst[0], 0);
+  EXPECT_EQ(dst[1], 0);
+  EXPECT_EQ(dst[2], 0);
+  // Pixel 1: all at max → 255
+  EXPECT_EQ(dst[3], 255);
+  EXPECT_EQ(dst[4], 255);
+  EXPECT_EQ(dst[5], 255);
+}
+
+TEST(PixelConversionsTest, normalizeBuffer_double) {
+  const double src[] = {-10.0, 0.0, 10.0};
+  uint8_t dst[3] = {};
+  pixel_conversions::normalizeBuffer<double>(reinterpret_cast<const uint8_t*>(src), dst, 3);
+  EXPECT_EQ(dst[0], 0); // min
+  EXPECT_EQ(dst[1], 127); // midpoint
+  EXPECT_EQ(dst[2], 255); // max
+}
+
+TEST(PixelConversionsTest, normalizeBuffer_allNaN) {
+  const float src[] = {nanf(""), nanf(""), nanf("")};
+  uint8_t dst[3] = {0xFF, 0xFF, 0xFF};
+  pixel_conversions::normalizeBuffer<float>(reinterpret_cast<const uint8_t*>(src), dst, 3);
+  // All NaN → min >= max (both 0), so memset to 0
+  EXPECT_EQ(dst[0], 0);
+  EXPECT_EQ(dst[1], 0);
+  EXPECT_EQ(dst[2], 0);
+}
+
+TEST(PixelConversionsTest, normalizeRGBXfloatToRGB8_withNaN) {
+  // 3 pixels with NaN in some channels. Need ≥2 distinct non-NaN values per channel for range.
+  const float src[] = {
+      0.0f,
+      0.0f,
+      0.0f, // pixel 0: all at min
+      1.0f,
+      2.0f,
+      4.0f, // pixel 1: all at max
+      nanf(""),
+      nanf(""),
+      nanf(""), // pixel 2: all NaN
+  };
+  uint8_t dst[9] = {};
+  pixel_conversions::normalizeRGBXfloatToRGB8(reinterpret_cast<const uint8_t*>(src), dst, 3, 3);
+  EXPECT_EQ(dst[0], 0); // R min
+  EXPECT_EQ(dst[1], 0); // G min
+  EXPECT_EQ(dst[2], 0); // B min
+  EXPECT_EQ(dst[3], 255); // R max
+  EXPECT_EQ(dst[4], 255); // G max
+  EXPECT_EQ(dst[5], 255); // B max
+  EXPECT_EQ(dst[6], 0); // R NaN → 0
+  EXPECT_EQ(dst[7], 0); // G NaN → 0
+  EXPECT_EQ(dst[8], 0); // B NaN → 0
+}
+
+TEST(PixelConversionsTest, normalizeRGBXfloatToRGB8_rgba32f) {
+  // 2 RGBA32F pixels (channelCount=4), alpha channel should be skipped
+  const float src[] = {0.0f, 0.0f, 0.0f, 99.0f, 1.0f, 2.0f, 4.0f, 99.0f};
+  uint8_t dst[6] = {};
+  pixel_conversions::normalizeRGBXfloatToRGB8(reinterpret_cast<const uint8_t*>(src), dst, 2, 4);
+  EXPECT_EQ(dst[0], 0);
+  EXPECT_EQ(dst[1], 0);
+  EXPECT_EQ(dst[2], 0);
+  EXPECT_EQ(dst[3], 255);
+  EXPECT_EQ(dst[4], 255);
+  EXPECT_EQ(dst[5], 255);
 }
