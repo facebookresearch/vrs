@@ -173,7 +173,6 @@ bool PixelFrame::readFrame(RecordReader* reader, const ContentBlock& cb) {
     default:
       return false;
   }
-  return false;
 }
 
 bool PixelFrame::readDiskImageData(RecordReader* reader, const ContentBlock& cb) {
@@ -284,7 +283,6 @@ bool PixelFrame::readCompressedFrame(const std::vector<uint8_t>& pixels, ImageFo
     default:
       return false;
   }
-  return false;
 }
 
 void PixelFrame::normalizeFrame(
