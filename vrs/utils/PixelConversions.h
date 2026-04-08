@@ -46,6 +46,7 @@ void convertRaw10ToGrey8(
     uint32_t height);
 
 /// Convert single-channel grey pixels to RGB8 by triplicating each grey value.
+/// Reads 4 grey bytes via uint32_t, writes 12 RGB bytes via 3x uint32_t.
 void convertGreyToRgb8(
     const uint8_t* src,
     size_t srcStride,

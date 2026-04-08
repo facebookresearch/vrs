@@ -228,7 +228,23 @@ void convertGreyToRgb8(
   for (uint32_t h = 0; h < height; h++, srcPtr += srcStride, outPtr += dstStride) {
     const uint8_t* lineSrcPtr = srcPtr;
     uint8_t* lineOutPtr = outPtr;
-    for (uint32_t w = 0; w < width; w++, lineSrcPtr++, lineOutPtr += 3) {
+    uint32_t w = 0;
+    // Read 4 grey bytes via uint32_t, triplicate each via bit shifts,
+    // write 12 RGB bytes as 3x uint32_t stores.
+    // Both src (4-byte stride) and dst (12-byte stride) maintain 4-byte alignment.
+    if (isAligned<4>(lineSrcPtr) && isAligned<4>(lineOutPtr)) {
+      for (; w + 3 < width; w += 4, lineSrcPtr += 4, lineOutPtr += 12) {
+        const uint32_t v = *reinterpret_cast<const uint32_t*>(lineSrcPtr);
+        const uint32_t g0 = v & 0xFF;
+        const uint32_t g1 = (v >> 8) & 0xFF;
+        const uint32_t g2 = (v >> 16) & 0xFF;
+        const uint32_t g3 = (v >> 24) & 0xFF;
+        *reinterpret_cast<uint32_t*>(lineOutPtr) = g0 | (g0 << 8) | (g0 << 16) | (g1 << 24);
+        *reinterpret_cast<uint32_t*>(lineOutPtr + 4) = g1 | (g1 << 8) | (g2 << 16) | (g2 << 24);
+        *reinterpret_cast<uint32_t*>(lineOutPtr + 8) = g2 | (g3 << 8) | (g3 << 16) | (g3 << 24);
+      }
+    }
+    for (; w < width; w++, lineSrcPtr++, lineOutPtr += 3) {
       lineOutPtr[0] = lineSrcPtr[0];
       lineOutPtr[1] = lineSrcPtr[0];
       lineOutPtr[2] = lineSrcPtr[0];

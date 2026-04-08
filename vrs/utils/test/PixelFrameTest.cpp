@@ -403,3 +403,24 @@ TEST(PixelConversionsTest, convertRaw10ToGrey8_nonMultipleOf4) {
   const vector<uint8_t> expected = {11, 22, 33, 44, 55, 66};
   EXPECT_EQ(grey, expected);
 }
+
+TEST(PixelConversionsTest, convertGreyToRgb8_basic) {
+  constexpr uint32_t kWidth = 6; // exercises 4-pixel batch + 2 remainder
+  constexpr uint32_t kHeight = 2;
+  vector<uint8_t> grey(kWidth * kHeight);
+  for (uint32_t i = 0; i < grey.size(); ++i) {
+    grey[i] = static_cast<uint8_t>(i * 10);
+  }
+  vector<uint8_t> rgb(kWidth * 3 * kHeight, 0);
+  pixel_conversions::convertGreyToRgb8(
+      grey.data(), kWidth, rgb.data(), kWidth * 3, kWidth, kHeight);
+  for (uint32_t h = 0; h < kHeight; ++h) {
+    for (uint32_t w = 0; w < kWidth; ++w) {
+      uint8_t g = grey[h * kWidth + w];
+      size_t off = h * kWidth * 3 + w * 3;
+      EXPECT_EQ(rgb[off + 0], g) << "R at (" << w << "," << h << ")";
+      EXPECT_EQ(rgb[off + 1], g) << "G at (" << w << "," << h << ")";
+      EXPECT_EQ(rgb[off + 2], g) << "B at (" << w << "," << h << ")";
+    }
+  }
+}
