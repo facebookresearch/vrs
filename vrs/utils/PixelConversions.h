@@ -61,6 +61,7 @@ inline uint8_t clipToUint8(int value) {
 }
 
 /// Convert YUY2 (YUYV) to RGB8.
+/// Reads each 4-byte macro-pixel as uint32_t when aligned, writes 2 RGB pixels as bytes.
 void convertYuy2ToRgb8(
     const uint8_t* src,
     size_t srcStride,

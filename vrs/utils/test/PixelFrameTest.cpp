@@ -424,3 +424,45 @@ TEST(PixelConversionsTest, convertGreyToRgb8_basic) {
     }
   }
 }
+
+TEST(PixelConversionsTest, convertYuy2ToRgb8_knownValues) {
+  // YUY2 macro-pixel: Y0=128, U=128, Y1=128, V=128 → neutral grey
+  // With the BT.601 formula used: c=128-16=112, d=0, e=0
+  // R = clip((298*112 + 409*0 + 128) >> 8) = clip(130.5) = 130
+  // G = clip((298*112 - 100*0 - 208*0 + 128) >> 8) = clip(130.5) = 130
+  // B = clip((298*112 + 516*0 + 128) >> 8) = clip(130.5) = 130
+  constexpr uint32_t kWidth = 2;
+  constexpr uint32_t kHeight = 1;
+  const uint8_t yuy2[] = {128, 128, 128, 128}; // Y0 U Y1 V
+  uint8_t rgb[6] = {};
+  pixel_conversions::convertYuy2ToRgb8(yuy2, 4, rgb, 6, kWidth, kHeight);
+  EXPECT_EQ(rgb[0], 130); // R0
+  EXPECT_EQ(rgb[1], 130); // G0
+  EXPECT_EQ(rgb[2], 130); // B0
+  EXPECT_EQ(rgb[3], 130); // R1
+  EXPECT_EQ(rgb[4], 130); // G1
+  EXPECT_EQ(rgb[5], 130); // B1
+}
+
+TEST(PixelConversionsTest, convertYuy2ToRgb8_clamping) {
+  // Y0=0, U=0, Y1=255, V=255 → tests both low and high clamping
+  constexpr uint32_t kWidth = 2;
+  constexpr uint32_t kHeight = 1;
+  const uint8_t yuy2[] = {0, 0, 255, 255};
+  uint8_t rgb[6] = {};
+  pixel_conversions::convertYuy2ToRgb8(yuy2, 4, rgb, 6, kWidth, kHeight);
+  // Pixel 0: Y=0, U=0, V=255 → c=-16, d=-128, e=127
+  // R = clip((298*(-16) + 409*127 + 128) >> 8) = clip((47215)>>8) = clip(184) = 184
+  // G = clip((298*(-16) - 100*(-128) - 208*127 + 128) >> 8) = clip((-30960)>>8) = 0
+  // B = clip((298*(-16) + 516*(-128) + 128) >> 8) = clip((-70784)>>8) = 0
+  EXPECT_EQ(rgb[0], 184); // R0 - red from high V
+  EXPECT_EQ(rgb[1], 0); // G0 - clamped low
+  EXPECT_EQ(rgb[2], 0); // B0 - clamped low from low U
+  // Pixel 1: Y=255, U=0, V=255 → c=239, d=-128, e=127
+  // R = clip((298*239 + 409*127 + 128) >> 8) = clip(123293>>8) = 255
+  // G = clip((298*239 - 100*(-128) - 208*127 + 128) >> 8) = clip(57734>>8) = 225
+  // B = clip((298*239 + 516*(-128) + 128) >> 8) = clip(5302>>8) = 20
+  EXPECT_EQ(rgb[3], 255); // R1 - clamped high
+  EXPECT_EQ(rgb[4], 225); // G1
+  EXPECT_EQ(rgb[5], 20); // B1
+}

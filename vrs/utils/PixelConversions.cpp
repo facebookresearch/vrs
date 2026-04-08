@@ -264,21 +264,34 @@ void convertYuy2ToRgb8(
   for (uint32_t h = 0; h < height; h++, srcPtr += srcStride, outPtr += dstStride) {
     const uint8_t* lineSrcPtr = srcPtr;
     uint8_t* lineOutPtr = outPtr;
+    // Source advances by 4 bytes (maintains 4-byte alignment).
+    // Output advances by 6 bytes (does NOT maintain 4-byte alignment), so output
+    // uses byte writes. The YUV arithmetic dominates the cost anyway.
+    const bool srcAligned = isAligned<4>(lineSrcPtr);
+    int y0 = 0, u0 = 0, y1 = 0, v0 = 0;
     for (uint32_t w = 0; w < width / 2; w++, lineSrcPtr += 4, lineOutPtr += 6) {
-      int y0 = lineSrcPtr[0];
-      int u0 = lineSrcPtr[1];
-      int y1 = lineSrcPtr[2];
-      int v0 = lineSrcPtr[3];
+      if (srcAligned) {
+        const uint32_t macro = *reinterpret_cast<const uint32_t*>(lineSrcPtr);
+        y0 = static_cast<int>(macro & 0xFF);
+        u0 = static_cast<int>((macro >> 8) & 0xFF);
+        y1 = static_cast<int>((macro >> 16) & 0xFF);
+        v0 = static_cast<int>((macro >> 24) & 0xFF);
+      } else {
+        y0 = lineSrcPtr[0];
+        u0 = lineSrcPtr[1];
+        y1 = lineSrcPtr[2];
+        v0 = lineSrcPtr[3];
+      }
       int c = y0 - 16;
       int d = u0 - 128;
       int e = v0 - 128;
-      lineOutPtr[2] = clipToUint8((298 * c + 516 * d + 128) >> 8); // blue
-      lineOutPtr[1] = clipToUint8((298 * c - 100 * d - 208 * e + 128) >> 8); // green
-      lineOutPtr[0] = clipToUint8((298 * c + 409 * e + 128) >> 8); // red
+      lineOutPtr[0] = clipToUint8((298 * c + 409 * e + 128) >> 8);
+      lineOutPtr[1] = clipToUint8((298 * c - 100 * d - 208 * e + 128) >> 8);
+      lineOutPtr[2] = clipToUint8((298 * c + 516 * d + 128) >> 8);
       c = y1 - 16;
-      lineOutPtr[5] = clipToUint8((298 * c + 516 * d + 128) >> 8); // blue
-      lineOutPtr[4] = clipToUint8((298 * c - 100 * d - 208 * e + 128) >> 8); // green
-      lineOutPtr[3] = clipToUint8((298 * c + 409 * e + 128) >> 8); // red
+      lineOutPtr[3] = clipToUint8((298 * c + 409 * e + 128) >> 8);
+      lineOutPtr[4] = clipToUint8((298 * c - 100 * d - 208 * e + 128) >> 8);
+      lineOutPtr[5] = clipToUint8((298 * c + 516 * d + 128) >> 8);
     }
   }
 }
