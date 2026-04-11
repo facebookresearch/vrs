@@ -22,6 +22,7 @@
 #include <vrs/Record.h>
 #include <vrs/RecordFileReader.h>
 #include <vrs/RecordFileWriter.h>
+#include <vrs/os/UndoWindows.h>
 
 #include <vrs/utils/ThrottleHelpers.h>
 

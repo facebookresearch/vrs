@@ -24,6 +24,7 @@
 #include <vrs/DataLayout.h>
 #include <vrs/RecordFormat.h>
 #include <vrs/StreamPlayer.h>
+#include <vrs/os/UndoWindows.h>
 
 namespace vrs {
 

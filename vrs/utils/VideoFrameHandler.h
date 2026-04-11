@@ -21,6 +21,7 @@
 
 #include <vrs/ForwardDefinitions.h>
 #include <vrs/StreamPlayer.h>
+#include <vrs/os/UndoWindows.h>
 #include <vrs/utils/DecoderFactory.h>
 
 namespace vrs::utils {
