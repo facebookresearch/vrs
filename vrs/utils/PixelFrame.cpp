@@ -540,11 +540,11 @@ bool PixelFrame::normalizeFrame(
   } else if (srcFormat == PixelFormat::DEPTH32F) {
     // normalize float pixels to grey8
     pixel_conversions::normalizeBuffer<float>(
-        rdata(), outNormalizedFrame.wdata(), getWidth() * getHeight());
+        rdata(), outNormalizedFrame.wdata(), getWidth(), getHeight());
   } else if (srcFormat == PixelFormat::SCALAR64F) {
     // normalize double pixels to grey8
     pixel_conversions::normalizeBuffer<double>(
-        rdata(), outNormalizedFrame.wdata(), getWidth() * getHeight());
+        rdata(), outNormalizedFrame.wdata(), getWidth(), getHeight());
   } else if (srcFormat == PixelFormat::BAYER8_RGGB || srcFormat == PixelFormat::BAYER8_BGGR) {
     // display as grey8(copy) for now
     memcpy(outNormalizedFrame.wdata(), rdata(), getWidth() * getHeight() * componentCount);

@@ -18,9 +18,11 @@
 
 #include <vrs/os/CompilerAttributes.h>
 
+#include <algorithm>
 #include <cmath>
 #include <cstring>
 #include <limits>
+#include <vector>
 
 using namespace std;
 
@@ -308,53 +310,60 @@ void downscalePixels16To8(const uint16_t* src, uint8_t* dst, uint32_t count, uin
   }
 }
 
+/// Target number of pixels to sample for percentile computation.
+constexpr uint32_t kTargetSampleCount = 5000;
+/// Minimum number of valid samples required for percentile-based normalization.
+constexpr size_t kMinSamplesForPercentile = 10;
+/// Low percentile (p5) used as the normalization floor.
+constexpr size_t kLowPercentile = 5;
+/// High percentile (p95) used as the normalization ceiling.
+constexpr size_t kHighPercentile = 95;
+
 template <class Float>
-void normalizeBuffer(const uint8_t* pixelPtr, uint8_t* outPtr, uint32_t pixelCount) {
+void normalizeBuffer(const uint8_t* pixelPtr, uint8_t* outPtr, uint32_t width, uint32_t height) {
+  const uint32_t pixelCount = width * height;
   const Float* srcPtr = reinterpret_cast<const Float*>(pixelPtr);
-  Float min = 0;
-  Float max = 0;
-  bool nan = false;
-  uint32_t firstPixelIndex = 0;
-  while (firstPixelIndex < pixelCount && isnan(srcPtr[firstPixelIndex])) {
-    nan = true;
-    firstPixelIndex++;
-  }
-  if (firstPixelIndex < pixelCount) {
-    min = max = srcPtr[firstPixelIndex];
-    for (uint32_t pixelIndex = firstPixelIndex + 1; pixelIndex < pixelCount; ++pixelIndex) {
-      const Float pixel = srcPtr[pixelIndex];
-      if (isnan(pixel)) {
-        nan = true;
-      } else if (pixel < min) {
-        min = pixel;
-      } else if (pixel > max) {
-        max = pixel;
-      }
+  // Collect sampled valid (non-NaN, finite, positive) pixel values for percentile computation
+  // using an R2 quasi-random sequence for uniform 2D coverage.
+  R2Sampler2D sampler(width, height, kTargetSampleCount);
+  vector<Float> samples;
+  samples.reserve(sampler.sampleCount());
+  for (uint32_t idx : sampler) {
+    const Float v = srcPtr[idx];
+    if (!isnan(v) && isfinite(v) && v > 0) {
+      samples.push_back(v);
     }
   }
-  if (min >= max) {
-    // for constant input, blank the image
+  if (samples.size() < kMinSamplesForPercentile) {
     memset(outPtr, 0, pixelCount);
-  } else {
-    const Float factor = numeric_limits<uint8_t>::max() / (max - min);
-    if (nan) {
-      for (uint32_t pixelIndex = 0; pixelIndex < pixelCount; ++pixelIndex) {
-        const Float pixel = srcPtr[pixelIndex];
-        outPtr[pixelIndex] =
-            isnan(pixel) ? kNaNPixel : static_cast<uint8_t>((pixel - min) * factor);
-      }
-    } else {
-      for (uint32_t pixelIndex = 0; pixelIndex < pixelCount; ++pixelIndex) {
-        const Float pixel = srcPtr[pixelIndex];
-        outPtr[pixelIndex] = static_cast<uint8_t>((pixel - min) * factor);
-      }
-    }
+    return;
+  }
+  // Compute p5 and p95 percentiles using partial sorting.
+  size_t p5idx = samples.size() * kLowPercentile / 100;
+  size_t p95idx = samples.size() * kHighPercentile / 100;
+  std::nth_element(samples.begin(), samples.begin() + p5idx, samples.end());
+  Float min = samples[p5idx];
+  std::nth_element(samples.begin() + p5idx + 1, samples.begin() + p95idx, samples.end());
+  Float max = samples[p95idx];
+  if (min >= max) {
+    memset(outPtr, 0, pixelCount);
+    return;
+  }
+  // Map [min, max] to [0, 255] with clamping, NaN to kNaNPixel.
+  const Float factor = numeric_limits<uint8_t>::max() / (max - min);
+  for (uint32_t pixelIndex = 0; pixelIndex < pixelCount; ++pixelIndex) {
+    const Float pixel = srcPtr[pixelIndex];
+    outPtr[pixelIndex] = isnan(pixel)
+        ? kNaNPixel
+        : (pixel <= min       ? 0
+               : pixel >= max ? 255
+                              : static_cast<uint8_t>((pixel - min) * factor));
   }
 }
 
 // Explicit instantiations for float and double.
-template void normalizeBuffer<float>(const uint8_t*, uint8_t*, uint32_t);
-template void normalizeBuffer<double>(const uint8_t*, uint8_t*, uint32_t);
+template void normalizeBuffer<float>(const uint8_t*, uint8_t*, uint32_t, uint32_t);
+template void normalizeBuffer<double>(const uint8_t*, uint8_t*, uint32_t, uint32_t);
 
 void normalizeBufferWithRange(
     const uint8_t* pixelPtr,

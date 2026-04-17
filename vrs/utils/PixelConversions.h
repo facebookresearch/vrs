@@ -16,10 +16,80 @@
 
 #pragma once
 
+#include <algorithm>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 
 namespace vrs::utils::pixel_conversions {
+
+/// Generates a deterministic, low-discrepancy 2D quasi-random sequence of pixel indices using the
+/// R2 sequence (plastic constant). Provides uniform spatial coverage without the diagonal artifacts
+/// of 1D golden-ratio sampling. Supports range-for iteration.
+///
+/// Usage:
+///   for (uint32_t idx : R2Sampler2D(width, height, maxSamples)) { ... }
+class R2Sampler2D {
+ public:
+  /// @param width   Image width in pixels.
+  /// @param height  Image height in pixels.
+  /// @param maxSamples  Maximum number of samples (clamped to width * height).
+  /// @param stride  Row stride in elements (defaults to width for tightly-packed buffers).
+  explicit R2Sampler2D(uint32_t width, uint32_t height, uint32_t maxSamples, uint32_t stride = 0)
+      : width_(width),
+        height_(height),
+        stride_(stride == 0 ? width : stride),
+        sampleCount_(std::min(maxSamples, width * height)) {}
+
+  class Iterator {
+   public:
+    Iterator(uint32_t index, uint32_t width, uint32_t height, uint32_t stride)
+        : index_(index), width_(width), height_(height), stride_(stride) {}
+
+    uint32_t operator*() const {
+      uint32_t col =
+          static_cast<uint32_t>(std::fmod(0.5 + (index_ + 1) * kPlasticInv_, 1.0) * width_);
+      uint32_t row =
+          static_cast<uint32_t>(std::fmod(0.5 + (index_ + 1) * kPlasticInv2_, 1.0) * height_);
+      return row * stride_ + col;
+    }
+
+    Iterator& operator++() {
+      ++index_;
+      return *this;
+    }
+
+    bool operator!=(const Iterator& other) const {
+      return index_ != other.index_;
+    }
+
+   private:
+    uint32_t index_;
+    uint32_t width_;
+    uint32_t height_;
+    uint32_t stride_;
+  };
+
+  Iterator begin() const {
+    return {0, width_, height_, stride_};
+  }
+  Iterator end() const {
+    return {sampleCount_, width_, height_, stride_};
+  }
+  uint32_t sampleCount() const {
+    return sampleCount_;
+  }
+
+ private:
+  /// Reciprocals of the plastic constant (root of x^3 = x + 1, ~1.3247).
+  static constexpr double kPlasticInv_ = 1.0 / 1.3247179572447460;
+  static constexpr double kPlasticInv2_ = kPlasticInv_ * kPlasticInv_;
+
+  uint32_t width_;
+  uint32_t height_;
+  uint32_t stride_;
+  uint32_t sampleCount_;
+};
 
 /// Convert RGBA8 rows to RGB8 rows, dropping the alpha channel.
 /// Optimized with 64-bit wide reads/writes when pointers are 8-byte aligned.
@@ -76,10 +146,13 @@ void upscalePixels16(const uint16_t* src, uint16_t* dst, uint32_t count, uint16_
 /// Downscale pixel components from 16/12/10-bit stored in uint16_t to 8-bit by right-shifting.
 void downscalePixels16To8(const uint16_t* src, uint8_t* dst, uint32_t count, uint16_t bitsToShift);
 
-/// Normalize float or double buffer to grey8 with dynamic range calculation.
-/// NaN values are mapped to 0. Constant input produces a blank image.
+/// Normalize float or double buffer to grey8 using p5/p95 percentile range.
+/// Samples ~5000 pixels using an R2 quasi-random sequence (plastic constant) for uniform 2D
+/// coverage, then maps [p5, p95] to [0, 255] with clamping.
+/// NaN, non-finite, and non-positive values are excluded from percentile computation.
+/// NaN values are mapped to 0 in the output. Insufficient data produces a blank image.
 template <class Float>
-void normalizeBuffer(const uint8_t* pixelPtr, uint8_t* outPtr, uint32_t pixelCount);
+void normalizeBuffer(const uint8_t* pixelPtr, uint8_t* outPtr, uint32_t width, uint32_t height);
 
 /// Normalize float buffer to grey8 with a provided [min, max] range.
 /// Values outside the range are clamped. NaN values are mapped to 0.

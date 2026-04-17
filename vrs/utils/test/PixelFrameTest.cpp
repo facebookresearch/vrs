@@ -16,6 +16,7 @@
 
 #include <cmath>
 #include <memory>
+#include <set>
 #include <string>
 
 #include <gtest/gtest.h>
@@ -88,11 +89,12 @@ static bool checkNormalized(const vector<float>& floats, const vector<uint8_t>& 
 }
 
 TEST_F(PixelFrameTest, normalizeDepth) {
-  EXPECT_TRUE(checkNormalized({1, 2, 3, 4}, {0, 85, 170, 255}));
-  EXPECT_TRUE(checkNormalized({-10, -100, 25, -2}, {183, 0, 255, 199}));
-  EXPECT_TRUE(checkNormalized({NAN, -100, 25, -2}, {0, 0, 255, 199}));
-  EXPECT_TRUE(checkNormalized({-10, -100, 25, NAN}, {183, 0, 255, 0}));
-  EXPECT_TRUE(checkNormalized({NAN, NAN, 25, -2}, {0, 0, 255, 0}));
+  // With < 10 valid positive samples, percentile normalization produces blank output.
+  EXPECT_TRUE(checkNormalized({1, 2, 3, 4}, {0, 0, 0, 0}));
+  EXPECT_TRUE(checkNormalized({-10, -100, 25, -2}, {0, 0, 0, 0}));
+  EXPECT_TRUE(checkNormalized({NAN, -100, 25, -2}, {0, 0, 0, 0}));
+  EXPECT_TRUE(checkNormalized({-10, -100, 25, NAN}, {0, 0, 0, 0}));
+  EXPECT_TRUE(checkNormalized({NAN, NAN, 25, -2}, {0, 0, 0, 0}));
   EXPECT_TRUE(checkNormalized({NAN, NAN, NAN, NAN}, {0, 0, 0, 0}));
 }
 
@@ -524,22 +526,129 @@ TEST(PixelConversionsTest, downscalePixels16To8_variousShifts) {
   }
 }
 
+TEST(R2Sampler2DTest, sampleCountClamped) {
+  // maxSamples > pixelCount → clamped to pixelCount
+  pixel_conversions::R2Sampler2D sampler(10, 10, 5000);
+  EXPECT_EQ(sampler.sampleCount(), 100u);
+}
+
+TEST(R2Sampler2DTest, sampleCountRespected) {
+  // maxSamples < pixelCount → uses maxSamples
+  pixel_conversions::R2Sampler2D sampler(100, 100, 500);
+  EXPECT_EQ(sampler.sampleCount(), 500u);
+}
+
+TEST(R2Sampler2DTest, indicesInBounds) {
+  // All generated indices must be within [0, width*height)
+  constexpr uint32_t W = 640, H = 480;
+  for (uint32_t idx : pixel_conversions::R2Sampler2D(W, H, 5000)) {
+    EXPECT_LT(idx, W * H);
+  }
+}
+
+TEST(R2Sampler2DTest, indicesInBoundsWithStride) {
+  // With stride > width, indices must be within [0, stride*height)
+  constexpr uint32_t W = 100, H = 50, STRIDE = 128;
+  for (uint32_t idx : pixel_conversions::R2Sampler2D(W, H, 2000, STRIDE)) {
+    uint32_t row = idx / STRIDE;
+    uint32_t col = idx % STRIDE;
+    EXPECT_LT(row, H);
+    EXPECT_LT(col, W);
+  }
+}
+
+TEST(R2Sampler2DTest, deterministic) {
+  // Same parameters always produce the same sequence
+  constexpr uint32_t W = 320, H = 240, N = 1000;
+  std::vector<uint32_t> run1, run2;
+  for (uint32_t idx : pixel_conversions::R2Sampler2D(W, H, N)) {
+    run1.push_back(idx);
+  }
+  for (uint32_t idx : pixel_conversions::R2Sampler2D(W, H, N)) {
+    run2.push_back(idx);
+  }
+  EXPECT_EQ(run1, run2);
+}
+
+TEST(R2Sampler2DTest, coverage2D) {
+  // For a moderately-sized 2D image, the R2 sequence should cover a good fraction of unique pixels
+  constexpr uint32_t W = 50, H = 40;
+  std::set<uint32_t> unique;
+  for (uint32_t idx : pixel_conversions::R2Sampler2D(W, H, W * H)) {
+    unique.insert(idx);
+  }
+  // Expect at least 70% unique coverage (R2 on 50x40 typically achieves ~80%)
+  EXPECT_GT(unique.size(), static_cast<size_t>(W * H * 7 / 10));
+}
+
+TEST(R2Sampler2DTest, singlePixel) {
+  pixel_conversions::R2Sampler2D sampler(1, 1, 100);
+  EXPECT_EQ(sampler.sampleCount(), 1u);
+  uint32_t count = 0;
+  for (uint32_t idx : sampler) {
+    EXPECT_EQ(idx, 0u);
+    ++count;
+  }
+  EXPECT_EQ(count, 1u);
+}
+
+TEST(R2Sampler2DTest, strideDefaultsToWidth) {
+  // Without explicit stride, indices should be the same as stride=width
+  constexpr uint32_t W = 40, H = 30, N = 500;
+  std::vector<uint32_t> defaultStride, explicitStride;
+  for (uint32_t idx : pixel_conversions::R2Sampler2D(W, H, N)) {
+    defaultStride.push_back(idx);
+  }
+  for (uint32_t idx : pixel_conversions::R2Sampler2D(W, H, N, W)) {
+    explicitStride.push_back(idx);
+  }
+  EXPECT_EQ(defaultStride, explicitStride);
+}
+
 TEST(PixelConversionsTest, normalizeBuffer_floatRange) {
-  // 4 float pixels: 0.0, 0.5, 1.0, NaN → should map to 0, 127, 255, 0
+  // With < 10 valid positive samples, normalizeBuffer returns blank output.
   const float src[] = {0.0f, 0.5f, 1.0f, nanf("")};
   uint8_t dst[4] = {};
-  pixel_conversions::normalizeBuffer<float>(reinterpret_cast<const uint8_t*>(src), dst, 4);
-  EXPECT_EQ(dst[0], 0); // min
-  EXPECT_EQ(dst[1], 127); // midpoint
-  EXPECT_EQ(dst[2], 255); // max
-  EXPECT_EQ(dst[3], 0); // NaN → 0
+  pixel_conversions::normalizeBuffer<float>(reinterpret_cast<const uint8_t*>(src), dst, 4, 1);
+  EXPECT_EQ(dst[0], 0);
+  EXPECT_EQ(dst[1], 0);
+  EXPECT_EQ(dst[2], 0);
+  EXPECT_EQ(dst[3], 0);
+}
+
+TEST(PixelConversionsTest, normalizeBuffer_percentile) {
+  // 20 positive values (4x5 image): percentile-based normalization with p5/p95 range.
+  // R2 quasi-random sampling covers 16/20 unique values for this size.
+  // p5idx=1 → p5=2, p95idx=19 → p95=19. factor = 255 / (19 - 2) = 15.
+  constexpr uint32_t W = 4;
+  constexpr uint32_t H = 5;
+  constexpr uint32_t N = W * H;
+  float src[N];
+  for (uint32_t i = 0; i < N; ++i) {
+    src[i] = static_cast<float>(i + 1);
+  }
+  uint8_t dst[N] = {};
+  pixel_conversions::normalizeBuffer<float>(reinterpret_cast<const uint8_t*>(src), dst, W, H);
+  EXPECT_EQ(dst[0], 0); // 1 <= p5(2) → clamped to 0
+  EXPECT_EQ(dst[1], 0); // 2 <= p5(2) → clamped to 0
+  EXPECT_EQ(dst[N - 1], 255); // 20 >= p95(19) → clamped to 255
+  EXPECT_EQ(dst[N - 2], 255); // 19 >= p95(19) → clamped to 255
+  // Values between p5 and p95 should be in (0, 255) exclusive.
+  for (uint32_t i = 2; i < N - 2; ++i) {
+    EXPECT_GT(dst[i], 0);
+    EXPECT_LT(dst[i], 255);
+  }
+  // Monotonically increasing input → monotonically increasing output.
+  for (uint32_t i = 2; i < N - 3; ++i) {
+    EXPECT_LE(dst[i], dst[i + 1]);
+  }
 }
 
 TEST(PixelConversionsTest, normalizeBuffer_constantInput) {
   // All same value → blank output
   const float src[] = {5.0f, 5.0f, 5.0f};
   uint8_t dst[3] = {0xFF, 0xFF, 0xFF};
-  pixel_conversions::normalizeBuffer<float>(reinterpret_cast<const uint8_t*>(src), dst, 3);
+  pixel_conversions::normalizeBuffer<float>(reinterpret_cast<const uint8_t*>(src), dst, 3, 1);
   EXPECT_EQ(dst[0], 0);
   EXPECT_EQ(dst[1], 0);
   EXPECT_EQ(dst[2], 0);
@@ -574,18 +683,19 @@ TEST(PixelConversionsTest, normalizeRGBXfloatToRGB8_uniform) {
 }
 
 TEST(PixelConversionsTest, normalizeBuffer_double) {
+  // With < 10 valid positive samples, normalizeBuffer returns blank output.
   const double src[] = {-10.0, 0.0, 10.0};
   uint8_t dst[3] = {};
-  pixel_conversions::normalizeBuffer<double>(reinterpret_cast<const uint8_t*>(src), dst, 3);
-  EXPECT_EQ(dst[0], 0); // min
-  EXPECT_EQ(dst[1], 127); // midpoint
-  EXPECT_EQ(dst[2], 255); // max
+  pixel_conversions::normalizeBuffer<double>(reinterpret_cast<const uint8_t*>(src), dst, 3, 1);
+  EXPECT_EQ(dst[0], 0);
+  EXPECT_EQ(dst[1], 0);
+  EXPECT_EQ(dst[2], 0);
 }
 
 TEST(PixelConversionsTest, normalizeBuffer_allNaN) {
   const float src[] = {nanf(""), nanf(""), nanf("")};
   uint8_t dst[3] = {0xFF, 0xFF, 0xFF};
-  pixel_conversions::normalizeBuffer<float>(reinterpret_cast<const uint8_t*>(src), dst, 3);
+  pixel_conversions::normalizeBuffer<float>(reinterpret_cast<const uint8_t*>(src), dst, 3, 1);
   // All NaN → min >= max (both 0), so memset to 0
   EXPECT_EQ(dst[0], 0);
   EXPECT_EQ(dst[1], 0);
