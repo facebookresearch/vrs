@@ -202,6 +202,10 @@ void convertAVFrameToFrame(const AVFrame* const avframe, Frame& frame) {
   frame.height = avframe->height;
   frame.keyFrame =
       (avframe->pict_type == AV_PICTURE_TYPE_I); // true if this is an I frame; false otherwise
+
+  // Propagate color range from H.265 VUI (video_full_range_flag).
+  // AVCOL_RANGE_JPEG = full range [0,255], AVCOL_RANGE_MPEG = limited [16,235].
+  frame.fullRange = (avframe->color_range == AVCOL_RANGE_JPEG);
 }
 
 const char* convertExceptionToError(const std::exception& exception, XprsResult& error) {

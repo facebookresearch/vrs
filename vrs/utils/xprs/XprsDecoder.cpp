@@ -1,18 +1,4 @@
-/*
- * Copyright (c) Meta Platforms, Inc. and affiliates.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// (c) Meta Platforms, Inc. and affiliates. Confidential and proprietary.
 
 #include <vrs/utils/xprs/XprsDecoder.h>
 
@@ -191,8 +177,10 @@ class VXDecoder : public vrs::utils::DecoderI {
       const uint32_t w = outputImageSpec.getWidth();
       const uint32_t h = outputImageSpec.getHeight();
       using namespace Ocean;
-      FrameType sourceFrameType(
-          w, h, Ocean::FrameType::FORMAT_Y_U_V12, FrameType::ORIGIN_UPPER_LEFT);
+      // Select limited vs full range based on H.265 VUI video_full_range_flag
+      const auto yuv420pFmt = frame.fullRange ? Ocean::FrameType::FORMAT_Y_U_V12_FULL_RANGE
+                                              : Ocean::FrameType::FORMAT_Y_U_V12_LIMITED_RANGE;
+      FrameType sourceFrameType(w, h, yuv420pFmt, FrameType::ORIGIN_UPPER_LEFT);
       Frame::PlaneInitializers<uint8_t> sourcePlaneInitializers = {
           {frame.planes[0], Frame::CM_USE_KEEP_LAYOUT, static_cast<uint32_t>(frame.stride[0] - w)},
           {frame.planes[1],
@@ -219,8 +207,10 @@ class VXDecoder : public vrs::utils::DecoderI {
       const uint32_t w = outputImageSpec.getWidth();
       const uint32_t h = outputImageSpec.getHeight();
       using namespace Ocean;
-      FrameType sourceFrameType(
-          w, h, Ocean::FrameType::FORMAT_Y_UV12, FrameType::ORIGIN_UPPER_LEFT); // NV12
+      // Select limited vs full range based on H.265 VUI video_full_range_flag
+      const auto nv12Fmt = frame.fullRange ? Ocean::FrameType::FORMAT_Y_UV12_FULL_RANGE
+                                           : Ocean::FrameType::FORMAT_Y_UV12_LIMITED_RANGE;
+      FrameType sourceFrameType(w, h, nv12Fmt, FrameType::ORIGIN_UPPER_LEFT);
       Frame::PlaneInitializers<uint8_t> srcPlaneInitializers = {
           {frame.planes[0],
            Frame::CM_USE_KEEP_LAYOUT,
@@ -284,8 +274,9 @@ class VXDecoder : public vrs::utils::DecoderI {
       const uint32_t w = outputImageSpec.getWidth();
       const uint32_t h = outputImageSpec.getHeight();
       using namespace Ocean;
-      FrameType sourceFrameType(
-          w, h, Ocean::FrameType::FORMAT_Y_UV12, FrameType::ORIGIN_UPPER_LEFT); // NV12
+      const auto nv12Fmt = frame.fullRange ? Ocean::FrameType::FORMAT_Y_UV12_FULL_RANGE
+                                           : Ocean::FrameType::FORMAT_Y_UV12_LIMITED_RANGE;
+      FrameType sourceFrameType(w, h, nv12Fmt, FrameType::ORIGIN_UPPER_LEFT);
       Frame::PlaneInitializers<uint8_t> srcPlaneInitializers = {
           {frame.planes[0],
            Frame::CM_USE_KEEP_LAYOUT,

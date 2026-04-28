@@ -206,6 +206,13 @@ struct Frame {
    * from a key (IDR) frame, false indicates otherwise.
    */
   bool keyFrame = false;
+
+  /**
+   * For decoding: true if the H.265 VUI signals full-range YCbCr (video_full_range_flag=1).
+   * false indicates limited range (BT.601 headroom: Y=[16,235], C=[16,240]).
+   * Populated from FFmpeg AVFrame::color_range after decode.
+   */
+  bool fullRange = false;
 };
 
 /**
@@ -610,8 +617,8 @@ IVideoDecoder* createDecoder(const VideoCodec& codec);
 
 /**
  * Create a video muxer.
- * @return Muxer instance on sucess or nullptr on failure. The returned pointer should be deleted by
- * the caller.
+ * @return Muxer instance on success or nullptr on failure. The returned pointer should be deleted
+ * by the caller.
  */
 IVideoMuxer* createMuxer();
 
