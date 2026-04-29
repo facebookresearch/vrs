@@ -20,9 +20,19 @@
 
 namespace vrs::vxprs {
 
+struct DecoderOptions {
+  bool useHwCodecs = true;
+};
+
 std::unique_ptr<vrs::utils::DecoderI> xprsDecoderMaker(
     const vector<uint8_t>& encodedFrame,
     void* outDecodedFrame,
     const ImageContentBlockSpec& outputImageSpec);
+
+std::unique_ptr<vrs::utils::DecoderI> xprsDecoderMaker(
+    const vector<uint8_t>& encodedFrame,
+    void* outDecodedFrame,
+    const ImageContentBlockSpec& outputImageSpec,
+    const DecoderOptions& options);
 
 } // namespace vrs::vxprs

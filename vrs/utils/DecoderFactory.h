@@ -66,6 +66,15 @@ class DecoderFactory {
 
   void registerDecoderMaker(const DecoderMaker& decoderMaker);
 
+  /// Function-pointer overload: lets `registerDecoderMaker(myMaker)` pick the
+  /// 3-arg overload of `myMaker` unambiguously when the maker has additional
+  /// overloads (e.g. one taking decoder-specific options).
+  void registerDecoderMaker(
+      std::unique_ptr<DecoderI> (
+          *decoderMaker)(const vector<uint8_t>&, void*, const ImageContentBlockSpec&)) {
+    registerDecoderMaker(DecoderMaker{decoderMaker});
+  }
+
   std::unique_ptr<DecoderI> makeDecoder(
       const vector<uint8_t>& encodedFrame,
       void* outDecodedFrame,
