@@ -63,7 +63,7 @@ set<uint16_t>& getusedObjectColors() {
 bool grey16helps(PixelFormat format) {
   return format == PixelFormat::GREY16 || format == PixelFormat::GREY12 ||
       format == PixelFormat::GREY10 || format == PixelFormat::GREY10PACKED ||
-      format == PixelFormat::RAW10;
+      format == PixelFormat::RAW10 || format == PixelFormat::BAYER10_GBRG;
 }
 
 } // namespace
@@ -495,6 +495,17 @@ bool PixelFrame::normalizeFrame(
     case PixelFormat::BAYER8_BGGR:
       format = PixelFormat::GREY8;
       componentCount = 1;
+      break;
+    case PixelFormat::BAYER10_GBRG:
+      if (grey16supported) {
+        format = PixelFormat::GREY16;
+        bitsToShift = 6;
+        componentCount = 1;
+      } else {
+        format = PixelFormat::GREY8;
+        bitsToShift = 2;
+        componentCount = 1;
+      }
       break;
     case PixelFormat::RGB_IR_RAW_4X4:
       format = PixelFormat::RGB8;
