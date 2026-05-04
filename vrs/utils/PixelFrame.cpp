@@ -305,7 +305,9 @@ PixelFormat PixelFrame::getNormalizedPixelFormat(
       sourcePixelFormat == PixelFormat::GREY16) {
     format = PixelFormat::RGB8;
 #if IS_VRS_FB_INTERNAL()
-  } else if (format == PixelFormat::BAYER8_RGGB || format == PixelFormat::BAYER8_BGGR) {
+  } else if (
+      format == PixelFormat::BAYER8_RGGB || format == PixelFormat::BAYER8_BGGR ||
+      format == PixelFormat::BAYER10_GBRG) {
     format = PixelFormat::RGB8;
 #endif
   } else {
