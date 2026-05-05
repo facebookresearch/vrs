@@ -36,6 +36,10 @@ enum class DecodeStatus {
   UnexpectedImageDimensions,
 };
 
+struct DecoderOptions {
+  bool useHwCodecs = true;
+};
+
 class DecoderI {
  public:
   DecoderI() = default;
@@ -58,7 +62,8 @@ class DecoderI {
 using DecoderMaker = std::function<std::unique_ptr<DecoderI>(
     const vector<uint8_t>& encodedFrame,
     void* outDecodedFrame,
-    const ImageContentBlockSpec& outputImageSpec)>;
+    const ImageContentBlockSpec& outputImageSpec,
+    const DecoderOptions& options)>;
 
 class DecoderFactory {
  public:
@@ -66,19 +71,29 @@ class DecoderFactory {
 
   void registerDecoderMaker(const DecoderMaker& decoderMaker);
 
-  /// Function-pointer overload: lets `registerDecoderMaker(myMaker)` pick the
-  /// 3-arg overload of `myMaker` unambiguously when the maker has additional
-  /// overloads (e.g. one taking decoder-specific options).
   void registerDecoderMaker(
       std::unique_ptr<DecoderI> (
-          *decoderMaker)(const vector<uint8_t>&, void*, const ImageContentBlockSpec&)) {
-    registerDecoderMaker(DecoderMaker{decoderMaker});
+          *noOptionsDecoderMaker)(const vector<uint8_t>&, void*, const ImageContentBlockSpec&)) {
+    registerDecoderMaker(
+        DecoderMaker{[noOptionsDecoderMaker](
+                         const vector<uint8_t>& encodedFrame,
+                         void* outDecodedFrame,
+                         const ImageContentBlockSpec& outputImageSpec,
+                         const DecoderOptions& /*options*/) {
+          return noOptionsDecoderMaker(encodedFrame, outDecodedFrame, outputImageSpec);
+        }});
   }
 
   std::unique_ptr<DecoderI> makeDecoder(
       const vector<uint8_t>& encodedFrame,
       void* outDecodedFrame,
       const ImageContentBlockSpec& outputImageSpec);
+
+  std::unique_ptr<DecoderI> makeDecoder(
+      const vector<uint8_t>& encodedFrame,
+      void* outDecodedFrame,
+      const ImageContentBlockSpec& outputImageSpec,
+      const DecoderOptions& options);
 
  protected:
   DecoderFactory() = default;

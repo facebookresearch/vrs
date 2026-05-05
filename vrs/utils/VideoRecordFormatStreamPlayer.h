@@ -28,6 +28,9 @@ namespace vrs::utils {
 /// Note that this class can handle anything else RecordFormatStreamPlayer can handle, just as well.
 class VideoRecordFormatStreamPlayer : public RecordFormatStreamPlayer {
  public:
+  explicit VideoRecordFormatStreamPlayer(DecoderOptions decoderOptions = {})
+      : decoderOptions_(decoderOptions) {}
+
   /// Method to handle image/video data received in the onImageRead() callback.
   /// @param outBuffer: an allocated buffer where to write the decoded image data.
   /// The buffer's size must be cb.image().getRawImageSize()
@@ -95,6 +98,7 @@ class VideoRecordFormatStreamPlayer : public RecordFormatStreamPlayer {
 #endif
 
  private:
+  DecoderOptions decoderOptions_;
   std::map<StreamId, VideoFrameHandler> handlers_;
   bool whileReadingMissingFrames_ = false;
 };

@@ -70,8 +70,17 @@ unique_ptr<DecoderI> DecoderFactory::makeDecoder(
     const vector<uint8_t>& encodedFrame,
     void* outDecodedFrame,
     const ImageContentBlockSpec& outputImageSpec) {
+  return makeDecoder(encodedFrame, outDecodedFrame, outputImageSpec, DecoderOptions{});
+}
+
+unique_ptr<DecoderI> DecoderFactory::makeDecoder(
+    const vector<uint8_t>& encodedFrame,
+    void* outDecodedFrame,
+    const ImageContentBlockSpec& outputImageSpec,
+    const DecoderOptions& options) {
   for (const DecoderMaker& decoderMaker : decoderMakers_) {
-    unique_ptr<DecoderI> decoder = decoderMaker(encodedFrame, outDecodedFrame, outputImageSpec);
+    unique_ptr<DecoderI> decoder =
+        decoderMaker(encodedFrame, outDecodedFrame, outputImageSpec, options);
     if (decoder) {
       return decoder;
     }

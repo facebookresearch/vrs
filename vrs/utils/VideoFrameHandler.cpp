@@ -57,8 +57,8 @@ int VideoFrameHandler::tryToDecodeFrame(
     if (decoder_) {
       return decoder_->decode(encodedFrame_, outDecodedFrame, contentBlock.image());
     }
-    decoder_ =
-        DecoderFactory::get().makeDecoder(encodedFrame_, outDecodedFrame, contentBlock.image());
+    decoder_ = DecoderFactory::get().makeDecoder(
+        encodedFrame_, outDecodedFrame, contentBlock.image(), decoderOptions_);
     return decoder_ ? SUCCESS : domainError(DecodeStatus::CodecNotFound);
   }
   if (requestedKeyFrameTimestamp_ == decodedKeyFrameTimestamp_) {

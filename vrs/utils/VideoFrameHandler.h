@@ -33,6 +33,9 @@ constexpr uint32_t kInvalidFrameIndex = std::numeric_limits<uint32_t>::max();
 /// VideoRecordFormatStreamPlayer uses this class, and might be the only class that needs to.
 class VideoFrameHandler {
  public:
+  explicit VideoFrameHandler(DecoderOptions decoderOptions = {})
+      : decoderOptions_(decoderOptions) {}
+
   /// Attempt to decode a video codec encoded frame of a video stream with i-frames, and p-frames.
   /// i-frames can be decoded in any order. p-frames can only be decoded in the correct sequence.
   /// This callback is designed to implement RecordFormatStreamPlayer::onImageRead() for video
@@ -99,6 +102,7 @@ class VideoFrameHandler {
   void reset();
 
  private:
+  DecoderOptions decoderOptions_;
   std::unique_ptr<DecoderI> decoder_;
   std::vector<uint8_t> encodedFrame_;
 

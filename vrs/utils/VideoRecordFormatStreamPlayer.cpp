@@ -39,7 +39,7 @@ int VideoRecordFormatStreamPlayer::readMissingFrames(
     const IndexRecord::RecordInfo& recordInfo,
     bool exactFrame) {
   int result = 0;
-  VideoFrameHandler& handler = handlers_[recordInfo.streamId];
+  VideoFrameHandler& handler = getVideoFrameHandler(recordInfo.streamId);
   if (!whileReadingMissingFrames_ && handler.isMissingFrames()) {
     whileReadingMissingFrames_ = true;
     result = handler.readMissingFrames(fileReader, recordInfo, exactFrame);
@@ -49,21 +49,23 @@ int VideoRecordFormatStreamPlayer::readMissingFrames(
 }
 
 VideoFrameHandler& VideoRecordFormatStreamPlayer::getVideoFrameHandler(StreamId streamId) {
-  return handlers_[streamId];
+  return handlers_.try_emplace(streamId, decoderOptions_).first->second;
 }
 
 int VideoRecordFormatStreamPlayer::tryToDecodeFrame(
     void* outBuffer,
     const CurrentRecord& record,
     const ContentBlock& contentBlock) {
-  return handlers_[record.streamId].tryToDecodeFrame(outBuffer, record.reader, contentBlock);
+  return getVideoFrameHandler(record.streamId)
+      .tryToDecodeFrame(outBuffer, record.reader, contentBlock);
 }
 
 int VideoRecordFormatStreamPlayer::tryToDecodeFrame(
     PixelFrame& outFrame,
     const CurrentRecord& record,
     const ContentBlock& contentBlock) {
-  return handlers_[record.streamId].tryToDecodeFrame(outFrame, record.reader, contentBlock);
+  return getVideoFrameHandler(record.streamId)
+      .tryToDecodeFrame(outFrame, record.reader, contentBlock);
 }
 
 bool VideoRecordFormatStreamPlayer::readFrame(
@@ -81,7 +83,7 @@ bool VideoRecordFormatStreamPlayer::readFrame(
 
 void VideoRecordFormatStreamPlayer::resetVideoFrameHandler(StreamId streamId) {
   if (streamId.isValid()) {
-    handlers_[streamId].reset();
+    getVideoFrameHandler(streamId).reset();
   } else {
     for (auto& handler : handlers_) {
       handler.second.reset();
