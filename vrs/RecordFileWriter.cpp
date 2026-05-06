@@ -838,8 +838,13 @@ int RecordFileWriter::createFile(const string& filePath, bool splitHead) {
     return error;
   }
 
-  if (file_->getFileHandlerName() == DiskFile::staticName() &&
-      spec.fileHandlerName != DiskFile::staticName()) {
+  const string& currentHandler = file_->getFileHandlerName();
+  const bool currentIsDiskFile = currentHandler == DiskFile::staticName()
+#if VRS_ASYNC_DISKFILE_SUPPORTED()
+      || currentHandler == AsyncDiskFile::staticName()
+#endif
+      ;
+  if (currentIsDiskFile && !spec.isDiskFile()) {
     unique_ptr<WriteFileHandler> writeFile = WriteFileHandler::make(spec.fileHandlerName);
     if (!writeFile) {
       XR_LOGE("Found no WriteFileHandler named {}.", spec.fileHandlerName);
