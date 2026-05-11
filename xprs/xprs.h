@@ -278,6 +278,34 @@ struct EncoderConfig {
   int32_t framerate = 25;
 
   /**
+   * Number of B-frames to insert between P-frames. Sentinel value -1 means
+   * "use the backend default" (today every encoder backend in XPRS forces
+   * max_b_frames=0 for low-latency, so the sentinel preserves existing
+   * behavior exactly). Set to 0 to explicitly request a B-frame-free
+   * bitstream, or to N to allow N B-frames between P-frames.
+   *
+   * This knob exists because the Coleman A0 GMCU0 Dali decoder on Dragon
+   * (Verisilicon VC9000D) wedges silicon when an HEVC bitstream's SPS
+   * reports max_dec_frame_buffering > 2. Forcing bFrames=0 (combined with
+   * maxRefFrames=1 below) keeps the bitstream within the Dali HW DPB
+   * budget. See T269146483 for the Dragon decoder spec.
+   */
+  int32_t bFrames = -1;
+
+  /**
+   * Maximum number of reference frames the encoder is allowed to keep in
+   * the Decoded Picture Buffer (DPB). Sentinel value 0 means "use the
+   * backend default", which preserves today's behavior for every existing
+   * caller (NVENC HEVC defaults to maxNumRefFramesInDPB=4, libx265 picks
+   * its preset default, etc.). Set to N > 0 to clamp the DPB to N frames.
+   *
+   * Used together with bFrames=0 to satisfy the Dragon Coleman A0 GMCU0
+   * Dali decoder constraint described above (max_dec_frame_buffering <= 2
+   * for HEVC). See T269146483.
+   */
+  int32_t maxRefFrames = 0;
+
+  /**
    * Suppress verbose debugging message.
    */
   bool suppressNonFatalMessage = false;
