@@ -306,6 +306,15 @@ struct EncoderConfig {
   int32_t maxRefFrames = 0;
 
   /**
+   * Hint for the encoder's CPU thread pool size. Currently consumed only by the libx265
+   * (H.265 software) backend, where it sets `pools=N:wpp=1` in
+   * x265-params. This enables wavefront parallelism within a frame without altering
+   * one-frame-in / one-frame-out behavior (frame-threads stays at 1). 0 = leave codec
+   * defaults unchanged (libx265 autodetects pool size from the host).
+   */
+  int32_t threadCount = 0;
+
+  /**
    * Suppress verbose debugging message.
    */
   bool suppressNonFatalMessage = false;
