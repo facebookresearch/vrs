@@ -187,6 +187,7 @@ enum class RecordableTypeId : uint16_t {
   BatteryRecordableClass = 502, ///< Battery data streams.
   AlsFlickerDetectionRecordableClass = 503, ///< ALS light flicker detection data streams.
   ProximitySensorRecordableClass = 504, ///< For proximity sensor data streams.
+  ButtonStateRecordableClass = 505, ///< For button state data streams.
 
   // << Test, Samples and other fake devices >>
   SampleDeviceRecordableClass = 998, ///< For sample device streams.
