@@ -12,5 +12,6 @@ var searchData=
   ['bluetoothbeaconrecordableclass_9',['BluetoothBeaconRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5ae4e62ac387600e101072ac9905c59031',1,'vrs']]],
   ['bool_10',['Bool',['../classvrs_1_1_bool.html',1,'vrs']]],
   ['build_11',['build',['../classvrs_1_1_content_block_reader.html#aae94a30c4f439779b1eb2a5b280d88ef',1,'vrs::ContentBlockReader']]],
-  ['buildrecordboundaries_12',['buildRecordBoundaries',['../classvrs_1_1_record_file_reader.html#a0dc3c414de9605ea725afdd605212f6b',1,'vrs::RecordFileReader']]]
+  ['buildrecordboundaries_12',['buildRecordBoundaries',['../classvrs_1_1_record_file_reader.html#a0dc3c414de9605ea725afdd605212f6b',1,'vrs::RecordFileReader']]],
+  ['buttonstaterecordableclass_13',['ButtonStateRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5af4b07298c24779c0adb1d2eb98ecd96f',1,'vrs']]]
 ];
