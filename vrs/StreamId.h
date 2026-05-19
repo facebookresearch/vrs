@@ -150,6 +150,7 @@ enum class RecordableTypeId : uint16_t {
   ScriptRecordableClass = 323, ///< For script data streams.
   ControlRecordableClass = 324, ///< For control data streams.
   PipelineEventRecordableClass = 325, ///< For EMG pipeline events streams.
+  TtsEventRecordableClass = 326, ///< For TTS event data streams.
 
   // << Ground Truth >>
   GroundTruthRecordableClass = 340, ///< For ground truth data streams.
