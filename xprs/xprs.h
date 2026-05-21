@@ -216,6 +216,32 @@ struct Frame {
 };
 
 /**
+ * Bitstream tuning bundle. Selects a small, well-known set of encoder
+ * options whose intent is decoder-side simplicity rather than a single
+ * dimension like bitrate or DPB depth.
+ *
+ * Default leaves every backend at its existing tune (today: zerolatency on
+ * libx264/libx265, NVENC preset default) — existing call sites observe no
+ * behavior change.
+ *
+ * UltraLow targets low-end / mobile HEVC decoders that cannot afford the
+ * full Main-profile DPB and reference-management surface. On libx265 this
+ * appends `ref=N:sps-max-num-reorder-pics=0:open-gop=0:temporal-mvp=0`
+ * to x265-params (mirrors `--tune ull`). On NVENC HEVC it selects
+ * `NV_ENC_TUNING_INFO_ULTRA_LOW_LATENCY` and clamps `numRefL0=1`.
+ * Documented x265 cost: ~3-5% RD penalty at low bitrate.
+ *
+ * Independent of `maxRefFrames` — that knob remains the generic DPB
+ * clamp (`AVCodecContext::refs`). Setting both `latencyTuning=UltraLow`
+ * and `maxRefFrames=1` is the typical combination for the most
+ * conservative HEVC interop.
+ */
+enum class LatencyTuning : uint8_t {
+  Default = 0,
+  UltraLow,
+};
+
+/**
  * Used to set the video encoder configuration.
  */
 struct EncoderConfig {
@@ -304,6 +330,13 @@ struct EncoderConfig {
    * for HEVC). See T269146483.
    */
   int32_t maxRefFrames = 0;
+
+  /**
+   * Selects an end-to-end tuning bundle for decoder interop. Default
+   * preserves today's behavior. See `LatencyTuning` for what UltraLow
+   * activates on each backend.
+   */
+  LatencyTuning latencyTuning = LatencyTuning::Default;
 
   /**
    * Hint for the encoder's CPU thread pool size. Currently consumed only by the libx265
