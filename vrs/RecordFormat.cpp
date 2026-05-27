@@ -813,7 +813,7 @@ size_t AudioContentBlockSpec::getBlockSize() const {
 size_t AudioContentBlockSpec::getPcmBlockSize() const {
   uint8_t stride = getSampleFrameStride();
   if (stride > 0 && sampleFrameCount_ > 0) {
-    return stride * sampleFrameCount_;
+    return static_cast<size_t>(stride) * static_cast<size_t>(sampleFrameCount_);
   }
   return ContentBlock::kSizeUnknown;
 }
