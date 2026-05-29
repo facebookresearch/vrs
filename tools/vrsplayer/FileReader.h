@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <functional>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -106,6 +107,12 @@ class FileReader : public QObject {
   void saveConfiguration();
   void loadConfiguration();
 
+  /// Type-erased connector that wires a slot to FramePlayer::frameReadyForPostProcessing
+  /// for every FramePlayer this FileReader owns, now and in the future. Slot must use
+  /// Qt::DirectConnection — see FramePlayer.h for threading & mutation contract.
+  using FramePostProcessorConnector = std::function<void(FramePlayer*)>;
+  void setFramePostProcessorConnector(FramePostProcessorConnector connector);
+
  signals:
   void mediaStateChanged(FileReaderState state);
   void durationChanged(double start, double end, int duration);
@@ -188,6 +195,7 @@ class FileReader : public QObject {
   QVBoxLayout* videoFrames_{};
   int lastMaxPerRow_{0};
   map<StreamId, unique_ptr<FramePlayer>> imageReaders_;
+  FramePostProcessorConnector framePostProcessorConnector_;
   map<StreamId, unique_ptr<AudioPlayer>> audioReaders_;
   map<StreamId, size_t> lastReadRecords_;
   Record::Type recordType_{Record::Type::UNDEFINED};

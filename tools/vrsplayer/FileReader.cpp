@@ -241,6 +241,16 @@ void FileReader::closeFile() {
   lastMaxPerRow_ = 0;
 }
 
+void FileReader::setFramePostProcessorConnector(FramePostProcessorConnector connector) {
+  unique_lock<recursive_mutex> guard{mutex_};
+  framePostProcessorConnector_ = std::move(connector);
+  if (framePostProcessorConnector_) {
+    for (auto& kv : imageReaders_) {
+      framePostProcessorConnector_(kv.second.get());
+    }
+  }
+}
+
 static QString getFileName(const FileSpec& spec) {
   if (!spec.fileName.empty()) {
     return QString::fromStdString(spec.fileName);
@@ -332,6 +342,9 @@ vector<FrameWidget*> FileReader::openFile(QVBoxLayout* videoFrames, QWidget* wid
           fileReader_->setStreamPlayer(id, player);
           player->setEstimatedFps(static_cast<int>(utils::frameRateEstimationFps(index, id) + 0.5));
           imageReaders_[id].reset(player);
+          if (framePostProcessorConnector_) {
+            framePostProcessorConnector_(player);
+          }
           connect(frame, &FrameWidget::orientationChanged, [this]() {
             if (layoutUpdatesEnabled_) {
               relayout();

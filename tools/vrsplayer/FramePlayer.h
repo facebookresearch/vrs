@@ -79,6 +79,23 @@ class FramePlayer : public QObject, public VideoRecordFormatStreamPlayer {
 
   void imageJobsThreadActivity();
 
+ signals:
+  /// Emitted on the FramePlayer's image-decoding background thread, after pixel-format
+  /// normalization (`convertFrame`) and before the frame is handed to the widget for display.
+  /// Slots MUST be connected with Qt::DirectConnection so they run synchronously in the
+  /// emitting thread; the frame is mutated in place and any latency directly stalls display.
+  ///
+  /// Mutation contract:
+  ///   - The slot MAY mutate the PixelFrame in place (e.g., overlay annotations).
+  ///   - The slot MAY std::move out of `frame` and replace it with a different PixelFrame
+  ///     of any pixel format/size; the new frame is what gets displayed.
+  ///   - The slot MAY reset `frame` to nullptr to suppress display of this frame entirely.
+  ///   - The slot MUST NOT retain the unique_ptr beyond the call; ownership stays with
+  ///     FramePlayer.
+  void frameReadyForPostProcessing(
+      vrs::StreamId streamId,
+      std::unique_ptr<vrs::utils::PixelFrame>& frame);
+
  public slots:
   void mediaStateChanged(FileReaderState state);
 

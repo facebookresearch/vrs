@@ -300,7 +300,12 @@ void FramePlayer::imageJobsThreadActivity() {
     }
     if (frameValid) {
       convertFrame(frame);
-      widget_->swapImage(frame);
+      // Phase 1 post-processing hook: synchronous, in-emitting-thread (DirectConnection).
+      // Slots may mutate, replace, or null `frame` before display. See FramePlayer.h.
+      emit frameReadyForPostProcessing(id_, frame);
+      if (frame) {
+        widget_->swapImage(frame);
+      }
     }
     if (imageFormat != vrs::ImageFormat::VIDEO) {
       recycle(frame);
