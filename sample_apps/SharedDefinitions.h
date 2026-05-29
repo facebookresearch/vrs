@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#pragma once
+
 #include <vrs/DataLayout.h>
 #include <vrs/DataLayoutConventions.h>
 #include <vrs/DataPieces.h>
