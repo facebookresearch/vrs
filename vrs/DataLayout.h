@@ -48,7 +48,8 @@ class DataPieceString;
 
 namespace internal {
 class DataLayouter;
-}
+struct DataPieceFactory;
+} // namespace internal
 
 /// Forward declaration of a mystery type to avoid exposing a third party json library.
 struct JsonWrapper;
