@@ -5,6 +5,5 @@ var searchData=
   ['matrixnd_2',['MatrixND',['../structvrs_1_1_matrix_n_d.html',1,'vrs']]],
   ['motionstreamconfig_3',['MotionStreamConfig',['../structvrs__sample__apps_1_1_motion_stream_config.html',1,'vrs_sample_apps']]],
   ['motionstreamdata_4',['MotionStreamData',['../structvrs__sample__apps_1_1_motion_stream_data.html',1,'vrs_sample_apps']]],
-  ['motionstreamplayer_5',['MotionStreamPlayer',['../classvrs__sample__apps_1_1_motion_stream_player.html',1,'vrs_sample_apps']]],
-  ['multirecordfilereader_6',['MultiRecordFileReader',['../classvrs_1_1_multi_record_file_reader.html',1,'vrs']]]
+  ['multirecordfilereader_5',['MultiRecordFileReader',['../classvrs_1_1_multi_record_file_reader.html',1,'vrs']]]
 ];

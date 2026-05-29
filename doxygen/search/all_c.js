@@ -35,9 +35,8 @@ var searchData=
   ['motionrecordableclass_32',['MotionRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a96c4e0f8ccf4aa2d45ff867242d7ca17',1,'vrs']]],
   ['motionstreamconfig_33',['MotionStreamConfig',['../structvrs__sample__apps_1_1_motion_stream_config.html',1,'vrs_sample_apps']]],
   ['motionstreamdata_34',['MotionStreamData',['../structvrs__sample__apps_1_1_motion_stream_data.html',1,'vrs_sample_apps']]],
-  ['motionstreamplayer_35',['MotionStreamPlayer',['../classvrs__sample__apps_1_1_motion_stream_player.html',1,'vrs_sample_apps']]],
-  ['mouserecordableclass_36',['MouseRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a163618e879ed2730013bfa67fb28cc03',1,'vrs']]],
-  ['mouthcamerarecordableclass_37',['MouthCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a24c75ba495c9cea9e2a0c7fbfcc820cb',1,'vrs']]],
-  ['mu_5flaw_38',['MU_LAW',['../namespacevrs.html#a52303127bf307e1191fcb9b2ee2841d4ac977d3bb3090c7c7a6dfebc95d84fc5e',1,'vrs']]],
-  ['multirecordfilereader_39',['MultiRecordFileReader',['../classvrs_1_1_multi_record_file_reader.html',1,'vrs']]]
+  ['mouserecordableclass_35',['MouseRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a163618e879ed2730013bfa67fb28cc03',1,'vrs']]],
+  ['mouthcamerarecordableclass_36',['MouthCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a24c75ba495c9cea9e2a0c7fbfcc820cb',1,'vrs']]],
+  ['mu_5flaw_37',['MU_LAW',['../namespacevrs.html#a52303127bf307e1191fcb9b2ee2841d4ac977d3bb3090c7c7a6dfebc95d84fc5e',1,'vrs']]],
+  ['multirecordfilereader_38',['MultiRecordFileReader',['../classvrs_1_1_multi_record_file_reader.html',1,'vrs']]]
 ];

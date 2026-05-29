@@ -94,11 +94,8 @@ Inheritance diagram for vrs::RecordFormatStreamPlayer:</div>
  <div class="center">
   <img src="classvrs_1_1_record_format_stream_player.png" usemap="#vrs::RecordFormatStreamPlayer_map" alt=""/>
   <map id="vrs::RecordFormatStreamPlayer_map" name="vrs::RecordFormatStreamPlayer_map">
-<area href="classvrs_1_1_stream_player.html" title="Class designed to receive record data when reading a VRS file." alt="vrs::StreamPlayer" shape="rect" coords="360,0,590,24"/>
-<area href="classvrs_1_1_tags_record_player.html" title="StreamPlayer to decode the content of VRS tag records." alt="vrs::TagsRecordPlayer" shape="rect" coords="0,112,230,136"/>
-<area href="classvrs__sample__apps_1_1_audio_stream_player.html" title="Audio stream reader showing how to read records from a typical stream containing audio blocks." alt="vrs_sample_apps::AudioStreamPlayer" shape="rect" coords="240,112,470,136"/>
-<area href="classvrs__sample__apps_1_1_image_stream_player.html" title="Image stream reader showing how to read records from a typical stream containing images." alt="vrs_sample_apps::ImageStreamPlayer" shape="rect" coords="480,112,710,136"/>
-<area href="classvrs__sample__apps_1_1_motion_stream_player.html" title="Stream reader showing how to read records containing only metadata information in a DataLayout." alt="vrs_sample_apps::MotionStreamPlayer" shape="rect" coords="720,112,950,136"/>
+<area href="classvrs_1_1_stream_player.html" title="Class designed to receive record data when reading a VRS file." alt="vrs::StreamPlayer" shape="rect" coords="0,0,192,24"/>
+<area href="classvrs_1_1_tags_record_player.html" title="StreamPlayer to decode the content of VRS tag records." alt="vrs::TagsRecordPlayer" shape="rect" coords="0,112,192,136"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -325,8 +322,6 @@ map&lt; pair&lt; <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>, 
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Return true if remaining record content blocks should be read. </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classvrs__sample__apps_1_1_audio_stream_player.html#a51748810c796bcccec2c27d07efda034">vrs_sample_apps::AudioStreamPlayer</a>.</p>
-
 </div>
 </div>
 <a id="a5a7225617a1cdfadbda0010716c5b4e3" name="a5a7225617a1cdfadbda0010716c5b4e3"></a>
@@ -429,7 +424,7 @@ map&lt; pair&lt; <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>, 
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Return true if remaining record content blocks should be read. Return false, if the record should not be read entirely, for instance, if you only need to read some metadata stored in the first content block, but don't need to read &amp; decode the rest of the record. </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classvrs_1_1_tags_record_player.html#a551db81d7f8968efcc9cd772e1e6cc35">vrs::TagsRecordPlayer</a>, <a class="el" href="classvrs__sample__apps_1_1_image_stream_player.html#aac15715d30aea144c275f2487c43b5b5">vrs_sample_apps::ImageStreamPlayer</a>, and <a class="el" href="classvrs__sample__apps_1_1_motion_stream_player.html#a366255633bd47cd47cb596caa29934ce">vrs_sample_apps::MotionStreamPlayer</a>.</p>
+<p>Reimplemented in <a class="el" href="classvrs_1_1_tags_record_player.html#a551db81d7f8968efcc9cd772e1e6cc35">vrs::TagsRecordPlayer</a>.</p>
 
 </div>
 </div>
@@ -481,8 +476,6 @@ map&lt; pair&lt; <a class="el" href="classvrs_1_1_stream_id.html">StreamId</a>, 
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Return true if remaining record content blocks should be read. </dd></dl>
-
-<p>Reimplemented in <a class="el" href="classvrs__sample__apps_1_1_image_stream_player.html#ad98c6c2af0d0cadf97af905a194438a5">vrs_sample_apps::ImageStreamPlayer</a>.</p>
 
 </div>
 </div>

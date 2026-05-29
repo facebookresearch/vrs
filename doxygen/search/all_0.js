@@ -18,7 +18,7 @@ var searchData=
   ['addrecordformat_15',['addrecordformat',['../classvrs_1_1_recordable.html#aa801d89039dc4435461210f53e5c5c89',1,'vrs::Recordable::addRecordFormat()'],['../classvrs_1_1_record_format.html#a4bb88867e1f983ab46cf8cff83b4e69f',1,'vrs::RecordFormat::addRecordFormat()']]],
   ['addsoftwaredetails_16',['addSoftwareDetails',['../namespacevrs_1_1tag__conventions.html#a67ff625be83d2f948f1116fb04c51931',1,'vrs::tag_conventions']]],
   ['addsplithead_17',['addSplitHead',['../classvrs_1_1_write_file_handler.html#a250b01c29f8923717e3e5b217ad7ff12',1,'vrs::WriteFileHandler']]],
-  ['addtags_18',['addtags',['../classvrs_1_1_record_file_writer.html#abb5d20c53fcd9e5c5bb309c0ace6e581',1,'vrs::RecordFileWriter::addTags()'],['../classvrs_1_1_recordable.html#ae61b438be2513c28ad26dcd70f0fa193',1,'vrs::Recordable::addTags(const StreamTags &amp;tags)'],['../classvrs_1_1_recordable.html#ac97c9ca729acf1dfe2673c114401c834',1,'vrs::Recordable::addTags(const map&lt; string, string &gt; &amp;newTags)']]],
+  ['addtags_18',['addtags',['../classvrs_1_1_recordable.html#ac97c9ca729acf1dfe2673c114401c834',1,'vrs::Recordable::addTags(const map&lt; string, string &gt; &amp;newTags)'],['../classvrs_1_1_recordable.html#ae61b438be2513c28ad26dcd70f0fa193',1,'vrs::Recordable::addTags(const StreamTags &amp;tags)'],['../classvrs_1_1_record_file_writer.html#abb5d20c53fcd9e5c5bb309c0ace6e581',1,'vrs::RecordFileWriter::addTags()']]],
   ['addtagset_19',['addTagSet',['../namespacevrs_1_1tag__conventions.html#a476bbcbb15e95d2da63d23f91c9f76a1',1,'vrs::tag_conventions']]],
   ['adduniquesessionid_20',['addUniqueSessionId',['../namespacevrs_1_1tag__conventions.html#a3b2b814f54288677df0458c512ed432a',1,'vrs::tag_conventions']]],
   ['alignmentrecordableclass_21',['AlignmentRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a015f4f4f7127bfa675464c6d26d02c67',1,'vrs']]],
@@ -32,8 +32,8 @@ var searchData=
   ['annotationstream_29',['AnnotationStream',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5ac726e63aa301813747fe80cb5a505321',1,'vrs']]],
   ['archivestream_30',['ArchiveStream',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a7087ea5209577d70c23dd4b15438a311',1,'vrs']]],
   ['array_31',['Array',['../namespacevrs.html#afb0b040e753b40173e69f247afa430a2a4410ec34d9e6c1a68100ca0ce033fb17',1,'vrs']]],
-  ['asjson_32',['asjson',['../classvrs_1_1_data_layout.html#af09ce83ef49d3ddceed7399dedfaf108',1,'vrs::DataLayout::asJson(JsonFormatProfile profile) const'],['../classvrs_1_1_data_layout.html#a0bc2c897c4a70bdb4b17447a6e101e59',1,'vrs::DataLayout::asJson(const JsonFormatProfileSpec &amp;profile=JsonFormatProfileSpec()) const']]],
-  ['asstring_33',['asstring',['../classvrs_1_1_image_content_block_spec.html#a3f08976df417ff3a7aabe680c9174045',1,'vrs::ImageContentBlockSpec::asString()'],['../classvrs_1_1_record_format.html#af68349884716c4b1a5905651d1619e5c',1,'vrs::RecordFormat::asString()'],['../classvrs_1_1_content_block.html#a35b64179434af43ffab6df192e718463',1,'vrs::ContentBlock::asString()'],['../classvrs_1_1_audio_content_block_spec.html#a124e6d3ae5c94abaae0f4ca494885c7e',1,'vrs::AudioContentBlockSpec::asString()']]],
+  ['asjson_32',['asjson',['../classvrs_1_1_data_layout.html#a0bc2c897c4a70bdb4b17447a6e101e59',1,'vrs::DataLayout::asJson(const JsonFormatProfileSpec &amp;profile=JsonFormatProfileSpec()) const'],['../classvrs_1_1_data_layout.html#af09ce83ef49d3ddceed7399dedfaf108',1,'vrs::DataLayout::asJson(JsonFormatProfile profile) const']]],
+  ['asstring_33',['asstring',['../classvrs_1_1_audio_content_block_spec.html#a124e6d3ae5c94abaae0f4ca494885c7e',1,'vrs::AudioContentBlockSpec::asString()'],['../classvrs_1_1_record_format.html#af68349884716c4b1a5905651d1619e5c',1,'vrs::RecordFormat::asString()'],['../classvrs_1_1_content_block.html#a35b64179434af43ffab6df192e718463',1,'vrs::ContentBlock::asString()'],['../classvrs_1_1_image_content_block_spec.html#a3f08976df417ff3a7aabe680c9174045',1,'vrs::ImageContentBlockSpec::asString()']]],
   ['atomicdiskfile_34',['AtomicDiskFile',['../classvrs_1_1_atomic_disk_file.html',1,'vrs']]],
   ['attentionrecordableclass_35',['AttentionRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a5ce1e16873eb9a011c4e08ded0ce9798',1,'vrs']]],
   ['audio_36',['audio',['../classvrs_1_1_content_block.html#a97be4c1b6bac1e5e4c7ab8b5deeb4264',1,'vrs::ContentBlock::audio()'],['../namespacevrs.html#ae73984aca85d0aa7b6f3406cd9f2f6eaae423b8bde9bfbfd7e9409b23b23aed91',1,'vrs::AUDIO']]],
@@ -43,9 +43,8 @@ var searchData=
   ['audiosampleformat_40',['AudioSampleFormat',['../namespacevrs.html#a52303127bf307e1191fcb9b2ee2841d4',1,'vrs']]],
   ['audiospec_41',['AudioSpec',['../classvrs_1_1datalayout__conventions_1_1_audio_spec.html',1,'vrs::datalayout_conventions']]],
   ['audiostream_42',['AudioStream',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5ab2addede571a6f1d615a06c5ce0a11d4',1,'vrs']]],
-  ['audiostreamplayer_43',['AudioStreamPlayer',['../classvrs__sample__apps_1_1_audio_stream_player.html',1,'vrs_sample_apps']]],
-  ['autodatalayout_44',['AutoDataLayout',['../classvrs_1_1_auto_data_layout.html',1,'vrs']]],
-  ['autodatalayoutend_45',['AutoDataLayoutEnd',['../classvrs_1_1_auto_data_layout_end.html',1,'vrs']]],
-  ['autopurgerecords_46',['autoPurgeRecords',['../classvrs_1_1_record_file_writer.html#a99522ed232b7179766420ef32819b954',1,'vrs::RecordFileWriter']]],
-  ['autowriterecordsasync_47',['autoWriteRecordsAsync',['../classvrs_1_1_record_file_writer.html#a3456d07552e4834d658ba92f2ee7272d',1,'vrs::RecordFileWriter']]]
+  ['autodatalayout_43',['AutoDataLayout',['../classvrs_1_1_auto_data_layout.html',1,'vrs']]],
+  ['autodatalayoutend_44',['AutoDataLayoutEnd',['../classvrs_1_1_auto_data_layout_end.html',1,'vrs']]],
+  ['autopurgerecords_45',['autoPurgeRecords',['../classvrs_1_1_record_file_writer.html#a99522ed232b7179766420ef32819b954',1,'vrs::RecordFileWriter']]],
+  ['autowriterecordsasync_46',['autoWriteRecordsAsync',['../classvrs_1_1_record_file_writer.html#a3456d07552e4834d658ba92f2ee7272d',1,'vrs::RecordFileWriter']]]
 ];
