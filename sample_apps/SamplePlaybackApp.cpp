@@ -33,7 +33,7 @@ using namespace vrs;
 using namespace vrs::datalayout_conventions;
 using namespace vrs_sample_apps;
 
-namespace vrs_sample_apps {
+namespace {
 
 /// Image stream reader showing how to read records from a typical stream containing images.
 class ImageStreamPlayer : public RecordFormatStreamPlayer {
@@ -161,7 +161,7 @@ class MotionStreamPlayer : public RecordFormatStreamPlayer {
   size_t motionRecordCount = 0;
 };
 
-} // namespace vrs_sample_apps
+} // namespace
 
 int main() {
   RecordFileReader reader;
