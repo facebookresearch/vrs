@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#pragma once
+
 /* Markdown text included in the ReadMe.md file when extracting a VRS file. */
 
 R"====(# VRS File Extraction Data Format
