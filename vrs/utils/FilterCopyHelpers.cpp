@@ -76,6 +76,24 @@ CopyOptions::CopyOptions(const CopyOptions& rhs)
   }
 }
 
+CopyOptions& CopyOptions::operator=(const CopyOptions& rhs) {
+  if (this != &rhs) {
+    compressionPoolSize = rhs.compressionPoolSize;
+    showProgress = rhs.showProgress;
+    graceWindow = rhs.graceWindow;
+    jsonOutput = rhs.jsonOutput;
+    maxChunkSizeMB = rhs.maxChunkSizeMB;
+    mergeStreams = rhs.mergeStreams;
+    tagOverrider.reset();
+    if (rhs.tagOverrider) {
+      TagOverrider& thisTagOverrider = getTagOverrider();
+      thisTagOverrider.fileTags = rhs.tagOverrider->fileTags;
+      thisTagOverrider.streamTags = rhs.tagOverrider->streamTags;
+    }
+  }
+  return *this;
+}
+
 void TagOverrider::overrideTags(RecordFileWriter& writer) const {
   writer.addTags(fileTags);
   if (!streamTags.empty()) {

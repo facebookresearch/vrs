@@ -44,6 +44,7 @@ struct CopyOptions {
   CopyOptions() = default;
   explicit CopyOptions(bool showProgress) : showProgress{showProgress} {}
   CopyOptions(const CopyOptions& rhs);
+  CopyOptions& operator=(const CopyOptions& rhs);
 
   // Compression preset of the output file. Use this method to set the user's explicit choice.
   void setCompressionPreset(CompressionPreset preset) {
