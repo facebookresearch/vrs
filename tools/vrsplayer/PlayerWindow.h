@@ -54,7 +54,7 @@ class PlayerWindow : public QMainWindow {
 
   string getAudioMode() const;
   std::pair<uint32_t, uint32_t> getSelectedChannels() const {
-    return std::pair<uint32_t, uint32_t>(leftAudioChannel_, rightAudioChannel_);
+    return {leftAudioChannel_, rightAudioChannel_};
   }
 
   void restoreAudioSelection(
