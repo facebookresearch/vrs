@@ -500,7 +500,9 @@ int PixelFrame::writeAsPng(const string& filename, vector<uint8_t>* outBuffer) c
   png_destroy_write_struct(&pngStruct, &pngInfo);
 
   if (outBuffer == nullptr) {
-    os::fileClose(file);
+    if (file != nullptr) {
+      os::fileClose(file);
+    }
   } else {
     memBuffer.getData(*outBuffer);
     size_t totalSize = outBuffer->size();
