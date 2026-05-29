@@ -165,7 +165,8 @@ bool PixelFrame::jpgCompress(
 
   XR_VERIFY(tjDestroy(_jpegCompressor) == 0);
 
-  if (XR_VERIFY(jpegData != nullptr)) {
+  XR_VERIFY(jpegData != nullptr);
+  if (jpegData != nullptr) {
     outBuffer.resize(jpegDataSize);
     memcpy(outBuffer.data(), jpegData, jpegDataSize);
     tjFree(jpegData);
