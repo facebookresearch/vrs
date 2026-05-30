@@ -49,6 +49,8 @@ static double kDefaultAutoCollectDelay = 1;
 
 namespace RecordFileWriter_ {
 
+namespace {
+
 class CompressionJob {
  public:
   CompressionJob() = default;
@@ -127,6 +129,8 @@ class CompressionWorker {
 
   thread thread_;
 };
+
+} // namespace
 
 struct CompressionThreadsData {
   CompressionJobQueue jobsQueue;
