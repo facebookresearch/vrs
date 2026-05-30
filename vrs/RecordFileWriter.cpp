@@ -112,8 +112,10 @@ class CompressionWorker {
 
     CompressionJob* job = nullptr;
     while (workQueue_.waitForJob(job)) {
-      job->performJob();
-      resultsQueue_.sendJob(job);
+      if (job != nullptr) {
+        job->performJob();
+        resultsQueue_.sendJob(job);
+      }
     }
   }
 
