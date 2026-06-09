@@ -57,7 +57,7 @@ using vrs::os::EventChannel;
 
 class PlayerUI;
 
-enum class Action { ShowFrame = 1, ShowFrameFast, ChangeFrame };
+enum class Action { ShowFrame = 1, ShowFrameFast, ChangeFrame, RefreshCurrentFrame };
 enum class Direction { Forward, Backward };
 enum class Seek { Accurate, Fast };
 
@@ -142,6 +142,7 @@ class FileReader : public QObject {
   void pause();
   void nextFrame();
   void previousFrame();
+  void refreshCurrentFrames();
   void updatePosition();
   void relayout();
   void setPlaybackSpeed(double speed);

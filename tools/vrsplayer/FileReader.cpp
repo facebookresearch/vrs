@@ -194,6 +194,7 @@ static int64_t kReadPreviousPage = DispatchAction(Action::ChangeFrame, -kPageSiz
 static int64_t kReadNextPage = DispatchAction(Action::ChangeFrame, kPageSize).bundle();
 static int64_t kReadPreviousBigPage = DispatchAction(Action::ChangeFrame, -kBigPageSize).bundle();
 static int64_t kReadNextBigPage = DispatchAction(Action::ChangeFrame, kBigPageSize).bundle();
+static int64_t kRefreshCurrentFrame = DispatchAction(Action::RefreshCurrentFrame).bundle();
 
 FileReader::FileReader(QObject* parent) : QObject(parent) {
   isSliderActive_ = false;
@@ -899,6 +900,18 @@ void FileReader::playAction(DispatchAction action) {
       size_t lastPlayed = *frameSet.rbegin();
       time_.setTime(index[lastPlayed].timestamp);
     }
+  } else if (action.action == Action::RefreshCurrentFrame) {
+    const auto& index = fileReader_->getIndex();
+    for (StreamId id : visibleStreams_) {
+      auto iter = lastReadRecords_.find(id);
+      if (iter != lastReadRecords_.end() && iter->second < index.size()) {
+        frameSet.insert(iter->second);
+      }
+    }
+    Prefetcher prefetcher(*fileReader_, frameSet, isLocalFile_);
+    for (size_t recIdx : frameSet) {
+      fileReader_->readRecord(index[recIdx]);
+    }
   }
   mediaStateChanged(state_);
 }
@@ -975,6 +988,13 @@ void FileReader::nextFrame() {
 void FileReader::previousFrame() {
   setBlankMode(false);
   waitEvent_.dispatchEvent(kReadPreviousFrame);
+}
+
+void FileReader::refreshCurrentFrames() {
+  if (state_ == FileReaderState::Playing) {
+    return;
+  }
+  waitEvent_.dispatchEvent(kRefreshCurrentFrame);
 }
 
 void FileReader::updatePosition() {
