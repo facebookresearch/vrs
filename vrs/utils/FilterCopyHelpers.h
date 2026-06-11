@@ -205,19 +205,20 @@ class RecordFilterCopier : public RecordFormatStreamPlayer {
   virtual bool shouldCopyVerbatim(const CurrentRecord& record) = 0;
 
   // Modify the output record's timestamp, record format version, or record type (rarely needed).
-  virtual void doHeaderEdits(CurrentRecord& record) {}
+  virtual void doHeaderEdits(CurrentRecord& /* record */) {}
 
   // Edit DataLayout blocks, if needed.
   // Use getExpectedLayout() to get the DataLayout object in the form you expect, then for each of
   // its DataPiece fields, use isMapped() to tell if the field is present, and use patchValue(x) to
   // modify the value as you need.
-  virtual void doDataLayoutEdits(const CurrentRecord& record, size_t blockIndex, DataLayout& dl) {}
+  virtual void
+  doDataLayoutEdits(const CurrentRecord& /* record */, size_t blockIndex, DataLayout& dl) {}
 
   // Filter image blocks. If the filter is more than a simple pixel buffer modification,
   // in particular if a pixel format conversion and/or a resolution change are made,
   // make sure to make the corresponding changes in the datalayout that describes the image format.
   virtual void filterImage(
-      const CurrentRecord& record,
+      const CurrentRecord& /* record */,
       size_t blockIndex,
       const ContentBlock& imageBlock,
       vector<uint8_t>& pixels) {}
@@ -225,7 +226,7 @@ class RecordFilterCopier : public RecordFormatStreamPlayer {
   // Filter audio blocks. If the filter is more than a simple audio samples buffer modification,
   // make sure to make the corresponding changes in the datalayout that describes the audio format.
   virtual void filterAudio(
-      const CurrentRecord& record,
+      const CurrentRecord& /* record */,
       size_t blockIndex,
       const ContentBlock& audioBlock,
       vector<uint8_t>& audioSamples) {}
