@@ -18,7 +18,6 @@
 
 #include <algorithm>
 
-#include <thread_safety_analysis/Attributes.h>
 #include <vrs/Compressor.h>
 #include <vrs/DataSource.h>
 #include <vrs/FileFormat.h>
@@ -178,8 +177,7 @@ void RecordManager::purgeCache() {
   cache_.clear();
 }
 
-void RecordManager::collectOldRecords(double maxAge, list<Record*>& outCollectedRecords)
-    XR_TSA_NO_THREAD_SAFETY_ANALYSIS {
+void RecordManager::collectOldRecords(double maxAge, list<Record*>& outCollectedRecords) {
   outCollectedRecords.clear();
   lock_guard<mutex> guard{mutex_};
   if (!activeRecords_.empty()) {
