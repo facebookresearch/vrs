@@ -14,5 +14,6 @@
 
 add_subdirectory(logging)
 add_subdirectory(portability)
+add_subdirectory(thread_safety_analysis)
 add_subdirectory(test_helpers)
 add_subdirectory(TestDataDir)

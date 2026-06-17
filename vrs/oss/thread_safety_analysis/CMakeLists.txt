@@ -1,0 +1,33 @@
+# Copyright (c) Meta Platforms, Inc. and affiliates.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# This library is a minimal replacement for the thread safety analysis library
+# used at Meta, which is not open source. The TSA annotations compile to no-ops
+# and the tsa:: types map to the corresponding std synchronization primitives,
+# so VRS source builds unchanged. Thread safety analysis itself is unsupported
+# in open source builds.
+
+add_library(vrs_oss_thread_safety_analysis INTERFACE)
+target_include_directories(vrs_oss_thread_safety_analysis
+  INTERFACE
+    $<BUILD_INTERFACE:${VRS_SOURCE_DIR}/vrs/oss>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+
+install(TARGETS vrs_oss_thread_safety_analysis EXPORT VRSLibTargets
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+  INCLUDES DESTINATION include
+)

@@ -29,6 +29,7 @@ target_link_libraries(vrslib
     vrs_helpers
     vrs_logging
     vrs_os
+    vrs_oss_thread_safety_analysis
     vrs_utils_xxhash
 )
 target_link_libraries(vrslib
