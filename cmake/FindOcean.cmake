@@ -24,18 +24,40 @@ endif()
 # 0) Standard install dirs
 include(GNUInstallDirs)
 
-# --------------------------
-# 1) Fetch & build Ocean
-include(FetchContent)
-FetchContent_Declare(
-  ocean
-  GIT_REPOSITORY https://github.com/facebookresearch/ocean.git
-  GIT_TAG        5fca1d27a9f37e868738b6db09a6b1e00723d80f # master branch, 2025.11.07
+# Try to find Ocean in fbsource tree first
+set(OCEAN_FBSOURCE_PATHS
+  "${VRS_SOURCE_DIR}/../../../xplat/ocean"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../../../xplat/ocean"
+  "${CMAKE_SOURCE_DIR}/../../../xplat/ocean"
 )
-set(OCEAN_BUILD_MINIMAL ON)
-set(OCEAN_BUILD_TEST    OFF)
-message(STATUS "⤷ FetchContent: pulling and building Facebook Ocean…")
-FetchContent_MakeAvailable(ocean)
+foreach(ocean_path IN LISTS OCEAN_FBSOURCE_PATHS)
+  if(EXISTS "${ocean_path}/CMakeLists.txt")
+    set(OCEAN_SOURCE_DIR "${ocean_path}")
+    break()
+  endif()
+endforeach()
+
+if(OCEAN_SOURCE_DIR)
+  message(STATUS "Found Ocean in fbsource at ${OCEAN_SOURCE_DIR}")
+  set(OCEAN_BUILD_MINIMAL ON CACHE BOOL "" FORCE)
+  set(OCEAN_BUILD_TEST OFF CACHE BOOL "" FORCE)
+  # Ocean requires CMake 3.26, VRS requires 3.16 - allow higher version
+  add_subdirectory("${OCEAN_SOURCE_DIR}" "${CMAKE_BINARY_DIR}/ocean")
+  set(ocean_SOURCE_DIR "${OCEAN_SOURCE_DIR}")
+else()
+  # --------------------------
+  # 1) Fetch & build Ocean
+  include(FetchContent)
+  FetchContent_Declare(
+    ocean
+    GIT_REPOSITORY https://github.com/facebookresearch/ocean.git
+    GIT_TAG        5fca1d27a9f37e868738b6db09a6b1e00723d80f # master branch, 2025.11.07
+  )
+  set(OCEAN_BUILD_MINIMAL ON)
+  set(OCEAN_BUILD_TEST    OFF)
+  message(STATUS "⤷ FetchContent: pulling and building Facebook Ocean…")
+  FetchContent_MakeAvailable(ocean)
+endif()
 
 # --------------------------
 # 2) Normalize component include dirs to avoid build-tree paths

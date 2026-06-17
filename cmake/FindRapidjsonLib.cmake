@@ -15,22 +15,49 @@
 # The package version of rapidjson provided by apt on Linux or brew on Mac date from August 2016,
 # despite being the last official version (v1.1.0), and don't include important fixes.
 # So we get the code from GitHub at a known working state.
-find_path(RAPIDJSON_INSTALL NAMES rapidjson/rapidjson.h)
-if (RAPIDJSON_INSTALL)
-  message(WARNING "Found RapidJson at ${RAPIDJSON_INSTALL} It might be used instead "
-    "of VRS' version, and cause builds errors because the code is too old.")
-endif()
 
-set(RAPIDJSON_DIR "${EXTERNAL_DEPENDENCIES_DIR}/rapidjson")
-set(RAPIDJSON_INCLUDE_DIR "${RAPIDJSON_DIR}/include")
-set(RAPIDJSON_INCLUDE_FILE "${RAPIDJSON_INCLUDE_DIR}/rapidjson/rapidjson.h")
+# Try to find rapidjson in fbsource third-party (for fbsource builds)
+# Note: We intentionally do NOT search system paths here, because the system
+# rapidjson (v1.1.0 from 2016) is too old and causes build errors.
+# OSS builds will fall back to git clone below.
+find_path(RAPIDJSON_INCLUDE_DIR
+  NAMES rapidjson/rapidjson.h
+  HINTS
+    # fbsource third-party location
+    "${VRS_SOURCE_DIR}/../../../third-party/rapidjson/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../../third-party/rapidjson/include"
+  NO_DEFAULT_PATH
+  NO_CMAKE_ENVIRONMENT_PATH
+  NO_CMAKE_SYSTEM_PATH
+)
 
-if (NOT EXISTS "${RAPIDJSON_INCLUDE_FILE}")
-  execute_process(COMMAND git clone https://github.com/Tencent/rapidjson.git "${RAPIDJSON_DIR}")
-endif()
-execute_process(COMMAND cd "${RAPIDJSON_DIR}" && git -f checkout a95e013b97ca6523f32da23f5095fcc9dd6067e5)
-if (NOT EXISTS "${RAPIDJSON_INCLUDE_FILE}")
-  message(FATAL_ERROR "Could not setup rapidjson external dependency at ${RAPIDJSON_DIR}")
+if (RAPIDJSON_INCLUDE_DIR)
+  message(STATUS "Found RapidJson at ${RAPIDJSON_INCLUDE_DIR}")
+  set(RAPIDJSON_FOUND TRUE)
+else()
+  # Fall back to downloading from GitHub (OSS behavior)
+  set(RAPIDJSON_DIR "${EXTERNAL_DEPENDENCIES_DIR}/rapidjson")
+  set(RAPIDJSON_INCLUDE_DIR "${RAPIDJSON_DIR}/include")
+  set(RAPIDJSON_INCLUDE_FILE "${RAPIDJSON_INCLUDE_DIR}/rapidjson/rapidjson.h")
+
+  if (NOT EXISTS "${RAPIDJSON_INCLUDE_FILE}")
+    execute_process(
+      COMMAND git clone https://github.com/Tencent/rapidjson.git "${RAPIDJSON_DIR}"
+      RESULT_VARIABLE GIT_CLONE_RESULT
+      ERROR_QUIET
+    )
+  endif()
+  if (EXISTS "${RAPIDJSON_DIR}")
+    execute_process(
+      COMMAND git -C "${RAPIDJSON_DIR}" checkout -f a95e013b97ca6523f32da23f5095fcc9dd6067e5
+      RESULT_VARIABLE GIT_CHECKOUT_RESULT
+      ERROR_QUIET
+    )
+  endif()
+  if (NOT EXISTS "${RAPIDJSON_INCLUDE_FILE}")
+    message(FATAL_ERROR "Could not setup rapidjson external dependency at ${RAPIDJSON_DIR}")
+  endif()
+  message(STATUS "Found RapidJson: ${RAPIDJSON_DIR}")
 endif()
 
 add_library(rapidjson::rapidjson INTERFACE IMPORTED)
@@ -38,6 +65,3 @@ set_target_properties(
   rapidjson::rapidjson PROPERTIES
   INTERFACE_INCLUDE_DIRECTORIES "${RAPIDJSON_INCLUDE_DIR}"
 )
-add_dependencies(rapidjson::rapidjson rapidjson)
-
-message(STATUS "Found RapidJson: ${RAPIDJSON_DIR}")
