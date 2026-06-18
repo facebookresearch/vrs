@@ -217,6 +217,33 @@ static PixelFrame makeBayer10GbrgFrame(
   return frame;
 }
 
+// Build a BAYER8_GBRG source with constant per-channel values and an explicit
+// row stride. GBRG row-major layout:
+//   even rows: G B G B ...
+//   odd  rows: R G R G ...
+static PixelFrame makeBayer8GbrgFrame(
+    uint32_t width,
+    uint32_t height,
+    uint8_t green8,
+    uint8_t blue8,
+    uint8_t red8,
+    uint32_t strideBytes = 0) {
+  if (strideBytes == 0) {
+    strideBytes = width;
+  }
+  PixelFrame frame(PixelFormat::BAYER8_GBRG, width, height, strideBytes);
+  uint8_t* dst = frame.wdata();
+  for (uint32_t y = 0; y < height; ++y) {
+    uint8_t* row = dst + y * strideBytes;
+    for (uint32_t x = 0; x < width; ++x) {
+      const bool evenRow = (y % 2) == 0;
+      const bool evenCol = (x % 2) == 0;
+      row[x] = evenRow ? (evenCol ? green8 : blue8) : (evenCol ? red8 : green8);
+    }
+  }
+  return frame;
+}
+
 TEST_F(PixelFrameTest, normalizeBayer10GbrgFastPath) {
   // 4x4 GBRG -> 2x2 RGB8 with speedOverPrecision=true.
   // 10-bit input is shifted right by 2 to produce 8-bit output.
@@ -262,6 +289,126 @@ TEST_F(PixelFrameTest, normalizeBayer10GbrgQualityPath) {
       EXPECT_EQ(row[x * 3 + 0], 50) << "R at (" << x << "," << y << ")";
       EXPECT_EQ(row[x * 3 + 1], 200) << "G at (" << x << "," << y << ")";
       EXPECT_EQ(row[x * 3 + 2], 100) << "B at (" << x << "," << y << ")";
+    }
+  }
+}
+
+TEST_F(PixelFrameTest, normalizeBayer8GbrgFastPath) {
+  // 4x4 GBRG -> 2x2 RGB8 with speedOverPrecision=true.
+  constexpr uint8_t kGreen8 = 200;
+  constexpr uint8_t kBlue8 = 100;
+  constexpr uint8_t kRed8 = 50;
+  PixelFrame source = makeBayer8GbrgFrame(4, 4, kGreen8, kBlue8, kRed8);
+  shared_ptr<PixelFrame> normalized;
+  NormalizeOptions options(ImageSemantic::Camera);
+  options.speedOverPrecision = true;
+  ASSERT_TRUE(source.normalizeFrame(normalized, false, options));
+  ASSERT_EQ(normalized->getPixelFormat(), PixelFormat::RGB8);
+  ASSERT_EQ(normalized->getWidth(), 2u);
+  ASSERT_EQ(normalized->getHeight(), 2u);
+  const uint8_t* rgb = normalized->rdata();
+  for (uint32_t i = 0; i < 4; ++i) {
+    EXPECT_EQ(rgb[i * 3 + 0], 50) << "R at block " << i;
+    EXPECT_EQ(rgb[i * 3 + 1], 200) << "G at block " << i;
+    EXPECT_EQ(rgb[i * 3 + 2], 100) << "B at block " << i;
+  }
+}
+
+TEST_F(PixelFrameTest, normalizeBayer8GbrgQualityPath) {
+  // 8x8 GBRG -> 8x8 RGB8 with speedOverPrecision=false.
+  // For constant per-channel input, interior bilinear-debayered pixels return
+  // each channel at its constant value; border pixels are excluded from checks.
+  constexpr uint8_t kGreen8 = 200;
+  constexpr uint8_t kBlue8 = 100;
+  constexpr uint8_t kRed8 = 50;
+  PixelFrame source = makeBayer8GbrgFrame(8, 8, kGreen8, kBlue8, kRed8);
+  shared_ptr<PixelFrame> normalized;
+  NormalizeOptions options(ImageSemantic::Camera);
+  options.speedOverPrecision = false;
+  ASSERT_TRUE(source.normalizeFrame(normalized, false, options));
+  ASSERT_EQ(normalized->getPixelFormat(), PixelFormat::RGB8);
+  ASSERT_EQ(normalized->getWidth(), 8u);
+  ASSERT_EQ(normalized->getHeight(), 8u);
+  const uint8_t* rgb = normalized->rdata();
+  const uint32_t stride = normalized->getStride();
+  for (uint32_t y = 2; y < 6; ++y) {
+    const uint8_t* row = rgb + y * stride;
+    for (uint32_t x = 2; x < 6; ++x) {
+      EXPECT_EQ(row[x * 3 + 0], 50) << "R at (" << x << "," << y << ")";
+      EXPECT_EQ(row[x * 3 + 1], 200) << "G at (" << x << "," << y << ")";
+      EXPECT_EQ(row[x * 3 + 2], 100) << "B at (" << x << "," << y << ")";
+    }
+  }
+}
+
+TEST_F(PixelFrameTest, normalizeBayer8GbrgFastPathRespectsStride) {
+  // Regression test: with a padded source row stride, the handler must index
+  // using getStride(), not width. Padding bytes are filled with sentinel values
+  // that would corrupt the output if read as pixels.
+  constexpr uint32_t kWidth = 4;
+  constexpr uint32_t kHeight = 4;
+  constexpr uint32_t kPadPixels = 2;
+  constexpr uint32_t kPaddedStride = kWidth + kPadPixels;
+  constexpr uint8_t kGreen8 = 200;
+  constexpr uint8_t kBlue8 = 100;
+  constexpr uint8_t kRed8 = 50;
+  PixelFrame source = makeBayer8GbrgFrame(kWidth, kHeight, kGreen8, kBlue8, kRed8, kPaddedStride);
+  uint8_t* dst = source.wdata();
+  for (uint32_t y = 0; y < kHeight; ++y) {
+    uint8_t* row = dst + y * kPaddedStride;
+    for (uint32_t x = kWidth; x < kWidth + kPadPixels; ++x) {
+      row[x] = 0xFF;
+    }
+  }
+  shared_ptr<PixelFrame> normalized;
+  NormalizeOptions options(ImageSemantic::Camera);
+  options.speedOverPrecision = true;
+  ASSERT_TRUE(source.normalizeFrame(normalized, false, options));
+  ASSERT_EQ(normalized->getPixelFormat(), PixelFormat::RGB8);
+  ASSERT_EQ(normalized->getWidth(), 2u);
+  ASSERT_EQ(normalized->getHeight(), 2u);
+  const uint8_t* rgb = normalized->rdata();
+  for (uint32_t i = 0; i < 4; ++i) {
+    EXPECT_EQ(rgb[i * 3 + 0], 50) << "R leaked padding at block " << i;
+    EXPECT_EQ(rgb[i * 3 + 1], 200) << "G leaked padding at block " << i;
+    EXPECT_EQ(rgb[i * 3 + 2], 100) << "B leaked padding at block " << i;
+  }
+}
+
+TEST_F(PixelFrameTest, normalizeBayer8GbrgQualityPathRespectsStride) {
+  // Regression test: quality path must also honor source stride. With padded
+  // rows containing sentinel garbage, interior debayered pixels must still
+  // resolve to the constant per-channel input values.
+  constexpr uint32_t kWidth = 8;
+  constexpr uint32_t kHeight = 8;
+  constexpr uint32_t kPadPixels = 4;
+  constexpr uint32_t kPaddedStride = kWidth + kPadPixels;
+  constexpr uint8_t kGreen8 = 200;
+  constexpr uint8_t kBlue8 = 100;
+  constexpr uint8_t kRed8 = 50;
+  PixelFrame source = makeBayer8GbrgFrame(kWidth, kHeight, kGreen8, kBlue8, kRed8, kPaddedStride);
+  uint8_t* dst = source.wdata();
+  for (uint32_t y = 0; y < kHeight; ++y) {
+    uint8_t* row = dst + y * kPaddedStride;
+    for (uint32_t x = kWidth; x < kWidth + kPadPixels; ++x) {
+      row[x] = 0xFF;
+    }
+  }
+  shared_ptr<PixelFrame> normalized;
+  NormalizeOptions options(ImageSemantic::Camera);
+  options.speedOverPrecision = false;
+  ASSERT_TRUE(source.normalizeFrame(normalized, false, options));
+  ASSERT_EQ(normalized->getPixelFormat(), PixelFormat::RGB8);
+  ASSERT_EQ(normalized->getWidth(), kWidth);
+  ASSERT_EQ(normalized->getHeight(), kHeight);
+  const uint8_t* rgb = normalized->rdata();
+  const uint32_t stride = normalized->getStride();
+  for (uint32_t y = 2; y < 6; ++y) {
+    const uint8_t* row = rgb + y * stride;
+    for (uint32_t x = 2; x < 6; ++x) {
+      EXPECT_EQ(row[x * 3 + 0], 50) << "R leaked at (" << x << "," << y << ")";
+      EXPECT_EQ(row[x * 3 + 1], 200) << "G leaked at (" << x << "," << y << ")";
+      EXPECT_EQ(row[x * 3 + 2], 100) << "B leaked at (" << x << "," << y << ")";
     }
   }
 }
