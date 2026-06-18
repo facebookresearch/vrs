@@ -495,6 +495,7 @@ bool PixelFrame::normalizeFrame(
     case PixelFormat::SCALAR64F:
     case PixelFormat::BAYER8_RGGB:
     case PixelFormat::BAYER8_BGGR:
+    case PixelFormat::BAYER8_GBRG:
       format = PixelFormat::GREY8;
       componentCount = 1;
       break;
@@ -558,7 +559,9 @@ bool PixelFrame::normalizeFrame(
     // normalize double pixels to grey8
     pixel_conversions::normalizeBuffer<double>(
         rdata(), outNormalizedFrame.wdata(), getWidth(), getHeight());
-  } else if (srcFormat == PixelFormat::BAYER8_RGGB || srcFormat == PixelFormat::BAYER8_BGGR) {
+  } else if (
+      srcFormat == PixelFormat::BAYER8_RGGB || srcFormat == PixelFormat::BAYER8_BGGR ||
+      srcFormat == PixelFormat::BAYER8_GBRG) {
     // display as grey8(copy) for now
     memcpy(outNormalizedFrame.wdata(), rdata(), getWidth() * getHeight() * componentCount);
   } else if (

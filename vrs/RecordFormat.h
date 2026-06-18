@@ -90,6 +90,7 @@ enum class PixelFormat : uint8_t {
   GREY10PACKED, ///< 10 bit per pixel, packed in successive little-endian bits, in 40 bits blocks.
   BAYER8_BGGR, ///< 8 bit per pixel, BGGR bayer pattern.
   BAYER10_GBRG, ///< 10 bit per pixel, GBRG bayer pattern.
+  BAYER8_GBRG, ///< 8 bit per pixel, GBRG bayer pattern.
 
   COUNT, ///< Count of values in this enum type. @internal
 };

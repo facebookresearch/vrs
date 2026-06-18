@@ -357,6 +357,17 @@ TEST_F(RecordFormatTest, testBlockFormat) {
   EXPECT_EQ(bayer10gbrg.image().getChannelCountPerPixel(), 1);
   EXPECT_EQ(bayer10gbrg.image().getCodecQuality(), ImageContentBlockSpec::kQualityUndefined);
 
+  ContentBlock bayer8gbrg("image/raw/640x480/pixel=bayer8_gbrg");
+  EXPECT_EQ(bayer8gbrg.getContentType(), ContentType::IMAGE);
+  EXPECT_EQ(bayer8gbrg.image().getImageFormat(), ImageFormat::RAW);
+  EXPECT_EQ(bayer8gbrg.image().getPixelFormat(), PixelFormat::BAYER8_GBRG);
+  EXPECT_TRUE(checkImageDimensions(bayer8gbrg, 640, 480, 0, 640));
+  EXPECT_TRUE(checkImageHeights(bayer8gbrg, 480));
+  EXPECT_EQ(bayer8gbrg.image().getBlockSize(), 640 * 480);
+  EXPECT_EQ(bayer8gbrg.image().getBytesPerPixel(), 1);
+  EXPECT_EQ(bayer8gbrg.image().getChannelCountPerPixel(), 1);
+  EXPECT_EQ(bayer8gbrg.image().getCodecQuality(), ImageContentBlockSpec::kQualityUndefined);
+
   ContentBlock video("image/video/codec_quality=100");
   EXPECT_EQ(video.getContentType(), ContentType::IMAGE);
   EXPECT_EQ(video.image().getImageFormat(), ImageFormat::VIDEO);
