@@ -89,7 +89,7 @@ string_view sPixelFormatNames[] = {
     "grey12",           "grey16",       "rgb32F",       "scalar64F",    "yuy2",
     "rgb_ir_4x4",       "rgba32F",      "bayer8_rggb",  "raw10",        "raw10_bayer_rggb",
     "raw10_bayer_bggr", "yuv_420_nv21", "yuv_420_nv12", "grey10packed", "bayer8_bggr",
-    "bayer10_gbrg"};
+    "bayer10_gbrg",     "bayer8_gbrg"};
 ENUM_STRING_CONVERTER(PixelFormat, sPixelFormatNames, PixelFormat::UNDEFINED);
 
 // Enum values may NEVER BE CHANGED, as they are used in data layout definitions!!
@@ -122,6 +122,7 @@ static_assert(
 static_assert(
     static_cast<int>(PixelFormat::BAYER10_GBRG) == 25,
     "PixelFormat enum values CHANGED!");
+static_assert(static_cast<int>(PixelFormat::BAYER8_GBRG) == 26, "PixelFormat enum values CHANGED!");
 
 string_view sAudioFormatNames[] = {"undefined", "pcm", "opus"};
 ENUM_STRING_CONVERTER(AudioFormat, sAudioFormatNames, AudioFormat::UNDEFINED);
@@ -481,6 +482,7 @@ uint8_t ImageContentBlockSpec::getChannelCountPerPixel(PixelFormat pixel) {
     case PixelFormat::SCALAR64F:
     case PixelFormat::BAYER8_RGGB:
     case PixelFormat::BAYER8_BGGR:
+    case PixelFormat::BAYER8_GBRG:
     case PixelFormat::RAW10_BAYER_RGGB:
     case PixelFormat::RAW10_BAYER_BGGR:
     case PixelFormat::BAYER10_GBRG:
@@ -518,6 +520,7 @@ size_t ImageContentBlockSpec::getBytesPerPixel(PixelFormat pixel) {
     case PixelFormat::RGB_IR_RAW_4X4:
     case PixelFormat::BAYER8_RGGB:
     case PixelFormat::BAYER8_BGGR:
+    case PixelFormat::BAYER8_GBRG:
       return 1;
     case PixelFormat::GREY10:
     case PixelFormat::GREY12:
