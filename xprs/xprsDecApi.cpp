@@ -26,7 +26,7 @@
 
 namespace xprs {
 
-static const std::string_view kPreferredDecoderImplentations[] = {
+static const std::string_view kPreferredDecoderImplementations[] = {
     kH265DecoderName,
     kH264DecoderName,
 #ifdef WITH_NVCODEC
@@ -78,9 +78,9 @@ XprsResult enumDecoders(CodecList& codecs, bool hwCapabilityCheck) {
   XprsResult result = XprsResult::OK;
 
   codecs.clear();
-  codecs.reserve(std::size(kPreferredDecoderImplentations));
+  codecs.reserve(std::size(kPreferredDecoderImplementations));
   try {
-    for (const auto& impl : kPreferredDecoderImplentations) {
+    for (const auto& impl : kPreferredDecoderImplementations) {
       VideoCodec codec;
       if (findDecoderByName(impl, codec)) {
         if (codec.hwAccel && hwCapabilityCheck) {
@@ -118,9 +118,9 @@ enumDecodersByFormat(CodecList& codecs, VideoCodecFormat standard, bool hwCapabi
   XprsResult result = XprsResult::OK;
 
   codecs.clear();
-  codecs.reserve(std::size(kPreferredDecoderImplentations));
+  codecs.reserve(std::size(kPreferredDecoderImplementations));
   try {
-    for (const auto& impl : kPreferredDecoderImplentations) {
+    for (const auto& impl : kPreferredDecoderImplementations) {
       VideoCodec codec;
       if (findDecoderByName(impl, codec)) {
         if (codec.format == standard) {
