@@ -362,6 +362,15 @@ class PixelFrame {
   /// supported (grey8 or rgb8), and the comparison succeeded.
   bool msssimCompare(const PixelFrame& other, double& msssim);
 
+  /// Build the NormalizeOptions describing how a stream's images should be normalized.
+  /// These options must be derived *only* from stream tags and file tags. Tags are
+  /// lightweight metadata that can be read cheaply and safely without touching the
+  /// file's data records. Deriving normalization parameters by reading any record
+  /// is NOT acceptable, because not thread-safe.
+  /// @param reader: the file reader, used to read the stream's and file's tags.
+  /// @param id: the stream whose images will be normalized.
+  /// @param format: the pixel format of the images to normalize.
+  /// @return the NormalizeOptions to use when normalizing that stream's images.
   static NormalizeOptions
   getStreamNormalizeOptions(RecordFileReader& reader, StreamId id, PixelFormat format);
 

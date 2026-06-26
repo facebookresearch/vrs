@@ -50,6 +50,23 @@ enum class ImageSemantic : uint16_t {
   Depth, ///< Depth information
 };
 
+/// Parameters describing how a PixelFrame should be normalized.
+///
+/// "Normalizing" means converting a frame from its on-disk representation into a
+/// form suitable for display or for re-encoding. Different streams require
+/// different treatments (e.g. plain camera images, depth, segmentation, ...),
+/// and this struct exists so that those alternate normalization methods can be
+/// selected and tuned without overloading the normalization API: callers fill
+/// in a NormalizeOptions, and the normalization code branches on its fields.
+///
+/// Adding a new normalization use case:
+///  - Extend ImageSemantic (and/or add fields below) to describe the new case
+///    and any parameters it needs.
+///  - Teach the normalization code (PixelFrame::normalizeFrame and friends) how
+///    to honor those fields.
+///  - Teach the factory that builds these options (PixelFrame::
+///    getStreamNormalizeOptions) how to recognize the new case and populate the
+///    fields.
 struct NormalizeOptions {
   NormalizeOptions() = default;
   explicit NormalizeOptions(ImageSemantic semantic) : semantic{semantic} {}
