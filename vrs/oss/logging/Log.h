@@ -18,7 +18,9 @@
 
 #include <string>
 
-#include <fmt/core.h>
+// fmt/format.h (not fmt/core.h) for fmt::format: fmt 11 turned core.h into a thin
+// base.h shim and moved fmt::format into format.h, which the XR_LOG* macros need.
+#include <fmt/format.h>
 
 namespace vrs {
 

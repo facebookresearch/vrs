@@ -18,7 +18,9 @@
 
 #include <string>
 
-#include <fmt/core.h>
+// fmt/format.h (not core.h): the XR_CHECK* macros expand to fmt::format, which
+// fmt 11 moved out of core.h into format.h.
+#include <fmt/format.h>
 
 namespace vrs {
 
