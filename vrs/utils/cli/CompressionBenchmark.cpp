@@ -16,7 +16,7 @@
 
 #include <vrs/utils/cli/CompressionBenchmark.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <vrs/ErrorCode.h>
 #include <vrs/helpers/Strings.h>
