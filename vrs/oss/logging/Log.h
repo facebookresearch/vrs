@@ -18,7 +18,7 @@
 
 #include <string>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 namespace vrs {
 
