@@ -21,6 +21,10 @@
 #include <algorithm>
 #include <string_view>
 
+#ifdef WITH_DAV1D
+#include "Dav1dDecode.h"
+#endif
+
 #define DEFAULT_LOG_CHANNEL "XPRS"
 #include <logging/Log.h>
 
@@ -37,12 +41,24 @@ static const std::string_view kPreferredDecoderImplementations[] = {
 #if defined(HAS_VP9) && HAS_VP9 == 1
     kVp9DecoderName,
 #endif
+#ifdef WITH_DAV1D
+    // Prefer dav1d over libaom for AV1 whenever it is linked.
+    // Builds without WITH_DAV1D fall back to libaom.
+    kDav1dDecoderName,
+#endif
     kAomDecoderName,
 };
 
 namespace {
 
 bool findDecoderByName(const std::string_view& name, VideoCodec& codec) {
+#ifdef WITH_DAV1D
+  if (name == kDav1dDecoderName) {
+    codec = VideoCodec{VideoCodecFormat::AV1, kDav1dDecoderName.data(), false};
+    return true;
+  }
+#endif
+
   // Check ffmpeg first
   const AVCodec* avCodec = avcodec_find_decoder_by_name(name.data());
   if (avCodec != nullptr) {
@@ -102,7 +118,9 @@ XprsResult enumDecoders(CodecList& codecs, bool hwCapabilityCheck) {
     XR_LOGE("{}", convertExceptionToError(e, result));
   }
 
-  std::sort(codecs.begin(), codecs.end(), [](const VideoCodec& lhs, const VideoCodec& rhs) {
+  // stable_sort so decoders with equal hwAccel keep their
+  // kPreferredDecoderImplementations order (e.g. dav1d ahead of libaom for AV1).
+  std::stable_sort(codecs.begin(), codecs.end(), [](const VideoCodec& lhs, const VideoCodec& rhs) {
     return lhs.hwAccel > rhs.hwAccel;
   });
 
@@ -144,7 +162,9 @@ enumDecodersByFormat(CodecList& codecs, VideoCodecFormat standard, bool hwCapabi
     XR_LOGE("{}", convertExceptionToError(e, result));
   }
 
-  std::sort(codecs.begin(), codecs.end(), [](const VideoCodec& lhs, const VideoCodec& rhs) {
+  // stable_sort so decoders with equal hwAccel keep their
+  // kPreferredDecoderImplementations order (e.g. dav1d ahead of libaom for AV1).
+  std::stable_sort(codecs.begin(), codecs.end(), [](const VideoCodec& lhs, const VideoCodec& rhs) {
     return lhs.hwAccel > rhs.hwAccel;
   });
 
@@ -152,6 +172,11 @@ enumDecodersByFormat(CodecList& codecs, VideoCodecFormat standard, bool hwCapabi
 }
 
 IVideoDecoder* createDecoder(const VideoCodec& codec) {
+#ifdef WITH_DAV1D
+  if (codec.implementationName == kDav1dDecoderName) {
+    return new (std::nothrow) Dav1dVideoDecoder();
+  }
+#endif
   IVideoDecoder* result = new (std::nothrow) CVideoDecoder(codec);
   return result;
 }

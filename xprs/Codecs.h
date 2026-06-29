@@ -42,5 +42,7 @@ constexpr std::string_view kNvH265DecoderName = "hevc_cuvid";
 constexpr std::string_view kNvAv1DecoderName = "av1_cuvid";
 constexpr std::string_view kVp9DecoderName = "vp9";
 constexpr std::string_view kAomDecoderName = "libaom-av1";
+// Served by xprs's own Dav1dVideoDecoder, not FFmpeg.
+constexpr std::string_view kDav1dDecoderName = "libdav1d";
 
 } // namespace xprs
