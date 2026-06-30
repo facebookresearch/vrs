@@ -62,17 +62,20 @@ TEST_F(FileListTest, getFilesAndFoldersTest) {
   EXPECT_EQ(os::getFilename(files[0]), kTestFiles[0].first);
   EXPECT_EQ(os::getFilename(files[1]), kTestFiles[1].first);
   EXPECT_EQ(os::getFilename(files[2]), kTestFiles[2].first);
+  EXPECT_EQ(os::getFilename(files[3]), kTestFiles[3].first);
   ASSERT_EQ(folders.size(), 1);
-  EXPECT_EQ(string(folders[0].data() + folders[0].size() - 9), kVrsFilesFolder);
+  EXPECT_EQ(os::getFilename(folders[0]), kVrsFilesFolder);
 
-  vector<string> fullfiles, fullfolders;
-  EXPECT_EQ(os::getFilesAndFolders(kSubTestFolder, fullfiles, &fullfolders), 0);
-  ASSERT_EQ(fullfiles.size(), files.size());
-  ASSERT_EQ(folders, fullfolders);
+  // The overload without the folders out-param must return the same file list.
+  vector<string> filesOnly;
+  EXPECT_EQ(os::getFilesAndFolders(kSubTestFolder, filesOnly), 0);
+  ASSERT_EQ(filesOnly, files);
 
-  vector<string> files2;
-  EXPECT_EQ(os::getFilesAndFolders(kSubTestFolder, files2), 0);
-  ASSERT_EQ(fullfiles, files2);
+  // Repeated calls must return identical, deterministically-ordered results.
+  vector<string> filesAgain, foldersAgain;
+  EXPECT_EQ(os::getFilesAndFolders(kSubTestFolder, filesAgain, &foldersAgain), 0);
+  ASSERT_EQ(filesAgain, files);
+  ASSERT_EQ(foldersAgain, folders);
 }
 
 TEST_F(FileListTest, getFileListTest) {
@@ -83,7 +86,7 @@ TEST_F(FileListTest, getFileListTest) {
   EXPECT_EQ(os::getFilename(files[1]), kTestFiles[1].first);
   EXPECT_EQ(os::getFilename(files[2]), kTestFiles[2].first);
   size_t testVrsFileIndex = 4;
-  string testVrsFileName = os::getParentFolder(kTestFiles[testVrsFileIndex].first);
+  string testVrsFileName = os::getFilename(kTestFiles[testVrsFileIndex].first);
   size_t testVrsFileSize = kTestFiles[testVrsFileIndex].second;
   int VRS_FilesCount = 0;
   for (const string& file : files) {

@@ -816,7 +816,7 @@ TEST_F(MultiRecordFileReaderTest, getFileChunks) {
   ASSERT_EQ(singleFilePath, singleFileChunks[0].first);
   RecordFileReader singleReaderExpected;
   ASSERT_EQ(SUCCESS, singleReaderExpected.openFile(singleFilePath));
-  const auto singleFileChunksExpected = singleReader.getFileChunks();
+  const auto singleFileChunksExpected = singleReaderExpected.getFileChunks();
   ASSERT_EQ(singleFileChunksExpected, singleFileChunks);
   const auto expectedSize = singleFileChunksExpected[0].second;
   ASSERT_EQ(singleReaderExpected.getTotalSourceSize(), singleReader.getTotalSourceSize());

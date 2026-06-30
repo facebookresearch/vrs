@@ -1083,7 +1083,7 @@ TEST_F(StringsHelpersTester, splitViewsTest) {
 #define CHECK_BEFORE_SELF(a) EXPECT_FALSE(helpers::beforeFileName(a, a))
 
 TEST_F(StringsHelpersTester, beforeFileNameTest) {
-  helpers::beforeFileName("part0image10.png", "part0000image011.png");
+  EXPECT_TRUE(helpers::beforeFileName("part0image10.png", "part0000image011.png"));
 
   CHECK_BEFORE_SELF("");
   CHECK_BEFORE_SELF("a");
