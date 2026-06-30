@@ -169,6 +169,24 @@ struct RawImageTest {
       EXPECT_EQ(cb, ContentBlock(getRecordFormatImageContentBlock()));
       PixelFrame frame;
       EXPECT_TRUE(frame.readFrame(record.reader, cb));
+      EXPECT_EQ(frame.getWidth(), 640u);
+      EXPECT_EQ(frame.getHeight(), 480u);
+      EXPECT_EQ(frame.getPixelFormat(), PixelFormat::GREY8);
+      // makeImage() writes a ramp where pixel[i] == uint8_t(index + i), so each pixel is its
+      // predecessor + 1 (mod 256). Checking the ramp survived the round-trip catches zeroed,
+      // constant, shuffled or truncated pixel data that a dimensions-only check would accept.
+      EXPECT_EQ(frame.size(), 640u * 480u);
+      if (frame.size() == 640u * 480u) {
+        const uint8_t* pixels = frame.rdata();
+        size_t firstBadOffset = 0;
+        for (size_t i = 1; i < frame.size(); i++) {
+          if (pixels[i] != static_cast<uint8_t>(pixels[i - 1] + 1)) {
+            firstBadOffset = i;
+            break;
+          }
+        }
+        EXPECT_EQ(firstBadOffset, 0u) << "GREY8 ramp broken at offset " << firstBadOffset;
+      }
       return false;
     }
   };

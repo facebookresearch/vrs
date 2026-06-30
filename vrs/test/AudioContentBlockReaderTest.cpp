@@ -15,6 +15,7 @@
  */
 
 #include <cstdio>
+#include <cstring>
 
 #include <string>
 #include <vector>
@@ -268,6 +269,9 @@ struct Analytics {
   uint8_t channels = 0;
   uint32_t sampleRate = 0;
   uint32_t unsupportedCount = 0;
+  // Concatenation of every decoded PCM block's bytes, in read order. Left empty for Opus blocks,
+  // which are lossy and can't be byte-compared against the original samples.
+  vector<uint8_t> decodedPcmBytes;
 };
 
 class AnalyticsPlayer : public RecordFormatStreamPlayer {
@@ -283,11 +287,18 @@ class AnalyticsPlayer : public RecordFormatStreamPlayer {
   bool onAudioRead(const CurrentRecord& record, size_t, const ContentBlock& cb) override {
     analytics_.audioBlockCount++;
     utils::AudioBlock audioBlock;
-    if (audioBlock.readBlock(record.reader, cb) &&
-        XR_VERIFY(audioBlock.decompressAudio(decompressor_))) {
-      analytics_.audioSampleCount += audioBlock.getSampleCount();
-      EXPECT_EQ(audioBlock.getSampleRate(), analytics_.sampleRate);
-      EXPECT_EQ(audioBlock.getChannelCount(), analytics_.channels);
+    if (audioBlock.readBlock(record.reader, cb)) {
+      const bool wasPcm = audioBlock.getAudioFormat() == AudioFormat::PCM;
+      if (XR_VERIFY(audioBlock.decompressAudio(decompressor_))) {
+        analytics_.audioSampleCount += audioBlock.getSampleCount();
+        EXPECT_EQ(audioBlock.getSampleRate(), analytics_.sampleRate);
+        EXPECT_EQ(audioBlock.getChannelCount(), analytics_.channels);
+        if (wasPcm) {
+          const uint8_t* bytes = audioBlock.rdata();
+          analytics_.decodedPcmBytes.insert(
+              analytics_.decodedPcmBytes.end(), bytes, bytes + audioBlock.size());
+        }
+      }
     }
     return true;
   }
@@ -339,6 +350,16 @@ runTest(const char* name, LayoutStyle style, uint32_t sampleCount, const AudioDa
   return readAudioVRSFile(testPath, ipAudioData);
 }
 
+// For uncompressed PCM, the decoded bytes must exactly equal the source samples that were written
+// (the writer tiles ipAudioData.samples contiguously across records). This catches endianness
+// swaps, dropped/duplicated sample frames, and content corruption that count-only checks miss.
+void expectPcmRoundTrip(const Analytics& analytics, const AudioData& ipAudioData) {
+  const size_t expectedBytes =
+      size_t{ipAudioData.sampleCount} * ipAudioData.channels * sizeof(int16_t);
+  ASSERT_EQ(analytics.decodedPcmBytes.size(), expectedBytes);
+  EXPECT_EQ(memcmp(analytics.decodedPcmBytes.data(), ipAudioData.samples.data(), expectedBytes), 0);
+}
+
 } // namespace
 
 #define TEST_NAME (::testing::UnitTest::GetInstance()->current_test_info()->name())
@@ -355,6 +376,7 @@ TEST_F(AudioContentBlockReaderTest, testClassicAudio) {
   EXPECT_EQ(analytics.audioBlockCount, 114);
   EXPECT_EQ(analytics.audioSampleCount, kTotalSampleCount);
   EXPECT_EQ(analytics.unsupportedCount, 0);
+  expectPcmRoundTrip(analytics, stereoAudio);
 }
 
 TEST_F(AudioContentBlockReaderTest, testNoSize) {
@@ -367,6 +389,7 @@ TEST_F(AudioContentBlockReaderTest, testNoSize) {
   EXPECT_EQ(analytics.audioBlockCount, 177);
   EXPECT_EQ(analytics.audioSampleCount, kTotalSampleCount);
   EXPECT_EQ(analytics.unsupportedCount, 0);
+  expectPcmRoundTrip(analytics, stereoAudio);
 }
 
 TEST_F(AudioContentBlockReaderTest, testFullSpecData) {
@@ -379,6 +402,7 @@ TEST_F(AudioContentBlockReaderTest, testFullSpecData) {
   EXPECT_EQ(analytics.audioBlockCount, 177);
   EXPECT_EQ(analytics.audioSampleCount, kTotalSampleCount);
   EXPECT_EQ(analytics.unsupportedCount, 0);
+  expectPcmRoundTrip(analytics, stereoAudio);
 }
 
 #ifdef OPUS_IS_AVAILABLE

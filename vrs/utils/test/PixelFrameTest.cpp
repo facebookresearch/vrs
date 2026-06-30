@@ -48,16 +48,25 @@ struct PixelFrameTest : testing::Test {
 class ImagePlayer : public RecordFormatStreamPlayer {
   bool onImageRead(const CurrentRecord& record, size_t /*idx*/, const ContentBlock& cb) override {
     EXPECT_TRUE(PixelFrame::readFrame(frame_, record.reader, cb));
+    // Normalization may change the pixel format, but must preserve the image dimensions.
+    const uint32_t width = frame_->getWidth();
+    const uint32_t height = frame_->getHeight();
+    EXPECT_GT(width, 0u);
+    EXPECT_GT(height, 0u);
     PixelFrame::normalizeFrame(frame_, normalized_, true);
     PixelFormat format = normalized_->getPixelFormat();
     EXPECT_TRUE(
         format == PixelFormat::GREY8 || format == PixelFormat::GREY16 ||
         format == PixelFormat::RGB8 || format == PixelFormat::RGBA8);
+    EXPECT_EQ(normalized_->getWidth(), width);
+    EXPECT_EQ(normalized_->getHeight(), height);
     PixelFrame::normalizeFrame(frame_, normalized_, false);
     format = normalized_->getPixelFormat();
     EXPECT_TRUE(
         format == PixelFormat::GREY8 || format == PixelFormat::RGB8 ||
         format == PixelFormat::RGBA8);
+    EXPECT_EQ(normalized_->getWidth(), width);
+    EXPECT_EQ(normalized_->getHeight(), height);
     return true; // read next blocks, if any
   }
 
@@ -150,8 +159,8 @@ class PngImageWriteRead : public RecordFormatStreamPlayer {
     EXPECT_TRUE(frame.readRawFrame(record.reader, cb.image()));
     vector<uint8_t> buffer;
     PixelFrame decoded;
-    frame.writeAsPng("", &buffer);
-    decoded.readPngFrame(buffer);
+    EXPECT_EQ(frame.writeAsPng("", &buffer), 0);
+    EXPECT_TRUE(decoded.readPngFrame(buffer));
     EXPECT_TRUE(frame.hasSamePixels(decoded.getSpec()));
     EXPECT_EQ(frame.getBuffer(), decoded.getBuffer());
     return true; // read next blocks, if any
