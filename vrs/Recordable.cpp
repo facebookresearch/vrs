@@ -22,6 +22,7 @@
 
 #include <vrs/DataLayout.h>
 #include <vrs/RecordFormat.h>
+#include <vrs/RecordableInstanceIdStorage.h>
 #include <vrs/os/System.h>
 
 using namespace std;
@@ -74,24 +75,16 @@ void Recordable::addTags(const StreamTags& tags) {
   }
 }
 
-static recursive_mutex& getInstanceIdMutex() {
-  static recursive_mutex sMutex;
-  return sMutex;
-}
-
-static map<RecordableTypeId, uint16_t>& getInstanceIds() {
-  static map<RecordableTypeId, uint16_t> sInstanceIds;
-  return sInstanceIds;
-}
-
 void Recordable::resetNewInstanceIds() {
+  // NOLINTNEXTLINE(facebook-thread-safety-analysis)
   unique_lock<recursive_mutex> guard{getInstanceIdMutex()};
-  getInstanceIds().clear();
+  getInstanceIdMap().clear();
 }
 
 uint16_t Recordable::getNewInstanceId(RecordableTypeId typeId) {
+  // NOLINTNEXTLINE(facebook-thread-safety-analysis)
   unique_lock<recursive_mutex> guard{getInstanceIdMutex()};
-  map<RecordableTypeId, uint16_t>& instanceIds = getInstanceIds();
+  map<RecordableTypeId, uint16_t>& instanceIds = getInstanceIdMap();
   uint16_t instanceId = 1; // default instance Id
   auto newId = instanceIds.find(typeId);
   if (newId == instanceIds.end()) {
@@ -113,11 +106,11 @@ const string& Recordable::getTag(const map<string, string>& tags, const string& 
 
 TemporaryRecordableInstanceIdsResetter::TemporaryRecordableInstanceIdsResetter()
     : lock_{getInstanceIdMutex()} {
-  preservedState_.swap(getInstanceIds());
+  preservedState_.swap(getInstanceIdMap());
 }
 
 TemporaryRecordableInstanceIdsResetter::~TemporaryRecordableInstanceIdsResetter() {
-  preservedState_.swap(getInstanceIds());
+  preservedState_.swap(getInstanceIdMap());
 }
 
 } // namespace vrs
