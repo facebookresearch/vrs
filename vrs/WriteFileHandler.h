@@ -18,6 +18,7 @@
 
 #include <vrs/ErrorCode.h>
 #include <vrs/FileHandler.h>
+#include <vrs/VrsExport.h>
 #include <vrs/os/CompilerAttributes.h>
 
 namespace vrs {
@@ -39,7 +40,7 @@ namespace vrs {
 /// implementation details should ideally be abstracted, but in order to optimize cloud VRS file
 /// creation, the abstraction is compromised, and cloud WriteFileHandler implementations are not
 /// easily reusable for other applications that VRS.
-class WriteFileHandler : public FileHandler {
+class VRS_API WriteFileHandler : public FileHandler {
  public:
   WriteFileHandler() = default;
 

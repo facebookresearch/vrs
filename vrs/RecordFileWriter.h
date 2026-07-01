@@ -29,6 +29,7 @@
 #include <vrs/NewChunkHandler.h>
 #include <vrs/Record.h>
 #include <vrs/Recordable.h>
+#include <vrs/VrsExport.h>
 #include <vrs/WriteFileHandler.h>
 
 namespace vrs {
@@ -87,7 +88,7 @@ using InitCreatedThreadCallback = std::function<void(std::thread&, ThreadRole, i
 ///   - call waitForFileClosed() to write all the unwritten records & wait for the file
 ///     to be written & closed. (blocking call).
 ///   - profit!
-class RecordFileWriter {
+class VRS_API RecordFileWriter {
  public:
   RecordFileWriter();
   RecordFileWriter(const RecordFileWriter&) = delete;

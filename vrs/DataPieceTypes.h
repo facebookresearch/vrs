@@ -20,6 +20,8 @@
 
 #include <type_traits>
 
+#include <vrs/VrsExport.h>
+
 namespace vrs {
 
 using std::enable_if;
@@ -34,7 +36,7 @@ using std::size_t;
 /// vector<bool> has no data() method, which means it can't be used with DataPiece template code.
 /// vector<Bool> does behave like other vector<T> classes. Yes, it's silly.
 /// https://stackoverflow.com/questions/17794569/why-isnt-vectorbool-a-stl-container
-class Bool {
+class VRS_API Bool {
  public:
   // NOLINTNEXTLINE(hicpp-explicit-conversions)
   Bool(bool value = false) : value_(value) {}

@@ -19,6 +19,7 @@
 #include <mutex>
 
 #include <vrs/RecordFormat.h>
+#include <vrs/VrsExport.h>
 
 namespace vrs {
 
@@ -32,7 +33,7 @@ class DataLayout;
 class LegacyFormatsProvider;
 
 /// Utility class to handle record format registry manipulations
-class RecordFormatRegistrar {
+class VRS_API RecordFormatRegistrar {
   /// Private constructor, since there must be only one instance.
   RecordFormatRegistrar() = default;
 
@@ -96,7 +97,7 @@ class RecordFormatRegistrar {
 /// easier transition to RecordFormat and DataLayout, as client code can be updated to rely entirely
 /// on RecordFormatStreamPlayer to read older and newer VRS files alike.
 /// For this, you can inject RecordFormat and DataLayout definitions using this class.
-class LegacyFormatsProvider {
+class VRS_API LegacyFormatsProvider {
  public:
   LegacyFormatsProvider() = default;
   virtual ~LegacyFormatsProvider();

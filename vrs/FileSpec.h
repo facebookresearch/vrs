@@ -23,6 +23,8 @@
 #include <utility>
 #include <vector>
 
+#include <vrs/VrsExport.h>
+
 namespace vrs {
 using std::map;
 using std::string;
@@ -37,7 +39,7 @@ using std::vector;
 /// the chunks are urls), and possibly a source uri.
 /// If no file handler name is specified, the object is assumed to a set of local files.
 /// Additional properties may be specified in the extras field, which has helper methods.
-struct FileSpec {
+struct VRS_API FileSpec {
   /// Map type with heterogeneous lookup support for string keys.
   /// Allows lookup using string_view without creating temporary string objects.
   using Extras = map<string, string, std::less<>>;

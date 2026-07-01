@@ -20,13 +20,15 @@
 #include <memory>
 #include <string>
 
+#include <vrs/VrsExport.h>
+
 namespace vrs {
 
 using std::string;
 using std::unique_ptr;
 
 /// Context description for telemetry events.
-struct OperationContext {
+struct VRS_API OperationContext {
   string operation;
   string sourceLocation;
 
@@ -47,7 +49,7 @@ struct OperationContext {
 };
 
 /// General purpose telemetry event.
-struct LogEvent {
+struct VRS_API LogEvent {
   LogEvent() = default;
   LogEvent(string type, OperationContext opContext, string message, string serverReply)
       : type{std::move(type)},
@@ -73,7 +75,7 @@ struct LogEvent {
 /// resource usage and detect excessive traffic. This requires logging every network transaction,
 /// as opposed to sparse events, giving leverage to custom implementation optimizations not possible
 /// with a generic event.
-struct TrafficEvent {
+struct VRS_API TrafficEvent {
   bool isSuccess = false;
   bool uploadNotDownload = false;
   int64_t transferStartTime = 0; // start time
@@ -145,7 +147,7 @@ struct TrafficEvent {
 /// Telemetry building block infra to report events from VRS operations.
 /// The default implementation simply logs using XR_LOGI and XR_LOGE, XR_LOGW,
 /// but can easily be augmented to implement telemetry in a central database.
-class TelemetryLogger {
+class VRS_API TelemetryLogger {
  public:
   virtual ~TelemetryLogger();
 

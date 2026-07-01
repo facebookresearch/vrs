@@ -26,6 +26,7 @@ class GTEST_TEST_CLASS_NAME_(MultiRecordFileReaderTest, multiFile);
 
 #include <vrs/IndexRecord.h>
 #include <vrs/RecordFileReader.h>
+#include <vrs/VrsExport.h>
 
 namespace vrs {
 
@@ -36,7 +37,7 @@ using std::unique_ptr;
 /// Records are sorted by timestamps across all the files, therefore it is essential that
 /// *** all the files must have their timestamps in the same time domain. ***
 /// Operates in a manner similar to `RecordFileReader`, but with multiple files.
-class MultiRecordFileReader {
+class VRS_API MultiRecordFileReader {
  public:
   /// External facing StreamId which handles collisions between StreamId across
   /// multiple files (RecordFileReaders).

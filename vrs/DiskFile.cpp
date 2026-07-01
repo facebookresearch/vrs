@@ -613,7 +613,7 @@ const string& DiskFileT<DiskFileChunk>::staticName() {
   return sDiskFileHandlerName;
 }
 
-template class DiskFileT<DiskFileChunk>; // force instantiation of all methods
+template class VRS_API DiskFileT<DiskFileChunk>; // force instantiation of all methods
 
 #if VRS_ASYNC_DISKFILE_SUPPORTED()
 
@@ -623,7 +623,7 @@ const string& DiskFileT<AsyncDiskFileChunk>::staticName() {
   return sAsyncDiskFileHandlerName;
 }
 
-template class DiskFileT<AsyncDiskFileChunk>; // force instantiation of all methods
+template class VRS_API DiskFileT<AsyncDiskFileChunk>; // force instantiation of all methods
 
 #endif
 

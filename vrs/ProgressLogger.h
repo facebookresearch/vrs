@@ -18,6 +18,8 @@
 
 #include <string>
 
+#include <vrs/VrsExport.h>
+
 namespace vrs {
 
 using std::string;
@@ -28,7 +30,7 @@ using std::string;
 /// By default, logs to use XR_LOGI and XR_LOGE, but can be easily overwritten
 /// to log anywhere. By default, this class never requests to stop the operation, but that can be
 /// overridden.
-class ProgressLogger {
+class VRS_API ProgressLogger {
  public:
   static constexpr double kDefaultUpdateDelay = 2;
   /// By default, only logs every 2 seconds, and after 2 seconds, so opening from a file will be
@@ -124,7 +126,7 @@ class ProgressLogger {
 };
 
 /// \brief Progress logger to ignore all progress notifications.
-class SilentLogger : public ProgressLogger {
+class VRS_API SilentLogger : public ProgressLogger {
  public:
   ~SilentLogger() override;
   bool logProgress(const string&, size_t = 0, size_t = 100, bool = false) override {

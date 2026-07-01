@@ -20,6 +20,7 @@
 #include <vrs/DataPieces.h>
 #include <vrs/ForwardDefinitions.h>
 #include <vrs/RecordFormat.h>
+#include <vrs/VrsExport.h>
 
 namespace vrs {
 
@@ -61,7 +62,7 @@ using ImageSpecType = uint32_t;
 ///
 /// Note that the values used are *not* static, so that if the configuration changes,
 /// the latest value is used, without having to search each time we have a new image block.
-class ImageSpec : public AutoDataLayout {
+class VRS_API ImageSpec : public AutoDataLayout {
  public:
   DataPieceValue<ImageSpecType> width{kImageWidth};
   DataPieceValue<ImageSpecType> height{kImageHeight};
@@ -97,7 +98,7 @@ constexpr const char* kImageKeyFrameTimeStamp = "image_key_frame_timestamp";
 constexpr const char* kImageKeyFrameIndex = "image_key_frame_index";
 
 /// DataLayout definitions use to describe a video image content block.
-class VideoFrameSpec : public AutoDataLayout {
+class VRS_API VideoFrameSpec : public AutoDataLayout {
  public:
   DataPieceValue<double> keyFrameTimestamp{kImageKeyFrameTimeStamp};
   DataPieceValue<ImageSpecType> keyFrameIndex{kImageKeyFrameIndex};
@@ -141,7 +142,7 @@ constexpr const char* kAudioStereoPairCount = "audio_stereo_pair_count";
 ///
 /// Note that the values used are *not* static, so that if the configuration changes,
 /// the latest value is used, without having to search each time we have a new image block.
-class AudioSpec : public AutoDataLayout {
+class VRS_API AudioSpec : public AutoDataLayout {
  public:
   DataPieceEnum<AudioFormat, uint8_t> audioFormat{kAudioFormat}; ///< optional
   DataPieceEnum<AudioSampleFormat, uint8_t> sampleType{kAudioSampleFormat};
@@ -159,7 +160,7 @@ constexpr const char* kNextContentBlockSize = "next_content_block_size";
 using ContentBlockSizeType = uint32_t;
 
 /// Optional values specifying the content block following the DataLayout.
-class NextContentBlockSpec : public AutoDataLayout {
+class VRS_API NextContentBlockSpec : public AutoDataLayout {
  public:
   DataPieceValue<ContentBlockSizeType> nextContentBlockSize{kNextContentBlockSize};
   DataPieceValue<uint32_t> nextAudioContentBlockSampleCount{kAudioSampleCount};

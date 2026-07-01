@@ -23,6 +23,8 @@
 #include <vrs/DataPieces.h>
 #endif
 
+#include <vrs/VrsExport.h>
+
 namespace vrs {
 
 using std::min;
@@ -33,7 +35,7 @@ using std::string;
 ///
 /// Written values are stored in the string member of this class (VRS record creation)
 /// Read values are extracted from the DataLayout's buffer, (VRS records reading/decoding)
-class DataPieceString : public DataPiece {
+class VRS_API DataPieceString : public DataPiece {
  public:
   /// @param label: Name for the DataPiece.
   explicit DataPieceString(string label, string defaultValue = {})

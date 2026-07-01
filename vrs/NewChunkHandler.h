@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <vrs/VrsExport.h>
 #include <vrs/WriteFileHandler.h>
 
 namespace vrs {
@@ -24,7 +25,7 @@ namespace vrs {
 ///
 /// Definition of a class of objects that can be attached to a RecordFileWriter, to monitor the
 /// creation of file chunks, to process them in some way (maybe to upload them in the cloud?).
-class NewChunkHandler {
+class VRS_API NewChunkHandler {
  public:
   virtual ~NewChunkHandler() = default;
   /// Callback function to be notified when new file chunks are created.
@@ -44,7 +45,7 @@ class NewChunkHandler {
 /// New chunks notifications must come after the chunk has been closed, which leads to ugly/unsafe
 /// code. This helper class gathers the details about the current chunk, so that the notification,
 /// if any, can be sent at the right time.
-class NewChunkNotifier {
+class VRS_API NewChunkNotifier {
  public:
   NewChunkNotifier(WriteFileHandler& file, const std::unique_ptr<NewChunkHandler>& chunkHandler)
       : chunkHandler_{chunkHandler.get()} {

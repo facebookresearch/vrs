@@ -19,6 +19,7 @@
 #include <vrs/DataReference.h>
 #include <vrs/Decompressor.h>
 #include <vrs/ErrorCode.h>
+#include <vrs/VrsExport.h>
 
 namespace vrs {
 
@@ -26,7 +27,7 @@ class FileHandler;
 
 /// \brief Abstract VRS internal helper class to read & (if necessary) uncompress records.
 /// @internal
-class RecordReader {
+class VRS_API RecordReader {
  public:
   virtual ~RecordReader();
 
@@ -104,7 +105,7 @@ class RecordReader {
 
 /// \brief RecordReader specialized to read uncompressed records. For VRS internal usage only.
 /// @internal
-class UncompressedRecordReader : public RecordReader {
+class VRS_API UncompressedRecordReader : public RecordReader {
  public:
   int read(DataReference& destination, uint32_t& outReadSize) override;
   CompressionType getCompressionType() const override;
@@ -112,7 +113,7 @@ class UncompressedRecordReader : public RecordReader {
 
 /// \brief RecordReader specialized to read compressed records. For VRS internal usage only.
 /// @internal
-class CompressedRecordReader : public RecordReader {
+class VRS_API CompressedRecordReader : public RecordReader {
  public:
   void initCompressionType(CompressionType compressionType);
   int read(DataReference& destination, uint32_t& outReadSize) override;

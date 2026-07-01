@@ -22,6 +22,8 @@
 #include <type_traits>
 #include <vector>
 
+#include <vrs/VrsExport.h>
+
 namespace vrs {
 
 using std::is_pointer;
@@ -37,7 +39,7 @@ class WriteFileHandler;
 /// Do not change the underlying DataLayout until the DataLayoutChunk is destroyed. This is usually
 /// a trivial requirement, as DataSource objects (which hold DataLayoutChunk objects) only live
 /// briefly for the purpose of calling createRecord().
-struct DataLayoutChunk {
+struct VRS_API DataLayoutChunk {
   /// Default constructor to no DataLayout.
   DataLayoutChunk() = default;
   /// Constructor to reference a DataLayout, which must outlive this DataLayoutChunk.
@@ -66,7 +68,7 @@ struct DataLayoutChunk {
 /// This class is meant to simplify the manipulation of a buffer of bytes, for use by DataSource.
 /// Only the constructors and assignment operators are meant to be used by code outside of
 /// DataSource.
-class DataSourceChunk {
+class VRS_API DataSourceChunk {
  public:
   /// Not copyable as there are derived classes that aren't safe to copy from the base class.
   DataSourceChunk(const DataSourceChunk& other) = default;
@@ -114,7 +116,7 @@ class DataSourceChunk {
 
 /// \brief Class to represent a data chunk composed of multiple smaller
 /// chunks that each have fixed offsets from each other in memory.
-class NonContiguousChunk final : public vrs::DataSourceChunk {
+class VRS_API NonContiguousChunk final : public vrs::DataSourceChunk {
  public:
   /// @param data: start of the buffer.
   /// @param blockSize: number of useful bytes in each block of data.
@@ -148,7 +150,7 @@ class NonContiguousChunk final : public vrs::DataSourceChunk {
 /// Alternatively, you can use custom DataSourceChunk objects that override fillAndAdvanceBuffer().
 /// DataSource objects are expected to be temporary object created on the stack each time
 /// createdRecord() is called.
-class DataSource {
+class VRS_API DataSource {
  public:
   /// No DataLayout, no DataSourceChunk
   /// @param size: Cached number of bytes of the data source.
@@ -244,7 +246,7 @@ class DataSource {
 /// - that data is written at the end of the record, after the data provided using a DataSource
 /// object. If you want to assemble your DataContentBlocks differently, you need to own that logic.
 /// - none of record's data can be compressed by VRS, leading to potentially much larger files.
-class DirectWriteRecordData {
+class VRS_API DirectWriteRecordData {
  public:
   virtual ~DirectWriteRecordData() = default;
 

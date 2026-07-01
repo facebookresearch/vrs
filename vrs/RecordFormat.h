@@ -22,6 +22,7 @@
 #include <vector>
 
 #include <vrs/Record.h>
+#include <vrs/VrsExport.h>
 
 namespace vrs {
 
@@ -41,7 +42,7 @@ enum class ContentType : uint8_t {
   COUNT ///< Count of values in this enum type. @internal
 };
 
-string toString(ContentType contentType);
+VRS_API string toString(ContentType contentType);
 
 /// Image format type.
 /// For CUSTOM_CODEC and VIDEO, the actual data format is provided by codec name,
@@ -57,7 +58,7 @@ enum class ImageFormat : uint8_t {
   COUNT ///< Count of values in this enum type. @internal
 };
 
-string toString(ImageFormat imageFormat);
+VRS_API string toString(ImageFormat imageFormat);
 
 /// Pixel format type, then the image format is ImageFormat::RAW.
 enum class PixelFormat : uint8_t {
@@ -95,7 +96,7 @@ enum class PixelFormat : uint8_t {
   COUNT, ///< Count of values in this enum type. @internal
 };
 
-string toString(PixelFormat pixelFormat);
+VRS_API string toString(PixelFormat pixelFormat);
 
 /// Audio format type.
 enum class AudioFormat : uint8_t {
@@ -106,7 +107,7 @@ enum class AudioFormat : uint8_t {
 };
 
 /// Convert an AudioFormat to a string
-string toString(AudioFormat audioFormat);
+VRS_API string toString(AudioFormat audioFormat);
 
 /// Audio sample format, when the audio type is AudioFormat::PCM.
 enum class AudioSampleFormat : uint8_t {
@@ -135,13 +136,13 @@ enum class AudioSampleFormat : uint8_t {
 };
 
 /// Convert an AudioSampleFormat to a string
-string toString(AudioSampleFormat audioSampleFormat);
+VRS_API string toString(AudioSampleFormat audioSampleFormat);
 
 class ContentParser; // to workaround not being able to forward declare istringstream.
 class RecordFormat;
 
 /// Specification of an image content block.
-class ImageContentBlockSpec {
+class VRS_API ImageContentBlockSpec {
  public:
   static constexpr uint8_t kQualityUndefined = 255;
   static constexpr double kInvalidTimestamp = -1E-308; // arbitrary unrealistic value
@@ -373,7 +374,7 @@ class ImageContentBlockSpec {
 };
 
 /// Specification of an audio content block.
-class AudioContentBlockSpec {
+class VRS_API AudioContentBlockSpec {
  public:
   AudioContentBlockSpec() = default;
   /// Default copy constructor
@@ -508,7 +509,7 @@ class AudioContentBlockSpec {
 ///  - Custom
 ///
 /// Each block may have a fixed size, or an unknown size if the size might vary between records.
-class ContentBlock {
+class VRS_API ContentBlock {
  public:
   /// Special value used to represent an unknown block size.
   static const size_t kSizeUnknown;
@@ -623,7 +624,7 @@ class ContentBlock {
   string customContentBlockFormat_;
 };
 
-class CustomContentBlock : public ContentBlock {
+class VRS_API CustomContentBlock : public ContentBlock {
  public:
   explicit CustomContentBlock(const string& customContentBlockFormat, size_t size = kSizeUnknown);
   explicit CustomContentBlock(size_t size = kSizeUnknown);
@@ -640,7 +641,7 @@ using RecordFormatMap = map<pair<Record::Type, uint32_t>, RecordFormat>;
 /// - a record type,
 /// - a record format version,
 /// - a block index.
-class ContentBlockId {
+class VRS_API ContentBlockId {
  public:
   ContentBlockId(
       RecordableTypeId typeIdIn,
@@ -684,7 +685,7 @@ class ContentBlockId {
 /// See enum class ContentType above for the complete list of ContentBlock types.
 ///
 /// See ContentBlock to find out about all the different types of content blocks supported.
-class RecordFormat {
+class VRS_API RecordFormat {
  public:
   /// Empty record format definition.
   RecordFormat() = default;

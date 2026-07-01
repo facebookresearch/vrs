@@ -34,6 +34,7 @@
 #include <vrs/RecordReaders.h>
 #include <vrs/Recordable.h>
 #include <vrs/StreamId.h>
+#include <vrs/VrsExport.h>
 
 namespace vrs {
 
@@ -72,7 +73,7 @@ constexpr const char* kFailFastOnIncompleteIndex = "fail_fast_on_incomplete_inde
 /// State, configuration & data records handling is delegated to their stream id players.
 /// Player can 'process' the data in the callback made by the file reader's thread,
 /// or delegate the work by posting a PlaybackRecord to a PlaybackThread.
-class RecordFileReader {
+class VRS_API RecordFileReader {
  public:
   RecordFileReader();
   RecordFileReader(const RecordFileReader&) = delete;
@@ -631,7 +632,7 @@ class RecordFileReader {
 /// @param epsilon: the threshold we search for the index.
 /// @param recordType: record type to find, or Record::Type::UNDEFINED for any record type.
 /// @return Pointer to the record info, or nullptr (timestamp is too big?).
-const IndexRecord::RecordInfo* getNearestRecordByTime(
+VRS_API const IndexRecord::RecordInfo* getNearestRecordByTime(
     const std::vector<const IndexRecord::RecordInfo*>& index,
     double timestamp,
     double epsilon,

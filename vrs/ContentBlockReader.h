@@ -21,6 +21,7 @@
 #include <vrs/DataLayout.h>
 #include <vrs/DataLayoutConventions.h>
 #include <vrs/StreamPlayer.h>
+#include <vrs/VrsExport.h>
 
 namespace vrs {
 
@@ -36,7 +37,7 @@ struct RecordFormatReader;
 /// @see RecordFormat
 /// @see ContentBlock
 /// @internal
-class ContentBlockReader {
+class VRS_API ContentBlockReader {
  public:
   /// Factory style constructor, which will determine what ContentBlockReader object needs to be
   /// created to handle the referenced block.
@@ -69,7 +70,7 @@ class ContentBlockReader {
 
 /// \brief Specialized version of ContentBlockReader to handle content blocks containing an image.
 /// @internal
-class ImageBlockReader : public ContentBlockReader {
+class VRS_API ImageBlockReader : public ContentBlockReader {
  public:
   ImageBlockReader(const RecordFormat& recordFormat, size_t blockIndex)
       : ContentBlockReader(recordFormat, blockIndex) {}
@@ -86,7 +87,7 @@ class ImageBlockReader : public ContentBlockReader {
 
 /// \brief Specialized version of ContentBlockReader to handle content blocks containing audio data.
 /// @internal
-class AudioBlockReader : public ContentBlockReader {
+class VRS_API AudioBlockReader : public ContentBlockReader {
  public:
   AudioBlockReader(const RecordFormat& recordFormat, size_t blockIndex)
       : ContentBlockReader(recordFormat, blockIndex) {}
@@ -114,7 +115,7 @@ class AudioBlockReader : public ContentBlockReader {
 /// \brief Specialized version of ContentBlockReader to handle a content block containing custom
 /// data. Custom data is data which format/content is not known to VRS.
 /// @internal
-class CustomBlockReader : public ContentBlockReader {
+class VRS_API CustomBlockReader : public ContentBlockReader {
  public:
   CustomBlockReader(const RecordFormat& recordFormat, size_t blockIndex)
       : ContentBlockReader(recordFormat, blockIndex) {}
@@ -125,7 +126,7 @@ class CustomBlockReader : public ContentBlockReader {
 /// \brief Specialized version of ContentBlockReader to handle data that could not be handled by
 /// another better suited ContentBlockReader. It's the fallback handler.
 /// @internal
-class UnsupportedBlockReader : public ContentBlockReader {
+class VRS_API UnsupportedBlockReader : public ContentBlockReader {
  public:
   UnsupportedBlockReader(const RecordFormat& recordFormat, size_t blockIndex)
       : ContentBlockReader(recordFormat, blockIndex) {}
@@ -138,7 +139,7 @@ class UnsupportedBlockReader : public ContentBlockReader {
 /// This can happen, when a variable size block is empty, or when a content block ends up being
 /// a placeholder.
 /// @internal
-class EmptyBlockReader : public ContentBlockReader {
+class VRS_API EmptyBlockReader : public ContentBlockReader {
  public:
   EmptyBlockReader(const RecordFormat& recordFormat, size_t blockIndex)
       : ContentBlockReader(recordFormat, blockIndex) {}
@@ -148,7 +149,7 @@ class EmptyBlockReader : public ContentBlockReader {
 
 /// \brief Specialized version of ContentBlockReader to handle DataLayout blocks.
 /// @internal
-class DataLayoutBlockReader : public ContentBlockReader {
+class VRS_API DataLayoutBlockReader : public ContentBlockReader {
  public:
   DataLayoutBlockReader(
       const RecordFormat& recordFormat,

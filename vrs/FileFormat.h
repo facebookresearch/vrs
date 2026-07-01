@@ -17,6 +17,7 @@
 #pragma once
 
 #include <vrs/Record.h>
+#include <vrs/VrsExport.h>
 
 /// Writing headers to disk, you must control endianness and have no padding so that you can read a
 /// file written by any system, using any other system.
@@ -57,7 +58,7 @@ namespace FileFormat {
 #pragma pack(push, 1)
 
 /// Every file starts with this header, which may grow but not shrink!
-struct FileHeader {
+struct VRS_API FileHeader {
   uint32_t magicHeader1{}; ///< magic value #1
   uint32_t magicHeader2{}; ///< magic value #2
   uint64_t creationId{}; ///< A timestamp, hopefully unique, to match files (future).
@@ -104,11 +105,11 @@ struct FileHeader {
 };
 
 // Re-interpret legacy recordable Type id
-RecordableTypeId readRecordableTypeId(int32_t recordableTypeId);
+VRS_API RecordableTypeId readRecordableTypeId(int32_t recordableTypeId);
 
 /// \brief Every record starts with this header, and is followed by a raw data blob,
 /// which semantic is private to the data type handler.
-struct RecordHeader {
+struct VRS_API RecordHeader {
   RecordHeader();
   RecordHeader(
       Record::Type recordType,
@@ -219,7 +220,7 @@ constexpr uint32_t fourCharCode(char a, char b, char c, char d) {
 
 /// Debug method to printout key internal details about a VRS file for debugging purposes.
 /// @return True if the file looks "good", false if anything doesn't look right.
-bool printVRSFileInternals(std::unique_ptr<FileHandler>& file);
+VRS_API bool printVRSFileInternals(std::unique_ptr<FileHandler>& file);
 
 } // namespace FileFormat
 

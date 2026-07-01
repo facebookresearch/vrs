@@ -25,6 +25,7 @@
 #include <vrs/ErrorCode.h>
 #include <vrs/FileDelegator.h>
 #include <vrs/FileSpec.h>
+#include <vrs/VrsExport.h>
 #include <vrs/helpers/EnumTemplates.hpp>
 #include <vrs/os/CompilerAttributes.h>
 
@@ -50,10 +51,10 @@ enum class CachingStrategy {
 /// To enable basic caching for network file handlers
 constexpr const char* kPrefetchCache = "prefetch_cache";
 
-string toString(CachingStrategy cachingStrategy);
+VRS_API string toString(CachingStrategy cachingStrategy);
 
 template <>
-CachingStrategy toEnum<>(const string& name);
+VRS_API CachingStrategy toEnum<>(const string& name);
 
 /// \brief Class to abstract VRS file system operations, to enable support for alternate storage
 /// methods, in particular network/cloud storage implementations.
@@ -71,7 +72,7 @@ CachingStrategy toEnum<>(const string& name);
 /// which can always be converted to a human readable string using vrs::errorCodeToMessage(code).
 /// File sizes and offset are specified using int64_t, which is equivalent to the POSIX behavior.
 /// Byte counts use size_t.
-class FileHandler : public FileDelegator {
+class VRS_API FileHandler : public FileDelegator {
  public:
   /// Stats for cache.
   struct CacheStats {
@@ -249,7 +250,7 @@ class FileHandler : public FileDelegator {
 };
 
 /// Helper class to temporarily modify a FileHandler's caching strategy.
-class TemporaryCachingStrategy {
+class VRS_API TemporaryCachingStrategy {
  public:
   TemporaryCachingStrategy(unique_ptr<FileHandler>& handler, CachingStrategy temporaryStrategy)
       : handler_{handler},

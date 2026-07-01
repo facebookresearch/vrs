@@ -233,19 +233,19 @@ class DataPieceVector : public DataPiece {
 
 // Specializations declaration, required here for come compilers.
 template <>
-void DataPieceVector<string>::stage(const string* values, size_t count);
+VRS_API void DataPieceVector<string>::stage(const string* values, size_t count);
 template <>
-size_t DataPieceVector<string>::getVariableSize() const;
+VRS_API size_t DataPieceVector<string>::getVariableSize() const;
 template <>
-size_t DataPieceVector<string>::collectVariableData(int8_t* data, size_t bufferSize);
+VRS_API size_t DataPieceVector<string>::collectVariableData(int8_t* data, size_t bufferSize);
 template <>
 void DataPieceVector<string>::setDefault(const string* defaultValues, size_t count) = delete;
 template <>
-bool DataPieceVector<string>::get(vector<string>& outValues) const;
+VRS_API bool DataPieceVector<string>::get(vector<string>& outValues) const;
 template <>
-void DataPieceVector<string>::print(ostream& out, const string& indent) const;
+VRS_API void DataPieceVector<string>::print(ostream& out, const string& indent) const;
 template <>
-void DataPieceVector<string>::printCompact(ostream& out, const string& indent) const;
+VRS_API void DataPieceVector<string>::printCompact(ostream& out, const string& indent) const;
 
 } // namespace vrs
 

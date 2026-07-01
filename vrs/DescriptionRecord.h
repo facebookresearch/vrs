@@ -20,6 +20,7 @@
 #include <string>
 
 #include <vrs/ForwardDefinitions.h>
+#include <vrs/VrsExport.h>
 #include <vrs/WriteFileHandler.h>
 
 namespace vrs {
@@ -45,7 +46,7 @@ enum {
 /// @param fileTags: Tags for the file.
 /// @param outPreviousRecordSize: Reference set to the size of the written description record.
 /// @return 0 if all went well, or some file system error.
-int writeDescriptionRecord(
+VRS_API int writeDescriptionRecord(
     WriteFileHandler& file,
     const map<StreamId, const StreamTags*>& streamTags,
     const map<string, string>& fileTags,
@@ -59,7 +60,7 @@ int writeDescriptionRecord(
 /// @param outStreamTags: Reference to be set to the stream tags.
 /// @param outFileTags: Reference to be set to file's tags.
 /// @return 0 if all went well, or some file system error.
-int readDescriptionRecord(
+VRS_API int readDescriptionRecord(
     FileHandler& file,
     uint32_t recordHeaderSize,
     uint32_t& outDescriptionRecordSize,
@@ -70,7 +71,7 @@ int readDescriptionRecord(
 /// Currently, this process consists simply of making sure the original stream's name saved
 /// in VRS tags are stripped of a potential instance number, which used to be included.
 /// This clean-up is required for checksums compares to work as expected.
-void upgradeStreamTags(map<string, string>& streamTags);
+VRS_API void upgradeStreamTags(map<string, string>& streamTags);
 
 /// Streams did not always have a serial number generated at creation.
 /// To simplify backward compatibility with existing files, when opening a file, we generate a
@@ -80,7 +81,7 @@ void upgradeStreamTags(map<string, string>& streamTags);
 /// @param inFileTags: the file's tags.
 /// @param inOutStreamTags: stream tags with or without serial numbers.
 /// On exit, every stream will have a unique serial number, preserving existing values.
-void createStreamSerialNumbers(
+VRS_API void createStreamSerialNumbers(
     const map<string, string>& inFileTags,
     map<StreamId, StreamTags>& inOutStreamTags);
 

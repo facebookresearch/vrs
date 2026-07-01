@@ -20,6 +20,8 @@
 
 #include <vector>
 
+#include <vrs/VrsExport.h>
+
 namespace vrs {
 
 using std::vector;
@@ -56,7 +58,7 @@ class FileHandler;
 ///      double otherValue;
 ///    } someStruct;
 ///    DataReference dataReference(someStruct, buffer, kBufferLength);
-class DataReference {
+class VRS_API DataReference {
  public:
   /// @param data1: Pointer to first block of bytes.
   /// @param size1: Size of first block of bytes.

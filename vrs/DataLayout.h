@@ -25,6 +25,7 @@
 #include <vector>
 
 #include <vrs/ForwardDefinitions.h>
+#include <vrs/VrsExport.h>
 
 namespace vrs {
 
@@ -82,7 +83,7 @@ enum class JsonFormatProfile {
 /// be changed, or DataLayout blocks might not be read correctly.
 ///
 /// Default values are for VRS internal usage: DO NOT CHANGE THIS FORMAT IN ANY WAY!
-struct JsonFormatProfileSpec {
+struct VRS_API JsonFormatProfileSpec {
   bool publicNames = false; ///< Use internal names, or public names. "data_layout" vs. "metadata"
   bool prettyJson = false; ///< Format the text so that it is easier to read.
   bool value = false; ///< Include the value of the data piece elements.
@@ -207,7 +208,7 @@ struct JsonFormatProfileSpec {
 ///
 /// Of course, all of this is the responsibility of VRS itself.
 ///
-class DataLayout {
+class VRS_API DataLayout {
  protected:
   DataLayout() = default;
 
@@ -576,7 +577,7 @@ class DataLayout {
 };
 
 /// When you just need a placeholder for a DataLayout.
-class EmptyDataLayout : public DataLayout {
+class VRS_API EmptyDataLayout : public DataLayout {
  public:
   EmptyDataLayout() {
     initLayout();
@@ -601,13 +602,13 @@ class EmptyDataLayout : public DataLayout {
 ///   };
 ///
 /// Be very careful to always match each AutoDataLayout with an AutoDataLayoutEnd member!
-class AutoDataLayout : public DataLayout {
+class VRS_API AutoDataLayout : public DataLayout {
  public:
   AutoDataLayout();
 };
 
 /// For use within an AutoDataLayout class, to end the AutoDataLayout's construction.
-class AutoDataLayoutEnd {
+class VRS_API AutoDataLayoutEnd {
  public:
   AutoDataLayoutEnd();
 };
@@ -616,7 +617,7 @@ class AutoDataLayoutEnd {
 ///
 /// Helper class to build a DataLayout manually, piece-by-piece.
 /// Make sure to call endLayout as soon as you're no longer adding pieces, to release a global lock.
-class ManualDataLayout : public DataLayout {
+class VRS_API ManualDataLayout : public DataLayout {
  public:
   /// Build a DataLayout from a json definition.
   /// This is how VRS rebuilds DataLayout objects when reading a file.
@@ -677,7 +678,7 @@ class ManualDataLayout : public DataLayout {
 ///
 /// Use the alternate macro DATA_LAYOUT_STRUCT_WITH_INIT if you need your DataLayoutStruct to be
 /// initialized by an init() method, to assign default values to DataPiece fields for instance.
-struct DataLayoutStruct {
+struct VRS_API DataLayoutStruct {
   explicit DataLayoutStruct(const string& structName);
   static void dataLayoutStructEnd(const string& structName);
 };

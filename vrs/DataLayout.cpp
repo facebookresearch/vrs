@@ -1972,27 +1972,27 @@ JsonFormatProfileSpec::JsonFormatProfileSpec(JsonFormatProfile profile) {
       const;                                                                                      \
   template DataPieceStringMap<T>* DataLayout::findDataPieceStringMap(const string& label);
 
-#define DEFINE_DATA_PIECE_TYPE(x)          \
-  template <>                              \
-  const string& getTypeName<x>() {         \
-    static const string sName = XSTR(x);   \
-    return sName;                          \
-  }                                        \
-  REGISTER_TEMPLATE(DataPieceValue, x)     \
-  REGISTER_TEMPLATE(DataPieceArray, x)     \
-  REGISTER_TEMPLATE(DataPieceVector, x)    \
-  REGISTER_TEMPLATE(DataPieceStringMap, x) \
-  DEFINE_FIND_DATA_PIECE(x)                \
-  template class DataPieceValue<x>;        \
-  template class DataPieceArray<x>;        \
-  template class DataPieceVector<x>;       \
-  template class DataPieceStringMap<x>;
+#define DEFINE_DATA_PIECE_TYPE(x)            \
+  template <>                                \
+  VRS_API const string& getTypeName<x>() {   \
+    static const string sName = XSTR(x);     \
+    return sName;                            \
+  }                                          \
+  REGISTER_TEMPLATE(DataPieceValue, x)       \
+  REGISTER_TEMPLATE(DataPieceArray, x)       \
+  REGISTER_TEMPLATE(DataPieceVector, x)      \
+  REGISTER_TEMPLATE(DataPieceStringMap, x)   \
+  DEFINE_FIND_DATA_PIECE(x)                  \
+  template class VRS_API DataPieceValue<x>;  \
+  template class VRS_API DataPieceArray<x>;  \
+  template class VRS_API DataPieceVector<x>; \
+  template class VRS_API DataPieceStringMap<x>;
 
 // Define & generate the code for each POD type supported.
 #define POD_MACRO DEFINE_DATA_PIECE_TYPE
 #include <vrs/helpers/PODMacro.inc>
 
-template class DataPieceVector<string>;
-template class DataPieceStringMap<string>;
+template class VRS_API DataPieceVector<string>;
+template class VRS_API DataPieceStringMap<string>;
 
 } // namespace vrs

@@ -19,6 +19,8 @@
 #include <memory>
 #include <string>
 
+#include <vrs/VrsExport.h>
+
 namespace vrs {
 
 using std::string;
@@ -26,7 +28,7 @@ using std::string;
 /// \brief Utility class to manage various forms of file caching. Disabled by default.
 ///
 /// There is a main file cache, which needs to be created for file caching to be enabled.
-class FileCache {
+class VRS_API FileCache {
  public:
   /// Make the file cache. You need to create it to enable caching features.
   /// Note that there is only one of these file cache in any running app, but there could be

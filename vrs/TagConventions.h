@@ -23,6 +23,7 @@
 */
 
 #include <vrs/RecordFileWriter.h>
+#include <vrs/VrsExport.h>
 
 namespace vrs {
 
@@ -46,14 +47,14 @@ namespace tag_conventions {
   /// Add a unique session id tag, generated then.
   /// @param writer: the file writer to add the tag to.
   /// @return The generated session ID.
-  string addUniqueSessionId(RecordFileWriter& writer);
+  VRS_API string addUniqueSessionId(RecordFileWriter& writer);
   /// Add a capture time tag, using the current time.
   /// @param writer: the file writer to add the tag to.
-  void addCaptureTime(RecordFileWriter& writer);
+  VRS_API void addCaptureTime(RecordFileWriter& writer);
   /// Add a set of tags to a file.
   /// @param writer: the file writer to add the tagset to.
   /// @param tags: a vector of text tags.
-  void addTagSet(RecordFileWriter& writer, const vector<string>& tags);
+  VRS_API void addTagSet(RecordFileWriter& writer, const vector<string>& tags);
 
 // Hardware components
 // For dependent devices with their own id/serial (controllers?), tag at the stream level
@@ -108,7 +109,7 @@ namespace tag_conventions {
 
   /// Add a tag describing the OS version.
   /// @param writer: the file writer to attach the tag to.
-  void addOsFingerprint(RecordFileWriter& writer);
+  VRS_API void addOsFingerprint(RecordFileWriter& writer);
   /// Add a tag describing the running software version.
   /// @param writer: the file writer to attach the tag to.
   /// @param compileDate: the software's compile date.
@@ -165,12 +166,12 @@ namespace tag_conventions {
   /// Convert a set of string tags to json.
   /// @param tags: A set of string tags.
   /// @return A json string containing all the tags.
-  string makeTagSet(const vector<string>& tags);
+  VRS_API string makeTagSet(const vector<string>& tags);
   /// Convert a json tag set back to a vector of string tags.
   /// @param jsonTagSet: json string containing the tags.
   /// @param outVectorTagSet: vector of strings where to place the tags parsed.
   /// @return True if parsing worked (might still not be real tagset).
-  bool parseTagSet(const string& jsonTagSet, vector<string>& outVectorTagSet);
+  VRS_API bool parseTagSet(const string& jsonTagSet, vector<string>& outVectorTagSet);
 
 /*
  * Sample: Santa Cruz + controllers

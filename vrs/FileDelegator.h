@@ -19,6 +19,7 @@
 #include <memory>
 
 #include <vrs/FileSpec.h>
+#include <vrs/VrsExport.h>
 #include <vrs/os/CompilerAttributes.h>
 
 namespace vrs {
@@ -28,7 +29,7 @@ using std::unique_ptr;
 class FileHandler;
 
 /// \brief Class to abstract the delegate file open operation for VRS file.
-class FileDelegator {
+class VRS_API FileDelegator {
  public:
   FileDelegator() = default;
 

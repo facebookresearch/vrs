@@ -20,11 +20,12 @@
 
 #include <vrs/DataLayout.h>
 #include <vrs/RecordFormatStreamPlayer.h>
+#include <vrs/VrsExport.h>
 
 namespace vrs {
 
 /// \brief DataLayout definition used in tag records, which is a VRS internal record type.
-struct TagsRecord : public AutoDataLayout {
+struct VRS_API TagsRecord : public AutoDataLayout {
   enum { kTagsVersion = 1 };
 
   constexpr static const double kTagsRecordTimestamp = std::numeric_limits<double>::lowest();
@@ -36,7 +37,7 @@ struct TagsRecord : public AutoDataLayout {
 };
 
 /// \brief StreamPlayer to decode the content of VRS tag records.
-class TagsRecordPlayer : public RecordFormatStreamPlayer {
+class VRS_API TagsRecordPlayer : public RecordFormatStreamPlayer {
  public:
   TagsRecordPlayer(RecordFileReader* fileReader, map<StreamId, StreamTags>& streamTags);
 

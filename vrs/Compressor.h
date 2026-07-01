@@ -21,6 +21,7 @@
 #include <vector>
 
 #include <vrs/ForwardDefinitions.h>
+#include <vrs/VrsExport.h>
 #include <vrs/WriteFileHandler.h>
 
 namespace vrs {
@@ -65,21 +66,21 @@ enum class CompressionPreset {
 
 };
 
-string toPrettyName(CompressionPreset preset);
-string toString(CompressionPreset preset);
+VRS_API string toPrettyName(CompressionPreset preset);
+VRS_API string toString(CompressionPreset preset);
 template <>
-CompressionPreset toEnum<CompressionPreset>(const string& presetName);
+VRS_API CompressionPreset toEnum<CompressionPreset>(const string& presetName);
 
-string toString(CompressionType compressionType);
+VRS_API string toString(CompressionType compressionType);
 template <>
-CompressionType toEnum<CompressionType>(const string& compressionTypeName);
+VRS_API CompressionType toEnum<CompressionType>(const string& compressionTypeName);
 
 /// \brief Helper class to compress data using lz4 or zstd presets.
 ///
 /// You can switch between presets at no cost. If presets don't work well enough with your data, you
 /// can easily experiment with new settings and add your own preset to CompressionPreset.
 /// @internal
-class Compressor {
+class VRS_API Compressor {
  public:
   static const size_t kMinByteCountForCompression; // don't try to compress small payloads
 

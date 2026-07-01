@@ -25,6 +25,7 @@
 #include <vrs/ForwardDefinitions.h>
 #include <vrs/NewChunkHandler.h>
 #include <vrs/Record.h>
+#include <vrs/VrsExport.h>
 
 namespace vrs {
 
@@ -50,7 +51,7 @@ enum {
 #pragma pack(push, 1)
 
 /// \brief Helper class to store StreamID objects on disk.
-struct DiskStreamId {
+struct VRS_API DiskStreamId {
   DiskStreamId() : typeId(static_cast<int32_t>(RecordableTypeId::Undefined)), instanceId(0) {}
   explicit DiskStreamId(StreamId streamId)
       : typeId(static_cast<int32_t>(streamId.getTypeId())), instanceId(streamId.getInstanceId()) {}
@@ -72,7 +73,7 @@ struct DiskStreamId {
 };
 
 /// \brief Helper class to store details about a single VRS record on disk.
-struct DiskRecordInfo {
+struct VRS_API DiskRecordInfo {
   DiskRecordInfo() = default;
   DiskRecordInfo(
       double timestampIn,
@@ -106,7 +107,7 @@ struct DiskRecordInfo {
 #pragma pack(pop)
 
 /// \brief Helper class to hold the details about a single VRS record in memory.
-struct RecordInfo {
+struct VRS_API RecordInfo {
   RecordInfo() = default;
   RecordInfo(
       double timestampIn,
@@ -137,7 +138,7 @@ struct RecordInfo {
 };
 
 /// \brief Helper class to write VRS index records.
-class Writer {
+class VRS_API Writer {
  public:
   explicit Writer(FileFormat::FileHeader& fileHeader) : fileHeader_{fileHeader} {}
 
@@ -196,7 +197,7 @@ class Writer {
 };
 
 /// \brief Helper class to read VRS index records.
-class Reader {
+class VRS_API Reader {
  public:
   Reader(
       FileHandler& file,
@@ -245,7 +246,7 @@ class Reader {
 };
 
 /// This is used to count records to different kinds
-struct RecordSignature {
+struct VRS_API RecordSignature {
   StreamId streamId;
   Record::Type recordType;
 

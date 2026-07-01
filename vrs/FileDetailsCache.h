@@ -22,6 +22,7 @@
 #include <vector>
 
 #include <vrs/ForwardDefinitions.h>
+#include <vrs/VrsExport.h>
 
 namespace vrs {
 
@@ -41,7 +42,7 @@ namespace FileDetailsCache {
 /// @param recordIndex: VRS file index to save.
 /// @param fileHasIndex: does the original VRS file have a proper index.
 /// @return A status code, 0 for success.
-int write(
+VRS_API int write(
     const string& cacheFile,
     const set<StreamId>& streamIds,
     const map<string, string>& fileTags,
@@ -57,7 +58,7 @@ int write(
 /// @param outRecordIndex: VRS file index read.
 /// @param outFileHasIndex: does the original VRS file have a proper index.
 /// @return A status code, 0 for success.
-int read(
+VRS_API int read(
     const string& cacheFile,
     set<StreamId>& outStreamIds,
     map<string, string>& outFileTags,

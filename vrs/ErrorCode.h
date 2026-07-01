@@ -21,6 +21,7 @@
 
 #include <fmt/format.h>
 
+#include <vrs/VrsExport.h>
 #include <vrs/os/Platform.h>
 
 namespace vrs {
@@ -117,19 +118,19 @@ constexpr int errorDomainToErrorCodeStart(ErrorDomain errorDomain) {
 /// This API should work with any int error code returned by any VRS API.
 /// @param errorCode: an error code returned by any VRS API.
 /// @return A string that describes the error.
-string errorCodeToMessage(int errorCode);
+VRS_API string errorCodeToMessage(int errorCode);
 
 /// Convert an int error code into a human readable string for logging.
 /// This API should work with any int error code returned by any VRS API.
 /// This version includes the error code's numeric value.
 /// @param errorCode: an error code returned by any VRS API.
 /// @return A string that describes the error.
-string errorCodeToMessageWithCode(int errorCode);
+VRS_API string errorCodeToMessageWithCode(int errorCode);
 
 /// Create a new error domain, based on a name that's supposed to be unique, such as "CURL"
 /// @param domainName: some unique domain name.
 /// @return A new error domain enum value.
-ErrorDomain newErrorDomain(const string& domainName);
+VRS_API ErrorDomain newErrorDomain(const string& domainName);
 
 /// Create an int error code for a specific error domain and error code within that domain.
 /// @param errorDomain: the error domain of the error code.
@@ -138,7 +139,7 @@ ErrorDomain newErrorDomain(const string& domainName);
 /// @return A int that can be safely returned by VRS to represent the domain error.
 /// The errorMessage is saved, so that future calls to errorCodeToMessage() will return that
 /// error message for that int error code.
-int domainErrorCode(ErrorDomain errorDomain, int64_t errorCode, const char* errorMessage);
+VRS_API int domainErrorCode(ErrorDomain errorDomain, int64_t errorCode, const char* errorMessage);
 
 /// Helper function so that any integer error type (including enums) can be used for domain errors,
 /// as this template helper will simply cast that error code to an int64.

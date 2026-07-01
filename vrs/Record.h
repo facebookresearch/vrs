@@ -21,6 +21,7 @@
 
 #include <vrs/ForwardDefinitions.h>
 #include <vrs/StreamId.h>
+#include <vrs/VrsExport.h>
 #include <vrs/helpers/EnumTemplates.hpp>
 
 namespace vrs {
@@ -78,7 +79,7 @@ enum class CompressionType : uint8_t {
 /// so records can be written in a single write operation.
 ///
 /// See Recordable::createRecord() to see how to create records.
-class Record final {
+class VRS_API Record final {
  public:
   /// Maximum timestamp for a record.
   static const double kMaxTimestamp;
@@ -179,10 +180,10 @@ class Record final {
 };
 
 /// Get a record type as a text string.
-string toString(Record::Type recordType);
+VRS_API string toString(Record::Type recordType);
 
 /// Convert a record type name into an enum value.
 template <>
-Record::Type toEnum(const string& name);
+VRS_API Record::Type toEnum(const string& name);
 
 } // namespace vrs

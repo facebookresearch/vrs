@@ -49,6 +49,7 @@
 #include <string>
 
 #include <vrs/ErrorCode.h>
+#include <vrs/VrsExport.h>
 #include <vrs/os/Platform.h>
 
 #define VRS_DISKFILECHUNK "AsyncDiskFileChunk"
@@ -60,7 +61,7 @@ namespace vrs {
 using ssize_t = int64_t;
 #define O_DIRECT 0x80000000U
 
-struct AsyncWindowsHandle {
+struct VRS_API AsyncWindowsHandle {
   AsyncWindowsHandle() : h_(INVALID_HANDLE_VALUE) {}
   AsyncWindowsHandle(HANDLE h) : h_(h) {}
   AsyncWindowsHandle(AsyncWindowsHandle&& rhs) : h_(rhs.h_) {
@@ -90,7 +91,7 @@ struct AsyncWindowsHandle {
 };
 using AsyncHandle = AsyncWindowsHandle;
 #else
-struct AsyncFileDescriptor {
+struct VRS_API AsyncFileDescriptor {
   static constexpr int INVALID_FILE_DESCRIPTOR = -1;
 
   AsyncFileDescriptor() = default;
@@ -123,7 +124,7 @@ struct AsyncFileDescriptor {
 using AsyncHandle = AsyncFileDescriptor;
 #endif
 
-class AlignedBuffer {
+class VRS_API AlignedBuffer {
  private:
   void* aligned_buffer_ = nullptr;
   size_t capacity_ = 0;
@@ -159,14 +160,14 @@ class AlignedBuffer {
 
 class AsyncBuffer;
 #if IS_WINDOWS_PLATFORM()
-struct AsyncOVERLAPPED {
+struct VRS_API AsyncOVERLAPPED {
   OVERLAPPED ov;
   // Allows the completion routine to recover a pointer to the containing AsyncBuffer
   AsyncBuffer* self;
 };
 #endif
 
-class AsyncBuffer : public AlignedBuffer {
+class VRS_API AsyncBuffer : public AlignedBuffer {
  public:
   using complete_write_callback = std::function<void(ssize_t io_return, int io_errno)>;
 
@@ -189,7 +190,7 @@ class AsyncBuffer : public AlignedBuffer {
   complete_write_callback on_complete_ = nullptr;
 };
 
-class AsyncDiskFileChunk {
+class VRS_API AsyncDiskFileChunk {
  public:
   AsyncDiskFileChunk() = default;
   AsyncDiskFileChunk(std::string path, int64_t offset, int64_t size)

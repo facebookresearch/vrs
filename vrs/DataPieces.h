@@ -25,6 +25,7 @@
 #include <ostream>
 
 #include <vrs/DataLayout.h>
+#include <vrs/VrsExport.h>
 
 namespace vrs {
 
@@ -37,7 +38,7 @@ using std::string;
 /// DataPiece objects have a type (DataPieceType) and label (a text name),
 /// which together are enough to identify uniquely a DataPiece of a particular DataLayout.
 /// See DataLayout for more details.
-class DataPiece {
+class VRS_API DataPiece {
  public:
   /// \brief Forward declaration, so we can pass RapidJson definitions in headers,
   /// without having to include the actual RapidJson headers everywhere.

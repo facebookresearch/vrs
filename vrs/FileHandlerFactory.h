@@ -22,6 +22,7 @@
 #include <string>
 
 #include <vrs/ForwardDefinitions.h>
+#include <vrs/VrsExport.h>
 
 namespace vrs {
 
@@ -32,7 +33,7 @@ using std::unique_ptr;
 
 /// \brief A factory system for FileHandlers, allowing the runtime registration & usage of custom
 /// FileHandler implementations
-class FileHandlerFactory {
+class VRS_API FileHandlerFactory {
  public:
   static FileHandlerFactory& getInstance();
 

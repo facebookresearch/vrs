@@ -24,6 +24,7 @@
 #include <vrs/DataLayout.h>
 #include <vrs/RecordFormat.h>
 #include <vrs/StreamPlayer.h>
+#include <vrs/VrsExport.h>
 #include <vrs/os/UndoWindows.h>
 
 namespace vrs {
@@ -61,8 +62,18 @@ struct RecordFormatReader {
 /// decoding error occurred, or a callback returns false.
 /// The block's index is passed in case you need to disambiguate successive blocks of the same type,
 /// or need to know when a new block is started.
-class RecordFormatStreamPlayer : public StreamPlayer {
+class VRS_API RecordFormatStreamPlayer : public StreamPlayer {
  public:
+  RecordFormatStreamPlayer() = default;
+  // Move-only: holds maps of move-only RecordFormatReader. The copy operations are deleted (and
+  // declared explicitly so MSVC does not try to emit the deleted implicit copy when the class is
+  // dllexport'd — C2280); the move operations stay defaulted so the implicit move is not
+  // suppressed.
+  RecordFormatStreamPlayer(const RecordFormatStreamPlayer&) = delete;
+  RecordFormatStreamPlayer& operator=(const RecordFormatStreamPlayer&) = delete;
+  RecordFormatStreamPlayer(RecordFormatStreamPlayer&&) = default;
+  RecordFormatStreamPlayer& operator=(RecordFormatStreamPlayer&&) = default;
+  ~RecordFormatStreamPlayer() override = default;
   /// Callback for DataLayout content blocks, after it was read.
   /// @param record: Metadata associated with the record being read.
   /// @param blockIndex: Index of the content block being read.

@@ -20,6 +20,7 @@
 #include <vector>
 
 #include <vrs/ForwardDefinitions.h>
+#include <vrs/VrsExport.h>
 
 namespace vrs {
 
@@ -31,7 +32,7 @@ namespace vrs {
 /// Call decompress to decompress a full record to the DataReference location. The whole record will
 /// be decompressed & written at the target location without intermediate memory copy.
 /// @internal For VRS internal use only.
-class Decompressor {
+class VRS_API Decompressor {
  public:
   Decompressor();
   ~Decompressor();

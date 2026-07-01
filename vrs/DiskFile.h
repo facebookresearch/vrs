@@ -18,6 +18,7 @@
 
 #include <cstdio>
 
+#include <vrs/VrsExport.h>
 #include <vrs/WriteFileHandler.h>
 #include <vrs/os/Platform.h>
 
@@ -30,7 +31,7 @@ class DiskFileChunk;
 
 /// FileHandler implementation for disk files, with chunked file support.
 template <class FileChunk>
-class DiskFileT : public WriteFileHandler {
+class VRS_API DiskFileT : public WriteFileHandler {
  public:
   static const string& staticName();
 
@@ -203,7 +204,7 @@ using AsyncDiskFile = DiskFileT<AsyncDiskFileChunk>;
 /// The actual behavior will depend on the actual file system, how atomic its file rename operations
 /// are, and how it handles file locking, but the behavior should be appropriate for storing data
 /// for caching purposes, when its better to fail saving a cache entry, than creating a corrupt one.
-class AtomicDiskFile : public DiskFile {
+class VRS_API AtomicDiskFile : public DiskFile {
  public:
   ~AtomicDiskFile() override;
 

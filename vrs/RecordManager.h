@@ -22,6 +22,7 @@
 
 #include <vrs/ForwardDefinitions.h>
 #include <vrs/Record.h>
+#include <vrs/VrsExport.h>
 
 namespace vrs {
 
@@ -35,7 +36,7 @@ class DataLayout;
 /// All timestamps are in seconds since some arbitrary point in time, and must be using the same
 /// time domain for the entire VRS file.
 /// @internal
-class RecordManager {
+class VRS_API RecordManager {
   friend class Record;
 
  public:

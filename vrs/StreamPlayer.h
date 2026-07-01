@@ -18,13 +18,14 @@
 
 #include <vrs/ForwardDefinitions.h>
 #include <vrs/Record.h>
+#include <vrs/VrsExport.h>
 
 namespace vrs {
 
 class RecordReader;
 
 /// Class describing which record is being read. Most fields are really self explanatory.
-struct CurrentRecord {
+struct VRS_API CurrentRecord {
   double timestamp;
   StreamId streamId;
   Record::Type recordType;
@@ -50,7 +51,7 @@ struct CurrentRecord {
 /// case the callback is expected to set the provided DataReference to tell where the record's data
 /// should be read. Upon completion of the read, the matching processXXX() callback will be
 /// invoked, allowing the StreamPlayer to interpret/use the read data.
-class StreamPlayer {
+class VRS_API StreamPlayer {
  public:
   virtual ~StreamPlayer();
 
