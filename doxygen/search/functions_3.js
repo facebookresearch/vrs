@@ -19,5 +19,5 @@ var searchData=
   ['decompress_16',['decompress',['../classvrs_1_1_decompressor.html#a0ef267aebe47b3d781e5add2fe1fbe30',1,'vrs::Decompressor']]],
   ['delegateopen_17',['delegateopen',['../classvrs_1_1_file_delegator.html#a20ed43d0540c28802acdec6c33001cc6',1,'vrs::FileDelegator::delegateOpen()'],['../classvrs_1_1_file_handler.html#a29c9ecdcaec465eded60d96890b23670',1,'vrs::FileHandler::delegateOpen()'],['../classvrs_1_1_file_handler_factory.html#a8cc1b86d81f9a65dd1fc6a9caeaaa1e7',1,'vrs::FileHandlerFactory::delegateOpen()']]],
   ['disablefilecache_18',['disableFileCache',['../classvrs_1_1_file_cache.html#a1fd3bb879d9a325e53ba07d680eb9476',1,'vrs::FileCache']]],
-  ['domainerrorcode_19',['domainerrorcode',['../namespacevrs.html#af8f48850a81dd113f904cd3d4ccfd50c',1,'vrs::domainErrorCode(ErrorDomain errorDomain, int64_t errorCode, const char *errorMessage)'],['../namespacevrs.html#a60e81ad2cbd310d1ed9a254abdb914e2',1,'vrs::domainErrorCode(ErrorDomain errorDomain, T errorCode, const char *errorMessage)']]]
+  ['domainerrorcode_19',['domainerrorcode',['../namespacevrs.html#a912eeea436844f977eca40b1e8d5901d',1,'vrs::domainErrorCode(ErrorDomain errorDomain, int64_t errorCode, const char *errorMessage)'],['../namespacevrs.html#a60e81ad2cbd310d1ed9a254abdb914e2',1,'vrs::domainErrorCode(ErrorDomain errorDomain, T errorCode, const char *errorMessage)']]]
 ];
