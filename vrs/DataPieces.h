@@ -25,6 +25,7 @@
 #include <ostream>
 
 #include <vrs/DataLayout.h>
+#include <vrs/DataPieceTypes.h>
 #include <vrs/VrsExport.h>
 
 namespace vrs {
@@ -248,6 +249,14 @@ inline const string& getTypeName<string>() {
   return sName;
 }
 
+// The getTypeName<> POD specializations are defined out-of-line in DataLayout.cpp. Declare them
+// here with VRS_API so consumers of the shared library see the import-side attribute at every call
+// site (e.g. the inline DataPiece<T>::getElementTypeName()).
+#define POD_MACRO(x) \
+  template <>        \
+  VRS_API const string& getTypeName<x>();
+#include <vrs/helpers/PODMacro.inc>
+
 /// \brief Template to represent some POD object without memory alignment.
 ///
 /// Data read from disk might not be aligned as the architecture would like it,
@@ -280,8 +289,6 @@ inline void unalignedCopy(void* dst, const void* src, size_t size) {
 } // namespace vrs
 
 // These are required pretty much every single time we use DataLayout. Just include them all.
-#include <vrs/DataPieceTypes.h>
-
 #ifndef DATA_PIECES_ARRAY_H
 #include <vrs/DataPieceArray.h>
 #endif
