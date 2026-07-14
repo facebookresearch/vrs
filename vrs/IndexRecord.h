@@ -230,6 +230,30 @@ class VRS_API Reader {
       int64_t& outUsedFileSize);
   int readSplitIndexRecord(size_t indexByteSize, size_t uncompressedSize, int64_t& outUsedFileSize);
   int readDiskInfo(vector<DiskRecordInfo>& outRecords);
+  // Index reading helpers extracted to keep CCN within threshold.
+  bool determineSplitIndexLayout(
+      size_t& inOutIndexByteSize,
+      int64_t& outUsedFileSize,
+      bool& outNoRecords);
+  int readSplitIndexData(
+      size_t indexByteSize,
+      size_t uncompressedSize,
+      vector<DiskRecordInfo>& outRecords,
+      bool noRecords);
+  bool processSplitIndexRecords(const vector<DiskRecordInfo>& records, int64_t& outUsedFileSize);
+  int determineClassicIndexLayout(
+      size_t indexRecordPayloadSize,
+      uint32_t& outRecordCount,
+      size_t& outIndexSize);
+  int readClassicIndexData(
+      size_t indexSize,
+      size_t uncompressedSize,
+      uint32_t recordCount,
+      vector<DiskRecordInfo>& outRecords);
+  bool processClassicIndexRecords(
+      const vector<DiskRecordInfo>& records,
+      int64_t fileOffset,
+      int64_t& outUsedFileSize);
 
  private:
   FileHandler& file_;

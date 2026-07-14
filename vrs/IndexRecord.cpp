@@ -45,6 +45,13 @@ const uint32_t kMaxBatchSize = 100000;
 // requests too much memory, we limit the maximum record count to this arbitrarily large number.
 constexpr size_t kMaxRecordCount = 500000000;
 
+// Record sizes are stored as uint32_t, so uncompressed index size cannot exceed UINT32_MAX.
+constexpr uint64_t kMaxUncompressedSize = std::numeric_limits<uint32_t>::max();
+
+// Plausible compression ratio bound to detect decompression bombs; 100000:1 allows zero-filled
+// records.
+constexpr size_t kMaxCompressionRatio = 100000;
+
 // Compression presets, in increasingly tighter settings, starting with NONE, which will be only
 // used when there are too few index entries for compression to reasonably work...
 #if IS_MOBILE_PLATFORM()
@@ -71,6 +78,99 @@ size_t firstCompressionPresetIndex(size_t recordCount) {
 
 // When tuning compression, this logging is very useful, so let's keep it in the code.
 const bool kLogStats = false;
+
+// Validate classic index allocation size before vector allocation.
+bool validateClassicIndexAllocation(
+    uint32_t recordCount,
+    size_t indexSize,
+    size_t uncompressedSize,
+    int64_t totalFileSize) {
+  if (recordCount > kMaxRecordCount) {
+    XR_LOGE("Too many records in index ({} > {}). Corrupt index?", recordCount, kMaxRecordCount);
+    return false;
+  }
+  const uint64_t expectedDataSize =
+      static_cast<uint64_t>(sizeof(vrs::IndexRecord::DiskRecordInfo)) * recordCount;
+  if (uncompressedSize > 0) {
+    if (static_cast<uint64_t>(uncompressedSize) > kMaxUncompressedSize) {
+      XR_LOGE(
+          "Claimed uncompressed size {} exceeds maximum possible value {}. Corrupt index?",
+          uncompressedSize,
+          kMaxUncompressedSize);
+      return false;
+    }
+    if (expectedDataSize > uncompressedSize) {
+      XR_LOGE(
+          "Record count {} implies {} bytes but uncompressed size is only {}. Corrupt index?",
+          recordCount,
+          expectedDataSize,
+          uncompressedSize);
+      return false;
+    }
+    // Division avoids uint64_t overflow and works on 32-bit targets where size_t is 32 bits.
+    if (expectedDataSize / kMaxCompressionRatio > indexSize) {
+      XR_LOGE(
+          "Record count {} implies {} bytes which exceeds plausible decompressed size from {} compressed bytes (ratio > {}:1). Corrupt index?",
+          recordCount,
+          expectedDataSize,
+          indexSize,
+          kMaxCompressionRatio);
+      return false;
+    }
+    // Decompressed size may exceed on-disk file size for highly compressible data.
+  } else {
+    if (totalFileSize < 0 || expectedDataSize > static_cast<uint64_t>(totalFileSize)) {
+      XR_LOGE(
+          "Record count {} implies {} bytes which exceeds total file size {}. Corrupt index?",
+          recordCount,
+          expectedDataSize,
+          totalFileSize);
+      return false;
+    }
+    if (expectedDataSize > indexSize) {
+      XR_LOGE("More records expected than can fit in the index record. Corrupt index?");
+      return false;
+    }
+  }
+  return true;
+}
+
+// Validate split index allocation size before vector allocation.
+bool validateSplitIndexAllocation(
+    size_t indexByteSize,
+    size_t sizeToRead,
+    size_t uncompressedSize,
+    int64_t totalFileSize) {
+  if (static_cast<uint64_t>(uncompressedSize) > kMaxUncompressedSize) {
+    XR_LOGE(
+        "Claimed uncompressed size {} exceeds maximum possible value {}. Corrupt index?",
+        uncompressedSize,
+        kMaxUncompressedSize);
+    return false;
+  }
+  // indexByteSize is on-disk size, must never exceed total file size.
+  // In uncompressed case sizeToRead equals indexByteSize, so this single check
+  // covers both; no redundant second check needed.
+  if (totalFileSize < 0 || indexByteSize > static_cast<size_t>(totalFileSize)) {
+    XR_LOGE(
+        "Index byte size {} exceeds total file size {}. Corrupt index?",
+        indexByteSize,
+        totalFileSize);
+    return false;
+  }
+  if (uncompressedSize != 0) {
+    // Division avoids uint64_t overflow and works on 32-bit targets.
+    if (sizeToRead / kMaxCompressionRatio > indexByteSize) {
+      XR_LOGE(
+          "Decompressed index size {} exceeds plausible size from {} compressed bytes (ratio > {}:1). Corrupt index?",
+          sizeToRead,
+          indexByteSize,
+          kMaxCompressionRatio);
+      return false;
+    }
+  }
+  return true;
+}
 
 /// Format of the index record:
 ///
@@ -324,97 +424,18 @@ int IndexRecord::Reader::readClassicIndexRecord(
     size_t uncompressedSize,
     int64_t firstUserRecordOffset,
     int64_t& outUsedFileSize) {
-  const size_t kCountersCount = 2;
-  if (indexRecordPayloadSize < sizeof(uint32_t) * kCountersCount) {
-    XR_LOGE("Index record way too small. Corrupt file or index?");
-    return INDEX_RECORD_ERROR;
-  }
-  size_t preludeSize = sizeof(uint32_t) * kCountersCount; // discount counters
-  uint32_t typeCount{};
-  if (file_.read(typeCount) != 0) {
-    return file_.getLastError();
-  }
-  if (typeCount > 0) {
-    const size_t readSize = sizeof(DiskStreamId) * typeCount;
-    if (readSize > indexRecordPayloadSize - preludeSize) {
-      XR_LOGE("Index record too small. Corrupt file or index?");
-      return INDEX_RECORD_ERROR;
-    }
-    vector<DiskStreamId> diskStreams(typeCount);
-    if (file_.read(diskStreams) != 0) {
-      return file_.getLastError();
-    }
-    preludeSize += static_cast<uint32_t>(readSize);
-    for (auto diskStruct : diskStreams) {
-      streamIds_.insert(StreamId{diskStruct.getTypeId(), diskStruct.getInstanceId()});
-    }
-  }
-  uint32_t recordCount{};
-  if (file_.read(recordCount) != 0) {
-    return file_.getLastError();
-  }
-  const size_t indexSize = indexRecordPayloadSize - preludeSize;
+  uint32_t recordCount = 0;
+  size_t indexSize = 0;
+  IF_ERROR_RETURN(determineClassicIndexLayout(indexRecordPayloadSize, recordCount, indexSize));
   if (recordCount > 0) {
-    if (recordCount > kMaxRecordCount) {
-      XR_LOGE("Too many records in index ({} > {}). Corrupt index?", recordCount, kMaxRecordCount);
+    vector<DiskRecordInfo> recordStructs;
+    IF_ERROR_RETURN(readClassicIndexData(indexSize, uncompressedSize, recordCount, recordStructs));
+    int64_t fileOffset = firstUserRecordOffset;
+    if (!processClassicIndexRecords(recordStructs, fileOffset, outUsedFileSize)) {
       return INDEX_RECORD_ERROR;
     }
-    vector<DiskRecordInfo> recordStructs(recordCount);
-    int status = 0;
-    if (uncompressedSize > 0) {
-      Decompressor decompressor;
-      size_t frameSize = 0;
-      size_t maxReadSize = indexSize;
-      status = decompressor.initFrame(file_, frameSize, maxReadSize);
-      if (status == 0) {
-        if (frameSize != sizeof(DiskRecordInfo) * recordCount) {
-          XR_LOGE("Compressed index size unexpected. Corrupt index?");
-          return INDEX_RECORD_ERROR;
-        }
-        status = decompressor.readFrame(file_, recordStructs.data(), frameSize, maxReadSize);
-      }
-    } else {
-      if (sizeof(DiskRecordInfo) * recordCount > indexSize) {
-        XR_LOGE("More records expected than can fit in the index record. Corrupt index?");
-        return INDEX_RECORD_ERROR;
-      }
-      status = readDiskInfo(recordStructs);
-    }
-    if (status != 0) {
-      XR_LOGW("Failed to read entire index.");
-      return status;
-    }
-    index_.reserve(recordStructs.size());
-    int64_t fileOffset = firstUserRecordOffset;
-    for (auto record : recordStructs) {
-      double timestamp = record.timestamp;
-      Record::Type recordType = record.getRecordType();
-      uint32_t recordSize = record.recordSize;
-      StreamId streamId = record.getStreamId();
-      if (!isValid(record.getRecordType())) {
-        XR_LOGE(
-            "Unexpected index record entry: Stream Id: {} Type: {} Size: {} Timestamp: {}",
-            streamId.getNumericName(),
-            toString(recordType),
-            recordSize,
-            timestamp);
-        return INDEX_RECORD_ERROR;
-      }
-      int64_t nextFileOffset = fileOffset + recordSize;
-      if (nextFileOffset > totalFileSize_) {
-        droppedRecordCount_ = static_cast<int32_t>(recordStructs.size() - index_.size());
-        break; // The file is too short, and this record goes beyond the end...
-      }
-      index_.emplace_back(timestamp, fileOffset, streamId, recordType);
-      if (index_.size() > 1 && index_.back() < index_[index_.size() - 2]) {
-        sortErrorCount_++;
-      }
-      fileOffset = nextFileOffset;
-    }
-    outUsedFileSize = fileOffset;
   }
   indexComplete_ = true;
-  // we're just past the index record, which might be the end of the file
   int64_t offsetPastIndexRecord = file_.getPos();
   if (offsetPastIndexRecord > outUsedFileSize) {
     outUsedFileSize = offsetPastIndexRecord;
@@ -440,33 +461,52 @@ int IndexRecord::Reader::readSplitIndexRecord(
     size_t indexByteSize,
     size_t uncompressedSize,
     int64_t& outUsedFileSize) {
+  bool noRecords = false;
+  if (!determineSplitIndexLayout(indexByteSize, outUsedFileSize, noRecords)) {
+    return INDEX_RECORD_ERROR;
+  }
+  vector<DiskRecordInfo> recordStructs;
+  IF_ERROR_RETURN(readSplitIndexData(indexByteSize, uncompressedSize, recordStructs, noRecords));
+  if (recordStructs.empty()) {
+    return 0;
+  }
+  if (!processSplitIndexRecords(recordStructs, outUsedFileSize)) {
+    return INDEX_RECORD_ERROR;
+  }
+  return 0;
+}
+
+bool IndexRecord::Reader::determineSplitIndexLayout(
+    size_t& inOutIndexByteSize,
+    int64_t& outUsedFileSize,
+    bool& outNoRecords) {
   // The index record's size is only updated after the index body is fully written,
   // because we will add to the index while the file is written
   int64_t firstUserRecordOffset = fileHeader_.firstUserRecordOffset;
-  bool noRecords = (firstUserRecordOffset == totalFileSize_);
+  outNoRecords = (firstUserRecordOffset == totalFileSize_);
   int64_t currentPos = file_.getPos();
   int64_t chunkStart{}, chunkSize{};
   if (!XR_VERIFY(file_.getChunkRange(chunkStart, chunkSize) == 0) || !XR_VERIFY(chunkSize > 0) ||
       !XR_VERIFY(
           (currentPos >= chunkStart && currentPos < chunkStart + chunkSize) ||
-          currentPos == totalFileSize_ && noRecords)) {
-    return INDEX_RECORD_ERROR;
+          currentPos == totalFileSize_ && outNoRecords)) {
+    return false;
   }
   const int64_t nextChunkStart = chunkStart + chunkSize;
-  indexComplete_ = ((indexByteSize > 0 || noRecords) && firstUserRecordOffset > 0);
+  indexComplete_ = ((inOutIndexByteSize > 0 || outNoRecords) && firstUserRecordOffset > 0);
   if (chunkStart == 0) {
     const size_t chunkLeft = static_cast<size_t>(nextChunkStart - currentPos);
-    if (indexByteSize == 0) {
+    if (inOutIndexByteSize == 0) {
       if (nextChunkStart == totalFileSize_ && firstUserRecordOffset == 0) {
         // There is a single chunk, we don't know the size of the index record,
         // nor where the first user record is: we must give up! :-(
         XR_LOGE("VRS file not recoverable: can't determine where the user records are.");
-        return INDEX_RECORD_ERROR;
+        return false;
       }
-      indexByteSize = chunkLeft;
-    } else if (chunkLeft < indexByteSize) {
-      XR_LOGW("Index record too short. {} bytes missing...", indexByteSize - chunkLeft);
-      indexByteSize = chunkLeft;
+      inOutIndexByteSize = chunkLeft;
+    } else if (chunkLeft < inOutIndexByteSize) {
+      XR_LOGW("Index record too short. {} bytes missing...", inOutIndexByteSize - chunkLeft);
+      inOutIndexByteSize = chunkLeft;
       indexComplete_ = false;
     }
     hasSplitHeadChunk_ = nextChunkStart < totalFileSize_;
@@ -481,23 +521,22 @@ int IndexRecord::Reader::readSplitIndexRecord(
     }
   } else {
     // We're already at the next chunk! there is no data in the index!
-    indexByteSize = 0;
+    inOutIndexByteSize = 0;
     indexComplete_ = false;
     hasSplitHeadChunk_ = chunkStart < totalFileSize_;
     firstUserRecordOffset = currentPos;
   }
   outUsedFileSize = firstUserRecordOffset;
+  return true;
+}
+
+int IndexRecord::Reader::readSplitIndexData(
+    size_t indexByteSize,
+    size_t uncompressedSize,
+    vector<DiskRecordInfo>& outRecords,
+    bool noRecords) {
   size_t sizeToRead = (uncompressedSize == 0) ? indexByteSize : uncompressedSize;
-  // Validate that claimed uncompressedSize doesn't exceed the VRS format's inherent limit.
-  // Record sizes are stored as uint32_t in the VRS format, so uncompressedSize cannot
-  // legitimately exceed UINT32_MAX. This prevents malicious inputs claiming implausibly
-  // large sizes while working correctly with all valid VRS files including zero-vrs variants.
-  constexpr uint64_t kMaxUncompressedSize = std::numeric_limits<uint32_t>::max();
-  if (static_cast<uint64_t>(uncompressedSize) > kMaxUncompressedSize) {
-    XR_LOGE(
-        "Claimed uncompressed size {} exceeds maximum possible value {}. Corrupt index?",
-        uncompressedSize,
-        kMaxUncompressedSize);
+  if (!validateSplitIndexAllocation(indexByteSize, sizeToRead, uncompressedSize, totalFileSize_)) {
     return INDEX_RECORD_ERROR;
   }
   const size_t extraBytes = sizeToRead % sizeof(IndexRecord::DiskRecordInfo);
@@ -512,14 +551,15 @@ int IndexRecord::Reader::readSplitIndexRecord(
       XR_LOGW("No index data to read.");
     }
     return 0;
-  } else if (maxRecordInfoCount > kMaxRecordCount) {
+  }
+  if (maxRecordInfoCount > kMaxRecordCount) {
     XR_LOGE(
         "Too many records in index ({} > {}). Corrupt index?", maxRecordInfoCount, kMaxRecordCount);
     return INDEX_RECORD_ERROR;
   }
-  vector<DiskRecordInfo> recordStructs(maxRecordInfoCount);
-  if (uncompressedSize == 0) { // not compressed
-    int status = readDiskInfo(recordStructs);
+  outRecords.resize(maxRecordInfoCount);
+  if (uncompressedSize == 0) {
+    int status = readDiskInfo(outRecords);
     if (status != 0) {
       XR_LOGW("Failed to read uncompressed index.");
       return status;
@@ -528,7 +568,7 @@ int IndexRecord::Reader::readSplitIndexRecord(
     size_t decompressedRecords = 0;
     Decompressor decompressor;
     int error = 0;
-    char* endBuffer = reinterpret_cast<char*>(recordStructs.data()) + sizeToRead;
+    char* endBuffer = reinterpret_cast<char*>(outRecords.data()) + sizeToRead;
     while (sizeToRead > 0) {
       size_t frameSize = 0;
       BREAK_ON_ERROR(decompressor.initFrame(file_, frameSize, indexByteSize));
@@ -544,12 +584,18 @@ int IndexRecord::Reader::readSplitIndexRecord(
           (maxRecordInfoCount - decompressedRecords),
           maxRecordInfoCount);
       indexComplete_ = false;
-      recordStructs.resize(decompressedRecords);
+      outRecords.resize(decompressedRecords);
     }
   }
-  index_.reserve(recordStructs.size());
+  return 0;
+}
+
+bool IndexRecord::Reader::processSplitIndexRecords(
+    const vector<DiskRecordInfo>& records,
+    int64_t& outUsedFileSize) {
+  index_.reserve(records.size());
   const uint32_t recordHeaderSize = fileHeader_.recordHeaderSize;
-  for (const DiskRecordInfo& record : recordStructs) {
+  for (const DiskRecordInfo& record : records) {
     double timestamp = record.timestamp;
     StreamId streamId = record.getStreamId();
     uint32_t recordSize = record.recordSize;
@@ -561,7 +607,7 @@ int IndexRecord::Reader::readSplitIndexRecord(
           toString(recordType),
           recordSize,
           timestamp);
-      return INDEX_RECORD_ERROR;
+      return false;
     }
     int64_t followingRecordOffset = outUsedFileSize + recordSize;
     if (droppedRecordCount_ > 0 || followingRecordOffset > totalFileSize_) {
@@ -578,7 +624,109 @@ int IndexRecord::Reader::readSplitIndexRecord(
       outUsedFileSize = followingRecordOffset;
     }
   }
+  return true;
+}
+
+int IndexRecord::Reader::determineClassicIndexLayout(
+    size_t indexRecordPayloadSize,
+    uint32_t& outRecordCount,
+    size_t& outIndexSize) {
+  const size_t kCountersCount = 2;
+  if (indexRecordPayloadSize < sizeof(uint32_t) * kCountersCount) {
+    XR_LOGE("Index record way too small. Corrupt file or index?");
+    return INDEX_RECORD_ERROR;
+  }
+  size_t preludeSize = sizeof(uint32_t) * kCountersCount;
+  uint32_t typeCount = 0;
+  if (file_.read(typeCount) != 0) {
+    return file_.getLastError();
+  }
+  if (typeCount > 0) {
+    const size_t readSize = sizeof(DiskStreamId) * typeCount;
+    if (readSize > indexRecordPayloadSize - preludeSize) {
+      XR_LOGE("Index record too small. Corrupt file or index?");
+      return INDEX_RECORD_ERROR;
+    }
+    vector<DiskStreamId> diskStreams(typeCount);
+    if (file_.read(diskStreams) != 0) {
+      return file_.getLastError();
+    }
+    preludeSize += static_cast<uint32_t>(readSize);
+    for (auto diskStruct : diskStreams) {
+      streamIds_.insert(StreamId{diskStruct.getTypeId(), diskStruct.getInstanceId()});
+    }
+  }
+  if (file_.read(outRecordCount) != 0) {
+    return file_.getLastError();
+  }
+  outIndexSize = indexRecordPayloadSize - preludeSize;
   return 0;
+}
+
+int IndexRecord::Reader::readClassicIndexData(
+    size_t indexSize,
+    size_t uncompressedSize,
+    uint32_t recordCount,
+    vector<DiskRecordInfo>& outRecords) {
+  if (!validateClassicIndexAllocation(recordCount, indexSize, uncompressedSize, totalFileSize_)) {
+    return INDEX_RECORD_ERROR;
+  }
+  outRecords.resize(recordCount);
+  int status = 0;
+  if (uncompressedSize > 0) {
+    Decompressor decompressor;
+    size_t frameSize = 0;
+    size_t maxReadSize = indexSize;
+    status = decompressor.initFrame(file_, frameSize, maxReadSize);
+    if (status == 0) {
+      if (frameSize != sizeof(DiskRecordInfo) * recordCount) {
+        XR_LOGE("Compressed index size unexpected. Corrupt index?");
+        return INDEX_RECORD_ERROR;
+      }
+      status = decompressor.readFrame(file_, outRecords.data(), frameSize, maxReadSize);
+    }
+  } else {
+    status = readDiskInfo(outRecords);
+  }
+  if (status != 0) {
+    XR_LOGW("Failed to read entire index.");
+    return status;
+  }
+  return 0;
+}
+
+bool IndexRecord::Reader::processClassicIndexRecords(
+    const vector<DiskRecordInfo>& records,
+    int64_t fileOffset,
+    int64_t& outUsedFileSize) {
+  index_.reserve(records.size());
+  for (const auto& record : records) {
+    double timestamp = record.timestamp;
+    Record::Type recordType = record.getRecordType();
+    uint32_t recordSize = record.recordSize;
+    StreamId streamId = record.getStreamId();
+    if (!isValid(record.getRecordType())) {
+      XR_LOGE(
+          "Unexpected index record entry: Stream Id: {} Type: {} Size: {} Timestamp: {}",
+          streamId.getNumericName(),
+          toString(recordType),
+          recordSize,
+          timestamp);
+      return false;
+    }
+    int64_t nextFileOffset = fileOffset + recordSize;
+    if (nextFileOffset > totalFileSize_) {
+      droppedRecordCount_ = static_cast<int32_t>(records.size() - index_.size());
+      break;
+    }
+    index_.emplace_back(timestamp, fileOffset, streamId, recordType);
+    if (index_.size() > 1 && index_.back() < index_[index_.size() - 2]) {
+      sortErrorCount_++;
+    }
+    fileOffset = nextFileOffset;
+  }
+  outUsedFileSize = fileOffset;
+  return true;
 }
 
 int IndexRecord::Reader::readDiskInfo(vector<DiskRecordInfo>& outRecords) {
