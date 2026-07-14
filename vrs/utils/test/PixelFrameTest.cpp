@@ -27,7 +27,10 @@
 #include <TestDataDir/TestDataDir.h>
 
 #include <vrs/RecordFileReader.h>
+#include <vrs/RecordFileWriter.h>
 #include <vrs/RecordFormatStreamPlayer.h>
+#include <vrs/Recordable.h>
+#include <vrs/TagConventions.h>
 #include <vrs/os/Utils.h>
 #include <vrs/utils/PixelFrame.h>
 #include <vrs/utils/PixelFrameOptions.h>
@@ -194,6 +197,96 @@ TEST_F(PixelFrameTest, colorTableTest) {
   ASSERT_GT(colors.size(), 0xffff);
   EXPECT_TRUE(equal(colors[0], RGBColor()));
   EXPECT_TRUE(equal(colors[0xffff], RGBColor(255, 255, 255)));
+}
+
+namespace {
+// Minimal recordable that writes empty configuration & state records, used to exercise
+// tag-driven getStreamNormalizeOptions() behavior. Tags are set by the test before writing.
+class TagStream : public Recordable {
+ public:
+  TagStream(RecordableTypeId typeId, const string& flavor) : Recordable(typeId, flavor) {}
+  const Record* createConfigurationRecord() override {
+    return createRecord(0, Record::Type::CONFIGURATION, 1);
+  }
+  const Record* createStateRecord() override {
+    return createRecord(0, Record::Type::STATE, 1);
+  }
+};
+
+string writeTagStreamFile(const string& name, const std::function<void(RecordFileWriter&)>& setup) {
+  string path = os::pathJoin(os::getTempFolder(), name);
+  RecordFileWriter writer;
+  setup(writer);
+  EXPECT_EQ(writer.writeToFile(path), 0);
+  return path;
+}
+} // namespace
+
+// getStreamNormalizeOptions() characterization: today the options are derived purely from
+// stream/file tags and RecordableTypeId, with no configuration-record input. These lock the
+// current behavior before the per-stream configuration mechanism is introduced.
+TEST_F(PixelFrameTest, getStreamNormalizeOptionsCameraTag) {
+  TagStream stream(RecordableTypeId::ImageStream, "test/camera");
+  string path = writeTagStreamFile("normOptsCameraTag.vrs", [&](RecordFileWriter& writer) {
+    stream.setTag(tag_conventions::kImageSemantic, tag_conventions::kImageSemanticCamera);
+    writer.addRecordable(&stream);
+  });
+  RecordFileReader reader;
+  ASSERT_EQ(reader.openFile(path), 0);
+  StreamId id = reader.getStreamForType(RecordableTypeId::ImageStream);
+  ASSERT_TRUE(id.isValid());
+  NormalizeOptions options = PixelFrame::getStreamNormalizeOptions(reader, id, PixelFormat::RGB8);
+  EXPECT_EQ(options.semantic, ImageSemantic::Camera);
+  reader.closeFile();
+}
+
+TEST_F(PixelFrameTest, getStreamNormalizeOptionsDepthTagWithFileRange) {
+  TagStream stream(RecordableTypeId::ImageStream, "test/depth");
+  string path = writeTagStreamFile("normOptsDepthTag.vrs", [&](RecordFileWriter& writer) {
+    stream.setTag(tag_conventions::kImageSemantic, tag_conventions::kImageSemanticDepth);
+    writer.addRecordable(&stream);
+    writer.setTag(tag_conventions::kRenderDepthImagesRangeMin, "0.5");
+    writer.setTag(tag_conventions::kRenderDepthImagesRangeMax, "4");
+  });
+  RecordFileReader reader;
+  ASSERT_EQ(reader.openFile(path), 0);
+  StreamId id = reader.getStreamForType(RecordableTypeId::ImageStream);
+  ASSERT_TRUE(id.isValid());
+  NormalizeOptions options =
+      PixelFrame::getStreamNormalizeOptions(reader, id, PixelFormat::DEPTH32F);
+  EXPECT_EQ(options.semantic, ImageSemantic::Depth);
+  EXPECT_FLOAT_EQ(options.min, 0.5f);
+  EXPECT_FLOAT_EQ(options.max, 4.0f);
+  reader.closeFile();
+}
+
+TEST_F(PixelFrameTest, getStreamNormalizeOptionsDefaultsToCamera) {
+  TagStream stream(RecordableTypeId::ImageStream, "test/plain");
+  string path = writeTagStreamFile(
+      "normOptsDefault.vrs", [&](RecordFileWriter& writer) { writer.addRecordable(&stream); });
+  RecordFileReader reader;
+  ASSERT_EQ(reader.openFile(path), 0);
+  StreamId id = reader.getStreamForType(RecordableTypeId::ImageStream);
+  ASSERT_TRUE(id.isValid());
+  NormalizeOptions options = PixelFrame::getStreamNormalizeOptions(reader, id, PixelFormat::GREY8);
+  EXPECT_EQ(options.semantic, ImageSemantic::Camera);
+  reader.closeFile();
+}
+
+TEST_F(PixelFrameTest, getStreamNormalizeOptionsLegacyDepthCameraTypeId) {
+  TagStream stream(RecordableTypeId::DepthCameraRecordableClass, "test/legacy_depth");
+  string path = writeTagStreamFile(
+      "normOptsLegacyDepth.vrs", [&](RecordFileWriter& writer) { writer.addRecordable(&stream); });
+  RecordFileReader reader;
+  ASSERT_EQ(reader.openFile(path), 0);
+  StreamId id = reader.getStreamForType(RecordableTypeId::DepthCameraRecordableClass);
+  ASSERT_TRUE(id.isValid());
+  NormalizeOptions options =
+      PixelFrame::getStreamNormalizeOptions(reader, id, PixelFormat::DEPTH32F);
+  EXPECT_EQ(options.semantic, ImageSemantic::Depth);
+  EXPECT_FLOAT_EQ(options.min, 0.0f);
+  EXPECT_FLOAT_EQ(options.max, 6.0f);
+  reader.closeFile();
 }
 
 #if IS_VRS_FB_INTERNAL()
