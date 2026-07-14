@@ -312,37 +312,61 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>      int64_t&amp; outUsedFileSize);</div>
 <div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>  <span class="keywordtype">int</span> readSplitIndexRecord(<span class="keywordtype">size_t</span> indexByteSize, <span class="keywordtype">size_t</span> uncompressedSize, int64_t&amp; outUsedFileSize);</div>
 <div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>  <span class="keywordtype">int</span> readDiskInfo(vector&lt;DiskRecordInfo&gt;&amp; outRecords);</div>
-<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span> </div>
-<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span> <span class="keyword">private</span>:</div>
-<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span>  <a class="code hl_class" href="classvrs_1_1_file_handler.html">FileHandler</a>&amp; file_;</div>
-<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>  <span class="keyword">const</span> int64_t totalFileSize_;</div>
-<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>  <a class="code hl_struct" href="structvrs_1_1_file_format_1_1_file_header.html">FileFormat::FileHeader</a>&amp; fileHeader_;</div>
-<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>  <a class="code hl_class" href="classvrs_1_1_progress_logger.html">ProgressLogger</a>* progressLogger_;</div>
-<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>  set&lt;StreamId&gt;&amp; streamIds_;</div>
-<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>  vector&lt;RecordInfo&gt;&amp; index_;</div>
-<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>  unique_ptr&lt;deque&lt;IndexRecord::DiskRecordInfo&gt;&gt; diskIndex_; <span class="comment">// only when rewriting the index</span></div>
-<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>  <span class="keywordtype">bool</span> indexComplete_{};</div>
-<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>  <span class="keywordtype">bool</span> hasSplitHeadChunk_{};</div>
-<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>  int32_t sortErrorCount_{};</div>
-<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>  int32_t droppedRecordCount_{};</div>
-<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>};</div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>  <span class="comment">// Index reading helpers extracted to keep CCN within threshold.</span></div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>  <span class="keywordtype">bool</span> determineSplitIndexLayout(</div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span>      <span class="keywordtype">size_t</span>&amp; inOutIndexByteSize,</div>
+<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>      int64_t&amp; outUsedFileSize,</div>
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>      <span class="keywordtype">bool</span>&amp; outNoRecords);</div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>  <span class="keywordtype">int</span> readSplitIndexData(</div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>      <span class="keywordtype">size_t</span> indexByteSize,</div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>      <span class="keywordtype">size_t</span> uncompressedSize,</div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>      vector&lt;DiskRecordInfo&gt;&amp; outRecords,</div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>      <span class="keywordtype">bool</span> noRecords);</div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>  <span class="keywordtype">bool</span> processSplitIndexRecords(<span class="keyword">const</span> vector&lt;DiskRecordInfo&gt;&amp; records, int64_t&amp; outUsedFileSize);</div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>  <span class="keywordtype">int</span> determineClassicIndexLayout(</div>
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>      <span class="keywordtype">size_t</span> indexRecordPayloadSize,</div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>      uint32_t&amp; outRecordCount,</div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>      <span class="keywordtype">size_t</span>&amp; outIndexSize);</div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>  <span class="keywordtype">int</span> readClassicIndexData(</div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>      <span class="keywordtype">size_t</span> indexSize,</div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>      <span class="keywordtype">size_t</span> uncompressedSize,</div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>      uint32_t recordCount,</div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>      vector&lt;DiskRecordInfo&gt;&amp; outRecords);</div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>  <span class="keywordtype">bool</span> processClassicIndexRecords(</div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>      <span class="keyword">const</span> vector&lt;DiskRecordInfo&gt;&amp; records,</div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>      int64_t fileOffset,</div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>      int64_t&amp; outUsedFileSize);</div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span> </div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span> <span class="keyword">private</span>:</div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>  <a class="code hl_class" href="classvrs_1_1_file_handler.html">FileHandler</a>&amp; file_;</div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span>  <span class="keyword">const</span> int64_t totalFileSize_;</div>
+<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>  <a class="code hl_struct" href="structvrs_1_1_file_format_1_1_file_header.html">FileFormat::FileHeader</a>&amp; fileHeader_;</div>
+<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span>  <a class="code hl_class" href="classvrs_1_1_progress_logger.html">ProgressLogger</a>* progressLogger_;</div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>  set&lt;StreamId&gt;&amp; streamIds_;</div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>  vector&lt;RecordInfo&gt;&amp; index_;</div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>  unique_ptr&lt;deque&lt;IndexRecord::DiskRecordInfo&gt;&gt; diskIndex_; <span class="comment">// only when rewriting the index</span></div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>  <span class="keywordtype">bool</span> indexComplete_{};</div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>  <span class="keywordtype">bool</span> hasSplitHeadChunk_{};</div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>  int32_t sortErrorCount_{};</div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>  int32_t droppedRecordCount_{};</div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>};</div>
 </div>
-<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span> </div>
-<div class="foldopen" id="foldopen00249" data-start="{" data-end="};">
-<div class="line"><a id="l00249" name="l00249"></a><span class="lineno"><a class="line" href="structvrs_1_1_index_record_1_1_record_signature.html">  249</a></span><span class="keyword">struct </span>VRS_API <a class="code hl_struct" href="structvrs_1_1_index_record_1_1_record_signature.html">RecordSignature</a> {</div>
-<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>  <a class="code hl_class" href="classvrs_1_1_stream_id.html">StreamId</a> streamId;</div>
-<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>  <a class="code hl_enumeration" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> recordType;</div>
-<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span> </div>
-<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>  <span class="keywordtype">bool</span> operator&lt;(<span class="keyword">const</span> <a class="code hl_struct" href="structvrs_1_1_index_record_1_1_record_signature.html">RecordSignature</a>&amp; rhs)<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>    <span class="keywordflow">return</span> this-&gt;recordType &lt; rhs.recordType ||</div>
-<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>        (this-&gt;recordType == rhs.recordType &amp;&amp; this-&gt;streamId &lt; rhs.streamId);</div>
-<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>  }</div>
-<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>};</div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span> </div>
+<div class="foldopen" id="foldopen00273" data-start="{" data-end="};">
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno"><a class="line" href="structvrs_1_1_index_record_1_1_record_signature.html">  273</a></span><span class="keyword">struct </span>VRS_API <a class="code hl_struct" href="structvrs_1_1_index_record_1_1_record_signature.html">RecordSignature</a> {</div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>  <a class="code hl_class" href="classvrs_1_1_stream_id.html">StreamId</a> streamId;</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>  <a class="code hl_enumeration" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> recordType;</div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span> </div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>  <span class="keywordtype">bool</span> operator&lt;(<span class="keyword">const</span> <a class="code hl_struct" href="structvrs_1_1_index_record_1_1_record_signature.html">RecordSignature</a>&amp; rhs)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>    <span class="keywordflow">return</span> this-&gt;recordType &lt; rhs.recordType ||</div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>        (this-&gt;recordType == rhs.recordType &amp;&amp; this-&gt;streamId &lt; rhs.streamId);</div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>  }</div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>};</div>
 </div>
-<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span> </div>
-<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>} <span class="comment">// namespace IndexRecord</span></div>
-<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span> </div>
-<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>} <span class="comment">// namespace vrs</span></div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span> </div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>} <span class="comment">// namespace IndexRecord</span></div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span> </div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span>} <span class="comment">// namespace vrs</span></div>
 <div class="ttc" id="aclassvrs_1_1_compressor_html"><div class="ttname"><a href="classvrs_1_1_compressor.html">vrs::Compressor</a></div><div class="ttdoc">Helper class to compress data using lz4 or zstd presets.</div><div class="ttdef"><b>Definition</b> Compressor.h:83</div></div>
 <div class="ttc" id="aclassvrs_1_1_disk_file_t_html"><div class="ttname"><a href="classvrs_1_1_disk_file_t.html">vrs::DiskFileT</a></div><div class="ttdoc">FileHandler implementation for disk files, with chunked file support.</div><div class="ttdef"><b>Definition</b> DiskFile.h:34</div></div>
 <div class="ttc" id="aclassvrs_1_1_file_handler_html"><div class="ttname"><a href="classvrs_1_1_file_handler.html">vrs::FileHandler</a></div><div class="ttdoc">Class to abstract VRS file system operations, to enable support for alternate storage methods,...</div><div class="ttdef"><b>Definition</b> FileHandler.h:75</div></div>
@@ -368,7 +392,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="ttc" id="astructvrs_1_1_index_record_1_1_record_info_html_a74510568cacf67c9d7078fc61496dbf2"><div class="ttname"><a href="structvrs_1_1_index_record_1_1_record_info.html#a74510568cacf67c9d7078fc61496dbf2">vrs::IndexRecord::RecordInfo::timestamp</a></div><div class="ttdeci">double timestamp</div><div class="ttdoc">timestamp of the record</div><div class="ttdef"><b>Definition</b> IndexRecord.h:122</div></div>
 <div class="ttc" id="astructvrs_1_1_index_record_1_1_record_info_html_a7ed65599d1b99b934f8df461b4b898a6"><div class="ttname"><a href="structvrs_1_1_index_record_1_1_record_info.html#a7ed65599d1b99b934f8df461b4b898a6">vrs::IndexRecord::RecordInfo::streamId</a></div><div class="ttdeci">StreamId streamId</div><div class="ttdoc">creator of the record</div><div class="ttdef"><b>Definition</b> IndexRecord.h:124</div></div>
 <div class="ttc" id="astructvrs_1_1_index_record_1_1_record_info_html_aea64a0ec5a359bfa9c42ffa55adffdcc"><div class="ttname"><a href="structvrs_1_1_index_record_1_1_record_info.html#aea64a0ec5a359bfa9c42ffa55adffdcc">vrs::IndexRecord::RecordInfo::fileOffset</a></div><div class="ttdeci">int64_t fileOffset</div><div class="ttdoc">absolute byte offset of the record in the whole file</div><div class="ttdef"><b>Definition</b> IndexRecord.h:123</div></div>
-<div class="ttc" id="astructvrs_1_1_index_record_1_1_record_signature_html"><div class="ttname"><a href="structvrs_1_1_index_record_1_1_record_signature.html">vrs::IndexRecord::RecordSignature</a></div><div class="ttdoc">This is used to count records to different kinds.</div><div class="ttdef"><b>Definition</b> IndexRecord.h:249</div></div>
+<div class="ttc" id="astructvrs_1_1_index_record_1_1_record_signature_html"><div class="ttname"><a href="structvrs_1_1_index_record_1_1_record_signature.html">vrs::IndexRecord::RecordSignature</a></div><div class="ttdoc">This is used to count records to different kinds.</div><div class="ttdef"><b>Definition</b> IndexRecord.h:273</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
