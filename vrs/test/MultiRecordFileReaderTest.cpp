@@ -803,8 +803,8 @@ TEST_F(MultiRecordFileReaderTest, getFileChunks) {
   constexpr auto numDataRecords = 10;
   constexpr auto fileCount = 4;
   const auto filePaths = getOsTempPaths(fileCount);
-  for (size_t i = 0; i < filePaths.size(); i++) {
-    createVRSFileSynchronously(filePaths[i], numDataRecords);
+  for (const auto& filePath : filePaths) {
+    createVRSFileSynchronously(filePath, numDataRecords);
   }
   // Single file use case
   MultiRecordFileReader singleReader;
