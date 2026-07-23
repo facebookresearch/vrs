@@ -677,8 +677,8 @@ TEST_F(RecordFormatTest, testFormat) {
       "image/custom_codec/2048x3072/pixel=grey8/stride=2050/codec=my_codec/codec_quality=85",
       "data_layout+image/raw/102x200/pixel=depth32f",
       "custom/size=70+image/raw/20x30/pixel=bgr8/stride=24"};
-  for (size_t k = 0; k < array_size(formats); ++k) {
-    FORMAT_EQUAL(RecordFormat(formats[k]), formats[k]);
+  for (auto& format : formats) {
+    FORMAT_EQUAL(RecordFormat(format), format);
   }
 }
 
