@@ -17,6 +17,7 @@
 #include <cmath>
 
 #include <random>
+#include <ranges>
 
 #include <gtest/gtest.h>
 
@@ -345,8 +346,7 @@ TEST_F(GetRecordTester, GetRecordForwardBackwardTest) {
   uint32_t id2Counter = file.getRecordCount(id2);
   // validate backward iteration
   RecordFileReader::RecordTypeCounter reverseCounters;
-  for (auto riter = index.rbegin(); riter != index.rend(); ++riter) {
-    const IndexRecord::RecordInfo& record = *riter;
+  for (const auto& record : std::ranges::reverse_view(index)) {
     if (record.streamId == id2) {
       uint32_t streamTypeIndex =
           counters[record.recordType] - reverseCounters[record.recordType] - 1;
