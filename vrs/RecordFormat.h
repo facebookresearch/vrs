@@ -43,6 +43,8 @@ enum class ContentType : uint8_t {
 };
 
 VRS_API string toString(ContentType contentType);
+template <>
+VRS_API ContentType toEnum<ContentType>(const string& name);
 
 /// Image format type.
 /// For CUSTOM_CODEC and VIDEO, the actual data format is provided by codec name,
@@ -59,6 +61,8 @@ enum class ImageFormat : uint8_t {
 };
 
 VRS_API string toString(ImageFormat imageFormat);
+template <>
+VRS_API ImageFormat toEnum<ImageFormat>(const string& name);
 
 /// Pixel format type, then the image format is ImageFormat::RAW.
 enum class PixelFormat : uint8_t {
@@ -97,6 +101,8 @@ enum class PixelFormat : uint8_t {
 };
 
 VRS_API string toString(PixelFormat pixelFormat);
+template <>
+VRS_API PixelFormat toEnum<PixelFormat>(const string& name);
 
 /// Audio format type.
 enum class AudioFormat : uint8_t {
@@ -108,6 +114,8 @@ enum class AudioFormat : uint8_t {
 
 /// Convert an AudioFormat to a string
 VRS_API string toString(AudioFormat audioFormat);
+template <>
+VRS_API AudioFormat toEnum<AudioFormat>(const string& name);
 
 /// Audio sample format, when the audio type is AudioFormat::PCM.
 enum class AudioSampleFormat : uint8_t {
@@ -137,6 +145,8 @@ enum class AudioSampleFormat : uint8_t {
 
 /// Convert an AudioSampleFormat to a string
 VRS_API string toString(AudioSampleFormat audioSampleFormat);
+template <>
+VRS_API AudioSampleFormat toEnum<AudioSampleFormat>(const string& name);
 
 class ContentParser; // to workaround not being able to forward declare istringstream.
 class RecordFormat;
