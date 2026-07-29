@@ -183,6 +183,10 @@ class PixelFrame {
   /// Decode compressed image data, except for video codec compression.
   bool readCompressedFrame(const vector<uint8_t>& pixels, ImageFormat imageFormat);
 
+  /// Read a CUSTOM_CODEC frame and decode it via a DecoderFactory-registered decoder. Returns
+  /// false if no decoder is registered for the codec name (frame left undecoded).
+  bool readCustomCodecFrame(RecordReader* reader, const ContentBlock& cb);
+
   /// Read a JPEG encoded frame into the internal buffer.
   /// @return True if the frame type is supported & the frame was read.
   bool readJpegFrame(RecordReader* reader, uint32_t sizeBytes);
@@ -336,7 +340,8 @@ class PixelFrame {
   /// Tell if an image format supports a specific pixel format.
   /// Only meaningful for png, jpg, jxl.
   /// Always true for ImageFormat::VIDEO (needs decoders to be sure).
-  /// Always false for ImageFormat::CUSTOM_CODEC (never available).
+  /// Always false for ImageFormat::CUSTOM_CODEC (decodability comes from a registered decoder,
+  /// not this table).
   static bool areCompatible(ImageFormat imageFormat, PixelFormat pixelFormat);
 
   /// Conversion in place from RGBA to RGB (no memory allocation)
@@ -414,7 +419,12 @@ class PixelFrame {
       PixelFormat targetPixelFormat,
       const NormalizeOptions& options) const;
 
- private:
+  /// Decode an in-memory CUSTOM_CODEC payload to RAW pixels via a DecoderFactory-registered
+  /// decoder. codecSpec carries the codec name and decoded format/dimensions.
+  bool decodeCustomCodecFrame(
+      const vector<uint8_t>& compressedData,
+      const ImageContentBlockSpec& codecSpec);
+
   ImageContentBlockSpec imageSpec_;
   vector<uint8_t> frameBytes_;
 };

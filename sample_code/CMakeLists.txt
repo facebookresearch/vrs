@@ -21,4 +21,5 @@ target_link_libraries(sample_code_app
     vrslib
     vrs_logging
     vrs_os
+    vrs_utils
 )

@@ -32,6 +32,7 @@
 #include <vrs/helpers/FileMacros.h>
 #include <vrs/helpers/Throttler.h>
 #include <vrs/utils/BufferRecordReader.hpp>
+#include <vrs/utils/DecoderFactory.h>
 #include <vrs/utils/converters/Grey10PackedConverters.h>
 #include <vrs/utils/converters/Raw10ToGrey10Converter.h>
 #include <utility>
@@ -170,6 +171,8 @@ bool PixelFrame::readFrame(RecordReader* reader, const ContentBlock& cb) {
       return readJpegFrame(reader, cb.getBlockSize());
     case ImageFormat::JXL:
       return readJxlFrame(reader, cb.getBlockSize());
+    case ImageFormat::CUSTOM_CODEC:
+      return readCustomCodecFrame(reader, cb);
     default:
       return false;
   }
@@ -213,10 +216,89 @@ bool PixelFrame::decompressImage(VideoFrameHandler* videoFrameHandler) {
       vector<uint8_t> compressedData(std::move(frameBytes_));
       return readJxlFrame(compressedData);
     }
+    case ImageFormat::CUSTOM_CODEC: {
+      // No ContentBlock here, so imageSpec_ is the only source of the codec name. It is
+      // authoritative only when the frame came from readDiskImageData, which preserves the spec
+      // verbatim.
+      if (!XR_VERIFY(imageSpec_.getImageFormat() == ImageFormat::CUSTOM_CODEC) ||
+          !XR_VERIFY(!imageSpec_.getCodecName().empty())) {
+        return false;
+      }
+      vector<uint8_t> compressedData(std::move(frameBytes_));
+      return decodeCustomCodecFrame(compressedData, imageSpec_);
+    }
     default:
       return false;
   }
   return false;
+}
+
+bool PixelFrame::readCustomCodecFrame(RecordReader* reader, const ContentBlock& cb) {
+  // The codec spec, which carries the codec name, comes from the content block; imageSpec_ is not
+  // authoritative here.
+  const ImageContentBlockSpec& codecSpec = cb.image();
+  if (!XR_VERIFY(codecSpec.getImageFormat() == ImageFormat::CUSTOM_CODEC) ||
+      !XR_VERIFY(!codecSpec.getCodecName().empty())) {
+    return false;
+  }
+  size_t sizeBytes = cb.getBlockSize();
+  if (sizeBytes == 0 || sizeBytes == ContentBlock::kSizeUnknown) {
+    return false;
+  }
+  // Bound against the record before allocating, like readRawFrame, so a bad size can't throw
+  // bad_alloc out of this bool API.
+  if (sizeBytes > reader->getUnreadBytes()) {
+    THROTTLED_LOGE(
+        reader->getRef(),
+        "Custom codec image {} needs {} bytes, only {} available. Recording bug?",
+        codecSpec.asString(),
+        sizeBytes,
+        reader->getUnreadBytes());
+    return false;
+  }
+  vector<uint8_t> compressedData(sizeBytes);
+  if (!VERIFY_SUCCESS(reader->read(compressedData.data(), sizeBytes))) {
+    return false;
+  }
+  return decodeCustomCodecFrame(compressedData, codecSpec);
+}
+
+bool PixelFrame::decodeCustomCodecFrame(
+    const vector<uint8_t>& compressedData,
+    const ImageContentBlockSpec& codecSpec) {
+  if (codecSpec.getImageFormat() != ImageFormat::CUSTOM_CODEC || codecSpec.getCodecName().empty()) {
+    return false;
+  }
+  PixelFormat pixelFormat = codecSpec.getPixelFormat();
+  uint32_t width = codecSpec.getWidth();
+  uint32_t height = codecSpec.getHeight();
+  if (pixelFormat == PixelFormat::UNDEFINED || width == 0 || height == 0) {
+    return false;
+  }
+  // Decode into a local buffer and commit only on success, as png/jpg/jxl do, so a failed decode
+  // can't leave a reused frame presenting the prior image as fresh.
+  ImageContentBlockSpec rawSpec(pixelFormat, width, height);
+  size_t rawSize = rawSpec.getRawImageSize();
+  if (rawSize == ContentBlock::kSizeUnknown || rawSize == 0) {
+    return false;
+  }
+  vector<uint8_t> decoded(rawSize);
+  // Hand the decoder a spec with default strides so getRawImageSize() matches decoded.size();
+  // codecSpec may carry an explicit stride a stride-honoring decoder would overrun.
+  ImageContentBlockSpec decodeSpec(
+      ImageFormat::CUSTOM_CODEC,
+      codecSpec.getCodecName(),
+      ImageContentBlockSpec::kQualityUndefined,
+      pixelFormat,
+      width,
+      height);
+  unique_ptr<DecoderI> decoder =
+      DecoderFactory::get().makeDecoder(compressedData, decoded.data(), decodeSpec);
+  if (!decoder || decoder->decode(compressedData, decoded.data(), decodeSpec) != 0) {
+    return false;
+  }
+  init(rawSpec, std::move(decoded));
+  return true;
 }
 
 bool PixelFrame::readRawFrame(

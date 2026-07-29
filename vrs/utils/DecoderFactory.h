@@ -48,17 +48,22 @@ class DecoderI {
   DecoderI& operator=(const DecoderI&) = delete;
   DecoderI(DecoderI&&) = delete;
   DecoderI& operator=(DecoderI&&) = delete;
-  /// Decode compressed image to a frame
+  /// Decode compressed image to a frame. outDecodedFrame is sized to
+  /// outputImageSpec.getRawImageSize(); never write past it. Returns 0 on success, else a
+  /// domainError(DecodeStatus::X) so errorCodeToMessage() can render it.
   virtual int decode(
       const vector<uint8_t>& encodedFrame,
       void* outDecodedFrame,
       const ImageContentBlockSpec& outputImageSpec) = 0;
   /// Flush the decoder's internal state (e.g., decoded picture buffer).
   /// Call this when seeking backward to avoid duplicate POC errors.
-  /// Default implementation does nothing.
+  /// Default implementation does nothing: custom image codecs are stateless and never need it,
+  /// unlike video decoders that carry inter-frame state across seeks.
   virtual void flush() {}
 };
 
+/// Selects a DecoderI for a stream; it must only select, never decode, else the frame decodes
+/// twice.
 using DecoderMaker = std::function<std::unique_ptr<DecoderI>(
     const vector<uint8_t>& encodedFrame,
     void* outDecodedFrame,
@@ -69,6 +74,8 @@ class DecoderFactory {
  public:
   static DecoderFactory& get();
 
+  /// Not thread-safe: register all makers at startup before any file is read. makeDecoder()
+  /// iterates the maker list without a lock.
   void registerDecoderMaker(const DecoderMaker& decoderMaker);
 
   void registerDecoderMaker(
