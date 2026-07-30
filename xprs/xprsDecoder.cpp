@@ -19,11 +19,11 @@
 // See xprsDecoder.h for details.
 
 #include "xprsDecoder.h"
-#ifdef WITH_NVCODEC
-#include "cudaContextProvider.h"
-#endif
-#ifdef WITH_NVCODEC
+
 #include "Codecs.h"
+#include "NvCodecConfig.h"
+#ifdef XPRS_HAS_NVDEC
+#include "cudaContextProvider.h"
 #endif
 #include "xprsUtils.h"
 
@@ -47,7 +47,7 @@ CVideoDecoder::~CVideoDecoder() = default;
 XprsResult CVideoDecoder::init(bool disableHwAcceleration) {
   XprsResult result = XprsResult::OK;
   try {
-#ifdef WITH_NVCODEC
+#ifdef XPRS_HAS_NVDEC
     if (implementationName == kNvH264DecoderName || implementationName == kNvH265DecoderName ||
         implementationName == kNvAv1DecoderName) {
       const NvCodecContext nvcodec_context = NvCodecContextProvider::getNvCodecContext();
