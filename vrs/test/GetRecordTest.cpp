@@ -345,6 +345,7 @@ TEST_F(GetRecordTester, GetRecordForwardBackwardTest) {
   uint32_t id2Counter = file.getRecordCount(id2);
   // validate backward iteration
   RecordFileReader::RecordTypeCounter reverseCounters;
+  // do not try to use std::ranges::reverse_view() because it's not available in OSS
   for (auto riter = index.rbegin(); riter != index.rend(); ++riter) {
     const IndexRecord::RecordInfo& record = *riter;
     if (record.streamId == id2) {

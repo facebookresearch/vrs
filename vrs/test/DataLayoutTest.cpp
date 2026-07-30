@@ -332,8 +332,8 @@ TEST_F(DataLayoutTester, testDataLayoutMatcher) {
   Point2Di calibration3c[2];
   EXPECT_FALSE(newConfig.calibration3_.get(calibration3c, 2));
   vector<Point2Di> calibration3d;
-  for (size_t k = 0; k < 2; k++) {
-    calibration3d.push_back(calibration3c[k]);
+  for (auto point : calibration3c) {
+    calibration3d.push_back(point);
   }
   EXPECT_EQ(calibration3, calibration3d);
 }
