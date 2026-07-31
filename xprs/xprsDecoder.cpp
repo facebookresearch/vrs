@@ -279,7 +279,11 @@ XprsResult CVideoDecoder::decodeFrame(Frame& frameOut, const Buffer& compressed)
       convertAVFrame(_pix.avFrame(), frameOut);
     }
   } catch (std::exception& e) {
-    XR_LOGE("{}", convertExceptionToError(e, result));
+    // WARNING, not ERROR: a decode exception here is recoverable — the error is
+    // returned via `result` and the caller (xprsDecoderMaker) falls back to the
+    // next decoder. The most common case is NVDEC rejecting an unsupported
+    // stream (e.g. monochrome H.265) during HW->SW probing.
+    XR_LOGW("{}", convertExceptionToError(e, result));
   }
 
   return result;
