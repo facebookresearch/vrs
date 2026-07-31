@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
+// DEFAULT_LOG_CHANNEL must be defined before <logging/Log.h>: the OSS build's
+// XR_LOGE/XR_LOGW/XR_LOGI macros are gated on it (the internal logging header
+// defines them unconditionally, which is why this ordering bug is invisible to
+// the Buck build but breaks the OSS CMake build).
+#define DEFAULT_LOG_CHANNEL "XPRS"
+
 #include "nvDecoder.h"
 #include "Codecs.h"
 #include "FFmpegUtils.h"
@@ -22,10 +28,9 @@
 
 #include <logging/Log.h>
 #include <cmath>
+#include <memory>
 #include <stdexcept>
 #include <string>
-
-#define DEFAULT_LOG_CHANNEL "XPRS"
 
 namespace xprs {
 
@@ -167,6 +172,44 @@ int NvDecoder::HandleVideoSequence(CUVIDEOFORMAT* vdeo_format) {
   _decoded_image_yuv.resize(size_ofdecoded_image_yuv_format_in_bytes);
 
   CUDAContextScope cuda_context_scope(_nvcodec_context);
+
+  // Capability pre-check (NVIDIA-recommended): NVDEC hardware does not support
+  // every codec/chroma/bit-depth/resolution combination. Most notably it cannot
+  // decode monochrome (4:0:0) H.265 — used by Aria's grayscale SLAM and eye
+  // cameras — and returns CUDA_ERROR_NOT_SUPPORTED from cuvidCreateDecoder.
+  // Querying cuvidGetDecoderCaps first lets such streams fall back to SW decode
+  // with a single clear log line, instead of emitting alarming CUDA error logs
+  // for an entirely expected condition. cuvidGetDecoderCaps is loaded optionally
+  // by nv-codec-headers, so guard against a null function pointer.
+  if (_nvcodec_context._cuvid_functions->cuvidGetDecoderCaps != nullptr) {
+    CUVIDDECODECAPS decode_caps = {};
+    decode_caps.eCodecType = video_decode_create_info.CodecType;
+    decode_caps.eChromaFormat = video_decode_create_info.ChromaFormat;
+    decode_caps.nBitDepthMinus8 = video_decode_create_info.bitDepthMinus8;
+    // Only a *successful* caps query that reports the format unsupported (or out
+    // of the supported size range) forces SW fallback. If the query itself fails
+    // (transient driver/context issue), fall through to cuvidCreateDecoder and
+    // let it surface the real error rather than permanently disabling NVDEC.
+    if (_nvcodec_context._cuvid_functions->cuvidGetDecoderCaps(&decode_caps) == CUDA_SUCCESS) {
+      const unsigned long width = video_decode_create_info.ulWidth;
+      const unsigned long height = video_decode_create_info.ulHeight;
+      const bool unsupported = !decode_caps.bIsSupported ||
+          width < static_cast<unsigned long>(decode_caps.nMinWidth) ||
+          height < static_cast<unsigned long>(decode_caps.nMinHeight) ||
+          width > static_cast<unsigned long>(decode_caps.nMaxWidth) ||
+          height > static_cast<unsigned long>(decode_caps.nMaxHeight);
+      if (unsupported) {
+        XR_LOGW(
+            "NVDEC does not support this stream (chroma_format={}, bit_depth={}, {}x{}); falling back to SW decode",
+            static_cast<int>(video_decode_create_info.ChromaFormat),
+            static_cast<int>(video_decode_create_info.bitDepthMinus8) + 8,
+            width,
+            height);
+        throw std::runtime_error("NVDEC unsupported stream format; using SW decode");
+      }
+    }
+  }
+
   CUDA_API_CALL(
       _nvcodec_context._cuvid_functions->cuvidCreateDecoder(&_decoder, &video_decode_create_info),
       _nvcodec_context._cuda_functions,

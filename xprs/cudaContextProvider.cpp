@@ -14,10 +14,15 @@
  * limitations under the License.
  */
 
+// DEFAULT_LOG_CHANNEL must be defined before "logging/Log.h": the OSS build's
+// XR_LOGE/XR_LOGW macros are gated on it (the internal logging header defines
+// them unconditionally, which is why this ordering bug is invisible to the Buck
+// build but breaks the OSS CMake build).
+#define DEFAULT_LOG_CHANNEL "XPRS"
+
 #include "cudaContextProvider.h"
 
 #include "logging/Log.h"
-#define DEFAULT_LOG_CHANNEL "XPRS"
 
 namespace xprs {
 
@@ -49,23 +54,27 @@ NvCodecContext NvCodecContextProvider::getNvCodecContext(const int device_num) {
     return nv_codec_context;
   }
 
+  // Note: all failures in this function below log at WARN, not ERROR. The only caller
+  // (xprsDecApi.cpp::enumDecoders) catches the throw and falls back to SW
+  // decoders. On a non-GPU machine this fires every VRS file open, so logging
+  // ERROR-level would spam users who never asked for GPU decoding.
   int ret = cuda_load_functions(&nv_codec_context._cuda_functions, nullptr);
   if (ret < 0) {
     const std::string message = "Loading CUDA functions failed";
-    XR_LOGE("{}", message.c_str());
+    XR_LOGW("{}", message.c_str());
     throw std::runtime_error(message);
   }
   ret = cuvid_load_functions(&nv_codec_context._cuvid_functions, nullptr);
   if (ret < 0) {
     const std::string message = "Loading nvcuvid functions failed";
-    XR_LOGE("{}", message.c_str());
+    XR_LOGW("{}", message.c_str());
     throw std::runtime_error(message);
   }
 
   CUresult cu_result = nv_codec_context._cuda_functions->cuInit(0);
   if (cu_result != CUDA_SUCCESS) {
     const std::string message = "cuInit failed with error code: " + std::to_string(cu_result);
-    XR_LOGE("{}", message.c_str());
+    XR_LOGW("{}", message.c_str());
     throw std::runtime_error(message);
   }
 
@@ -73,7 +82,7 @@ NvCodecContext NvCodecContextProvider::getNvCodecContext(const int device_num) {
   cu_result = nv_codec_context._cuda_functions->cuDeviceGet(&cuda_device, device_num);
   if (cu_result != CUDA_SUCCESS) {
     const std::string message = "cuDeviceGet failed with error code: " + std::to_string(cu_result);
-    XR_LOGE("{}", message.c_str());
+    XR_LOGW("{}", message.c_str());
     throw std::runtime_error(message);
   }
 
@@ -82,7 +91,7 @@ NvCodecContext NvCodecContextProvider::getNvCodecContext(const int device_num) {
   if (cu_result != CUDA_SUCCESS) {
     const std::string message =
         "cuDeviceGetName failed with error code: " + std::to_string(cu_result);
-    XR_LOGE("{}", message.c_str());
+    XR_LOGW("{}", message.c_str());
     throw std::runtime_error(message);
   }
 
@@ -90,7 +99,7 @@ NvCodecContext NvCodecContextProvider::getNvCodecContext(const int device_num) {
       &nv_codec_context._cucontext, CU_CTX_SCHED_BLOCKING_SYNC, cuda_device);
   if (cu_result != CUDA_SUCCESS) {
     const std::string message = "cuCtxCreate failed with error code: " + std::to_string(cu_result);
-    XR_LOGE("{}", message.c_str());
+    XR_LOGW("{}", message.c_str());
     throw std::runtime_error(message);
   }
 
@@ -99,7 +108,7 @@ NvCodecContext NvCodecContextProvider::getNvCodecContext(const int device_num) {
   if (cu_result != CUDA_SUCCESS) {
     const std::string message =
         "cuCtxPopCurrent failed with error code: " + std::to_string(cu_result);
-    XR_LOGE("{}", message.c_str());
+    XR_LOGW("{}", message.c_str());
     throw std::runtime_error(message);
   }
 

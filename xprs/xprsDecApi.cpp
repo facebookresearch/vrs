@@ -19,6 +19,7 @@
 #include "xprsUtils.h"
 
 #include <algorithm>
+#include <cstdlib>
 #include <string_view>
 
 #ifdef WITH_DAV1D
@@ -85,6 +86,15 @@ bool findDecoderByName(const std::string_view& name, VideoCodec& codec) {
   return false;
 }
 
+// Set XPRS_DISABLE_HW_DECODE to any value to force CPU-only decoding. Useful
+// for deterministic results, working around GPU memory pressure, or comparing
+// HW-vs-SW output. Read once at first call so the value is fixed for the
+// process lifetime — runtime mutation of the env var has no effect.
+bool isHwDecodeDisabled() {
+  static const bool disabled = std::getenv("XPRS_DISABLE_HW_DECODE") != nullptr;
+  return disabled;
+}
+
 } // namespace
 
 ///
@@ -95,10 +105,16 @@ XprsResult enumDecoders(CodecList& codecs, bool hwCapabilityCheck) {
 
   codecs.clear();
   codecs.reserve(std::size(kPreferredDecoderImplementations));
+  const bool hwDisabled = isHwDecodeDisabled();
   try {
     for (const auto& impl : kPreferredDecoderImplementations) {
       VideoCodec codec;
       if (findDecoderByName(impl, codec)) {
+        if (codec.hwAccel && hwDisabled) {
+          XR_LOGI(
+              "Skipping HW decoder {} (XPRS_DISABLE_HW_DECODE is set)", codec.implementationName);
+          continue;
+        }
         if (codec.hwAccel && hwCapabilityCheck) {
 #ifdef WITH_NVCODEC
           const NvCodecContext nvcodecContext = NvCodecContextProvider::getNvCodecContext();
@@ -115,7 +131,10 @@ XprsResult enumDecoders(CodecList& codecs, bool hwCapabilityCheck) {
       }
     }
   } catch (std::exception& e) {
-    XR_LOGE("{}", convertExceptionToError(e, result));
+    // Downgraded from XR_LOGE: on non-GPU machines this fires every time a VRS
+    // file is opened (CUDA init throws). Callers fall back to SW decoders that
+    // were already collected before the throw, so this is expected, not an error.
+    XR_LOGW("HW decoder enumeration skipped: {}", convertExceptionToError(e, result));
   }
 
   // stable_sort so decoders with equal hwAccel keep their
@@ -137,11 +156,17 @@ enumDecodersByFormat(CodecList& codecs, VideoCodecFormat standard, bool hwCapabi
 
   codecs.clear();
   codecs.reserve(std::size(kPreferredDecoderImplementations));
+  const bool hwDisabled = isHwDecodeDisabled();
   try {
     for (const auto& impl : kPreferredDecoderImplementations) {
       VideoCodec codec;
       if (findDecoderByName(impl, codec)) {
         if (codec.format == standard) {
+          if (codec.hwAccel && hwDisabled) {
+            XR_LOGI(
+                "Skipping HW decoder {} (XPRS_DISABLE_HW_DECODE is set)", codec.implementationName);
+            continue;
+          }
           if (codec.hwAccel && hwCapabilityCheck) {
 #ifdef WITH_NVCODEC
             const NvCodecContext nvcodecContext = NvCodecContextProvider::getNvCodecContext();
@@ -159,7 +184,7 @@ enumDecodersByFormat(CodecList& codecs, VideoCodecFormat standard, bool hwCapabi
       }
     }
   } catch (std::exception& e) {
-    XR_LOGE("{}", convertExceptionToError(e, result));
+    XR_LOGW("HW decoder enumeration skipped: {}", convertExceptionToError(e, result));
   }
 
   // stable_sort so decoders with equal hwAccel keep their
