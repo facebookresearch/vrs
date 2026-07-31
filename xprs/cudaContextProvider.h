@@ -44,4 +44,21 @@ class NvCodecContextProvider {
   static NvCodecContext getNvCodecContext(int device_num = 0);
 };
 
+namespace detail {
+// Test-only hooks for the concurrency stress test (xprs_gtest_concurrency.cpp).
+// Not for production use.
+
+// Number of times getNvCodecContext() has run its heavy init body (past the
+// under-lock double-check). A correct atomic+mutex gate keeps this at exactly 1
+// per init generation no matter how many threads race; a regression to racy
+// double-checked-locking lets more than one thread through, which is otherwise
+// invisible because every thread still returns the same cached answer.
+int nvCodecInitCallCountForTesting();
+
+// Reset the init state machine to Uninit, freeing any cached handles, so the
+// next getNvCodecContext() re-runs init. NOT safe against live decoders holding
+// a CUcontext — test-only, for re-exercising the first-init race across rounds.
+void resetNvCodecContextForTesting();
+} // namespace detail
+
 } // namespace xprs
