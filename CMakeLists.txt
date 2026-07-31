@@ -71,6 +71,7 @@ add_subdirectory(vrs)
 OPTION(BUILD_TOOLS "Build all of the tools" ON)
 OPTION(BUILD_SAMPLES "Build sample code and sample apps" ON)
 OPTION(BUILD_WITH_XPRS "Build with XPRS decoding library" OFF)
+OPTION(ENABLE_NVCODEC "Enable NVIDIA CUVID/NVDEC GPU-accelerated H.265 decoding in XPRS" OFF)
 
 # Check the operating system for BUILD_WITH_XPRS
 if (BUILD_WITH_XPRS)
@@ -79,7 +80,25 @@ if (BUILD_WITH_XPRS)
   endif()
 endif()
 
-# Add xprs folder if BUILD_WITH_XPRS is set
+# ENABLE_NVCODEC is meaningless without XPRS — fail fast rather than silently
+# building a CPU-only library when the user asked for GPU acceleration.
+# Also gate on Linux: NVDEC is currently shipped only for Linux x86_64; the
+# nv-codec-headers pkg-config dep doesn't exist on macOS.
+if (ENABLE_NVCODEC)
+  if (NOT BUILD_WITH_XPRS)
+    message(FATAL_ERROR "ENABLE_NVCODEC=ON requires BUILD_WITH_XPRS=ON.")
+  endif()
+  if (NOT TARGET_LINUX)
+    message(FATAL_ERROR "ENABLE_NVCODEC=ON is currently supported only on Linux x86_64.")
+  endif()
+  if (NOT CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+    message(FATAL_ERROR "ENABLE_NVCODEC=ON requires x86_64 architecture (nv-codec-headers is x86_64-only).")
+  endif()
+endif()
+
+# Add xprs folder if BUILD_WITH_XPRS is set. The ENABLE_NVCODEC cache
+# variable set above propagates automatically to xprs/CMakeLists.txt's
+# `option(ENABLE_NVCODEC ...)` declaration.
 if (BUILD_WITH_XPRS)
   add_subdirectory(${VRS_SOURCE_DIR}/xprs)
 endif()
