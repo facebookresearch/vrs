@@ -13,16 +13,17 @@
 # limitations under the License.
 
 
-# Base sources (always built). Explicit list rather than file(GLOB) so the
-# NVDEC/CUDA sources (nvDecoder.cpp, cudaContextProvider.cpp) are not compiled
-# unconditionally: they need nv-codec-headers (ffnvcodec) at build time and an
-# NVIDIA driver at runtime, so the default OSS build (ENABLE_NVCODEC=OFF) must
-# leave them out. Only the files synced to OSS by vrs.cconf are listed.
+# Base sources (always built). Explicit list rather than file(GLOB) so that
+# nvDecoder.cpp / cudaContextProvider.cpp are NOT compiled unconditionally —
+# they need CUDA / nv-codec-headers and would fail to compile on machines
+# without them. Pybind11.cpp is intentionally excluded: it lives in a separate
+# Buck target (xprs_python_bindings) and is not part of the OSS CMake library.
 #
-# DECODER-ONLY: the OSS distribution ships only the decode path. The encoder
-# sources (nvEncoder.cpp, FFmpegEncode, etc.) depend on internal-only headers
-# that are not synced to OSS; xprsEncZero.cpp is the no-op encoder stub that
-# lets the library link without them.
+# DECODER-ONLY: the OSS distribution ships only the decode path (matching the
+# files synced by vrs.cconf's xprsFileList). The real encoder (FFmpegEncode,
+# SvtAv1Encoder, mux, xprsEncoder, xprsEncApi, xprsMux) depends on internal-only
+# headers (e.g. hevc_sps_dpb_patch.h) and SVT-AV1, neither of which ship to OSS;
+# xprsEncZero.cpp provides the no-op encoder stub so the library still links.
 set(XPRS_SRCS
   FFmpegDecode.cpp
   FFmpegUtils.cpp
@@ -40,12 +41,13 @@ set(XPRS_HEADERS
   FFmpegUtils.h
   Final.h
   InternalDecoder.h
+  NvCodecConfig.h
   xprs.h
   xprsDecoder.h
   xprsUtils.h
 )
 
-# NVDEC/CUDA decode sources (only when ENABLE_NVCODEC=ON).
+# NVCODEC decode sources (only when ENABLE_NVCODEC=ON).
 set(XPRS_NVCODEC_SRCS
   nvDecoder.cpp
   cudaContextProvider.cpp
@@ -66,7 +68,18 @@ add_library(xprs ${XPRS_SRCS} ${XPRS_HEADERS})
 set(XPRS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
 if (ENABLE_NVCODEC)
+  # WITH_NVCODEC is the upstream flag read by NvCodecConfig.h, which then
+  # defines XPRS_HAS_NVDEC / XPRS_HAS_NVENC for source files to use.
+  # Note: this used to be `target_compile_options(... PRIVATE WITH_NVCODEC)`
+  # which silently did nothing (compile_options expects raw flags like
+  # -Wall, not preprocessor names) — the OSS CUDA build path has never
+  # actually been compiled with WITH_NVCODEC defined until this fix.
   target_compile_definitions(xprs PRIVATE WITH_NVCODEC=1)
+
+  # nv-codec-headers ships the runtime dlopen shims for libcuda/libnvcuvid.
+  # Found via pkg-config; required at OS level (apt install nv-codec-headers
+  # or build from https://github.com/FFmpeg/nv-codec-headers). No CUDA
+  # toolchain is required at build time — symbols are loaded at runtime.
   find_package(PkgConfig REQUIRED)
   pkg_check_modules(FFNVCODEC REQUIRED IMPORTED_TARGET ffnvcodec)
   target_link_libraries(xprs PRIVATE PkgConfig::FFNVCODEC)
