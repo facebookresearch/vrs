@@ -75,3 +75,50 @@ jobs:
           cd build
           ninja all
           ctest -j8
+
+  build-nvcodec:
+    name: Build VRS NVCODEC (Linux, build-only)
+    runs-on: ubuntu-latest
+    # GitHub-hosted runners have no NVIDIA GPU, so this only compiles the
+    # ENABLE_NVCODEC path -- which needs nv-codec-headers but neither a GPU nor a
+    # CUDA toolkit -- to catch OSS build breakage. GPU decode is validated
+    # manually on a GPU machine (see projectaria_tools shipping docs).
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -o Acquire::Retries=5 \
+            cmake git ninja-build libgtest-dev libfmt-dev \
+            libjpeg-dev libturbojpeg-dev libpng-dev \
+            liblz4-dev libzstd-dev libxxhash-dev \
+            libboost-dev \
+            libopus-dev \
+            qtbase5-dev portaudio19-dev \
+            libeigen3-dev
+
+      - name: Install nv-codec-headers
+        run: |
+          git clone --depth 1 --branch n12.1.14.0 \
+            https://github.com/FFmpeg/nv-codec-headers.git /tmp/nv-codec-headers
+          sudo make -C /tmp/nv-codec-headers install PREFIX=/usr
+          pkg-config --modversion ffnvcodec
+
+      - name: Build FFMPEG
+        shell: bash
+        run: |
+          ./build_third_party_libs/build_ffmpeg_linuxunix.sh
+
+      - name: Configure (XPRS + NVCODEC)
+        shell: bash
+        run: |
+          mkdir build
+          cmake -S . -B build -G Ninja \
+            -DBUILD_WITH_XPRS:BOOL=ON -DENABLE_NVCODEC:BOOL=ON
+
+      - name: Build C++
+        shell: bash
+        run: |
+          cd build
+          ninja all
