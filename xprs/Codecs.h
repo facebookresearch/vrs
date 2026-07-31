@@ -18,9 +18,11 @@
 
 #include <string_view>
 
-#ifdef WITH_NVCODEC
-#include "nvEncoder.h"
-#endif
+// Note: nvEncoder.h is intentionally NOT included here. Earlier versions of
+// this header pulled it in under WITH_NVCODEC, but the only consumers
+// (xprsEncApi.cpp, xprsEncoder.cpp, test/xprs_gtest_common.h) include
+// nvEncoder.h directly. Removing it here lets Codecs.h stay free of the
+// XPRS_HAS_NVENC guard.
 
 namespace xprs {
 

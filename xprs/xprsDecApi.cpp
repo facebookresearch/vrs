@@ -15,6 +15,7 @@
  */
 
 #include "Codecs.h"
+#include "NvCodecConfig.h"
 #include "xprsDecoder.h"
 #include "xprsUtils.h"
 
@@ -34,7 +35,7 @@ namespace xprs {
 static const std::string_view kPreferredDecoderImplementations[] = {
     kH265DecoderName,
     kH264DecoderName,
-#ifdef WITH_NVCODEC
+#ifdef XPRS_HAS_NVDEC
     kNvH264DecoderName,
     kNvH265DecoderName,
     kNvAv1DecoderName,
@@ -68,7 +69,7 @@ bool findDecoderByName(const std::string_view& name, VideoCodec& codec) {
   }
 
   // Add custom decoders
-#ifdef WITH_NVCODEC
+#ifdef XPRS_HAS_NVDEC
   if (name == kNvH265DecoderName) {
     codec = VideoCodec{VideoCodecFormat::H265, name.data(), true};
     return true;
@@ -116,7 +117,7 @@ XprsResult enumDecoders(CodecList& codecs, bool hwCapabilityCheck) {
           continue;
         }
         if (codec.hwAccel && hwCapabilityCheck) {
-#ifdef WITH_NVCODEC
+#ifdef XPRS_HAS_NVDEC
           const NvCodecContext nvcodecContext = NvCodecContextProvider::getNvCodecContext();
           if (deviceHasNoHwDecoder(codec.implementationName, nvcodecContext._device_name)) {
             XR_LOGI(
@@ -168,7 +169,7 @@ enumDecodersByFormat(CodecList& codecs, VideoCodecFormat standard, bool hwCapabi
             continue;
           }
           if (codec.hwAccel && hwCapabilityCheck) {
-#ifdef WITH_NVCODEC
+#ifdef XPRS_HAS_NVDEC
             const NvCodecContext nvcodecContext = NvCodecContextProvider::getNvCodecContext();
             if (deviceHasNoHwDecoder(codec.implementationName, nvcodecContext._device_name)) {
               XR_LOGI(
