@@ -22,7 +22,8 @@
 #include <memory>
 
 #include "FFmpegDecode.h"
-#ifdef WITH_NVCODEC
+#include "NvCodecConfig.h"
+#ifdef XPRS_HAS_NVDEC
 #include "nvDecoder.h"
 #endif
 #include "xprs.h"
