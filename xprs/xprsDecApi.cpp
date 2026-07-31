@@ -207,4 +207,23 @@ IVideoDecoder* createDecoder(const VideoCodec& codec) {
   return result;
 }
 
+bool hasCudaSupport() noexcept {
+#ifdef XPRS_HAS_NVDEC
+  // Compile-time NVDEC is wired in. Runtime check: try to bring up the
+  // CUDA context once. If the driver is missing, the kernel module isn't
+  // loaded, or no NVIDIA device is visible, getNvCodecContext() throws and
+  // we report no support. NvCodecContextProvider caches the result via
+  // its tri-state atomic (see cudaContextProvider.cpp), so subsequent
+  // calls are a single atomic load.
+  try {
+    NvCodecContextProvider::getNvCodecContext();
+    return true;
+  } catch (...) {
+    return false;
+  }
+#else
+  return false;
+#endif
+}
+
 } // namespace xprs

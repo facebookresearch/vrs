@@ -410,6 +410,22 @@ XprsResult enumEncoders(CodecList& codecs, bool hwCapabilityCheck = true);
 XprsResult enumDecoders(CodecList& codecs, bool hwCapabilityCheck = true);
 
 /**
+ * Returns true if NVDEC GPU-accelerated decoding is available in this process.
+ *
+ * This is a runtime check: it requires both that the library was compiled with
+ * NVDEC support (XPRS_HAS_NVDEC) AND that the CUDA driver / libnvcuvid can
+ * be loaded on the current machine. False is returned on builds without
+ * XPRS_HAS_NVDEC, on machines without an NVIDIA driver, and on machines where
+ * CUDA init fails for any reason. The result is cached after the first call.
+ *
+ * Note: the XPRS_DISABLE_HW_DECODE env var is a separate concern — it
+ * suppresses HW codec selection in enumDecoders() but does not affect this
+ * function's return value. This function reports hardware capability, not
+ * effective decode policy.
+ */
+bool hasCudaSupport() noexcept;
+
+/**
  * Enumerate all available encoders for a give codec. In the beginning before we have HW support,
  * this would return just 1 codec.
  * @param codecs Returns the list of available encoders specified by \p standard.
