@@ -84,6 +84,22 @@ _These instructions are validated using Ubuntu 20.04, whereas Ubuntu 18.04 doesn
   sudo apt-get install npm doxygen
   ```
 
+### Optional: GPU-accelerated H.265 decoding (Linux x86_64, NVIDIA)
+
+XPRS can decode H.265 on NVIDIA GPUs via NVDEC. This requires the header-only
+[nv-codec-headers](https://github.com/FFmpeg/nv-codec-headers) at build time (no CUDA
+toolkit needed; the driver's `libcuda`/`libnvcuvid` are loaded at runtime):
+
+```
+git clone --branch n12.1.14.0 https://github.com/FFmpeg/nv-codec-headers.git
+sudo make -C nv-codec-headers install PREFIX=/usr
+```
+
+Then configure with `-DBUILD_WITH_XPRS=ON -DENABLE_NVCODEC=ON`. The resulting library is
+CUDA-agnostic: it auto-accelerates color (YUV420) H.265 streams when an NVIDIA driver is
+present and falls back to CPU decoding otherwise (monochrome streams always use CPU, as
+NVDEC does not support them).
+
 ## Build & run (macOS & Linux)
 
 - Run cmake:
