@@ -210,6 +210,18 @@ int NvDecoder::HandleVideoSequence(CUVIDEOFORMAT* vdeo_format) {
     }
   }
 
+  // HandleVideoSequence can fire again mid-stream on a new sequence header or
+  // format change (see header). Never overwrite a live decoder handle: that
+  // leaks the previous CUvideodecoder and leaves the parser driving a stale one.
+  // Destroy the existing decoder before creating its replacement.
+  if (_decoder != nullptr) {
+    CUDA_API_CALL(
+        _nvcodec_context._cuvid_functions->cuvidDestroyDecoder(_decoder),
+        _nvcodec_context._cuda_functions,
+        DO_NOT_THROW);
+    _decoder = nullptr;
+  }
+
   CUDA_API_CALL(
       _nvcodec_context._cuvid_functions->cuvidCreateDecoder(&_decoder, &video_decode_create_info),
       _nvcodec_context._cuda_functions,
