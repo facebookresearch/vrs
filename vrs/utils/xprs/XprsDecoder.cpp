@@ -373,7 +373,11 @@ unique_ptr<utils::DecoderI> xprsDecoderMaker(
   const string& codecFormatName = outputImageSpec.getCodecName();
   unique_ptr<VXDecoder> decoder;
   xprs::CodecList decoders;
-  if (xprs::enumDecoders(decoders) != XprsResult::OK) {
+  // enumDecoders can report a failure while still having collected usable SW
+  // decoders, e.g. when CUDA init throws on a machine with no NVIDIA driver.
+  (void)xprs::enumDecoders(decoders);
+  if (decoders.empty()) {
+    XR_LOGE("xprs::enumDecoders returned no decoders");
     return nullptr;
   }
   xprs::VideoCodecFormat codecFormat{};
@@ -399,7 +403,7 @@ unique_ptr<utils::DecoderI> xprsDecoderMaker(
             dec.implementationName,
             codecFormatName,
             xprs::getErrorMessage(res));
-        return nullptr;
+        continue;
       }
       decoder = make_unique<VXDecoder>(std::move(xprsDecoder));
       if (decoder->decode(encodedFrame, outDecodedFrame, outputImageSpec) == 0) {
@@ -424,8 +428,11 @@ unique_ptr<utils::DecoderI> xprsDecoderMaker(
       }
     }
   }
+  // Reaching here means no candidate both initialized and decoded, so never
+  // hand back the last instance: it may have failed decode, and a non-null
+  // return stops DecoderFactory from trying any other registered maker.
   TelemetryLogger::error(context, "No decoder found for " + codecFormatName);
-  return decoder;
+  return nullptr;
 }
 
 } // namespace vrs::vxprs
