@@ -46,6 +46,7 @@ CVideoDecoder::~CVideoDecoder() = default;
 
 XprsResult CVideoDecoder::init(bool disableHwAcceleration) {
   XprsResult result = XprsResult::OK;
+  _didFallbackToSw = false;
   try {
 #ifdef XPRS_HAS_NVDEC
     if (implementationName == kNvH264DecoderName || implementationName == kNvH265DecoderName ||
@@ -259,34 +260,76 @@ void CVideoDecoder::convertAVFrame(const AVFrame* avframe, Frame& frameOut) {
 #endif
 }
 
+XprsResult CVideoDecoder::decodeOnce(Frame& frameOut, const Buffer& compressed) {
+  XprsResult result = XprsResult::OK;
+  try {
+    _decoder->decode(compressed.data, compressed.size, _pix);
+    if (_pix.avFrame()->flags & AV_FRAME_FLAG_CORRUPT) {
+      return XprsResult::ERR_CORRUPT_DATA;
+    }
+    if (_pix.avFrame()->flags & AV_FRAME_FLAG_DISCARD) {
+      return XprsResult::ERR_NO_FRAME;
+    }
+    // we create an artificial pts because we are dealing with raw bitstreams, which don't have
+    // this information
+    _pix.avFrame()->pts = _timeStamp++;
+    convertAVFrame(_pix.avFrame(), frameOut);
+    return XprsResult::OK;
+  } catch (std::exception& e) {
+    // WARNING, not ERROR: a decode exception here is recoverable — it is reported
+    // as an XprsResult (ERR_FFMPEG for codec failures) rather than propagated, so
+    // decodeFrame() can fall back to software decoding on MacOS and the higher
+    // level xprsDecoderMaker can fall back to the next decoder during HW->SW
+    // probing (e.g. NVDEC rejecting monochrome H.265).
+    XR_LOGW("{}", convertExceptionToError(e, result));
+    return result;
+  }
+}
+
 XprsResult CVideoDecoder::decodeFrame(Frame& frameOut, const Buffer& compressed) {
   if (!_decoder) {
     return XprsResult::ERR_NOT_INITIALIZED;
   }
 
-  XprsResult result = XprsResult::OK;
+  XprsResult result = decodeOnce(frameOut, compressed);
 
-  try {
-    _decoder->decode(compressed.data, compressed.size, _pix);
-    if (_pix.avFrame()->flags & AV_FRAME_FLAG_CORRUPT) {
-      result = XprsResult::ERR_CORRUPT_DATA;
-    } else if (_pix.avFrame()->flags & AV_FRAME_FLAG_DISCARD) {
-      result = XprsResult::ERR_NO_FRAME;
-    } else {
-      // we create an artificial pts because we are dealing with raw bitstreams, which don't have
-      // this information
-      _pix.avFrame()->pts = _timeStamp++;
-      convertAVFrame(_pix.avFrame(), frameOut);
+#ifdef __APPLE__
+  // A codec failure (reported as ERR_FFMPEG) on a hardware-accelerated decoder
+  // means VideoToolbox failed to decode this frame. This happens when the HW
+  // device was created successfully but cannot actually decode (e.g. under
+  // Rosetta translation or in a headless environment), and it can occur mid-
+  // stream on inter (P/B) frames as well as on the initial key frame. Corrupt or
+  // absent frames (ERR_CORRUPT_DATA / ERR_NO_FRAME) are stream conditions that
+  // software decoding would not recover, so they are left untouched.
+  if (result == XprsResult::ERR_FFMPEG && _decoder->isHwAccelerated()) {
+    if (!_autoSwFallback) {
+      // Caller has opted to control fallback; report the HW failure explicitly.
+      return XprsResult::ERR_HW_DECODE_FAILED;
     }
-  } catch (std::exception& e) {
-    // WARNING, not ERROR: a decode exception here is recoverable — the error is
-    // returned via `result` and the caller (xprsDecoderMaker) falls back to the
-    // next decoder. The most common case is NVDEC rejecting an unsupported
-    // stream (e.g. monochrome H.265) during HW->SW probing.
-    XR_LOGW("{}", convertExceptionToError(e, result));
+    XR_LOGW("HW decoding failed, falling back to software decoding");
+    if (init(/*disableHwAcceleration=*/true) != XprsResult::OK || !_decoder) {
+      return XprsResult::ERR_HW_DECODE_FAILED;
+    }
+    _didFallbackToSw = true;
+    result = decodeOnce(frameOut, compressed);
+    if (result != XprsResult::OK) {
+      // The freshly created software decoder cannot decode an inter frame without
+      // its reference frames. Signal the HW failure so the caller re-feeds from a
+      // key frame (IDR) with the now-software decoder.
+      return XprsResult::ERR_HW_DECODE_FAILED;
+    }
   }
+#endif
 
   return result;
+}
+
+void CVideoDecoder::setAutoSwFallback(bool enable) {
+  _autoSwFallback = enable;
+}
+
+bool CVideoDecoder::didFallbackToSw() const {
+  return _didFallbackToSw;
 }
 
 void CVideoDecoder::flush() {

@@ -50,6 +50,7 @@ enum class XprsResult : int {
   ERR_INVALID_INPUT = -10,
   ERR_MUX_FAILURE = -11,
   ERR_NOT_IMPLEMENTED = -12,
+  ERR_HW_DECODE_FAILED = -13,
 
   ERR_UNKNOWN = -999
 };
@@ -617,9 +618,34 @@ class IVideoDecoder {
    * returned buffer belongs to the decoder and is valid only until the next call to this function
    * or until deleting the decoder. The caller may not write to it.
    * @param compressed Input buffer containing the compressed frame.
-   * @return XprsResult
+   * @return XprsResult. On MacOS, if a hardware decode fails and automatic
+   * software fallback is disabled (see setAutoSwFallback()), or if the frame
+   * still cannot be decoded after falling back (e.g. an inter frame received
+   * before a key frame on the freshly created software decoder), returns
+   * XprsResult::ERR_HW_DECODE_FAILED so the caller can take control (e.g. seek to
+   * a key frame and re-feed).
    */
   virtual XprsResult decodeFrame(Frame& frameOut, const Buffer& compressed) = 0;
+
+  /**
+   * Enable or disable automatic fallback from hardware to software decoding when
+   * a hardware decode fails at runtime. Enabled by default. When disabled,
+   * decodeFrame() returns XprsResult::ERR_HW_DECODE_FAILED on a hardware decode
+   * failure instead of transparently retrying in software, letting the caller
+   * take full control of the fallback. No-op for decoders that never use
+   * hardware acceleration.
+   */
+  virtual void setAutoSwFallback(bool /*enable*/) {}
+
+  /**
+   * Returns true if a runtime hardware decode failure caused the decoder to fall
+   * back to software decoding. Lets callers observe that hardware acceleration is
+   * no longer in use for subsequent frames. Always false for decoders that never
+   * used hardware acceleration.
+   */
+  virtual bool didFallbackToSw() const {
+    return false;
+  }
 
   /**
    * Flush the decoder's internal state (decoded picture buffer).

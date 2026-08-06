@@ -36,10 +36,15 @@ class CVideoDecoder : public IVideoDecoder, public VideoCodec {
   ~CVideoDecoder() override;
   XprsResult init(bool disableHwAcceleration = false) override;
   XprsResult decodeFrame(Frame& frameOut, const Buffer& compressed) override;
+  void setAutoSwFallback(bool enable) override;
+  bool didFallbackToSw() const override;
   void flush() override;
 
  private:
   void convertAVFrame(const AVFrame* avframe, Frame& frame);
+  // Decode a single compressed buffer with the current internal decoder. Catches
+  // decode exceptions internally and reports them as an XprsResult; never throws.
+  XprsResult decodeOnce(Frame& frameOut, const Buffer& compressed);
 
  private:
   std::unique_ptr<InternalDecoder> _decoder;
@@ -47,6 +52,8 @@ class CVideoDecoder : public IVideoDecoder, public VideoCodec {
   int64_t _timeStamp;
   std::vector<uint8_t> _buffer;
   bool _expectHwFrame = false;
+  bool _autoSwFallback = true;
+  bool _didFallbackToSw = false;
 };
 
 } // namespace xprs
