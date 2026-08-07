@@ -337,7 +337,7 @@ class VXDecoder : public vrs::utils::DecoderI {
     compressedBuffer.data = const_cast<uint8_t*>(encodedFrame.data());
     XprsResult res = xprsDecoder_->decodeFrame(frame, compressedBuffer);
     if (res != XprsResult::OK) {
-      XR_LOGE("Failed to decode xprs frame: {}", xprs::getErrorMessage(res));
+      XR_LOGW("Failed to decode xprs frame: {}", xprs::getErrorMessage(res));
       return domainError(utils::DecodeStatus::DecoderError);
     }
     return SUCCESS;
