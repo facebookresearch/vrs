@@ -35,15 +35,37 @@ using std::string;
 using std::vector;
 
 /// Caching strategy requests
+///
+/// A strategy is a promise about how the file is about to be read, and the cache prefetches on the
+/// strength of it. Picking one that does not match what the caller then does will waste bandwidth
+/// on blocks that are never used, so the right strategy is a property of what the caller is doing,
+/// and a player that changes activity is expected to change strategy as it goes.
+///
+/// When the caller can say exactly which parts of the file it will read, and say it far enough
+/// ahead for the fetches to happen, prefer Passive plus FileHandler::prefetchReadSequence() over
+/// any of the guessing strategies.
 enum class CachingStrategy {
   Undefined = 0,
 
   Passive, ///< (default) Read & cache on-demand (don't prefetch).
+           ///< Also the strategy to pair with an explicitly declared read sequence: it keeps the
+           ///< cache from guessing when the caller is going to say what it needs, without
+           ///< preventing any access.
   Streaming, ///< Automatically download data "forward", using last read-request as a hint.
+             ///< Assumes the caller reads the file forwards, most likely every record in order.
   StreamingBidirectional, ///< Automatically download data "forward" and "backward", using last
                           ///< read-request as a hint.
+                          ///< For an interactive player that is paused: the user steps to the next
+                          ///< or previous frame, so either direction may be needed next. Players
+                          ///< typically switch to this on pause, and to Streaming on play.
   StreamingBackward, ///< Automatically download data "backward", using last read-request as a hint.
+                     ///< Assumes the caller reads the file backwards, most likely every record
+                     ///< from last to first. A demonstration that a file can be streamed back to
+                     ///< front: no known caller uses it outside of tests.
   ReleaseAfterRead, ///< Same as "Passive" but release used cache blocks immediately after read.
+                    ///< For a single pass over data that will not be read again, so blocks are
+                    ///< dropped once consumed rather than held. Only drops blocks when a read
+                    ///< sequence has been declared, which is what says a block is finished with.
 
   COUNT
 };
