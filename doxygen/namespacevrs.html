@@ -561,7 +561,6 @@ Enumerations</h2></td></tr>
 , <b>COUNT</b>
 <br />
  }</td></tr>
-<tr class="memdesc:acb1b4358038394407db2b2dc6200afae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Caching strategy requests.  <a href="namespacevrs.html#acb1b4358038394407db2b2dc6200afae">More...</a><br /></td></tr>
 <tr class="separator:acb1b4358038394407db2b2dc6200afae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac167a592f5255abc1a276d8ed0b96f2f" id="r_ac167a592f5255abc1a276d8ed0b96f2f"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a> : uint8_t { <a class="el" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2fa6adf97f83acf6453d4a6a4b1070f3754">None</a> = 0
 , <a class="el" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2fa56c8337568e62301ca0fb81adc631f1b">Lz4</a>
@@ -1171,18 +1170,19 @@ constexpr const char *&#160;</td><td class="memItemRight" valign="bottom"><b>cTa
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Caching strategy requests. </p>
+<p>Caching strategy requests</p>
+<p>A strategy is a promise about how the file is about to be read, and the cache prefetches on the strength of it. Picking one that does not match what the caller then does will waste bandwidth on blocks that are never used, so the right strategy is a property of what the caller is doing, and a player that changes activity is expected to change strategy as it goes.</p>
+<p>When the caller can say exactly which parts of the file it will read, and say it far enough ahead for the fetches to happen, prefer Passive plus <a class="el" href="classvrs_1_1_file_handler.html#a51b82422840e7bc0faee553fc29ca173">FileHandler::prefetchReadSequence()</a> over any of the guessing strategies. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="acb1b4358038394407db2b2dc6200afaeaf80bc338b6146b566004a046f8137c85" name="acb1b4358038394407db2b2dc6200afaeaf80bc338b6146b566004a046f8137c85"></a>Passive&#160;</td><td class="fielddoc"><p>(default) Read &amp; cache on-demand (don't prefetch). </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="acb1b4358038394407db2b2dc6200afaeaf80bc338b6146b566004a046f8137c85" name="acb1b4358038394407db2b2dc6200afaeaf80bc338b6146b566004a046f8137c85"></a>Passive&#160;</td><td class="fielddoc"><p>(default) Read &amp; cache on-demand (don't prefetch). Also the strategy to pair with an explicitly declared read sequence: it keeps the cache from guessing when the caller is going to say what it needs, without preventing any access. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="acb1b4358038394407db2b2dc6200afaeaac21d502848247aa2f578d0f718f5d1d" name="acb1b4358038394407db2b2dc6200afaeaac21d502848247aa2f578d0f718f5d1d"></a>Streaming&#160;</td><td class="fielddoc"><p>Automatically download data "forward", using last read-request as a hint. </p>
+<tr><td class="fieldname"><a id="acb1b4358038394407db2b2dc6200afaeaac21d502848247aa2f578d0f718f5d1d" name="acb1b4358038394407db2b2dc6200afaeaac21d502848247aa2f578d0f718f5d1d"></a>Streaming&#160;</td><td class="fielddoc"><p>Automatically download data "forward", using last read-request as a hint. Assumes the caller reads the file forwards, most likely every record in order. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="acb1b4358038394407db2b2dc6200afaea02c8e5bdc421c350b1a6a698ae5d4540" name="acb1b4358038394407db2b2dc6200afaea02c8e5bdc421c350b1a6a698ae5d4540"></a>StreamingBidirectional&#160;</td><td class="fielddoc"><p>Automatically download data "forward" and "backward", using last read-request as a hint. </p>
+<tr><td class="fieldname"><a id="acb1b4358038394407db2b2dc6200afaea02c8e5bdc421c350b1a6a698ae5d4540" name="acb1b4358038394407db2b2dc6200afaea02c8e5bdc421c350b1a6a698ae5d4540"></a>StreamingBidirectional&#160;</td><td class="fielddoc"><p>Automatically download data "forward" and "backward", using last read-request as a hint. For an interactive player that is paused: the user steps to the next or previous frame, so either direction may be needed next. Players typically switch to this on pause, and to Streaming on play. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="acb1b4358038394407db2b2dc6200afaeae3cb7042f6a2a56c14df0f764735000b" name="acb1b4358038394407db2b2dc6200afaeae3cb7042f6a2a56c14df0f764735000b"></a>StreamingBackward&#160;</td><td class="fielddoc"><p>Automatically download data "backward", using last read-request as a hint. </p>
+<tr><td class="fieldname"><a id="acb1b4358038394407db2b2dc6200afaeae3cb7042f6a2a56c14df0f764735000b" name="acb1b4358038394407db2b2dc6200afaeae3cb7042f6a2a56c14df0f764735000b"></a>StreamingBackward&#160;</td><td class="fielddoc"><p>Automatically download data "backward", using last read-request as a hint. Assumes the caller reads the file backwards, most likely every record from last to first. A demonstration that a file can be streamed back to front: no known caller uses it outside of tests. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="acb1b4358038394407db2b2dc6200afaea633b1508ec21803c516e3d437d20a0de" name="acb1b4358038394407db2b2dc6200afaea633b1508ec21803c516e3d437d20a0de"></a>ReleaseAfterRead&#160;</td><td class="fielddoc"><p>Same as "Passive" but release used cache blocks immediately after read. </p>
+<tr><td class="fieldname"><a id="acb1b4358038394407db2b2dc6200afaea633b1508ec21803c516e3d437d20a0de" name="acb1b4358038394407db2b2dc6200afaea633b1508ec21803c516e3d437d20a0de"></a>ReleaseAfterRead&#160;</td><td class="fielddoc"><p>Same as "Passive" but release used cache blocks immediately after read. For a single pass over data that will not be read again, so blocks are dropped once consumed rather than held. Only drops blocks when a read sequence has been declared, which is what says a block is finished with. </p>
 </td></tr>
 </table>
 
