@@ -28,22 +28,32 @@
 
 #include <logging/Log.h>
 #include <cmath>
+#include <cstring>
 #include <memory>
 #include <stdexcept>
 #include <string>
 
 namespace xprs {
 
-// Doing a device capability check via NVENC API is more generic and consistent way
-// but it turned out to be quite slow, > 600 ms
-// This method identifies A100 GPU which does not support HW AV1 decoder but is widely used in our
-// servers fleet. Filtering devices by device name is significantly faster.
-bool deviceHasNoHwDecoder(std::string& decoderName, const char* deviceName) {
+// Doing a device capability check via NVDEC API is more generic and consistent way
+// but it turned out to be quite slow, > 600 ms. Filtering known unsupported
+// device names before selecting a HW decoder keeps CI from failing late in
+// cuvidCreateDecoder().
+bool deviceHasNoHwDecoder(std::string_view decoderName, const char* deviceName) {
+  if (deviceName == nullptr) {
+    return true;
+  }
+
+  // This was from testinfra.test which shows: NVIDIA A100-PG509-200 MIG 1g.5gb ...
+  // cuvidCreateDecoder failed with CUDA_ERROR_NO_DEVICE. So the failure signature
+  // was specifically on a MIG slice, not on every PG509/A100 device.
+  if (strstr(deviceName, "MIG") != nullptr) {
+    return true;
+  }
   if (decoderName != kNvAv1DecoderName) {
     return false;
   }
-  return deviceName == nullptr || strstr(deviceName, "PG509") != nullptr ||
-      strstr(deviceName, "A100") != nullptr;
+  return strstr(deviceName, "PG509") != nullptr || strstr(deviceName, "A100") != nullptr;
 }
 
 // Currently we only support NV12 output format.

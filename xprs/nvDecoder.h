@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <string>
+#include <string_view>
 #include <vector>
 
 #include <ffnvcodec/dynlink_cuda.h>
@@ -37,7 +39,7 @@ cudaVideoCodec codecNameToCudaVideoCodecEnum(const std::string& codec_name);
 /*
  * Returns true if a GPU has no hardware decoder provided in the decoderName.
  */
-bool deviceHasNoHwDecoder(std::string& decoderName, const char* deviceName);
+bool deviceHasNoHwDecoder(std::string_view decoderName, const char* deviceName);
 
 class NvDecoder : public InternalDecoder {
  public:
