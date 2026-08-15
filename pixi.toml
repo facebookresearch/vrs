@@ -37,11 +37,11 @@ vrs = { cmd = "build/tools/vrs/vrs", depends-on = ["build"]}
 
 [target.win-64.tasks] # Deal with windows specifics (prepare and build)
 cmake-generator = "cmake --help"
-prepare = "cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DVRS_USE_SYSTEM_RAPIDJSON:BOOL=ON -DCMAKE_INSTALL_PREFIX=%PIXI_PROJECT_ROOT%/build/install"
+prepare = "cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DVRS_USE_SYSTEM_RAPIDJSON:BOOL=ON -DCMAKE_INSTALL_PREFIX=$PIXI_PROJECT_ROOT/build/install"
 build = { cmd = "cmake --build build --config Release  -- /m", depends-on = [
     "prepare",
 ] }
-prepare-consumer = { cmd = "cmake -S sample_project -B build/sample_project -Dvrslib_DIR=%PIXI_PROJECT_ROOT%/build/install/lib/cmake/vrslib", depends-on = [
+prepare-consumer = { cmd = "cmake -S sample_project -B build/sample_project -Dvrslib_DIR=$PIXI_PROJECT_ROOT/build/install/lib/cmake/vrslib", depends-on = [
     "install",
 ] }
 vrs = { cmd = "build/tools/vrs/Release/vrs", depends-on = ["build"]}
