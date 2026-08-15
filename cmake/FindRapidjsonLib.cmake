@@ -12,8 +12,47 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# The package version of rapidjson provided by apt on Linux or brew on Mac date from August 2016,
-# despite being the last official version (v1.1.0), and don't include important fixes.
+if(TARGET rapidjson::rapidjson)
+  return()
+endif()
+
+# Package managers can opt into a maintained RapidJSON package. Keep VRS'
+# pinned source fallback as the default because the official v1.1.0 release is
+# too old for VRS.
+if(VRS_USE_SYSTEM_RAPIDJSON OR VRS_CONFIG_USE_SYSTEM_RAPIDJSON)
+  unset(_RAPIDJSON_TARGET)
+  find_package(RapidJSON CONFIG QUIET)
+
+  if(TARGET RapidJSON::rapidjson)
+    set(_RAPIDJSON_TARGET RapidJSON::rapidjson)
+  elseif(TARGET RapidJSON)
+    set(_RAPIDJSON_TARGET RapidJSON)
+  elseif(TARGET rapidjson)
+    set(_RAPIDJSON_TARGET rapidjson)
+  else()
+    find_path(RAPIDJSON_INCLUDE_DIR NAMES rapidjson/rapidjson.h)
+    if(NOT RAPIDJSON_INCLUDE_DIR)
+      message(FATAL_ERROR "VRS_USE_SYSTEM_RAPIDJSON is enabled, but RapidJSON was not found")
+    endif()
+  endif()
+
+  add_library(rapidjson::rapidjson INTERFACE IMPORTED)
+  if(_RAPIDJSON_TARGET)
+    set_target_properties(rapidjson::rapidjson PROPERTIES
+      INTERFACE_LINK_LIBRARIES "${_RAPIDJSON_TARGET}"
+    )
+  else()
+    set_target_properties(rapidjson::rapidjson PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${RAPIDJSON_INCLUDE_DIR}"
+    )
+  endif()
+
+  unset(_RAPIDJSON_TARGET)
+  return()
+endif()
+
+# The package version of rapidjson provided by apt on Linux or brew on Mac dates from August 2016,
+# despite being the last official version (v1.1.0), and does not include important fixes.
 # So we get the code from GitHub at a known working state.
 
 # Try to find rapidjson in fbsource third-party (for fbsource builds)
@@ -36,6 +75,9 @@ if (RAPIDJSON_INCLUDE_DIR)
   set(RAPIDJSON_FOUND TRUE)
 else()
   # Fall back to downloading from GitHub (OSS behavior)
+  if ("${EXTERNAL_DEPENDENCIES_DIR}" STREQUAL "")
+    set(EXTERNAL_DEPENDENCIES_DIR "${CMAKE_BINARY_DIR}/external")
+  endif()
   set(RAPIDJSON_DIR "${EXTERNAL_DEPENDENCIES_DIR}/rapidjson")
   set(RAPIDJSON_INCLUDE_DIR "${RAPIDJSON_DIR}/include")
   set(RAPIDJSON_INCLUDE_FILE "${RAPIDJSON_INCLUDE_DIR}/rapidjson/rapidjson.h")

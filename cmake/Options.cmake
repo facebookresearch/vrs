@@ -18,3 +18,9 @@ endif()
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
 
 set(UNIT_TESTS ON CACHE BOOL "Disable unit tests.")
+
+option(
+  VRS_USE_SYSTEM_RAPIDJSON
+  "Use an installed RapidJSON package instead of downloading VRS' pinned revision."
+  OFF
+)

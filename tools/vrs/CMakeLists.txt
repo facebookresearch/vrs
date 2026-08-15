@@ -36,7 +36,7 @@ target_link_libraries(vrs
 
 
 install(TARGETS vrs EXPORT VRSLibTargets
-  RUNTIME DESTINATION bin
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
 if (UNIT_TESTS)
