@@ -64,4 +64,11 @@ zlib = "1.2.*"
 eigen = "3.4.*"
 libopus = "1.4*" # optional dependency
 ffmpeg = { version = "*", build = "*lgpl*" }
-rapidjson = ">=1.1.0.post20240409"
+# Keep this build compatible with the cxx-compiler 1.6 toolchain pinned above.
+rapidjson = { version = "==1.1.0.post20240409", build = "*_0" }
+
+[target.osx-64.dependencies]
+libcxx = { version = "==16.0.6", build = "*_0" }
+
+[target.osx-arm64.dependencies]
+libcxx = { version = "==16.0.6", build = "*_0" }
