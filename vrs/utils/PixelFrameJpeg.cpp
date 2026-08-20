@@ -16,6 +16,8 @@
 
 #include <vrs/utils/PixelFrame.h>
 
+#include <csetjmp>
+
 #include <jpeglib.h>
 #include <turbojpeg.h>
 
@@ -49,51 +51,68 @@ bool PixelFrame::readJpegFrame(RecordReader* reader, uint32_t sizeBytes) {
   return readJpegFrame(jpegBuf);
 }
 
-static bool
-readJpegFrameHelper(PixelFrame& frame, struct jpeg_decompress_struct& cinfo, bool decodePixels) {
-  bool success = true;
-  try {
-    jpeg_read_header(&cinfo, TRUE);
-    if (cinfo.num_components == 1) {
-      cinfo.out_color_space = JCS_GRAYSCALE;
-      frame.init(PixelFormat::GREY8, cinfo.image_width, cinfo.image_height);
-    } else {
-      cinfo.out_color_space = JCS_RGB;
-      frame.init(PixelFormat::RGB8, cinfo.image_width, cinfo.image_height);
-    }
-    if (decodePixels) {
-      // decompress row by row
-      jpeg_start_decompress(&cinfo);
-      uint8_t* rowPtr = frame.wdata();
-      while (cinfo.output_scanline < cinfo.output_height) {
-        jpeg_read_scanlines(&cinfo, &rowPtr, 1);
-        rowPtr += frame.getSpec().getStride();
-      }
-      jpeg_finish_decompress(&cinfo);
-    }
-  } catch (runtime_error&) {
-    success = false;
-  }
-  jpeg_destroy_decompress(&cinfo);
-  return success;
-}
+namespace {
 
-static void error_exit(j_common_ptr cinfo) {
+/// libjpeg requires error_exit to not return. Longjmp out to the caller's setjmp, which is the
+/// mechanism libjpeg documents, and the only one available with exceptions disabled.
+/// Derives from jpeg_error_mgr rather than holding one, so that recovering the handler from
+/// libjpeg's jpeg_error_mgr* is a checked downcast instead of an assumption about layout.
+struct JpegErrorHandler : jpeg_error_mgr {
+  jmp_buf failure{};
+};
+
+void error_exit(j_common_ptr cinfo) {
   char buffer[JMSG_LENGTH_MAX];
   (*cinfo->err->format_message)(cinfo, buffer);
   THROTTLED_LOGW("error_exit", "{}", buffer);
-  throw runtime_error("libjpeg error");
+  longjmp(static_cast<JpegErrorHandler*>(cinfo->err)->failure, 1);
 }
+
+void setupErrorHandler(struct jpeg_decompress_struct& cinfo, JpegErrorHandler& handler) {
+  cinfo.err = jpeg_std_error(&handler);
+  handler.error_exit = error_exit;
+}
+
+// Runs inside the caller's setjmp: no object with a non-trivial destructor may be alive here,
+// because longjmp would not unwind it.
+void decodeJpeg(PixelFrame& frame, struct jpeg_decompress_struct& cinfo, bool decodePixels) {
+  jpeg_read_header(&cinfo, TRUE);
+  if (cinfo.num_components == 1) {
+    cinfo.out_color_space = JCS_GRAYSCALE;
+    frame.init(PixelFormat::GREY8, cinfo.image_width, cinfo.image_height);
+  } else {
+    cinfo.out_color_space = JCS_RGB;
+    frame.init(PixelFormat::RGB8, cinfo.image_width, cinfo.image_height);
+  }
+  if (decodePixels) {
+    // decompress row by row
+    jpeg_start_decompress(&cinfo);
+    uint8_t* rowPtr = frame.wdata();
+    while (cinfo.output_scanline < cinfo.output_height) {
+      jpeg_read_scanlines(&cinfo, &rowPtr, 1);
+      rowPtr += frame.getSpec().getStride();
+    }
+    jpeg_finish_decompress(&cinfo);
+  }
+}
+
+} // namespace
 
 bool PixelFrame::readJpegFrame(const vector<uint8_t>& jpegBuf, bool decodePixels) {
   // setup libjpeg
   struct jpeg_decompress_struct cinfo{};
-  struct jpeg_error_mgr jerr{};
-  cinfo.err = jpeg_std_error(&jerr);
-  jerr.error_exit = error_exit;
+  JpegErrorHandler handler;
+  setupErrorHandler(cinfo, handler);
+  // setjmp before the first libjpeg call, so a failure in any of them has a target.
+  if (setjmp(handler.failure) != 0) {
+    jpeg_destroy_decompress(&cinfo);
+    return false;
+  }
   jpeg_create_decompress(&cinfo);
   jpeg_mem_src(&cinfo, jpegBuf.data(), jpegBuf.size());
-  return readJpegFrameHelper(*this, cinfo, decodePixels);
+  decodeJpeg(*this, cinfo, decodePixels);
+  jpeg_destroy_decompress(&cinfo);
+  return true;
 }
 
 bool PixelFrame::readJpegFrameFromFile(const string& path, bool decodePixels) {
@@ -104,14 +123,20 @@ bool PixelFrame::readJpegFrameFromFile(const string& path, bool decodePixels) {
 
   // setup libjpeg
   struct jpeg_decompress_struct cinfo{};
-  struct jpeg_error_mgr jerr{};
-  cinfo.err = jpeg_std_error(&jerr);
-  jerr.error_exit = error_exit;
+  JpegErrorHandler handler;
+  setupErrorHandler(cinfo, handler);
+  // setjmp before the first libjpeg call, so a failure in any of them has a target.
+  if (setjmp(handler.failure) != 0) {
+    jpeg_destroy_decompress(&cinfo);
+    fclose(infile);
+    return false;
+  }
   jpeg_create_decompress(&cinfo);
   jpeg_stdio_src(&cinfo, infile);
-  const bool success = readJpegFrameHelper(*this, cinfo, decodePixels);
+  decodeJpeg(*this, cinfo, decodePixels);
+  jpeg_destroy_decompress(&cinfo);
   fclose(infile);
-  return success;
+  return true;
 }
 
 bool PixelFrame::jpgCompress(vector<uint8_t>& outBuffer, uint32_t quality) {

@@ -15,6 +15,8 @@
  */
 
 #include <cmath>
+
+#include <fstream>
 #include <memory>
 #include <set>
 #include <string>
@@ -603,6 +605,28 @@ TEST_F(PixelFrameTest, jpegTest) {
   ASSERT_EQ(frame.getSpec(), frame2.getSpec());
   frame.blankFrame();
   EXPECT_EQ(frame.getBuffer(), frame2.getBuffer());
+}
+
+TEST_F(PixelFrameTest, jpegFailureTest) {
+  // libjpeg reports failures by calling error_exit, which longjmps back out. Nothing else
+  // reaches that path, so decoding has to be seen failing, not just succeeding.
+  PixelFrame frame;
+  const vector<uint8_t> notAJpeg(64, 0x5a);
+  EXPECT_FALSE(frame.readJpegFrame(notAJpeg));
+
+  // A real header followed by nothing: fails later, once decoding has started.
+  vector<uint8_t> truncated;
+  {
+    PixelFrame whole;
+    ASSERT_TRUE(whole.readJpegFrameFromFile(kJpegTestFilePath, false));
+    ifstream file(kJpegTestFilePath, std::ios::binary);
+    ASSERT_TRUE(file.is_open());
+    truncated.assign(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>());
+    ASSERT_GT(truncated.size(), 200);
+    truncated.resize(truncated.size() / 4);
+  }
+  PixelFrame partial;
+  EXPECT_FALSE(partial.readJpegFrame(truncated));
 }
 #endif
 
