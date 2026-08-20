@@ -310,6 +310,19 @@ TEST_F(FileTest, testGetLinkedTargetResolvesASymlink) {
   EXPECT_TRUE(os::getLinkedTarget(link, linkedPath));
   EXPECT_EQ(linkedPath, target);
 }
+
+TEST_F(FileTest, testGetLinkedTargetOfABrokenSymlink) {
+  const string folder = os::makeUniqueFolder();
+  const string missingTarget = os::pathJoin(folder, "gone.txt");
+  const string link = os::pathJoin(folder, "broken_link.txt");
+  const int symlinkResult = ::symlink(missingTarget.c_str(), link.c_str());
+  const int symlinkErrno = errno;
+  ASSERT_EQ(symlinkResult, 0) << "symlink failed, errno " << symlinkErrno;
+  ASSERT_FALSE(os::pathExists(missingTarget));
+  string linkedPath;
+  EXPECT_FALSE(os::getLinkedTarget(link, linkedPath));
+  EXPECT_EQ(linkedPath, link);
+}
 #endif // !IS_WINDOWS_PLATFORM() && !IS_ANDROID_PLATFORM()
 
 TEST(System, getTerminalWidthTest) {
