@@ -130,8 +130,19 @@ class VRS_API AlignedBuffer {
   size_t capacity_ = 0;
   size_t size_ = 0;
 
- public:
+ protected:
+  /// `size` must be a multiple of `lenalign`, unless `lenalign` is 0.
   AlignedBuffer(size_t size, size_t memalign, size_t lenalign);
+
+  [[nodiscard]] inline bool isValid() const {
+    return aligned_buffer_ != nullptr;
+  }
+
+ public:
+  /// @return A buffer of `size` bytes aligned to `memalign`, or nullptr if it couldn't be
+  /// allocated.
+  static std::unique_ptr<AlignedBuffer> make(size_t size, size_t memalign, size_t lenalign);
+
   virtual ~AlignedBuffer();
 
   [[nodiscard]] inline size_t size() const {
@@ -155,7 +166,11 @@ class VRS_API AlignedBuffer {
   [[nodiscard]] inline char* bdata() const {
     return reinterpret_cast<char*>(aligned_buffer_);
   }
-  [[nodiscard]] ssize_t add(const void* buffer, size_t size);
+  /// Append up to `size` bytes, stopping at the buffer's capacity.
+  /// @param outCopiedSize: Set to the number of bytes copied, which is 0 if the buffer is
+  /// already full, or `size` was 0.
+  /// @return False if the buffer has no storage.
+  [[nodiscard]] bool add(const void* buffer, size_t size, size_t& outCopiedSize);
 };
 
 class AsyncBuffer;
@@ -171,13 +186,19 @@ class VRS_API AsyncBuffer : public AlignedBuffer {
  public:
   using complete_write_callback = std::function<void(ssize_t io_return, int io_errno)>;
 
-  AsyncBuffer(size_t size, size_t memalign, size_t lenalign)
-      : AlignedBuffer(size, memalign, lenalign) {}
+  /// @return A buffer of `size` bytes aligned to `memalign`, or nullptr if it couldn't be
+  /// allocated.
+  static std::unique_ptr<AsyncBuffer> make(size_t size, size_t memalign, size_t lenalign);
+
   ~AsyncBuffer() override = default;
 
   void complete_write(ssize_t io_return, int io_errno);
   [[nodiscard]] int
   start_write(const AsyncHandle& file, int64_t offset, complete_write_callback on_complete);
+
+ protected:
+  AsyncBuffer(size_t size, size_t memalign, size_t lenalign)
+      : AlignedBuffer(size, memalign, lenalign) {}
 
  private:
 #if IS_WINDOWS_PLATFORM()

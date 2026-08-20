@@ -20,7 +20,7 @@
 
 #include <cstdint>
 #include <cstring>
-#include <stdexcept>
+#include <memory>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -44,79 +44,113 @@ vector<uint8_t> makePayload(size_t size, uint8_t seed = 0) {
 
 } // namespace
 
-TEST(AlignedBufferTest, ConstructsEmptyWithAlignedStorage) {
-  AlignedBuffer buffer{kCapacity, kMemAlign, kLenAlign};
-  EXPECT_EQ(buffer.capacity(), kCapacity);
-  EXPECT_EQ(buffer.size(), size_t{0});
-  EXPECT_TRUE(buffer.empty());
-  EXPECT_FALSE(buffer.full());
-  ASSERT_NE(buffer.data(), nullptr);
-  EXPECT_EQ(reinterpret_cast<uintptr_t>(buffer.data()) % kMemAlign, uintptr_t{0});
+TEST(AlignedBufferTest, MakeReturnsEmptyBufferWithAlignedStorage) {
+  const unique_ptr<AlignedBuffer> buffer = AlignedBuffer::make(kCapacity, kMemAlign, kLenAlign);
+  ASSERT_NE(buffer, nullptr);
+  EXPECT_EQ(buffer->capacity(), kCapacity);
+  EXPECT_EQ(buffer->size(), size_t{0});
+  EXPECT_TRUE(buffer->empty());
+  EXPECT_FALSE(buffer->full());
+  ASSERT_NE(buffer->data(), nullptr);
+  EXPECT_EQ(reinterpret_cast<uintptr_t>(buffer->data()) % kMemAlign, uintptr_t{0});
 }
 
 TEST(AlignedBufferTest, AddCopiesPayloadAndAdvancesSize) {
-  AlignedBuffer buffer{kCapacity, kMemAlign, kLenAlign};
+  const unique_ptr<AlignedBuffer> buffer = AlignedBuffer::make(kCapacity, kMemAlign, kLenAlign);
+  ASSERT_NE(buffer, nullptr);
   const vector<uint8_t> payload = makePayload(1000);
-  EXPECT_EQ(buffer.add(payload.data(), payload.size()), ssize_t{1000});
-  EXPECT_EQ(buffer.size(), size_t{1000});
-  EXPECT_FALSE(buffer.full());
-  EXPECT_EQ(memcmp(buffer.data(), payload.data(), payload.size()), 0);
+  size_t copied = 0;
+  EXPECT_TRUE(buffer->add(payload.data(), payload.size(), copied));
+  EXPECT_EQ(copied, size_t{1000});
+  EXPECT_EQ(buffer->size(), size_t{1000});
+  EXPECT_FALSE(buffer->full());
+  EXPECT_EQ(memcmp(buffer->data(), payload.data(), payload.size()), 0);
 }
 
 TEST(AlignedBufferTest, AddClampsToRemainingCapacity) {
-  AlignedBuffer buffer{kCapacity, kMemAlign, kLenAlign};
+  const unique_ptr<AlignedBuffer> buffer = AlignedBuffer::make(kCapacity, kMemAlign, kLenAlign);
+  ASSERT_NE(buffer, nullptr);
   const vector<uint8_t> payload = makePayload(kCapacity + 1000);
-  EXPECT_EQ(buffer.add(payload.data(), payload.size()), static_cast<ssize_t>(kCapacity));
-  EXPECT_EQ(buffer.size(), kCapacity);
-  EXPECT_TRUE(buffer.full());
-  EXPECT_EQ(memcmp(buffer.data(), payload.data(), kCapacity), 0);
+  size_t copied = 0;
+  EXPECT_TRUE(buffer->add(payload.data(), payload.size(), copied));
+  EXPECT_EQ(copied, kCapacity);
+  EXPECT_EQ(buffer->size(), kCapacity);
+  EXPECT_TRUE(buffer->full());
+  EXPECT_EQ(memcmp(buffer->data(), payload.data(), kCapacity), 0);
 }
 
 TEST(AlignedBufferTest, AddAppendsAtTheCurrentSizeAndClampsToWhatIsLeft) {
-  AlignedBuffer buffer{kCapacity, kMemAlign, kLenAlign};
+  const unique_ptr<AlignedBuffer> buffer = AlignedBuffer::make(kCapacity, kMemAlign, kLenAlign);
+  ASSERT_NE(buffer, nullptr);
   const vector<uint8_t> head = makePayload(1000, 1);
-  ASSERT_EQ(buffer.add(head.data(), head.size()), ssize_t{1000});
+  size_t copied = 0;
+  ASSERT_TRUE(buffer->add(head.data(), head.size(), copied));
+  ASSERT_EQ(copied, size_t{1000});
   const vector<uint8_t> tail = makePayload(kCapacity, 2);
-  EXPECT_EQ(buffer.add(tail.data(), tail.size()), static_cast<ssize_t>(kCapacity - 1000));
-  EXPECT_EQ(buffer.size(), kCapacity);
-  EXPECT_EQ(memcmp(buffer.data(), head.data(), head.size()), 0);
-  EXPECT_EQ(memcmp(buffer.bdata() + head.size(), tail.data(), kCapacity - head.size()), 0);
+  EXPECT_TRUE(buffer->add(tail.data(), tail.size(), copied));
+  EXPECT_EQ(copied, kCapacity - 1000);
+  EXPECT_EQ(buffer->size(), kCapacity);
+  EXPECT_EQ(memcmp(buffer->data(), head.data(), head.size()), 0);
+  EXPECT_EQ(memcmp(buffer->bdata() + head.size(), tail.data(), kCapacity - head.size()), 0);
 }
 
-TEST(AlignedBufferTest, AddOnFullBufferThrows) {
-  AlignedBuffer buffer{kCapacity, kMemAlign, kLenAlign};
+TEST(AlignedBufferTest, AddOnFullBufferCopiesNothing) {
+  const unique_ptr<AlignedBuffer> buffer = AlignedBuffer::make(kCapacity, kMemAlign, kLenAlign);
+  ASSERT_NE(buffer, nullptr);
   const vector<uint8_t> payload = makePayload(kCapacity);
-  ASSERT_EQ(buffer.add(payload.data(), payload.size()), static_cast<ssize_t>(kCapacity));
-  ASSERT_TRUE(buffer.full());
-  EXPECT_THROW((void)buffer.add(payload.data(), 1), std::runtime_error);
+  size_t copied = 0;
+  ASSERT_TRUE(buffer->add(payload.data(), payload.size(), copied));
+  ASSERT_TRUE(buffer->full());
+  copied = 12345;
+  EXPECT_TRUE(buffer->add(payload.data(), 1, copied));
+  EXPECT_EQ(copied, size_t{0});
+  EXPECT_EQ(buffer->size(), kCapacity);
 }
 
-TEST(AlignedBufferTest, AddWithoutStorageReturnsMinusOne) {
-  AlignedBuffer buffer{kCapacity, kMemAlign, kLenAlign};
-  buffer.free();
-  ASSERT_EQ(buffer.capacity(), size_t{0});
+TEST(AlignedBufferTest, AddOfNothingIsANoOp) {
+  const unique_ptr<AlignedBuffer> buffer = AlignedBuffer::make(kCapacity, kMemAlign, kLenAlign);
+  ASSERT_NE(buffer, nullptr);
   const vector<uint8_t> payload = makePayload(16);
-  EXPECT_EQ(buffer.add(payload.data(), payload.size()), ssize_t{-1});
+  size_t copied = 12345;
+  EXPECT_TRUE(buffer->add(payload.data(), 0, copied));
+  EXPECT_EQ(copied, size_t{0});
+  EXPECT_EQ(buffer->size(), size_t{0});
+}
+
+TEST(AlignedBufferTest, AddWithoutStorageFails) {
+  const unique_ptr<AlignedBuffer> buffer = AlignedBuffer::make(kCapacity, kMemAlign, kLenAlign);
+  ASSERT_NE(buffer, nullptr);
+  buffer->free();
+  ASSERT_EQ(buffer->capacity(), size_t{0});
+  const vector<uint8_t> payload = makePayload(16);
+  size_t copied = 12345;
+  EXPECT_FALSE(buffer->add(payload.data(), payload.size(), copied));
+  EXPECT_EQ(copied, size_t{0});
 }
 
 TEST(AlignedBufferTest, ClearMakesBufferReusable) {
-  AlignedBuffer buffer{kCapacity, kMemAlign, kLenAlign};
+  const unique_ptr<AlignedBuffer> buffer = AlignedBuffer::make(kCapacity, kMemAlign, kLenAlign);
+  ASSERT_NE(buffer, nullptr);
   const vector<uint8_t> payload = makePayload(kCapacity);
-  ASSERT_EQ(buffer.add(payload.data(), payload.size()), static_cast<ssize_t>(kCapacity));
-  buffer.clear();
-  EXPECT_EQ(buffer.size(), size_t{0});
-  EXPECT_TRUE(buffer.empty());
-  EXPECT_EQ(buffer.capacity(), kCapacity);
-  EXPECT_EQ(buffer.add(payload.data(), payload.size()), static_cast<ssize_t>(kCapacity));
+  size_t copied = 0;
+  ASSERT_TRUE(buffer->add(payload.data(), payload.size(), copied));
+  buffer->clear();
+  EXPECT_EQ(buffer->size(), size_t{0});
+  EXPECT_TRUE(buffer->empty());
+  EXPECT_EQ(buffer->capacity(), kCapacity);
+  EXPECT_TRUE(buffer->add(payload.data(), payload.size(), copied));
+  EXPECT_EQ(copied, kCapacity);
 }
 
-TEST(AlignedBufferTest, CapacityNotMultipleOfLenAlignThrows) {
-  EXPECT_THROW((AlignedBuffer{kCapacity + 1, kMemAlign, kLenAlign}), std::runtime_error);
+TEST(AlignedBufferDeathTest, CapacityNotMultipleOfLenAlignAborts) {
+  EXPECT_DEATH(
+      (void)AlignedBuffer::make(kCapacity + 1, kMemAlign, kLenAlign), "not a multiple of lenalign");
 }
 
 TEST(AlignedBufferTest, ZeroLenAlignSkipsTheCapacityConstraint) {
-  AlignedBuffer buffer{kCapacity + 1, kMemAlign, 0};
-  EXPECT_EQ(buffer.capacity(), kCapacity + 1);
+  const unique_ptr<AlignedBuffer> buffer = AlignedBuffer::make(kCapacity + 1, kMemAlign, 0);
+  ASSERT_NE(buffer, nullptr);
+  EXPECT_EQ(buffer->capacity(), kCapacity + 1);
 }
 
 #endif // VRS_ASYNC_DISKFILE_SUPPORTED()
