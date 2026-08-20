@@ -16,8 +16,12 @@
 
 #include "Strings.h"
 
+#include <cctype>
+#include <cerrno>
 #include <charconv>
+#include <clocale>
 #include <cmath>
+#include <cstdlib>
 #include <cstring>
 #include <ctime>
 
@@ -329,15 +333,7 @@ bool getUInt64(const StringStringMap& m, string_view field, uint64_t& outValue) 
 
 bool getDouble(const StringStringMap& m, string_view field, double& outValue) {
   const auto iter = m.find(field);
-  if (iter != m.end() && !iter->second.empty()) {
-    try {
-      outValue = stod(iter->second);
-      return true;
-    } catch (logic_error&) {
-      /* do nothing */
-    }
-  }
-  return false;
+  return iter != m.end() && readDouble(iter->second, outValue);
 }
 
 bool getByteSize(const StringStringMap& m, string_view field, uint64_t& outByteSize) {
@@ -374,6 +370,10 @@ bool readInt64(string_view str, int64_t& outValue) {
   return result.ec == errc{} && result.ptr == strEnd;
 }
 
+inline bool safeisspace(char c) {
+  return isspace(static_cast<unsigned char>(c)) != 0;
+}
+
 inline char safeisdigit(char c) {
   return isdigit(static_cast<unsigned char>(c));
 }
@@ -388,6 +388,37 @@ bool readUInt64(string_view str, uint64_t& outValue) {
   }
   outValue = 0;
   return false;
+}
+
+bool readDouble(const string& str, double& outValue) {
+  outValue = 0;
+  // Do not "simplify" this to from_chars: it has no floating point support on every toolchain
+  // VRS builds for. strtod is the portable option, at the cost of needing a null terminated
+  // string, and of honoring LC_NUMERIC.
+  if (str.empty() || safeisspace(str.front()) || str.find(',') != string::npos) {
+    return false;
+  }
+  const char* first = str.c_str();
+  const char* digits = (*first == '+' || *first == '-') ? first + 1 : first;
+  if (digits[0] == '0' && (digits[1] == 'x' || digits[1] == 'X')) {
+    return false;
+  }
+  // VRS numbers always use '.', so hand strtod whatever separator the locale actually wants.
+  const char separator = *localeconv()->decimal_point;
+  string localized;
+  if (separator != '.') {
+    localized = str;
+    std::replace(localized.begin(), localized.end(), '.', separator);
+    first = localized.c_str();
+  }
+  char* last = nullptr;
+  errno = 0;
+  const double value = strtod(first, &last);
+  if (errno != 0 || last != first + str.size() || !std::isfinite(value)) {
+    return false;
+  }
+  outValue = value;
+  return true;
 }
 
 inline char safetolower(char c) {

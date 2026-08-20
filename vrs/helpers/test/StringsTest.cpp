@@ -382,6 +382,7 @@ TEST_F(StringsHelpersTester, getValueTest) {
   EXPECT_TRUE(getDouble(m, "double", doubleValue));
   EXPECT_EQ(doubleValue, -3.5);
   EXPECT_FALSE(getDouble(m, "double_bad", doubleValue));
+  EXPECT_EQ(doubleValue, 0);
 
   uint64_t byteSize = 0;
   EXPECT_TRUE(getByteSize(m, "1234", byteSize));
@@ -726,6 +727,54 @@ TEST_F(StringsHelpersTester, readUInt64) {
   EXPECT_FALSE(readUInt64("-1", value));
   EXPECT_FALSE(readUInt64("123vrs", value));
   EXPECT_FALSE(readUInt64("vrs", value));
+}
+
+TEST_F(StringsHelpersTester, readDouble) {
+  using namespace vrs::helpers;
+  double value = -1;
+
+  // Valid values
+  EXPECT_TRUE(readDouble("1.5", value));
+  EXPECT_EQ(value, 1.5);
+  EXPECT_TRUE(readDouble("-3.5", value));
+  EXPECT_EQ(value, -3.5);
+  // A sign followed by a leading zero: the case the 0x guard has to let through
+  EXPECT_TRUE(readDouble("-0.5", value));
+  EXPECT_EQ(value, -0.5);
+  EXPECT_TRUE(readDouble("0", value));
+  EXPECT_EQ(value, 0);
+  EXPECT_TRUE(readDouble("42", value));
+  EXPECT_EQ(value, 42);
+
+  // A leading + is accepted: RecordFilter uses it for times relative to the file start
+  EXPECT_TRUE(readDouble("+5", value));
+  EXPECT_EQ(value, 5);
+
+  // Invalid - trailing characters, which stod ignored
+  value = -1;
+  EXPECT_FALSE(readDouble("3.5abc", value));
+  EXPECT_EQ(value, 0);
+  EXPECT_FALSE(readDouble("1.2.3", value));
+  EXPECT_FALSE(readDouble("3.5 ", value));
+
+  // Invalid - leading whitespace, hex, and the non-finite tokens
+  EXPECT_FALSE(readDouble(" 1.5", value));
+  EXPECT_FALSE(readDouble("0x10", value));
+  EXPECT_FALSE(readDouble("+0x10", value));
+  EXPECT_FALSE(readDouble("-0x10", value));
+  EXPECT_FALSE(readDouble("nan", value));
+  EXPECT_FALSE(readDouble("inf", value));
+  EXPECT_FALSE(readDouble("infinity", value));
+
+  // A ',' decimal separator is never accepted, whatever the locale
+  EXPECT_FALSE(readDouble("1,5", value));
+
+  // Invalid - overflow
+  EXPECT_FALSE(readDouble("1e999", value));
+
+  // Invalid - non-numeric and empty
+  EXPECT_FALSE(readDouble("abc", value));
+  EXPECT_FALSE(readDouble("", value));
 }
 
 TEST_F(StringsHelpersTester, readByteSize) {
