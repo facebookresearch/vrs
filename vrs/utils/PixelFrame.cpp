@@ -30,6 +30,7 @@
 #include <vrs/RecordFileReader.h>
 #include <vrs/TagConventions.h>
 #include <vrs/helpers/FileMacros.h>
+#include <vrs/helpers/Strings.h>
 #include <vrs/helpers/Throttler.h>
 #include <vrs/utils/BufferRecordReader.hpp>
 #include <vrs/utils/DecoderFactory.h>
@@ -910,11 +911,8 @@ static float asFloat(const string& strFloat, float defaultValue) {
   if (strFloat.empty()) {
     return defaultValue;
   }
-  try {
-    return stod(strFloat);
-  } catch (logic_error&) {
-    return defaultValue;
-  }
+  double value = 0;
+  return helpers::readDouble(strFloat, value) ? static_cast<float>(value) : defaultValue;
 }
 
 static const float kDefaultDepthMin = 0;

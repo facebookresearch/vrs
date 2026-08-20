@@ -117,12 +117,10 @@ bool isValidStreamFilter(const string& numericName) {
       StreamId::fromNumericNamePlus(numericName).isValid()) {
     return true;
   }
-  try {
-    unsigned long id = stoul(numericName);
-    return id > 0 && id < 0xffff;
-  } catch (logic_error&) {
-    return false;
-  }
+  // Partial parse on purpose: "100-some/flavor" is a valid filter naming recordable type 100.
+  const char* cursor = numericName.c_str();
+  uint32_t id = 0;
+  return helpers::parseNextUInt32(cursor, id) && id > 0 && id < 0xffff;
 }
 
 void computeIncludedStreams(
@@ -409,12 +407,12 @@ void FilteredFileReader::applyTypeFilters(const vector<string>& filters) {
 }
 
 bool RecordFilter::afterConstraint(const string& after) {
-  try {
-    setMinTime(stod(after), isSigned(after));
-    return true;
-  } catch (logic_error&) {
+  double minimumTime = 0;
+  if (!helpers::readDouble(after, minimumTime)) {
     return false;
   }
+  setMinTime(minimumTime, isSigned(after));
+  return true;
 }
 
 void RecordFilter::setMinTime(double minimumTime, bool relativeToBegin) {
@@ -423,12 +421,12 @@ void RecordFilter::setMinTime(double minimumTime, bool relativeToBegin) {
 }
 
 bool RecordFilter::beforeConstraint(const string& before) {
-  try {
-    setMaxTime(stod(before), isSigned(before));
-    return true;
-  } catch (logic_error&) {
+  double maximumTime = 0;
+  if (!helpers::readDouble(before, maximumTime)) {
     return false;
   }
+  setMaxTime(maximumTime, isSigned(before));
+  return true;
 }
 
 void RecordFilter::setMaxTime(double maximumTime, bool relativeToEnd) {
