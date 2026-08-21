@@ -116,9 +116,6 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>CacheStatsCallbackFu
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a80622c2dc172232f62e8afdb6f635889" id="r_a80622c2dc172232f62e8afdb6f635889"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrs_1_1_write_file_handler.html">WriteFileHandler</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#a80622c2dc172232f62e8afdb6f635889">asWriteFileHandler</a> ()</td></tr>
-<tr class="memdesc:a80622c2dc172232f62e8afdb6f635889"><td class="mdescLeft">&#160;</td><td class="mdescRight">So VRS can avoid RTTI.  <br /></td></tr>
-<tr class="separator:a80622c2dc172232f62e8afdb6f635889"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a0fad21cc11da4451664cf36805ea32" id="r_a9a0fad21cc11da4451664cf36805ea32"><td class="memItemLeft" align="right" valign="top">virtual unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler.html#a9a0fad21cc11da4451664cf36805ea32">makeNew</a> () const =0</td></tr>
 <tr class="separator:a9a0fad21cc11da4451664cf36805ea32"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a517b4a7e2cc00f6bd7b98d999e2e540a" id="r_a517b4a7e2cc00f6bd7b98d999e2e540a"><td class="memItemLeft" align="right" valign="top"><a id="a517b4a7e2cc00f6bd7b98d999e2e540a" name="a517b4a7e2cc00f6bd7b98d999e2e540a"></a>
@@ -216,35 +213,6 @@ static unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHa
 <p>VRS file users probably only need to use <a class="el" href="classvrs_1_1_record_file_reader.html" title="The class to read VRS files.">RecordFileReader</a> &amp; <a class="el" href="classvrs_1_1_record_file_writer.html" title="The class to create VRS files.">RecordFileWriter</a>, but they have the option to use <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> directly to access files stored on remote file systems, same as VRS. Use <a class="el" href="classvrs_1_1_file_handler_factory.html#a8cc1b86d81f9a65dd1fc6a9caeaaa1e7">FileHandlerFactory::delegateOpen()</a> to find the proper <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> implementation and open a file. <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> only exposes read operations, because it's the most implementation, while <a class="el" href="classvrs_1_1_write_file_handler.html" title="The WriteFileHandler interface adds write operations to the FileHandler interface.">WriteFileHandler</a> extends <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> for write operations. Both are abstract classes.</p>
 <p>'int' return values are status codes: 0 means success, while other values are error codes, which can always be converted to a human readable string using <a class="el" href="namespacevrs.html#a9d1cff6866c1a17d4d5ac9f664dfa1a1">vrs::errorCodeToMessage(code)</a>. File sizes and offset are specified using int64_t, which is equivalent to the POSIX behavior. Byte counts use size_t. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a80622c2dc172232f62e8afdb6f635889" name="a80622c2dc172232f62e8afdb6f635889"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a80622c2dc172232f62e8afdb6f635889">&#9670;&#160;</a></span>asWriteFileHandler()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual <a class="el" href="classvrs_1_1_write_file_handler.html">WriteFileHandler</a> * vrs::FileHandler::asWriteFileHandler </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>So VRS can avoid RTTI. </p>
-
-<p>Reimplemented in <a class="el" href="classvrs_1_1_write_file_handler.html#ad31fa61344a28a1d19787cb0c8d13861">vrs::WriteFileHandler</a>.</p>
-
-</div>
-</div>
 <a id="ae110dcfe731d9a1e1c6b2a8069271554" name="ae110dcfe731d9a1e1c6b2a8069271554"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae110dcfe731d9a1e1c6b2a8069271554">&#9670;&#160;</a></span>close()</h2>
 
