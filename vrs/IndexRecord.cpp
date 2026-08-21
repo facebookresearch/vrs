@@ -751,7 +751,7 @@ int IndexRecord::Reader::readDiskInfo(vector<DiskRecordInfo>& outRecords) {
 }
 
 int IndexRecord::Reader::rebuildIndex(bool writeFixedIndex) {
-  WriteFileHandler* writeFile = writeFixedIndex ? dynamic_cast<WriteFileHandler*>(&file_) : nullptr;
+  WriteFileHandler* writeFile = writeFixedIndex ? file_.asWriteFileHandler() : nullptr;
   if (writeFixedIndex && (writeFile == nullptr || !writeFile->reopenForUpdatesSupported())) {
     XR_LOGW("File modifications not supported by {}.", file_.getFileHandlerName());
     writeFixedIndex = false;

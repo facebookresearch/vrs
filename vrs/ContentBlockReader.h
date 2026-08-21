@@ -28,6 +28,7 @@ namespace vrs {
 using std::unique_ptr;
 
 class ContentBlock;
+class DataLayoutBlockReader;
 class RecordFormatStreamPlayer;
 struct RecordFormatReader;
 
@@ -39,6 +40,11 @@ struct RecordFormatReader;
 /// @internal
 class VRS_API ContentBlockReader {
  public:
+  /// So VRS can avoid RTTI.
+  virtual DataLayoutBlockReader* asDataLayoutBlockReader() {
+    return nullptr;
+  }
+
   /// Factory style constructor, which will determine what ContentBlockReader object needs to be
   /// created to handle the referenced block.
   /// @param recordFormat: RecordFormat of the record.
@@ -151,6 +157,10 @@ class VRS_API EmptyBlockReader : public ContentBlockReader {
 /// @internal
 class VRS_API DataLayoutBlockReader : public ContentBlockReader {
  public:
+  DataLayoutBlockReader* asDataLayoutBlockReader() override {
+    return this;
+  }
+
   DataLayoutBlockReader(
       const RecordFormat& recordFormat,
       size_t blockIndex,

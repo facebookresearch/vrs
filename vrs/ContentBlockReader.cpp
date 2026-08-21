@@ -76,8 +76,9 @@ bool mayUsePastConfigurationReader(
 /// @param desiredLayout: Layout to map to the record's layout.
 /// @return True there was a record layout to map to, False otherwise.
 bool mapToBlockLayout(RecordFormatReader* reader, size_t blockIndex, DataLayout& desiredLayout) {
+  ContentBlockReader* blockReader = reader->contentReaders[blockIndex].get();
   DataLayoutBlockReader* layoutReader =
-      dynamic_cast<DataLayoutBlockReader*>(reader->contentReaders[blockIndex].get());
+      blockReader == nullptr ? nullptr : blockReader->asDataLayoutBlockReader();
   return layoutReader != nullptr && layoutReader->mapToBlockLayout(desiredLayout);
 }
 
