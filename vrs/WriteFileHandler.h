@@ -42,10 +42,6 @@ namespace vrs {
 /// easily reusable for other applications that VRS.
 class VRS_API WriteFileHandler : public FileHandler {
  public:
-  WriteFileHandler* asWriteFileHandler() override {
-    return this;
-  }
-
   WriteFileHandler() = default;
 
   /// Create a new WriteFileHandler from a name.

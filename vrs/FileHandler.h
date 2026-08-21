@@ -78,8 +78,6 @@ VRS_API string toString(CachingStrategy cachingStrategy);
 template <>
 VRS_API CachingStrategy toEnum<>(const string& name);
 
-class WriteFileHandler;
-
 /// \brief Class to abstract VRS file system operations, to enable support for alternate storage
 /// methods, in particular network/cloud storage implementations.
 ///
@@ -98,11 +96,6 @@ class WriteFileHandler;
 /// Byte counts use size_t.
 class VRS_API FileHandler : public FileDelegator {
  public:
-  /// So VRS can avoid RTTI.
-  virtual WriteFileHandler* asWriteFileHandler() {
-    return nullptr;
-  }
-
   /// Stats for cache.
   struct CacheStats {
     double startTime;

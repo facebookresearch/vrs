@@ -218,10 +218,8 @@ unique_ptr<WriteFileHandler> WriteFileHandler::make(const string& fileHandlerNam
       handler = FileHandlerFactory::getInstance().getFileHandler(writerName);
     }
   }
-  if (handler == nullptr || handler->asWriteFileHandler() == nullptr) {
-    return nullptr;
-  }
-  return unique_ptr<WriteFileHandler>{static_cast<WriteFileHandler*>(handler.release())};
+  unique_ptr<WriteFileHandler> file{dynamic_cast<WriteFileHandler*>(handler.release())};
+  return file;
 }
 
 } // namespace vrs
