@@ -228,7 +228,7 @@ enum class RecordableTypeId : uint16_t {
 string toString(RecordableTypeId typeId);
 
 /// Tell if an id is that of a "Recordable Class".
-inline bool isARecordableClass(RecordableTypeId typeId) {
+constexpr bool isARecordableClass(RecordableTypeId typeId) {
   return typeId >= RecordableTypeId::FirstRecordableClassId &&
       typeId <= RecordableTypeId::LastRecordableClassId;
 }
@@ -250,44 +250,44 @@ inline bool isARecordableClass(RecordableTypeId typeId) {
 /// can then quickly determine the StreamId for each of the streams in the file.
 class StreamId {
  public:
-  StreamId() : typeId_{RecordableTypeId::Undefined}, instanceId_{0} {}
-  StreamId(const StreamId& rhs) = default;
-  StreamId(StreamId&& rhs) noexcept = default;
-  StreamId(RecordableTypeId typeId, uint16_t instanceId)
+  constexpr StreamId() : typeId_{RecordableTypeId::Undefined}, instanceId_{0} {}
+  constexpr StreamId(const StreamId& rhs) = default;
+  constexpr StreamId(StreamId&& rhs) noexcept = default;
+  constexpr StreamId(RecordableTypeId typeId, uint16_t instanceId)
       : typeId_{typeId}, instanceId_{instanceId} {}
   ~StreamId() = default;
 
   /// Get the recordable type id.
   /// @return Recordable type id.
-  RecordableTypeId getTypeId() const {
+  constexpr RecordableTypeId getTypeId() const {
     return typeId_;
   }
 
   /// Get the instance id.
   /// @return Instance id.
-  uint16_t getInstanceId() const {
+  constexpr uint16_t getInstanceId() const {
     return instanceId_;
   }
 
-  StreamId& operator=(const StreamId& rhs) = default;
-  StreamId& operator=(StreamId&& rhs) noexcept = default;
-  bool operator==(const StreamId& rhs) const {
+  constexpr StreamId& operator=(const StreamId& rhs) = default;
+  constexpr StreamId& operator=(StreamId&& rhs) noexcept = default;
+  constexpr bool operator==(const StreamId& rhs) const {
     return typeId_ == rhs.typeId_ && instanceId_ == rhs.instanceId_;
   }
 
-  bool operator!=(const StreamId& rhs) const {
+  constexpr bool operator!=(const StreamId& rhs) const {
     return !operator==(rhs);
   }
 
   /// Compare operator, so that we can use StreamId in containers, with a guaranteed behavior.
-  bool operator<(const StreamId& rhs) const {
+  constexpr bool operator<(const StreamId& rhs) const {
     return typeId_ < rhs.typeId_ || (typeId_ == rhs.typeId_ && instanceId_ < rhs.instanceId_);
   }
 
   /// Test if the instance represents device.
   /// Useful when an API returns a StreamId, and needs to tell that no device was found.
   /// @return True if the instance is valid/found, false otherwise.
-  bool isValid() const {
+  constexpr bool isValid() const {
     return typeId_ != RecordableTypeId::Undefined;
   }
 
@@ -321,7 +321,7 @@ class StreamId {
   static bool isKnownTypeId(RecordableTypeId typeId);
 
   /// StreamId value guaranteed to be smaller than any valid StreamId object.
-  static StreamId lowest() {
+  static constexpr StreamId lowest() {
     return {static_cast<RecordableTypeId>(0), 0};
   }
 

@@ -33,6 +33,16 @@ namespace {
 
 struct RecordTester : testing::Test {};
 
+constexpr StreamId kConstexprStreamId{RecordableTypeId::UnitTest1, 1};
+static_assert(kConstexprStreamId.isValid());
+static_assert(kConstexprStreamId.getTypeId() == RecordableTypeId::UnitTest1);
+static_assert(kConstexprStreamId.getInstanceId() == 1);
+static_assert(kConstexprStreamId == StreamId{RecordableTypeId::UnitTest1, 1});
+static_assert(kConstexprStreamId != StreamId{RecordableTypeId::UnitTest1, 2});
+static_assert(StreamId::lowest() < kConstexprStreamId);
+static_assert(!StreamId{}.isValid());
+static_assert(isARecordableClass(RecordableTypeId::ForwardCameraRecordableClass));
+
 size_t collect(
     RecordFileWriter::RecordBatches& batches,
     const vector<pair<RecordManager*, StreamId>>& recordManagers,
