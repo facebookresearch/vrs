@@ -108,10 +108,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>unregisterExtraDelega
 <tr class="memitem:a6e371e8865da29b0261d7ccdd1670b9e" id="r_a6e371e8865da29b0261d7ccdd1670b9e"><td class="memItemLeft" align="right" valign="top"><a id="a6e371e8865da29b0261d7ccdd1670b9e" name="a6e371e8865da29b0261d7ccdd1670b9e"></a>
 <a class="el" href="classvrs_1_1_file_delegator.html">FileDelegator</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>getExtraDelegator</b> (const string &amp;extraName, const string &amp;extraValue)</td></tr>
 <tr class="separator:a6e371e8865da29b0261d7ccdd1670b9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adb7871f04a4f6919d06c0dca8c2bd734" id="r_adb7871f04a4f6919d06c0dca8c2bd734"><td class="memItemLeft" align="right" valign="top"><a id="adb7871f04a4f6919d06c0dca8c2bd734" name="adb7871f04a4f6919d06c0dca8c2bd734"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>registerFileHandler</b> (unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt; &amp;&amp;fileHandler)</td></tr>
-<tr class="memdesc:adb7871f04a4f6919d06c0dca8c2bd734"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delegators operating on FileSpec.fileHandlerName. <br /></td></tr>
+<tr class="memitem:adb7871f04a4f6919d06c0dca8c2bd734" id="r_adb7871f04a4f6919d06c0dca8c2bd734"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler_factory.html#adb7871f04a4f6919d06c0dca8c2bd734">registerFileHandler</a> (unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt; &amp;&amp;fileHandler)</td></tr>
 <tr class="separator:adb7871f04a4f6919d06c0dca8c2bd734"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a43c717f794d387f50a55c7ee1bdbff24" id="r_a43c717f794d387f50a55c7ee1bdbff24"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_file_handler_factory.html#a43c717f794d387f50a55c7ee1bdbff24">registerFileHandler</a> (const string &amp;name, unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt; &amp;&amp;fileHandler)</td></tr>
+<tr class="separator:a43c717f794d387f50a55c7ee1bdbff24"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4bb0b156965119809e47b73f45efb891" id="r_a4bb0b156965119809e47b73f45efb891"><td class="memItemLeft" align="right" valign="top"><a id="a4bb0b156965119809e47b73f45efb891" name="a4bb0b156965119809e47b73f45efb891"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>unregisterFileHandler</b> (const string &amp;fileHandlerName)</td></tr>
 <tr class="separator:a4bb0b156965119809e47b73f45efb891"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -257,6 +257,54 @@ static <a class="el" href="classvrs_1_1_file_handler_factory.html">FileHandlerFa
       </table>
 </div><div class="memdoc">
 <p>Delegators operating on particular key-value pairs of FileSpec.extras so this type of URI can be customized: a_scheme:/my/path?my_unique_name=my_unique_value </p>
+
+</div>
+</div>
+<a id="a43c717f794d387f50a55c7ee1bdbff24" name="a43c717f794d387f50a55c7ee1bdbff24"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a43c717f794d387f50a55c7ee1bdbff24">&#9670;&#160;</a></span>registerFileHandler() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void vrs::FileHandlerFactory::registerFileHandler </td>
+          <td>(</td>
+          <td class="paramtype">const string &amp;&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"><em>fileHandler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Register a <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> under a chosen name, so one implementation can be reached under an alias. The handler still reports its own name, and <code><a class="el" href="classvrs_1_1_file_handler_factory.html#ade33e86c2608e83643c1e049b2e6f86d">parseUri()</a></code> implementations typically only accept that name as a URI scheme, so an alias is for lookup by name, not for URIs. </p>
+
+</div>
+</div>
+<a id="adb7871f04a4f6919d06c0dca8c2bd734" name="adb7871f04a4f6919d06c0dca8c2bd734"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adb7871f04a4f6919d06c0dca8c2bd734">&#9670;&#160;</a></span>registerFileHandler() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void vrs::FileHandlerFactory::registerFileHandler </td>
+          <td>(</td>
+          <td class="paramtype">unique_ptr&lt; <a class="el" href="classvrs_1_1_file_handler.html">FileHandler</a> &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"><em>fileHandler</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Delegators operating on FileSpec.fileHandlerName Register a <a class="el" href="classvrs_1_1_file_handler.html" title="Class to abstract VRS file system operations, to enable support for alternate storage methods,...">FileHandler</a> under its own name. </p>
 
 </div>
 </div>
