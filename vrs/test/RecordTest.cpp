@@ -209,10 +209,10 @@ void checkIndexOrder(const vector<R>& records) {
 }
 
 TEST_F(RecordTester, indexSortTest) {
-  const StreamId id1(RecordableTypeId::UnitTest1, 1);
-  const StreamId id2(RecordableTypeId::UnitTest1, 2);
-  const StreamId id3(RecordableTypeId::UnitTest2, 1);
-  const StreamId id4(RecordableTypeId::UnitTest2, 2);
+  constexpr StreamId id1(RecordableTypeId::UnitTest1, 1);
+  constexpr StreamId id2(RecordableTypeId::UnitTest1, 2);
+  constexpr StreamId id3(RecordableTypeId::UnitTest2, 1);
+  constexpr StreamId id4(RecordableTypeId::UnitTest2, 2);
 
   // Create a vector of records you expect to be sorted and verify all the compares combo
   vector<IndexRecord::RecordInfo> records;
@@ -254,10 +254,10 @@ static void checkSortOrder(const vector<RecordFileWriter::SortRecord>& records) 
   recordManager.createRecord(TIMESTAMP, TYPE, 0, DataSource()), ID
 
 TEST_F(RecordTester, sortRecordSortTest) {
-  const StreamId id1(RecordableTypeId::UnitTest1, 1);
-  const StreamId id2(RecordableTypeId::UnitTest1, 2);
-  const StreamId id3(RecordableTypeId::UnitTest2, 1);
-  const StreamId id4(RecordableTypeId::UnitTest2, 2);
+  constexpr StreamId id1(RecordableTypeId::UnitTest1, 1);
+  constexpr StreamId id2(RecordableTypeId::UnitTest1, 2);
+  constexpr StreamId id3(RecordableTypeId::UnitTest2, 1);
+  constexpr StreamId id4(RecordableTypeId::UnitTest2, 2);
 
   RecordManager recordManager;
 
