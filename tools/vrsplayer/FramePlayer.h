@@ -103,6 +103,7 @@ class FramePlayer : public QObject, public VideoRecordFormatStreamPlayer {
   std::mutex videoDecodingMutex_;
   std::mutex frameMutex_;
   std::deque<unique_ptr<PixelFrame>> recycledFrames_;
+  utils::NormalizeOptionsConfig normalizeConfig_;
   utils::NormalizeOptions normalizeOptions_;
   bool needsConvertedFrame_{false};
   ImageFormat imageFormat_{ImageFormat::UNDEFINED};
