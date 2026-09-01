@@ -60,6 +60,8 @@ bool FramePlayer::onDataLayoutRead(
     if (deviceType != nullptr) {
       widget_->setDeviceType(deviceType->get());
     }
+    normalizeConfig_ =
+        PixelFrame::captureNormalizeOptionsConfig(*record.fileReader, record.streamId, layout);
   }
   return true; // read next blocks, if any
 }
@@ -107,7 +109,7 @@ bool FramePlayer::onImageRead(
   if (firstImage_) {
     if (frameValid) {
       normalizeOptions_ = PixelFrame::getStreamNormalizeOptions(
-          *record.fileReader, record.streamId, frame->getPixelFormat());
+          *record.fileReader, record.streamId, frame->getPixelFormat(), normalizeConfig_);
       normalizeOptions_.speedOverPrecision = frame->getWidth() * frame->getHeight() >= 4000 * 4000;
     }
     fmt::print(
