@@ -20,10 +20,23 @@
 #include <memory>
 
 #include <vrs/ForwardDefinitions.h>
+#include <vrs/os/Platform.h>
+
+#if IS_VRS_FB_INTERNAL()
+#include <vrs/utils/PixelFrameOptions_fb.h>
+#endif
 
 namespace vrs::utils {
 
 class PixelFrame;
+
+#if IS_VRS_OSS_CODE()
+/// Open-source builds have no Meta-only fields; these keep NormalizeOptions and
+/// NormalizeOptionsConfig a uniform type across the OSS and Meta-internal trees.
+/// The Meta-internal definitions live in PixelFrameOptions_fb.h.
+struct MetaNormalizeOptions {};
+struct MetaNormalizeOptionsConfig {};
+#endif
 
 // When additional compression options are needed, use this struct instead of overloading the API
 struct CompressionOptions {
@@ -49,6 +62,7 @@ enum class ImageSemantic : uint16_t {
   ObjectClassSegmentation, ///< Segmentation data, one value per object class.
   ObjectIdSegmentation, ///< Segmentation data, one value per object instance.
   Depth, ///< Depth information
+  BuildSpecific, ///< Rendering selected by build-private NormalizeOptions fields.
 };
 
 /// Parameters describing how a PixelFrame should be normalized.
@@ -75,14 +89,18 @@ struct NormalizeOptions {
   bool speedOverPrecision{false}; // prefer speed (for display?) or precision (to save to disk?)
   float min{0};
   float max{0};
+  MetaNormalizeOptions meta{}; // Meta-only fields (empty in open source)
 };
 
 /// Per-stream normalization parameters captured from a stream's configuration record, to build its
 /// NormalizeOptions. Obtain one via PixelFrame::captureNormalizeOptionsConfig() while reading a
 /// configuration record, keep it per stream, and pass it to
-/// PixelFrame::getStreamNormalizeOptions(). Empty for now -- it is the placeholder a future
-/// configuration-record-driven use case will populate (see captureNormalizeOptionsConfig).
-struct NormalizeOptionsConfig {};
+/// PixelFrame::getStreamNormalizeOptions(). The open-source part is empty for now -- it is the
+/// placeholder a future configuration-record-driven use case will populate (see
+/// captureNormalizeOptionsConfig); Meta-only parameters live in the meta field.
+struct NormalizeOptionsConfig {
+  MetaNormalizeOptionsConfig meta{}; // Meta-only fields (empty in open source)
+};
 
 /// Options for resizing (downscaling or upscaling) images
 struct ResizeOptions {
