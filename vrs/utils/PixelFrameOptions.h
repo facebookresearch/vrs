@@ -44,7 +44,8 @@ struct CompressionOptions {
 
 enum class ImageSemantic : uint16_t {
   Undefined,
-  Camera, ///< Visual data (regular image)
+  Image, ///< Visual data ready to display as is
+  Camera [[deprecated("Use Image instead")]] = Image,
   ObjectClassSegmentation, ///< Segmentation data, one value per object class.
   ObjectIdSegmentation, ///< Segmentation data, one value per object instance.
   Depth, ///< Depth information
@@ -53,20 +54,17 @@ enum class ImageSemantic : uint16_t {
 /// Parameters describing how a PixelFrame should be normalized.
 ///
 /// "Normalizing" means converting a frame from its on-disk representation into a
-/// form suitable for display or for re-encoding. Different streams require
+/// form suitable for visualization or re-encoding/compression. Different streams require
 /// different treatments (e.g. plain camera images, depth, segmentation, ...),
 /// and this struct exists so that those alternate normalization methods can be
 /// selected and tuned without overloading the normalization API: callers fill
 /// in a NormalizeOptions, and the normalization code branches on its fields.
 ///
-/// Adding a new normalization use case:
-///  - Extend ImageSemantic (and/or add fields below) to describe the new case
-///    and any parameters it needs.
-///  - Teach the normalization code (PixelFrame::normalizeFrame and friends) how
-///    to honor those fields.
-///  - Teach the factory that builds these options (PixelFrame::
-///    getStreamNormalizeOptions) how to recognize the new case and populate the
-///    fields.
+/// To add a new normalization use case:
+///  - Extend ImageSemantic and/or add fields below.
+///  - Implement NormalizeOptions construction in PixelFrame::captureNormalizeOptionsConfig and/or
+///    PixelFrame::getStreamNormalizeOptions.
+///  - Make PixelFrame::normalizeFrame and friends do normalization as needed.
 struct NormalizeOptions {
   NormalizeOptions() = default;
   explicit NormalizeOptions(ImageSemantic semantic) : semantic{semantic} {}
@@ -78,6 +76,13 @@ struct NormalizeOptions {
   float min{0};
   float max{0};
 };
+
+/// Per-stream normalization parameters captured from a stream's configuration record, to build its
+/// NormalizeOptions. Obtain one via PixelFrame::captureNormalizeOptionsConfig() while reading a
+/// configuration record, keep it per stream, and pass it to
+/// PixelFrame::getStreamNormalizeOptions(). Empty for now -- it is the placeholder a future
+/// configuration-record-driven use case will populate (see captureNormalizeOptionsConfig).
+struct NormalizeOptionsConfig {};
 
 /// Options for resizing (downscaling or upscaling) images
 struct ResizeOptions {

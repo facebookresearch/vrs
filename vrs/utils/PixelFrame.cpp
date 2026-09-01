@@ -402,6 +402,18 @@ PixelFormat PixelFrame::getNormalizedPixelFormat(
   return format;
 }
 
+bool PixelFrame::transformsImage(ImageSemantic semantic) {
+  return semantic != ImageSemantic::Undefined && semantic != ImageSemantic::Image;
+}
+
+bool PixelFrame::normalizationRequired(
+    PixelFormat srcFormat,
+    bool grey16supported,
+    const NormalizeOptions& options) {
+  return transformsImage(options.semantic) ||
+      getNormalizedPixelFormat(srcFormat, grey16supported, options) != srcFormat;
+}
+
 bool PixelFrame::inplaceRgbaToRgb() {
   if (getPixelFormat() != PixelFormat::RGBA8) {
     return false;
@@ -432,27 +444,27 @@ bool PixelFrame::normalizeFrame(
     shared_ptr<PixelFrame>& outNormalizedFrame,
     bool grey16supported,
     const NormalizeOptions& options) const {
-  // See if we can convert to something simple enough using Ocean
-  PixelFormat targetPixelFormat =
-      getNormalizedPixelFormat(imageSpec_.getPixelFormat(), grey16supported, options);
-  if (imageSpec_.getPixelFormat() == targetPixelFormat) {
+  PixelFormat srcFormat = imageSpec_.getPixelFormat();
+  if (!normalizationRequired(srcFormat, grey16supported, options)) {
     return false;
   }
+  PixelFormat targetPixelFormat = getNormalizedPixelFormat(srcFormat, grey16supported, options);
+  shared_ptr<PixelFrame> previousOut = outNormalizedFrame;
   if (outNormalizedFrame.get() == this || !outNormalizedFrame) {
     outNormalizedFrame = make_shared<PixelFrame>();
   }
-  return normalizeFrame(*outNormalizedFrame, grey16supported, options, targetPixelFormat);
+  if (normalizeFrame(*outNormalizedFrame, grey16supported, options, targetPixelFormat)) {
+    return true;
+  }
+  outNormalizedFrame = previousOut;
+  return false;
 }
 
-bool PixelFrame::normalizeFrame(
+bool PixelFrame::normalizeSemanticFrame(
     PixelFrame& outNormalizedFrame,
-    bool grey16supported,
-    const NormalizeOptions& options,
-    PixelFormat normalizedPixelFormat) const {
-  PixelFormat srcFormat = imageSpec_.getPixelFormat();
-  if (normalizedPixelFormat == PixelFormat::UNDEFINED) {
-    normalizedPixelFormat = getNormalizedPixelFormat(srcFormat, grey16supported, options);
-  }
+    PixelFormat normalizedPixelFormat,
+    const NormalizeOptions& options) const {
+  const PixelFormat srcFormat = imageSpec_.getPixelFormat();
   if (options.semantic == ImageSemantic::Depth && getPixelFormat() == PixelFormat::DEPTH32F &&
       normalizedPixelFormat == PixelFormat::GREY8) {
     if (options.min < options.max) {
@@ -475,8 +487,8 @@ bool PixelFrame::normalizeFrame(
       uint32_t srcStride = getStride();
       uint32_t dstStride = outNormalizedFrame.getStride();
       for (uint32_t h = 0; h < getHeight(); ++h) {
-        const uint16_t* srcLine = data<uint16_t>(srcStride * h);
-        RGBColor* dstLine = outNormalizedFrame.data<RGBColor>(dstStride * h);
+        const uint16_t* srcLine = data<uint16_t>(static_cast<size_t>(srcStride) * h);
+        RGBColor* dstLine = outNormalizedFrame.data<RGBColor>(static_cast<size_t>(dstStride) * h);
         for (uint32_t w = 0; w < getWidth(); ++w) {
           uint16_t color = srcLine[w];
           dstLine[w] = colors[color];
@@ -493,6 +505,27 @@ bool PixelFrame::normalizeFrame(
       }
       return true;
     }
+  }
+  if (getImageFormat() == ImageFormat::RAW && normalizedPixelFormat == srcFormat &&
+      transformsImage(options.semantic)) {
+    outNormalizedFrame.init(imageSpec_);
+    outNormalizedFrame.getBuffer() = frameBytes_;
+    return true;
+  }
+  return false;
+}
+
+bool PixelFrame::normalizeFrame(
+    PixelFrame& outNormalizedFrame,
+    bool grey16supported,
+    const NormalizeOptions& options,
+    PixelFormat normalizedPixelFormat) const {
+  PixelFormat srcFormat = imageSpec_.getPixelFormat();
+  if (normalizedPixelFormat == PixelFormat::UNDEFINED) {
+    normalizedPixelFormat = getNormalizedPixelFormat(srcFormat, grey16supported, options);
+  }
+  if (normalizeSemanticFrame(outNormalizedFrame, normalizedPixelFormat, options)) {
+    return true;
   }
   if (normalizeToPixelFormatWithOcean(outNormalizedFrame, normalizedPixelFormat, options)) {
     return true;
@@ -918,8 +951,18 @@ static float asFloat(const string& strFloat, float defaultValue) {
 static const float kDefaultDepthMin = 0;
 static const float kDefaultDepthMax = 6;
 
-NormalizeOptions
-PixelFrame::getStreamNormalizeOptions(RecordFileReader& reader, StreamId id, PixelFormat format) {
+NormalizeOptionsConfig PixelFrame::captureNormalizeOptionsConfig(
+    RecordFileReader& /* reader */,
+    StreamId /* id */,
+    const DataLayout& /* configLayout */) {
+  return {};
+}
+
+NormalizeOptions PixelFrame::getStreamNormalizeOptions(
+    RecordFileReader& reader,
+    StreamId id,
+    PixelFormat format,
+    const NormalizeOptionsConfig& /* capturedConfig */) {
   string imageSemantic = reader.getTag(id, tag_conventions::kImageSemantic);
   if (!imageSemantic.empty()) {
     if (imageSemantic == tag_conventions::kImageSemanticObjectClassSegmentation) {
@@ -933,7 +976,7 @@ PixelFrame::getStreamNormalizeOptions(RecordFileReader& reader, StreamId id, Pix
           asFloat(reader.getTag(tag_conventions::kRenderDepthImagesRangeMax), kDefaultDepthMax);
       return {ImageSemantic::Depth, min, max};
     } else if (imageSemantic == tag_conventions::kImageSemanticCamera) {
-      return NormalizeOptions(ImageSemantic::Camera);
+      return NormalizeOptions(ImageSemantic::Image);
     }
   }
   /// Legacy streams handling, using RecordableTypeId as proxy
@@ -960,7 +1003,7 @@ PixelFrame::getStreamNormalizeOptions(RecordFileReader& reader, StreamId id, Pix
     default:
       break;
   }
-  return NormalizeOptions(ImageSemantic::Camera);
+  return NormalizeOptions(ImageSemantic::Image);
 }
 
 bool PixelFrame::areCompatible(ImageFormat imageFormat, PixelFormat pixelFormat) {

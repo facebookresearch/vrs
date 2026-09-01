@@ -249,7 +249,7 @@ TEST_F(PixelFrameTest, getStreamNormalizeOptionsCameraTag) {
   StreamId id = reader.getStreamForType(RecordableTypeId::ImageStream);
   ASSERT_TRUE(id.isValid());
   NormalizeOptions options = PixelFrame::getStreamNormalizeOptions(reader, id, PixelFormat::RGB8);
-  EXPECT_EQ(options.semantic, ImageSemantic::Camera);
+  EXPECT_EQ(options.semantic, ImageSemantic::Image);
   reader.closeFile();
 }
 
@@ -282,7 +282,7 @@ TEST_F(PixelFrameTest, getStreamNormalizeOptionsDefaultsToCamera) {
   StreamId id = reader.getStreamForType(RecordableTypeId::ImageStream);
   ASSERT_TRUE(id.isValid());
   NormalizeOptions options = PixelFrame::getStreamNormalizeOptions(reader, id, PixelFormat::GREY8);
-  EXPECT_EQ(options.semantic, ImageSemantic::Camera);
+  EXPECT_EQ(options.semantic, ImageSemantic::Image);
   reader.closeFile();
 }
 
@@ -344,7 +344,7 @@ TEST_F(PixelFrameTest, getStreamNormalizeOptionsExplicitTagOverridesLegacyInfere
   ASSERT_TRUE(id.isValid());
   NormalizeOptions options =
       PixelFrame::getStreamNormalizeOptions(reader, id, PixelFormat::DEPTH32F);
-  EXPECT_EQ(options.semantic, ImageSemantic::Camera);
+  EXPECT_EQ(options.semantic, ImageSemantic::Image);
   reader.closeFile();
   os::remove(path);
 }
@@ -425,12 +425,12 @@ TEST_F(PixelFrameTest, normalizedPixelFormatMatrix) {
     PixelFormat expected;
   };
   const vector<TestCase> testCases{
-      {PixelFormat::GREY8, true, ImageSemantic::Camera, PixelFormat::GREY8},
-      {PixelFormat::GREY10, true, ImageSemantic::Camera, PixelFormat::GREY16},
-      {PixelFormat::GREY10, false, ImageSemantic::Camera, PixelFormat::GREY8},
-      {PixelFormat::GREY12, true, ImageSemantic::Camera, PixelFormat::GREY16},
-      {PixelFormat::RGB8, false, ImageSemantic::Camera, PixelFormat::RGB8},
-      {PixelFormat::RGBA8, false, ImageSemantic::Camera, PixelFormat::RGB8},
+      {PixelFormat::GREY8, true, ImageSemantic::Image, PixelFormat::GREY8},
+      {PixelFormat::GREY10, true, ImageSemantic::Image, PixelFormat::GREY16},
+      {PixelFormat::GREY10, false, ImageSemantic::Image, PixelFormat::GREY8},
+      {PixelFormat::GREY12, true, ImageSemantic::Image, PixelFormat::GREY16},
+      {PixelFormat::RGB8, false, ImageSemantic::Image, PixelFormat::RGB8},
+      {PixelFormat::RGBA8, false, ImageSemantic::Image, PixelFormat::RGB8},
       {PixelFormat::GREY16, true, ImageSemantic::Depth, PixelFormat::GREY16},
       {PixelFormat::GREY16, true, ImageSemantic::ObjectClassSegmentation, PixelFormat::RGB8},
       {PixelFormat::GREY16, true, ImageSemantic::ObjectIdSegmentation, PixelFormat::RGB8},
@@ -445,7 +445,30 @@ TEST_F(PixelFrameTest, normalizedPixelFormatMatrix) {
   }
 }
 
-TEST_F(PixelFrameTest, fixedPointSemanticNormalizationIsNoOp) {
+TEST_F(PixelFrameTest, normalizationRequirementIncludesSemanticTransforms) {
+  EXPECT_FALSE(PixelFrame::transformsImage(ImageSemantic::Undefined));
+  EXPECT_FALSE(PixelFrame::transformsImage(ImageSemantic::Image));
+  EXPECT_TRUE(PixelFrame::transformsImage(ImageSemantic::Depth));
+  EXPECT_TRUE(PixelFrame::transformsImage(ImageSemantic::ObjectClassSegmentation));
+  EXPECT_TRUE(PixelFrame::transformsImage(ImageSemantic::ObjectIdSegmentation));
+  EXPECT_FALSE(
+      PixelFrame::normalizationRequired(
+          PixelFormat::GREY8, false, NormalizeOptions(ImageSemantic::Image)));
+  EXPECT_FALSE(
+      PixelFrame::normalizationRequired(
+          PixelFormat::GREY16, true, NormalizeOptions(ImageSemantic::Image)));
+  EXPECT_TRUE(
+      PixelFrame::normalizationRequired(
+          PixelFormat::RGBA8, false, NormalizeOptions(ImageSemantic::Image)));
+  EXPECT_TRUE(
+      PixelFrame::normalizationRequired(
+          PixelFormat::GREY8, false, NormalizeOptions(ImageSemantic::Depth)));
+  EXPECT_TRUE(
+      PixelFrame::normalizationRequired(
+          PixelFormat::RGB8, false, NormalizeOptions(ImageSemantic::ObjectClassSegmentation)));
+}
+
+TEST_F(PixelFrameTest, fixedPointSemanticNormalizationCopiesFrame) {
   struct TestCase {
     PixelFormat format;
     bool grey16Supported;
@@ -461,9 +484,14 @@ TEST_F(PixelFrameTest, fixedPointSemanticNormalizationIsNoOp) {
     PixelFrame source(testCase.format, 2, 1);
     source.getBuffer() = vector<uint8_t>(source.size(), 0x5a);
     shared_ptr<PixelFrame> normalized;
-    EXPECT_FALSE(source.normalizeFrame(
+    EXPECT_TRUE(
+        PixelFrame::normalizationRequired(
+            testCase.format, testCase.grey16Supported, NormalizeOptions(testCase.semantic)));
+    ASSERT_TRUE(source.normalizeFrame(
         normalized, testCase.grey16Supported, NormalizeOptions(testCase.semantic)));
-    EXPECT_EQ(normalized, nullptr);
+    ASSERT_NE(normalized, nullptr);
+    EXPECT_EQ(normalized->getSpec(), source.getSpec());
+    EXPECT_EQ(normalized->getBuffer(), source.getBuffer());
   }
 }
 
@@ -560,7 +588,7 @@ TEST_F(PixelFrameTest, normalizeBayer10GbrgFastPath) {
   constexpr uint16_t kRed10 = 50 << 2;
   PixelFrame source = makeBayer10GbrgFrame(4, 4, kGreen10, kBlue10, kRed10);
   shared_ptr<PixelFrame> normalized;
-  NormalizeOptions options(ImageSemantic::Camera);
+  NormalizeOptions options(ImageSemantic::Image);
   options.speedOverPrecision = true;
   ASSERT_TRUE(source.normalizeFrame(normalized, false, options));
   ASSERT_EQ(normalized->getPixelFormat(), PixelFormat::RGB8);
@@ -583,7 +611,7 @@ TEST_F(PixelFrameTest, normalizeBayer10GbrgQualityPath) {
   constexpr uint16_t kRed10 = 50 << 2;
   PixelFrame source = makeBayer10GbrgFrame(8, 8, kGreen10, kBlue10, kRed10);
   shared_ptr<PixelFrame> normalized;
-  NormalizeOptions options(ImageSemantic::Camera);
+  NormalizeOptions options(ImageSemantic::Image);
   options.speedOverPrecision = false;
   ASSERT_TRUE(source.normalizeFrame(normalized, false, options));
   ASSERT_EQ(normalized->getPixelFormat(), PixelFormat::RGB8);
@@ -608,7 +636,7 @@ TEST_F(PixelFrameTest, normalizeBayer8GbrgFastPath) {
   constexpr uint8_t kRed8 = 50;
   PixelFrame source = makeBayer8GbrgFrame(4, 4, kGreen8, kBlue8, kRed8);
   shared_ptr<PixelFrame> normalized;
-  NormalizeOptions options(ImageSemantic::Camera);
+  NormalizeOptions options(ImageSemantic::Image);
   options.speedOverPrecision = true;
   ASSERT_TRUE(source.normalizeFrame(normalized, false, options));
   ASSERT_EQ(normalized->getPixelFormat(), PixelFormat::RGB8);
@@ -631,7 +659,7 @@ TEST_F(PixelFrameTest, normalizeBayer8GbrgQualityPath) {
   constexpr uint8_t kRed8 = 50;
   PixelFrame source = makeBayer8GbrgFrame(8, 8, kGreen8, kBlue8, kRed8);
   shared_ptr<PixelFrame> normalized;
-  NormalizeOptions options(ImageSemantic::Camera);
+  NormalizeOptions options(ImageSemantic::Image);
   options.speedOverPrecision = false;
   ASSERT_TRUE(source.normalizeFrame(normalized, false, options));
   ASSERT_EQ(normalized->getPixelFormat(), PixelFormat::RGB8);
@@ -669,7 +697,7 @@ TEST_F(PixelFrameTest, normalizeBayer8GbrgFastPathRespectsStride) {
     }
   }
   shared_ptr<PixelFrame> normalized;
-  NormalizeOptions options(ImageSemantic::Camera);
+  NormalizeOptions options(ImageSemantic::Image);
   options.speedOverPrecision = true;
   ASSERT_TRUE(source.normalizeFrame(normalized, false, options));
   ASSERT_EQ(normalized->getPixelFormat(), PixelFormat::RGB8);
@@ -703,7 +731,7 @@ TEST_F(PixelFrameTest, normalizeBayer8GbrgQualityPathRespectsStride) {
     }
   }
   shared_ptr<PixelFrame> normalized;
-  NormalizeOptions options(ImageSemantic::Camera);
+  NormalizeOptions options(ImageSemantic::Image);
   options.speedOverPrecision = false;
   ASSERT_TRUE(source.normalizeFrame(normalized, false, options));
   ASSERT_EQ(normalized->getPixelFormat(), PixelFormat::RGB8);
@@ -743,7 +771,7 @@ TEST_F(PixelFrameTest, normalizeBayer10GbrgFastPathRespectsStride) {
     }
   }
   shared_ptr<PixelFrame> normalized;
-  NormalizeOptions options(ImageSemantic::Camera);
+  NormalizeOptions options(ImageSemantic::Image);
   options.speedOverPrecision = true;
   ASSERT_TRUE(source.normalizeFrame(normalized, false, options));
   ASSERT_EQ(normalized->getPixelFormat(), PixelFormat::RGB8);
@@ -778,7 +806,7 @@ TEST_F(PixelFrameTest, normalizeBayer10GbrgQualityPathRespectsStride) {
     }
   }
   shared_ptr<PixelFrame> normalized;
-  NormalizeOptions options(ImageSemantic::Camera);
+  NormalizeOptions options(ImageSemantic::Image);
   options.speedOverPrecision = false;
   ASSERT_TRUE(source.normalizeFrame(normalized, false, options));
   ASSERT_EQ(normalized->getPixelFormat(), PixelFormat::RGB8);
