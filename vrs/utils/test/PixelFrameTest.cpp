@@ -451,6 +451,7 @@ TEST_F(PixelFrameTest, normalizationRequirementIncludesSemanticTransforms) {
   EXPECT_TRUE(PixelFrame::transformsImage(ImageSemantic::Depth));
   EXPECT_TRUE(PixelFrame::transformsImage(ImageSemantic::ObjectClassSegmentation));
   EXPECT_TRUE(PixelFrame::transformsImage(ImageSemantic::ObjectIdSegmentation));
+  EXPECT_TRUE(PixelFrame::transformsImage(ImageSemantic::BuildSpecific));
   EXPECT_FALSE(
       PixelFrame::normalizationRequired(
           PixelFormat::GREY8, false, NormalizeOptions(ImageSemantic::Image)));
@@ -466,6 +467,9 @@ TEST_F(PixelFrameTest, normalizationRequirementIncludesSemanticTransforms) {
   EXPECT_TRUE(
       PixelFrame::normalizationRequired(
           PixelFormat::RGB8, false, NormalizeOptions(ImageSemantic::ObjectClassSegmentation)));
+  EXPECT_TRUE(
+      PixelFrame::normalizationRequired(
+          PixelFormat::RGB8, false, NormalizeOptions(ImageSemantic::BuildSpecific)));
 }
 
 TEST_F(PixelFrameTest, fixedPointSemanticNormalizationCopiesFrame) {

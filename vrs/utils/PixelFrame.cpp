@@ -38,6 +38,10 @@
 #include <vrs/utils/converters/Raw10ToGrey10Converter.h>
 #include <utility>
 
+#if IS_VRS_FB_INTERNAL()
+#include <vrs/utils/PixelFrameOptions_fb.h>
+#endif
+
 using namespace std;
 using namespace vrs;
 
@@ -506,6 +510,9 @@ bool PixelFrame::normalizeSemanticFrame(
       return true;
     }
   }
+  if (options.semantic == ImageSemantic::BuildSpecific) {
+    return normalizeToPixelFormat(outNormalizedFrame, normalizedPixelFormat, options);
+  }
   if (getImageFormat() == ImageFormat::RAW && normalizedPixelFormat == srcFormat &&
       transformsImage(options.semantic)) {
     outNormalizedFrame.init(imageSpec_);
@@ -952,17 +959,34 @@ static const float kDefaultDepthMin = 0;
 static const float kDefaultDepthMax = 6;
 
 NormalizeOptionsConfig PixelFrame::captureNormalizeOptionsConfig(
-    RecordFileReader& /* reader */,
-    StreamId /* id */,
-    const DataLayout& /* configLayout */) {
-  return {};
+    RecordFileReader& reader,
+    StreamId id,
+    const DataLayout& configLayout) {
+  NormalizeOptionsConfig config;
+#if IS_VRS_FB_INTERNAL()
+  if (captureMetaNormalizeOptionsConfig(reader, id, configLayout, config)) {
+    return config;
+  }
+#endif
+  (void)reader;
+  (void)id;
+  (void)configLayout;
+  return config;
 }
 
 NormalizeOptions PixelFrame::getStreamNormalizeOptions(
     RecordFileReader& reader,
     StreamId id,
     PixelFormat format,
-    const NormalizeOptionsConfig& /* capturedConfig */) {
+    const NormalizeOptionsConfig& capturedConfig) {
+#if IS_VRS_FB_INTERNAL()
+  NormalizeOptions metaOptions;
+  if (getMetaStreamNormalizeOptions(reader, id, format, capturedConfig, metaOptions)) {
+    return metaOptions; // NOLINT(clang-diagnostic-nrvo)
+  }
+#else
+  (void)capturedConfig;
+#endif
   string imageSemantic = reader.getTag(id, tag_conventions::kImageSemantic);
   if (!imageSemantic.empty()) {
     if (imageSemantic == tag_conventions::kImageSemanticObjectClassSegmentation) {
