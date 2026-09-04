@@ -463,8 +463,16 @@ const string& getHomeFolder() {
 
 #if !IS_WINDOWS_PLATFORM() && !IS_APPLE_PLATFORM()
 static size_t getLinuxSelfExePath(char* buf, size_t buflen) {
+  if (buflen == 0) {
+    return 0;
+  }
   ssize_t readlinkLen = ::readlink("/proc/self/exe", buf, buflen);
-  size_t len = (readlinkLen == -1 || readlinkLen == sizeof(buf)) ? 0 : readlinkLen;
+  // readlink() does not write a terminating null. When the returned length equals
+  // the buffer size, the path was truncated and null-terminating at that offset
+  // would write past the end of the buffer.
+  size_t len = (readlinkLen <= 0 || static_cast<size_t>(readlinkLen) >= buflen)
+      ? 0
+      : static_cast<size_t>(readlinkLen);
   buf[len] = '\0';
   return len;
 }
