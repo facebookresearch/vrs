@@ -52,7 +52,13 @@ class VRS_API FileHandlerFactory {
   FileDelegator* getExtraDelegator(const string& extraName, const string& extraValue);
 
   /// Delegators operating on FileSpec.fileHandlerName
+  /// Register a FileHandler under its own name.
   void registerFileHandler(unique_ptr<FileHandler>&& fileHandler);
+
+  /// Register a FileHandler under a chosen name, so one implementation can be reached under an
+  /// alias. The handler still reports its own name, and `parseUri()` implementations typically
+  /// only accept that name as a URI scheme, so an alias is for lookup by name, not for URIs.
+  void registerFileHandler(const string& name, unique_ptr<FileHandler>&& fileHandler);
   void unregisterFileHandler(const string& fileHandlerName);
   unique_ptr<FileHandler> getFileHandler(const string& name);
   FileDelegator* getFileDelegator(const string& name);

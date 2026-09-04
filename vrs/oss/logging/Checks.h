@@ -39,6 +39,7 @@ void logAndAbort(const char* condition, const string& message = {});
   (condition ? 0 : ((vrs::logging::logAndAbort(#condition, fmt::format(fmtstr, ##__VA_ARGS__))), 0))
 
 #define XR_CHECK(condition, ...) XR_CHECK_FORMAT(condition, "" __VA_ARGS__)
+#define XR_CHECK_NOEXCEPT(condition, ...) XR_CHECK_FORMAT(condition, "" __VA_ARGS__)
 
 #define XR_CHECK_EQ(val1, val2, ...) XR_CHECK((val1) == (val2), ##__VA_ARGS__)
 

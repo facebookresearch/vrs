@@ -337,6 +337,15 @@ class PixelFrame {
       bool grey16supported,
       const NormalizeOptions& options = {});
 
+  /// Tell if the given semantic implies a transform (not a plain camera image).
+  static bool transformsImage(ImageSemantic semantic);
+
+  /// Tell if normalization is required for a given source format and options.
+  static bool normalizationRequired(
+      PixelFormat srcFormat,
+      bool grey16supported,
+      const NormalizeOptions& options);
+
   /// Tell if an image format supports a specific pixel format.
   /// Only meaningful for png, jpg, jxl.
   /// Always true for ImageFormat::VIDEO (needs decoders to be sure).
@@ -367,17 +376,33 @@ class PixelFrame {
   /// supported (grey8 or rgb8), and the comparison succeeded.
   bool msssimCompare(const PixelFrame& other, double& msssim);
 
-  /// Build the NormalizeOptions describing how a stream's images should be normalized.
-  /// These options must be derived *only* from stream tags and file tags. Tags are
-  /// lightweight metadata that can be read cheaply and safely without touching the
-  /// file's data records. Deriving normalization parameters by reading any record
-  /// is NOT acceptable, because not thread-safe.
+  /// Extract a stream's normalization parameters from its configuration record, to later build
+  /// its NormalizeOptions. Apps call this from a RecordFormatStreamPlayer's onDataLayoutRead()
+  /// callback when reading a configuration record, keep the result per stream, and pass it to
+  /// getStreamNormalizeOptions().
+  /// @param reader: the file reader (for stream/file tags, if needed).
+  /// @param id: the stream whose configuration record is being read.
+  /// @param configLayout: the configuration record's DataLayout being read.
+  /// @return the captured config, to keep next to the stream's NormalizeOptions.
+  static NormalizeOptionsConfig captureNormalizeOptionsConfig(
+      RecordFileReader& reader,
+      StreamId id,
+      const DataLayout& configLayout);
+
+  /// Build the NormalizeOptions describing how a stream's images should be normalized, from any of:
+  /// the stream's captured NormalizeOptionsConfig, the stream's and file's tags, the stream's
+  /// RecordableTypeId, and the image's pixel format.
   /// @param reader: the file reader, used to read the stream's and file's tags.
   /// @param id: the stream whose images will be normalized.
   /// @param format: the pixel format of the images to normalize.
+  /// @param capturedConfig: the stream's parameters from captureNormalizeOptionsConfig(), or an
+  /// empty value to derive options from tags, RecordableTypeId, and PixelFormat alone.
   /// @return the NormalizeOptions to use when normalizing that stream's images.
-  static NormalizeOptions
-  getStreamNormalizeOptions(RecordFileReader& reader, StreamId id, PixelFormat format);
+  static NormalizeOptions getStreamNormalizeOptions(
+      RecordFileReader& reader,
+      StreamId id,
+      PixelFormat format,
+      const NormalizeOptionsConfig& capturedConfig = {});
 
   struct RGBColor {
     RGBColor() = default;
@@ -405,6 +430,10 @@ class PixelFrame {
   }
 
  private:
+  bool normalizeSemanticFrame(
+      PixelFrame& outNormalizedFrame,
+      PixelFormat normalizedPixelFormat,
+      const NormalizeOptions& options) const;
   /// Conversion from an external buffer
   /// @param outNormalizedFrame: on exit, converted frame when returning true.
   /// @param targetPixelFormat: pixel format to target. Expect GREY8, GREY16 and RGB8 to work.

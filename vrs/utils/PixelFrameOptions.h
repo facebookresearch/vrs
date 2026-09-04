@@ -20,10 +20,23 @@
 #include <memory>
 
 #include <vrs/ForwardDefinitions.h>
+#include <vrs/os/Platform.h>
+
+#if IS_VRS_FB_INTERNAL()
+#include <vrs/utils/PixelFrameOptions_fb.h>
+#endif
 
 namespace vrs::utils {
 
 class PixelFrame;
+
+#if IS_VRS_OSS_CODE()
+/// Open-source builds have no Meta-only fields; these keep NormalizeOptions and
+/// NormalizeOptionsConfig a uniform type across the OSS and Meta-internal trees.
+/// The Meta-internal definitions live in PixelFrameOptions_fb.h.
+struct MetaNormalizeOptions {};
+struct MetaNormalizeOptionsConfig {};
+#endif
 
 // When additional compression options are needed, use this struct instead of overloading the API
 struct CompressionOptions {
@@ -44,29 +57,28 @@ struct CompressionOptions {
 
 enum class ImageSemantic : uint16_t {
   Undefined,
-  Camera, ///< Visual data (regular image)
+  Image, ///< Visual data ready to display as is
+  Camera [[deprecated("Use Image instead")]] = Image,
   ObjectClassSegmentation, ///< Segmentation data, one value per object class.
   ObjectIdSegmentation, ///< Segmentation data, one value per object instance.
   Depth, ///< Depth information
+  BuildSpecific, ///< Rendering selected by build-private NormalizeOptions fields.
 };
 
 /// Parameters describing how a PixelFrame should be normalized.
 ///
 /// "Normalizing" means converting a frame from its on-disk representation into a
-/// form suitable for display or for re-encoding. Different streams require
+/// form suitable for visualization or re-encoding/compression. Different streams require
 /// different treatments (e.g. plain camera images, depth, segmentation, ...),
 /// and this struct exists so that those alternate normalization methods can be
 /// selected and tuned without overloading the normalization API: callers fill
 /// in a NormalizeOptions, and the normalization code branches on its fields.
 ///
-/// Adding a new normalization use case:
-///  - Extend ImageSemantic (and/or add fields below) to describe the new case
-///    and any parameters it needs.
-///  - Teach the normalization code (PixelFrame::normalizeFrame and friends) how
-///    to honor those fields.
-///  - Teach the factory that builds these options (PixelFrame::
-///    getStreamNormalizeOptions) how to recognize the new case and populate the
-///    fields.
+/// To add a new normalization use case:
+///  - Extend ImageSemantic and/or add fields below.
+///  - Implement NormalizeOptions construction in PixelFrame::captureNormalizeOptionsConfig and/or
+///    PixelFrame::getStreamNormalizeOptions.
+///  - Make PixelFrame::normalizeFrame and friends do normalization as needed.
 struct NormalizeOptions {
   NormalizeOptions() = default;
   explicit NormalizeOptions(ImageSemantic semantic) : semantic{semantic} {}
@@ -77,6 +89,17 @@ struct NormalizeOptions {
   bool speedOverPrecision{false}; // prefer speed (for display?) or precision (to save to disk?)
   float min{0};
   float max{0};
+  MetaNormalizeOptions meta{}; // Meta-only fields (empty in open source)
+};
+
+/// Per-stream normalization parameters captured from a stream's configuration record, to build its
+/// NormalizeOptions. Obtain one via PixelFrame::captureNormalizeOptionsConfig() while reading a
+/// configuration record, keep it per stream, and pass it to
+/// PixelFrame::getStreamNormalizeOptions(). The open-source part is empty for now -- it is the
+/// placeholder a future configuration-record-driven use case will populate (see
+/// captureNormalizeOptionsConfig); Meta-only parameters live in the meta field.
+struct NormalizeOptionsConfig {
+  MetaNormalizeOptionsConfig meta{}; // Meta-only fields (empty in open source)
 };
 
 /// Options for resizing (downscaling or upscaling) images

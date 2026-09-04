@@ -108,3 +108,18 @@ TEST_F(FileHandlerFactoryTest, openCustomSchemeUri) {
   factory.unregisterFileHandler("myscheme");
   file.reset();
 }
+
+TEST_F(FileHandlerFactoryTest, registerUnderAnAliasName) {
+  FileHandlerFactory& factory = FileHandlerFactory::getInstance();
+
+  factory.registerFileHandler("myalias", make_unique<FakeHandler>("myscheme"));
+  unique_ptr<FileHandler> handler = factory.getFileHandler("myalias");
+  ASSERT_TRUE(handler);
+  // The alias is a registry key only: the handler still reports its own name.
+  EXPECT_STREQ(handler->getFileHandlerName().c_str(), "myscheme");
+  // Registering under an alias does not also register the handler's own name.
+  EXPECT_FALSE(factory.getFileHandler("myscheme"));
+
+  factory.unregisterFileHandler("myalias");
+  EXPECT_FALSE(factory.getFileHandler("myalias"));
+}

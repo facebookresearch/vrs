@@ -18,6 +18,7 @@
 
 #if VRS_ASYNC_DISKFILE_SUPPORTED()
 
+#include <logging/Checks.h>
 #include <logging/Log.h>
 
 #include <algorithm>
@@ -357,9 +358,11 @@ int AsyncFileDescriptor::close() {
 #endif
 
 AlignedBuffer::AlignedBuffer(size_t size, size_t memalign, size_t lenalign) : capacity_(size) {
-  if (lenalign && 0 != (capacity_ % lenalign)) {
-    throw std::runtime_error("Capacity is not a multiple of lenalign");
-  }
+  XR_CHECK(
+      lenalign == 0 || 0 == (capacity_ % lenalign),
+      "Capacity {} is not a multiple of lenalign {}",
+      capacity_,
+      lenalign);
 #if IS_WINDOWS_PLATFORM()
   aligned_buffer_ = _aligned_malloc(capacity_, memalign);
 #else
@@ -368,8 +371,14 @@ AlignedBuffer::AlignedBuffer(size_t size, size_t memalign, size_t lenalign) : ca
   }
 #endif
   if (aligned_buffer_ == nullptr) {
-    throw std::runtime_error("Failed to allocate aligned buffer");
+    XR_LOGCE(VRS_DISKFILECHUNK, "Failed to allocate a {} byte aligned buffer", capacity_);
+    capacity_ = 0;
   }
+}
+
+std::unique_ptr<AlignedBuffer> AlignedBuffer::make(size_t size, size_t memalign, size_t lenalign) {
+  std::unique_ptr<AlignedBuffer> buffer(new AlignedBuffer(size, memalign, lenalign));
+  return buffer->isValid() ? std::move(buffer) : nullptr;
 }
 
 AlignedBuffer::~AlignedBuffer() {
@@ -394,21 +403,23 @@ void AlignedBuffer::clear() {
   size_ = 0;
 }
 
-ssize_t AlignedBuffer::add(const void* buffer, size_t size) {
-  assert(size);
-
-  size_t capacity = this->capacity();
-  if (capacity == 0) {
-    return -1;
+bool AlignedBuffer::add(const void* buffer, size_t size, size_t& outCopiedSize) {
+  outCopiedSize = 0;
+  if (!isValid()) {
+    return false;
   }
-  if (size_ >= capacity) {
-    throw std::runtime_error("buffer is already at capacity");
+  size_t tocopy = std::min<size_t>(size, capacity_ - size_);
+  if (tocopy != 0) {
+    memcpy(bdata() + size_, buffer, tocopy);
+    size_ += tocopy;
+    outCopiedSize = tocopy;
   }
-  size_t tocopy = std::min<size_t>(size, capacity - size_);
-  memcpy(bdata() + size_, buffer, tocopy);
-  size_ += tocopy;
+  return true;
+}
 
-  return tocopy;
+std::unique_ptr<AsyncBuffer> AsyncBuffer::make(size_t size, size_t memalign, size_t lenalign) {
+  std::unique_ptr<AsyncBuffer> buffer(new AsyncBuffer(size, memalign, lenalign));
+  return buffer->isValid() ? std::move(buffer) : nullptr;
 }
 
 void AsyncBuffer::complete_write(ssize_t io_return, int io_errno) {
@@ -514,29 +525,29 @@ void AsyncBuffer::SigEvNotifyFunction(union sigval val) {
   ssize_t io_return = 0;
   int io_errno = 0;
 
+  // Runs on a libc SIGEV_THREAD thread.
   io_errno = aio_error(&self->aiocb_);
   if (io_errno == 0) {
     io_return = aio_return(&self->aiocb_);
-    if (io_return < 0) {
-      throw std::runtime_error(
-          "aio_return returned a negative number despite aio_error indicating success");
-    }
+    XR_CHECK_GE(
+        io_return, 0, "aio_return returned {} despite aio_error indicating success", io_return);
   } else if (io_errno == EINPROGRESS) {
-    throw std::runtime_error("aio_error()==EINPROGRESS on a completed aio_write");
+    XR_CHECK(false, "aio_error()==EINPROGRESS on a completed aio_write");
   } else if (io_errno == ECANCELED) {
     // If canceled, aio_return will give -1
     io_return = aio_return(&self->aiocb_);
-    if (io_return >= 0) {
-      throw std::runtime_error(
-          "aio_error() signaled cancellation, but aio_return indicated success");
-    }
+    XR_CHECK_LT(
+        io_return, 0, "aio_error() signaled cancellation, but aio_return returned {}", io_return);
   } else if (io_errno > 0) {
     io_return = aio_return(&self->aiocb_);
-    if (io_return >= 0) {
-      throw std::runtime_error("aio_error() signaled an error, but aio_return indicated success");
-    }
+    XR_CHECK_LT(
+        io_return,
+        0,
+        "aio_error() signaled error {}, but aio_return returned {}",
+        io_errno,
+        io_return);
   } else {
-    throw std::runtime_error("aio_error() returned an unexpected negative number");
+    XR_CHECK(false, "aio_error() returned an unexpected negative number: {}", io_errno);
   }
 
   self->complete_write(io_return, io_errno);
@@ -579,10 +590,9 @@ AsyncDiskFileChunk::AsyncDiskFileChunk(AsyncDiskFileChunk&& other) noexcept {
 }
 
 AsyncDiskFileChunk::~AsyncDiskFileChunk() {
-  try {
-    close();
-  } catch (std::exception& e) {
-    XR_LOGCE(VRS_DISKFILECHUNK, "Exception on close() during destruction: {}", e.what());
+  int error = close();
+  if (error != 0) {
+    XR_LOGCE(VRS_DISKFILECHUNK, "close() failed during destruction: {}", errorCodeToMessage(error));
   }
 }
 
@@ -725,8 +735,8 @@ int AsyncDiskFileChunk::write(const void* buffer, size_t count, size_t& outWritt
 
   while (count != 0) {
     // This data is aligned to lenalign, so cache it in the current_buffer_
-    ssize_t additionalBuffered = current_buffer_->add(bbuffer, count);
-    if (additionalBuffered <= 0) {
+    size_t additionalBuffered = 0;
+    if (!current_buffer_->add(bbuffer, count, additionalBuffered)) {
       return DISKFILE_PARTIAL_WRITE_ERROR;
     }
     bbuffer += additionalBuffered;
@@ -1044,7 +1054,7 @@ int AsyncDiskFileChunk::alloc_write_buffers() {
   buffers_free_.reserve(num_buffers_);
   buffers_.reserve(num_buffers_);
   while (buffers_.size() < num_buffers_) {
-    auto buffer = std::make_unique<AsyncBuffer>(buffer_size_, mem_align_, offset_align_);
+    auto buffer = AsyncBuffer::make(buffer_size_, mem_align_, offset_align_);
     if (!buffer) {
       return ENOMEM;
     }

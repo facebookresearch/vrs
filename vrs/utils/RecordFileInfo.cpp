@@ -102,11 +102,21 @@ void printTags(ostream& out, string_view prefix, const map<string, string>& tags
     line.append(prefix).append(iter.first).append(" = ");
     appendTruncated(line, iter.second, details, width);
     if (iter.first == tag_conventions::kCaptureTimeEpoch) {
-      time_t creationTimeSec = static_cast<time_t>(stoul(iter.second));
-      if (creationTimeSec > 1000000) {
-        stringstream ss;
-        ss << put_time(localtime(&creationTimeSec), " -- %c %Z");
-        appendTruncated(line, ss.str(), details, width);
+      uint64_t epochSec = 0;
+      if (helpers::readUInt64(iter.second, epochSec) && epochSec > 1000000) {
+        auto creationTimeSec = static_cast<time_t>(epochSec);
+        // Decoding fails for an epoch time_t can't represent, leaving no date to append.
+        struct tm creationTime{};
+#if IS_WINDOWS_PLATFORM()
+        const bool decoded = localtime_s(&creationTime, &creationTimeSec) == 0;
+#else
+        const bool decoded = localtime_r(&creationTimeSec, &creationTime) != nullptr;
+#endif
+        if (decoded) {
+          stringstream ss;
+          ss << put_time(&creationTime, " -- %c %Z");
+          appendTruncated(line, ss.str(), details, width);
+        }
       }
     }
     string printable = make_printable(line);

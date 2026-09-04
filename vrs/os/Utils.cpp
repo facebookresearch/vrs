@@ -231,11 +231,15 @@ const string& getTempFolder() {
 /// Returns true if the source was really a link, but you can *always* use outLinkedPath.
 bool getLinkedTarget(const string& sourcePath, string& outLinkedPath) {
   fs::path source(sourcePath);
-  if (fs::is_symlink(source)) {
+  fs_error_code ec;
+  if (fs::is_symlink(source, ec) && !ec) {
     // Note: apply canonical() instead of readlink()
     // so that relative paths in symlinks are resolved properly
-    outLinkedPath = fs::canonical(source).string();
-    return true;
+    fs::path target = fs::canonical(source, ec);
+    if (!ec) {
+      outLinkedPath = target.string();
+      return true;
+    }
   }
   outLinkedPath = sourcePath;
   return false;
@@ -380,10 +384,13 @@ bool isFile(const string& path) {
 
 vector<string> listDir(const string& dir) {
   vector<string> result;
-  if (isDir(dir)) {
-    for (const auto& entry : fs::directory_iterator(dir)) {
-      result.push_back(entry.path().string());
-    }
+  fs_error_code ec;
+  for (fs::directory_iterator it(dir, ec), end; !ec && it != end; it.increment(ec)) {
+    result.push_back(it->path().string());
+  }
+  if (ec) {
+    // A partial listing is indistinguishable from a complete one, so report nothing instead.
+    result.clear();
   }
   return result;
 }

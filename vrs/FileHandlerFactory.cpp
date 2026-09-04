@@ -103,10 +103,16 @@ int FileHandlerFactory::parseUri(FileSpec& inOutFileSpec, size_t colonIndex) {
 }
 
 void FileHandlerFactory::registerFileHandler(unique_ptr<FileHandler>&& fileHandler) {
+  const string name = fileHandler->getFileHandlerName();
+  registerFileHandler(name, std::move(fileHandler));
+}
+
+void FileHandlerFactory::registerFileHandler(
+    const string& name,
+    unique_ptr<FileHandler>&& fileHandler) {
   unique_lock<mutex> lock(mutex_);
-  const auto fileHandlerName = fileHandler->getFileHandlerName();
-  XR_DEV_CHECK_FALSE(fileHandlerName.empty());
-  fileHandlerMap_[fileHandlerName] = std::move(fileHandler);
+  XR_DEV_CHECK_FALSE(name.empty());
+  fileHandlerMap_[name] = std::move(fileHandler);
 }
 
 void FileHandlerFactory::unregisterFileHandler(const string& fileHandlerName) {

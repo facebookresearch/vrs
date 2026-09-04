@@ -23,6 +23,7 @@
 #include <thread>
 
 #define DEFAULT_LOG_CHANNEL "RecordFileWriter"
+#include <logging/Checks.h>
 #include <logging/Log.h>
 #include <logging/Verify.h>
 
@@ -102,6 +103,7 @@ class CompressionWorker {
   CompressionWorker(const CompressionWorker&) = delete;
   CompressionWorker(CompressionWorker&&) = delete;
   ~CompressionWorker() {
+    XR_CHECK_NOEXCEPT(thread_.joinable());
     thread_.join();
   }
 
@@ -648,6 +650,7 @@ int RecordFileWriter::waitForFileClosed() {
     return NO_FILE_OPEN;
   }
   closeFileAsync();
+  XR_CHECK_NOEXCEPT(writerThreadData_->saveThread.joinable());
   writerThreadData_->saveThread.join();
   int chunkError = 0;
   if (newChunkHandler_ != nullptr) {
@@ -1206,28 +1209,16 @@ int RecordFileWriter::completeAndCloseFile() {
 }
 
 RecordFileWriter::~RecordFileWriter() noexcept {
-  try {
-    if (writerThreadData_ != nullptr) {
-      RecordFileWriter::waitForFileClosed(); // overloads not available in destructors
-      delete writerThreadData_;
-    }
-  } catch (const std::exception& e) {
-    XR_LOGE("Caught exception in ~RecordFileWriter while cleaning up writer thread: {}", e.what());
-  } catch (...) {
-    XR_LOGE("Unknown exception in ~RecordFileWriter while cleaning up writer thread");
+  if (writerThreadData_ != nullptr) {
+    RecordFileWriter::waitForFileClosed(); // overloads not available in destructors
+    delete writerThreadData_;
   }
-
-  try {
-    if (purgeThreadData_ != nullptr) {
-      purgeThreadData_->shouldEndThread = true;
-      purgeThreadData_->purgeEventChannel.dispatchEvent();
-      purgeThreadData_->purgeThread.join();
-      delete purgeThreadData_;
-    }
-  } catch (const std::exception& e) {
-    XR_LOGE("Caught exception in ~RecordFileWriter while cleaning up purge thread: {}", e.what());
-  } catch (...) {
-    XR_LOGE("Unknown exception in ~RecordFileWriter while cleaning up purge thread");
+  if (purgeThreadData_ != nullptr) {
+    purgeThreadData_->shouldEndThread = true;
+    purgeThreadData_->purgeEventChannel.dispatchEvent();
+    XR_CHECK_NOEXCEPT(purgeThreadData_->purgeThread.joinable());
+    purgeThreadData_->purgeThread.join();
+    delete purgeThreadData_;
   }
 }
 

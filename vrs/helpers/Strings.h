@@ -171,8 +171,8 @@ bool getUInt64(const StringStringMap& m, string_view field, uint64_t& outValue);
 /// Helper to get a field of a string map interpreted as a double.
 /// @param m: the map to search.
 /// @param field: the name of the field.
-/// @param outValue: on exit, set to the value retrieved.
-/// @return True if the field was found and outValue was set.
+/// @param outValue: on exit, set to the value retrieved, or 0 if it was not a number only.
+/// @return True if the field was found and its value was a number only.
 bool getDouble(const StringStringMap& m, string_view field, double& outValue);
 
 /// Helper to get a field of a string map interpreted as an uint64_t, with potential unit,
@@ -207,6 +207,14 @@ bool readInt64(string_view str, int64_t& outValue);
 /// @param outValue: the parsed value.
 /// @return True if the string was parsed successfully and the string was a number only.
 bool readUInt64(string_view str, uint64_t& outValue);
+
+/// Helper method to parse a string containing a double value strictly.
+/// Always uses '.' as the decimal separator, whatever the locale.
+/// Takes a string, not a string_view: strtod needs a null terminated string.
+/// @param str: the string that needs to be parsed.
+/// @param outValue: the parsed value, or 0 if the string could not be parsed.
+/// @return True if the string was parsed successfully and the string was a number only.
+bool readDouble(const string& str, double& outValue);
 
 // Reads a number of bytes with optional KB, MB, GB, TB, EB suffixes
 // Returns true on success, false on failure, setting outByteSize to 0.

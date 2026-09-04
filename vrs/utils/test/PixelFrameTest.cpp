@@ -15,6 +15,8 @@
  */
 
 #include <cmath>
+
+#include <fstream>
 #include <memory>
 #include <set>
 #include <string>
@@ -89,8 +91,19 @@ TEST_F(PixelFrameTest, normalize) {
   reader.readAllRecords();
 }
 
+TEST_F(PixelFrameTest, fixedPointSemanticNormalizationKeepsCompressedSource) {
+  const ImageContentBlockSpec spec(ImageFormat::PNG, PixelFormat::GREY8, 2, 1);
+  const vector<uint8_t> encodedBytes{0x89, 0x50, 0x4e, 0x47};
+  auto source = make_shared<PixelFrame>(spec, vector<uint8_t>(encodedBytes));
+  shared_ptr<PixelFrame> normalized;
+  PixelFrame::normalizeFrame(source, normalized, false, NormalizeOptions(ImageSemantic::Depth));
+  ASSERT_EQ(normalized, source);
+  EXPECT_EQ(normalized->getSpec(), spec);
+  EXPECT_EQ(normalized->getBuffer(), encodedBytes);
+}
+
 static bool checkNormalized(const vector<float>& floats, const vector<uint8_t>& ints) {
-  PixelFrame pf(PixelFormat::DEPTH32F, floats.size(), 1);
+  PixelFrame pf(PixelFormat::DEPTH32F, static_cast<uint32_t>(floats.size()), 1);
   memcpy(pf.wdata(), floats.data(), floats.size() * sizeof(float));
   shared_ptr<PixelFrame> normalizedFrame;
   pf.normalizeFrame(normalizedFrame, false);
@@ -130,7 +143,7 @@ static bool checkNormalizedRGB32F(const vector<TripletF>& floats, const vector<T
   if (!XR_VERIFY(floats.size() == ints.size())) {
     return false;
   }
-  PixelFrame pf(PixelFormat::RGB32F, floats.size(), 1);
+  PixelFrame pf(PixelFormat::RGB32F, static_cast<uint32_t>(floats.size()), 1);
   memcpy(
       pf.wdata(), reinterpret_cast<const float*>(floats.data()), 3 * floats.size() * sizeof(float));
   shared_ptr<PixelFrame> normalizedFrame;
@@ -236,7 +249,7 @@ TEST_F(PixelFrameTest, getStreamNormalizeOptionsCameraTag) {
   StreamId id = reader.getStreamForType(RecordableTypeId::ImageStream);
   ASSERT_TRUE(id.isValid());
   NormalizeOptions options = PixelFrame::getStreamNormalizeOptions(reader, id, PixelFormat::RGB8);
-  EXPECT_EQ(options.semantic, ImageSemantic::Camera);
+  EXPECT_EQ(options.semantic, ImageSemantic::Image);
   reader.closeFile();
 }
 
@@ -269,7 +282,7 @@ TEST_F(PixelFrameTest, getStreamNormalizeOptionsDefaultsToCamera) {
   StreamId id = reader.getStreamForType(RecordableTypeId::ImageStream);
   ASSERT_TRUE(id.isValid());
   NormalizeOptions options = PixelFrame::getStreamNormalizeOptions(reader, id, PixelFormat::GREY8);
-  EXPECT_EQ(options.semantic, ImageSemantic::Camera);
+  EXPECT_EQ(options.semantic, ImageSemantic::Image);
   reader.closeFile();
 }
 
@@ -287,6 +300,231 @@ TEST_F(PixelFrameTest, getStreamNormalizeOptionsLegacyDepthCameraTypeId) {
   EXPECT_FLOAT_EQ(options.min, 0.0f);
   EXPECT_FLOAT_EQ(options.max, 6.0f);
   reader.closeFile();
+}
+
+TEST_F(PixelFrameTest, getStreamNormalizeOptionsSegmentationTags) {
+  struct TestCase {
+    const char* tag;
+    ImageSemantic expected;
+  };
+  const vector<TestCase> testCases{
+      {tag_conventions::kImageSemanticObjectClassSegmentation,
+       ImageSemantic::ObjectClassSegmentation},
+      {tag_conventions::kImageSemanticObjectIdSegmentation, ImageSemantic::ObjectIdSegmentation},
+  };
+  for (size_t index = 0; index < testCases.size(); ++index) {
+    const TestCase& testCase = testCases[index];
+    TagStream stream(RecordableTypeId::ImageStream, "test/segmentation");
+    string path = writeTagStreamFile(
+        "normOptsSegmentationTag" + to_string(index) + ".vrs", [&](RecordFileWriter& writer) {
+          stream.setTag(tag_conventions::kImageSemantic, testCase.tag);
+          writer.addRecordable(&stream);
+        });
+    RecordFileReader reader;
+    ASSERT_EQ(reader.openFile(path), 0);
+    StreamId id = reader.getStreamForType(RecordableTypeId::ImageStream);
+    ASSERT_TRUE(id.isValid());
+    NormalizeOptions options =
+        PixelFrame::getStreamNormalizeOptions(reader, id, PixelFormat::GREY16);
+    EXPECT_EQ(options.semantic, testCase.expected);
+    reader.closeFile();
+    os::remove(path);
+  }
+}
+
+TEST_F(PixelFrameTest, getStreamNormalizeOptionsExplicitTagOverridesLegacyInference) {
+  TagStream stream(RecordableTypeId::DepthCameraRecordableClass, "test/tag_override");
+  string path = writeTagStreamFile("normOptsTagOverride.vrs", [&](RecordFileWriter& writer) {
+    stream.setTag(tag_conventions::kImageSemantic, tag_conventions::kImageSemanticCamera);
+    writer.addRecordable(&stream);
+  });
+  RecordFileReader reader;
+  ASSERT_EQ(reader.openFile(path), 0);
+  StreamId id = reader.getStreamForType(RecordableTypeId::DepthCameraRecordableClass);
+  ASSERT_TRUE(id.isValid());
+  NormalizeOptions options =
+      PixelFrame::getStreamNormalizeOptions(reader, id, PixelFormat::DEPTH32F);
+  EXPECT_EQ(options.semantic, ImageSemantic::Image);
+  reader.closeFile();
+  os::remove(path);
+}
+
+TEST_F(PixelFrameTest, getStreamNormalizeOptionsUnknownTagFallsBackToLegacyInference) {
+  TagStream stream(RecordableTypeId::DepthCameraRecordableClass, "test/unknown_tag");
+  string path = writeTagStreamFile("normOptsUnknownTag.vrs", [&](RecordFileWriter& writer) {
+    stream.setTag(tag_conventions::kImageSemantic, "unknown-semantic");
+    writer.addRecordable(&stream);
+  });
+  RecordFileReader reader;
+  ASSERT_EQ(reader.openFile(path), 0);
+  StreamId id = reader.getStreamForType(RecordableTypeId::DepthCameraRecordableClass);
+  ASSERT_TRUE(id.isValid());
+  NormalizeOptions options =
+      PixelFrame::getStreamNormalizeOptions(reader, id, PixelFormat::DEPTH32F);
+  EXPECT_EQ(options.semantic, ImageSemantic::Depth);
+  EXPECT_FLOAT_EQ(options.min, 0.0f);
+  EXPECT_FLOAT_EQ(options.max, 6.0f);
+  reader.closeFile();
+  os::remove(path);
+}
+
+TEST_F(PixelFrameTest, getStreamNormalizeOptionsInvalidDepthRangeUsesDefaults) {
+  TagStream stream(RecordableTypeId::ImageStream, "test/invalid_depth_range");
+  string path = writeTagStreamFile("normOptsInvalidDepthRange.vrs", [&](RecordFileWriter& writer) {
+    stream.setTag(tag_conventions::kImageSemantic, tag_conventions::kImageSemanticDepth);
+    writer.addRecordable(&stream);
+    writer.setTag(tag_conventions::kRenderDepthImagesRangeMin, "not-a-number");
+    writer.setTag(tag_conventions::kRenderDepthImagesRangeMax, "also-not-a-number");
+  });
+  RecordFileReader reader;
+  ASSERT_EQ(reader.openFile(path), 0);
+  StreamId id = reader.getStreamForType(RecordableTypeId::ImageStream);
+  ASSERT_TRUE(id.isValid());
+  NormalizeOptions options =
+      PixelFrame::getStreamNormalizeOptions(reader, id, PixelFormat::DEPTH32F);
+  EXPECT_EQ(options.semantic, ImageSemantic::Depth);
+  EXPECT_FLOAT_EQ(options.min, 0.0f);
+  EXPECT_FLOAT_EQ(options.max, 6.0f);
+  reader.closeFile();
+  os::remove(path);
+}
+
+TEST_F(PixelFrameTest, getStreamNormalizeOptionsLegacySegmentationFlavors) {
+  struct TestCase {
+    const char* flavor;
+    ImageSemantic expected;
+  };
+  const vector<TestCase> testCases{
+      {"test/SegmentationObjectID", ImageSemantic::ObjectClassSegmentation},
+      {"test/SegmentationInstanceID", ImageSemantic::ObjectIdSegmentation},
+      {"test/other", ImageSemantic::ObjectIdSegmentation},
+  };
+  for (size_t index = 0; index < testCases.size(); ++index) {
+    const TestCase& testCase = testCases[index];
+    TagStream stream(RecordableTypeId::DepthCameraRecordableClass, testCase.flavor);
+    string path = writeTagStreamFile(
+        "normOptsLegacySegmentation" + to_string(index) + ".vrs",
+        [&](RecordFileWriter& writer) { writer.addRecordable(&stream); });
+    RecordFileReader reader;
+    ASSERT_EQ(reader.openFile(path), 0);
+    StreamId id = reader.getStreamForType(RecordableTypeId::DepthCameraRecordableClass);
+    ASSERT_TRUE(id.isValid());
+    NormalizeOptions options =
+        PixelFrame::getStreamNormalizeOptions(reader, id, PixelFormat::GREY16);
+    EXPECT_EQ(options.semantic, testCase.expected);
+    reader.closeFile();
+    os::remove(path);
+  }
+}
+
+TEST_F(PixelFrameTest, normalizedPixelFormatMatrix) {
+  struct TestCase {
+    PixelFormat source;
+    bool grey16Supported;
+    ImageSemantic semantic;
+    PixelFormat expected;
+  };
+  const vector<TestCase> testCases{
+      {PixelFormat::GREY8, true, ImageSemantic::Image, PixelFormat::GREY8},
+      {PixelFormat::GREY10, true, ImageSemantic::Image, PixelFormat::GREY16},
+      {PixelFormat::GREY10, false, ImageSemantic::Image, PixelFormat::GREY8},
+      {PixelFormat::GREY12, true, ImageSemantic::Image, PixelFormat::GREY16},
+      {PixelFormat::RGB8, false, ImageSemantic::Image, PixelFormat::RGB8},
+      {PixelFormat::RGBA8, false, ImageSemantic::Image, PixelFormat::RGB8},
+      {PixelFormat::GREY16, true, ImageSemantic::Depth, PixelFormat::GREY16},
+      {PixelFormat::GREY16, true, ImageSemantic::ObjectClassSegmentation, PixelFormat::RGB8},
+      {PixelFormat::GREY16, true, ImageSemantic::ObjectIdSegmentation, PixelFormat::RGB8},
+  };
+  for (const TestCase& testCase : testCases) {
+    EXPECT_EQ(
+        PixelFrame::getNormalizedPixelFormat(
+            testCase.source, testCase.grey16Supported, NormalizeOptions(testCase.semantic)),
+        testCase.expected)
+        << "source=" << toString(testCase.source)
+        << ", grey16Supported=" << testCase.grey16Supported;
+  }
+}
+
+TEST_F(PixelFrameTest, normalizationRequirementIncludesSemanticTransforms) {
+  EXPECT_FALSE(PixelFrame::transformsImage(ImageSemantic::Undefined));
+  EXPECT_FALSE(PixelFrame::transformsImage(ImageSemantic::Image));
+  EXPECT_TRUE(PixelFrame::transformsImage(ImageSemantic::Depth));
+  EXPECT_TRUE(PixelFrame::transformsImage(ImageSemantic::ObjectClassSegmentation));
+  EXPECT_TRUE(PixelFrame::transformsImage(ImageSemantic::ObjectIdSegmentation));
+  EXPECT_TRUE(PixelFrame::transformsImage(ImageSemantic::BuildSpecific));
+  EXPECT_FALSE(
+      PixelFrame::normalizationRequired(
+          PixelFormat::GREY8, false, NormalizeOptions(ImageSemantic::Image)));
+  EXPECT_FALSE(
+      PixelFrame::normalizationRequired(
+          PixelFormat::GREY16, true, NormalizeOptions(ImageSemantic::Image)));
+  EXPECT_TRUE(
+      PixelFrame::normalizationRequired(
+          PixelFormat::RGBA8, false, NormalizeOptions(ImageSemantic::Image)));
+  EXPECT_TRUE(
+      PixelFrame::normalizationRequired(
+          PixelFormat::GREY8, false, NormalizeOptions(ImageSemantic::Depth)));
+  EXPECT_TRUE(
+      PixelFrame::normalizationRequired(
+          PixelFormat::RGB8, false, NormalizeOptions(ImageSemantic::ObjectClassSegmentation)));
+  EXPECT_TRUE(
+      PixelFrame::normalizationRequired(
+          PixelFormat::RGB8, false, NormalizeOptions(ImageSemantic::BuildSpecific)));
+}
+
+TEST_F(PixelFrameTest, fixedPointSemanticNormalizationCopiesFrame) {
+  struct TestCase {
+    PixelFormat format;
+    bool grey16Supported;
+    ImageSemantic semantic;
+  };
+  const vector<TestCase> testCases{
+      {PixelFormat::GREY8, false, ImageSemantic::Depth},
+      {PixelFormat::GREY16, true, ImageSemantic::Depth},
+      {PixelFormat::RGB8, false, ImageSemantic::ObjectClassSegmentation},
+      {PixelFormat::RGB8, false, ImageSemantic::ObjectIdSegmentation},
+  };
+  for (const TestCase& testCase : testCases) {
+    PixelFrame source(testCase.format, 2, 1);
+    source.getBuffer() = vector<uint8_t>(source.size(), 0x5a);
+    shared_ptr<PixelFrame> normalized;
+    EXPECT_TRUE(
+        PixelFrame::normalizationRequired(
+            testCase.format, testCase.grey16Supported, NormalizeOptions(testCase.semantic)));
+    ASSERT_TRUE(source.normalizeFrame(
+        normalized, testCase.grey16Supported, NormalizeOptions(testCase.semantic)));
+    ASSERT_NE(normalized, nullptr);
+    EXPECT_EQ(normalized->getSpec(), source.getSpec());
+    EXPECT_EQ(normalized->getBuffer(), source.getBuffer());
+  }
+}
+
+TEST_F(PixelFrameTest, depthSemanticUsesConfiguredRange) {
+  const vector<float> depthValues{-1.0f, 0.0f, 0.5f, 1.0f, 2.0f, nanf("")};
+  PixelFrame source(PixelFormat::DEPTH32F, static_cast<uint32_t>(depthValues.size()), 1);
+  memcpy(source.wdata(), depthValues.data(), source.size());
+  shared_ptr<PixelFrame> normalized;
+  ASSERT_TRUE(
+      source.normalizeFrame(normalized, false, NormalizeOptions(ImageSemantic::Depth, 0, 1)));
+  ASSERT_NE(normalized, nullptr);
+  EXPECT_EQ(normalized->getPixelFormat(), PixelFormat::GREY8);
+  const vector<uint8_t> expected{0, 0, 127, 255, 255, 0};
+  EXPECT_EQ(normalized->getBuffer(), expected);
+}
+
+TEST_F(PixelFrameTest, segmentationSemanticRendersKnownObjectIds) {
+  PixelFrame source(PixelFormat::GREY16, 2, 1);
+  source.data<uint16_t>()[0] = 0;
+  source.data<uint16_t>()[1] = 0xffff;
+  for (ImageSemantic semantic :
+       {ImageSemantic::ObjectClassSegmentation, ImageSemantic::ObjectIdSegmentation}) {
+    shared_ptr<PixelFrame> normalized;
+    ASSERT_TRUE(source.normalizeFrame(normalized, false, NormalizeOptions(semantic)));
+    ASSERT_NE(normalized, nullptr);
+    EXPECT_EQ(normalized->getPixelFormat(), PixelFormat::RGB8);
+    const vector<uint8_t> expected{0, 0, 0, 255, 255, 255};
+    EXPECT_EQ(normalized->getBuffer(), expected);
+  }
 }
 
 #if IS_VRS_FB_INTERNAL()
@@ -354,7 +592,7 @@ TEST_F(PixelFrameTest, normalizeBayer10GbrgFastPath) {
   constexpr uint16_t kRed10 = 50 << 2;
   PixelFrame source = makeBayer10GbrgFrame(4, 4, kGreen10, kBlue10, kRed10);
   shared_ptr<PixelFrame> normalized;
-  NormalizeOptions options(ImageSemantic::Camera);
+  NormalizeOptions options(ImageSemantic::Image);
   options.speedOverPrecision = true;
   ASSERT_TRUE(source.normalizeFrame(normalized, false, options));
   ASSERT_EQ(normalized->getPixelFormat(), PixelFormat::RGB8);
@@ -377,7 +615,7 @@ TEST_F(PixelFrameTest, normalizeBayer10GbrgQualityPath) {
   constexpr uint16_t kRed10 = 50 << 2;
   PixelFrame source = makeBayer10GbrgFrame(8, 8, kGreen10, kBlue10, kRed10);
   shared_ptr<PixelFrame> normalized;
-  NormalizeOptions options(ImageSemantic::Camera);
+  NormalizeOptions options(ImageSemantic::Image);
   options.speedOverPrecision = false;
   ASSERT_TRUE(source.normalizeFrame(normalized, false, options));
   ASSERT_EQ(normalized->getPixelFormat(), PixelFormat::RGB8);
@@ -402,7 +640,7 @@ TEST_F(PixelFrameTest, normalizeBayer8GbrgFastPath) {
   constexpr uint8_t kRed8 = 50;
   PixelFrame source = makeBayer8GbrgFrame(4, 4, kGreen8, kBlue8, kRed8);
   shared_ptr<PixelFrame> normalized;
-  NormalizeOptions options(ImageSemantic::Camera);
+  NormalizeOptions options(ImageSemantic::Image);
   options.speedOverPrecision = true;
   ASSERT_TRUE(source.normalizeFrame(normalized, false, options));
   ASSERT_EQ(normalized->getPixelFormat(), PixelFormat::RGB8);
@@ -425,7 +663,7 @@ TEST_F(PixelFrameTest, normalizeBayer8GbrgQualityPath) {
   constexpr uint8_t kRed8 = 50;
   PixelFrame source = makeBayer8GbrgFrame(8, 8, kGreen8, kBlue8, kRed8);
   shared_ptr<PixelFrame> normalized;
-  NormalizeOptions options(ImageSemantic::Camera);
+  NormalizeOptions options(ImageSemantic::Image);
   options.speedOverPrecision = false;
   ASSERT_TRUE(source.normalizeFrame(normalized, false, options));
   ASSERT_EQ(normalized->getPixelFormat(), PixelFormat::RGB8);
@@ -463,7 +701,7 @@ TEST_F(PixelFrameTest, normalizeBayer8GbrgFastPathRespectsStride) {
     }
   }
   shared_ptr<PixelFrame> normalized;
-  NormalizeOptions options(ImageSemantic::Camera);
+  NormalizeOptions options(ImageSemantic::Image);
   options.speedOverPrecision = true;
   ASSERT_TRUE(source.normalizeFrame(normalized, false, options));
   ASSERT_EQ(normalized->getPixelFormat(), PixelFormat::RGB8);
@@ -497,7 +735,7 @@ TEST_F(PixelFrameTest, normalizeBayer8GbrgQualityPathRespectsStride) {
     }
   }
   shared_ptr<PixelFrame> normalized;
-  NormalizeOptions options(ImageSemantic::Camera);
+  NormalizeOptions options(ImageSemantic::Image);
   options.speedOverPrecision = false;
   ASSERT_TRUE(source.normalizeFrame(normalized, false, options));
   ASSERT_EQ(normalized->getPixelFormat(), PixelFormat::RGB8);
@@ -537,7 +775,7 @@ TEST_F(PixelFrameTest, normalizeBayer10GbrgFastPathRespectsStride) {
     }
   }
   shared_ptr<PixelFrame> normalized;
-  NormalizeOptions options(ImageSemantic::Camera);
+  NormalizeOptions options(ImageSemantic::Image);
   options.speedOverPrecision = true;
   ASSERT_TRUE(source.normalizeFrame(normalized, false, options));
   ASSERT_EQ(normalized->getPixelFormat(), PixelFormat::RGB8);
@@ -572,7 +810,7 @@ TEST_F(PixelFrameTest, normalizeBayer10GbrgQualityPathRespectsStride) {
     }
   }
   shared_ptr<PixelFrame> normalized;
-  NormalizeOptions options(ImageSemantic::Camera);
+  NormalizeOptions options(ImageSemantic::Image);
   options.speedOverPrecision = false;
   ASSERT_TRUE(source.normalizeFrame(normalized, false, options));
   ASSERT_EQ(normalized->getPixelFormat(), PixelFormat::RGB8);
@@ -603,6 +841,28 @@ TEST_F(PixelFrameTest, jpegTest) {
   ASSERT_EQ(frame.getSpec(), frame2.getSpec());
   frame.blankFrame();
   EXPECT_EQ(frame.getBuffer(), frame2.getBuffer());
+}
+
+TEST_F(PixelFrameTest, jpegFailureTest) {
+  // libjpeg reports failures by calling error_exit, which longjmps back out. Nothing else
+  // reaches that path, so decoding has to be seen failing, not just succeeding.
+  PixelFrame frame;
+  const vector<uint8_t> notAJpeg(64, 0x5a);
+  EXPECT_FALSE(frame.readJpegFrame(notAJpeg));
+
+  // A real header followed by nothing: fails later, once decoding has started.
+  vector<uint8_t> truncated;
+  {
+    PixelFrame whole;
+    ASSERT_TRUE(whole.readJpegFrameFromFile(kJpegTestFilePath, false));
+    ifstream file(kJpegTestFilePath, std::ios::binary);
+    ASSERT_TRUE(file.is_open());
+    truncated.assign(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>());
+    ASSERT_GT(truncated.size(), 200);
+    truncated.resize(truncated.size() / 4);
+  }
+  PixelFrame partial;
+  EXPECT_FALSE(partial.readJpegFrame(truncated));
 }
 #endif
 

@@ -30,6 +30,7 @@ target_link_libraries(vrs_test_helpers
 target_compile_definitions(vrs_test_helpers PUBLIC GTEST_BUILD)
 
 add_executable(test_vrslib
+  AsyncDiskFileChunkTest.cpp
   AudioContentBlockReaderTest.cpp
   ContentBlockReaderTest.cpp
   CustomBlockTest.cpp
