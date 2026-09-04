@@ -36,3 +36,6 @@ jobs:
 
       - name: Test
         run: pixi run test
+
+      - name: Test installed CMake package
+        run: pixi run test-consumer
