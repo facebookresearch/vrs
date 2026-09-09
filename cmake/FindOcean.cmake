@@ -20,6 +20,21 @@ if(Ocean_FOUND)
   return()
 endif()
 
+# Reuse the Ocean targets installed alongside VRS when this module is loaded
+# from vrslibConfig.cmake. This avoids fetching and rebuilding Ocean in every
+# downstream project.
+set(_Ocean_INSTALLED_TARGETS "${CMAKE_CURRENT_LIST_DIR}/../../Ocean/FindOceanTargets.cmake")
+if(EXISTS "${_Ocean_INSTALLED_TARGETS}")
+  include("${_Ocean_INSTALLED_TARGETS}")
+  if(TARGET Ocean::Ocean)
+    set(Ocean_LIBRARIES Ocean::Ocean)
+    set(Ocean_FOUND TRUE)
+    unset(_Ocean_INSTALLED_TARGETS)
+    return()
+  endif()
+endif()
+unset(_Ocean_INSTALLED_TARGETS)
+
 # --------------------------
 # 0) Standard install dirs
 include(GNUInstallDirs)
@@ -82,6 +97,7 @@ target_link_libraries(ocean INTERFACE
   ocean_math
 )
 add_library(Ocean::Ocean ALIAS ocean)
+set_target_properties(ocean PROPERTIES EXPORT_NAME Ocean)
 
 # --------------------------
 # 4) Installation

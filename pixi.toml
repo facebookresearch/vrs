@@ -27,16 +27,22 @@ version = "1.1.0"
 # Note: extra CLI argument after `pixi run TASK` are passed to the task cmd.
 clean = { cmd = "rm -rf build" }
 print-env = { cmd = "echo $PATH" }
-prepare = "cmake -G 'Ninja' -B build -S . -DBUILD_WITH_XPRS:BOOL=ON -DFFmpeg_ROOT=$CONDA_PREFIX -DCMAKE_BUILD_TYPE=Release"
+prepare = "cmake -G 'Ninja' -B build -S . -DBUILD_WITH_XPRS:BOOL=ON -DVRS_USE_SYSTEM_RAPIDJSON:BOOL=ON -DFFmpeg_ROOT=$CONDA_PREFIX -DCMAKE_INSTALL_PREFIX=$PIXI_PROJECT_ROOT/build/install -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_BUILD_TYPE=Release"
 build = { cmd = "cmake --build build --config Release --target all", depends-on = ["prepare"] }
 test = { cmd = "ctest -j --rerun-failed --output-on-failure ", cwd = "build", depends-on = ["build"]}
+install = { cmd = "cmake --install build --config Release", depends-on = ["build"] }
+prepare-consumer = { cmd = "cmake -S sample_project -B build/sample_project -Dvrslib_DIR=$PIXI_PROJECT_ROOT/build/install/lib/cmake/vrslib", depends-on = ["install"] }
+test-consumer = { cmd = "cmake --build build/sample_project --config Release", depends-on = ["prepare-consumer"] }
 vrs = { cmd = "build/tools/vrs/vrs", depends-on = ["build"]}
 
 [target.win-64.tasks] # Deal with windows specifics (prepare and build)
 cmake-generator = "cmake --help"
-prepare = "cmake -B build -S . -DCMAKE_BUILD_TYPE=Release"
+prepare = "cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DVRS_USE_SYSTEM_RAPIDJSON:BOOL=ON -DCMAKE_INSTALL_PREFIX=$PIXI_PROJECT_ROOT/build/install"
 build = { cmd = "cmake --build build --config Release  -- /m", depends-on = [
     "prepare",
+] }
+prepare-consumer = { cmd = "cmake -S sample_project -B build/sample_project -Dvrslib_DIR=$PIXI_PROJECT_ROOT/build/install/lib/cmake/vrslib", depends-on = [
+    "install",
 ] }
 vrs = { cmd = "build/tools/vrs/Release/vrs", depends-on = ["build"]}
 
@@ -58,3 +64,11 @@ zlib = "1.2.*"
 eigen = "3.4.*"
 libopus = "1.4*" # optional dependency
 ffmpeg = { version = "*", build = "*lgpl*" }
+# Keep this build compatible with the cxx-compiler 1.6 toolchain pinned above.
+rapidjson = { version = "==1.1.0.post20240409", build = "*_0" }
+
+[target.osx-64.dependencies]
+libcxx = { version = "==16.0.6", build = "*_0" }
+
+[target.osx-arm64.dependencies]
+libcxx = { version = "==16.0.6", build = "*_0" }

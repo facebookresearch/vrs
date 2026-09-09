@@ -33,8 +33,10 @@ find_package(TurboJpeg REQUIRED)
 find_package(Opus)
 find_package(Ocean)
 
-# Optional dependencies for XPRS decoding: only on Unix-like platforms (Linux & macOS)
-if (BUILD_WITH_XPRS AND (TARGET_LINUX OR TARGET_MACOS))
+# Optional dependencies for XPRS decoding: only on Unix-like platforms (Linux & macOS).
+# VRS_CONFIG_WITH_XPRS records whether an installed VRS package contains XPRS.
+if ((BUILD_WITH_XPRS OR VRS_CONFIG_WITH_XPRS) AND
+    (CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "Darwin"))
   find_package(FFmpeg)
 endif()
 
