@@ -110,26 +110,31 @@ class Decompressor::ZstdDecompressor {
 
 void* Decompressor::allocateCompressedDataBuffer(size_t requestSize) {
   XR_CHECK_LE(decodedSize_, readSize_);
+  const size_t bufferSize = compressedBuffer_.size();
   // see if there are bytes in the buffer that we need to preserve
   if (readSize_ == decodedSize_) {
-    // nothing to preserve, just make sure our buffer is big enough & use from the beginning
-    if (requestSize > compressedBuffer_.size()) {
-      compressedBuffer_.resize(max(kMinInputBufferSize, requestSize));
+    // Nothing to preserve; grow geometrically so repeated growth remains amortized.
+    if (requestSize > bufferSize) {
+      const size_t requestedBufferSize = max(kMinInputBufferSize, requestSize);
+      if (requestedBufferSize > compressedBuffer_.capacity()) {
+        compressedBuffer_.clear();
+        compressedBuffer_.reserve(bufferSize + max(bufferSize, requestedBufferSize - bufferSize));
+      }
+      compressedBuffer_.resizeDiscardingWithoutInitialization(requestedBufferSize);
     }
     decodedSize_ = 0;
     readSize_ = requestSize;
     return compressedBuffer_.data();
-  } else if (readSize_ + requestSize > compressedBuffer_.size()) {
+  } else if (readSize_ + requestSize > bufferSize) {
     // our read size exceeds what we have left between our last read & the end of the buffer
     size_t undecodedSize = readSize_ - decodedSize_;
-    if (undecodedSize + requestSize > compressedBuffer_.size()) {
+    if (undecodedSize + requestSize > bufferSize) {
       // the buffer is just too small: we need a new one
-      vector<uint8_t> newBuffer;
-      newBuffer.resize(undecodedSize + requestSize);
+      auto newBuffer = helpers::IOVector<uint8_t>::newUninitialized(undecodedSize + requestSize);
       if (undecodedSize > 0) {
         memcpy(newBuffer.data(), compressedBuffer_.data() + decodedSize_, undecodedSize);
       }
-      compressedBuffer_.swap(newBuffer);
+      compressedBuffer_ = std::move(newBuffer);
     } else {
       // we can fit everything in the buffer, but we need to shift the undecoded data to make room
       memmove(compressedBuffer_.data(), compressedBuffer_.data() + decodedSize_, undecodedSize);
