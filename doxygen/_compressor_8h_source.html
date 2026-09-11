@@ -103,11 +103,11 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">#include &lt;memory&gt;</span></div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="preprocessor">#include &lt;string&gt;</span></div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="preprocessor">#include &lt;vector&gt;</span></div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="preprocessor">#include &lt;vrs/ForwardDefinitions.h&gt;</span></div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="preprocessor">#include &lt;vrs/VrsExport.h&gt;</span></div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="preprocessor">#include &lt;vrs/WriteFileHandler.h&gt;</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="preprocessor">#include &lt;vrs/ForwardDefinitions.h&gt;</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="preprocessor">#include &lt;vrs/VrsExport.h&gt;</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="preprocessor">#include &lt;vrs/WriteFileHandler.h&gt;</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="preprocessor">#include &lt;vrs/helpers/IOVector.h&gt;</span></div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacevrs.html">vrs</a> {</div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span> </div>
@@ -187,33 +187,23 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span> </div>
 <div class="foldopen" id="foldopen00155" data-start="{" data-end="}">
 <div class="line"><a id="l00155" name="l00155"></a><span class="lineno"><a class="line" href="classvrs_1_1_compressor.html#a25a6b98fb7a1ee28f77b623341c7b8b9">  155</a></span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classvrs_1_1_compressor.html#a25a6b98fb7a1ee28f77b623341c7b8b9">clear</a>() {</div>
-<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>    std::vector&lt;uninitialized_byte&gt; blank;</div>
-<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>    buffer_.swap(blank);</div>
-<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>  }</div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>    buffer_.release();</div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>  }</div>
 </div>
-<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span> </div>
-<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>  <span class="keyword">static</span> <span class="keywordtype">bool</span> shouldTryToCompress(<a class="code hl_enumeration" href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7b">CompressionPreset</a> preset, <span class="keywordtype">size_t</span> size);</div>
-<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span> </div>
-<div class="foldopen" id="foldopen00162" data-start="{" data-end="};">
-<div class="line"><a id="l00162" name="l00162"></a><span class="lineno"><a class="line" href="structvrs_1_1_compressor_1_1uninitialized__byte.html">  162</a></span>  <span class="keyword">struct </span><a class="code hl_struct" href="structvrs_1_1_compressor_1_1uninitialized__byte.html">uninitialized_byte</a> final {</div>
-<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>    <span class="comment">// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, modernize-use-equals-default)</span></div>
-<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>    <a class="code hl_struct" href="structvrs_1_1_compressor_1_1uninitialized__byte.html">uninitialized_byte</a>() {} <span class="comment">// do not use &#39;= default&#39; as it will initialize byte!</span></div>
-<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>    uint8_t byte;</div>
-<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>  };</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span> </div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>  <span class="keyword">static</span> <span class="keywordtype">bool</span> shouldTryToCompress(<a class="code hl_enumeration" href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7b">CompressionPreset</a> preset, <span class="keywordtype">size_t</span> size);</div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span> </div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span> <span class="keyword">private</span>:</div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>  <span class="keyword">class </span>CompressorImpl;</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>  std::unique_ptr&lt;CompressorImpl&gt; impl_;</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>  helpers::IOVector&lt;uint8_t&gt; buffer_;</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>};</div>
 </div>
-<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span> </div>
-<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span> <span class="keyword">private</span>:</div>
-<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>  <span class="keyword">class </span><a class="code hl_class" href="classvrs_1_1_compressor_1_1_compressor_impl.html">CompressorImpl</a>;</div>
-<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>  std::unique_ptr&lt;CompressorImpl&gt; impl_;</div>
-<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>  std::vector&lt;uninitialized_byte&gt; buffer_;</div>
-<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>};</div>
-</div>
-<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span> </div>
-<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>} <span class="comment">// namespace vrs</span></div>
-<div class="ttc" id="aclassvrs_1_1_compressor_1_1_compressor_impl_html"><div class="ttname"><a href="classvrs_1_1_compressor_1_1_compressor_impl.html">vrs::Compressor::CompressorImpl</a></div><div class="ttdef"><b>Definition</b> Compressor.cpp:131</div></div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span> </div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>} <span class="comment">// namespace vrs</span></div>
 <div class="ttc" id="aclassvrs_1_1_compressor_html"><div class="ttname"><a href="classvrs_1_1_compressor.html">vrs::Compressor</a></div><div class="ttdoc">Helper class to compress data using lz4 or zstd presets.</div><div class="ttdef"><b>Definition</b> Compressor.h:83</div></div>
 <div class="ttc" id="aclassvrs_1_1_compressor_html_a0fb16009c746082d8a11586705e78288"><div class="ttname"><a href="classvrs_1_1_compressor.html#a0fb16009c746082d8a11586705e78288">vrs::Compressor::getData</a></div><div class="ttdeci">const void * getData() const</div><div class="ttdef"><b>Definition</b> Compressor.h:144</div></div>
-<div class="ttc" id="aclassvrs_1_1_compressor_html_a25a6b98fb7a1ee28f77b623341c7b8b9"><div class="ttname"><a href="classvrs_1_1_compressor.html#a25a6b98fb7a1ee28f77b623341c7b8b9">vrs::Compressor::clear</a></div><div class="ttdeci">void clear()</div><div class="ttdoc">Really deallocate the buffer's memory (clear() doesn't do that)</div><div class="ttdef"><b>Definition</b> Compressor.h:155</div></div>
+<div class="ttc" id="aclassvrs_1_1_compressor_html_a25a6b98fb7a1ee28f77b623341c7b8b9"><div class="ttname"><a href="classvrs_1_1_compressor.html#a25a6b98fb7a1ee28f77b623341c7b8b9">vrs::Compressor::clear</a></div><div class="ttdeci">void clear()</div><div class="ttdoc">Deallocate the internal buffer's storage.</div><div class="ttdef"><b>Definition</b> Compressor.h:155</div></div>
 <div class="ttc" id="aclassvrs_1_1_compressor_html_ac60c5c6ad4615405ee99ce1036e117f2"><div class="ttname"><a href="classvrs_1_1_compressor.html#ac60c5c6ad4615405ee99ce1036e117f2">vrs::Compressor::getHeader</a></div><div class="ttdeci">HeaderType * getHeader()</div><div class="ttdoc">Get the space reserved for a header.</div><div class="ttdef"><b>Definition</b> Compressor.h:149</div></div>
 <div class="ttc" id="aclassvrs_1_1_write_file_handler_html"><div class="ttname"><a href="classvrs_1_1_write_file_handler.html">vrs::WriteFileHandler</a></div><div class="ttdoc">The WriteFileHandler interface adds write operations to the FileHandler interface.</div><div class="ttdef"><b>Definition</b> WriteFileHandler.h:43</div></div>
 <div class="ttc" id="anamespacevrs_html"><div class="ttname"><a href="namespacevrs.html">vrs</a></div><div class="ttdef"><b>Definition</b> Compressor.cpp:113</div></div>
@@ -223,8 +213,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="ttc" id="anamespacevrs_html_a37a35edf18e8bb343398cb938d3e2b7ba7a1920d61156abc05a60135aefe8bc67"><div class="ttname"><a href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7ba7a1920d61156abc05a60135aefe8bc67">vrs::CompressionPreset::Default</a></div><div class="ttdeci">@ Default</div><div class="ttdoc">Default preset.</div></div>
 <div class="ttc" id="anamespacevrs_html_a37a35edf18e8bb343398cb938d3e2b7ba981e12fe6dbad219590b0546f411adc1"><div class="ttname"><a href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7ba981e12fe6dbad219590b0546f411adc1">vrs::CompressionPreset::Lz4Fast</a></div><div class="ttdeci">@ Lz4Fast</div><div class="ttdoc">Fast compression speed, very fast decompression, not great compression ratio.</div></div>
 <div class="ttc" id="anamespacevrs_html_a37a35edf18e8bb343398cb938d3e2b7baec0fc0100c4fc1ce4eea230c3dc10360"><div class="ttname"><a href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7baec0fc0100c4fc1ce4eea230c3dc10360">vrs::CompressionPreset::Undefined</a></div><div class="ttdeci">@ Undefined</div><div class="ttdoc">when not set explicitly</div></div>
-<div class="ttc" id="anamespacevrs_html_ac167a592f5255abc1a276d8ed0b96f2f"><div class="ttname"><a href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">vrs::CompressionType</a></div><div class="ttdeci">CompressionType</div><div class="ttdoc">Type of compression. Used in VRS record headers, so never modify the values.</div><div class="ttdef"><b>Definition</b> Record.h:38</div></div>
-<div class="ttc" id="astructvrs_1_1_compressor_1_1uninitialized__byte_html"><div class="ttname"><a href="structvrs_1_1_compressor_1_1uninitialized__byte.html">vrs::Compressor::uninitialized_byte</a></div><div class="ttdef"><b>Definition</b> Compressor.h:162</div></div>
+<div class="ttc" id="anamespacevrs_html_ac167a592f5255abc1a276d8ed0b96f2f"><div class="ttname"><a href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">vrs::CompressionType</a></div><div class="ttdeci">CompressionType</div><div class="ttdoc">Type of compression. Used in VRS record headers, so never modify the values.</div><div class="ttdef"><b>Definition</b> Record.h:39</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
