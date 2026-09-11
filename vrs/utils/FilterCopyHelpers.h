@@ -23,6 +23,7 @@
 #include <vrs/FileSpec.h>
 #include <vrs/RecordFormatStreamPlayer.h>
 #include <vrs/Recordable.h>
+#include <vrs/helpers/IOVector.h>
 #include <vrs/os/Platform.h>
 
 namespace vrs::utils {
@@ -133,7 +134,7 @@ class Copier : public StreamPlayer {
   Writer writer_;
   RecordFileWriter& fileWriter_;
   const CopyOptions& options_;
-  vector<int8_t> rawRecordData_;
+  helpers::IOVector<int8_t> rawRecordData_;
 };
 
 class ContentChunk {
