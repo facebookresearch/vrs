@@ -18,11 +18,11 @@
 
 #include <memory>
 #include <string>
-#include <vector>
 
 #include <vrs/ForwardDefinitions.h>
 #include <vrs/VrsExport.h>
 #include <vrs/WriteFileHandler.h>
+#include <vrs/helpers/IOVector.h>
 
 namespace vrs {
 
@@ -151,24 +151,17 @@ class VRS_API Compressor {
   }
   CompressionType getCompressionType() const;
 
-  /// Really deallocate the buffer's memory (clear() doesn't do that)
+  /// Deallocate the internal buffer's storage.
   void clear() {
-    std::vector<uninitialized_byte> blank;
-    buffer_.swap(blank);
+    buffer_.release();
   }
 
   static bool shouldTryToCompress(CompressionPreset preset, size_t size);
 
-  struct uninitialized_byte final {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, modernize-use-equals-default)
-    uninitialized_byte() {} // do not use '= default' as it will initialize byte!
-    uint8_t byte;
-  };
-
  private:
   class CompressorImpl;
   std::unique_ptr<CompressorImpl> impl_;
-  std::vector<uninitialized_byte> buffer_;
+  helpers::IOVector<uint8_t> buffer_;
 };
 
 } // namespace vrs

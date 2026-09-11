@@ -139,7 +139,7 @@ class Compressor::CompressorImpl {
     }
   }
   uint32_t lz4Compress(
-      vector<uninitialized_byte>& buffer,
+      helpers::IOVector<uint8_t>& buffer,
       const void* data,
       size_t dataSize,
       CompressionPreset preset,
@@ -148,8 +148,7 @@ class Compressor::CompressorImpl {
     size_t maxCompressedSize = LZ4F_compressFrameBound(dataSize, prefs);
     // increase our internal buffer size if necessary
     if (buffer.size() < headerSpace + maxCompressedSize) {
-      buffer.resize(0); // avoid copy of current data when resizing
-      buffer.resize(headerSpace + maxCompressedSize);
+      buffer.resizeDiscardingWithoutInitialization(headerSpace + maxCompressedSize);
     }
     size_t result =
         LZ4F_compressFrame(buffer.data() + headerSpace, maxCompressedSize, data, dataSize, prefs);
@@ -167,7 +166,7 @@ class Compressor::CompressorImpl {
     return 0;
   }
   uint32_t zstdCompress(
-      vector<uninitialized_byte>& buffer,
+      helpers::IOVector<uint8_t>& buffer,
       const void* data,
       size_t dataSize,
       CompressionPreset preset,
@@ -175,8 +174,7 @@ class Compressor::CompressorImpl {
     size_t maxCompressedSize = ZSTD_compressBound(dataSize);
     // increase our internal buffer size if necessary
     if (buffer.size() < headerSpace + maxCompressedSize) {
-      buffer.resize(0); // avoid copy of current data when resizing
-      buffer.resize(headerSpace + maxCompressedSize);
+      buffer.resizeDiscardingWithoutInitialization(headerSpace + maxCompressedSize);
     }
     if (zstdContext_ == nullptr) {
       zstdContext_ = ZSTD_createCCtx();
@@ -299,8 +297,7 @@ int Compressor::startFrame(size_t frameSize, CompressionPreset zstdPreset, uint3
   outSize = 0;
   size_t minOutSize = ZSTD_CStreamOutSize();
   if (buffer_.size() < minOutSize) {
-    buffer_.resize(0); // avoid copy of current data when resizing
-    buffer_.resize(minOutSize);
+    buffer_.resizeDiscardingWithoutInitialization(minOutSize);
   }
   return impl_->startFrame(frameSize, zstdPreset);
 }
