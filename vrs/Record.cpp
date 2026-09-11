@@ -71,15 +71,9 @@ void Record::set(
   formatVersion_ = formatVersion;
   usedBufferSize_ = data.getDataSize();
   uint64_t allocateSize = kRecordHeaderSize + usedBufferSize_;
-  // only resize if we have to
-  if (buffer_.size() < allocateSize) {
-    // If we're going to reallocate our buffer, then ask for a bit more right away...
-    if (allocateSize > buffer_.capacity()) {
-      buffer_.resize(0); // make sure we don't copy existing data for no reason!
-    }
-    buffer_.resize(allocateSize);
-  }
-  data.copyTo(&buffer_.data()->byte + kRecordHeaderSize);
+  // writeRecord() either initializes this header or uses a separate compressed buffer.
+  buffer_.resizeDiscardingWithoutInitialization(allocateSize);
+  data.copyTo(buffer_.data() + kRecordHeaderSize);
   creationOrder_ = creationOrder;
   directWriteRecordData_.reset();
 }

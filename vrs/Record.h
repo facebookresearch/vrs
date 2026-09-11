@@ -23,6 +23,7 @@
 #include <vrs/StreamId.h>
 #include <vrs/VrsExport.h>
 #include <vrs/helpers/EnumTemplates.hpp>
+#include <vrs/helpers/IOVector.h>
 
 namespace vrs {
 
@@ -154,13 +155,6 @@ class VRS_API Record final {
   /// Get a record type as a text string.
   static const char* typeName(Type type);
 
-  /// Public for testing
-  struct uninitialized_byte final {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, modernize-use-equals-default)
-    uninitialized_byte() {} // do not use '= default' as it will initialize byte!
-    uint8_t byte;
-  };
-
  private:
   friend class RecordManager;
 
@@ -171,7 +165,7 @@ class VRS_API Record final {
   double timestamp_{};
   Type recordType_{};
   uint32_t formatVersion_{};
-  vector<uninitialized_byte> buffer_;
+  helpers::IOVector<uint8_t> buffer_;
   size_t usedBufferSize_{};
   uint64_t creationOrder_{};
   unique_ptr<DirectWriteRecordData> directWriteRecordData_;

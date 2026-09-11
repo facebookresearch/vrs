@@ -16,12 +16,21 @@
 
 #include <gtest/gtest.h>
 
+#include <algorithm>
+#include <cstdint>
+#include <cstring>
 #include <string>
+#include <vector>
 
+#include <vrs/Compressor.h>
+#include <vrs/DataSource.h>
+#include <vrs/DiskFile.h>
+#include <vrs/FileFormat.h>
 #include <vrs/Record.h>
 #include <vrs/RecordFileWriter.h>
 #include <vrs/RecordManager.h>
 #include <vrs/StreamId.h>
+#include <vrs/os/Utils.h>
 
 #include <vrs/test/helpers/VRSTestsHelpers.h>
 
@@ -32,6 +41,74 @@ using namespace vrs::test;
 namespace {
 
 struct RecordTester : testing::Test {};
+
+class OwnedDataSource final : public DataSource {
+ public:
+  OwnedDataSource(size_t size, uint8_t value) : DataSource{size}, payload_(size, value) {}
+  void copyTo(uint8_t* buffer) const override {
+    std::copy(payload_.begin(), payload_.end(), buffer);
+  }
+  const std::vector<uint8_t>& payload() const {
+    return payload_;
+  }
+
+ private:
+  std::vector<uint8_t> payload_;
+};
+
+class TemporaryRecordPath final {
+ public:
+  TemporaryRecordPath()
+      : path_{os::getUniquePath(os::getTempFolder() + "vrs-record-buffer-test")} {}
+  ~TemporaryRecordPath() {
+    deleteChunkedFile(path_);
+  }
+  const string& get() const {
+    return path_;
+  }
+
+ private:
+  string path_;
+};
+
+void expectWrittenPayload(Record& record, const vector<uint8_t>& expectedPayload) {
+  TemporaryRecordPath filePath;
+  DiskFile writer;
+  ASSERT_EQ(writer.create(filePath.get()), 0);
+  Compressor compressor;
+  uint32_t recordSize = 0;
+  const uint32_t expectedRecordSize =
+      static_cast<uint32_t>(sizeof(FileFormat::RecordHeader) + expectedPayload.size());
+  ASSERT_EQ(
+      record.writeRecord(
+          writer, StreamId{RecordableTypeId::UnitTest1, 1}, recordSize, compressor, 0),
+      0);
+  EXPECT_EQ(recordSize, expectedRecordSize);
+  ASSERT_EQ(writer.close(), 0);
+  DiskFile reader;
+  ASSERT_EQ(reader.open(filePath.get()), 0);
+  EXPECT_EQ(reader.getTotalSize(), expectedRecordSize);
+  vector<uint8_t> output(expectedRecordSize);
+  ASSERT_EQ(reader.read(output), 0);
+  ASSERT_EQ(reader.close(), 0);
+  FileFormat::RecordHeader expectedHeader;
+  expectedHeader.recordSize = expectedRecordSize;
+  expectedHeader.previousRecordSize = 0;
+  expectedHeader.recordableTypeId = static_cast<int32_t>(RecordableTypeId::UnitTest1);
+  expectedHeader.formatVersion = 1;
+  expectedHeader.timestamp = 1;
+  expectedHeader.recordableInstanceId = 1;
+  expectedHeader.recordType = static_cast<uint8_t>(Record::Type::DATA);
+  expectedHeader.compressionType = static_cast<uint8_t>(CompressionType::None);
+  expectedHeader.uncompressedSize = 0;
+  vector<uint8_t> expectedOutput(expectedRecordSize);
+  std::memcpy(expectedOutput.data(), &expectedHeader, sizeof(expectedHeader));
+  std::copy(
+      expectedPayload.begin(),
+      expectedPayload.end(),
+      expectedOutput.begin() + sizeof(expectedHeader));
+  EXPECT_EQ(output, expectedOutput);
+}
 
 constexpr StreamId kConstexprStreamId{RecordableTypeId::UnitTest1, 1};
 static_assert(kConstexprStreamId.isValid());
@@ -85,6 +162,34 @@ TEST_F(RecordTester, testRecord) {
   EXPECT_EQ(static_cast<Record::Type>(1), Record::Type::STATE);
   EXPECT_EQ(static_cast<Record::Type>(2), Record::Type::CONFIGURATION);
   EXPECT_EQ(static_cast<Record::Type>(3), Record::Type::DATA);
+}
+
+TEST_F(RecordTester, setWritesSmallerPayloadAfterLargerPayload) {
+  RecordManager recordManager;
+  constexpr size_t kInitialPayloadSize = 1024;
+  constexpr size_t kCurrentPayloadSize = 32;
+  static_assert(kInitialPayloadSize > kCurrentPayloadSize);
+  OwnedDataSource initialSource{kInitialPayloadSize, 0x11};
+  Record* record = recordManager.createRecord(1, Record::Type::DATA, 1, initialSource);
+  ASSERT_NE(record, nullptr);
+  OwnedDataSource smallerSource{kCurrentPayloadSize, 0x22};
+  record->set(1, Record::Type::DATA, 1, smallerSource, 1);
+  EXPECT_EQ(record->getSize(), smallerSource.getDataSize());
+  ASSERT_NO_FATAL_FAILURE(expectWrittenPayload(*record, smallerSource.payload()));
+}
+
+TEST_F(RecordTester, setWritesLargerPayloadAfterSmallerPayload) {
+  RecordManager recordManager;
+  constexpr size_t kInitialPayloadSize = 32;
+  constexpr size_t kCurrentPayloadSize = 2048;
+  static_assert(kCurrentPayloadSize > kInitialPayloadSize);
+  OwnedDataSource initialSource{kInitialPayloadSize, 0x22};
+  Record* record = recordManager.createRecord(1, Record::Type::DATA, 1, initialSource);
+  ASSERT_NE(record, nullptr);
+  OwnedDataSource largerSource{kCurrentPayloadSize, 0x33};
+  record->set(1, Record::Type::DATA, 1, largerSource, 1);
+  EXPECT_EQ(record->getSize(), largerSource.getDataSize());
+  ASSERT_NO_FATAL_FAILURE(expectWrittenPayload(*record, largerSource.payload()));
 }
 
 TEST_F(RecordTester, streamIdTest) {
@@ -294,76 +399,6 @@ TEST_F(RecordTester, sortRecordSortTest) {
 
   checkSortOrder(records);
 }
-
-#if defined(__has_feature)
-#if __has_feature(address_sanitizer)
-#define ASAN_ENABLED 1
-#endif
-#endif
-
-#if defined(__SANITIZE_ADDRESS__)
-#define ASAN_ENABLED 1
-#endif
-
-#if !defined(ASAN_ENABLED)
-static uint8_t f(uint8_t k) {
-  return 3 * k + 1;
-}
-
-const size_t kSize = 9; // odd, to expose padding issues
-
-union ArrayUnion {
-  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
-  ArrayUnion() {} // required, do not use '= default' which would initialize the fields!
-  Record::uninitialized_byte uninitialized_bytes[kSize];
-  uint8_t initialized_bytes[kSize];
-};
-
-// This test deliberately accesses memory beyond the size, but within the capacity of the vector.
-// We only run this test when ASAN is not enabled, because ASAN will catch the error.
-TEST_F(RecordTester, initRecordTest) {
-  vector<Record::uninitialized_byte> buffer;
-  buffer.reserve(100);
-  buffer.resize(1);
-  // init reserved capacity to our pattern
-  uint8_t* b = &buffer[0].byte;
-  size_t initCapacity = buffer.capacity();
-  for (size_t k = 0; k < initCapacity; k++) {
-    b[k] = f(k);
-  }
-  // allocate & verify that the buffer data wasn't initialized (still our pattern)
-  buffer.resize(0);
-  buffer.resize(10);
-  const uint8_t* b1 = &buffer[0].byte;
-  for (size_t k = 0; k < initCapacity; k++) {
-    EXPECT_EQ(b1[k], f(k));
-  }
-  // allocate & verify that the buffer data wasn't initialized (still our pattern)
-  buffer.resize(0);
-  buffer.resize(30);
-  const uint8_t* b2 = &buffer[0].byte;
-  for (size_t k = 0; k < initCapacity; k++) {
-    EXPECT_EQ(b2[k], f(k));
-  }
-  buffer.resize(0);
-  buffer.resize(2000); // we should get a new buffer which data should be different
-  const uint8_t* b3 = &buffer[0].byte;
-  bool differentData = false;
-  for (size_t k = 0; !differentData && k < initCapacity; k++) {
-    if (b3[k] != f(k)) {
-      differentData = true;
-    }
-  }
-  // if the underlying buffer is new, the data should be different
-  EXPECT_EQ(differentData, b3 != b2);
-  buffer.clear();
-  // Verify identical memory usage
-  ArrayUnion u;
-  EXPECT_EQ(sizeof(u.uninitialized_bytes), kSize);
-  EXPECT_EQ(sizeof(u.initialized_bytes), kSize);
-  EXPECT_EQ(sizeof(u), kSize);
-}
-#endif
 
 namespace {
 class TestRecordable : public Recordable {
