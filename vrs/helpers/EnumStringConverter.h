@@ -137,8 +137,11 @@ string_view EnumStringConverter<E, NAMES, NAMES_COUNT, DEFAULT_ENUM, DEFAULT_NAM
   if (index < cNamesCount) {
     return NAMES[index];
   }
-  const size_t defaultIndex = static_cast<size_t>(DEFAULT_NAME);
-  return defaultIndex < cNamesCount ? NAMES[defaultIndex] : "<Invalid value>";
+  constexpr size_t defaultIndex = static_cast<size_t>(DEFAULT_NAME);
+  if constexpr (defaultIndex < cNamesCount) {
+    return NAMES[defaultIndex];
+  }
+  return "<Invalid value>";
 }
 
 template <
