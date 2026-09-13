@@ -39,12 +39,20 @@
 
 namespace {
 using namespace vrs;
+// A CFA mosaic is one 8-bit sample per pixel, so a codec encodes and returns it as a luma
+// plane: the pattern lives in the pixel format, not in the bitstream. Treat these like GREY8
+// when deciding what a decoded grey plane may be handed back as.
+constexpr bool isSinglePlane8BitRaw(vrs::PixelFormat pixelFormat) {
+  return pixelFormat == PixelFormat::BAYER8_RGGB || pixelFormat == PixelFormat::BAYER8_BGGR ||
+      pixelFormat == PixelFormat::BAYER8_GBRG || pixelFormat == PixelFormat::RGB_IR_RAW_4X4;
+}
+
 PixelFormat xprsToVrsPixelFormat(
     xprs::PixelFormat xprsPixelFormat,
     vrs::PixelFormat vrsPixelFormat) {
   switch (xprsPixelFormat) {
     case xprs::PixelFormat::GRAY8:
-      return PixelFormat::GREY8;
+      return isSinglePlane8BitRaw(vrsPixelFormat) ? vrsPixelFormat : PixelFormat::GREY8;
     case xprs::PixelFormat::GRAY10LE:
       return PixelFormat::GREY10;
     case xprs::PixelFormat::GRAY12LE:
@@ -55,13 +63,13 @@ PixelFormat xprsToVrsPixelFormat(
     case xprs::PixelFormat::YUV420P:
       // some codecs don't support GREY8 or NV12, and will silently convert to YUV420
       if (vrsPixelFormat == PixelFormat::GREY8 || vrsPixelFormat == PixelFormat::RGB8 ||
-          vrsPixelFormat == PixelFormat::YUV_420_NV12) {
+          vrsPixelFormat == PixelFormat::YUV_420_NV12 || isSinglePlane8BitRaw(vrsPixelFormat)) {
         return vrsPixelFormat;
       }
       return PixelFormat::YUV_I420_SPLIT;
     case xprs::PixelFormat::NV12:
       if (vrsPixelFormat == PixelFormat::GREY8 || vrsPixelFormat == PixelFormat::YUV_I420_SPLIT ||
-          vrsPixelFormat == PixelFormat::RGB8) {
+          vrsPixelFormat == PixelFormat::RGB8 || isSinglePlane8BitRaw(vrsPixelFormat)) {
         return vrsPixelFormat;
       }
       return PixelFormat::YUV_420_NV12;
