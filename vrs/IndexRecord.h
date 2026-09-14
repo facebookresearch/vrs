@@ -238,7 +238,7 @@ class VRS_API Reader {
   int readSplitIndexData(
       size_t indexByteSize,
       size_t uncompressedSize,
-      vector<DiskRecordInfo>& outRecords,
+      int64_t& outUsedFileSize,
       bool noRecords);
   bool processSplitIndexRecords(const vector<DiskRecordInfo>& records, int64_t& outUsedFileSize);
   int determineClassicIndexLayout(
