@@ -39,20 +39,20 @@ using namespace std;
 using namespace vrs;
 using namespace vrs::IndexRecord;
 
-const uint32_t kMaxBatchSize = 100000;
+const uint32_t kMaxBatchSize = 100'000;
 
 // Maximum number of records in a single index record. To avoid a potentially corrupt file that
 // requests too much memory, we limit the maximum record count to this arbitrarily large number.
-constexpr size_t kMaxRecordCount = 500000000;
+constexpr size_t kMaxRecordCount = 500'000'000;
 
 constexpr size_t kMaxPreallocatedRecordCount = 50'000'000;
 
 // Record sizes are stored as uint32_t, so uncompressed index size cannot exceed UINT32_MAX.
 constexpr uint64_t kMaxUncompressedSize = std::numeric_limits<uint32_t>::max();
 
-// Plausible compression ratio bound to detect decompression bombs; 100000:1 allows zero-filled
+// Plausible compression ratio bound to detect decompression bombs; 100'000:1 allows zero-filled
 // records.
-constexpr size_t kMaxCompressionRatio = 100000;
+constexpr size_t kMaxCompressionRatio = 100'000;
 
 // Compression presets, in increasingly tighter settings, starting with NONE, which will be only
 // used when there are too few index entries for compression to reasonably work...

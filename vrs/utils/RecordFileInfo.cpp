@@ -103,7 +103,7 @@ void printTags(ostream& out, string_view prefix, const map<string, string>& tags
     appendTruncated(line, iter.second, details, width);
     if (iter.first == tag_conventions::kCaptureTimeEpoch) {
       uint64_t epochSec = 0;
-      if (helpers::readUInt64(iter.second, epochSec) && epochSec > 1000000) {
+      if (helpers::readUInt64(iter.second, epochSec) && epochSec > 1'000'000) {
         auto creationTimeSec = static_cast<time_t>(epochSec);
         // Decoding fails for an epoch time_t can't represent, leaving no date to append.
         struct tm creationTime{};
