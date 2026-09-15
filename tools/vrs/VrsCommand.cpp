@@ -605,8 +605,8 @@ int VrsCommand::doCopyMerge() {
               helpers::humanReadableDuration(duration));
         }
       } else {
-        cerr << "Error: could not open copied file '" << filteredReader.getPathOrUri()
-             << "', error #" << error << ": " << errorCodeToMessage(error) << "\n";
+        cerr << "Error: could not open copied file '" << targetPath << "', error #" << error
+             << ": " << errorCodeToMessage(error) << "\n";
         statusCode = EXIT_FAILURE;
       }
     }
