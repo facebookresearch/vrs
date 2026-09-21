@@ -31,6 +31,7 @@ enum class Level {
   Warning = 1,
   Info = 2,
   Debug = 3,
+  Trace = 4,
 };
 
 /// Logging backend: redirect where you need, depending on the log level and your preferences.
@@ -57,6 +58,7 @@ void log_every_n_seconds(
   log_every_n_seconds(                                   \
       __FILE__, __LINE__, level, nseconds, DEFAULT_LOG_CHANNEL, fmt::format(__VA_ARGS__))
 
+#define XR_LOGT(...) XR_LOG_DEFAULT(vrs::logging::Level::Trace, __VA_ARGS__)
 #define XR_LOGD(...) XR_LOG_DEFAULT(vrs::logging::Level::Debug, __VA_ARGS__)
 #define XR_LOGI(...) XR_LOG_DEFAULT(vrs::logging::Level::Info, __VA_ARGS__)
 #define XR_LOGW(...) XR_LOG_DEFAULT(vrs::logging::Level::Warning, __VA_ARGS__)

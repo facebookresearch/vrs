@@ -87,7 +87,7 @@ void TelemetryLogger::logEvent(LogEvent&& event) {
 void TelemetryLogger::logTraffic(
     const OperationContext& operationContext,
     const TrafficEvent& event) {
-  XR_LOGI(
+  XR_LOGT(
       "{} {} {}/{}, {}: When: {} Duration: {}/{} "
       "Offset: {} Transfer: {}/{} Retries: {} Errors: {} 429: {}",
       operationContext.operation,
