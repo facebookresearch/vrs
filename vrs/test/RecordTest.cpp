@@ -30,6 +30,7 @@
 #include <vrs/RecordFileWriter.h>
 #include <vrs/RecordManager.h>
 #include <vrs/StreamId.h>
+#include <vrs/WriteFileHandler.h>
 #include <vrs/os/Utils.h>
 
 #include <vrs/test/helpers/VRSTestsHelpers.h>
@@ -50,6 +51,20 @@ class OwnedDataSource final : public DataSource {
   }
   const std::vector<uint8_t>& payload() const {
     return payload_;
+  }
+
+ private:
+  std::vector<uint8_t> payload_;
+};
+
+class TestDirectWriteData final : public DirectWriteRecordData {
+ public:
+  explicit TestDirectWriteData(std::vector<uint8_t> payload) : payload_(std::move(payload)) {}
+  size_t getDataSize() const override {
+    return payload_.size();
+  }
+  int write(WriteFileHandler& file) const override {
+    return file.write(payload_.data(), payload_.size());
   }
 
  private:
@@ -190,6 +205,38 @@ TEST_F(RecordTester, setWritesLargerPayloadAfterSmallerPayload) {
   record->set(1, Record::Type::DATA, 1, largerSource, 1);
   EXPECT_EQ(record->getSize(), largerSource.getDataSize());
   ASSERT_NO_FATAL_FAILURE(expectWrittenPayload(*record, largerSource.payload()));
+}
+
+TEST_F(RecordTester, directWriteAppendsPayloadAfterDataSource) {
+  RecordManager recordManager;
+  constexpr size_t kLayoutSize = 16;
+  OwnedDataSource layout{kLayoutSize, 0xAB};
+  std::vector<uint8_t> image(1024);
+  for (size_t i = 0; i < image.size(); ++i) {
+    image[i] = static_cast<uint8_t>(i);
+  }
+  Record* record = recordManager.createUncompressedRecord(
+      1, Record::Type::DATA, 1, layout, std::make_unique<TestDirectWriteData>(image));
+  ASSERT_NE(record, nullptr);
+  EXPECT_EQ(record->getSize(), layout.getDataSize() + image.size());
+  std::vector<uint8_t> expected = layout.payload();
+  expected.insert(expected.end(), image.begin(), image.end());
+  ASSERT_NO_FATAL_FAILURE(expectWrittenPayload(*record, expected));
+}
+
+TEST_F(RecordTester, directWriteWithEmptyDataWritesOnlyDataSource) {
+  RecordManager recordManager;
+  constexpr size_t kLayoutSize = 24;
+  OwnedDataSource layout{kLayoutSize, 0x5A};
+  Record* record = recordManager.createUncompressedRecord(
+      1,
+      Record::Type::DATA,
+      1,
+      layout,
+      std::make_unique<TestDirectWriteData>(std::vector<uint8_t>{}));
+  ASSERT_NE(record, nullptr);
+  EXPECT_EQ(record->getSize(), layout.getDataSize());
+  ASSERT_NO_FATAL_FAILURE(expectWrittenPayload(*record, layout.payload()));
 }
 
 TEST_F(RecordTester, streamIdTest) {
