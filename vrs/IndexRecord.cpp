@@ -198,6 +198,7 @@ int readCompressedIndexData(
       inOutCompressedSize -= actualReadSize;
       readData = true;
     }
+    const size_t remainingBefore = decompressor.getRemainingCompressedDataBufferSize();
     uint32_t decompressedSize = 0;
     int error = decompressor.decompress(
         static_cast<uint8_t*>(outData) + outputSize,
@@ -207,7 +208,9 @@ int readCompressedIndexData(
       return error;
     }
     outputSize += decompressedSize;
-    if (!readData && decompressedSize == 0) {
+    // zstd may consume a partial block without producing output: only fail if nothing was consumed.
+    if (!readData && decompressedSize == 0 &&
+        decompressor.getRemainingCompressedDataBufferSize() == remainingBefore) {
       return NOT_ENOUGH_DATA;
     }
   }
