@@ -1019,10 +1019,11 @@ NormalizeOptions PixelFrame::getStreamNormalizeOptions(
             return NormalizeOptions(ImageSemantic::ObjectClassSegmentation);
           } else if (flavor.find("SegmentationInstanceID") != string::npos) {
             return NormalizeOptions(ImageSemantic::ObjectIdSegmentation);
-          } else if (id.getTypeId() == RecordableTypeId::GroundTruthDepthRecordableClass) {
-            // Aria Digital Twin ground-truth depth: GREY16 depth flavored by camera ("rgbFlavor").
-            return NormalizeOptions(ImageSemantic::Depth);
           }
+        }
+        if (id.getTypeId() == RecordableTypeId::GroundTruthDepthRecordableClass) {
+          // Aria Digital Twin ground-truth depth.
+          return NormalizeOptions(ImageSemantic::Depth);
         }
         return NormalizeOptions(ImageSemantic::ObjectIdSegmentation);
       }
