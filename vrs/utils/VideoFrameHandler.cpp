@@ -36,30 +36,50 @@ int VideoFrameHandler::tryToDecodeFrame(
   isVideo_ = true;
   requestedKeyFrameTimestamp_ = spec.getKeyFrameTimestamp();
   requestedKeyFrameIndex_ = spec.getKeyFrameIndex();
+  if (skipCurrentKeyFrameGroup_) {
+    if (requestedKeyFrameTimestamp_ == skippedKeyFrameTimestamp_) {
+      videoGoodState_ = true;
+      return skippedGroupStatus_;
+    }
+    skipCurrentKeyFrameGroup_ = false;
+  }
   videoGoodState_ = requestedKeyFrameIndex_ == 0 ||
       (requestedKeyFrameTimestamp_ == decodedKeyFrameTimestamp_ &&
        requestedKeyFrameIndex_ == decodedKeyFrameIndex_ + 1);
   if (videoGoodState_) {
-    // Flush decoder when seeking backward to a keyframe within the same group.
-    // This clears the DPB to avoid duplicate POC errors when re-decoding frames
-    // we've already seen. Only flush for backward seeks, not forward reading.
     bool sameKeyframeGroup = requestedKeyFrameTimestamp_ == decodedKeyFrameTimestamp_;
     bool atKeyframeWithPriorState =
         requestedKeyFrameIndex_ == 0 && decodedKeyFrameIndex_ != kInvalidFrameIndex;
     if (sameKeyframeGroup && atKeyframeWithPriorState && decoder_ != nullptr) {
+      // Re-decoding a keyframe in the same GOP requires clearing the backend DPB.
       decoder_->flush();
     }
-    decodedKeyFrameTimestamp_ = requestedKeyFrameTimestamp_;
-    decodedKeyFrameIndex_ = requestedKeyFrameIndex_;
-    // XR_LOGI("Reading frame {}/{}", requestedKeyFrameTimestamp_, requestedKeyFrameIndex_);
     encodedFrame_.resize(contentBlock.getBlockSize());
     IF_ERROR_LOG_AND_RETURN(reader->read(encodedFrame_));
+    int decodeStatus = SUCCESS;
     if (decoder_) {
-      return decoder_->decode(encodedFrame_, outDecodedFrame, contentBlock.image());
+      decodeStatus = decoder_->decode(encodedFrame_, outDecodedFrame, contentBlock.image());
+    } else {
+      // Video decoder makers decode the first frame while selecting a backend.
+      decoder_ = DecoderFactory::get().makeDecoder(
+          encodedFrame_, outDecodedFrame, contentBlock.image(), decoderOptions_);
+      if (decoder_ == nullptr) {
+        decodeStatus = domainError(DecodeStatus::CodecNotFound);
+        skipCurrentKeyFrameGroup(decodeStatus);
+        return decodeStatus;
+      }
     }
-    decoder_ = DecoderFactory::get().makeDecoder(
-        encodedFrame_, outDecodedFrame, contentBlock.image(), decoderOptions_);
-    return decoder_ ? SUCCESS : domainError(DecodeStatus::CodecNotFound);
+    if (decodeStatus != SUCCESS) {
+      decoder_.reset();
+      decodedKeyFrameIndex_ = kInvalidFrameIndex;
+      lastDecodeStatus_ = decodeStatus;
+      videoGoodState_ = false;
+      return decodeStatus;
+    }
+    lastDecodeStatus_ = SUCCESS;
+    decodedKeyFrameTimestamp_ = requestedKeyFrameTimestamp_;
+    decodedKeyFrameIndex_ = requestedKeyFrameIndex_;
+    return SUCCESS;
   }
   if (requestedKeyFrameTimestamp_ == decodedKeyFrameTimestamp_) {
     XR_LOGW(
@@ -110,7 +130,8 @@ int VideoFrameHandler::readMissingFrames(
           return error;
         }
         if (isMissingFrames()) {
-          return FAILURE;
+          skipCurrentKeyFrameGroup(lastDecodeStatus_);
+          return SUCCESS;
         }
         if (!exactFrame) {
           break;
@@ -119,6 +140,15 @@ int VideoFrameHandler::readMissingFrames(
     }
   }
   return SUCCESS;
+}
+
+void VideoFrameHandler::skipCurrentKeyFrameGroup(int decodeStatus) {
+  decoder_.reset();
+  decodedKeyFrameIndex_ = kInvalidFrameIndex;
+  skippedKeyFrameTimestamp_ = requestedKeyFrameTimestamp_;
+  skippedGroupStatus_ = decodeStatus;
+  skipCurrentKeyFrameGroup_ = true;
+  videoGoodState_ = true;
 }
 
 uint32_t VideoFrameHandler::getFramesToSkip() const {
@@ -133,6 +163,10 @@ void VideoFrameHandler::reset() {
   decodedKeyFrameTimestamp_ = 0;
   requestedKeyFrameIndex_ = kInvalidFrameIndex;
   requestedKeyFrameTimestamp_ = 0;
+  skippedKeyFrameTimestamp_ = 0;
+  lastDecodeStatus_ = SUCCESS;
+  skippedGroupStatus_ = SUCCESS;
+  skipCurrentKeyFrameGroup_ = false;
   videoGoodState_ = false;
 }
 
