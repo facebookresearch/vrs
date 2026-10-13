@@ -11,7 +11,7 @@ Image content blocks can be any of the following different subtypes:
 
 - `image/raw`\
    The image is stored as a buffer of raw pixels, which might be a compacted pixel format such as [RAW10](https://developer.android.com/reference/android/graphics/ImageFormat#RAW10), but not compressed using a `PixelFormat`.\
-   The exact [list of pixel formats](https://github.com/facebookresearch/vrs/blob/main/vrs/RecordFormat.h#L63-L92) grows over time.
+   The exact [list of pixel formats](https://github.com/facebookresearch/vrs/blob/main/vrs/RecordFormat.h#L68-L100) grows over time.
 - `image/png`, `image/jpg`, `image/jxl`, and `image/custom_codec`\
    The image is compressed using png, jpeg, jpeg-xl, or a custom codec. The payload of the image content block contains exactly what regular file of that image type would contain\
    _Note that when using a custom codec, you must specify a codec name, or the image content block will be reported as unsupported on read._
@@ -33,13 +33,13 @@ Without these properties, `image/raw` images cannot be interpreted safely. These
   The content block description might look like this:
   - `image/raw/640x480/pixel=grey8`
   - `image/raw/640x480/pixel=yuv_i420_split/stride=640`
-- The image properties can be provided in the datalayout content block found either before the `image` content block in the same record, or in the stream’s last configuration record. When using this method, the properties must be specified using the [Datalayout Conventions](https://github.com/facebookresearch/vrs/blob/main/vrs/DataLayoutConventions.h#L61-L64), which are merely a collection of data types and labels to use in your `DataLayout` to specify properties.
+- The image properties can be provided in the datalayout content block found either before the `image` content block in the same record, or in the stream’s last configuration record. When using this method, the properties must be specified using the [Datalayout Conventions](https://github.com/facebookresearch/vrs/blob/main/vrs/DataLayoutConventions.h#L30-L47), which are merely a collection of data types and labels to use in your `DataLayout` to specify properties.
 
 Whichever method you use, VRS collects the image properties for you, so that the `RecordFormatStreamPlayer::onImageRead()` callback can directly provide a content block object that you can query for the image format, regardless of how or where it was specified.
 
 ### Specifying Additional Image Properties
 
-For `image/raw` and `image/video` images, use a [`vrs::DataLayoutConventions::ImageSpec`](https://github.com/facebookresearch/vrs/blob/main/vrs/DataLayoutConventions.h#L59) to describe your image in a configuration record, or in a `DataLayout` block just before the image content block of your data records.
+For `image/raw` and `image/video` images, use a [`vrs::datalayout_conventions::ImageSpec`](https://github.com/facebookresearch/vrs/blob/main/vrs/DataLayoutConventions.h#L65) to describe your image in a configuration record, or in a `DataLayout` block just before the image content block of your data records.
 
 The `DataLayout` fields are:
 
@@ -55,7 +55,7 @@ The `DataLayout` fields are:
   DataPieceValue<ImageSpecType> codecQuality{kImageCodecQuality}; // optional
 ```
 
-For `image/video` images, specify the keyframe timestamp and the keyframe index, using the following `DataLayout` fields:
+For `image/video` images, specify the keyframe timestamp and the keyframe index using a [`vrs::datalayout_conventions::VideoFrameSpec`](https://github.com/facebookresearch/vrs/blob/main/vrs/DataLayoutConventions.h#L101), or the following `DataLayout` fields, in the `DataLayout` block immediately before the image content block:
 
 ```cpp
   DataPieceValue<double> keyFrameTimestamp{kImageKeyFrameTimeStamp};
@@ -80,7 +80,7 @@ png, jpg, and jxl payloads are exactly the same as png, jpg, and jxl files, whic
 ### `image/custom_codec`
 
 - Required properties: codec name.
-- Optional properties: width, height, pixel format, codec name, keyframe timestamp, keyframe index.
+- Optional properties: width, height, pixel format, keyframe timestamp, keyframe index.
 
 The only property VRS itself requires is a codec name for an image content block to be recognized. However, a particular custom codec may require additional properties, such as width, height, and pixel format. Whether a custom codec requires that information or not is an implementation detail of each specific custom codec. VRS does not support any particular custom codec by default, they are meant for experimentation and special cases.
 

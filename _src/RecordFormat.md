@@ -19,14 +19,14 @@ Use `RecordFormat` to describe records as a sequence of typed content blocks. Th
 
 ### `ContentBlock`
 
-The content block types are: `image`, `audio`, `datalayout`, and `custom`. VRS saves `RecordFormat` definitions as a string that is generated and parsed for you, but which was designed to be very expressive and compact. Content block descriptions may contain additional information, specific to the content type. Here are some examples of single content block `RecordFormat` definitions:
+The content block types are: `image`, `audio`, `data_layout`, and `custom`. VRS saves `RecordFormat` definitions as a string that is generated and parsed for you, but which was designed to be very expressive and compact. Content block descriptions may contain additional information, specific to the content type. Here are some examples of single content block `RecordFormat` definitions:
 
 - `image`
 - `image/png`
 - `image/jpg`
 - `image/jxl`
 - `image/raw`
-- `image/raw/640x480/pixel=grb8`
+- `image/raw/640x480/pixel=rgb8`
 - `image/raw/640x480/pixel=grey8/stride=648`
 - `image/custom_codec/codec=my_experiment`
 - `image/video`
@@ -34,18 +34,18 @@ The content block types are: `image`, `audio`, `datalayout`, and `custom`. VRS s
 - `audio`
 - `audio/pcm`
 - `audio/pcm/uint24be/rate=32000/channels=1`
-- `datalayout`
-- `datalayout/size=48`
+- `data_layout`
+- `data_layout/size=48`
 - `custom`
 - `custom/format=my_own_payload_format`
 - `custom/size=160`
 
-`image` and `audio` content blocks are pretty much what you expect when you read their text description. `datalayout` blocks contain structured metadata information. `custom` content blocks are blocks of raw data, which format is known only to you, and which you are responsible for interpreting.
+`image` and `audio` content blocks are pretty much what you expect when you read their text description. `data_layout` blocks contain structured metadata information. `custom` content blocks are blocks of raw data, which format is known only to you, and which you are responsible for interpreting.
 
 You can assemble as many content blocks as you like in a record, which might look like this:
 
-- `datalayout+image/raw`
-- `datalayout+datalayout+audio/pcm`
+- `data_layout+image/raw`
+- `data_layout+data_layout+audio/pcm`
 
 Again, these text descriptions are generated and parsed for you, so you don't need to worry about their syntax.
 
@@ -53,9 +53,9 @@ The `RecordFormat` and `DataLayout` descriptions of a stream's records are store
 
 In practice, the majority of the records used in VRS today use one of the following record formats:
 
-- `datalayout`: for records containing a single metadata content block, which is typical of configuration records.
-- `datalayout+image/raw`: for records containing some image specific metadata and the raw pixel data of an image.
-- `datalayout+image/jpg` and `datalayout+image/video`: for records containing some image specific metadata and compressed image data.
+- `data_layout`: for records containing a single metadata content block, which is typical of configuration records.
+- `data_layout+image/raw`: for records containing some image specific metadata and the raw pixel data of an image.
+- `data_layout+image/jpg` and `data_layout+image/video`: for records containing some image specific metadata and compressed image data.
 
 ### Datalayout Content Blocks
 
@@ -298,7 +298,7 @@ addRecordFormat(
   {&config_}); // DataLayout definition for the first block
 ```
 
-Here is an example of a record that contains a datalayout block, followed by an image block (“`datalayout+image/raw`”):
+Here is an example of a record that contains a datalayout block, followed by an image block (“`data_layout+image/raw`”):
 
 ```cpp
 // Assuming your recordable has a member variable declared like so:
@@ -332,7 +332,7 @@ You will get one callback per content block, until one of the callbacks returns 
 
 ### Reading a Datalayout
 
-When reading a `datalayout` content block, you will get an `onDataLayoutRead` callback in your `RecordFormatStreamPlayer` object, with the datalayout already loaded. In the `onDataLayoutRead` callback, you will want to handle records differently, depending on their record type.
+When reading a `data_layout` content block, you will get an `onDataLayoutRead` callback in your `RecordFormatStreamPlayer` object, with the datalayout already loaded. In the `onDataLayoutRead` callback, you will want to handle records differently, depending on their record type.
 
 For each record type, you will have a specific `DataLayout` definition, describing the latest version of the datalayout you are using. But you cannot know if that definition matches what was read, since the file could be using an older or newer version of the datalayout definition. Use the `getExpectedLayout<MyDataLayout>` API to get a `DataLayout` instance of the type your code is looking for. You can then access each of its fields safely, with the caveat that each field may or may not find actual data in the datalayout that was read from disk.
 
@@ -388,11 +388,11 @@ Datalayout Conventions are a set of names and types that VRS uses to find missin
 
 In the examples above, you can determine the size of the datalayout blocks by looking at the actual `DataLayout` definition. However, that only works if only fixed type pieces are used. When only fixed type pieces are used, the datalayout size is constant no matter what the content is. Look again at the definition of `MyDataLayout` above to see the difference between fixed size pieces and variable size pieces.
 
-When only fixed size pieces are used, the `getContentBlock()` API generates `"datalayout/size=XXX"`, with `XXX` being the number of bytes. If the datalayout contains any variable size pieces, the size of the datalayout can change from record to record, and the `getContentBlock()` API will return `"datalayout"`.
+When only fixed size pieces are used, the `getContentBlock()` API generates `"data_layout/size=XXX"`, with `XXX` being the number of bytes. If the datalayout contains any variable size pieces, the size of the datalayout can change from record to record, and the `getContentBlock()` API will return `"data_layout"`.
 
 If any variable size pieces are present, the datalayout will include an index, which has a fixed size. The index's size depends only on the number of variable size pieces declared, not on their actual values. This index makes it possible for VRS to determine the overall size of the `DataLayout` in two successive reads. The first read includes the data for all the fixed size pieces and the index for the variable size pieces. The added sizes found in the variable size index tells the total size of the variable size pieces, which VRS can now read with a second file read call. Therefore, VRS can always read a `DataLayout` block, because we can always determine its actual size.
 
-In the second `RecordFormat` example above, we have a datalayout block followed by an image block (`“datalayout+image/raw”`). Since the image block is the last content block of the record, and VRS knows the overall size of the record, and how to figure out the size of the datalayout, we can see that all the remaining bytes must belong to the `“image/raw”` block. However, this is not sufficient to interpret the image pixel data. This is when we need the Datalayout Conventions.
+In the second `RecordFormat` example above, we have a datalayout block followed by an image block (`“data_layout+image/raw”`). Since the image block is the last content block of the record, and VRS knows the overall size of the record, and how to figure out the size of the datalayout, we can see that all the remaining bytes must belong to the `“image/raw”` block. However, this is not sufficient to interpret the image pixel data. This is when we need the Datalayout Conventions.
 
 When working with a device such as a camera, typically, during the hardware initialization/setup, before the data collection begins, the software stack will configure the camera to function in a particular mode, which includes parameters such as resolution, color mode, exposure mode, and frame rate. These parameters will never change unless the configuration of the camera is changed, which is extremely rare in practice. These parameters all belong to a configuration record and can easily be saved in a datalayout block.
 
@@ -400,7 +400,7 @@ In a more advanced system, a camera’s resolution and color mode may change for
 
 VRS uses the following heuristics:
 
-- Search each datalayout block before the ambiguous block, in the same record, in reverse content block order. If the `RecordFormat` is `“datalayout+datalayout+image/raw+datalayout”`, to disambiguate the `“image/raw”` block, VRS ignores the last datalayout block (because it comes after the image/raw block), and searches the second datalayout block first. If that is not enough, it then searches the first datalayout block.
+- Search each datalayout block before the ambiguous block, in the same record, in reverse content block order. If the `RecordFormat` is `“data_layout+data_layout+image/raw+data_layout”`, to disambiguate the `“image/raw”` block, VRS ignores the last datalayout block (because it comes after the image/raw block), and searches the second datalayout block first. If that is not enough, it then searches the first datalayout block.
 
 - If the resolution and pixel format values cannot be found in the same record, VRS will search the last read configuration record in that stream.
 
