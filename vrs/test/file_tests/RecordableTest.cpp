@@ -477,6 +477,7 @@ class RecordableTest : public Recordable, StreamPlayer {
               counters + ((threadIndex + 1) % kThreadCount)});
     }
     vector<thread> threads;
+    threads.reserve(kThreadCount);
     for (uint32_t threadIndex = 0; threadIndex < kThreadCount; threadIndex++) {
       threads.emplace_back(
           &RecordableTest::createRecordsThreadTask, this, &threadParams[threadIndex]);

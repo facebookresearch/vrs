@@ -576,6 +576,7 @@ inline void addTemplatePiece(ManualDataLayout& layout, Counters& c, const T& def
   DataPieceArray<T>* newArray = new DataPieceArray<T>(arrayPieceName, c.arraySize++);
   layout.add(unique_ptr<DataPiece>(newArray));
   vector<T> values;
+  values.reserve(newArray->getArraySize());
   for (size_t k = 0; k < newArray->getArraySize(); ++k) {
     values.push_back(static_cast<T>(c.arraySize + k));
   }
@@ -622,6 +623,7 @@ inline void addTemplatePiecePoint(ManualDataLayout& layout, Counters& c) {
   DataPieceArray<T>* newArray = new DataPieceArray<T>(arrayPieceName, c.arraySize++);
   layout.add(unique_ptr<DataPiece>(newArray));
   vector<T> values;
+  values.reserve(newArray->getArraySize());
   for (size_t k = 0; k < newArray->getArraySize(); ++k) {
     values.push_back(makePoint<T>(c.arraySize + k));
   }
@@ -668,6 +670,7 @@ inline void addTemplatePieceMatrix(ManualDataLayout& layout, Counters& c) {
   DataPieceArray<T>* newArray = new DataPieceArray<T>(arrayPieceName, c.arraySize++);
   layout.add(unique_ptr<DataPiece>(newArray));
   vector<T> values;
+  values.reserve(newArray->getArraySize());
   for (size_t k = 0; k < newArray->getArraySize(); ++k) {
     values.push_back(makeMatrix<T>(c.arraySize + k));
   }
