@@ -110,6 +110,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aff0f64ed8b7ada9f6e0a2c55d3fd3a59"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a250b01c29f8923717e3e5b217ad7ff12" id="r_a250b01c29f8923717e3e5b217ad7ff12"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_write_file_handler.html#a250b01c29f8923717e3e5b217ad7ff12">addSplitHead</a> (MAYBE_UNUSED <a class="el" href="structvrs_1_1_file_spec.html">FileSpec</a> &amp;inOutSpec)</td></tr>
 <tr class="separator:a250b01c29f8923717e3e5b217ad7ff12"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9988c8ace9f4ea78385f185ff019a53" id="r_af9988c8ace9f4ea78385f185ff019a53"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_write_file_handler.html#af9988c8ace9f4ea78385f185ff019a53">abort</a> ()</td></tr>
+<tr class="separator:af9988c8ace9f4ea78385f185ff019a53"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a42d388f28fa2202dc18ab52964d7990c" id="r_a42d388f28fa2202dc18ab52964d7990c"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_write_file_handler.html#a42d388f28fa2202dc18ab52964d7990c">reopenForUpdatesSupported</a> () const =0</td></tr>
 <tr class="separator:a42d388f28fa2202dc18ab52964d7990c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a92afff70611d619395c027f01de60c6e" id="r_a92afff70611d619395c027f01de60c6e"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_write_file_handler.html#a92afff70611d619395c027f01de60c6e">reopenForUpdates</a> ()=0</td></tr>
@@ -248,6 +250,34 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>CacheStatsCallbackFu
 <p>VRS' DiskFile offers the most comprehensive implementation, because it is designed to fit all the needs of advanced VRS file creations, with chunking, but it can be used with non-VRS files.</p>
 <p>On the other hand, network <a class="el" href="classvrs_1_1_write_file_handler.html" title="The WriteFileHandler interface adds write operations to the FileHandler interface.">WriteFileHandler</a> implementations often have very specific behaviors designed to accommodate the specificities of the network storage they implement. These implementation details should ideally be abstracted, but in order to optimize cloud VRS file creation, the abstraction is compromised, and cloud <a class="el" href="classvrs_1_1_write_file_handler.html" title="The WriteFileHandler interface adds write operations to the FileHandler interface.">WriteFileHandler</a> implementations are not easily reusable for other applications that VRS. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="af9988c8ace9f4ea78385f185ff019a53" name="af9988c8ace9f4ea78385f185ff019a53"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af9988c8ace9f4ea78385f185ff019a53">&#9670;&#160;</a></span>abort()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void vrs::WriteFileHandler::abort </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Close the file after a failed recording, rather than completing it. Handlers that publish files, such as upload handlers, override it to discard the file. </p>
+
+<p>Reimplemented in <a class="el" href="classvrs_1_1_atomic_disk_file.html#ae00ba3a9625d3b6dad86d917bdc01db7">vrs::AtomicDiskFile</a>.</p>
+
+</div>
+</div>
 <a id="acc15477a0e4cac5307cd4d97ba9f94c9" name="acc15477a0e4cac5307cd4d97ba9f94c9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#acc15477a0e4cac5307cd4d97ba9f94c9">&#9670;&#160;</a></span>addChunk()</h2>
 

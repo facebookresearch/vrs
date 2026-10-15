@@ -91,6 +91,8 @@ $(function() {
 Public Member Functions</h2></td></tr>
 <tr class="memitem:aba760eec0aa2b500632f3327a34f06c4" id="r_aba760eec0aa2b500632f3327a34f06c4"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_new_chunk_handler.html#aba760eec0aa2b500632f3327a34f06c4">newChunk</a> (const string &amp;path, size_t index, bool isLastChunk)=0</td></tr>
 <tr class="separator:aba760eec0aa2b500632f3327a34f06c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a8caa358d75fe668ff9599c6970057e" id="r_a2a8caa358d75fe668ff9599c6970057e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_new_chunk_handler.html#a2a8caa358d75fe668ff9599c6970057e">recordingFailed</a> (MAYBE_UNUSED int error, MAYBE_UNUSED const std::vector&lt; std::string &gt; &amp;unnotifiedChunks)</td></tr>
+<tr class="separator:a2a8caa358d75fe668ff9599c6970057e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Listener to be notified when a new file chunk is finalized. </p>
@@ -140,6 +142,49 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramname">index</td><td>the index of the chunk in the file, 0 being the first chunk. </td></tr>
     <tr><td class="paramname">path</td><td>local file path to the chunk. </td></tr>
     <tr><td class="paramname">isLastChunk</td><td>flag telling if the chunk is the file's last (last notification). Note that chunk notifications may come out of sequence, so do not rely on any ordering. However, when you get this notification, the chunk is complete and will never change, and you may even delete the chunk (maybe when upload streaming with limited disk space?). When isLastChunk set to true, the file is complete, and a notification for every of the file's chunks has been sent. These callbacks can happen from any thread context. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a2a8caa358d75fe668ff9599c6970057e" name="a2a8caa358d75fe668ff9599c6970057e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2a8caa358d75fe668ff9599c6970057e">&#9670;&#160;</a></span>recordingFailed()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void vrs::NewChunkHandler::recordingFailed </td>
+          <td>(</td>
+          <td class="paramtype">MAYBE_UNUSED int&#160;</td>
+          <td class="paramname"><em>error</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">MAYBE_UNUSED const std::vector&lt; std::string &gt; &amp;&#160;</td>
+          <td class="paramname"><em>unnotifiedChunks</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Callback function to be notified that the recording failed because writing records failed. It replaces the remaining <a class="el" href="classvrs_1_1_new_chunk_handler.html#aba760eec0aa2b500632f3327a34f06c4">newChunk()</a> notifications: no notification follows it, and the file is incomplete. The writer closes the file's chunks and leaves them on disk, unless the write file handler's abort() discards the file, as <a class="el" href="classvrs_1_1_atomic_disk_file.html">AtomicDiskFile</a> does, so that an interrupted live recording can be recovered. Handlers whose chunks are temporary, such as upload handlers, may delete them. Errors while writing the index or closing the file are reported by the writer, but they still end with the last <a class="el" href="classvrs_1_1_new_chunk_handler.html#aba760eec0aa2b500632f3327a34f06c4">newChunk()</a> notification. It is called at most once, from any thread context. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">error</td><td>the error that stopped the recording. </td></tr>
+    <tr><td class="paramname">unnotifiedChunks</td><td>paths of the chunks never passed to <a class="el" href="classvrs_1_1_new_chunk_handler.html#aba760eec0aa2b500632f3327a34f06c4">newChunk()</a>: the chunk being written, and the head of split-head files. They may no longer exist if abort() discarded them. </td></tr>
   </table>
   </dd>
 </dl>
