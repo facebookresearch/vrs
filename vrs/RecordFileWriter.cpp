@@ -380,7 +380,7 @@ int RecordFileWriter::writeToFile(const string& filePath) {
   error = writeRecords(allRecords, error);
   // in case of error, don't bother writing an index or a description... :-(
   if (error != 0) {
-    file_->close();
+    closeFileAfterError(error);
     return error;
   }
   return completeAndCloseFile();
@@ -423,7 +423,7 @@ void RecordFileWriter::backgroundWriterThreadActivity() {
   } else {
     auto fileError = writerThreadData_->fileError.load(std::memory_order_relaxed);
     XR_LOGW("Closed file with error #{}, {}", fileError, errorCodeToMessage(fileError));
-    file_->close();
+    closeFileAfterError(fileError);
   }
   if (queueByteSize_) {
     queueByteSize_->store(0, memory_order_relaxed);
@@ -508,6 +508,7 @@ int RecordFileWriter::createFileAsync(const string& filePath, bool splitHead) {
   if (error != 0) {
     indexRecordWriter_.reset();
     file_->close();
+    newChunkHandler_.reset(); // no file: the handler must not hear about a later one
     return error;
   }
   if (LOG_FILE_OPERATIONS) {
@@ -1034,14 +1035,15 @@ void RecordFileWriter::writeOneRecord(
       sizeof(FileFormat::RecordHeader) + (compressedSize > 0 ? compressedSize : record->getSize());
   if (rwd.currentChunkSize > 0 && rwd.currentChunkSize + recordDiskSize >= maxChunkSize_) {
     NewChunkNotifier newChunkNotifier(*file_, newChunkHandler_);
-    // AddChunk() preserves the current chunk on error.
-    XR_VERIFY(
-        file_->addChunk() == 0,
-        "Add chunk failed: {}, {}",
-        file_->getLastError(),
-        errorCodeToMessage(file_->getLastError()));
+    // AddChunk() preserves the current chunk on error: we keep writing to it, so it's not complete.
+    if (XR_VERIFY(
+            file_->addChunk() == 0,
+            "Add chunk failed: {}, {}",
+            file_->getLastError(),
+            errorCodeToMessage(file_->getLastError()))) {
+      newChunkNotifier.notify(1); // offset chunk index by 1
+    }
     rwd.currentChunkSize = 0; // reset, even if addChunk() failed to reduce retrying.
-    newChunkNotifier.notify(1); // offset chunk index by 1
   }
   if (queueByteSize_) {
     queueByteSize_->fetch_sub(record->getSize(), memory_order_relaxed);
@@ -1206,6 +1208,34 @@ int RecordFileWriter::completeAndCloseFile() {
   newChunkNotifier.notify(1, true); // offset chunk index by 1, last chunk
   indexRecordWriter_.reset();
   return error;
+}
+
+void RecordFileWriter::closeFileAfterError(int error) {
+  vector<string> unnotifiedChunks;
+  if (newChunkHandler_ != nullptr) {
+    string path;
+    size_t index = 0;
+    if (indexRecordWriter_.getSplitHead() &&
+        indexRecordWriter_.getSplitHead()->getCurrentChunk(path, index)) {
+      unnotifiedChunks.push_back(path);
+    }
+    if (file_->getCurrentChunk(path, index)) {
+      unnotifiedChunks.push_back(path);
+    }
+  }
+  // The split index stays incomplete on purpose. Both files are closed (or discarded) before the
+  // chunk handler hears about the failure, in case it reads or cleans up local files.
+  if (indexRecordWriter_.getSplitHead()) {
+    int headError = indexRecordWriter_.getSplitHead()->close();
+    if (headError != 0) {
+      XR_LOGW("Failed to close the head file: {}", errorCodeToMessage(headError));
+    }
+  }
+  file_->abort();
+  if (newChunkHandler_ != nullptr) {
+    newChunkHandler_->recordingFailed(error, unnotifiedChunks);
+  }
+  indexRecordWriter_.reset();
 }
 
 RecordFileWriter::~RecordFileWriter() noexcept {

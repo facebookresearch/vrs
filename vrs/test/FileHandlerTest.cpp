@@ -19,6 +19,7 @@
 
 #include <vrs/DiskFile.h>
 #include <vrs/ErrorCode.h>
+#include <vrs/os/Utils.h>
 
 using namespace std;
 
@@ -302,4 +303,21 @@ TEST_F(FileHandlerTest, ExtrasHeterogeneousLookup) {
   auto it = spec.extras.find(keyView);
   EXPECT_NE(it, spec.extras.end());
   EXPECT_EQ(it->second, "myvalue");
+}
+
+TEST_F(FileHandlerTest, AtomicDiskFileAbortDiscardsTheFile) {
+  const string path = vrs::os::getTempFolder() + "AtomicDiskFileAbort.bin";
+  vrs::os::remove(path);
+  unique_ptr<vrs::WriteFileHandler> file = make_unique<vrs::AtomicDiskFile>();
+  ASSERT_EQ(file->create(path), 0);
+  double pi = 3.14;
+  ASSERT_EQ(file->write(&pi, sizeof(pi)), 0);
+  string tempPath;
+  size_t chunkIndex = 0;
+  file->getCurrentChunk(tempPath, chunkIndex);
+  EXPECT_NE(tempPath, path);
+  EXPECT_TRUE(vrs::os::isFile(tempPath));
+  file->abort();
+  EXPECT_FALSE(vrs::os::isFile(tempPath));
+  EXPECT_FALSE(vrs::os::isFile(path));
 }

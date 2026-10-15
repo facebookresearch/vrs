@@ -219,6 +219,104 @@ struct ChunkCollector : public NewChunkHandler {
   map<size_t, string>& chunks;
 };
 
+namespace {
+
+/// Body file handler whose writes fail after a number of successful writes.
+class FailingDiskFile : public DiskFile {
+ public:
+  explicit FailingDiskFile(size_t writesBeforeFailure) : writesLeft_{writesBeforeFailure} {}
+
+  using DiskFile::write;
+  int write(const void* buffer, size_t length) override {
+    if (writesLeft_ == 0) {
+      return DISKFILE_PARTIAL_WRITE_ERROR;
+    }
+    writesLeft_--;
+    return DiskFile::write(buffer, length);
+  }
+
+ private:
+  size_t writesLeft_;
+};
+
+/// Body file handler that can't create new chunks.
+class NoNewChunkDiskFile : public DiskFile {
+ public:
+  using DiskFile::addChunk;
+  int addChunk() override {
+    return DISKFILE_INVALID_STATE;
+  }
+};
+
+struct ChunkPathCounter : public NewChunkHandler {
+  explicit ChunkPathCounter(map<string, int>& _counts) : counts{_counts} {}
+  void newChunk(const string& path, size_t /*index*/, bool /*isLastChunk*/) override {
+    counts[path]++;
+  }
+  map<string, int>& counts;
+};
+
+struct FailureCollector : public NewChunkHandler {
+  FailureCollector(vector<int>& _failures, vector<string>& _unnotifiedChunks, bool& _lastChunkSeen)
+      : failures{_failures}, unnotifiedChunks{_unnotifiedChunks}, lastChunkSeen{_lastChunkSeen} {}
+  void newChunk(const string& /*path*/, size_t /*index*/, bool isLastChunk) override {
+    lastChunkSeen = lastChunkSeen || isLastChunk;
+  }
+  void recordingFailed(int error, const vector<string>& chunks) override {
+    failures.push_back(error);
+    unnotifiedChunks = chunks;
+  }
+  vector<int>& failures;
+  vector<string>& unnotifiedChunks;
+  bool& lastChunkSeen;
+};
+
+} // namespace
+
+TEST_F(DeviceSimulator, writeErrorFailsRecordingWithoutLastChunk) {
+  const string testPath = os::getTempFolder() + "WriteErrorFailsRecording.vrs";
+  vector<int> failures;
+  vector<string> unnotifiedChunks;
+  bool lastChunkSeen = false;
+  CreateParams creationParams(testPath, kLongFileConfig);
+  creationParams.setCustomCreateFileFunction([&](CreateParams& p, RecordFileWriter& writer) {
+    writer.setWriteFileHandler(make_unique<FailingDiskFile>(20));
+    return writer.createChunkedFile(
+        p.path, 0, make_unique<FailureCollector>(failures, unnotifiedChunks, lastChunkSeen));
+  });
+  EXPECT_EQ(singleThreadCreateRecords(creationParams), DISKFILE_PARTIAL_WRITE_ERROR);
+  ASSERT_EQ(failures.size(), 1);
+  EXPECT_EQ(failures.front(), DISKFILE_PARTIAL_WRITE_ERROR);
+  EXPECT_FALSE(lastChunkSeen);
+  // The split head and the body chunk being written were never notified, and they stay on disk.
+  EXPECT_EQ(unnotifiedChunks, (vector<string>{testPath, testPath + "_1"}));
+  for (const string& chunk : unnotifiedChunks) {
+    EXPECT_TRUE(os::isFile(chunk));
+  }
+  // The local file is incomplete, but readable: the index is rebuilt from the records written.
+  RecordFileReader reader;
+  ASSERT_EQ(reader.openFile(testPath), 0);
+  EXPECT_FALSE(reader.hasIndex());
+  EXPECT_GT(reader.getIndex().size(), 0);
+  reader.closeFile();
+  deleteChunkedFile(testPath);
+}
+
+TEST_F(DeviceSimulator, failedAddChunkKeepsWritingTheNotifiedChunk) {
+  const string testPath = os::getTempFolder() + "FailedAddChunk.vrs";
+  map<string, int> notifications;
+  CreateParams creationParams(testPath, kLongFileConfig);
+  creationParams.setCustomCreateFileFunction([&](CreateParams& p, RecordFileWriter& writer) {
+    writer.setWriteFileHandler(make_unique<NoNewChunkDiskFile>());
+    return writer.createChunkedFile(p.path, 1, make_unique<ChunkPathCounter>(notifications));
+  });
+  EXPECT_EQ(singleThreadCreateRecords(creationParams), 0);
+  // Every rollover fails, so all the records go to the first body chunk, notified once, at close.
+  EXPECT_EQ(notifications, (map<string, int>{{testPath, 1}, {testPath + "_1", 1}}));
+  checkRecordCountAndIndex(CheckParams(testPath, kLongFileConfig));
+  deleteChunkedFile(testPath);
+}
+
 static void checkChunks(const map<size_t, string>& chunks, const string& path, size_t count) {
   EXPECT_EQ(chunks.size(), count);
   if (!chunks.empty()) {

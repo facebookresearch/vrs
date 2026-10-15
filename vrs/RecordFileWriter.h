@@ -309,6 +309,7 @@ class VRS_API RecordFileWriter {
       Compressor& compressor,
       uint32_t compressedSize);
   int completeAndCloseFile(); ///< internal
+  void closeFileAfterError(int error); ///< internal
 
   void backgroundWriteCollectedRecord(); ///< internal
   bool addRecordsReadyToWrite(SortedRecords& inOutRecordsToWrite); ///< internal

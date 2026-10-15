@@ -79,6 +79,12 @@ class VRS_API WriteFileHandler : public FileHandler {
   /// and to createSplitFile(inOutSpec, options) to create the body file.
   virtual void addSplitHead(MAYBE_UNUSED FileSpec& inOutSpec) {}
 
+  /// Close the file after a failed recording, rather than completing it.
+  /// Handlers that publish files, such as upload handlers, override it to discard the file.
+  virtual void abort() {
+    close();
+  }
+
   /// Tell if modifying files is supported by this FileHandler implementation.
   /// @return True if file modification and creation is supported.
   virtual bool reopenForUpdatesSupported() const = 0;
