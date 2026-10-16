@@ -23,8 +23,11 @@
 #include <vector>
 
 #include <vrs/Compressor.h>
+#include <vrs/DataSlice.h>
 #include <vrs/DataSource.h>
+#include <vrs/Decompressor.h>
 #include <vrs/DiskFile.h>
+#include <vrs/ErrorCode.h>
 #include <vrs/FileFormat.h>
 #include <vrs/Record.h>
 #include <vrs/RecordFileWriter.h>
@@ -86,36 +89,74 @@ class TemporaryRecordPath final {
   string path_;
 };
 
-void expectWrittenPayload(Record& record, const vector<uint8_t>& expectedPayload) {
-  TemporaryRecordPath filePath;
+// Writes `record` to a fresh file at `filePath`, compressing iff `compress` (asserting the record
+// actually compresses when true). Reports the on-disk record size via `outRecordSize`.
+void expectWrittenToFile(
+    const string& filePath,
+    Record& record,
+    bool compress,
+    uint32_t& outRecordSize) {
   DiskFile writer;
-  ASSERT_EQ(writer.create(filePath.get()), 0);
+  ASSERT_EQ(writer.create(filePath), 0);
   Compressor compressor;
-  uint32_t recordSize = 0;
-  const uint32_t expectedRecordSize =
-      static_cast<uint32_t>(sizeof(FileFormat::RecordHeader) + expectedPayload.size());
+  uint32_t compressedSize = 0;
+  if (compress) {
+    ASSERT_TRUE(record.shouldTryToCompress());
+    ASSERT_EQ(record.compressRecord(compressor, compressedSize), SUCCESS);
+    ASSERT_GT(compressedSize, 0u);
+  }
+  outRecordSize = 0;
   ASSERT_EQ(
       record.writeRecord(
-          writer, StreamId{RecordableTypeId::UnitTest1, 1}, recordSize, compressor, 0),
+          writer,
+          StreamId{RecordableTypeId::UnitTest1, 1},
+          outRecordSize,
+          compressor,
+          compressedSize),
       0);
-  EXPECT_EQ(recordSize, expectedRecordSize);
   ASSERT_EQ(writer.close(), 0);
+}
+
+// Reads `recordSize` bytes, from `filePath` into `outRecord`, asserting the file's total size
+// matches.
+void expectReadFromFile(const string& filePath, uint32_t recordSize, vector<uint8_t>& outRecord) {
   DiskFile reader;
-  ASSERT_EQ(reader.open(filePath.get()), 0);
-  EXPECT_EQ(reader.getTotalSize(), expectedRecordSize);
-  vector<uint8_t> output(expectedRecordSize);
-  ASSERT_EQ(reader.read(output), 0);
+  ASSERT_EQ(reader.open(filePath), 0);
+  EXPECT_EQ(reader.getTotalSize(), recordSize);
+  outRecord.resize(recordSize);
+  ASSERT_EQ(reader.read(outRecord), 0);
   ASSERT_EQ(reader.close(), 0);
-  FileFormat::RecordHeader expectedHeader;
-  expectedHeader.recordSize = expectedRecordSize;
-  expectedHeader.previousRecordSize = 0;
-  expectedHeader.recordableTypeId = static_cast<int32_t>(RecordableTypeId::UnitTest1);
-  expectedHeader.formatVersion = 1;
-  expectedHeader.timestamp = 1;
-  expectedHeader.recordableInstanceId = 1;
-  expectedHeader.recordType = static_cast<uint8_t>(Record::Type::DATA);
-  expectedHeader.compressionType = static_cast<uint8_t>(CompressionType::None);
-  expectedHeader.uncompressedSize = 0;
+}
+
+FileFormat::RecordHeader makeExpectedHeader(
+    uint32_t recordSize,
+    CompressionType compressionType,
+    uint32_t uncompressedSize) {
+  FileFormat::RecordHeader header;
+  header.recordSize = recordSize;
+  header.previousRecordSize = 0;
+  header.recordableTypeId = static_cast<int32_t>(RecordableTypeId::UnitTest1);
+  header.formatVersion = 1;
+  header.timestamp = 1;
+  header.recordableInstanceId = 1;
+  header.recordType = static_cast<uint8_t>(Record::Type::DATA);
+  header.compressionType = static_cast<uint8_t>(compressionType);
+  header.uncompressedSize = uncompressedSize;
+  return header;
+}
+
+void expectWrittenPayload(Record& record, const vector<uint8_t>& expectedPayload) {
+  TemporaryRecordPath filePath;
+  uint32_t recordSize = 0;
+  ASSERT_NO_FATAL_FAILURE(
+      expectWrittenToFile(filePath.get(), record, /*compress=*/false, recordSize));
+  const uint32_t expectedRecordSize =
+      static_cast<uint32_t>(sizeof(FileFormat::RecordHeader) + expectedPayload.size());
+  EXPECT_EQ(recordSize, expectedRecordSize);
+  vector<uint8_t> output;
+  ASSERT_NO_FATAL_FAILURE(expectReadFromFile(filePath.get(), recordSize, output));
+  const FileFormat::RecordHeader expectedHeader =
+      makeExpectedHeader(expectedRecordSize, CompressionType::None, 0);
   vector<uint8_t> expectedOutput(expectedRecordSize);
   std::memcpy(expectedOutput.data(), &expectedHeader, sizeof(expectedHeader));
   std::copy(
@@ -123,6 +164,44 @@ void expectWrittenPayload(Record& record, const vector<uint8_t>& expectedPayload
       expectedPayload.end(),
       expectedOutput.begin() + sizeof(expectedHeader));
   EXPECT_EQ(output, expectedOutput);
+}
+
+// Writes a record that compresses, reads it back, decompresses, and checks the payload matches.
+void expectWrittenCompressedPayload(Record& record, const vector<uint8_t>& expectedPayload) {
+  TemporaryRecordPath filePath;
+  uint32_t recordSize = 0;
+  ASSERT_NO_FATAL_FAILURE(
+      expectWrittenToFile(filePath.get(), record, /*compress=*/true, recordSize));
+  vector<uint8_t> output;
+  ASSERT_NO_FATAL_FAILURE(expectReadFromFile(filePath.get(), recordSize, output));
+  const FileFormat::RecordHeader expectedHeader = makeExpectedHeader(
+      recordSize, CompressionType::Zstd, static_cast<uint32_t>(expectedPayload.size()));
+  EXPECT_EQ(0, std::memcmp(output.data(), &expectedHeader, sizeof(FileFormat::RecordHeader)));
+  const uint32_t diskPayloadSize = recordSize - sizeof(FileFormat::RecordHeader);
+  Decompressor decompressor;
+  decompressor.setCompressionType(CompressionType::Zstd);
+  std::memcpy(
+      decompressor.allocateCompressedDataBuffer(diskPayloadSize),
+      output.data() + sizeof(FileFormat::RecordHeader),
+      diskPayloadSize);
+  vector<uint8_t> decompressed(expectedPayload.size());
+  uint32_t writtenSize = 0;
+  ASSERT_EQ(
+      decompressor.decompress(
+          decompressed.data(), static_cast<uint32_t>(decompressed.size()), writtenSize),
+      0);
+  EXPECT_EQ(writtenSize, expectedPayload.size());
+  EXPECT_EQ(decompressed, expectedPayload);
+}
+
+// Builds a BorrowedData whose data pointer sits at an offset inside an owner-pinned buffer, so the
+// data pointer differs from the owner's base -- as an image does inside a larger mapped buffer.
+std::unique_ptr<BorrowedData> makeBorrowedData(const std::vector<uint8_t>& bytes) {
+  constexpr size_t kOffset = 8;
+  auto owner = std::make_shared<std::vector<uint8_t>>(kOffset + bytes.size());
+  std::copy(bytes.begin(), bytes.end(), owner->begin() + kOffset);
+  const void* data = owner->data() + kOffset;
+  return std::make_unique<BorrowedData>(data, bytes.size(), std::move(owner));
 }
 
 constexpr StreamId kConstexprStreamId{RecordableTypeId::UnitTest1, 1};
@@ -237,6 +316,67 @@ TEST_F(RecordTester, directWriteWithEmptyDataWritesOnlyDataSource) {
   ASSERT_NE(record, nullptr);
   EXPECT_EQ(record->getSize(), layout.getDataSize());
   ASSERT_NO_FATAL_FAILURE(expectWrittenPayload(*record, layout.payload()));
+}
+
+TEST_F(RecordTester, dataSourceBorrowedDataAndDirectWriteDataAreInOrderWhenUncompressed) {
+  RecordManager recordManager;
+  recordManager.setCompression(CompressionPreset::ZstdFast);
+  OwnedDataSource layout{16, 0xAB};
+  const std::vector<uint8_t> image(256, 0xCD);
+  const std::vector<uint8_t> encoded(128, 0xEF);
+  Record* record =
+      recordManager.createRecord(1, Record::Type::DATA, 1, layout, makeBorrowedData(image));
+  record->addDirectWriteRecordData(std::make_unique<TestDirectWriteData>(encoded));
+  ASSERT_NE(record, nullptr);
+  // DirectWrite present -> the whole record is uncompressed, laid out
+  // [owned][borrowed][directWrite].
+  EXPECT_FALSE(record->shouldTryToCompress());
+  EXPECT_EQ(record->getSize(), layout.getDataSize() + image.size() + encoded.size());
+  std::vector<uint8_t> expected = layout.payload();
+  expected.insert(expected.end(), image.begin(), image.end());
+  expected.insert(expected.end(), encoded.begin(), encoded.end());
+  ASSERT_NO_FATAL_FAILURE(expectWrittenPayload(*record, expected));
+}
+
+TEST_F(RecordTester, borrowedDataCompressesWithDataSource) {
+  RecordManager recordManager;
+  recordManager.setCompression(CompressionPreset::ZstdFast);
+  OwnedDataSource layout{64, 0x11};
+  std::vector<uint8_t> image(4096);
+  for (size_t i = 0; i < image.size(); ++i) {
+    image[i] = static_cast<uint8_t>(i / 5); // compressible
+  }
+  Record* record =
+      recordManager.createRecord(1, Record::Type::DATA, 1, layout, makeBorrowedData(image));
+  ASSERT_NE(record, nullptr);
+  std::vector<uint8_t> expected = layout.payload();
+  expected.insert(expected.end(), image.begin(), image.end());
+  ASSERT_NO_FATAL_FAILURE(expectWrittenCompressedPayload(*record, expected));
+}
+
+TEST_F(RecordTester, multiSegmentBorrowedDataCompressesSegmentsInOrder) {
+  RecordManager recordManager;
+  recordManager.setCompression(CompressionPreset::ZstdFast);
+  OwnedDataSource layout{64, 0x11};
+  // Two planes inside one owner buffer with inter-plane padding that must be skipped, as for NV12.
+  constexpr size_t kPlane1 = 2048;
+  constexpr size_t kPadding = 32;
+  constexpr size_t kPlane2 = 1024;
+  auto owner = std::make_shared<std::vector<uint8_t>>(kPlane1 + kPadding + kPlane2);
+  for (size_t i = 0; i < owner->size(); ++i) {
+    (*owner)[i] = static_cast<uint8_t>(i / 5); // compressible
+  }
+  const uint8_t* base = owner->data();
+  std::vector<DataSlice> segments = {
+      DataSlice{base, kPlane1}, DataSlice{base + kPlane1 + kPadding, kPlane2}};
+  auto borrowed = std::make_unique<BorrowedData>(segments.data(), segments.size(), owner);
+  Record* record =
+      recordManager.createRecord(1, Record::Type::DATA, 1, layout, std::move(borrowed));
+  ASSERT_NE(record, nullptr);
+  std::vector<uint8_t> expected = layout.payload();
+  expected.insert(expected.end(), base, base + kPlane1);
+  expected.insert(expected.end(), base + kPlane1 + kPadding, base + kPlane1 + kPadding + kPlane2);
+  ASSERT_NO_FATAL_FAILURE(expectWrittenCompressedPayload(*record, expected));
 }
 
 TEST_F(RecordTester, streamIdTest) {
