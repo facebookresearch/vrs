@@ -76,6 +76,24 @@ class VRS_API RecordManager {
       const DataSource& data,
       std::unique_ptr<DirectWriteRecordData>&& directWriteData);
 
+  /// Create & hold a record using the given parameters. RecordManager is responsible for deleting
+  /// the record. Copies the data referenced by the DataSource, and takes ownership of borrowedData,
+  /// whose borrowed memory is written after the DataSource payload: compressed together with it
+  /// when the record is compressed, or raw otherwise.
+  /// @param timestamp: Timestamp of the record, in seconds.
+  /// @param type: Type of the record.
+  /// @param formatVersion: Version number of the format of the record, so that when the record is
+  /// read, the data can be interpreted appropriately.
+  /// @param data: A DataSource that points to the payload to copy in the record immediately.
+  /// @param borrowedData: borrowed data written after the DataSource payload.
+  /// @return A pointer to the record created.
+  Record* createRecord(
+      double timestamp,
+      Record::Type type,
+      uint32_t formatVersion,
+      const DataSource& data,
+      std::unique_ptr<BorrowedData>&& borrowedData);
+
   /// Recycle or delete buffers older than a time.
   /// @param oldestTimestamp: Max timestamp of the records to purge.
   /// @param recycleBuffers: Tell if old records should be recycled (true) or delete (false).
