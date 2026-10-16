@@ -24,6 +24,7 @@
 
 #include <lz4frame.h>
 #include <zstd.h>
+#include <zstd_errors.h>
 
 #define DEFAULT_LOG_CHANNEL "VRSCompressor"
 #include <logging/Log.h>
@@ -135,18 +136,17 @@ DEFINE_ENUM_CONVERTERS(CompressionType)
     }                                                                                    \
   } while (false)
 
-#define IF_ZSTD_COMP_ERROR_LOG_AND_RETURN(operation__)                                 \
-  do {                                                                                 \
-    zresult = operation__;                                                             \
-    if (ZSTD_isError(zresult)) {                                                       \
-      XR_LOGE("{} failed: {}, {}", #operation__, zresult, ZSTD_getErrorName(zresult)); \
-      ZSTD_CCtx_reset(zstdContext_, ZSTD_reset_session_and_parameters);                \
-      compressionType_ = CompressionType::None;                                        \
-      return domainErrorCode(                                                          \
-          ErrorDomain::ZstdCompressionErrorDomain,                                     \
-          ZSTD_getErrorCode(zresult),                                                  \
-          ZSTD_getErrorName(zresult));                                                 \
-    }                                                                                  \
+#define IF_ZSTD_COMP_ERROR_LOG_AND_RETURN(operation__)                                          \
+  do {                                                                                          \
+    zresult = operation__;                                                                      \
+    if (ZSTD_isError(zresult)) {                                                                \
+      const ZSTD_ErrorCode errorCode = ZSTD_getErrorCode(zresult);                              \
+      const char* errorMessage = ZSTD_getErrorString(errorCode);                                \
+      XR_LOGE("{} failed: {}, {}", #operation__, zresult, errorMessage);                        \
+      ZSTD_CCtx_reset(zstdContext_, ZSTD_reset_session_and_parameters);                         \
+      compressionType_ = CompressionType::None;                                                 \
+      return domainErrorCode(ErrorDomain::ZstdCompressionErrorDomain, errorCode, errorMessage); \
+    }                                                                                           \
   } while (false)
 
 class Compressor::CompressorImpl {
@@ -209,11 +209,11 @@ class Compressor::CompressorImpl {
     size_t result = ZSTD_compress2(
         zstdContext_, buffer.data() + headerSpace, maxCompressedSize, data, dataSize);
     if (ZSTD_isError(result)) {
-      const char* errorMessage = ZSTD_getErrorName(result);
+      const ZSTD_ErrorCode errorCode = ZSTD_getErrorCode(result);
+      const char* errorMessage = ZSTD_getErrorString(errorCode);
       XR_LOGE("Compression error {}", errorMessage);
       compressionType_ = CompressionType::None;
-      return domainErrorCode(
-          ErrorDomain::ZstdCompressionErrorDomain, ZSTD_getErrorCode(result), errorMessage);
+      return domainErrorCode(ErrorDomain::ZstdCompressionErrorDomain, errorCode, errorMessage);
     }
     // if the compressed data isn't smaller, don't use it!
     if (result < dataSize) {
