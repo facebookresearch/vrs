@@ -88,11 +88,12 @@ bool Record::shouldTryToCompress() const {
       Compressor::shouldTryToCompress(recordManager_.getCompression(), usedBufferSize_);
 }
 
-uint32_t Record::compressRecord(Compressor& compressor) {
+int Record::compressRecord(Compressor& compressor, uint32_t& outCompressedSize) {
   return compressor.compress(
       buffer_.data() + kRecordHeaderSize,
       usedBufferSize_,
       recordManager_.getCompression(),
+      outCompressedSize,
       kRecordHeaderSize);
 }
 

@@ -75,8 +75,14 @@ TEST(IndexRecord, ReadRecord_MultiFrameCompressedSplitIndex_ReadsAllRecords) {
       batch[k] = IndexRecord::DiskRecordInfo(timestamp, recordSize, streamId, Record::Type::DATA);
     }
     Compressor compressor;
-    uint32_t compressedSize = compressor.compress(
-        batch.data(), batch.size() * sizeof(batch[0]), CompressionPreset::ZstdLight);
+    uint32_t compressedSize = 0;
+    ASSERT_EQ(
+        compressor.compress(
+            batch.data(),
+            batch.size() * sizeof(batch[0]),
+            CompressionPreset::ZstdLight,
+            compressedSize),
+        SUCCESS);
     ASSERT_GT(compressedSize, 0);
     const uint8_t* data = static_cast<const uint8_t*>(compressor.getData());
     compressedIndex.insert(compressedIndex.end(), data, data + compressedSize);

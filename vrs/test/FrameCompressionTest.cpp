@@ -25,6 +25,7 @@
 #include <vrs/Decompressor.h>
 #include <vrs/DiskFile.h>
 #include <vrs/ErrorCode.h>
+#include <vrs/Record.h>
 
 using namespace vrs;
 using namespace std;
@@ -402,6 +403,30 @@ int readFrame(
 }
 
 } // namespace
+
+TEST_F(FrameCompressionTest, smallPayloadResetsCompressionType) {
+  Compressor compressor;
+  const vector<uint8_t> compressibleInput(1024);
+  uint32_t compressedSize = 0;
+  ASSERT_EQ(
+      compressor.compress(
+          compressibleInput.data(),
+          compressibleInput.size(),
+          CompressionPreset::Lz4Fast,
+          compressedSize),
+      SUCCESS);
+  ASSERT_GT(compressedSize, 0);
+  ASSERT_EQ(compressor.getCompressionType(), CompressionType::Lz4);
+  const vector<uint8_t> smallInput(Compressor::kMinByteCountForCompression - 1);
+
+  EXPECT_EQ(
+      compressor.compress(
+          smallInput.data(), smallInput.size(), CompressionPreset::Lz4Fast, compressedSize),
+      SUCCESS);
+
+  EXPECT_EQ(compressedSize, 0);
+  EXPECT_EQ(compressor.getCompressionType(), CompressionType::None);
+}
 
 TEST_F(FrameCompressionTest, compressedFrames) {
   const string testPath = os::getTempFolder() + "compressedFrames.vrs";

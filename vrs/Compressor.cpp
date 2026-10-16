@@ -100,6 +100,11 @@ ENUM_STRING_CONVERTER3(
     CompressionType::None,
     true);
 
+// LZ4 encodes errors as size_t(-errorCode); unsigned negation reverses it safely.
+size_t lz4ErrorCodeFromResult(size_t result) {
+  return size_t{0} - result;
+}
+
 int zstdPresetToCompressionLevel(CompressionPreset preset) {
   auto iter = sZstdPresets.find(preset);
   if (iter == sZstdPresets.end()) {
@@ -117,15 +122,31 @@ const size_t Compressor::kMinByteCountForCompression = 250;
 DEFINE_ENUM_CONVERTERS(CompressionPreset);
 DEFINE_ENUM_CONVERTERS(CompressionType)
 
-#define IF_ZCOMP_ERROR_LOG_AND_RETURN(operation__)                                       \
+#define IF_LZ4_COMP_ERROR_LOG_AND_RETURN(operation__)                                    \
   do {                                                                                   \
-    zresult = operation__;                                                               \
-    if (ZSTD_isError(zresult)) {                                                         \
-      XR_LOGE("{} failed: {}, {}", #operation__, zresult, ZSTD_getErrorName(zresult));   \
-      ZSTD_CCtx_reset(zstdContext_, ZSTD_reset_session_and_parameters);                  \
+    lzresult = operation__;                                                              \
+    if (LZ4F_isError(lzresult)) {                                                        \
+      XR_LOGE("{} failed: {}, {}", #operation__, lzresult, LZ4F_getErrorName(lzresult)); \
+      compressionType_ = CompressionType::None;                                          \
       return domainErrorCode(                                                            \
-          ErrorDomain::ZstdCompressionErrorDomain, zresult, ZSTD_getErrorName(zresult)); \
+          ErrorDomain::Lz4CompressionErrorDomain,                                        \
+          lz4ErrorCodeFromResult(lzresult),                                              \
+          LZ4F_getErrorName(lzresult));                                                  \
     }                                                                                    \
+  } while (false)
+
+#define IF_ZSTD_COMP_ERROR_LOG_AND_RETURN(operation__)                                 \
+  do {                                                                                 \
+    zresult = operation__;                                                             \
+    if (ZSTD_isError(zresult)) {                                                       \
+      XR_LOGE("{} failed: {}, {}", #operation__, zresult, ZSTD_getErrorName(zresult)); \
+      ZSTD_CCtx_reset(zstdContext_, ZSTD_reset_session_and_parameters);                \
+      compressionType_ = CompressionType::None;                                        \
+      return domainErrorCode(                                                          \
+          ErrorDomain::ZstdCompressionErrorDomain,                                     \
+          ZSTD_getErrorCode(zresult),                                                  \
+          ZSTD_getErrorName(zresult));                                                 \
+    }                                                                                  \
   } while (false)
 
 class Compressor::CompressorImpl {
@@ -138,39 +159,40 @@ class Compressor::CompressorImpl {
       ZSTD_freeCCtx(zstdContext_);
     }
   }
-  uint32_t lz4Compress(
+  int lz4Compress(
       helpers::IOVector<uint8_t>& buffer,
       const void* data,
       size_t dataSize,
       CompressionPreset preset,
+      uint32_t& outCompressedSize,
       size_t headerSpace) {
+    outCompressedSize = 0;
     const auto* prefs = getLz4Preferences(preset);
     size_t maxCompressedSize = LZ4F_compressFrameBound(dataSize, prefs);
     // increase our internal buffer size if necessary
     if (buffer.size() < headerSpace + maxCompressedSize) {
       buffer.resizeDiscardingWithoutInitialization(headerSpace + maxCompressedSize);
     }
-    size_t result =
-        LZ4F_compressFrame(buffer.data() + headerSpace, maxCompressedSize, data, dataSize, prefs);
-    if (LZ4F_isError(result)) {
-      XR_LOGE("Compression error {}", LZ4F_getErrorName(result));
-      compressionType_ = CompressionType::None;
-      return 0;
-    }
+    size_t lzresult = 0;
+    IF_LZ4_COMP_ERROR_LOG_AND_RETURN(
+        LZ4F_compressFrame(buffer.data() + headerSpace, maxCompressedSize, data, dataSize, prefs));
     // if the compressed data isn't smaller, don't use it!
-    if (result < dataSize) {
+    if (lzresult < dataSize) {
       compressionType_ = CompressionType::Lz4;
-      return static_cast<uint32_t>(result);
+      outCompressedSize = static_cast<uint32_t>(lzresult);
+    } else {
+      compressionType_ = CompressionType::None;
     }
-    compressionType_ = CompressionType::None;
-    return 0;
+    return SUCCESS;
   }
-  uint32_t zstdCompress(
+  int zstdCompress(
       helpers::IOVector<uint8_t>& buffer,
       const void* data,
       size_t dataSize,
       CompressionPreset preset,
+      uint32_t& outCompressedSize,
       size_t headerSpace) {
+    outCompressedSize = 0;
     size_t maxCompressedSize = ZSTD_compressBound(dataSize);
     // increase our internal buffer size if necessary
     if (buffer.size() < headerSpace + maxCompressedSize) {
@@ -180,34 +202,37 @@ class Compressor::CompressorImpl {
       zstdContext_ = ZSTD_createCCtx();
     }
     size_t zresult = 0;
-    IF_ZCOMP_ERROR_LOG_AND_RETURN(ZSTD_CCtx_reset(zstdContext_, ZSTD_reset_session_only));
-    IF_ZCOMP_ERROR_LOG_AND_RETURN(ZSTD_CCtx_setParameter(
+    IF_ZSTD_COMP_ERROR_LOG_AND_RETURN(ZSTD_CCtx_reset(zstdContext_, ZSTD_reset_session_only));
+    IF_ZSTD_COMP_ERROR_LOG_AND_RETURN(ZSTD_CCtx_setParameter(
         zstdContext_, ZSTD_c_compressionLevel, zstdPresetToCompressionLevel(preset)));
-    IF_ZCOMP_ERROR_LOG_AND_RETURN(ZSTD_CCtx_setPledgedSrcSize(zstdContext_, dataSize));
+    IF_ZSTD_COMP_ERROR_LOG_AND_RETURN(ZSTD_CCtx_setPledgedSrcSize(zstdContext_, dataSize));
     size_t result = ZSTD_compress2(
         zstdContext_, buffer.data() + headerSpace, maxCompressedSize, data, dataSize);
     if (ZSTD_isError(result)) {
-      XR_LOGE("Compression error {}", ZSTD_getErrorName(result));
+      const char* errorMessage = ZSTD_getErrorName(result);
+      XR_LOGE("Compression error {}", errorMessage);
       compressionType_ = CompressionType::None;
-      return 0;
+      return domainErrorCode(
+          ErrorDomain::ZstdCompressionErrorDomain, ZSTD_getErrorCode(result), errorMessage);
     }
     // if the compressed data isn't smaller, don't use it!
     if (result < dataSize) {
       compressionType_ = CompressionType::Zstd;
-      return static_cast<uint32_t>(result);
+      outCompressedSize = static_cast<uint32_t>(result);
+    } else {
+      compressionType_ = CompressionType::None;
     }
-    compressionType_ = CompressionType::None;
-    return 0;
+    return SUCCESS;
   }
   int startFrame(size_t dataSize, CompressionPreset zstdPreset) {
     if (zstdContext_ == nullptr) {
       zstdContext_ = ZSTD_createCCtx();
     }
     size_t zresult = 0;
-    IF_ZCOMP_ERROR_LOG_AND_RETURN(ZSTD_CCtx_setParameter(
+    IF_ZSTD_COMP_ERROR_LOG_AND_RETURN(ZSTD_CCtx_setParameter(
         zstdContext_, ZSTD_c_compressionLevel, zstdPresetToCompressionLevel(zstdPreset)));
-    IF_ZCOMP_ERROR_LOG_AND_RETURN(ZSTD_CCtx_setPledgedSrcSize(zstdContext_, dataSize));
-    return 0;
+    IF_ZSTD_COMP_ERROR_LOG_AND_RETURN(ZSTD_CCtx_setPledgedSrcSize(zstdContext_, dataSize));
+    return SUCCESS;
   }
   int addFrameData(
       WriteFileHandler& file,
@@ -218,7 +243,7 @@ class Compressor::CompressorImpl {
       bool endFrame) {
     size_t zresult = 0;
     do {
-      IF_ZCOMP_ERROR_LOG_AND_RETURN(ZSTD_compressStream2(
+      IF_ZSTD_COMP_ERROR_LOG_AND_RETURN(ZSTD_compressStream2(
           zstdContext_, output, input, endFrame ? ZSTD_e_end : ZSTD_e_continue));
       if (output->pos > 0) {
         if (maxCompressedSize > 0 && inOutCompressedSize + output->pos > maxCompressedSize) {
@@ -230,7 +255,11 @@ class Compressor::CompressorImpl {
         output->pos = 0;
       }
     } while (endFrame ? (input->pos < input->size || zresult > 0) : (input->pos < input->size));
-    return 0;
+    return SUCCESS;
+  }
+
+  void resetCompressionType() {
+    compressionType_ = CompressionType::None;
   }
 
   CompressionType getCompressionType() const {
@@ -276,21 +305,24 @@ Compressor::Compressor() : impl_(new CompressorImpl()) {}
 
 Compressor::~Compressor() = default;
 
-uint32_t Compressor::compress(
+int Compressor::compress(
     const void* data,
     size_t dataSize,
     CompressionPreset preset,
+    uint32_t& outCompressedSize,
     size_t headerSpace) {
+  outCompressedSize = 0;
+  impl_->resetCompressionType();
   if (shouldTryToCompress(preset, dataSize)) {
     if (preset >= CompressionPreset::FirstLz4Preset && preset <= CompressionPreset::LastLz4Preset) {
-      return impl_->lz4Compress(buffer_, data, dataSize, preset, headerSpace);
+      return impl_->lz4Compress(buffer_, data, dataSize, preset, outCompressedSize, headerSpace);
     }
     if (preset >= CompressionPreset::FirstZstdPreset &&
         preset <= CompressionPreset::LastZstdPreset) {
-      return impl_->zstdCompress(buffer_, data, dataSize, preset, headerSpace);
+      return impl_->zstdCompress(buffer_, data, dataSize, preset, outCompressedSize, headerSpace);
     }
   }
-  return 0; // means failure
+  return SUCCESS;
 }
 
 int Compressor::startFrame(size_t frameSize, CompressionPreset zstdPreset, uint32_t& outSize) {

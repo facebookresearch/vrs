@@ -49,6 +49,10 @@ TEST_F(ErrorCodeTest, testErrorCode) {
   EXPECT_EQ(errorCode, errorDomainToErrorCodeStart(ErrorDomain::ZstdDecompressionErrorDomain) + 1);
   EXPECT_EQ(errorCodeToMessage(errorCode), "ZSTD Decompression error 42: test error message");
 
+  errorCode = domainErrorCode(ErrorDomain::Lz4CompressionErrorDomain, 42, errorMessage);
+  EXPECT_EQ(errorCode, errorDomainToErrorCodeStart(ErrorDomain::Lz4CompressionErrorDomain) + 1);
+  EXPECT_EQ(errorCodeToMessage(errorCode), "LZ4 Compression error 42: test error message");
+
   // Register domain errors to range limit.
   int domainError = 1000;
   for (int i = 2; i < kVRSErrorsDomainSize; i++) {

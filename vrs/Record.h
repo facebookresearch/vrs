@@ -120,9 +120,10 @@ class VRS_API Record final {
   bool shouldTryToCompress() const;
 
   /// Try to compress the record.
-  /// @return The compressed size, or 0 if the compression did not work.
+  /// @param outCompressedSize: Number of compressed bytes, or zero when compression was not used.
+  /// @return 0 for success, or an error code.
   /// @internal
-  uint32_t compressRecord(Compressor& compressor);
+  int compressRecord(Compressor& compressor, uint32_t& outCompressedSize);
 
   /// Write a possibly compressed record to a file (header + data).
   /// @internal

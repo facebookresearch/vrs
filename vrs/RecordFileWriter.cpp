@@ -70,9 +70,12 @@ class CompressionJob {
   }
 
   void performJob() {
-    compressedSize_ = sortRecord_.record->compressRecord(compressor_);
+    compressionError_ = sortRecord_.record->compressRecord(compressor_, compressedSize_);
   }
 
+  int getCompressionError() const {
+    return compressionError_;
+  }
   uint32_t getCompressedSize() const {
     return compressedSize_;
   }
@@ -83,7 +86,8 @@ class CompressionJob {
  private:
   Compressor compressor_;
   RecordFileWriter::SortRecord sortRecord_{nullptr, {RecordableTypeId::Undefined, 0}};
-  uint32_t compressedSize_{};
+  int compressionError_ = SUCCESS;
+  uint32_t compressedSize_ = 0;
 };
 
 using CompressionJobQueue = JobQueue<CompressionJob*>;
@@ -1074,14 +1078,28 @@ int RecordFileWriter::writeRecordsSingleThread(SortedRecords& records, int lastE
     Record* record = r.record;
     if (rwd.getError() != 0) {
       rwd.skippedRecords++;
+      if (queueByteSize_) {
+        queueByteSize_->fetch_sub(record->getSize(), memory_order_relaxed);
+      }
       record->recycle();
     } else {
-      uint32_t compressedSize =
-          record->shouldTryToCompress() ? record->compressRecord(compressor) : 0;
-      if (compressedSize > 0) {
-        rwd.compressedRecords++;
+      uint32_t compressedSize = 0;
+      const int compressionError = record->shouldTryToCompress()
+          ? record->compressRecord(compressor, compressedSize)
+          : SUCCESS;
+      if (compressionError != SUCCESS) {
+        XR_LOGE("Compression failed: {}", errorCodeToMessageWithCode(compressionError));
+        rwd.error = compressionError;
+        if (queueByteSize_) {
+          queueByteSize_->fetch_sub(record->getSize(), memory_order_relaxed);
+        }
+        record->recycle();
+      } else {
+        if (compressedSize > 0) {
+          rwd.compressedRecords++;
+        }
+        writeOneRecord(rwd, record, r.streamId, compressor, compressedSize);
       }
-      writeOneRecord(rwd, record, r.streamId, compressor, compressedSize);
     }
   }
   if (LOG_FILE_OPERATIONS) {
@@ -1128,7 +1146,6 @@ int RecordFileWriter::writeRecordsMultiThread(
         availableJobs.pop_back();
         job->setSortRecord(nextRecord);
         compressionThreadsData.jobsQueue.sendJob(job);
-        rwd.compressedRecords++;
       } else {
         compressionResults.emplace(nextRecord, &noCompressionJob);
       }
@@ -1144,9 +1161,22 @@ int RecordFileWriter::writeRecordsMultiThread(
       CompressionJob* job = resultsIter->second;
       if (rwd.getError() != 0) {
         rwd.skippedRecords++;
+        if (queueByteSize_) {
+          queueByteSize_->fetch_sub(record->getSize(), memory_order_relaxed);
+        }
+        record->recycle();
+      } else if (job->getCompressionError() != SUCCESS) {
+        XR_LOGE("Compression failed: {}", errorCodeToMessageWithCode(job->getCompressionError()));
+        rwd.error = job->getCompressionError();
+        if (queueByteSize_) {
+          queueByteSize_->fetch_sub(record->getSize(), memory_order_relaxed);
+        }
         record->recycle();
       } else {
         const StreamId streamId = resultsIter->first.streamId;
+        if (job->getCompressedSize() > 0) {
+          rwd.compressedRecords++;
+        }
         writeOneRecord(rwd, record, streamId, job->getCompressor(), job->getCompressedSize());
       }
       if (job != &noCompressionJob) {
