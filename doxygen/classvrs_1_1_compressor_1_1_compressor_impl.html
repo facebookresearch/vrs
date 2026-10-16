@@ -84,18 +84,21 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a39256a5b4b358eafb885e5f9cae88dc3" id="r_a39256a5b4b358eafb885e5f9cae88dc3"><td class="memItemLeft" align="right" valign="top"><a id="a39256a5b4b358eafb885e5f9cae88dc3" name="a39256a5b4b358eafb885e5f9cae88dc3"></a>
-uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>lz4Compress</b> (helpers::IOVector&lt; uint8_t &gt; &amp;buffer, const void *data, size_t dataSize, <a class="el" href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7b">CompressionPreset</a> preset, size_t headerSpace)</td></tr>
-<tr class="separator:a39256a5b4b358eafb885e5f9cae88dc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a974f902d7c7a1d11aef7c9404975e002" id="r_a974f902d7c7a1d11aef7c9404975e002"><td class="memItemLeft" align="right" valign="top"><a id="a974f902d7c7a1d11aef7c9404975e002" name="a974f902d7c7a1d11aef7c9404975e002"></a>
-uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>zstdCompress</b> (helpers::IOVector&lt; uint8_t &gt; &amp;buffer, const void *data, size_t dataSize, <a class="el" href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7b">CompressionPreset</a> preset, size_t headerSpace)</td></tr>
-<tr class="separator:a974f902d7c7a1d11aef7c9404975e002"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9a9dddfa1bca38eee1389942f9dbaa8" id="r_ac9a9dddfa1bca38eee1389942f9dbaa8"><td class="memItemLeft" align="right" valign="top"><a id="ac9a9dddfa1bca38eee1389942f9dbaa8" name="ac9a9dddfa1bca38eee1389942f9dbaa8"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>lz4Compress</b> (helpers::IOVector&lt; uint8_t &gt; &amp;buffer, const void *data, size_t dataSize, <a class="el" href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7b">CompressionPreset</a> preset, uint32_t &amp;outCompressedSize, size_t headerSpace)</td></tr>
+<tr class="separator:ac9a9dddfa1bca38eee1389942f9dbaa8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab450ade821eb21ec3f85ca15b4d33e8e" id="r_ab450ade821eb21ec3f85ca15b4d33e8e"><td class="memItemLeft" align="right" valign="top"><a id="ab450ade821eb21ec3f85ca15b4d33e8e" name="ab450ade821eb21ec3f85ca15b4d33e8e"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>zstdCompress</b> (helpers::IOVector&lt; uint8_t &gt; &amp;buffer, const void *data, size_t dataSize, <a class="el" href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7b">CompressionPreset</a> preset, uint32_t &amp;outCompressedSize, size_t headerSpace)</td></tr>
+<tr class="separator:ab450ade821eb21ec3f85ca15b4d33e8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aceff1d2ed002929b0c76b0ba5ed40f2d" id="r_aceff1d2ed002929b0c76b0ba5ed40f2d"><td class="memItemLeft" align="right" valign="top"><a id="aceff1d2ed002929b0c76b0ba5ed40f2d" name="aceff1d2ed002929b0c76b0ba5ed40f2d"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>startFrame</b> (size_t dataSize, <a class="el" href="namespacevrs.html#a37a35edf18e8bb343398cb938d3e2b7b">CompressionPreset</a> zstdPreset)</td></tr>
 <tr class="separator:aceff1d2ed002929b0c76b0ba5ed40f2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a64eaa123c06825d40b4ef8e940460c13" id="r_a64eaa123c06825d40b4ef8e940460c13"><td class="memItemLeft" align="right" valign="top"><a id="a64eaa123c06825d40b4ef8e940460c13" name="a64eaa123c06825d40b4ef8e940460c13"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>addFrameData</b> (<a class="el" href="classvrs_1_1_write_file_handler.html">WriteFileHandler</a> &amp;file, ZSTD_inBuffer_s *input, ZSTD_outBuffer_s *output, uint32_t &amp;inOutCompressedSize, size_t maxCompressedSize, bool <a class="el" href="classvrs_1_1_compressor.html#a9f661dc89e73af8a08af5ec6088303b2">endFrame</a>)</td></tr>
 <tr class="separator:a64eaa123c06825d40b4ef8e940460c13"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6d0e9515a5abba1e06f468e93d9b0e0" id="r_ac6d0e9515a5abba1e06f468e93d9b0e0"><td class="memItemLeft" align="right" valign="top"><a id="ac6d0e9515a5abba1e06f468e93d9b0e0" name="ac6d0e9515a5abba1e06f468e93d9b0e0"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>resetCompressionType</b> ()</td></tr>
+<tr class="separator:ac6d0e9515a5abba1e06f468e93d9b0e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e086f0d76be69f35bcb850f51765d60" id="r_a9e086f0d76be69f35bcb850f51765d60"><td class="memItemLeft" align="right" valign="top"><a id="a9e086f0d76be69f35bcb850f51765d60" name="a9e086f0d76be69f35bcb850f51765d60"></a>
 <a class="el" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getCompressionType</b> () const</td></tr>
 <tr class="separator:a9e086f0d76be69f35bcb850f51765d60"><td class="memSeparator" colspan="2">&#160;</td></tr>
