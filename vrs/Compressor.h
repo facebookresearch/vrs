@@ -18,6 +18,7 @@
 
 #include <memory>
 
+#include <vrs/DataSlice.h>
 #include <vrs/ForwardDefinitions.h>
 #include <vrs/VrsExport.h>
 #include <vrs/WriteFileHandler.h>
@@ -99,6 +100,24 @@ class VRS_API Compressor {
   int compress(
       const void* data,
       size_t dataSize,
+      CompressionPreset preset,
+      uint32_t& outCompressedSize,
+      size_t headerSpace = 0);
+
+  /// Compress several memory buffers (provided by `dataSlices`) into a single frame that
+  /// decompresses to their concatenation. The compressed bytes of multiple slices are not
+  /// necessarily identical to compressing the concatenation in one piece, but decode to the same
+  /// data.
+  /// @param dataSlices: The data slices, compressed in order as one payload.
+  /// @param dataSliceCount: Number of data slices.
+  /// @param preset: Compression preset to use.
+  /// @param outCompressedSize: Number of compressed bytes, or zero when compression was not used.
+  /// @param headerSpace: Number of bytes to reserve at the beginning of the buffer for a header
+  /// initialized manually later.
+  /// @return 0 for success, or an error code.
+  int compress(
+      const DataSlice* dataSlices,
+      size_t dataSliceCount,
       CompressionPreset preset,
       uint32_t& outCompressedSize,
       size_t headerSpace = 0);
