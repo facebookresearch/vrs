@@ -33,7 +33,8 @@ using std::unique_ptr;
 
 /// \brief A factory system for FileHandlers, allowing the runtime registration & usage of custom
 /// FileHandler implementations
-class VRS_API FileHandlerFactory {
+// Exported base class meant to be subclassed, for example FakeFileHandlerFactory in tests.
+class VRS_API FileHandlerFactory { // NOLINT(cppcoreguidelines-virtual-class-destructor)
  public:
   static FileHandlerFactory& getInstance();
 
