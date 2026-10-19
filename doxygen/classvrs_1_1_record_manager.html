@@ -106,6 +106,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a cla
 <tr class="separator:ac9609c8bd45a8ec1f2c98ef032e0a1c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac57ff039568255ccb9bac5f511a6a8bc" id="r_ac57ff039568255ccb9bac5f511a6a8bc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classvrs_1_1_record.html">Record</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_manager.html#ac57ff039568255ccb9bac5f511a6a8bc">createUncompressedRecord</a> (double timestamp, <a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> type, uint32_t formatVersion, const <a class="el" href="classvrs_1_1_data_source.html">DataSource</a> &amp;data, std::unique_ptr&lt; <a class="el" href="classvrs_1_1_direct_write_record_data.html">DirectWriteRecordData</a> &gt; &amp;&amp;directWriteData)</td></tr>
 <tr class="separator:ac57ff039568255ccb9bac5f511a6a8bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abe657a0972028868ee9b6d7dab72bd35" id="r_abe657a0972028868ee9b6d7dab72bd35"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classvrs_1_1_record.html">Record</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_manager.html#abe657a0972028868ee9b6d7dab72bd35">createRecord</a> (double timestamp, <a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> type, uint32_t formatVersion, const <a class="el" href="classvrs_1_1_data_source.html">DataSource</a> &amp;data, std::unique_ptr&lt; <a class="el" href="classvrs_1_1_borrowed_data.html">BorrowedData</a> &gt; &amp;&amp;borrowedData)</td></tr>
+<tr class="separator:abe657a0972028868ee9b6d7dab72bd35"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5a2b2380b4e3af398631f0471dc09a28" id="r_a5a2b2380b4e3af398631f0471dc09a28"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_manager.html#a5a2b2380b4e3af398631f0471dc09a28">purgeOldRecords</a> (double oldestTimestamp, bool recycleBuffers=true)</td></tr>
 <tr class="separator:a5a2b2380b4e3af398631f0471dc09a28"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af554e9dac61108218c37dd95b5708240" id="r_af554e9dac61108218c37dd95b5708240"><td class="memItemLeft" align="right" valign="top"><a id="af554e9dac61108218c37dd95b5708240" name="af554e9dac61108218c37dd95b5708240"></a>
@@ -169,7 +171,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Record</b></td></tr>
 </div>
 </div>
 <a id="ac9609c8bd45a8ec1f2c98ef032e0a1c4" name="ac9609c8bd45a8ec1f2c98ef032e0a1c4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac9609c8bd45a8ec1f2c98ef032e0a1c4">&#9670;&#160;</a></span>createRecord()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ac9609c8bd45a8ec1f2c98ef032e0a1c4">&#9670;&#160;</a></span>createRecord() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -211,6 +213,63 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Record</b></td></tr>
     <tr><td class="paramname">type</td><td>Type of the record. </td></tr>
     <tr><td class="paramname">formatVersion</td><td>Version number of the format of the record, so that when the record is read, the data can be interpreted appropriately. </td></tr>
     <tr><td class="paramname">data</td><td>A <a class="el" href="classvrs_1_1_data_source.html" title="A class referencing data to be captured in a record at creation.">DataSource</a> that points to the payload to copy in the record. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A pointer to the record created. </dd></dl>
+
+</div>
+</div>
+<a id="abe657a0972028868ee9b6d7dab72bd35" name="abe657a0972028868ee9b6d7dab72bd35"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abe657a0972028868ee9b6d7dab72bd35">&#9670;&#160;</a></span>createRecord() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classvrs_1_1_record.html">Record</a> * vrs::RecordManager::createRecord </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>timestamp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a>&#160;</td>
+          <td class="paramname"><em>type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>formatVersion</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classvrs_1_1_data_source.html">DataSource</a> &amp;&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::unique_ptr&lt; <a class="el" href="classvrs_1_1_borrowed_data.html">BorrowedData</a> &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"><em>borrowedData</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Create &amp; hold a record using the given parameters. <a class="el" href="classvrs_1_1_record_manager.html" title="VRS internal class to manage the records of a specific Recordable after their creation.">RecordManager</a> is responsible for deleting the record. Copies the data referenced by the <a class="el" href="classvrs_1_1_data_source.html" title="A class referencing data to be captured in a record at creation.">DataSource</a>, and takes ownership of borrowedData, whose borrowed memory is written after the <a class="el" href="classvrs_1_1_data_source.html" title="A class referencing data to be captured in a record at creation.">DataSource</a> payload: compressed together with it when the record is compressed, or raw otherwise. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timestamp</td><td>Timestamp of the record, in seconds. </td></tr>
+    <tr><td class="paramname">type</td><td>Type of the record. </td></tr>
+    <tr><td class="paramname">formatVersion</td><td>Version number of the format of the record, so that when the record is read, the data can be interpreted appropriately. </td></tr>
+    <tr><td class="paramname">data</td><td>A <a class="el" href="classvrs_1_1_data_source.html" title="A class referencing data to be captured in a record at creation.">DataSource</a> that points to the payload to copy in the record immediately. </td></tr>
+    <tr><td class="paramname">borrowedData</td><td>borrowed data written after the <a class="el" href="classvrs_1_1_data_source.html" title="A class referencing data to be captured in a record at creation.">DataSource</a> payload. </td></tr>
   </table>
   </dd>
 </dl>

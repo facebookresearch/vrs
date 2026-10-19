@@ -115,6 +115,8 @@ Public Member Functions</h2></td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>addDirectWriteRecordData</b> (unique_ptr&lt; <a class="el" href="classvrs_1_1_direct_write_record_data.html">DirectWriteRecordData</a> &gt; &amp;&amp;directWriteRecordData)</td></tr>
 <tr class="memdesc:ad0c2a67d58ce88a76696fb9dee33aa4c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add some data to write directly at the end of the record when it's written to disk. <br /></td></tr>
 <tr class="separator:ad0c2a67d58ce88a76696fb9dee33aa4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca43ce18a94090ed29fce9251d36a91c" id="r_aca43ce18a94090ed29fce9251d36a91c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record.html#aca43ce18a94090ed29fce9251d36a91c">addBorrowedData</a> (unique_ptr&lt; <a class="el" href="classvrs_1_1_borrowed_data.html">BorrowedData</a> &gt; &amp;&amp;borrowedData)</td></tr>
+<tr class="separator:aca43ce18a94090ed29fce9251d36a91c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa80b976bc6c773473c1b3aa1e3e60457" id="r_aa80b976bc6c773473c1b3aa1e3e60457"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record.html#aa80b976bc6c773473c1b3aa1e3e60457">shouldTryToCompress</a> () const</td></tr>
 <tr class="separator:aa80b976bc6c773473c1b3aa1e3e60457"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5851f3034de5ba223c0f10b02815c3a6" id="r_a5851f3034de5ba223c0f10b02815c3a6"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record.html#a5851f3034de5ba223c0f10b02815c3a6">compressRecord</a> (<a class="el" href="classvrs_1_1_compressor.html">Compressor</a> &amp;compressor, uint32_t &amp;outCompressedSize)</td></tr>
@@ -206,6 +208,25 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>RecordManager</b></t
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="aca43ce18a94090ed29fce9251d36a91c" name="aca43ce18a94090ed29fce9251d36a91c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aca43ce18a94090ed29fce9251d36a91c">&#9670;&#160;</a></span>addBorrowedData()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void vrs::Record::addBorrowedData </td>
+          <td>(</td>
+          <td class="paramtype">unique_ptr&lt; <a class="el" href="classvrs_1_1_borrowed_data.html">BorrowedData</a> &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"><em>borrowedData</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Add borrowed data to write after the <a class="el" href="classvrs_1_1_data_source.html" title="A class referencing data to be captured in a record at creation.">DataSource</a> payload, compressed together with it (unlike <a class="el" href="classvrs_1_1_direct_write_record_data.html" title="Class to hold data that is written directly in the file at the end of a record. Record data held by D...">DirectWriteRecordData</a>, which is always written raw). </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="classvrs_1_1_borrowed_data.html" title="Class to hold borrowed data that is not copied into the record&#39;s buffer, like DirectWriteRecordData,...">BorrowedData</a>. </dd></dl>
+
+</div>
+</div>
 <a id="a5851f3034de5ba223c0f10b02815c3a6" name="a5851f3034de5ba223c0f10b02815c3a6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5851f3034de5ba223c0f10b02815c3a6">&#9670;&#160;</a></span>compressRecord()</h2>
 

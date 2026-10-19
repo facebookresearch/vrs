@@ -12,7 +12,8 @@ var searchData=
   ['bgr8_9',['BGR8',['../namespacevrs.html#a0fbbb88591f21313dd46736fba5a7aa5ae764ec5a498470e04dd8b545427203cc',1,'vrs']]],
   ['bluetoothbeaconrecordableclass_10',['BluetoothBeaconRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5ae4e62ac387600e101072ac9905c59031',1,'vrs']]],
   ['bool_11',['Bool',['../classvrs_1_1_bool.html',1,'vrs']]],
-  ['build_12',['build',['../classvrs_1_1_content_block_reader.html#aae94a30c4f439779b1eb2a5b280d88ef',1,'vrs::ContentBlockReader']]],
-  ['buildrecordboundaries_13',['buildRecordBoundaries',['../classvrs_1_1_record_file_reader.html#a0dc3c414de9605ea725afdd605212f6b',1,'vrs::RecordFileReader']]],
-  ['buttonstaterecordableclass_14',['ButtonStateRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5af4b07298c24779c0adb1d2eb98ecd96f',1,'vrs']]]
+  ['borroweddata_12',['BorrowedData',['../classvrs_1_1_borrowed_data.html',1,'vrs']]],
+  ['build_13',['build',['../classvrs_1_1_content_block_reader.html#aae94a30c4f439779b1eb2a5b280d88ef',1,'vrs::ContentBlockReader']]],
+  ['buildrecordboundaries_14',['buildRecordBoundaries',['../classvrs_1_1_record_file_reader.html#a0dc3c414de9605ea725afdd605212f6b',1,'vrs::RecordFileReader']]],
+  ['buttonstaterecordableclass_15',['ButtonStateRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5af4b07298c24779c0adb1d2eb98ecd96f',1,'vrs']]]
 ];
