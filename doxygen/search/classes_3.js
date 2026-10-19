@@ -29,12 +29,13 @@ var searchData=
   ['datapiecevector_3c_20float_20_3e_26',['DataPieceVector&lt; float &gt;',['../classvrs_1_1_data_piece_vector.html',1,'vrs']]],
   ['datapiecevector_3c_20vrs_3a_3amatrixnd_20_3e_27',['DataPieceVector&lt; vrs::MatrixND &gt;',['../classvrs_1_1_data_piece_vector.html',1,'vrs']]],
   ['datareference_28',['DataReference',['../classvrs_1_1_data_reference.html',1,'vrs']]],
-  ['datasource_29',['DataSource',['../classvrs_1_1_data_source.html',1,'vrs']]],
-  ['datasourcechunk_30',['DataSourceChunk',['../classvrs_1_1_data_source_chunk.html',1,'vrs']]],
-  ['decompressor_31',['Decompressor',['../classvrs_1_1_decompressor.html',1,'vrs']]],
-  ['directwriterecorddata_32',['DirectWriteRecordData',['../classvrs_1_1_direct_write_record_data.html',1,'vrs']]],
-  ['diskfilechunk_33',['DiskFileChunk',['../classvrs_1_1_disk_file_chunk.html',1,'vrs']]],
-  ['diskfilet_34',['DiskFileT',['../classvrs_1_1_disk_file_t.html',1,'vrs']]],
-  ['diskrecordinfo_35',['DiskRecordInfo',['../structvrs_1_1_index_record_1_1_disk_record_info.html',1,'vrs::IndexRecord']]],
-  ['diskstreamid_36',['DiskStreamId',['../structvrs_1_1_index_record_1_1_disk_stream_id.html',1,'vrs::IndexRecord']]]
+  ['dataslice_29',['DataSlice',['../structvrs_1_1_data_slice.html',1,'vrs']]],
+  ['datasource_30',['DataSource',['../classvrs_1_1_data_source.html',1,'vrs']]],
+  ['datasourcechunk_31',['DataSourceChunk',['../classvrs_1_1_data_source_chunk.html',1,'vrs']]],
+  ['decompressor_32',['Decompressor',['../classvrs_1_1_decompressor.html',1,'vrs']]],
+  ['directwriterecorddata_33',['DirectWriteRecordData',['../classvrs_1_1_direct_write_record_data.html',1,'vrs']]],
+  ['diskfilechunk_34',['DiskFileChunk',['../classvrs_1_1_disk_file_chunk.html',1,'vrs']]],
+  ['diskfilet_35',['DiskFileT',['../classvrs_1_1_disk_file_t.html',1,'vrs']]],
+  ['diskrecordinfo_36',['DiskRecordInfo',['../structvrs_1_1_index_record_1_1_disk_record_info.html',1,'vrs::IndexRecord']]],
+  ['diskstreamid_37',['DiskStreamId',['../structvrs_1_1_index_record_1_1_disk_stream_id.html',1,'vrs::IndexRecord']]]
 ];
