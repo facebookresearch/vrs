@@ -31,7 +31,9 @@ using std::unique_ptr;
 using std::vector;
 
 class DataSource;
+struct DataSlice;
 class DirectWriteRecordData;
+class BorrowedData;
 class Compressor;
 class RecordManager;
 
@@ -114,6 +116,10 @@ class VRS_API Record final {
   /// Add some data to write directly at the end of the record when it's written to disk.
   void addDirectWriteRecordData(unique_ptr<DirectWriteRecordData>&& directWriteRecordData);
 
+  /// Add borrowed data to write after the DataSource payload, compressed together with it (unlike
+  /// DirectWriteRecordData, which is always written raw). @see BorrowedData.
+  void addBorrowedData(unique_ptr<BorrowedData>&& borrowedData);
+
   /// Tell if an attempt should be made to compress the record.
   /// If compression can't reduce the size of the record, then the record is written uncompressed.
   /// @internal
@@ -167,9 +173,12 @@ class VRS_API Record final {
   Type recordType_{};
   uint32_t formatVersion_{};
   helpers::IOVector<uint8_t> buffer_;
-  size_t usedBufferSize_{};
+  std::vector<DataSlice> compressorDataSlices_;
+  size_t usedBufferSize_{}; // total uncompressed payload: owned + borrowed + direct-write
+  size_t ownedSize_{}; // DataSource payload copied into buffer_, excluding borrowed/direct-write
   uint64_t creationOrder_{};
   unique_ptr<DirectWriteRecordData> directWriteRecordData_;
+  unique_ptr<BorrowedData> borrowedData_;
 
   RecordManager& recordManager_;
 };
