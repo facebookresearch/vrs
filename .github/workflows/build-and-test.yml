@@ -74,7 +74,7 @@ jobs:
         run: |
           cd build
           ninja all
-          ctest -j8
+          ctest -j8 --output-on-failure
 
   build-nvcodec:
     name: Build VRS NVCODEC (Linux, build-only)
