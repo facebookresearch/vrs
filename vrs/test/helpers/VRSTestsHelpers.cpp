@@ -366,8 +366,11 @@ int singleThreadCreateRecords(CreateParams& p) {
     }
   }
   if (p.customCreateFileFunction || (p.testOptions & TestOptions::SPLIT_HEADER)) {
-    EXPECT_EQ(fileWriter.closeFileAsync(), 0);
-    return fileWriter.waitForFileClosed();
+    // closeFileAsync() also reports any error the background thread already recorded, so when
+    // writes fail, either it or waitForFileClosed() surfaces the error, depending on timing.
+    int closeStatus = fileWriter.closeFileAsync();
+    int waitStatus = fileWriter.waitForFileClosed();
+    return closeStatus != 0 ? closeStatus : waitStatus;
   } else {
     fileWriter.setMaxChunkSizeMB(p.maxChunkSizeMB);
     return fileWriter.writeToFile(p.path);
