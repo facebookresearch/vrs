@@ -91,6 +91,7 @@
     "diff": "^8.0.3",
     "postcss": "8.5.18",
     "proxy-addr": "2.0.8",
-    "websocket-driver": "^0.7.5"
+    "websocket-driver": "^0.7.5",
+    "source-map-js": "1.2.2"
   }
 }
