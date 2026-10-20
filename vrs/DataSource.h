@@ -269,6 +269,7 @@ class VRS_API BorrowedData {
   BorrowedData(const void* data, size_t size, std::shared_ptr<void> owner)
       : segments_{{data, size}}, owner_{std::move(owner)}, size_{size} {}
 
+  // The slices are copied; only referenced memory is borrowed, owned by `owner` until written.
   BorrowedData(const DataSlice* dataSlices, size_t dataSliceCount, std::shared_ptr<void> owner)
       : owner_{std::move(owner)} {
     segments_.reserve(dataSliceCount);
