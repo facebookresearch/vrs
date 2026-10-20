@@ -80,6 +80,7 @@
     "brace-expansion": "1.1.21",
     "image-size": "2.0.4",
     "joi": "17.13.8",
+    "compression": "1.8.2",
     "fast-uri": "3.1.7",
     "tinypool": "2.1.2",
     "shelljs": "^0.8.5",
