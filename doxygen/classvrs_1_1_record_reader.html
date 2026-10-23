@@ -119,6 +119,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8d559e8ade31f41a49a58550615eedbb" id="r_a8d559e8ade31f41a49a58550615eedbb"><td class="memItemLeft" align="right" valign="top"><a id="a8d559e8ade31f41a49a58550615eedbb" name="a8d559e8ade31f41a49a58550615eedbb"></a>
 int64_t&#160;</td><td class="memItemRight" valign="bottom"><b>getFileOffset</b> () const</td></tr>
 <tr class="separator:a8d559e8ade31f41a49a58550615eedbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae8889c5c085fe805fa156743c75480e5" id="r_ae8889c5c085fe805fa156743c75480e5"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_reader.html#ae8889c5c085fe805fa156743c75480e5">getFileError</a> () const</td></tr>
+<tr class="separator:ae8889c5c085fe805fa156743c75480e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab463166d0f799a3846b889a8fb3dce66" id="r_ab463166d0f799a3846b889a8fb3dce66"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_reader.html#ab463166d0f799a3846b889a8fb3dce66">getCompressionType</a> () const =0</td></tr>
 <tr class="separator:ab463166d0f799a3846b889a8fb3dce66"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0f16d876c73143dd7c08cd7d129b5539" id="r_a0f16d876c73143dd7c08cd7d129b5539"><td class="memItemLeft" align="right" valign="top"><a id="a0f16d876c73143dd7c08cd7d129b5539" name="a0f16d876c73143dd7c08cd7d129b5539"></a>
@@ -136,6 +138,9 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>remainingDiskByte
 <tr class="memitem:ab725425a81e6544761e668835845273a" id="r_ab725425a81e6544761e668835845273a"><td class="memItemLeft" align="right" valign="top"><a id="ab725425a81e6544761e668835845273a" name="ab725425a81e6544761e668835845273a"></a>
 uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>remainingUncompressedSize_</b></td></tr>
 <tr class="separator:ab725425a81e6544761e668835845273a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a985c9501ef5b505dce19445f9f619a40" id="r_a985c9501ef5b505dce19445f9f619a40"><td class="memItemLeft" align="right" valign="top"><a id="a985c9501ef5b505dce19445f9f619a40" name="a985c9501ef5b505dce19445f9f619a40"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>fileError_</b> {}</td></tr>
+<tr class="separator:a985c9501ef5b505dce19445f9f619a40"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Abstract VRS internal helper class to read &amp; (if necessary) uncompress records. </p>
@@ -194,6 +199,32 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>remainingUncompre
 <p>Tell if/how the record was compressed. </p><dl class="section return"><dt>Returns</dt><dd>The compression type. </dd></dl>
 
 <p>Implemented in <a class="el" href="classvrs_1_1_uncompressed_record_reader.html#aafd385c6721828e4ce90ed8ba53afa31">vrs::UncompressedRecordReader</a>, and <a class="el" href="classvrs_1_1_compressed_record_reader.html#aff51ab9ce586ce0f1368992c059f2fa5">vrs::CompressedRecordReader</a>.</p>
+
+</div>
+</div>
+<a id="ae8889c5c085fe805fa156743c75480e5" name="ae8889c5c085fe805fa156743c75480e5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae8889c5c085fe805fa156743c75480e5">&#9670;&#160;</a></span>getFileError()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int vrs::RecordReader::getFileError </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Get the first error returned by the file handler while reading the current record, if any. Errors such as decompression failures or reads past the end of the record aren't file errors. </p><dl class="section return"><dt>Returns</dt><dd>0 if no file error happened since <a class="el" href="classvrs_1_1_record_reader.html#a5d29dedbcc6b0b61f57ba90099827359">init()</a>. </dd></dl>
 
 </div>
 </div>
