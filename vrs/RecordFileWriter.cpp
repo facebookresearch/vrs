@@ -307,7 +307,7 @@ RecordFileWriter::RecordFileWriter()
 
 void RecordFileWriter::addRecordable(Recordable* recordable) {
   { // mutex guard
-    lock_guard<mutex> lock(recordablesMutex_);
+    std::scoped_lock lock(recordablesMutex_);
     for (auto* r : recordables_) {
       if (r != recordable && !XR_VERIFY(r->getStreamId() != recordable->getStreamId())) {
         return;
@@ -340,7 +340,7 @@ void RecordFileWriter::addRecordable(Recordable* recordable) {
 vector<Recordable*> RecordFileWriter::getRecordables() const {
   vector<Recordable*> recordables;
   { // mutex guard
-    lock_guard<mutex> lock(recordablesMutex_);
+    std::scoped_lock lock(recordablesMutex_);
     recordables.reserve(recordables_.size());
     for (auto* recordable : recordables_) {
       recordables.push_back(recordable);

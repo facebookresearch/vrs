@@ -192,7 +192,7 @@ void RecordManager::purgeCache() {
 void RecordManager::collectOldRecords(double maxAge, list<Record*>& outCollectedRecords)
     XR_TSA_NO_THREAD_SAFETY_ANALYSIS {
   outCollectedRecords.clear();
-  lock_guard<mutex> guard{mutex_};
+  std::scoped_lock guard{mutex_};
   if (!activeRecords_.empty()) {
     auto iterator = upper_bound(
         activeRecords_.begin(), activeRecords_.end(), maxAge, [](double age, Record* record) {
