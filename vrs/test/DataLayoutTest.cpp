@@ -894,6 +894,36 @@ TEST_F(DataLayoutTester, testStaging) {
   EXPECT_EQ(stringMap, stringMapExpected);
 }
 
+TEST_F(DataLayoutTester, testRawData) {
+  OldVarSizeLayout oldLayout;
+  oldLayout.collectVariableDataAndUpdateIndex();
+  const void* data = nullptr;
+  size_t count = 0;
+  ASSERT_TRUE(oldLayout.ints_.getRawData(data, count));
+  vector<int32_t> ints(count);
+  memcpy(ints.data(), data, count * sizeof(int32_t));
+  EXPECT_EQ(ints, (vector<int32_t>{4, 3, 2, 1}));
+  // a mapped piece's raw data is in the mapped layout's buffer
+  VarSizeLayout layout;
+  layout.mapLayout(oldLayout);
+  ASSERT_TRUE(layout.doubles_.getRawData(data, count));
+  EXPECT_EQ(count, 2);
+  const vector<int8_t>& oldVarData = oldLayout.getVarData();
+  EXPECT_GE(static_cast<const int8_t*>(data), oldVarData.data());
+  EXPECT_LE(
+      static_cast<const int8_t*>(data) + count * sizeof(double),
+      oldVarData.data() + oldVarData.size());
+  // a piece missing from the mapped layout has no raw data
+  EXPECT_FALSE(layout.intsWithDefault_.getRawData(data, count));
+  EXPECT_EQ(data, nullptr);
+  EXPECT_EQ(count, 0);
+  // an empty vector
+  VarSizeLayout emptyLayout;
+  emptyLayout.collectVariableDataAndUpdateIndex();
+  EXPECT_TRUE(emptyLayout.ints_.getRawData(data, count));
+  EXPECT_EQ(count, 0);
+}
+
 static void cloneLayout(ManualDataLayout& copy, DataLayout& original) {
   copy.endLayout();
   // map layouts in each direction, to verify they both have the same fields
