@@ -88,6 +88,13 @@ class VRS_API RecordReader {
 
   int64_t getFileOffset() const;
 
+  /// Get the first error returned by the file handler while reading the current record, if any.
+  /// Errors such as decompression failures or reads past the end of the record aren't file errors.
+  /// @return 0 if no file error happened since init().
+  int getFileError() const {
+    return fileError_;
+  }
+
   /// Tell if/how the record was compressed.
   /// @return The compression type.
   [[nodiscard]] virtual CompressionType getCompressionType() const = 0;
@@ -101,6 +108,7 @@ class VRS_API RecordReader {
   FileHandler* file_;
   uint32_t remainingDiskBytes_;
   uint32_t remainingUncompressedSize_;
+  int fileError_{};
 };
 
 /// \brief RecordReader specialized to read uncompressed records. For VRS internal usage only.
