@@ -43,6 +43,7 @@ RecordReader* RecordReader::init(FileHandler& file, uint32_t diskSize, uint32_t 
   file_ = &file;
   remainingDiskBytes_ = diskSize;
   remainingUncompressedSize_ = expandedSize;
+  fileError_ = 0;
   return this;
 }
 
@@ -61,6 +62,9 @@ int UncompressedRecordReader::read(DataReference& destination, uint32_t& outRead
     return NOT_ENOUGH_DATA;
   }
   int error = destination.readFrom(*file_, outReadSize);
+  if (error != 0 && fileError_ == 0) {
+    fileError_ = error;
+  }
   remainingDiskBytes_ -= outReadSize;
   remainingUncompressedSize_ -= outReadSize;
   return error;
@@ -119,6 +123,9 @@ int CompressedRecordReader::read(
       int error =
           file_->read(decompressor_.allocateCompressedDataBuffer(targetReadSize), targetReadSize);
       if (error != 0) {
+        if (fileError_ == 0) {
+          fileError_ = error;
+        }
         return error;
       }
       uint32_t readSize = static_cast<uint32_t>(file_->getLastRWSize());

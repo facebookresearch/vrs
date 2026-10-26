@@ -39,18 +39,20 @@ using namespace std;
 using namespace vrs;
 using namespace vrs::IndexRecord;
 
-const uint32_t kMaxBatchSize = 100000;
+const uint32_t kMaxBatchSize = 100'000;
 
 // Maximum number of records in a single index record. To avoid a potentially corrupt file that
 // requests too much memory, we limit the maximum record count to this arbitrarily large number.
-constexpr size_t kMaxRecordCount = 500000000;
+constexpr size_t kMaxRecordCount = 500'000'000;
+
+constexpr size_t kMaxPreallocatedRecordCount = 50'000'000;
 
 // Record sizes are stored as uint32_t, so uncompressed index size cannot exceed UINT32_MAX.
 constexpr uint64_t kMaxUncompressedSize = std::numeric_limits<uint32_t>::max();
 
-// Plausible compression ratio bound to detect decompression bombs; 100000:1 allows zero-filled
+// Plausible compression ratio bound to detect decompression bombs; 100'000:1 allows zero-filled
 // records.
-constexpr size_t kMaxCompressionRatio = 100000;
+constexpr size_t kMaxCompressionRatio = 100'000;
 
 // Compression presets, in increasingly tighter settings, starting with NONE, which will be only
 // used when there are too few index entries for compression to reasonably work...
@@ -170,6 +172,49 @@ bool validateSplitIndexAllocation(
     }
   }
   return true;
+}
+
+int readCompressedIndexData(
+    FileHandler& file,
+    Decompressor& decompressor,
+    size_t& inOutCompressedSize,
+    void* outData,
+    size_t dataSize) {
+  size_t outputSize = 0;
+  while (outputSize < dataSize) {
+    bool readData = false;
+    if (decompressor.getRemainingCompressedDataBufferSize() == 0 && inOutCompressedSize > 0) {
+      size_t readSize =
+          std::max(decompressor.getRecommendedInputBufferSize(), dataSize - outputSize);
+      readSize = std::min(readSize, inOutCompressedSize);
+      int error = file.read(decompressor.allocateCompressedDataBuffer(readSize), readSize);
+      if (error != 0) {
+        return error;
+      }
+      const size_t actualReadSize = file.getLastRWSize();
+      if (actualReadSize > inOutCompressedSize) {
+        return VRSERROR_INTERNAL_ERROR;
+      }
+      inOutCompressedSize -= actualReadSize;
+      readData = true;
+    }
+    const size_t remainingBefore = decompressor.getRemainingCompressedDataBufferSize();
+    uint32_t decompressedSize = 0;
+    int error = decompressor.decompress(
+        static_cast<uint8_t*>(outData) + outputSize,
+        static_cast<uint32_t>(dataSize - outputSize),
+        decompressedSize);
+    if (error != 0) {
+      return error;
+    }
+    outputSize += decompressedSize;
+    // zstd may consume a partial block without producing output: only fail if nothing was consumed.
+    if (!readData && decompressedSize == 0 &&
+        decompressor.getRemainingCompressedDataBufferSize() == remainingBefore) {
+      return NOT_ENOUGH_DATA;
+    }
+  }
+  return 0;
 }
 
 /// Format of the index record:
@@ -465,15 +510,7 @@ int IndexRecord::Reader::readSplitIndexRecord(
   if (!determineSplitIndexLayout(indexByteSize, outUsedFileSize, noRecords)) {
     return INDEX_RECORD_ERROR;
   }
-  vector<DiskRecordInfo> recordStructs;
-  IF_ERROR_RETURN(readSplitIndexData(indexByteSize, uncompressedSize, recordStructs, noRecords));
-  if (recordStructs.empty()) {
-    return 0;
-  }
-  if (!processSplitIndexRecords(recordStructs, outUsedFileSize)) {
-    return INDEX_RECORD_ERROR;
-  }
-  return 0;
+  return readSplitIndexData(indexByteSize, uncompressedSize, outUsedFileSize, noRecords);
 }
 
 bool IndexRecord::Reader::determineSplitIndexLayout(
@@ -533,7 +570,7 @@ bool IndexRecord::Reader::determineSplitIndexLayout(
 int IndexRecord::Reader::readSplitIndexData(
     size_t indexByteSize,
     size_t uncompressedSize,
-    vector<DiskRecordInfo>& outRecords,
+    int64_t& outUsedFileSize,
     bool noRecords) {
   size_t sizeToRead = (uncompressedSize == 0) ? indexByteSize : uncompressedSize;
   if (!validateSplitIndexAllocation(indexByteSize, sizeToRead, uncompressedSize, totalFileSize_)) {
@@ -557,34 +594,49 @@ int IndexRecord::Reader::readSplitIndexData(
         "Too many records in index ({} > {}). Corrupt index?", maxRecordInfoCount, kMaxRecordCount);
     return INDEX_RECORD_ERROR;
   }
-  outRecords.resize(maxRecordInfoCount);
+  const uint64_t remainingFileSize = outUsedFileSize >= 0 && totalFileSize_ > outUsedFileSize
+      ? static_cast<uint64_t>(totalFileSize_ - outUsedFileSize)
+      : 0;
+  const uint64_t maxRecordCountFromFileSize =
+      fileHeader_.recordHeaderSize > 0 ? remainingFileSize / fileHeader_.recordHeaderSize : 0;
+  index_.reserve(
+      static_cast<size_t>(std::min<uint64_t>(
+          {maxRecordInfoCount, maxRecordCountFromFileSize, kMaxPreallocatedRecordCount})));
   if (uncompressedSize == 0) {
-    int status = readDiskInfo(outRecords);
+    vector<DiskRecordInfo> records(maxRecordInfoCount);
+    int status = readDiskInfo(records);
     if (status != 0) {
       XR_LOGW("Failed to read uncompressed index.");
       return status;
     }
-  } else {
-    size_t decompressedRecords = 0;
-    Decompressor decompressor;
-    int error = 0;
-    char* endBuffer = reinterpret_cast<char*>(outRecords.data()) + sizeToRead;
-    while (sizeToRead > 0) {
-      size_t frameSize = 0;
-      BREAK_ON_ERROR(decompressor.initFrame(file_, frameSize, indexByteSize));
-      BREAK_ON_FALSE(frameSize <= sizeToRead);
-      BREAK_ON_ERROR(
-          decompressor.readFrame(file_, endBuffer - sizeToRead, frameSize, indexByteSize));
-      sizeToRead -= frameSize;
-      decompressedRecords += frameSize / sizeof(DiskRecordInfo);
-    }
-    if (decompressedRecords < maxRecordInfoCount) {
-      XR_LOGW(
-          "Failed to read {} out of {} compressed index records.",
-          (maxRecordInfoCount - decompressedRecords),
-          maxRecordInfoCount);
+    return processSplitIndexRecords(records, outUsedFileSize) ? 0 : INDEX_RECORD_ERROR;
+  }
+  const int64_t indexEndPosition = file_.getPos() + static_cast<int64_t>(indexByteSize);
+  Decompressor decompressor;
+  decompressor.setCompressionType(CompressionType::Zstd);
+  size_t recordsLeft = maxRecordInfoCount;
+  vector<DiskRecordInfo> records(std::min<size_t>(recordsLeft, kMaxBatchSize));
+  while (recordsLeft > 0) {
+    const size_t batchSize = std::min<size_t>(recordsLeft, kMaxBatchSize);
+    records.resize(batchSize);
+    int status = readCompressedIndexData(
+        file_,
+        decompressor,
+        indexByteSize,
+        records.data(),
+        records.size() * sizeof(DiskRecordInfo));
+    if (status != 0) {
       indexComplete_ = false;
-      outRecords.resize(decompressedRecords);
+      XR_LOGW("Failed to read compressed index.");
+      return status;
+    }
+    if (!processSplitIndexRecords(records, outUsedFileSize)) {
+      return INDEX_RECORD_ERROR;
+    }
+    recordsLeft -= batchSize;
+    if (droppedRecordCount_ > 0) {
+      droppedRecordCount_ += static_cast<int32_t>(recordsLeft);
+      return file_.setPos(indexEndPosition);
     }
   }
   return 0;
@@ -593,7 +645,6 @@ int IndexRecord::Reader::readSplitIndexData(
 bool IndexRecord::Reader::processSplitIndexRecords(
     const vector<DiskRecordInfo>& records,
     int64_t& outUsedFileSize) {
-  index_.reserve(records.size());
   const uint32_t recordHeaderSize = fileHeader_.recordHeaderSize;
   for (const DiskRecordInfo& record : records) {
     double timestamp = record.timestamp;

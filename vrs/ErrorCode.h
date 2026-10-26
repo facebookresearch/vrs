@@ -104,6 +104,7 @@ enum class ErrorDomain : int {
   ZstdCompressionErrorDomain,
   ZstdDecompressionErrorDomain,
   FbVrsErrorDomain, // TODO(yinoue): convert fbcode to use a custom domain, then delete this.
+  Lz4CompressionErrorDomain,
 
   // keep last, as we will add to this enum at runtime using newErrorDomain()
   CustomDomains

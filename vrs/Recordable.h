@@ -312,6 +312,31 @@ class VRS_API Recordable {
         timestampSec, recordType, formatVersion, data, std::move(directWriteRecordData));
   }
 
+  /// Create a record whose borrowed data is written after the DataSource payload without copying it
+  /// into the record buffer, but -- unlike createUncompressedRecord -- compressed together with
+  /// that payload when the stream is compressed.
+  ///
+  /// Note: use borrowing data only for uncompressed (but prefer createUncompressedRecord) or for
+  /// lz4-compressed records, where it saves a copy. With zstd, the borrowed data is streamed
+  /// through zstd's internal buffer, which is usually slower than copying the payload and
+  /// compressing it in one shot.
+  /// @param timestampSec: Timestamp of the record, in seconds.
+  /// @param recordType: Type of the record.
+  /// @param formatVersion: Version number of the format of the record.
+  /// @param data: A DataSource that points to the payload to copy in the record immediately.
+  /// @param borrowedData: borrowed data written after the DataSource payload; its memory MUST live
+  /// long enough for the record to be written.
+  /// @return A pointer to the record created.
+  const Record* createRecord(
+      double timestampSec,
+      Record::Type recordType,
+      uint32_t formatVersion,
+      const DataSource& data,
+      std::unique_ptr<BorrowedData>&& borrowedData) {
+    return recordManager_.createRecord(
+        timestampSec, recordType, formatVersion, data, std::move(borrowedData));
+  }
+
   /// When direct edits of VRS tags is convenient (record filters)
   map<string, string>& getVRSTags() {
     return tags_.vrs;

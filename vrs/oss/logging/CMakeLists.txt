@@ -21,7 +21,7 @@ add_library(vrs_logging ${VRS_LOGGING_SRCS})
 target_include_directories(vrs_logging
   INTERFACE
     $<BUILD_INTERFACE:${VRS_SOURCE_DIR}/vrs/oss>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/vrs/oss>
 )
 
 target_link_libraries(vrs_logging

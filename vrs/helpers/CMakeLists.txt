@@ -46,7 +46,10 @@ install(TARGETS vrs_helpers vrs_helpers_strings EXPORT VRSLibTargets
 if (UNIT_TESTS)
   enable_testing()
 
-  add_executable(test_vrs_helpers test/StringsTest.cpp)
+  add_executable(test_vrs_helpers
+    test/IOVectorTest.cpp
+    test/StringsTest.cpp
+  )
   target_link_libraries(test_vrs_helpers
     PUBLIC
       vrs_helpers

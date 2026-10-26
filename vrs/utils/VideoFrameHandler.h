@@ -65,7 +65,8 @@ class VideoFrameHandler {
       const ContentBlock& contentBlock);
 
   /// After an attempt to decode a frame was made, tell if frames must be read to build up.
-  /// @return False if there is no need to decode previous frames.
+  /// @return False if there is no need to decode previous frames, including when decoding is
+  /// unavailable or the current keyframe group was abandoned after a repeated decode failure.
   bool isMissingFrames() const {
     return isVideo_ && !videoGoodState_;
   }
@@ -81,6 +82,8 @@ class VideoFrameHandler {
   /// @param exactFrame: if true, all the frames up to that frame might be read.
   /// If false, only up to one frame will be read, probably the keyframe.
   /// Use this API when scrubbing in a UI, as the result is unspecified.
+  /// If replay reaches the frame but decoding still fails, the current keyframe group is abandoned
+  /// and success is returned; decoding is retried at the next keyframe group.
   int readMissingFrames(
       RecordFileReader& fileReader,
       const IndexRecord::RecordInfo& record,
@@ -102,6 +105,8 @@ class VideoFrameHandler {
   void reset();
 
  private:
+  void skipCurrentKeyFrameGroup(int decodeStatus);
+
   DecoderOptions decoderOptions_;
   std::unique_ptr<DecoderI> decoder_;
   std::vector<uint8_t> encodedFrame_;
@@ -110,6 +115,10 @@ class VideoFrameHandler {
   uint32_t decodedKeyFrameIndex_{kInvalidFrameIndex};
   double requestedKeyFrameTimestamp_{};
   uint32_t requestedKeyFrameIndex_{kInvalidFrameIndex};
+  double skippedKeyFrameTimestamp_{};
+  int lastDecodeStatus_{};
+  int skippedGroupStatus_{};
+  bool skipCurrentKeyFrameGroup_{false};
   bool videoGoodState_{false};
   bool isVideo_{false};
 };

@@ -47,11 +47,11 @@ using std::vector;
 enum class CachingStrategy {
   Undefined = 0,
 
-  Passive, ///< (default) Read & cache on-demand (don't prefetch).
+  Passive, ///< Read & cache on-demand (don't prefetch).
            ///< Also the strategy to pair with an explicitly declared read sequence: it keeps the
            ///< cache from guessing when the caller is going to say what it needs, without
            ///< preventing any access.
-  Streaming, ///< Automatically download data "forward", using last read-request as a hint.
+  Streaming, ///< (default) Automatically download data "forward", using last read as a hint.
              ///< Assumes the caller reads the file forwards, most likely every record in order.
   StreamingBidirectional, ///< Automatically download data "forward" and "backward", using last
                           ///< read-request as a hint.

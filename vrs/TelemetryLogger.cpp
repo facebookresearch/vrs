@@ -43,7 +43,7 @@ void TelemetryLogger::setLogger(unique_ptr<TelemetryLogger> telemetryLogger) {
   TelemetryLogger* newLogger = telemetryLogger.get();
   {
     static mutex sMutex;
-    lock_guard<mutex> lock(sMutex);
+    std::scoped_lock lock(sMutex);
     auto& sCurrentLogger = getCurrentLogger();
     sCurrentLogger.load(std::memory_order_relaxed)->stop();
     static vector<unique_ptr<TelemetryLogger>> sLoggers;
@@ -87,7 +87,7 @@ void TelemetryLogger::logEvent(LogEvent&& event) {
 void TelemetryLogger::logTraffic(
     const OperationContext& operationContext,
     const TrafficEvent& event) {
-  XR_LOGI(
+  XR_LOGT(
       "{} {} {}/{}, {}: When: {} Duration: {}/{} "
       "Offset: {} Transfer: {}/{} Retries: {} Errors: {} 429: {}",
       operationContext.operation,

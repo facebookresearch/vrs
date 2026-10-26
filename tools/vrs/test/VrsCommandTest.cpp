@@ -43,7 +43,7 @@ static bool parse(VrsCommand& command, vector<string>& args, int& argn, int& out
   if (!command.parseCommand(args[0], argvs[++argn])) {
     return false;
   }
-  const string appName{args[0]};
+  const string& appName{args[0]};
   while (++argn < static_cast<int>(argvs.size())) {
     if (!command.parseArgument(
             appName, argn, static_cast<int>(argvs.size()), argvs.data(), outStatusCode) &&

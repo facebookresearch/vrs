@@ -124,6 +124,17 @@ Record* RecordManager::createUncompressedRecord(
   return record;
 }
 
+Record* RecordManager::createRecord(
+    double timestamp,
+    Record::Type type,
+    uint32_t formatVersion,
+    const DataSource& data,
+    std::unique_ptr<BorrowedData>&& borrowedData) {
+  Record* record = createRecord(timestamp, type, formatVersion, data);
+  record->addBorrowedData(std::move(borrowedData));
+  return record;
+}
+
 uint32_t RecordManager::purgeOldRecords(double oldestTimestamp, bool recycleBuffers) {
   uint32_t count = 0;
   unique_lock<mutex> guard{mutex_};
@@ -181,7 +192,7 @@ void RecordManager::purgeCache() {
 void RecordManager::collectOldRecords(double maxAge, list<Record*>& outCollectedRecords)
     XR_TSA_NO_THREAD_SAFETY_ANALYSIS {
   outCollectedRecords.clear();
-  lock_guard<mutex> guard{mutex_};
+  std::scoped_lock guard{mutex_};
   if (!activeRecords_.empty()) {
     auto iterator = upper_bound(
         activeRecords_.begin(), activeRecords_.end(), maxAge, [](double age, Record* record) {

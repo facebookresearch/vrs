@@ -16,8 +16,12 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
+
 #include <vrs/VrsExport.h>
 #include <vrs/WriteFileHandler.h>
+#include <vrs/os/CompilerAttributes.h>
 
 namespace vrs {
 
@@ -38,6 +42,21 @@ class VRS_API NewChunkHandler {
   /// When isLastChunk set to true, the file is complete, and a notification for every of the file's
   /// chunks has been sent. These callbacks can happen from any thread context.
   virtual void newChunk(const string& path, size_t index, bool isLastChunk) = 0;
+  /// Callback function to be notified that the recording failed because writing records failed.
+  /// It replaces the remaining newChunk() notifications: no notification follows it, and the file
+  /// is incomplete. The writer closes the file's chunks and leaves them on disk, unless the write
+  /// file handler's abort() discards the file, as AtomicDiskFile does, so that an interrupted live
+  /// recording can be recovered. Handlers whose chunks are temporary, such as upload handlers,
+  /// may delete them.
+  /// Errors while writing the index or closing the file are reported by the writer, but they still
+  /// end with the last newChunk() notification.
+  /// It is called at most once, from any thread context.
+  /// @param error: the error that stopped the recording.
+  /// @param unnotifiedChunks: paths of the chunks never passed to newChunk(): the chunk being
+  /// written, and the head of split-head files. They may no longer exist if abort() discarded them.
+  virtual void recordingFailed(
+      MAYBE_UNUSED int error,
+      MAYBE_UNUSED const std::vector<std::string>& unnotifiedChunks) {}
 };
 
 /// \brief Helper to make new chunks notifications simpler and safer.

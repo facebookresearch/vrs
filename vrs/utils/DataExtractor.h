@@ -74,6 +74,11 @@ class DataExtractor {
     int recordReadComplete(RecordFileReader&, const IndexRecord::RecordInfo&) override;
 
     bool writeImage(const CurrentRecord&, const ImageContentBlockSpec&, const vector<uint8_t>&);
+    bool writeImage(
+        const CurrentRecord&,
+        const ImageContentBlockSpec&,
+        const uint8_t* imageData,
+        size_t imageDataSize);
     void writePngImage(const CurrentRecord&);
 
     void wroteImage(const string& filename);

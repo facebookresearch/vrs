@@ -49,6 +49,10 @@ void log(Level level, const char* channel, const string& message) {
       c = fmt::color::green;
       logLevel = "DEBUG";
       break;
+    case Level::Trace:
+      c = fmt::color::gray;
+      logLevel = "TRACE";
+      break;
     default:
       c = kNoColor;
   }

@@ -417,6 +417,34 @@ TEST_F(PixelFrameTest, getStreamNormalizeOptionsLegacySegmentationFlavors) {
   }
 }
 
+TEST_F(PixelFrameTest, getStreamNormalizeOptionsLegacyGroundTruthDepthFlavors) {
+  struct TestCase {
+    const char* flavor;
+    ImageSemantic expected;
+  };
+  const vector<TestCase> testCases{
+      {"rgbFlavor", ImageSemantic::Depth},
+      {"slamFlavor", ImageSemantic::Depth},
+      {"test/SegmentationInstanceID", ImageSemantic::ObjectIdSegmentation},
+  };
+  for (size_t index = 0; index < testCases.size(); ++index) {
+    const TestCase& testCase = testCases[index];
+    TagStream stream(RecordableTypeId::GroundTruthDepthRecordableClass, testCase.flavor);
+    string path = writeTagStreamFile(
+        "normOptsLegacyGroundTruthDepth" + to_string(index) + ".vrs",
+        [&](RecordFileWriter& writer) { writer.addRecordable(&stream); });
+    RecordFileReader reader;
+    ASSERT_EQ(reader.openFile(path), 0);
+    StreamId id = reader.getStreamForType(RecordableTypeId::GroundTruthDepthRecordableClass);
+    ASSERT_TRUE(id.isValid());
+    NormalizeOptions options =
+        PixelFrame::getStreamNormalizeOptions(reader, id, PixelFormat::GREY16);
+    EXPECT_EQ(options.semantic, testCase.expected) << "flavor '" << testCase.flavor << "'";
+    reader.closeFile();
+    os::remove(path);
+  }
+}
+
 TEST_F(PixelFrameTest, normalizedPixelFormatMatrix) {
   struct TestCase {
     PixelFormat source;

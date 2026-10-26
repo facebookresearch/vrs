@@ -18,10 +18,11 @@
 
 #include <cstddef>
 #include <cstdint>
-
+#include <memory>
 #include <type_traits>
 #include <vector>
 
+#include <vrs/DataSlice.h>
 #include <vrs/VrsExport.h>
 
 namespace vrs {
@@ -255,6 +256,41 @@ class VRS_API DirectWriteRecordData {
 
   /// @param file: File to write the data to.
   virtual int write(WriteFileHandler& file) const = 0;
+};
+
+/// \brief Class to hold borrowed data that is not copied into the record's buffer, like
+/// DirectWriteRecordData, but which can be compressed together with the DataSource payload.
+/// The borrowed segments are written after the DataSource payload, in order: compressed with it
+/// when the record is compressed, or raw when it isn't. Multiple segments let non-contiguous memory
+/// regions be borrowed as one payload. `owner` keeps the borrowed memory alive until the record is
+/// written, which may happen later on a background thread.
+class VRS_API BorrowedData {
+ public:
+  BorrowedData(const void* data, size_t size, std::shared_ptr<void> owner)
+      : segments_{{data, size}}, owner_{std::move(owner)}, size_{size} {}
+
+  // The slices are copied; only referenced memory is borrowed, owned by `owner` until written.
+  BorrowedData(const DataSlice* dataSlices, size_t dataSliceCount, std::shared_ptr<void> owner)
+      : owner_{std::move(owner)} {
+    segments_.reserve(dataSliceCount);
+    for (size_t i = 0; i < dataSliceCount; ++i) {
+      segments_.push_back(dataSlices[i]);
+      size_ += dataSlices[i].size;
+    }
+  }
+
+  const std::vector<DataSlice>& getSegments() const {
+    return segments_;
+  }
+
+  size_t getDataSize() const {
+    return size_;
+  }
+
+ private:
+  std::vector<DataSlice> segments_;
+  std::shared_ptr<void> owner_;
+  size_t size_{0};
 };
 
 } // namespace vrs

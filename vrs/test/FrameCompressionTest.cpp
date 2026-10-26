@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include <limits>
+
 #include <gtest/gtest.h>
 
 #define DEFAULT_LOG_CHANNEL "FrameCompressionTest"
@@ -22,9 +24,11 @@
 #include <vrs/os/Utils.h>
 
 #include <vrs/Compressor.h>
+#include <vrs/DataSlice.h>
 #include <vrs/Decompressor.h>
 #include <vrs/DiskFile.h>
 #include <vrs/ErrorCode.h>
+#include <vrs/Record.h>
 
 using namespace vrs;
 using namespace std;
@@ -402,6 +406,94 @@ int readFrame(
 }
 
 } // namespace
+
+TEST_F(FrameCompressionTest, smallPayloadResetsCompressionType) {
+  Compressor compressor;
+  const vector<uint8_t> compressibleInput(1024);
+  uint32_t compressedSize = 0;
+  ASSERT_EQ(
+      compressor.compress(
+          compressibleInput.data(),
+          compressibleInput.size(),
+          CompressionPreset::Lz4Fast,
+          compressedSize),
+      SUCCESS);
+  ASSERT_GT(compressedSize, 0);
+  ASSERT_EQ(compressor.getCompressionType(), CompressionType::Lz4);
+  const vector<uint8_t> smallInput(Compressor::kMinByteCountForCompression - 1);
+
+  EXPECT_EQ(
+      compressor.compress(
+          smallInput.data(), smallInput.size(), CompressionPreset::Lz4Fast, compressedSize),
+      SUCCESS);
+
+  EXPECT_EQ(compressedSize, 0);
+  EXPECT_EQ(compressor.getCompressionType(), CompressionType::None);
+}
+
+TEST_F(FrameCompressionTest, oversizedPayloadIsRejected) {
+  const uint8_t input = 0;
+  Compressor compressor;
+  uint32_t compressedSize = 123;
+
+  if constexpr (sizeof(size_t) > sizeof(uint32_t)) {
+    const size_t oversizedDataSize =
+        static_cast<size_t>(uint64_t{numeric_limits<uint32_t>::max()} + 1);
+    EXPECT_EQ(
+        compressor.compress(&input, oversizedDataSize, CompressionPreset::Lz4Fast, compressedSize),
+        TOO_MUCH_DATA);
+    EXPECT_EQ(compressedSize, 0);
+  }
+
+  const vector<DataSlice> dataSlices = {{&input, numeric_limits<uint32_t>::max()}, {&input, 1}};
+  compressedSize = 123;
+  EXPECT_EQ(
+      compressor.compress(
+          dataSlices.data(), dataSlices.size(), CompressionPreset::ZstdFast, compressedSize),
+      TOO_MUCH_DATA);
+  EXPECT_EQ(compressedSize, 0);
+}
+
+TEST_F(FrameCompressionTest, multiSliceCompressRoundTripsThroughDecompressor) {
+  for (size_t size : {300u, 1024u, 100000u}) {
+    vector<uint8_t> input(size);
+    for (size_t i = 0; i < input.size(); ++i) {
+      input[i] = static_cast<uint8_t>(i / 7); // compressible so compression actually engages
+    }
+    for (CompressionPreset preset :
+         {CompressionPreset::Lz4Fast,
+          CompressionPreset::Lz4Tight,
+          CompressionPreset::ZstdFaster,
+          CompressionPreset::ZstdFast,
+          CompressionPreset::ZstdMedium}) {
+      const size_t split = input.size() / 3;
+      const std::vector<DataSlice> dataSlices = {
+          {input.data(), split}, {input.data() + split, input.size() - split}};
+      Compressor compressor;
+      uint32_t compressedSize = 0;
+      ASSERT_EQ(
+          compressor.compress(dataSlices.data(), dataSlices.size(), preset, compressedSize),
+          SUCCESS)
+          << "size " << size << " preset " << static_cast<int>(preset);
+      ASSERT_GT(compressedSize, 0u) << "size " << size << " preset " << static_cast<int>(preset);
+      Decompressor decompressor;
+      decompressor.setCompressionType(compressor.getCompressionType());
+      std::memcpy(
+          decompressor.allocateCompressedDataBuffer(compressedSize),
+          compressor.getData(),
+          compressedSize);
+      vector<uint8_t> decompressed(input.size());
+      uint32_t writtenSize = 0;
+      ASSERT_EQ(
+          decompressor.decompress(
+              decompressed.data(), static_cast<uint32_t>(decompressed.size()), writtenSize),
+          0)
+          << "size " << size << " preset " << static_cast<int>(preset);
+      EXPECT_EQ(writtenSize, input.size());
+      EXPECT_EQ(decompressed, input) << "size " << size << " preset " << static_cast<int>(preset);
+    }
+  }
+}
 
 TEST_F(FrameCompressionTest, compressedFrames) {
   const string testPath = os::getTempFolder() + "compressedFrames.vrs";

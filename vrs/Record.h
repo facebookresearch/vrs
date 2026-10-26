@@ -23,6 +23,7 @@
 #include <vrs/StreamId.h>
 #include <vrs/VrsExport.h>
 #include <vrs/helpers/EnumTemplates.hpp>
+#include <vrs/helpers/IOVector.h>
 
 namespace vrs {
 
@@ -30,7 +31,9 @@ using std::unique_ptr;
 using std::vector;
 
 class DataSource;
+struct DataSlice;
 class DirectWriteRecordData;
+class BorrowedData;
 class Compressor;
 class RecordManager;
 
@@ -113,15 +116,20 @@ class VRS_API Record final {
   /// Add some data to write directly at the end of the record when it's written to disk.
   void addDirectWriteRecordData(unique_ptr<DirectWriteRecordData>&& directWriteRecordData);
 
+  /// Add borrowed data to write after the DataSource payload, compressed together with it (unlike
+  /// DirectWriteRecordData, which is always written raw). @see BorrowedData.
+  void addBorrowedData(unique_ptr<BorrowedData>&& borrowedData);
+
   /// Tell if an attempt should be made to compress the record.
   /// If compression can't reduce the size of the record, then the record is written uncompressed.
   /// @internal
   bool shouldTryToCompress() const;
 
   /// Try to compress the record.
-  /// @return The compressed size, or 0 if the compression did not work.
+  /// @param outCompressedSize: Number of compressed bytes, or zero when compression was not used.
+  /// @return 0 for success, or an error code.
   /// @internal
-  uint32_t compressRecord(Compressor& compressor);
+  int compressRecord(Compressor& compressor, uint32_t& outCompressedSize);
 
   /// Write a possibly compressed record to a file (header + data).
   /// @internal
@@ -154,13 +162,6 @@ class VRS_API Record final {
   /// Get a record type as a text string.
   static const char* typeName(Type type);
 
-  /// Public for testing
-  struct uninitialized_byte final {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, modernize-use-equals-default)
-    uninitialized_byte() {} // do not use '= default' as it will initialize byte!
-    uint8_t byte;
-  };
-
  private:
   friend class RecordManager;
 
@@ -171,10 +172,13 @@ class VRS_API Record final {
   double timestamp_{};
   Type recordType_{};
   uint32_t formatVersion_{};
-  vector<uninitialized_byte> buffer_;
-  size_t usedBufferSize_{};
+  helpers::IOVector<uint8_t> buffer_;
+  std::vector<DataSlice> compressorDataSlices_;
+  size_t usedBufferSize_{}; // total uncompressed payload: owned + borrowed + direct-write
+  size_t ownedSize_{}; // DataSource payload copied into buffer_, excluding borrowed/direct-write
   uint64_t creationOrder_{};
   unique_ptr<DirectWriteRecordData> directWriteRecordData_;
+  unique_ptr<BorrowedData> borrowedData_;
 
   RecordManager& recordManager_;
 };

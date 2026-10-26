@@ -1021,6 +1021,10 @@ NormalizeOptions PixelFrame::getStreamNormalizeOptions(
             return NormalizeOptions(ImageSemantic::ObjectIdSegmentation);
           }
         }
+        if (id.getTypeId() == RecordableTypeId::GroundTruthDepthRecordableClass) {
+          // Aria Digital Twin ground-truth depth.
+          return NormalizeOptions(ImageSemantic::Depth);
+        }
         return NormalizeOptions(ImageSemantic::ObjectIdSegmentation);
       }
       break;

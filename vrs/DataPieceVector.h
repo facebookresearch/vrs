@@ -19,6 +19,8 @@
 #ifndef DATA_PIECES_VECTOR_H
 #define DATA_PIECES_VECTOR_H
 
+#include <type_traits>
+
 #ifndef DATA_PIECES_H
 #include <vrs/DataPieces.h>
 #endif
@@ -120,6 +122,24 @@ class DataPieceVector : public DataPiece {
     }
     outValues = defaultValues_;
     return false;
+  }
+  /// Get the read values without copying them, as bytes that may not be aligned for T.
+  /// The bytes are in the variable-size data buffer of the DataLayout, or of the mapped DataLayout,
+  /// and they stay valid until that buffer changes.
+  /// @param outData: set to the address of the first value, or nullptr if there are none.
+  /// @param outCount: set to the number of values.
+  /// @return True if values were read, maybe none. False if the piece is not mapped.
+  template <
+      typename U = T,
+      std::enable_if_t<std::is_same<U, T>::value && std::is_trivially_copyable<U>::value, int> = 0>
+  bool getRawData(const void*& outData, size_t& outCount) const {
+    outData = layout_.getVarData<T>(offset_, outCount);
+    if (outData != nullptr && outCount > 0) {
+      return true;
+    }
+    outData = nullptr;
+    outCount = 0;
+    return pieceIndex_ != DataLayout::kNotFound;
   }
 
   /// Specify a default value returned by get() when the DataPiece is not mapped.

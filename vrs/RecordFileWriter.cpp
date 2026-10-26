@@ -70,9 +70,12 @@ class CompressionJob {
   }
 
   void performJob() {
-    compressedSize_ = sortRecord_.record->compressRecord(compressor_);
+    compressionError_ = sortRecord_.record->compressRecord(compressor_, compressedSize_);
   }
 
+  int getCompressionError() const {
+    return compressionError_;
+  }
   uint32_t getCompressedSize() const {
     return compressedSize_;
   }
@@ -83,7 +86,8 @@ class CompressionJob {
  private:
   Compressor compressor_;
   RecordFileWriter::SortRecord sortRecord_{nullptr, {RecordableTypeId::Undefined, 0}};
-  uint32_t compressedSize_{};
+  int compressionError_ = SUCCESS;
+  uint32_t compressedSize_ = 0;
 };
 
 using CompressionJobQueue = JobQueue<CompressionJob*>;
@@ -303,7 +307,7 @@ RecordFileWriter::RecordFileWriter()
 
 void RecordFileWriter::addRecordable(Recordable* recordable) {
   { // mutex guard
-    lock_guard<mutex> lock(recordablesMutex_);
+    std::scoped_lock lock(recordablesMutex_);
     for (auto* r : recordables_) {
       if (r != recordable && !XR_VERIFY(r->getStreamId() != recordable->getStreamId())) {
         return;
@@ -336,7 +340,7 @@ void RecordFileWriter::addRecordable(Recordable* recordable) {
 vector<Recordable*> RecordFileWriter::getRecordables() const {
   vector<Recordable*> recordables;
   { // mutex guard
-    lock_guard<mutex> lock(recordablesMutex_);
+    std::scoped_lock lock(recordablesMutex_);
     recordables.reserve(recordables_.size());
     for (auto* recordable : recordables_) {
       recordables.push_back(recordable);
@@ -380,7 +384,7 @@ int RecordFileWriter::writeToFile(const string& filePath) {
   error = writeRecords(allRecords, error);
   // in case of error, don't bother writing an index or a description... :-(
   if (error != 0) {
-    file_->close();
+    closeFileAfterError(error);
     return error;
   }
   return completeAndCloseFile();
@@ -423,7 +427,7 @@ void RecordFileWriter::backgroundWriterThreadActivity() {
   } else {
     auto fileError = writerThreadData_->fileError.load(std::memory_order_relaxed);
     XR_LOGW("Closed file with error #{}, {}", fileError, errorCodeToMessage(fileError));
-    file_->close();
+    closeFileAfterError(fileError);
   }
   if (queueByteSize_) {
     queueByteSize_->store(0, memory_order_relaxed);
@@ -508,6 +512,7 @@ int RecordFileWriter::createFileAsync(const string& filePath, bool splitHead) {
   if (error != 0) {
     indexRecordWriter_.reset();
     file_->close();
+    newChunkHandler_.reset(); // no file: the handler must not hear about a later one
     return error;
   }
   if (LOG_FILE_OPERATIONS) {
@@ -1034,14 +1039,15 @@ void RecordFileWriter::writeOneRecord(
       sizeof(FileFormat::RecordHeader) + (compressedSize > 0 ? compressedSize : record->getSize());
   if (rwd.currentChunkSize > 0 && rwd.currentChunkSize + recordDiskSize >= maxChunkSize_) {
     NewChunkNotifier newChunkNotifier(*file_, newChunkHandler_);
-    // AddChunk() preserves the current chunk on error.
-    XR_VERIFY(
-        file_->addChunk() == 0,
-        "Add chunk failed: {}, {}",
-        file_->getLastError(),
-        errorCodeToMessage(file_->getLastError()));
+    // AddChunk() preserves the current chunk on error: we keep writing to it, so it's not complete.
+    if (XR_VERIFY(
+            file_->addChunk() == 0,
+            "Add chunk failed: {}, {}",
+            file_->getLastError(),
+            errorCodeToMessage(file_->getLastError()))) {
+      newChunkNotifier.notify(1); // offset chunk index by 1
+    }
     rwd.currentChunkSize = 0; // reset, even if addChunk() failed to reduce retrying.
-    newChunkNotifier.notify(1); // offset chunk index by 1
   }
   if (queueByteSize_) {
     queueByteSize_->fetch_sub(record->getSize(), memory_order_relaxed);
@@ -1072,14 +1078,28 @@ int RecordFileWriter::writeRecordsSingleThread(SortedRecords& records, int lastE
     Record* record = r.record;
     if (rwd.getError() != 0) {
       rwd.skippedRecords++;
+      if (queueByteSize_) {
+        queueByteSize_->fetch_sub(record->getSize(), memory_order_relaxed);
+      }
       record->recycle();
     } else {
-      uint32_t compressedSize =
-          record->shouldTryToCompress() ? record->compressRecord(compressor) : 0;
-      if (compressedSize > 0) {
-        rwd.compressedRecords++;
+      uint32_t compressedSize = 0;
+      const int compressionError = record->shouldTryToCompress()
+          ? record->compressRecord(compressor, compressedSize)
+          : SUCCESS;
+      if (compressionError != SUCCESS) {
+        XR_LOGE("Compression failed: {}", errorCodeToMessageWithCode(compressionError));
+        rwd.error = compressionError;
+        if (queueByteSize_) {
+          queueByteSize_->fetch_sub(record->getSize(), memory_order_relaxed);
+        }
+        record->recycle();
+      } else {
+        if (compressedSize > 0) {
+          rwd.compressedRecords++;
+        }
+        writeOneRecord(rwd, record, r.streamId, compressor, compressedSize);
       }
-      writeOneRecord(rwd, record, r.streamId, compressor, compressedSize);
     }
   }
   if (LOG_FILE_OPERATIONS) {
@@ -1126,7 +1146,6 @@ int RecordFileWriter::writeRecordsMultiThread(
         availableJobs.pop_back();
         job->setSortRecord(nextRecord);
         compressionThreadsData.jobsQueue.sendJob(job);
-        rwd.compressedRecords++;
       } else {
         compressionResults.emplace(nextRecord, &noCompressionJob);
       }
@@ -1142,9 +1161,22 @@ int RecordFileWriter::writeRecordsMultiThread(
       CompressionJob* job = resultsIter->second;
       if (rwd.getError() != 0) {
         rwd.skippedRecords++;
+        if (queueByteSize_) {
+          queueByteSize_->fetch_sub(record->getSize(), memory_order_relaxed);
+        }
+        record->recycle();
+      } else if (job->getCompressionError() != SUCCESS) {
+        XR_LOGE("Compression failed: {}", errorCodeToMessageWithCode(job->getCompressionError()));
+        rwd.error = job->getCompressionError();
+        if (queueByteSize_) {
+          queueByteSize_->fetch_sub(record->getSize(), memory_order_relaxed);
+        }
         record->recycle();
       } else {
         const StreamId streamId = resultsIter->first.streamId;
+        if (job->getCompressedSize() > 0) {
+          rwd.compressedRecords++;
+        }
         writeOneRecord(rwd, record, streamId, job->getCompressor(), job->getCompressedSize());
       }
       if (job != &noCompressionJob) {
@@ -1206,6 +1238,34 @@ int RecordFileWriter::completeAndCloseFile() {
   newChunkNotifier.notify(1, true); // offset chunk index by 1, last chunk
   indexRecordWriter_.reset();
   return error;
+}
+
+void RecordFileWriter::closeFileAfterError(int error) {
+  vector<string> unnotifiedChunks;
+  if (newChunkHandler_ != nullptr) {
+    string path;
+    size_t index = 0;
+    if (indexRecordWriter_.getSplitHead() &&
+        indexRecordWriter_.getSplitHead()->getCurrentChunk(path, index)) {
+      unnotifiedChunks.push_back(path);
+    }
+    if (file_->getCurrentChunk(path, index)) {
+      unnotifiedChunks.push_back(path);
+    }
+  }
+  // The split index stays incomplete on purpose. Both files are closed (or discarded) before the
+  // chunk handler hears about the failure, in case it reads or cleans up local files.
+  if (indexRecordWriter_.getSplitHead()) {
+    int headError = indexRecordWriter_.getSplitHead()->close();
+    if (headError != 0) {
+      XR_LOGW("Failed to close the head file: {}", errorCodeToMessage(headError));
+    }
+  }
+  file_->abort();
+  if (newChunkHandler_ != nullptr) {
+    newChunkHandler_->recordingFailed(error, unnotifiedChunks);
+  }
+  indexRecordWriter_.reset();
 }
 
 RecordFileWriter::~RecordFileWriter() noexcept {

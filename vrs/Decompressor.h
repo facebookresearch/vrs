@@ -17,10 +17,10 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 
 #include <vrs/ForwardDefinitions.h>
 #include <vrs/VrsExport.h>
+#include <vrs/helpers/IOVector.h>
 
 namespace vrs {
 
@@ -106,7 +106,7 @@ class VRS_API Decompressor {
   std::unique_ptr<Lz4Decompressor> lz4Context_;
   class ZstdDecompressor;
   std::unique_ptr<ZstdDecompressor> zstdContext_;
-  std::vector<uint8_t> compressedBuffer_;
+  helpers::IOVector<uint8_t> compressedBuffer_;
   CompressionType compressionType_{};
   size_t readSize_ = {};
   size_t decodedSize_ = {};

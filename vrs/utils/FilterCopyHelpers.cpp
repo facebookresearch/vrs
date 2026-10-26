@@ -129,13 +129,15 @@ Copier::Copier(
 }
 
 bool Copier::processRecordHeader(const CurrentRecord& record, DataReference& outDataRef) {
-  rawRecordData_.resize(record.recordSize);
+  rawRecordData_.resizePreservingWithoutInitialization(record.recordSize);
   outDataRef.useRawData(rawRecordData_.data(), record.recordSize);
   return true;
 }
 
 void Copier::processRecord(const CurrentRecord& record, uint32_t /*bytesWrittenCount*/) {
-  writer_.createRecord(record, rawRecordData_);
+  DataSourceChunk rawData{rawRecordData_.data(), rawRecordData_.size()};
+  DataSource source{rawData};
+  writer_.createRecord(record, source);
   ++options_.outRecordCopiedCount;
 }
 

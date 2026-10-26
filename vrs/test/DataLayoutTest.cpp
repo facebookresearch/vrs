@@ -576,6 +576,7 @@ inline void addTemplatePiece(ManualDataLayout& layout, Counters& c, const T& def
   DataPieceArray<T>* newArray = new DataPieceArray<T>(arrayPieceName, c.arraySize++);
   layout.add(unique_ptr<DataPiece>(newArray));
   vector<T> values;
+  values.reserve(newArray->getArraySize());
   for (size_t k = 0; k < newArray->getArraySize(); ++k) {
     values.push_back(static_cast<T>(c.arraySize + k));
   }
@@ -622,6 +623,7 @@ inline void addTemplatePiecePoint(ManualDataLayout& layout, Counters& c) {
   DataPieceArray<T>* newArray = new DataPieceArray<T>(arrayPieceName, c.arraySize++);
   layout.add(unique_ptr<DataPiece>(newArray));
   vector<T> values;
+  values.reserve(newArray->getArraySize());
   for (size_t k = 0; k < newArray->getArraySize(); ++k) {
     values.push_back(makePoint<T>(c.arraySize + k));
   }
@@ -668,6 +670,7 @@ inline void addTemplatePieceMatrix(ManualDataLayout& layout, Counters& c) {
   DataPieceArray<T>* newArray = new DataPieceArray<T>(arrayPieceName, c.arraySize++);
   layout.add(unique_ptr<DataPiece>(newArray));
   vector<T> values;
+  values.reserve(newArray->getArraySize());
   for (size_t k = 0; k < newArray->getArraySize(); ++k) {
     values.push_back(makeMatrix<T>(c.arraySize + k));
   }
@@ -889,6 +892,36 @@ TEST_F(DataLayoutTester, testStaging) {
   EXPECT_EQ(ints, expectedInts);
   EXPECT_TRUE(layout.mapString_.get(stringMap));
   EXPECT_EQ(stringMap, stringMapExpected);
+}
+
+TEST_F(DataLayoutTester, testRawData) {
+  OldVarSizeLayout oldLayout;
+  oldLayout.collectVariableDataAndUpdateIndex();
+  const void* data = nullptr;
+  size_t count = 0;
+  ASSERT_TRUE(oldLayout.ints_.getRawData(data, count));
+  vector<int32_t> ints(count);
+  memcpy(ints.data(), data, count * sizeof(int32_t));
+  EXPECT_EQ(ints, (vector<int32_t>{4, 3, 2, 1}));
+  // a mapped piece's raw data is in the mapped layout's buffer
+  VarSizeLayout layout;
+  layout.mapLayout(oldLayout);
+  ASSERT_TRUE(layout.doubles_.getRawData(data, count));
+  EXPECT_EQ(count, 2);
+  const vector<int8_t>& oldVarData = oldLayout.getVarData();
+  EXPECT_GE(static_cast<const int8_t*>(data), oldVarData.data());
+  EXPECT_LE(
+      static_cast<const int8_t*>(data) + count * sizeof(double),
+      oldVarData.data() + oldVarData.size());
+  // a piece missing from the mapped layout has no raw data
+  EXPECT_FALSE(layout.intsWithDefault_.getRawData(data, count));
+  EXPECT_EQ(data, nullptr);
+  EXPECT_EQ(count, 0);
+  // an empty vector
+  VarSizeLayout emptyLayout;
+  emptyLayout.collectVariableDataAndUpdateIndex();
+  EXPECT_TRUE(emptyLayout.ints_.getRawData(data, count));
+  EXPECT_EQ(count, 0);
 }
 
 static void cloneLayout(ManualDataLayout& copy, DataLayout& original) {

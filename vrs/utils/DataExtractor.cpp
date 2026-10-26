@@ -26,6 +26,7 @@
 #include <logging/Verify.h>
 
 #include <vrs/helpers/FileMacros.h>
+#include <vrs/helpers/IOVector.h>
 #include <vrs/helpers/Rapidjson.hpp>
 #include <vrs/helpers/Throttler.h>
 #include <vrs/os/Utils.h>
@@ -59,6 +60,14 @@ bool DataExtractor::DataExtractorStreamPlayer::writeImage(
     const CurrentRecord& record,
     const ImageContentBlockSpec& spec,
     const vector<uint8_t>& imageData) {
+  return writeImage(record, spec, imageData.data(), imageData.size());
+}
+
+bool DataExtractor::DataExtractorStreamPlayer::writeImage(
+    const CurrentRecord& record,
+    const ImageContentBlockSpec& spec,
+    const uint8_t* imageData,
+    size_t imageDataSize) {
   const auto& imageFormat = spec.getImageFormat();
   string filenamePostfix;
   string extension;
@@ -107,7 +116,7 @@ bool DataExtractor::DataExtractorStreamPlayer::writeImage(
     return false;
   }
   fmt::print("Writing {}\n", path);
-  if (!file.write(reinterpret_cast<const char*>(imageData.data()), imageData.size())) {
+  if (!file.write(reinterpret_cast<const char*>(imageData), imageDataSize)) {
     XR_LOGE("Failed to write file {}", filename);
     return false;
   }
@@ -143,10 +152,9 @@ bool DataExtractor::DataExtractorStreamPlayer::onImageRead(
       return true;
     }
   } else {
-    vector<uint8_t> imageData;
-    imageData.resize(imageBlock.getBlockSize());
-    if (VERIFY_SUCCESS(record.reader->read(imageData.data(), imageBlock.getBlockSize())) &&
-        writeImage(record, imageBlock.image(), imageData)) {
+    auto imageData = helpers::IOVector<uint8_t>::newUninitialized(imageBlock.getBlockSize());
+    if (VERIFY_SUCCESS(record.reader->read(imageData.data(), imageData.size())) &&
+        writeImage(record, imageBlock.image(), imageData.data(), imageData.size())) {
       return true;
     }
   }

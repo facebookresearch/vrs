@@ -16,6 +16,8 @@
 
 #include <vrs/Record.h>
 
+#include <vector>
+
 #define DEFAULT_LOG_CHANNEL "VRSRecord"
 #include <logging/Log.h>
 
@@ -57,6 +59,7 @@ Record::~Record() = default;
 
 void Record::recycle() {
   directWriteRecordData_.reset();
+  borrowedData_.reset();
   recordManager_.recycle(this);
 }
 
@@ -69,19 +72,15 @@ void Record::set(
   timestamp_ = timestamp;
   recordType_ = type;
   formatVersion_ = formatVersion;
-  usedBufferSize_ = data.getDataSize();
+  ownedSize_ = data.getDataSize();
+  usedBufferSize_ = ownedSize_;
   uint64_t allocateSize = kRecordHeaderSize + usedBufferSize_;
-  // only resize if we have to
-  if (buffer_.size() < allocateSize) {
-    // If we're going to reallocate our buffer, then ask for a bit more right away...
-    if (allocateSize > buffer_.capacity()) {
-      buffer_.resize(0); // make sure we don't copy existing data for no reason!
-    }
-    buffer_.resize(allocateSize);
-  }
-  data.copyTo(&buffer_.data()->byte + kRecordHeaderSize);
+  // writeRecord() either initializes this header or uses a separate compressed buffer.
+  buffer_.resizeDiscardingWithoutInitialization(allocateSize);
+  data.copyTo(buffer_.data() + kRecordHeaderSize);
   creationOrder_ = creationOrder;
   directWriteRecordData_.reset();
+  borrowedData_.reset();
 }
 
 void Record::addDirectWriteRecordData(std::unique_ptr<DirectWriteRecordData>&& directWriteData) {
@@ -89,16 +88,35 @@ void Record::addDirectWriteRecordData(std::unique_ptr<DirectWriteRecordData>&& d
   usedBufferSize_ += directWriteRecordData_->getDataSize();
 }
 
+void Record::addBorrowedData(std::unique_ptr<BorrowedData>&& borrowedData) {
+  if (borrowedData_) {
+    usedBufferSize_ -= borrowedData_->getDataSize();
+  }
+  borrowedData_ = std::move(borrowedData);
+  if (borrowedData_) {
+    usedBufferSize_ += borrowedData_->getDataSize();
+  }
+}
+
 bool Record::shouldTryToCompress() const {
   return !directWriteRecordData_ &&
       Compressor::shouldTryToCompress(recordManager_.getCompression(), usedBufferSize_);
 }
 
-uint32_t Record::compressRecord(Compressor& compressor) {
+int Record::compressRecord(Compressor& compressor, uint32_t& outCompressedSize) {
+  compressorDataSlices_.clear();
+  compressorDataSlices_.reserve(1 + (borrowedData_ ? borrowedData_->getSegments().size() : 0));
+  compressorDataSlices_.push_back(DataSlice{buffer_.data() + kRecordHeaderSize, ownedSize_});
+  if (borrowedData_) {
+    const auto& borrowedSegments = borrowedData_->getSegments();
+    compressorDataSlices_.insert(
+        compressorDataSlices_.end(), borrowedSegments.begin(), borrowedSegments.end());
+  }
   return compressor.compress(
-      buffer_.data() + kRecordHeaderSize,
-      usedBufferSize_,
+      compressorDataSlices_.data(),
+      compressorDataSlices_.size(),
       recordManager_.getCompression(),
+      outCompressedSize,
       kRecordHeaderSize);
 }
 
@@ -123,6 +141,8 @@ int Record::writeRecord(
         static_cast<uint32_t>(usedBufferSize_));
     WRITE_OR_LOG_AND_RETURN(file, header, recordSize);
     inOutRecordSize = recordSize;
+    // The borrowed bytes are already in the compressor's buffer; release the owner now.
+    borrowedData_.reset();
   } else {
     uint32_t recordSize = static_cast<uint32_t>(kRecordHeaderSize + usedBufferSize_);
     auto* header = reinterpret_cast<FileFormat::RecordHeader*>(buffer_.data());
@@ -135,12 +155,19 @@ int Record::writeRecord(
         inOutRecordSize,
         recordSize,
         0);
+    // Borrowed and direct-write data aren't in buffer_; append them raw after the copied payload.
+    const size_t tailSize = (borrowedData_ ? borrowedData_->getDataSize() : 0) +
+        (directWriteRecordData_ ? directWriteRecordData_->getDataSize() : 0);
+    WRITE_OR_LOG_AND_RETURN(file, header, recordSize - tailSize);
+    if (borrowedData_) {
+      for (const DataSlice& segment : borrowedData_->getSegments()) {
+        WRITE_OR_LOG_AND_RETURN(file, segment.data, segment.size);
+      }
+      borrowedData_.reset();
+    }
     if (directWriteRecordData_) {
-      WRITE_OR_LOG_AND_RETURN(file, header, recordSize - directWriteRecordData_->getDataSize());
       IF_ERROR_RETURN(directWriteRecordData_->write(file));
       directWriteRecordData_.reset();
-    } else {
-      WRITE_OR_LOG_AND_RETURN(file, header, recordSize);
     }
     inOutRecordSize = recordSize;
   }

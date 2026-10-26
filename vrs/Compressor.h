@@ -17,12 +17,12 @@
 #pragma once
 
 #include <memory>
-#include <string>
-#include <vector>
 
+#include <vrs/DataSlice.h>
 #include <vrs/ForwardDefinitions.h>
 #include <vrs/VrsExport.h>
 #include <vrs/WriteFileHandler.h>
+#include <vrs/helpers/IOVector.h>
 
 namespace vrs {
 
@@ -93,11 +93,34 @@ class VRS_API Compressor {
   /// @param data: Pointer to the data to compress.
   /// @param dataSize: Number of bytes in the buffer to compress.
   /// @param preset: Compression preset to use.
+  /// @param outCompressedSize: Number of compressed bytes, or zero when compression was not used.
   /// @param headerSpace: Number of bytes to reserve at the beginning of the buffer for a header
   /// initialized manually later.
-  /// @return The number of bytes of compressed data, or 0 in case of failure.
-  uint32_t
-  compress(const void* data, size_t dataSize, CompressionPreset preset, size_t headerSpace = 0);
+  /// @return 0 for success, or an error code.
+  int compress(
+      const void* data,
+      size_t dataSize,
+      CompressionPreset preset,
+      uint32_t& outCompressedSize,
+      size_t headerSpace = 0);
+
+  /// Compress several memory buffers (provided by `dataSlices`) into a single frame that
+  /// decompresses to their concatenation. The compressed bytes of multiple slices are not
+  /// necessarily identical to compressing the concatenation in one piece, but decode to the same
+  /// data.
+  /// @param dataSlices: The data slices, compressed in order as one payload.
+  /// @param dataSliceCount: Number of data slices.
+  /// @param preset: Compression preset to use.
+  /// @param outCompressedSize: Number of compressed bytes, or zero when compression was not used.
+  /// @param headerSpace: Number of bytes to reserve at the beginning of the buffer for a header
+  /// initialized manually later.
+  /// @return 0 for success, or an error code.
+  int compress(
+      const DataSlice* dataSlices,
+      size_t dataSliceCount,
+      CompressionPreset preset,
+      uint32_t& outCompressedSize,
+      size_t headerSpace = 0);
 
   /// Frame compression APIs, with streaming to a file.
   /// Write to a file a block of data (a "frame") to be compressed. That data will be logically self
@@ -134,9 +157,10 @@ class VRS_API Compressor {
   /// @param inOutCompressedSize: Updated number of bytes written out to the file.
   /// @param maxCompressedSize: Max number of bytes the compressed record may get. Fail if the
   /// compressed data is larger, while guarantying that fewer bytes have been written to disk.
-  /// @return 0 for success, or an error code. After this call, inOutSize counts the total number of
-  /// bytes used for the compressed frame, including compression metadata. This number should be
-  /// smaller than the frame size, but might be slightly larger, if the data couldn't be compressed.
+  /// @return 0 for success, or an error code. After this call, inOutCompressedSize counts the total
+  /// number of bytes used for the compressed frame, including compression metadata. This number
+  /// should be smaller than the frame size, but might be slightly larger if the data couldn't be
+  /// compressed.
   int endFrame(WriteFileHandler& file, uint32_t& inOutCompressedSize, size_t maxCompressedSize = 0);
 
   /// Get the compressed data after compression. The size to consider was returned by compress().
@@ -151,24 +175,17 @@ class VRS_API Compressor {
   }
   CompressionType getCompressionType() const;
 
-  /// Really deallocate the buffer's memory (clear() doesn't do that)
+  /// Deallocate the internal buffer's storage.
   void clear() {
-    std::vector<uninitialized_byte> blank;
-    buffer_.swap(blank);
+    buffer_.release();
   }
 
   static bool shouldTryToCompress(CompressionPreset preset, size_t size);
 
-  struct uninitialized_byte final {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init, modernize-use-equals-default)
-    uninitialized_byte() {} // do not use '= default' as it will initialize byte!
-    uint8_t byte;
-  };
-
  private:
   class CompressorImpl;
   std::unique_ptr<CompressorImpl> impl_;
-  std::vector<uninitialized_byte> buffer_;
+  helpers::IOVector<uint8_t> buffer_;
 };
 
 } // namespace vrs

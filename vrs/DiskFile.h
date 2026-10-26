@@ -211,7 +211,7 @@ class VRS_API AtomicDiskFile : public DiskFile {
   int create(const string& newFilePath, const FileSpec::Extras& options = {}) override;
   int close() override;
 
-  void abort();
+  void abort() override;
 
  private:
   string finalName_;

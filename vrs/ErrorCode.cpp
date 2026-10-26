@@ -149,6 +149,8 @@ int domainErrorCode(ErrorDomain errorDomain, int64_t errorCode, const char* erro
     sDomainErrorRegistry[errorDomainToErrorCodeStart(ErrorDomain::ZstdCompressionErrorDomain)] =
         "ZSTD Compression";
     sDomainErrorRegistry[errorDomainToErrorCodeStart(ErrorDomain::FbVrsErrorDomain)] = "fbVRS";
+    sDomainErrorRegistry[errorDomainToErrorCodeStart(ErrorDomain::Lz4CompressionErrorDomain)] =
+        "LZ4 Compression";
   }
   int newErrorCode = newDomainErrorCode(errorDomain, errorCode);
   // check if there are already too many errors registered for that domain.
