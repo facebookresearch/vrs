@@ -230,7 +230,8 @@ bool PixelFrame::decompressImage(VideoFrameHandler* videoFrameHandler) {
         return false;
       }
       vector<uint8_t> compressedData(std::move(frameBytes_));
-      return decodeCustomCodecFrame(compressedData, imageSpec_);
+      bool hasDecoder = true;
+      return decodeCustomCodecFrame(compressedData, imageSpec_, hasDecoder);
     }
     default:
       return false;
@@ -239,6 +240,15 @@ bool PixelFrame::decompressImage(VideoFrameHandler* videoFrameHandler) {
 }
 
 bool PixelFrame::readCustomCodecFrame(RecordReader* reader, const ContentBlock& cb) {
+  bool hasDecoder = true;
+  return readCustomCodecFrame(reader, cb, hasDecoder);
+}
+
+bool PixelFrame::readCustomCodecFrame(
+    RecordReader* reader,
+    const ContentBlock& cb,
+    bool& outHasDecoder) {
+  outHasDecoder = true;
   // The codec spec, which carries the codec name, comes from the content block; imageSpec_ is not
   // authoritative here.
   const ImageContentBlockSpec& codecSpec = cb.image();
@@ -265,12 +275,14 @@ bool PixelFrame::readCustomCodecFrame(RecordReader* reader, const ContentBlock& 
   if (!VERIFY_SUCCESS(reader->read(compressedData.data(), sizeBytes))) {
     return false;
   }
-  return decodeCustomCodecFrame(compressedData, codecSpec);
+  return decodeCustomCodecFrame(compressedData, codecSpec, outHasDecoder);
 }
 
 bool PixelFrame::decodeCustomCodecFrame(
     const vector<uint8_t>& compressedData,
-    const ImageContentBlockSpec& codecSpec) {
+    const ImageContentBlockSpec& codecSpec,
+    bool& outHasDecoder) {
+  outHasDecoder = true;
   if (codecSpec.getImageFormat() != ImageFormat::CUSTOM_CODEC || codecSpec.getCodecName().empty()) {
     return false;
   }
@@ -280,8 +292,8 @@ bool PixelFrame::decodeCustomCodecFrame(
   if (pixelFormat == PixelFormat::UNDEFINED || width == 0 || height == 0) {
     return false;
   }
-  // Decode into a local buffer and commit only on success, as png/jpg/jxl do, so a failed decode
-  // can't leave a reused frame presenting the prior image as fresh.
+  // Decode into a local buffer and commit only on success: the public overloads promise an
+  // unchanged frame when decoding fails.
   ImageContentBlockSpec rawSpec(pixelFormat, width, height);
   size_t rawSize = rawSpec.getRawImageSize();
   if (rawSize == ContentBlock::kSizeUnknown || rawSize == 0) {
@@ -299,6 +311,7 @@ bool PixelFrame::decodeCustomCodecFrame(
       height);
   unique_ptr<DecoderI> decoder =
       DecoderFactory::get().makeDecoder(compressedData, decoded.data(), decodeSpec);
+  outHasDecoder = decoder != nullptr;
   if (!decoder || decoder->decode(compressedData, decoded.data(), decodeSpec) != 0) {
     return false;
   }

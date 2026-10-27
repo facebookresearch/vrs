@@ -183,9 +183,18 @@ class PixelFrame {
   /// Decode compressed image data, except for video codec compression.
   bool readCompressedFrame(const vector<uint8_t>& pixels, ImageFormat imageFormat);
 
-  /// Read a CUSTOM_CODEC frame and decode it via a DecoderFactory-registered decoder. Returns
-  /// false if no decoder is registered for the codec name (frame left undecoded).
+  /// Read a CUSTOM_CODEC frame and decode it via a DecoderFactory-registered decoder.
+  /// @param reader: the record's reader, positioned at the frame.
+  /// @param cb: the frame's content block, which names the codec.
+  /// @return True if the frame was read and decoded, else false (frame left unchanged).
   bool readCustomCodecFrame(RecordReader* reader, const ContentBlock& cb);
+  /// Read a CUSTOM_CODEC frame and decode it via a DecoderFactory-registered decoder.
+  /// @param reader: the record's reader, positioned at the frame.
+  /// @param cb: the frame's content block, which names the codec.
+  /// @param outHasDecoder: set to false if the frame reached the decoder lookup and no registered
+  /// decoder accepted it, else true.
+  /// @return True if the frame was read and decoded, else false (frame left unchanged).
+  bool readCustomCodecFrame(RecordReader* reader, const ContentBlock& cb, bool& outHasDecoder);
 
   /// Read a JPEG encoded frame into the internal buffer.
   /// @return True if the frame type is supported & the frame was read.
@@ -452,7 +461,8 @@ class PixelFrame {
   /// decoder. codecSpec carries the codec name and decoded format/dimensions.
   bool decodeCustomCodecFrame(
       const vector<uint8_t>& compressedData,
-      const ImageContentBlockSpec& codecSpec);
+      const ImageContentBlockSpec& codecSpec,
+      bool& outHasDecoder);
 
   ImageContentBlockSpec imageSpec_;
   vector<uint8_t> frameBytes_;

@@ -84,6 +84,7 @@ class ImageExtractor : public utils::VideoRecordFormatStreamPlayer {
   uint32_t& imageFileCounter_;
   uint32_t imageCounter_ = 0;
   const bool extractImagesRaw_;
+  bool canDecodeCustomCodec_ = true;
 };
 
 } // namespace utils

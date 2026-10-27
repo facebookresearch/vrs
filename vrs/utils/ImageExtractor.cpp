@@ -27,6 +27,7 @@
 #include <logging/Verify.h>
 
 #include <vrs/helpers/Throttler.h>
+#include <vrs/utils/BufferRecordReader.hpp>
 
 using namespace std;
 using namespace vrs;
@@ -246,6 +247,15 @@ bool ImageExtractor::onImageRead(const CurrentRecord& record, size_t, const Cont
           record.timestamp,
           errorCodeToMessage(readStatus));
       return false;
+    }
+    if (!extractImagesRaw_ && format == ImageFormat::CUSTOM_CODEC && canDecodeCustomCodec_) {
+      unique_ptr<ImageJob> job = make_unique<ImageJob>(fmt::format(
+          "{}/{}", folderPath_, imageNamer_.namePngImage(id, imageCounter_, record.timestamp)));
+      BufferReader reader;
+      if (job->frame->readCustomCodecFrame(reader.init(imageData), ib, canDecodeCustomCodec_)) {
+        imageQueue.sendJob(std::move(job));
+        return true;
+      }
     }
     string filename = imageNamer_.nameRawImage(ib.image(), id, imageCounter_, record.timestamp);
     string filepath = fmt::format("{}/{}", folderPath_, filename);

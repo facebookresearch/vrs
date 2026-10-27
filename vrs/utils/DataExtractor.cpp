@@ -30,6 +30,7 @@
 #include <vrs/helpers/Rapidjson.hpp>
 #include <vrs/helpers/Throttler.h>
 #include <vrs/os/Utils.h>
+#include <vrs/utils/BufferRecordReader.hpp>
 #include <vrs/utils/PixelFrame.h>
 #include <vrs/utils/RecordFileInfo.h>
 
@@ -150,6 +151,25 @@ bool DataExtractor::DataExtractorStreamPlayer::onImageRead(
       PixelFrame::normalizeFrame(inputFrame_, processedFrame_, true);
       writePngImage(record);
       return true;
+    }
+  } else if (
+      format == vrs::ImageFormat::CUSTOM_CODEC && canDecodeCustomCodec_ &&
+      imageBlock.getBlockSize() <= record.reader->getUnreadBytes()) {
+    vector<uint8_t> imageData(imageBlock.getBlockSize());
+    if (VERIFY_SUCCESS(record.reader->read(imageData))) {
+      if (!inputFrame_) {
+        inputFrame_ = make_shared<PixelFrame>();
+      }
+      BufferReader reader;
+      if (inputFrame_->readCustomCodecFrame(
+              reader.init(imageData), imageBlock, canDecodeCustomCodec_)) {
+        PixelFrame::normalizeFrame(inputFrame_, processedFrame_, true);
+        writePngImage(record);
+        return true;
+      }
+      if (writeImage(record, imageBlock.image(), imageData)) {
+        return true;
+      }
     }
   } else {
     auto imageData = helpers::IOVector<uint8_t>::newUninitialized(imageBlock.getBlockSize());

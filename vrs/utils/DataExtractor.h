@@ -94,6 +94,7 @@ class DataExtractor {
     std::shared_ptr<PixelFrame> processedFrame_;
     uint32_t imageCounter_ = 0;
     uint32_t audioFileCounter_ = 0;
+    bool canDecodeCustomCodec_ = true;
   };
 
  private:
