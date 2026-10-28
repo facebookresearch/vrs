@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 
+#include <algorithm>
+#include <cstring>
 #include <limits>
+#include <memory>
 
 #include <gtest/gtest.h>
+#include <lz4frame.h>
 
 #define DEFAULT_LOG_CHANNEL "FrameCompressionTest"
 #include <logging/Log.h>
@@ -405,6 +409,42 @@ int readFrame(
   return 0;
 }
 
+void expectDecodedFrame(
+    const vector<uint8_t>& compressed,
+    CompressionType type,
+    const vector<uint8_t>& expected) {
+  vector<uint8_t> decoded(max<size_t>(expected.size(), 1));
+  if (type == CompressionType::Lz4) {
+    LZ4F_dctx* rawContext = nullptr;
+    ASSERT_EQ(LZ4F_createDecompressionContext(&rawContext, LZ4F_VERSION), 0u);
+    unique_ptr<LZ4F_dctx, decltype(&LZ4F_freeDecompressionContext)> context(
+        rawContext, &LZ4F_freeDecompressionContext);
+    size_t sourceSize = compressed.size();
+    size_t decodedSize = decoded.size();
+    ASSERT_EQ(
+        LZ4F_decompress(
+            context.get(), decoded.data(), &decodedSize, compressed.data(), &sourceSize, nullptr),
+        0u);
+    EXPECT_EQ(sourceSize, compressed.size());
+    EXPECT_EQ(decodedSize, expected.size());
+    decoded.resize(decodedSize);
+  } else {
+    Decompressor decompressor;
+    decompressor.setCompressionType(type);
+    memcpy(
+        decompressor.allocateCompressedDataBuffer(compressed.size()),
+        compressed.data(),
+        compressed.size());
+    uint32_t decodedSize = 0;
+    ASSERT_EQ(
+        decompressor.decompress(decoded.data(), static_cast<uint32_t>(decoded.size()), decodedSize),
+        SUCCESS);
+    EXPECT_EQ(decodedSize, expected.size());
+    decoded.resize(decodedSize);
+  }
+  EXPECT_EQ(decoded, expected);
+}
+
 } // namespace
 
 TEST_F(FrameCompressionTest, smallPayloadResetsCompressionType) {
@@ -542,6 +582,132 @@ TEST_F(FrameCompressionTest, compressedFrames) {
   EXPECT_EQ(maxReadSize, 0);
 
   os::remove(testPath);
+}
+
+TEST_F(FrameCompressionTest, lz4StreamedFrameRoundTrips) {
+  Compressor compressor;
+  for (CompressionPreset preset : {CompressionPreset::Lz4Fast, CompressionPreset::Lz4Tight}) {
+    for (size_t frameSize : {0u, 1u, 94562u}) {
+      const string testPath = os::getTempFolder() + "lz4StreamedFrame.vrs";
+      DiskFile file;
+      ASSERT_EQ(file.create(testPath), SUCCESS);
+      size_t totalSize = 0;
+      vector<uint8_t> frame;
+      ASSERT_EQ(
+          makeAndWriteFrame(file, compressor, frame, frameSize, 1024, 1687, preset, totalSize),
+          SUCCESS);
+      ASSERT_EQ(file.close(), SUCCESS);
+      ASSERT_EQ(file.open(testPath), SUCCESS);
+      vector<uint8_t> compressed(static_cast<size_t>(os::getFileSize(testPath)));
+      EXPECT_EQ(compressed.size(), totalSize);
+      ASSERT_EQ(file.read(compressed), SUCCESS);
+      ASSERT_EQ(file.close(), SUCCESS);
+      ASSERT_NO_FATAL_FAILURE(expectDecodedFrame(compressed, CompressionType::Lz4, frame));
+      os::remove(testPath);
+    }
+  }
+}
+
+TEST_F(FrameCompressionTest, streamedPayloadMatchesOneShot) {
+  vector<uint8_t> input(100000);
+  for (size_t i = 0; i < input.size(); ++i) {
+    input[i] = static_cast<uint8_t>(i / 7); // compressible so both paths actually compress
+  }
+
+  for (CompressionPreset preset :
+       {CompressionPreset::Lz4Fast,
+        CompressionPreset::Lz4Tight,
+        CompressionPreset::ZstdFast,
+        CompressionPreset::ZstdMedium}) {
+    Compressor oneShot;
+    uint32_t oneShotSize = 0;
+    ASSERT_EQ(oneShot.compress(input.data(), input.size(), preset, oneShotSize), SUCCESS);
+    ASSERT_GT(oneShotSize, 0u);
+    const auto* oneShotData = static_cast<const uint8_t*>(oneShot.getData());
+    const vector<uint8_t> oneShotBytes(oneShotData, oneShotData + oneShotSize);
+
+    const string path = os::getTempFolder() + "streamEquivalence.vrs";
+    DiskFile file;
+    ASSERT_EQ(file.create(path), 0);
+    Compressor streaming;
+    uint32_t writtenSize = 0;
+    ASSERT_EQ(streaming.startFrame(input.size(), preset, writtenSize), 0);
+    const size_t firstChunk = input.size() / 3;
+    ASSERT_EQ(streaming.addFrameData(file, input.data(), firstChunk, writtenSize), 0);
+    ASSERT_EQ(
+        streaming.addFrameData(
+            file, input.data() + firstChunk, input.size() - firstChunk, writtenSize),
+        0);
+    ASSERT_EQ(streaming.endFrame(file, writtenSize), 0);
+    ASSERT_EQ(file.close(), 0);
+
+    ASSERT_EQ(file.open(path), 0);
+    vector<uint8_t> streamedBytes(static_cast<size_t>(os::getFileSize(path)));
+    ASSERT_EQ(file.read(streamedBytes), 0);
+    ASSERT_EQ(file.close(), 0);
+    os::remove(path);
+
+    const auto type = oneShot.getCompressionType();
+    ASSERT_NO_FATAL_FAILURE(expectDecodedFrame(oneShotBytes, type, input));
+    ASSERT_NO_FATAL_FAILURE(expectDecodedFrame(streamedBytes, type, input));
+  }
+}
+
+TEST_F(FrameCompressionTest, lz4StreamedFrameSizeValidation) {
+  const string path = os::getTempFolder() + "lz4FrameSize.vrs";
+  DiskFile file;
+  ASSERT_EQ(file.create(path), SUCCESS);
+  Compressor compressor;
+  const vector<uint8_t> input(1024);
+  for (CompressionPreset preset : {CompressionPreset::Lz4Fast, CompressionPreset::Lz4Tight}) {
+    uint32_t writtenSize = 0;
+    ASSERT_EQ(compressor.startFrame(0, preset, writtenSize), SUCCESS);
+    EXPECT_EQ(compressor.addFrameData(file, input.data(), 1, writtenSize), TOO_MUCH_DATA);
+    ASSERT_EQ(compressor.startFrame(input.size() - 1, preset, writtenSize), SUCCESS);
+    EXPECT_EQ(
+        compressor.addFrameData(file, input.data(), input.size(), writtenSize), TOO_MUCH_DATA);
+    ASSERT_EQ(compressor.startFrame(input.size() + 1, preset, writtenSize), SUCCESS);
+    ASSERT_EQ(compressor.addFrameData(file, input.data(), input.size(), writtenSize), SUCCESS);
+    EXPECT_EQ(compressor.endFrame(file, writtenSize), NOT_ENOUGH_DATA);
+    ASSERT_EQ(compressor.startFrame(input.size(), preset, writtenSize), SUCCESS);
+    ASSERT_EQ(compressor.addFrameData(file, input.data(), input.size(), writtenSize), SUCCESS);
+    ASSERT_EQ(compressor.endFrame(file, writtenSize), SUCCESS);
+  }
+  ASSERT_EQ(file.close(), SUCCESS);
+  os::remove(path);
+}
+
+TEST_F(FrameCompressionTest, lz4StreamedFrameRecoversAfterOutputLimit) {
+  const string path = os::getTempFolder() + "lz4OutputLimit.vrs";
+  Compressor compressor;
+  const vector<uint8_t> input(1024);
+  for (CompressionPreset preset : {CompressionPreset::Lz4Fast, CompressionPreset::Lz4Tight}) {
+    for (size_t limit : {1u, 15u}) {
+      DiskFile file;
+      ASSERT_EQ(file.create(path), SUCCESS);
+      uint32_t writtenSize = 0;
+      ASSERT_EQ(compressor.startFrame(input.size(), preset, writtenSize), SUCCESS);
+      int status = compressor.addFrameData(file, input.data(), input.size(), writtenSize, limit);
+      if (status == SUCCESS) {
+        status = compressor.endFrame(file, writtenSize, limit);
+      }
+      EXPECT_EQ(status, TOO_MUCH_DATA);
+      EXPECT_LE(writtenSize, limit);
+      EXPECT_LE(file.getPos(), limit);
+      ASSERT_EQ(file.close(), SUCCESS);
+      ASSERT_EQ(file.create(path), SUCCESS);
+      ASSERT_EQ(compressor.startFrame(input.size(), preset, writtenSize), SUCCESS);
+      ASSERT_EQ(compressor.addFrameData(file, input.data(), input.size(), writtenSize), SUCCESS);
+      ASSERT_EQ(compressor.endFrame(file, writtenSize), SUCCESS);
+      ASSERT_EQ(file.close(), SUCCESS);
+      ASSERT_EQ(file.open(path), SUCCESS);
+      vector<uint8_t> compressed(writtenSize);
+      ASSERT_EQ(file.read(compressed), SUCCESS);
+      ASSERT_EQ(file.close(), SUCCESS);
+      ASSERT_NO_FATAL_FAILURE(expectDecodedFrame(compressed, CompressionType::Lz4, input));
+      os::remove(path);
+    }
+  }
 }
 
 TEST_F(FrameCompressionTest, truncatedFrame) {
