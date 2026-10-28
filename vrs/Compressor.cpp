@@ -16,6 +16,7 @@
 
 #include <vrs/Compressor.h>
 
+#include <algorithm>
 #include <cstring>
 
 #include <iterator>
@@ -365,37 +366,137 @@ class Compressor::CompressorImpl {
     }
     return SUCCESS;
   }
-  int startFrame(size_t dataSize, CompressionPreset zstdPreset) {
+  int startFrame(size_t dataSize, CompressionPreset preset) {
+    streamPreset_ = preset;
+    if (isLz4Preset(preset)) {
+      size_t lzresult = 0;
+      if (lz4Context_ == nullptr) {
+        IF_LZ4_COMP_ERROR_LOG_AND_RETURN(LZ4F_createCompressionContext(&lz4Context_, LZ4F_VERSION));
+      }
+      lz4FrameStarted_ = false;
+      lz4FrameSize_ = dataSize;
+      lz4FrameBytes_ = 0;
+      return SUCCESS;
+    }
     if (zstdContext_ == nullptr) {
       zstdContext_ = ZSTD_createCCtx();
     }
     size_t zresult = 0;
     IF_ZSTD_COMP_ERROR_LOG_AND_RETURN(ZSTD_CCtx_setParameter(
-        zstdContext_, ZSTD_c_compressionLevel, zstdPresetToCompressionLevel(zstdPreset)));
+        zstdContext_, ZSTD_c_compressionLevel, zstdPresetToCompressionLevel(preset)));
     IF_ZSTD_COMP_ERROR_LOG_AND_RETURN(ZSTD_CCtx_setPledgedSrcSize(zstdContext_, dataSize));
     return SUCCESS;
   }
-  int addFrameData(
+  int streamData(
       WriteFileHandler& file,
-      ZSTD_inBuffer_s* input,
-      ZSTD_outBuffer_s* output,
+      helpers::IOVector<uint8_t>& buffer,
+      const void* data,
+      size_t dataSize,
       uint32_t& inOutCompressedSize,
       size_t maxCompressedSize,
       bool endFrame) {
+    if (isLz4Preset(streamPreset_)) {
+      return lz4StreamData(
+          file, buffer, data, dataSize, inOutCompressedSize, maxCompressedSize, endFrame);
+    }
+    ZSTD_inBuffer_s input{data, dataSize, 0};
+    ZSTD_outBuffer_s output{buffer.data(), buffer.size(), 0};
     size_t zresult = 0;
     do {
       IF_ZSTD_COMP_ERROR_LOG_AND_RETURN(ZSTD_compressStream2(
-          zstdContext_, output, input, endFrame ? ZSTD_e_end : ZSTD_e_continue));
-      if (output->pos > 0) {
-        if (maxCompressedSize > 0 && inOutCompressedSize + output->pos > maxCompressedSize) {
+          zstdContext_, &output, &input, endFrame ? ZSTD_e_end : ZSTD_e_continue));
+      if (output.pos > 0) {
+        if (maxCompressedSize > 0 && inOutCompressedSize + output.pos > maxCompressedSize) {
           ZSTD_CCtx_reset(zstdContext_, ZSTD_reset_session_only);
           return TOO_MUCH_DATA;
         }
-        WRITE_OR_LOG_AND_RETURN(file, output->dst, output->pos);
-        inOutCompressedSize += static_cast<uint32_t>(output->pos);
-        output->pos = 0;
+        WRITE_OR_LOG_AND_RETURN(file, output.dst, output.pos);
+        inOutCompressedSize += static_cast<uint32_t>(output.pos);
+        output.pos = 0;
       }
-    } while (endFrame ? (input->pos < input->size || zresult > 0) : (input->pos < input->size));
+    } while (endFrame ? (input.pos < input.size || zresult > 0) : (input.pos < input.size));
+    return 0;
+  }
+  int lz4StreamData(
+      WriteFileHandler& file,
+      helpers::IOVector<uint8_t>& buffer,
+      const void* data,
+      size_t dataSize,
+      uint32_t& inOutCompressedSize,
+      size_t maxCompressedSize,
+      bool endFrame) {
+    const int status = lz4StreamDataImpl(
+        file, buffer, data, dataSize, inOutCompressedSize, maxCompressedSize, endFrame);
+    if (status != SUCCESS) {
+      // An abandoned frame leaves the LZ4 context mid-write; discard it before reuse.
+      if (lz4Context_ != nullptr) {
+        LZ4F_freeCompressionContext(lz4Context_);
+        lz4Context_ = nullptr;
+      }
+      lz4FrameStarted_ = false;
+    }
+    return status;
+  }
+  int lz4StreamDataImpl(
+      WriteFileHandler& file,
+      helpers::IOVector<uint8_t>& buffer,
+      const void* data,
+      size_t dataSize,
+      uint32_t& inOutCompressedSize,
+      size_t maxCompressedSize,
+      bool endFrame) {
+    if (dataSize > lz4FrameSize_ - lz4FrameBytes_) {
+      return TOO_MUCH_DATA;
+    }
+    if (endFrame && lz4FrameBytes_ != lz4FrameSize_) {
+      return NOT_ENOUGH_DATA;
+    }
+    LZ4F_preferences_t prefs = *getLz4Preferences(streamPreset_);
+    prefs.frameInfo.contentSize = lz4FrameSize_;
+    const size_t bound =
+        std::max<size_t>(LZ4F_HEADER_SIZE_MAX, LZ4F_compressBound(dataSize, &prefs));
+    if (buffer.size() < bound) {
+      buffer.resizeDiscardingWithoutInitialization(bound);
+    }
+    size_t lzresult = 0;
+    if (!lz4FrameStarted_) {
+      const size_t written = LZ4F_compressBegin(lz4Context_, buffer.data(), buffer.size(), &prefs);
+      IF_LZ4_COMP_ERROR_LOG_AND_RETURN(written);
+      IF_ERROR_RETURN(
+          writeCompressed(file, buffer.data(), written, inOutCompressedSize, maxCompressedSize));
+      lz4FrameStarted_ = true;
+    }
+    if (dataSize > 0) {
+      const size_t written =
+          LZ4F_compressUpdate(lz4Context_, buffer.data(), buffer.size(), data, dataSize, nullptr);
+      IF_LZ4_COMP_ERROR_LOG_AND_RETURN(written);
+      IF_ERROR_RETURN(
+          writeCompressed(file, buffer.data(), written, inOutCompressedSize, maxCompressedSize));
+      lz4FrameBytes_ += dataSize;
+    }
+    if (endFrame) {
+      const size_t written = LZ4F_compressEnd(lz4Context_, buffer.data(), buffer.size(), nullptr);
+      IF_LZ4_COMP_ERROR_LOG_AND_RETURN(written);
+      IF_ERROR_RETURN(
+          writeCompressed(file, buffer.data(), written, inOutCompressedSize, maxCompressedSize));
+      lz4FrameStarted_ = false;
+    }
+    return 0;
+  }
+  static int writeCompressed(
+      WriteFileHandler& file,
+      const void* data,
+      size_t size,
+      uint32_t& inOutCompressedSize,
+      size_t maxCompressedSize) {
+    if (size == 0) {
+      return 0;
+    }
+    if (maxCompressedSize > 0 && inOutCompressedSize + size > maxCompressedSize) {
+      return TOO_MUCH_DATA;
+    }
+    WRITE_OR_LOG_AND_RETURN(file, data, size);
+    inOutCompressedSize += static_cast<uint32_t>(size);
     return SUCCESS;
   }
 
@@ -408,6 +509,10 @@ class Compressor::CompressorImpl {
   }
 
  private:
+  static bool isLz4Preset(CompressionPreset preset) {
+    return preset >= CompressionPreset::FirstLz4Preset &&
+        preset <= CompressionPreset::LastLz4Preset;
+  }
   static const LZ4F_preferences_t* getLz4Preferences(CompressionPreset lz4Preset) {
     static LZ4F_preferences_t sLz4FastPreset;
     static LZ4F_preferences_t sLz4TightPreset;
@@ -426,6 +531,10 @@ class Compressor::CompressorImpl {
 
   ZSTD_CCtx* zstdContext_ = nullptr;
   LZ4F_compressionContext_t lz4Context_ = nullptr;
+  CompressionPreset streamPreset_ = CompressionPreset::None;
+  bool lz4FrameStarted_ = false;
+  size_t lz4FrameSize_ = 0;
+  size_t lz4FrameBytes_ = 0;
   CompressionType compressionType_;
 };
 
@@ -497,13 +606,13 @@ int Compressor::compress(
   return SUCCESS;
 }
 
-int Compressor::startFrame(size_t frameSize, CompressionPreset zstdPreset, uint32_t& outSize) {
+int Compressor::startFrame(size_t frameSize, CompressionPreset preset, uint32_t& outSize) {
   outSize = 0;
   size_t minOutSize = ZSTD_CStreamOutSize();
   if (buffer_.size() < minOutSize) {
     buffer_.resizeDiscardingWithoutInitialization(minOutSize);
   }
-  return impl_->startFrame(frameSize, zstdPreset);
+  return impl_->startFrame(frameSize, preset);
 }
 
 int Compressor::addFrameData(
@@ -512,20 +621,16 @@ int Compressor::addFrameData(
     size_t dataSize,
     uint32_t& inOutCompressedSize,
     size_t maxCompressedSize) {
-  ZSTD_inBuffer_s input{data, dataSize, 0};
-  ZSTD_outBuffer_s output{buffer_.data(), buffer_.size(), 0};
-  return impl_->addFrameData(
-      file, &input, &output, inOutCompressedSize, maxCompressedSize, /* endFrame */ false);
+  return impl_->streamData(
+      file, buffer_, data, dataSize, inOutCompressedSize, maxCompressedSize, /* endFrame */ false);
 }
 
 int Compressor::endFrame(
     WriteFileHandler& file,
     uint32_t& inOutCompressedSize,
     size_t maxCompressedSize) {
-  ZSTD_inBuffer_s input{nullptr, 0, 0};
-  ZSTD_outBuffer_s output{buffer_.data(), buffer_.size(), 0};
-  return impl_->addFrameData(
-      file, &input, &output, inOutCompressedSize, maxCompressedSize, /* endFrame */ true);
+  return impl_->streamData(
+      file, buffer_, nullptr, 0, inOutCompressedSize, maxCompressedSize, /* endFrame */ true);
 }
 
 CompressionType Compressor::getCompressionType() const {
