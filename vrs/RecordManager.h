@@ -137,6 +137,13 @@ class VRS_API RecordManager {
   }
 
  private:
+  Record* createRecord(
+      double timestamp,
+      Record::Type type,
+      uint32_t formatVersion,
+      const DataSource& data,
+      std::unique_ptr<DirectWriteRecordData> directWriteData,
+      std::unique_ptr<BorrowedData> borrowedData);
   static size_t getAcceptableOverCapacity(size_t capacity);
   void recycle(Record* record);
 

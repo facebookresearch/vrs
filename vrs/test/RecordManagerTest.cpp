@@ -16,8 +16,14 @@
 
 #include <gtest/gtest.h>
 
+#include <chrono>
+#include <thread>
+
+#include <thread_safety_analysis/ConditionVariable.h>
+#include <thread_safety_analysis/Mutex.h>
 #include <vrs/DataSource.h>
 #include <vrs/RecordManager.h>
+#include <vrs/WriteFileHandler.h>
 #include <vrs/os/Time.h>
 
 using namespace std;
@@ -85,6 +91,31 @@ TEST(RecordManager, Recycle) {
 }
 
 namespace {
+struct PayloadInitializationGate {
+  tsa::mutex mutex;
+  tsa::condition_variable condition;
+  bool hasEntered{false};
+  bool canContinue{false};
+};
+class BlockingDirectWriteData final : public DirectWriteRecordData {
+ public:
+  BlockingDirectWriteData(PayloadInitializationGate& gate, vector<uint8_t> payload)
+      : gate_{gate}, payload_{std::move(payload)} {}
+  size_t getDataSize() const override {
+    tsa::unique_lock<tsa::mutex> lock{gate_.mutex};
+    gate_.hasEntered = true;
+    gate_.condition.notify_one();
+    gate_.condition.wait(lock, [this] { return gate_.canContinue; });
+    return payload_.size();
+  }
+  int write(WriteFileHandler& file) const override {
+    return file.write(payload_.data(), payload_.size());
+  }
+
+ private:
+  PayloadInitializationGate& gate_;
+  vector<uint8_t> payload_;
+};
 constexpr uint32_t kDataVersion = 1337;
 void collectAndRecycle(RecordManager& manager, double maxAge = numeric_limits<double>::max()) {
   list<Record*> records;
@@ -124,4 +155,58 @@ TEST(RecordManager, RecordSize) {
 
   // test default allocation strategy
   testAllocationLimit(manager, 500, 500);
+}
+
+TEST(RecordManager, DirectWriteRecordsArePublishedAfterInitialization) {
+  RecordManager manager;
+  // A large copied payload lets collection run while external-payload initialization is blocked.
+  vector<uint8_t> copiedData(4096, 0x42);
+  const vector<uint8_t> directWriteData(2048, 0x24);
+  for (int iteration = 0; iteration < 2; ++iteration) {
+    PayloadInitializationGate gate;
+    thread producer{[&] {
+      manager.createUncompressedRecord(
+          1.0,
+          Record::Type::DATA,
+          kDataVersion,
+          DataSource(copiedData),
+          make_unique<BlockingDirectWriteData>(gate, directWriteData));
+    }};
+    bool hasEntered{false};
+    {
+      tsa::unique_lock<tsa::mutex> lock{gate.mutex};
+      hasEntered =
+          gate.condition.wait_for(lock, chrono::seconds{10}, [&] { return gate.hasEntered; });
+    }
+    list<Record*> earlyRecords;
+    bool hasCollected{false};
+    thread collector{[&] {
+      manager.collectOldRecords(Record::kMaxTimestamp, earlyRecords);
+      tsa::lock_guard<tsa::mutex> lock{gate.mutex};
+      hasCollected = true;
+      gate.condition.notify_all();
+    }};
+    bool hasCollectedBeforeRelease{false};
+    {
+      tsa::unique_lock<tsa::mutex> lock{gate.mutex};
+      hasCollectedBeforeRelease =
+          gate.condition.wait_for(lock, chrono::seconds{10}, [&] { return hasCollected; });
+      gate.canContinue = true;
+    }
+    gate.condition.notify_all();
+    producer.join();
+    collector.join();
+    EXPECT_TRUE(hasEntered);
+    EXPECT_TRUE(hasCollectedBeforeRelease);
+    EXPECT_TRUE(earlyRecords.empty());
+    list<Record*> records;
+    manager.collectOldRecords(Record::kMaxTimestamp, records);
+    records.splice(records.end(), earlyRecords);
+    EXPECT_EQ(records.size(), 1);
+    for (auto* record : records) {
+      EXPECT_EQ(record->getSize(), copiedData.size() + directWriteData.size());
+      EXPECT_FALSE(record->shouldTryToCompress());
+      record->recycle();
+    }
+  }
 }
