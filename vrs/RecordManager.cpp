@@ -57,6 +57,16 @@ Record* RecordManager::createRecord(
     Record::Type recordType,
     uint32_t formatVersion,
     const DataSource& data) {
+  return createRecord(timestamp, recordType, formatVersion, data, nullptr, nullptr);
+}
+
+Record* RecordManager::createRecord(
+    double timestamp,
+    Record::Type recordType,
+    uint32_t formatVersion,
+    const DataSource& data,
+    std::unique_ptr<DirectWriteRecordData> directWriteData,
+    std::unique_ptr<BorrowedData> borrowedData) {
   // Step 1: find a record to reuse, if there is any
   Record* record = nullptr;
   unique_lock<mutex> guard{mutex_};
@@ -90,6 +100,12 @@ Record* RecordManager::createRecord(
     record = new Record(*this);
   }
   record->set(timestamp, recordType, formatVersion, data, creationOrder);
+  if (directWriteData) {
+    record->addDirectWriteRecordData(std::move(directWriteData));
+  }
+  if (borrowedData) {
+    record->addBorrowedData(std::move(borrowedData));
+  }
   if (largeData) {
     guard.lock();
   }
@@ -119,9 +135,7 @@ Record* RecordManager::createUncompressedRecord(
     uint32_t formatVersion,
     const DataSource& data,
     std::unique_ptr<DirectWriteRecordData>&& directWriteData) {
-  Record* record = createRecord(timestamp, type, formatVersion, data);
-  record->addDirectWriteRecordData(std::move(directWriteData));
-  return record;
+  return createRecord(timestamp, type, formatVersion, data, std::move(directWriteData), nullptr);
 }
 
 Record* RecordManager::createRecord(
@@ -130,9 +144,7 @@ Record* RecordManager::createRecord(
     uint32_t formatVersion,
     const DataSource& data,
     std::unique_ptr<BorrowedData>&& borrowedData) {
-  Record* record = createRecord(timestamp, type, formatVersion, data);
-  record->addBorrowedData(std::move(borrowedData));
-  return record;
+  return createRecord(timestamp, type, formatVersion, data, nullptr, std::move(borrowedData));
 }
 
 uint32_t RecordManager::purgeOldRecords(double oldestTimestamp, bool recycleBuffers) {
