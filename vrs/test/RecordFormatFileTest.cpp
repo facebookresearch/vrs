@@ -604,6 +604,8 @@ class DataLayoutFileTest : public Recordable, RecordFormatStreamPlayer {
     time_t epoch = static_cast<time_t>(atoll(tag.c_str()));
     EXPECT_GE(epoch, timeBefore);
     EXPECT_LE(epoch, timeBefore + 20); // let's give it 20 seconds!
+    // Persisted tag name and value, spelled out so that a change to the constants fails here.
+    EXPECT_EQ(filePlayer.getTag("capture_time_source"), "host_writer_time");
     tag = filePlayer.getTag(tag_conventions::kTagSet);
     EXPECT_EQ(strcmp(tag.c_str(), "{\"tags\":[\"tag1\",\"tag2\",\"tag3\"]}"), 0);
     EXPECT_EQ(

@@ -16,6 +16,8 @@
 
 #include <vrs/TagConventions.h>
 
+#include <chrono>
+
 #include <vrs/helpers/Rapidjson.hpp>
 #include <vrs/os/System.h>
 
@@ -24,7 +26,10 @@ using namespace std;
 namespace vrs {
 
 void tag_conventions::addCaptureTime(RecordFileWriter& writer) {
-  writer.setTag(kCaptureTimeEpoch, to_string(time(nullptr)));
+  const auto epochSeconds = std::chrono::duration_cast<std::chrono::seconds>(
+      std::chrono::system_clock::now().time_since_epoch());
+  writer.setTag(kCaptureTimeEpoch, to_string(epochSeconds.count()));
+  writer.setTag(kCaptureTimeSource, kCaptureTimeSourceHostWriterTime);
 }
 
 void tag_conventions::addOsFingerprint(RecordFileWriter& writer) {

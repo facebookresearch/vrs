@@ -34,8 +34,15 @@ namespace tag_conventions {
 
   // Project name: overarching project name.
   constexpr const char* kProjectName = "project_name";
-  // EPOCH time in seconds since Jan 1, 1970, when the capture started. Uses C's 'time(NULL)'
+  // EPOCH time in seconds since Jan 1, 1970, associated with the capture.
   constexpr const char* kCaptureTimeEpoch = "capture_time_epoch";
+  // Origin of kCaptureTimeEpoch: supplied by the caller or the source recording, or the host time
+  // when the file was written, built offline, or merged from other recordings.
+  constexpr const char* kCaptureTimeSource = "capture_time_source";
+  constexpr const char* kCaptureTimeSourceExplicit = "explicit";
+  constexpr const char* kCaptureTimeSourceHostWriterTime = "host_writer_time";
+  constexpr const char* kCaptureTimeSourceHostBuildTime = "host_build_time";
+  constexpr const char* kCaptureTimeSourceHostMergeTime = "host_merge_time";
   // Session ID: unique identifier which can be used to recognize the session
   constexpr const char* kSessionId = "session_id";
   // Capture type: description of the recording session context
@@ -48,7 +55,7 @@ namespace tag_conventions {
   /// @param writer: the file writer to add the tag to.
   /// @return The generated session ID.
   VRS_API string addUniqueSessionId(RecordFileWriter& writer);
-  /// Add a capture time tag, using the current time.
+  /// Add capture time and source tags, using the current host time.
   /// @param writer: the file writer to add the tag to.
   VRS_API void addCaptureTime(RecordFileWriter& writer);
   /// Add a set of tags to a file.
@@ -98,6 +105,8 @@ namespace tag_conventions {
   constexpr const char* kOsBuildVersion = "os_build_version";
   // OS build number: Operating system build number
   constexpr const char* kOsBranch = "os_branch";
+  // Name of the software that produced the file or stream.
+  constexpr const char* kSoftwareName = "software_name";
   // SW compile time: when the recording software was compiled
   constexpr const char* kSoftwareCompileDate = "software_compile_date";
   // SW revision: source control revision of the software
