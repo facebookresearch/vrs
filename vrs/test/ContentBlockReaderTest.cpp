@@ -18,8 +18,11 @@
 
 #include <gtest/gtest.h>
 
+#include <vrs/ContentBlockReader.h>
 #include <vrs/DataLayoutConventions.h>
 #include <vrs/RecordFormatStreamPlayer.h>
+#include <vrs/RecordReaders.h>
+#include <vrs/utils/BufferRecordReader.hpp>
 
 using namespace vrs;
 using namespace vrs::datalayout_conventions;
@@ -57,6 +60,35 @@ bool hasImageContentBlock(
 }
 
 } // namespace
+
+TEST_F(ContentBlockReaderTest, rejectsOversizedVariableDataBeforeAllocation) {
+  class StringDataLayout : public AutoDataLayout {
+   public:
+    using DataLayout::getVarSizeIndex;
+    DataPieceString text{"text"};
+    AutoDataLayoutEnd end;
+  };
+  auto blockLayout = std::make_unique<StringDataLayout>();
+  blockLayout->text.stage("test payload");
+  blockLayout->collectVariableDataAndUpdateIndex();
+  blockLayout->getVarSizeIndex()[0].setLength(1024 * 1024);
+  vector<int8_t> payload = blockLayout->getFixedData();
+  const vector<int8_t>& varData = blockLayout->getVarData();
+  payload.insert(payload.end(), varData.begin(), varData.end());
+  vector<int8_t>().swap(blockLayout->getVarData());
+  DataLayout& layout = *blockLayout;
+  RecordFormat format{blockLayout->getContentBlock()};
+  DataLayoutBlockReader blockReader{format, 0, std::move(blockLayout)};
+  utils::BufferFileHandler file(payload);
+  UncompressedRecordReader reader;
+  const uint32_t size = static_cast<uint32_t>(payload.size());
+  reader.init(file, size, size);
+  CurrentRecord record{};
+  record.reader = &reader;
+  RecordFormatStreamPlayer player;
+  EXPECT_FALSE(blockReader.readBlock(record, player));
+  EXPECT_EQ(0, layout.getVarData().capacity());
+}
 
 TEST_F(ContentBlockReaderTest, rawImageSpecTest) {
   class MinimumSpec : public AutoDataLayout {
