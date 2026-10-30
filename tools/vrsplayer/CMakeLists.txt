@@ -48,7 +48,7 @@ if (QT_FOUND)
   endif()
 
   install(TARGETS vrsplayer EXPORT VRSLibTargets
-    RUNTIME DESTINATION bin
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   )
 
   set(CMAKE_AUTOMOC OFF)
