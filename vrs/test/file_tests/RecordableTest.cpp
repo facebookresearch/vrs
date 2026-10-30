@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include <limits>
 #include <random>
 #include <thread>
 
@@ -22,6 +23,9 @@
 #include <portability/Filesystem.h>
 #include <test_helpers/GTestMacros.h>
 
+#include <vrs/DiskFile.h>
+#include <vrs/FileFormat.h>
+#include <vrs/IndexRecord.h>
 #include <vrs/RecordFileReader.h>
 #include <vrs/RecordFileWriter.h>
 #include <vrs/Recordable.h>
@@ -639,6 +643,143 @@ TEST_F(RecordableTester, createWriteReadAndRebuildIndexTwoRecordablesAsync) {
   EXPECT_EQ(recordable.rebuildIndex(testFilePath), 0);
   EXPECT_EQ(deleteEveryChunk(testFilePath), 1);
 }
+
+class AutomaticCollectionTester : public RecordableTester,
+                                  public testing::WithParamInterface<size_t> {};
+
+TEST_P(AutomaticCollectionTester, CloseDuringAutomaticCollectionPreservesLateStreams) {
+  const string testFilePath = os::getTempFolder() + "RecordableTest-auto-close.vrs";
+  vector<unique_ptr<Recordable_2>> recordables;
+  set<StreamId> expectedStreams;
+  const thread::id applicationThread = this_thread::get_id();
+  atomic<bool> automaticCollectorReady{false};
+  atomic<bool> resumeAutomaticCollector{false};
+  const double deadline = os::getTimestampSec() + 5;
+  RecordFileWriter fileWriter;
+  fileWriter.setCompressionThreadPoolSize(GetParam());
+  ASSERT_EQ(fileWriter.createFileAsync(testFilePath), 0);
+  ASSERT_EQ(
+      fileWriter.autoWriteRecordsAsync(
+          [&]() {
+            if (this_thread::get_id() != applicationThread) {
+              automaticCollectorReady.store(true, memory_order_relaxed);
+              while (!resumeAutomaticCollector.load(memory_order_relaxed) &&
+                     os::getTimestampSec() < deadline) {
+                this_thread::yield();
+              }
+            }
+            return Record::kMaxTimestamp;
+          },
+          0.001),
+      0);
+  constexpr uint32_t kStreamCount = 128;
+  for (uint32_t i = 0; i < kStreamCount; ++i) {
+    auto stream = make_unique<Recordable_2>();
+    stream->setTag("late-stream", to_string(i));
+    stream->createDataRecord(1);
+    expectedStreams.insert(stream->getStreamId());
+    fileWriter.addRecordable(stream.get());
+    recordables.push_back(std::move(stream));
+  }
+  while (!automaticCollectorReady.load(memory_order_relaxed) && os::getTimestampSec() < deadline) {
+    this_thread::yield();
+  }
+  EXPECT_TRUE(automaticCollectorReady.load(memory_order_relaxed));
+  EXPECT_LT(os::getTimestampSec(), deadline);
+  resumeAutomaticCollector.store(true, memory_order_relaxed);
+  ASSERT_EQ(fileWriter.waitForFileClosed(), 0);
+  RecordFileReader reader;
+  ASSERT_EQ(reader.openFile(testFilePath), 0);
+  EXPECT_TRUE(reader.hasIndex());
+  EXPECT_EQ(reader.getStreams(), expectedStreams);
+  for (uint32_t i = 0; i < kStreamCount; ++i) {
+    const StreamId id = recordables[i]->getStreamId();
+    EXPECT_EQ(reader.getRecordCount(id, Record::Type::DATA), 1);
+    const auto& index = reader.getIndex(id);
+    auto dataRecord = find_if(index.begin(), index.end(), [](const auto* entry) {
+      return entry->recordType == Record::Type::DATA;
+    });
+    ASSERT_NE(dataRecord, index.end());
+    EXPECT_EQ((*dataRecord)->timestamp, 1);
+    const map<string, string> expectedTags{{"late-stream", to_string(i)}};
+    EXPECT_EQ(reader.getTags(id).user, expectedTags);
+  }
+  EXPECT_EQ(reader.closeFile(), 0);
+  os::remove(testFilePath);
+}
+
+INSTANTIATE_TEST_SUITE_P(CompressionThreads, AutomaticCollectionTester, testing::Values(0, 1));
+
+class EmptyCollectionTester : public testing::TestWithParam<bool> {};
+
+TEST_P(EmptyCollectionTester, DiscoveredStreamWithoutRecordsRemainsInClassicIndex) {
+  const string testFilePath = os::getTempFolder() + "RecordableTest-empty-collection.vrs";
+  Recordable_2 initialInactive;
+  Recordable_2 lateActive;
+  Recordable_2 lateInactive;
+  initialInactive.setRecordableIsActive(false);
+  lateInactive.setRecordableIsActive(false);
+  atomic<uint32_t> backgroundProviderCalls{0};
+  const thread::id applicationThread = this_thread::get_id();
+  RecordFileWriter fileWriter;
+  fileWriter.addRecordable(&initialInactive);
+  ASSERT_EQ(fileWriter.createFileAsync(testFilePath), 0);
+  if (GetParam()) {
+    ASSERT_EQ(
+        fileWriter.autoWriteRecordsAsync(
+            [&]() {
+              if (this_thread::get_id() != applicationThread) {
+                backgroundProviderCalls.fetch_add(1, memory_order_relaxed);
+              }
+              return numeric_limits<double>::lowest();
+            },
+            0.001),
+        0);
+  }
+  fileWriter.addRecordable(&lateActive);
+  fileWriter.addRecordable(&lateInactive);
+  if (GetParam()) {
+    const uint32_t targetCalls = backgroundProviderCalls.load(memory_order_relaxed) + 2;
+    const double deadline = os::getTimestampSec() + 5;
+    while (backgroundProviderCalls.load(memory_order_relaxed) < targetCalls &&
+           os::getTimestampSec() < deadline) {
+      this_thread::yield();
+    }
+    EXPECT_GE(backgroundProviderCalls.load(memory_order_relaxed), targetCalls);
+  } else {
+    ASSERT_EQ(fileWriter.writeRecordsAsync(numeric_limits<double>::lowest()), 0);
+  }
+  if (GetParam()) {
+    ASSERT_EQ(
+        fileWriter.autoWriteRecordsAsync(
+            [&]() {
+              lateActive.setRecordableIsActive(false);
+              return numeric_limits<double>::lowest();
+            },
+            0),
+        0);
+  } else {
+    lateActive.setRecordableIsActive(false);
+  }
+  ASSERT_EQ(fileWriter.waitForFileClosed(), 0);
+  DiskFile file;
+  ASSERT_EQ(file.open(testFilePath), 0);
+  FileFormat::FileHeader header;
+  ASSERT_EQ(file.read(header), 0);
+  set<StreamId> streamIds;
+  vector<IndexRecord::RecordInfo> index;
+  IndexRecord::Reader indexReader(file, header, nullptr, streamIds, index);
+  int64_t usedFileSize = 0;
+  ASSERT_EQ(indexReader.readRecord(header.firstUserRecordOffset, usedFileSize), 0);
+  const set<StreamId> expectedStreams{initialInactive.getStreamId(), lateActive.getStreamId()};
+  EXPECT_TRUE(indexReader.isIndexComplete());
+  EXPECT_EQ(streamIds, expectedStreams);
+  EXPECT_TRUE(index.empty());
+  EXPECT_EQ(file.close(), 0);
+  os::remove(testFilePath);
+}
+
+INSTANTIATE_TEST_SUITE_P(Automatic, EmptyCollectionTester, testing::Bool());
 
 TEST_F(RecordableTester, ReuseRecordFileWriter) {
   string testFilePath = os::getTempFolder() + "RecordableTest-f.vrs";

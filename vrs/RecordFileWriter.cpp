@@ -443,6 +443,7 @@ void RecordFileWriter::backgroundWriterThreadActivity() {
 }
 
 bool RecordFileWriter::autoCollectRecords(bool checkTime) {
+  XR_CHECK(writerThreadData_ != nullptr);
   bool somethingToWrite = false;
 
   const double now = os::getTimestampSec();
@@ -458,7 +459,8 @@ bool RecordFileWriter::autoCollectRecords(bool checkTime) {
       if (autoCollectDelay != 0. && writerThreadData_->maxTimestampProvider != nullptr) {
         writerThreadData_->nextAutoCollectTime = now + autoCollectDelay;
         unique_ptr<RecordBatch> newBatch = make_unique<RecordBatch>();
-        if (collectOldRecords(*newBatch, writerThreadData_->maxTimestampProvider()) > 0) {
+        collectOldRecords(*newBatch, writerThreadData_->maxTimestampProvider());
+        if (!newBatch->empty()) {
           if (LOG_FILE_OPERATIONS) {
             logBatch(*newBatch, "autoCollectRecords");
           }
@@ -573,7 +575,8 @@ int RecordFileWriter::writeRecordsAsync(double maxTimestamp) {
   }
 
   unique_ptr<RecordBatch> recordBatch = make_unique<RecordBatch>();
-  if (collectOldRecords(*recordBatch, maxTimestamp) > 0) {
+  collectOldRecords(*recordBatch, maxTimestamp);
+  if (!recordBatch->empty()) {
     if (LOG_FILE_OPERATIONS) {
       logBatch(*recordBatch, "writeRecordsAsync");
     }
@@ -722,6 +725,13 @@ bool RecordFileWriter::addRecordsReadyToWrite(
     batches.swap(writerThreadData_->recordsReadyToWrite);
     writerThreadData_->hasRecordsReadyToWrite.store(false, memory_order_relaxed);
   } // mutex guard
+  for (const auto& batch : batches) {
+    const RecordBatch* batchPtr = batch.get();
+    XR_CHECK(batchPtr != nullptr);
+    for (const auto& streamRecords : *batchPtr) {
+      indexRecordWriter_.addStream(streamRecords.first);
+    }
+  }
   uint64_t addedSize = addRecordBatchesToSortedRecords(batches, inOutRecordsToWrite);
   if (queueByteSize_) {
     queueByteSize_->fetch_add(addedSize, memory_order_relaxed);
@@ -736,7 +746,6 @@ uint64_t RecordFileWriter::collectOldRecords(RecordBatch& batch, double maxTimes
   for (auto* recordable : recordables) {
     if (recordable->isRecordableActive()) {
       StreamId id = recordable->getStreamId();
-      indexRecordWriter_.addStream(id);
       batch.push_back({id, {}});
       list<Record*>& oldRecords = batch.back().second;
       recordable->getRecordManager().collectOldRecords(maxTimestamp, oldRecords);
