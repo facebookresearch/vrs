@@ -528,6 +528,8 @@ Because VRS files must have timestamps in a single time domain, it is assumed th
 
 File tags are merged. In case of name collision and the values are different, the first instance "wins". The other values of the tag are preserved, by adding a tag with a different name: "name" becomes "name_merged", then "name_merged-1" if there are more conflicting values, etc.
 
+When a file tag is explicitly overridden with `--file-tag`, conflicting input values for that tag are not preserved under `_merged` names. The explicit value is the only output value for that tag.
+
 #### Merging Files with `copy`
 
 When handling multiple source files, the **`copy` operation copies all the streams side-by-side** in the output file, so that the number of streams in the output file will always be the sum of the number of streams in all the input files, even if two or more streams in input files have the same stream identifier. When streams with the same recordable type ID are copied in a single file, the stream instance IDs will be ordered so that the streams with a particular recordable type ID from the first file will have the lowest instance IDs, in the same order they had in their source file, then come the streams from the next file, etc.

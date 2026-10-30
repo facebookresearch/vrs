@@ -32,8 +32,9 @@ namespace vrs::utils {
 void copyMergeDoc() {
   cout << "When combining multiple VRS files into a single VRS file, the following rules apply:\n";
   cout << "\n";
-  cout << "File tags will be merged. If a tag name is used in multiple file, the value found in\n";
-  cout << "the first file is used, the others are ignored.\n";
+  cout << "File tags will be merged. If a tag name is used in multiple files, the value found in\n";
+  cout << "the first file is used and the others are preserved under derived names. Values for\n";
+  cout << "explicitly overridden file tags are not preserved under derived names.\n";
   cout << "\n";
   cout << "The 'copy' option keeps streams separate, even when two streams found in different\n";
   cout << "source files have the same StreamId.\n";
@@ -121,12 +122,17 @@ void mergeTags(
     const map<string, string>& newTags,
     map<string, string>& outTags,
     const string& source,
-    bool isVrsPrivate) {
+    bool isVrsPrivate,
+    const map<string, string>* fileTagOverrides) {
   for (const auto& newTag : newTags) {
     auto writtenTag = writtenTags.find(newTag.first);
     // add tags, but don't overwrite an existing value (warn instead)
     if (writtenTag != writtenTags.end()) {
       if (newTag.second != writtenTag->second) {
+        if (fileTagOverrides != nullptr &&
+            fileTagOverrides->find(newTag.first) != fileTagOverrides->end()) {
+          continue;
+        }
         // if that tag is already set to a different value
         if (isVrsPrivate) {
           // don't merge private VRS tags, but warn...
@@ -223,7 +229,8 @@ int filterMerge(
         reader.getTags(),
         tags,
         recordFilter->spec.getEasyPath(),
-        false);
+        false,
+        copyOptions.tagOverrider ? &copyOptions.tagOverrider->fileTags : nullptr);
     recordFileWriter.addTags(tags);
 
     // track how many stream of each type we've seen in the current reader
@@ -242,8 +249,8 @@ int filterMerge(
           const StreamTags& newTags = reader.getTags(id);
           StreamTags streamTags;
           string tagSource = id.getName() + " of " + recordFilter->spec.getEasyPath();
-          mergeTags(writtenTags.user, newTags.user, streamTags.user, tagSource, false);
-          mergeTags(writtenTags.vrs, newTags.vrs, streamTags.vrs, tagSource, true);
+          mergeTags(writtenTags.user, newTags.user, streamTags.user, tagSource, false, nullptr);
+          mergeTags(writtenTags.vrs, newTags.vrs, streamTags.vrs, tagSource, true, nullptr);
           writer.addTags(streamTags);
         } else {
           copiers.emplace_back(reader, recordFileWriter, id, copyOptions);
