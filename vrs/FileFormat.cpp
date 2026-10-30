@@ -19,6 +19,7 @@
 #include <ctime>
 
 #include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <iomanip>
 #include <iostream>
@@ -52,6 +53,8 @@ constexpr uint32_t kFrontIndexFileFormatVersion = fourCharCode('V', 'R', 'S', '2
 /// When we added support for ztd compression. Used only briefly.
 constexpr uint32_t kZstdFormatVersion = fourCharCode('V', 'R', 'S', '3');
 
+static atomic<uint64_t> creationIdOffset{0};
+
 void FileHeader::init() {
   init(kMagicHeader1, kMagicHeader2, kMagicHeader3, kOriginalFileFormatVersion);
 }
@@ -62,8 +65,9 @@ void FileHeader::init(uint32_t magic1, uint32_t magic2, uint32_t magic3, uint32_
   magicHeader3 = magic3;
   fileHeaderSize = sizeof(FileHeader);
   recordHeaderSize = sizeof(RecordHeader);
-  uint64_t id = static_cast<uint64_t>(
-      duration_cast<nanoseconds>(system_clock::now().time_since_epoch()).count());
+  uint64_t id = creationIdOffset.load(memory_order_relaxed) +
+      static_cast<uint64_t>(
+                    duration_cast<nanoseconds>(system_clock::now().time_since_epoch()).count());
   // The 64 bit creationId might be used to identify the file to cache its index: it must be unique.
   // Most nanosecond implementations don't return values with nanosecond precision,
   // so we override the 30 lsb (~1s) with random bits.
@@ -78,6 +82,10 @@ void FileHeader::init(uint32_t magic1, uint32_t magic2, uint32_t magic3, uint32_
   id = (id & ~c30bits) | (randomBits & c30bits);
   creationId = id;
   fileFormatVersion = formatVersion;
+}
+
+void FileHeader::setCreationIdOffset(uint64_t offset) {
+  creationIdOffset.store(offset, memory_order_relaxed);
 }
 
 bool FileHeader::looksLikeAVRSFile() const {

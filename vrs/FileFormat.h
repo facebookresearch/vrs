@@ -79,6 +79,10 @@ struct VRS_API FileHeader {
   void init();
   /// Initialize the structure's fixed values, with configuration options.
   void init(uint32_t magic1, uint32_t magic2, uint32_t magic3, uint32_t formatVersion);
+  /// For privacy with regard to creation time, allow for the injection
+  /// of a (random) creation ID offset.
+  /// @param offset: Offset in nanoseconds, added to the current wall-clock time. Defaults to zero.
+  static void setCreationIdOffset(uint64_t offset);
   /// Check the sanity of the file header.
   /// @return True if the header looks valid for a VRS file, false otherwise.
   bool looksLikeAVRSFile() const;

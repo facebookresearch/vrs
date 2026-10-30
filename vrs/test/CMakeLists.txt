@@ -37,6 +37,7 @@ add_executable(test_vrslib
   DataLayoutFormatTest.cpp
   DataLayoutTest.cpp
   ErrorCodeTest.cpp
+  FileFormatTest.cpp
   TelemetryLoggerTest.cpp
   FileHandlerFactoryTest.cpp
   FileHandlerTest.cpp
