@@ -77,6 +77,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="structvrs_1_1_file_format_1_1_file_header-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">vrs::FileFormat::FileHeader Struct Reference</div></div>
@@ -108,6 +109,11 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>init</b> (uint32_t ma
 <tr class="separator:a0de96eb90d16c861e17820c7f7ec05bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a733f0a0ed829b905ec9d12e3d638a46d" id="r_a733f0a0ed829b905ec9d12e3d638a46d"><td class="memItemLeft" align="right" valign="top">int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvrs_1_1_file_format_1_1_file_header.html#a733f0a0ed829b905ec9d12e3d638a46d">getEndOfUserRecordsOffset</a> (int64_t fileSize) const</td></tr>
 <tr class="separator:a733f0a0ed829b905ec9d12e3d638a46d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a3cd3c615fd75dae446b296847678279d" id="r_a3cd3c615fd75dae446b296847678279d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structvrs_1_1_file_format_1_1_file_header.html#a3cd3c615fd75dae446b296847678279d">setCreationIdOffset</a> (uint64_t offset)</td></tr>
+<tr class="separator:a3cd3c615fd75dae446b296847678279d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -276,6 +282,38 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>fileFormatVersion
       </table>
 </div><div class="memdoc">
 <p>Check the sanity of the file header. </p><dl class="section return"><dt>Returns</dt><dd>True if the header looks valid a header we might have created, false otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="a3cd3c615fd75dae446b296847678279d" name="a3cd3c615fd75dae446b296847678279d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3cd3c615fd75dae446b296847678279d">&#9670;&#160;</a></span>setCreationIdOffset()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void vrs::FileFormat::FileHeader::setCreationIdOffset </td>
+          <td>(</td>
+          <td class="paramtype">uint64_t&#160;</td>
+          <td class="paramname"><em>offset</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>For privacy with regard to creation time, allow for the injection of a (random) creation ID offset. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">offset</td><td>Offset in nanoseconds, added to the current wall-clock time. Defaults to zero. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

@@ -129,135 +129,136 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span> </div>
 <div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>  <span class="keywordtype">void</span> init();</div>
 <div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>  <span class="keywordtype">void</span> init(uint32_t magic1, uint32_t magic2, uint32_t magic3, uint32_t formatVersion);</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>  <span class="keywordtype">bool</span> looksLikeAVRSFile() <span class="keyword">const</span>;</div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>  <span class="keywordtype">bool</span> looksLikeOurFiles(uint32_t magic1, uint32_t magic2, uint32_t magic3) <span class="keyword">const</span>;</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>  <span class="keywordtype">bool</span> isFormatSupported() <span class="keyword">const</span>;</div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>  <span class="keywordtype">void</span> enableFrontIndexRecordSupport();</div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>  int64_t getEndOfUserRecordsOffset(int64_t fileSize) <span class="keyword">const</span>;</div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>};</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>  <span class="keyword">static</span> <span class="keywordtype">void</span> setCreationIdOffset(uint64_t offset);</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>  <span class="keywordtype">bool</span> looksLikeAVRSFile() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>  <span class="keywordtype">bool</span> looksLikeOurFiles(uint32_t magic1, uint32_t magic2, uint32_t magic3) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>  <span class="keywordtype">bool</span> isFormatSupported() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>  <span class="keywordtype">void</span> enableFrontIndexRecordSupport();</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>  int64_t getEndOfUserRecordsOffset(int64_t fileSize) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>};</div>
 </div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span> </div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span><span class="comment">// Re-interpret legacy recordable Type id</span></div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>VRS_API <a class="code hl_enumeration" href="namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5">RecordableTypeId</a> readRecordableTypeId(int32_t recordableTypeId);</div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span> </div>
-<div class="foldopen" id="foldopen00112" data-start="{" data-end="};">
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html">  112</a></span><span class="keyword">struct </span>VRS_API <a class="code hl_struct" href="structvrs_1_1_file_format_1_1_record_header.html">RecordHeader</a> {</div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>  <a class="code hl_struct" href="structvrs_1_1_file_format_1_1_record_header.html">RecordHeader</a>();</div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>  <a class="code hl_struct" href="structvrs_1_1_file_format_1_1_record_header.html">RecordHeader</a>(</div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>      <a class="code hl_enumeration" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> recordType,</div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>      <a class="code hl_class" href="classvrs_1_1_stream_id.html">StreamId</a> streamId,</div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>      <span class="keywordtype">double</span> timestamp,</div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>      uint32_t formatVersion,</div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>      <a class="code hl_enumeration" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a> compressionType,</div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>      uint32_t previousRecordSize,</div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>      uint32_t recordSize,</div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>      uint32_t uncompressedSize);</div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#ae7020222d5d26e93d4b8df89a438e4fe">  123</a></span>  uint32_t recordSize{}; </div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#a4dfb159cf0b6fa76bc4e4d42ebbb1a96">  124</a></span>  uint32_t previousRecordSize{}; </div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#ad4f3828a520fd90183608ec074649e52">  125</a></span>  int32_t recordableTypeId{}; </div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#a97af09e21b14104b11e34115d9b7cd36">  126</a></span>  uint32_t formatVersion{}; </div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#a54acf5602538056ab4fc3eaac1679a6e">  127</a></span>  <span class="keywordtype">double</span> timestamp{}; </div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#ad8b1b4b07f94360e252a0111f8db5c26">  128</a></span>  uint16_t recordableInstanceId{}; </div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#a6a6640171ca7a9ab10bbb6f0d82c0fe8">  129</a></span>  uint8_t recordType{}; </div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#a08d5abcb5faa584de4fac75e0cf29f46">  130</a></span>  uint8_t compressionType{}; </div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#a82c7f4d5d5ef4d90b0205894f6384ff4">  131</a></span>  uint32_t uncompressedSize{}; </div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span> </div>
-<div class="foldopen" id="foldopen00135" data-start="{" data-end="}">
-<div class="line"><a id="l00135" name="l00135"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#a3cb7a24177884f1f5915723f7e4a2085">  135</a></span>  <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code hl_function" href="structvrs_1_1_file_format_1_1_record_header.html#a3cb7a24177884f1f5915723f7e4a2085">setRecordType</a>(<a class="code hl_enumeration" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> type) {</div>
-<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>    recordType = <span class="keyword">static_cast&lt;</span>uint8_t<span class="keyword">&gt;</span>(type);</div>
-<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>  }</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span> </div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span><span class="comment">// Re-interpret legacy recordable Type id</span></div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>VRS_API <a class="code hl_enumeration" href="namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5">RecordableTypeId</a> readRecordableTypeId(int32_t recordableTypeId);</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span> </div>
+<div class="foldopen" id="foldopen00116" data-start="{" data-end="};">
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html">  116</a></span><span class="keyword">struct </span>VRS_API <a class="code hl_struct" href="structvrs_1_1_file_format_1_1_record_header.html">RecordHeader</a> {</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>  <a class="code hl_struct" href="structvrs_1_1_file_format_1_1_record_header.html">RecordHeader</a>();</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>  <a class="code hl_struct" href="structvrs_1_1_file_format_1_1_record_header.html">RecordHeader</a>(</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>      <a class="code hl_enumeration" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> recordType,</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>      <a class="code hl_class" href="classvrs_1_1_stream_id.html">StreamId</a> streamId,</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>      <span class="keywordtype">double</span> timestamp,</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>      uint32_t formatVersion,</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>      <a class="code hl_enumeration" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a> compressionType,</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>      uint32_t previousRecordSize,</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>      uint32_t recordSize,</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>      uint32_t uncompressedSize);</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#ae7020222d5d26e93d4b8df89a438e4fe">  127</a></span>  uint32_t recordSize{}; </div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#a4dfb159cf0b6fa76bc4e4d42ebbb1a96">  128</a></span>  uint32_t previousRecordSize{}; </div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#ad4f3828a520fd90183608ec074649e52">  129</a></span>  int32_t recordableTypeId{}; </div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#a97af09e21b14104b11e34115d9b7cd36">  130</a></span>  uint32_t formatVersion{}; </div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#a54acf5602538056ab4fc3eaac1679a6e">  131</a></span>  <span class="keywordtype">double</span> timestamp{}; </div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#ad8b1b4b07f94360e252a0111f8db5c26">  132</a></span>  uint16_t recordableInstanceId{}; </div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#a6a6640171ca7a9ab10bbb6f0d82c0fe8">  133</a></span>  uint8_t recordType{}; </div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#a08d5abcb5faa584de4fac75e0cf29f46">  134</a></span>  uint8_t compressionType{}; </div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#a82c7f4d5d5ef4d90b0205894f6384ff4">  135</a></span>  uint32_t uncompressedSize{}; </div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span> </div>
+<div class="foldopen" id="foldopen00139" data-start="{" data-end="}">
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#a3cb7a24177884f1f5915723f7e4a2085">  139</a></span>  <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code hl_function" href="structvrs_1_1_file_format_1_1_record_header.html#a3cb7a24177884f1f5915723f7e4a2085">setRecordType</a>(<a class="code hl_enumeration" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> type) {</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>    recordType = <span class="keyword">static_cast&lt;</span>uint8_t<span class="keyword">&gt;</span>(type);</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>  }</div>
 </div>
-<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span> </div>
-<div class="foldopen" id="foldopen00141" data-start="{" data-end="}">
-<div class="line"><a id="l00141" name="l00141"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#a4859ff8b3591fe226495b4e6f7969abf">  141</a></span>  <span class="keyword">inline</span> <a class="code hl_enumeration" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> <a class="code hl_function" href="structvrs_1_1_file_format_1_1_record_header.html#a4859ff8b3591fe226495b4e6f7969abf">getRecordType</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><a class="code hl_enumeration" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a><span class="keyword">&gt;</span>(recordType);</div>
-<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>  }</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span> </div>
+<div class="foldopen" id="foldopen00145" data-start="{" data-end="}">
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#a4859ff8b3591fe226495b4e6f7969abf">  145</a></span>  <span class="keyword">inline</span> <a class="code hl_enumeration" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> <a class="code hl_function" href="structvrs_1_1_file_format_1_1_record_header.html#a4859ff8b3591fe226495b4e6f7969abf">getRecordType</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><a class="code hl_enumeration" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a><span class="keyword">&gt;</span>(recordType);</div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>  }</div>
 </div>
-<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span> </div>
-<div class="foldopen" id="foldopen00147" data-start="{" data-end="}">
-<div class="line"><a id="l00147" name="l00147"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#a2e7077d6cc78aa8a73c3d0efed0563b7">  147</a></span>  <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code hl_function" href="structvrs_1_1_file_format_1_1_record_header.html#a2e7077d6cc78aa8a73c3d0efed0563b7">setRecordableTypeId</a>(<a class="code hl_enumeration" href="namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5">RecordableTypeId</a> typeId) {</div>
-<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>    recordableTypeId = <span class="keyword">static_cast&lt;</span>int32_t<span class="keyword">&gt;</span>(typeId);</div>
-<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>  }</div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span> </div>
+<div class="foldopen" id="foldopen00151" data-start="{" data-end="}">
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#a2e7077d6cc78aa8a73c3d0efed0563b7">  151</a></span>  <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code hl_function" href="structvrs_1_1_file_format_1_1_record_header.html#a2e7077d6cc78aa8a73c3d0efed0563b7">setRecordableTypeId</a>(<a class="code hl_enumeration" href="namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5">RecordableTypeId</a> typeId) {</div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>    recordableTypeId = <span class="keyword">static_cast&lt;</span>int32_t<span class="keyword">&gt;</span>(typeId);</div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>  }</div>
 </div>
-<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span> </div>
-<div class="foldopen" id="foldopen00153" data-start="{" data-end="}">
-<div class="line"><a id="l00153" name="l00153"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#a3203e70c86d0845d08737536f86c394e">  153</a></span>  <span class="keyword">inline</span> <a class="code hl_enumeration" href="namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5">RecordableTypeId</a> <a class="code hl_function" href="structvrs_1_1_file_format_1_1_record_header.html#a3203e70c86d0845d08737536f86c394e">getRecordableTypeId</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>    <span class="keywordflow">return</span> readRecordableTypeId(recordableTypeId);</div>
-<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>  }</div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span> </div>
+<div class="foldopen" id="foldopen00157" data-start="{" data-end="}">
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#a3203e70c86d0845d08737536f86c394e">  157</a></span>  <span class="keyword">inline</span> <a class="code hl_enumeration" href="namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5">RecordableTypeId</a> <a class="code hl_function" href="structvrs_1_1_file_format_1_1_record_header.html#a3203e70c86d0845d08737536f86c394e">getRecordableTypeId</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>    <span class="keywordflow">return</span> readRecordableTypeId(recordableTypeId);</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>  }</div>
 </div>
-<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span> </div>
-<div class="foldopen" id="foldopen00159" data-start="{" data-end="}">
-<div class="line"><a id="l00159" name="l00159"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#ad20e655d113f7a3757d7c8e61a5a0968">  159</a></span>  <span class="keyword">inline</span> <a class="code hl_class" href="classvrs_1_1_stream_id.html">StreamId</a> <a class="code hl_function" href="structvrs_1_1_file_format_1_1_record_header.html#ad20e655d113f7a3757d7c8e61a5a0968">getStreamId</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>    <span class="keywordflow">return</span> {getRecordableTypeId(), <span class="keyword">static_cast&lt;</span>uint16_t<span class="keyword">&gt;</span>(recordableInstanceId)};</div>
-<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>  }</div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span> </div>
+<div class="foldopen" id="foldopen00163" data-start="{" data-end="}">
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#ad20e655d113f7a3757d7c8e61a5a0968">  163</a></span>  <span class="keyword">inline</span> <a class="code hl_class" href="classvrs_1_1_stream_id.html">StreamId</a> <a class="code hl_function" href="structvrs_1_1_file_format_1_1_record_header.html#ad20e655d113f7a3757d7c8e61a5a0968">getStreamId</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>    <span class="keywordflow">return</span> {getRecordableTypeId(), <span class="keyword">static_cast&lt;</span>uint16_t<span class="keyword">&gt;</span>(recordableInstanceId)};</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>  }</div>
 </div>
-<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span> </div>
-<div class="foldopen" id="foldopen00165" data-start="{" data-end="}">
-<div class="line"><a id="l00165" name="l00165"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#afa2c8379f3018df13dee5ac3bdc8b2d2">  165</a></span>  <span class="keyword">inline</span> <a class="code hl_enumeration" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a> <a class="code hl_function" href="structvrs_1_1_file_format_1_1_record_header.html#afa2c8379f3018df13dee5ac3bdc8b2d2">getCompressionType</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><a class="code hl_enumeration" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a><span class="keyword">&gt;</span>(compressionType);</div>
-<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>  }</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span> </div>
+<div class="foldopen" id="foldopen00169" data-start="{" data-end="}">
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#afa2c8379f3018df13dee5ac3bdc8b2d2">  169</a></span>  <span class="keyword">inline</span> <a class="code hl_enumeration" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a> <a class="code hl_function" href="structvrs_1_1_file_format_1_1_record_header.html#afa2c8379f3018df13dee5ac3bdc8b2d2">getCompressionType</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><a class="code hl_enumeration" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a><span class="keyword">&gt;</span>(compressionType);</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>  }</div>
 </div>
-<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span> </div>
-<div class="foldopen" id="foldopen00171" data-start="{" data-end="}">
-<div class="line"><a id="l00171" name="l00171"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#a360ffd918fee83f36c4e4aaaa87f1be5">  171</a></span>  <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code hl_function" href="structvrs_1_1_file_format_1_1_record_header.html#a360ffd918fee83f36c4e4aaaa87f1be5">setCompressionType</a>(<a class="code hl_enumeration" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a> type) {</div>
-<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>    this-&gt;compressionType = <span class="keyword">static_cast&lt;</span>uint8_t<span class="keyword">&gt;</span>(type);</div>
-<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>  }</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span> </div>
+<div class="foldopen" id="foldopen00175" data-start="{" data-end="}">
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno"><a class="line" href="structvrs_1_1_file_format_1_1_record_header.html#a360ffd918fee83f36c4e4aaaa87f1be5">  175</a></span>  <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code hl_function" href="structvrs_1_1_file_format_1_1_record_header.html#a360ffd918fee83f36c4e4aaaa87f1be5">setCompressionType</a>(<a class="code hl_enumeration" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a> type) {</div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>    this-&gt;compressionType = <span class="keyword">static_cast&lt;</span>uint8_t<span class="keyword">&gt;</span>(type);</div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>  }</div>
 </div>
-<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span> </div>
-<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>  <span class="keywordtype">void</span> initHeader(</div>
-<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>      <a class="code hl_enumeration" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> recordType,</div>
-<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>      <a class="code hl_class" href="classvrs_1_1_stream_id.html">StreamId</a> streamId,</div>
-<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>      <span class="keywordtype">double</span> timestamp,</div>
-<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>      uint32_t formatVersion,</div>
-<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>      <a class="code hl_enumeration" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a> compressionType,</div>
-<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>      uint32_t previousRecordSize,</div>
-<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>      uint32_t recordSize,</div>
-<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>      uint32_t uncompressedSize);</div>
-<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span> </div>
-<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>  <span class="keywordtype">void</span> initIndexHeader(</div>
-<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>      uint32_t formatVersion,</div>
-<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>      uint32_t indexSize,</div>
-<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>      uint32_t previousRecordSize,</div>
-<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>      <a class="code hl_enumeration" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a> compressionType);</div>
-<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span> </div>
-<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>  <span class="keywordtype">void</span> initDescriptionHeader(</div>
-<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>      uint32_t formatVersion,</div>
-<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>      uint32_t descriptionRecordSize,</div>
-<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>      uint32_t previousRecordSize);</div>
-<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span> </div>
-<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>  <span class="keywordtype">bool</span> isSanityCheckOk() <span class="keyword">const</span>;</div>
-<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>};</div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span> </div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>  <span class="keywordtype">void</span> initHeader(</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>      <a class="code hl_enumeration" href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">Record::Type</a> recordType,</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>      <a class="code hl_class" href="classvrs_1_1_stream_id.html">StreamId</a> streamId,</div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>      <span class="keywordtype">double</span> timestamp,</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>      uint32_t formatVersion,</div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>      <a class="code hl_enumeration" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a> compressionType,</div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>      uint32_t previousRecordSize,</div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>      uint32_t recordSize,</div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>      uint32_t uncompressedSize);</div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span> </div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>  <span class="keywordtype">void</span> initIndexHeader(</div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>      uint32_t formatVersion,</div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>      uint32_t indexSize,</div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>      uint32_t previousRecordSize,</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>      <a class="code hl_enumeration" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a> compressionType);</div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span> </div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>  <span class="keywordtype">void</span> initDescriptionHeader(</div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>      uint32_t formatVersion,</div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>      uint32_t descriptionRecordSize,</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>      uint32_t previousRecordSize);</div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span> </div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>  <span class="keywordtype">bool</span> isSanityCheckOk() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>};</div>
 </div>
-<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span> </div>
-<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span><span class="preprocessor">#pragma pack(pop)</span></div>
-<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span> </div>
-<div class="foldopen" id="foldopen00216" data-start="{" data-end="}">
-<div class="line"><a id="l00216" name="l00216"></a><span class="lineno"><a class="line" href="namespacevrs_1_1_file_format.html#a2334b3b96dac72f21afcb6ca3029ce4e">  216</a></span><span class="keyword">constexpr</span> uint32_t <a class="code hl_function" href="namespacevrs_1_1_file_format.html#a2334b3b96dac72f21afcb6ca3029ce4e">fourCharCode</a>(<span class="keywordtype">char</span> a, <span class="keywordtype">char</span> b, <span class="keywordtype">char</span> c, <span class="keywordtype">char</span> d) {</div>
-<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>  <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>uint32_t<span class="keyword">&gt;</span>(a) | (<span class="keyword">static_cast&lt;</span>uint32_t<span class="keyword">&gt;</span>(b) &lt;&lt; 8) |</div>
-<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>      (<span class="keyword">static_cast&lt;</span>uint32_t<span class="keyword">&gt;</span>(c) &lt;&lt; 16) | (<span class="keyword">static_cast&lt;</span>uint32_t<span class="keyword">&gt;</span>(d) &lt;&lt; 24);</div>
-<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>}</div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span> </div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span><span class="preprocessor">#pragma pack(pop)</span></div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span> </div>
+<div class="foldopen" id="foldopen00220" data-start="{" data-end="}">
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno"><a class="line" href="namespacevrs_1_1_file_format.html#a2334b3b96dac72f21afcb6ca3029ce4e">  220</a></span><span class="keyword">constexpr</span> uint32_t <a class="code hl_function" href="namespacevrs_1_1_file_format.html#a2334b3b96dac72f21afcb6ca3029ce4e">fourCharCode</a>(<span class="keywordtype">char</span> a, <span class="keywordtype">char</span> b, <span class="keywordtype">char</span> c, <span class="keywordtype">char</span> d) {</div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>  <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>uint32_t<span class="keyword">&gt;</span>(a) | (<span class="keyword">static_cast&lt;</span>uint32_t<span class="keyword">&gt;</span>(b) &lt;&lt; 8) |</div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>      (<span class="keyword">static_cast&lt;</span>uint32_t<span class="keyword">&gt;</span>(c) &lt;&lt; 16) | (<span class="keyword">static_cast&lt;</span>uint32_t<span class="keyword">&gt;</span>(d) &lt;&lt; 24);</div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span>}</div>
 </div>
-<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span> </div>
-<div class="line"><a id="l00223" name="l00223"></a><span class="lineno"><a class="line" href="namespacevrs_1_1_file_format.html#aef7eadc7098dfcd7dd0b8a537f161092">  223</a></span>VRS_API <span class="keywordtype">bool</span> printVRSFileInternals(std::unique_ptr&lt;FileHandler&gt;&amp; file);</div>
 <div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span> </div>
-<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>} <span class="comment">// namespace FileFormat</span></div>
-<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span> </div>
-<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>} <span class="comment">// namespace vrs</span></div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno"><a class="line" href="namespacevrs_1_1_file_format.html#aef7eadc7098dfcd7dd0b8a537f161092">  227</a></span>VRS_API <span class="keywordtype">bool</span> printVRSFileInternals(std::unique_ptr&lt;FileHandler&gt;&amp; file);</div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span> </div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>} <span class="comment">// namespace FileFormat</span></div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span> </div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>} <span class="comment">// namespace vrs</span></div>
 <div class="ttc" id="aclassvrs_1_1_record_html_a449931b6fc23eaef585e3c7a4c0ed2ce"><div class="ttname"><a href="classvrs_1_1_record.html#a449931b6fc23eaef585e3c7a4c0ed2ce">vrs::Record::Type</a></div><div class="ttdeci">Type</div><div class="ttdef"><b>Definition</b> Record.h:94</div></div>
 <div class="ttc" id="aclassvrs_1_1_stream_id_html"><div class="ttname"><a href="classvrs_1_1_stream_id.html">vrs::StreamId</a></div><div class="ttdoc">VRS stream identifier class.</div><div class="ttdef"><b>Definition</b> StreamId.h:251</div></div>
-<div class="ttc" id="anamespacevrs_1_1_file_format_html_a2334b3b96dac72f21afcb6ca3029ce4e"><div class="ttname"><a href="namespacevrs_1_1_file_format.html#a2334b3b96dac72f21afcb6ca3029ce4e">vrs::FileFormat::fourCharCode</a></div><div class="ttdeci">constexpr uint32_t fourCharCode(char a, char b, char c, char d)</div><div class="ttdef"><b>Definition</b> FileFormat.h:216</div></div>
+<div class="ttc" id="anamespacevrs_1_1_file_format_html_a2334b3b96dac72f21afcb6ca3029ce4e"><div class="ttname"><a href="namespacevrs_1_1_file_format.html#a2334b3b96dac72f21afcb6ca3029ce4e">vrs::FileFormat::fourCharCode</a></div><div class="ttdeci">constexpr uint32_t fourCharCode(char a, char b, char c, char d)</div><div class="ttdef"><b>Definition</b> FileFormat.h:220</div></div>
 <div class="ttc" id="anamespacevrs_html"><div class="ttname"><a href="namespacevrs.html">vrs</a></div><div class="ttdef"><b>Definition</b> Compressor.cpp:128</div></div>
 <div class="ttc" id="anamespacevrs_html_ac167a592f5255abc1a276d8ed0b96f2f"><div class="ttname"><a href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">vrs::CompressionType</a></div><div class="ttdeci">CompressionType</div><div class="ttdoc">Type of compression. Used in VRS record headers, so never modify the values.</div><div class="ttdef"><b>Definition</b> Record.h:41</div></div>
 <div class="ttc" id="anamespacevrs_html_ae6fdfd6738201eddee4597c27fe31ac5"><div class="ttname"><a href="namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5">vrs::RecordableTypeId</a></div><div class="ttdeci">RecordableTypeId</div><div class="ttdoc">VRS stream type or class identifier enum.</div><div class="ttdef"><b>Definition</b> StreamId.h:51</div></div>
 <div class="ttc" id="astructvrs_1_1_file_format_1_1_file_header_html"><div class="ttname"><a href="structvrs_1_1_file_format_1_1_file_header.html">vrs::FileFormat::FileHeader</a></div><div class="ttdoc">Every file starts with this header, which may grow but not shrink!</div><div class="ttdef"><b>Definition</b> FileFormat.h:61</div></div>
-<div class="ttc" id="astructvrs_1_1_file_format_1_1_record_header_html"><div class="ttname"><a href="structvrs_1_1_file_format_1_1_record_header.html">vrs::FileFormat::RecordHeader</a></div><div class="ttdoc">Every record starts with this header, and is followed by a raw data blob, which semantic is private t...</div><div class="ttdef"><b>Definition</b> FileFormat.h:112</div></div>
-<div class="ttc" id="astructvrs_1_1_file_format_1_1_record_header_html_a2e7077d6cc78aa8a73c3d0efed0563b7"><div class="ttname"><a href="structvrs_1_1_file_format_1_1_record_header.html#a2e7077d6cc78aa8a73c3d0efed0563b7">vrs::FileFormat::RecordHeader::setRecordableTypeId</a></div><div class="ttdeci">void setRecordableTypeId(RecordableTypeId typeId)</div><div class="ttdef"><b>Definition</b> FileFormat.h:147</div></div>
-<div class="ttc" id="astructvrs_1_1_file_format_1_1_record_header_html_a3203e70c86d0845d08737536f86c394e"><div class="ttname"><a href="structvrs_1_1_file_format_1_1_record_header.html#a3203e70c86d0845d08737536f86c394e">vrs::FileFormat::RecordHeader::getRecordableTypeId</a></div><div class="ttdeci">RecordableTypeId getRecordableTypeId() const</div><div class="ttdef"><b>Definition</b> FileFormat.h:153</div></div>
-<div class="ttc" id="astructvrs_1_1_file_format_1_1_record_header_html_a360ffd918fee83f36c4e4aaaa87f1be5"><div class="ttname"><a href="structvrs_1_1_file_format_1_1_record_header.html#a360ffd918fee83f36c4e4aaaa87f1be5">vrs::FileFormat::RecordHeader::setCompressionType</a></div><div class="ttdeci">void setCompressionType(CompressionType type)</div><div class="ttdef"><b>Definition</b> FileFormat.h:171</div></div>
-<div class="ttc" id="astructvrs_1_1_file_format_1_1_record_header_html_a3cb7a24177884f1f5915723f7e4a2085"><div class="ttname"><a href="structvrs_1_1_file_format_1_1_record_header.html#a3cb7a24177884f1f5915723f7e4a2085">vrs::FileFormat::RecordHeader::setRecordType</a></div><div class="ttdeci">void setRecordType(Record::Type type)</div><div class="ttdef"><b>Definition</b> FileFormat.h:135</div></div>
-<div class="ttc" id="astructvrs_1_1_file_format_1_1_record_header_html_a4859ff8b3591fe226495b4e6f7969abf"><div class="ttname"><a href="structvrs_1_1_file_format_1_1_record_header.html#a4859ff8b3591fe226495b4e6f7969abf">vrs::FileFormat::RecordHeader::getRecordType</a></div><div class="ttdeci">Record::Type getRecordType() const</div><div class="ttdef"><b>Definition</b> FileFormat.h:141</div></div>
-<div class="ttc" id="astructvrs_1_1_file_format_1_1_record_header_html_ad20e655d113f7a3757d7c8e61a5a0968"><div class="ttname"><a href="structvrs_1_1_file_format_1_1_record_header.html#ad20e655d113f7a3757d7c8e61a5a0968">vrs::FileFormat::RecordHeader::getStreamId</a></div><div class="ttdeci">StreamId getStreamId() const</div><div class="ttdef"><b>Definition</b> FileFormat.h:159</div></div>
-<div class="ttc" id="astructvrs_1_1_file_format_1_1_record_header_html_afa2c8379f3018df13dee5ac3bdc8b2d2"><div class="ttname"><a href="structvrs_1_1_file_format_1_1_record_header.html#afa2c8379f3018df13dee5ac3bdc8b2d2">vrs::FileFormat::RecordHeader::getCompressionType</a></div><div class="ttdeci">CompressionType getCompressionType() const</div><div class="ttdef"><b>Definition</b> FileFormat.h:165</div></div>
+<div class="ttc" id="astructvrs_1_1_file_format_1_1_record_header_html"><div class="ttname"><a href="structvrs_1_1_file_format_1_1_record_header.html">vrs::FileFormat::RecordHeader</a></div><div class="ttdoc">Every record starts with this header, and is followed by a raw data blob, which semantic is private t...</div><div class="ttdef"><b>Definition</b> FileFormat.h:116</div></div>
+<div class="ttc" id="astructvrs_1_1_file_format_1_1_record_header_html_a2e7077d6cc78aa8a73c3d0efed0563b7"><div class="ttname"><a href="structvrs_1_1_file_format_1_1_record_header.html#a2e7077d6cc78aa8a73c3d0efed0563b7">vrs::FileFormat::RecordHeader::setRecordableTypeId</a></div><div class="ttdeci">void setRecordableTypeId(RecordableTypeId typeId)</div><div class="ttdef"><b>Definition</b> FileFormat.h:151</div></div>
+<div class="ttc" id="astructvrs_1_1_file_format_1_1_record_header_html_a3203e70c86d0845d08737536f86c394e"><div class="ttname"><a href="structvrs_1_1_file_format_1_1_record_header.html#a3203e70c86d0845d08737536f86c394e">vrs::FileFormat::RecordHeader::getRecordableTypeId</a></div><div class="ttdeci">RecordableTypeId getRecordableTypeId() const</div><div class="ttdef"><b>Definition</b> FileFormat.h:157</div></div>
+<div class="ttc" id="astructvrs_1_1_file_format_1_1_record_header_html_a360ffd918fee83f36c4e4aaaa87f1be5"><div class="ttname"><a href="structvrs_1_1_file_format_1_1_record_header.html#a360ffd918fee83f36c4e4aaaa87f1be5">vrs::FileFormat::RecordHeader::setCompressionType</a></div><div class="ttdeci">void setCompressionType(CompressionType type)</div><div class="ttdef"><b>Definition</b> FileFormat.h:175</div></div>
+<div class="ttc" id="astructvrs_1_1_file_format_1_1_record_header_html_a3cb7a24177884f1f5915723f7e4a2085"><div class="ttname"><a href="structvrs_1_1_file_format_1_1_record_header.html#a3cb7a24177884f1f5915723f7e4a2085">vrs::FileFormat::RecordHeader::setRecordType</a></div><div class="ttdeci">void setRecordType(Record::Type type)</div><div class="ttdef"><b>Definition</b> FileFormat.h:139</div></div>
+<div class="ttc" id="astructvrs_1_1_file_format_1_1_record_header_html_a4859ff8b3591fe226495b4e6f7969abf"><div class="ttname"><a href="structvrs_1_1_file_format_1_1_record_header.html#a4859ff8b3591fe226495b4e6f7969abf">vrs::FileFormat::RecordHeader::getRecordType</a></div><div class="ttdeci">Record::Type getRecordType() const</div><div class="ttdef"><b>Definition</b> FileFormat.h:145</div></div>
+<div class="ttc" id="astructvrs_1_1_file_format_1_1_record_header_html_ad20e655d113f7a3757d7c8e61a5a0968"><div class="ttname"><a href="structvrs_1_1_file_format_1_1_record_header.html#ad20e655d113f7a3757d7c8e61a5a0968">vrs::FileFormat::RecordHeader::getStreamId</a></div><div class="ttdeci">StreamId getStreamId() const</div><div class="ttdef"><b>Definition</b> FileFormat.h:163</div></div>
+<div class="ttc" id="astructvrs_1_1_file_format_1_1_record_header_html_afa2c8379f3018df13dee5ac3bdc8b2d2"><div class="ttname"><a href="structvrs_1_1_file_format_1_1_record_header.html#afa2c8379f3018df13dee5ac3bdc8b2d2">vrs::FileFormat::RecordHeader::getCompressionType</a></div><div class="ttdeci">CompressionType getCompressionType() const</div><div class="ttdef"><b>Definition</b> FileFormat.h:169</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
