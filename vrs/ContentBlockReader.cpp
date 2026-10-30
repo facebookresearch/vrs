@@ -441,10 +441,12 @@ bool DataLayoutBlockReader::readBlock(
   // so we can then read the var size buffer...
   const size_t kMaxFixedDataSize = 1024 * 1024 * 1024; // 1GB, arbitrary limit
   const size_t kMaxRecordSize = 4 * 1024 * 1024 * 1024UL - sizeof(FileFormat::RecordHeader);
+  static_assert(kMaxFixedDataSize <= kMaxRecordSize);
   DataLayout& layout = *blockLayout_;
   vector<int8_t>& fixedData = layout.getFixedData();
   size_t fixedDataSize = layout.getFixedDataSizeNeeded();
-  if (!XR_VERIFY(fixedDataSize <= kMaxFixedDataSize)) {
+  if (!XR_VERIFY(fixedDataSize <= kMaxFixedDataSize) ||
+      fixedDataSize > record.reader->getUnreadBytes()) {
     return false;
   }
   fixedData.resize(fixedDataSize);
@@ -452,7 +454,8 @@ bool DataLayoutBlockReader::readBlock(
   int readBlockStatus = record.reader->read(fixedData);
   if (readBlockStatus == 0) {
     size_t varDataSize = layout.getVarDataSizeFromIndex();
-    if (!XR_VERIFY(fixedDataSize + varDataSize <= kMaxRecordSize)) {
+    if (!XR_VERIFY(varDataSize <= kMaxRecordSize - fixedDataSize) ||
+        varDataSize > record.reader->getUnreadBytes()) {
       return false;
     }
     varData.resize(varDataSize);
