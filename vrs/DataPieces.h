@@ -257,6 +257,36 @@ inline const string& getTypeName<string>() {
   VRS_API const string& getTypeName<x>();
 #include <vrs/helpers/PODMacro.inc>
 
+// Same for the DataLayout::findDataPiece*<> instantiations defined in DataLayout.cpp.
+#define DECLARE_FIND_DATA_PIECE(T)                                                            \
+  extern template VRS_API const DataPieceValue<T>* DataLayout::findDataPieceValue<T>(         \
+      const string& label) const;                                                             \
+  extern template VRS_API DataPieceValue<T>* DataLayout::findDataPieceValue<T>(               \
+      const string& label);                                                                   \
+  extern template VRS_API const DataPieceArray<T>* DataLayout::findDataPieceArray<T>(         \
+      const string& label, size_t arraySize) const;                                           \
+  extern template VRS_API DataPieceArray<T>* DataLayout::findDataPieceArray<T>(               \
+      const string& label, size_t arraySize);                                                 \
+  extern template VRS_API const DataPieceVector<T>* DataLayout::findDataPieceVector<T>(       \
+      const string& label) const;                                                             \
+  extern template VRS_API DataPieceVector<T>* DataLayout::findDataPieceVector<T>(             \
+      const string& label);                                                                   \
+  extern template VRS_API const DataPieceStringMap<T>* DataLayout::findDataPieceStringMap<T>( \
+      const string& label) const;                                                             \
+  extern template VRS_API DataPieceStringMap<T>* DataLayout::findDataPieceStringMap<T>(       \
+      const string& label);
+#define POD_MACRO DECLARE_FIND_DATA_PIECE
+#include <vrs/helpers/PODMacro.inc>
+#undef DECLARE_FIND_DATA_PIECE
+extern template VRS_API const DataPieceVector<string>* DataLayout::findDataPieceVector<string>(
+    const string& label) const;
+extern template VRS_API DataPieceVector<string>* DataLayout::findDataPieceVector<string>(
+    const string& label);
+extern template VRS_API const DataPieceStringMap<string>*
+DataLayout::findDataPieceStringMap<string>(const string& label) const;
+extern template VRS_API DataPieceStringMap<string>* DataLayout::findDataPieceStringMap<string>(
+    const string& label);
+
 /// \brief Template to represent some POD object without memory alignment.
 ///
 /// Data read from disk might not be aligned as the architecture would like it,

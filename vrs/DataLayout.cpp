@@ -627,9 +627,10 @@ DataPieceVector<T>* DataLayout::findDataPieceVector(const string& label) {
       const_cast<const DataLayout*>(this)->findDataPieceVector<T>(label));
 }
 
-template const DataPieceVector<string>* DataLayout::findDataPieceVector<string>(
+template VRS_API const DataPieceVector<string>* DataLayout::findDataPieceVector<string>(
     const string& label) const;
-template DataPieceVector<string>* DataLayout::findDataPieceVector<string>(const string& label);
+template VRS_API DataPieceVector<string>* DataLayout::findDataPieceVector<string>(
+    const string& label);
 
 template <typename T>
 const DataPieceStringMap<T>* DataLayout::findDataPieceStringMap(const string& label) const {
@@ -649,9 +650,9 @@ DataPieceStringMap<T>* DataLayout::findDataPieceStringMap(const string& label) {
       const_cast<const DataLayout*>(this)->findDataPieceStringMap<T>(label));
 }
 
-template const DataPieceStringMap<string>* DataLayout::findDataPieceStringMap<string>(
+template VRS_API const DataPieceStringMap<string>* DataLayout::findDataPieceStringMap<string>(
     const string& label) const;
-template DataPieceStringMap<string>* DataLayout::findDataPieceStringMap<string>(
+template VRS_API DataPieceStringMap<string>* DataLayout::findDataPieceStringMap<string>(
     const string& label);
 
 const DataPieceString* DataLayout::findDataPieceString(const string& label) const {
@@ -1959,18 +1960,20 @@ JsonFormatProfileSpec::JsonFormatProfileSpec(JsonFormatProfile profile) {
       Registerer_##TEMPLATE_CLASS##_##TEMPLATE_TYPE(                                \
           STR(TEMPLATE_CLASS), getTypeName<TEMPLATE_TYPE>());
 
-#define DEFINE_FIND_DATA_PIECE(T)                                                                 \
-  template const DataPieceValue<T>* DataLayout::findDataPieceValue<T>(const string& label) const; \
-  template DataPieceValue<T>* DataLayout::findDataPieceValue<T>(const string& label);             \
-  template const DataPieceArray<T>* DataLayout::findDataPieceArray(                               \
-      const string& label, size_t arraySize) const;                                               \
-  template DataPieceArray<T>* DataLayout::findDataPieceArray(                                     \
-      const string& label, size_t arraySize);                                                     \
-  template const DataPieceVector<T>* DataLayout::findDataPieceVector(const string& label) const;  \
-  template DataPieceVector<T>* DataLayout::findDataPieceVector(const string& label);              \
-  template const DataPieceStringMap<T>* DataLayout::findDataPieceStringMap(const string& label)   \
-      const;                                                                                      \
-  template DataPieceStringMap<T>* DataLayout::findDataPieceStringMap(const string& label);
+#define DEFINE_FIND_DATA_PIECE(T)                                                                  \
+  template VRS_API const DataPieceValue<T>* DataLayout::findDataPieceValue<T>(const string& label) \
+      const;                                                                                       \
+  template VRS_API DataPieceValue<T>* DataLayout::findDataPieceValue<T>(const string& label);      \
+  template VRS_API const DataPieceArray<T>* DataLayout::findDataPieceArray(                        \
+      const string& label, size_t arraySize) const;                                                \
+  template VRS_API DataPieceArray<T>* DataLayout::findDataPieceArray(                              \
+      const string& label, size_t arraySize);                                                      \
+  template VRS_API const DataPieceVector<T>* DataLayout::findDataPieceVector(const string& label)  \
+      const;                                                                                       \
+  template VRS_API DataPieceVector<T>* DataLayout::findDataPieceVector(const string& label);       \
+  template VRS_API const DataPieceStringMap<T>* DataLayout::findDataPieceStringMap(                \
+      const string& label) const;                                                                  \
+  template VRS_API DataPieceStringMap<T>* DataLayout::findDataPieceStringMap(const string& label);
 
 #define DEFINE_DATA_PIECE_TYPE(x)            \
   template <>                                \
