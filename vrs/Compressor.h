@@ -130,10 +130,10 @@ class VRS_API Compressor {
   ///
   /// Start a new frame, declaring its full size upfront. This size must be respected.
   /// @param frameSize: exact number of bytes that will be added to the frame in total.
-  /// @param zstdPreset: compression preset to use. Only zstd presets are supported by this API.
+  /// @param preset: compression preset to use (lz4 or zstd).
   /// @param outSize: total number of compressed bytes written.
   /// @return 0 for success, or an error code. This call initializes outSize to 0.
-  int startFrame(size_t frameSize, CompressionPreset zstdPreset, uint32_t& outSize);
+  int startFrame(size_t frameSize, CompressionPreset preset, uint32_t& outSize);
   /// Add data to a frame started before.
   /// The total amount of data may not exceed the declared size of the frame when it was started.
   /// @param file: A file open for writing.
