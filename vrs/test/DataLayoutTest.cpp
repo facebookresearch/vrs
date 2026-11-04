@@ -15,6 +15,7 @@
  */
 
 #include <algorithm>
+#include <cstring>
 #include <iostream>
 #include <limits>
 #include <type_traits>
@@ -1310,4 +1311,33 @@ TEST_F(DataLayoutTester, getTest) {
   EXPECT_EQ(m, emptyMap);
   EXPECT_FALSE(targetLayout.mapUnmapped.get(m));
   EXPECT_EQ(m, defaultMap);
+}
+
+namespace {
+
+class StringVectorLayout : public AutoDataLayout {
+ public:
+  DataPieceVector<string> strings{"strings"};
+
+  AutoDataLayoutEnd end;
+};
+
+} // namespace
+
+TEST_F(DataLayoutTester, stringVectorBogusCount) {
+  StringVectorLayout layout;
+  layout.strings.stagedValues() = {"one", "two"};
+  layout.collectVariableDataAndUpdateIndex();
+  vector<int8_t>& varData = layout.getVarData();
+  ASSERT_GE(varData.size(), sizeof(uint32_t));
+  const uint32_t bogusCount = numeric_limits<uint32_t>::max();
+  memcpy(varData.data(), &bogusCount, sizeof(bogusCount));
+  vector<string> values{"stale"};
+  EXPECT_FALSE(layout.strings.get(values));
+  EXPECT_TRUE(values.empty());
+  const uint32_t tooLargeCount = 1000;
+  memcpy(varData.data(), &tooLargeCount, sizeof(tooLargeCount));
+  values = {"stale"};
+  EXPECT_FALSE(layout.strings.get(values));
+  EXPECT_TRUE(values.empty());
 }

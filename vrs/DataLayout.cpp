@@ -1442,7 +1442,7 @@ bool DataPieceVector<string>::get(vector<string>& outValues) const {
   uint32_t vectorSize = 0;
   size_t readSize = 0;
   if (loadElement<uint32_t>(vectorSize, source, readSize, byteCount)) {
-    if ((vectorSize + 1) * sizeof(uint32_t) <= byteCount) {
+    if (vectorSize < byteCount / sizeof(uint32_t)) {
       outValues.resize(vectorSize);
       for (string& str : outValues) {
         if (!loadElement<string>(str, source, readSize, byteCount)) {
@@ -1457,7 +1457,7 @@ bool DataPieceVector<string>::get(vector<string>& outValues) const {
         "which requires {} bytes at least, but we have only {} bytes...",
         getLabel(),
         vectorSize,
-        (vectorSize + 1) * sizeof(uint32_t),
+        (static_cast<uint64_t>(vectorSize) + 1) * sizeof(uint32_t),
         byteCount);
   }
   outValues = defaultValues_;
