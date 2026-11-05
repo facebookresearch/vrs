@@ -103,6 +103,7 @@
     "**/postcss-minify-selectors/postcss-selector-parser": "6.1.5",
     "**/postcss-unique-selectors/postcss-selector-parser": "6.1.5",
     "**/stylehacks/postcss-selector-parser": "6.1.5",
-    "postcss-selector-parser": "7.1.7"
+    "postcss-selector-parser": "7.1.7",
+    "node-forge": "1.4.3"
   }
 }
