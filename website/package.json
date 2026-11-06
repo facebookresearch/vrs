@@ -85,6 +85,7 @@
     "js-yaml": "4.3.2",
     "compression": "1.8.2",
     "fast-uri": "3.1.7",
+    "follow-redirects": "1.16.2",
     "tinypool": "2.1.2",
     "shelljs": "^0.8.5",
     "@mdx-js/react": "^3.1.0",
