@@ -19,6 +19,8 @@
 #include <iomanip>
 #include <sstream>
 
+#include <fmt/format.h>
+
 #define DEFAULT_LOG_CHANNEL "ProgressLogger"
 #include <logging/Log.h>
 

@@ -28,6 +28,8 @@
 #include <mutex>
 #include <sstream>
 
+#include <fmt/format.h>
+
 #define DEFAULT_LOG_CHANNEL "DataLayout"
 #include <logging/Log.h>
 #include <logging/Verify.h>

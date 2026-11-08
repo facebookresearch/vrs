@@ -24,6 +24,8 @@
 #include <sstream>
 #include <utility>
 
+#include <fmt/format.h>
+
 #define DEFAULT_LOG_CHANNEL "RecordFormat"
 #include <logging/Log.h>
 #include <logging/Verify.h>
