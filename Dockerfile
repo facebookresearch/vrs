@@ -13,14 +13,14 @@
 # limitations under the License.
 
 # Start from an ubuntu container
-FROM ubuntu:jammy
+FROM ubuntu:noble
 
 # Get dependencies
 RUN apt-get update && DEBIAN_FRONTEND="noninteractive" TZ="America/New_York" apt-get install -y tzdata
 RUN apt-get install -y git cmake ninja-build ccache libgtest-dev libfmt-dev libjpeg-dev libturbojpeg-dev\
-    libpng-dev liblz4-dev libzstd-dev libxxhash-dev\
+    libpng-dev liblz4-dev libzstd-dev libxxhash-dev libeigen3-dev\
     libboost-dev\
-    qtbase5-dev portaudio19-dev\
+    qtbase5-dev portaudio19-dev libopus-dev\
     npm doxygen;
 
 # Code
