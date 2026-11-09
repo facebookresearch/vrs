@@ -1,0 +1,45 @@
+name: CodeQL
+
+on:
+  push:
+    branches-ignore: [gh-pages]
+  pull_request:
+    branches-ignore: [gh-pages]
+  schedule:
+    - cron: '23 5 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    if: github.ref != 'refs/heads/gh-pages' && github.base_ref != 'gh-pages'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [c-cpp, python, javascript-typescript, actions]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+          queries: +security-extended
+
+      - name: Analyze
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: /language:${{ matrix.language }}
