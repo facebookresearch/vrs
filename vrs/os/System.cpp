@@ -45,6 +45,7 @@
 
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <fmt/format.h>
 
 #define DEFAULT_LOG_CHANNEL "OsSystem"
 #include <logging/Log.h>

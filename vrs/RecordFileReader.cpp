@@ -18,6 +18,8 @@
 
 #include <algorithm>
 
+#include <fmt/format.h>
+
 #define DEFAULT_LOG_CHANNEL "RecordFileReader"
 #include <logging/Log.h>
 #include <logging/Verify.h>

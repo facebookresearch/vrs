@@ -25,6 +25,8 @@
 #include <iostream>
 #include <random>
 
+#include <fmt/format.h>
+
 #define DEFAULT_LOG_CHANNEL "FileFormat"
 #include <logging/Log.h>
 #include <logging/Verify.h>

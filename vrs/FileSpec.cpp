@@ -22,6 +22,8 @@
 
 #include <tuple>
 
+#include <fmt/format.h>
+
 #define DEFAULT_LOG_CHANNEL "FileHandler"
 #include <logging/Log.h>
 #include <logging/Verify.h>

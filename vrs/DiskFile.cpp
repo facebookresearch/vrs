@@ -25,6 +25,8 @@
 #include <gtest/gtest.h>
 #endif
 
+#include <fmt/format.h>
+
 #define DEFAULT_LOG_CHANNEL "DiskFile"
 #include <logging/Log.h>
 #include <logging/Verify.h>

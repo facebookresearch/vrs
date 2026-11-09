@@ -24,6 +24,7 @@
 #include <map>
 #include <mutex>
 
+#include <fmt/format.h>
 #include <lz4frame.h>
 #include <zstd.h>
 #include <zstd_errors.h>
