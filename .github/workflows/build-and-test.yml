@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install dependencies
         run: |
@@ -84,7 +84,7 @@ jobs:
     # CUDA toolkit -- to catch OSS build breakage. GPU decode is validated
     # manually on a GPU machine (see projectaria_tools shipping docs).
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install dependencies
         run: |

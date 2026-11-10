@@ -2,18 +2,21 @@ name: VRS Release
 
 on: [push]
 
+permissions:
+  contents: read
+
 jobs:
   get-current-version:
     if: github.repository == 'facebookresearch/vrs'
     runs-on: ubuntu-latest
     steps:
       - name: checkout-repo-content
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: setup-python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
-          python-version: 3.9
+          python-version: '3.13'
 
       - name: get current version and tag
         id: get-current-version-and-tag
@@ -33,6 +36,8 @@ jobs:
   create-release-if-not-exist:
     if: github.repository == 'facebookresearch/vrs'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     needs:
       - get-current-version
     steps:
@@ -41,7 +46,7 @@ jobs:
         with:
           repository: ${{ github.repository }}
       - name: checkout-repo-content
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Create release
         if: needs.get-current-version.outputs.current_tag != steps.get-latest-tag.outputs.release

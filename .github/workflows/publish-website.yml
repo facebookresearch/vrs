@@ -7,17 +7,24 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build_docs_job:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
-
-    - uses: actions/setup-node@v4
+      uses: actions/checkout@v7
       with:
-          node-version: 20
+        persist-credentials: false
+
+    - uses: actions/setup-node@v7
+      with:
+          node-version: '22'
           cache: yarn
           cache-dependency-path: ./website/yarn.lock
 
@@ -28,12 +35,40 @@ jobs:
       working-directory: website
       run: |
         yarn install --frozen-lockfile
+        yarn test:security
         yarn run build
 
-    - name: Deploy
+    - name: Upload website
       if: ${{ github.event_name == 'push' }}
-      uses: JamesIves/github-pages-deploy-action@releases/v4
+      uses: actions/upload-artifact@v6
       with:
-          ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: gh-pages # The branch the action should deploy to.
-          FOLDER: website/build # The folder the action should deploy.
+        name: website-build
+        path: website/build
+        if-no-files-found: error
+        include-hidden-files: true
+
+  deploy_docs_job:
+    needs: build_docs_job
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v7
+      with:
+        persist-credentials: false
+
+    - name: Download website
+      uses: actions/download-artifact@v7
+      with:
+        name: website-build
+        path: website/build
+
+    - name: Deploy
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages # The branch the action should deploy to.
+          folder: website/build # The folder the action should deploy.
