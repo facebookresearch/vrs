@@ -29,7 +29,6 @@
 
 #ifdef __APPLE__
 #include <CoreVideo/CoreVideo.h>
-#include <libavutil/hwcontext_videotoolbox.h>
 #endif
 
 #define DEFAULT_LOG_CHANNEL "XPRS"

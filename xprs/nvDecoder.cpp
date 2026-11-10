@@ -368,7 +368,16 @@ int NvDecoder::HandlePictureDisplay(CUVIDPARSERDISPINFO* parser_disp_info) {
   _decoded_frame_ptr->data[1] =
       _decoded_image_yuv.data() + (_decoded_frame_ptr->width * _decoded_frame_ptr->height);
   _decoded_frame_ptr->linesize[1] = _decoded_frame_ptr->linesize[0];
+  // AVFrame::key_frame is deprecated since libavutil 58.7 (FFmpeg 6.1).
+#if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(58, 7, 100)
+  if (_isKeyFrame) {
+    _decoded_frame_ptr->flags |= AV_FRAME_FLAG_KEY;
+  } else {
+    _decoded_frame_ptr->flags &= ~AV_FRAME_FLAG_KEY;
+  }
+#else
   _decoded_frame_ptr->key_frame = _isKeyFrame;
+#endif
   if (_isKeyFrame) {
     _decoded_frame_ptr->pict_type = AV_PICTURE_TYPE_I;
   } else {
