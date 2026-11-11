@@ -36,6 +36,7 @@
 #include <vrs/TagsRecord.h>
 #include <vrs/helpers/JobQueue.h>
 #include <vrs/os/Event.h>
+#include <vrs/os/System.h>
 #include <vrs/os/Time.h>
 #include <vrs/os/Utils.h>
 
@@ -350,7 +351,7 @@ vector<Recordable*> RecordFileWriter::getRecordables() const {
 }
 
 void RecordFileWriter::setCompressionThreadPoolSize(size_t size) {
-  size_t maxThreads = thread::hardware_concurrency();
+  size_t maxThreads = os::getAvailableConcurrency();
   if (maxThreads > 4) {
     maxThreads--; // healthier for the rest of the system while not impacting compression perf much
   }

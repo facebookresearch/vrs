@@ -30,6 +30,7 @@
 #include <vrs/RecordFileWriter.h>
 #include <vrs/Recordable.h>
 #include <vrs/StreamPlayer.h>
+#include <vrs/os/System.h>
 #include <vrs/os/Time.h>
 #include <vrs/os/Utils.h>
 
@@ -102,7 +103,7 @@ class RecordableTest : public Recordable, StreamPlayer {
   const uint32_t kFrameRate = 15000;
   const uint32_t kFrameCount = 150;
   const uint32_t kFrameSaveFrequency = 50; // save every X frames
-  const uint32_t kThreadCount = thread::hardware_concurrency();
+  const uint32_t kThreadCount = os::getAvailableConcurrency();
   const double kPrerollTime = 0.5;
   const uint32_t kRecordable2RecordFrameFrequency =
       10; // Save one frame every X frame of the other type

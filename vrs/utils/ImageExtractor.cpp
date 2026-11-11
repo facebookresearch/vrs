@@ -27,6 +27,7 @@
 #include <logging/Verify.h>
 
 #include <vrs/helpers/Throttler.h>
+#include <vrs/os/System.h>
 #include <vrs/utils/BufferRecordReader.hpp>
 
 using namespace std;
@@ -143,7 +144,7 @@ class ImageProcessor {
 
   void startThreadPool() {
     unique_lock<mutex> locker(mutex_);
-    while (threadPool_.size() < thread::hardware_concurrency()) {
+    while (threadPool_.size() < os::getAvailableConcurrency()) {
       threadPool_.emplace_back(&ImageProcessor::saveImagesThreadActivity, this);
     }
   }
@@ -216,7 +217,7 @@ bool ImageExtractor::onDataLayoutRead(const CurrentRecord& r, size_t idx, DataLa
 
 bool ImageExtractor::onImageRead(const CurrentRecord& record, size_t, const ContentBlock& ib) {
   JobQueue<unique_ptr<ImageJob>>& imageQueue = ImageProcessor::get().getImageQueue();
-  while (imageQueue.getQueueSize() > 2 * thread::hardware_concurrency()) {
+  while (imageQueue.getQueueSize() > 2 * os::getAvailableConcurrency()) {
     this_thread::sleep_for(chrono::milliseconds(50));
   }
 

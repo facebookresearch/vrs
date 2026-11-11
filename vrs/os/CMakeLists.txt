@@ -56,6 +56,7 @@ if (UNIT_TESTS)
   add_executable(test_vrs_os
     test/TimeTest.cpp
     test/EventUnitTest.cpp
+    test/SystemTest.cpp
     test/UtilsTest.cpp
   )
   target_link_libraries(test_vrs_os

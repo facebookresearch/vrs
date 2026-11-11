@@ -21,6 +21,7 @@
 
 #include <vrs/RecordFileReader.h>
 #include <vrs/helpers/Strings.h>
+#include <vrs/os/System.h>
 #include <vrs/os/Time.h>
 
 namespace {
@@ -66,7 +67,7 @@ ThrottledWriter::ThrottledWriter(const CopyOptions& options, ThrottledFileDelega
 
 void ThrottledWriter::initWriter() {
   writer_.setCompressionThreadPoolSize(
-      min<size_t>(copyOptions_.compressionPoolSize, thread::hardware_concurrency()));
+      min<size_t>(copyOptions_.compressionPoolSize, os::getAvailableConcurrency()));
   writer_.setMaxChunkSizeMB(copyOptions_.maxChunkSizeMB);
 }
 

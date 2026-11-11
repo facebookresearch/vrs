@@ -26,6 +26,7 @@
 #include <vrs/FileCache.h>
 #include <vrs/FileDetailsCache.h>
 #include <vrs/RecordFileReader.h>
+#include <vrs/os/System.h>
 #include <vrs/os/Utils.h>
 #include <vrs/utils/BufferRecordReader.hpp>
 
@@ -152,7 +153,7 @@ TEST_F(FileCacheTest, detailsTest) {
   testDetails(cacheFile, reader, true, false);
   testDetails(cacheFile, reader, false, false);
 
-  const uint32_t kThreadCount = thread::hardware_concurrency();
+  const uint32_t kThreadCount = os::getAvailableConcurrency();
 
   vector<thread> threads;
   threads.reserve(kThreadCount);

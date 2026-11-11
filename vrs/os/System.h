@@ -27,5 +27,14 @@ std::string getOsFingerPrint();
 std::string getUniqueSessionId();
 uint32_t getTerminalWidth(uint32_t setValue = 0); // option to set value for tests
 
+/// Get the number of threads this process can run in parallel, at least 1. Use it to size thread
+/// pools instead of std::thread::hardware_concurrency(), which returns the number of CPUs of the
+/// host, even when the process is limited to fewer CPUs, as in containers.
+/// On Linux, the result is also limited by the CPU affinity of the calling thread, and by the CPU
+/// quota of the process' cgroup and its ancestors (cgroup v2).
+/// Computed on the first call, then cached for the life of the process: later changes of affinity
+/// or quota are ignored.
+uint32_t getAvailableConcurrency();
+
 } // namespace os
 } // namespace vrs

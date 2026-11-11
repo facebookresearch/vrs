@@ -16,9 +16,11 @@
 
 #include <vrs/os/System.h>
 
+#include <algorithm>
 #include <array>
 #include <atomic>
 #include <sstream>
+#include <thread>
 
 #include <vrs/os/Platform.h>
 
@@ -31,9 +33,12 @@
 #include <unistd.h>
 
 #elif IS_LINUX_PLATFORM()
+#include <sched.h>
 #include <sys/ioctl.h>
 #include <sys/utsname.h>
 #include <unistd.h>
+
+#include <fstream>
 
 #elif IS_WINDOWS_PLATFORM()
 #ifndef NOMINMAX
@@ -56,6 +61,59 @@ using namespace std;
 
 namespace vrs {
 namespace os {
+
+namespace {
+
+#if IS_LINUX_PLATFORM()
+
+// Combine two limits, where 0 means no limit.
+uint32_t combineLimits(uint32_t a, uint32_t b) {
+  return a == 0 ? b : (b == 0 ? a : min(a, b));
+}
+
+// Number of CPUs in the affinity mask of the calling thread, or 0 if unknown.
+uint32_t getAffinityCpuCount() {
+  cpu_set_t cpuSet;
+  CPU_ZERO(&cpuSet);
+  return sched_getaffinity(0, sizeof(cpuSet), &cpuSet) == 0 ? CPU_COUNT(&cpuSet) : 0;
+}
+
+// CPUs allowed by the cgroup v2 CPU quota of the process' cgroup and its ancestors, rounded up,
+// or 0 if there is no quota.
+uint32_t getCgroupCpuLimit() {
+  // cgroup v2: the process' cgroup is the "0::<path>" line, and each cgroup has a "cpu.max" file:
+  // "max <period>" (no limit), or "<quota> <period>", in microseconds.
+  ifstream cgroups("/proc/self/cgroup");
+  string path;
+  for (string line; getline(cgroups, line);) {
+    if (line.compare(0, 3, "0::") == 0) { // NOLINT(modernize-use-starts-ends-with): C++17 in OSS
+      path = line.substr(3);
+    }
+  }
+  if (!path.empty() && path.back() == '/') {
+    path.pop_back();
+  }
+  // A quota can be set on any ancestor: check them all, up to the root of the mount.
+  // In a container, the process' cgroup may be the root of the mount: then only the root matches.
+  uint32_t limit = 0;
+  while (true) {
+    ifstream cpuMax("/sys/fs/cgroup" + path + "/cpu.max");
+    int64_t quota = 0;
+    int64_t period = 0;
+    if (cpuMax >> quota >> period && quota > 0 && period > 0) {
+      limit = combineLimits(limit, static_cast<uint32_t>((quota + period - 1) / period));
+    }
+    size_t lastSlash = path.rfind('/');
+    if (lastSlash == string::npos) {
+      return limit;
+    }
+    path.resize(lastSlash);
+  }
+}
+
+#endif // IS_LINUX_PLATFORM()
+
+} // namespace
 
 string getOsFingerPrint() {
 #if IS_ANDROID_PLATFORM()
@@ -147,6 +205,18 @@ uint32_t getTerminalWidth(uint32_t setValue) {
     sLastWidthCheckTime = now;
   }
   return width;
+}
+
+uint32_t getAvailableConcurrency() {
+  static const uint32_t sAvailableConcurrency = []() {
+    uint32_t concurrency = thread::hardware_concurrency(); // 0 when unknown
+#if IS_LINUX_PLATFORM()
+    concurrency = combineLimits(concurrency, getAffinityCpuCount());
+    concurrency = combineLimits(concurrency, getCgroupCpuLimit());
+#endif
+    return max<uint32_t>(concurrency, 1);
+  }();
+  return sAvailableConcurrency;
 }
 
 } // namespace os
