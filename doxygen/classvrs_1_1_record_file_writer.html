@@ -158,6 +158,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ae13cabd33d9e7b2b7f7a97d52c13291a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac7d5ba84186faf5026df2a6607d27da4" id="r_ac7d5ba84186faf5026df2a6607d27da4"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#ac7d5ba84186faf5026df2a6607d27da4">getBackgroundThreadQueueByteSize</a> ()</td></tr>
 <tr class="separator:ac7d5ba84186faf5026df2a6607d27da4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a86ba07c09054685c45acb692c63ed332" id="r_a86ba07c09054685c45acb692c63ed332"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#a86ba07c09054685c45acb692c63ed332">getFileError</a> () const</td></tr>
+<tr class="separator:a86ba07c09054685c45acb692c63ed332"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acfc62c321a72cb16c5fba1c128f16676" id="r_acfc62c321a72cb16c5fba1c128f16676"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#acfc62c321a72cb16c5fba1c128f16676">closeFileAsync</a> ()</td></tr>
 <tr class="separator:acfc62c321a72cb16c5fba1c128f16676"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4f17115d0823c49cad9537a444175106" id="r_a4f17115d0823c49cad9537a444175106"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#a4f17115d0823c49cad9537a444175106">waitForFileClosed</a> ()</td></tr>
@@ -522,6 +524,24 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>::vrs::test::Record
       </table>
 </div><div class="memdoc">
 <p>Get how many record-bytes have been passed to the background thread, but not yet processed, which correlates with how much memory is being used by the queue. </p><dl class="section return"><dt>Returns</dt><dd>The number record bytes are waiting to be processed by the background thread. </dd></dl>
+
+</div>
+</div>
+<a id="a86ba07c09054685c45acb692c63ed332" name="a86ba07c09054685c45acb692c63ed332"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a86ba07c09054685c45acb692c63ed332">&#9670;&#160;</a></span>getFileError()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int vrs::RecordFileWriter::getFileError </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get the first error that occurred while writing the file in the background, so that a recording can report a failed write as it happens, rather than when closing the file. Not synchronized with closing the file: call it from the thread that closes the file, or serialize the two. </p><dl class="section return"><dt>Returns</dt><dd>0 if no error occurred, or if no file is being written, a file system error code otherwise. </dd></dl>
 
 </div>
 </div>
