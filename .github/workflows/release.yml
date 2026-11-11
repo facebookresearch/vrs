@@ -42,7 +42,7 @@ jobs:
       - get-current-version
     steps:
       - id: get-latest-tag
-        uses: pozetroninc/github-action-get-latest-release@master
+        uses: pozetroninc/github-action-get-latest-release@5ac6001ed175b443484c81ab32a20e12132be99c # master
         with:
           repository: ${{ github.repository }}
       - name: checkout-repo-content
@@ -50,6 +50,6 @@ jobs:
 
       - name: Create release
         if: needs.get-current-version.outputs.current_tag != steps.get-latest-tag.outputs.release
-        uses: ncipollo/release-action@v1
+        uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1
         with:
           tag: '${{ needs.get-current-version.outputs.current_tag }}'
