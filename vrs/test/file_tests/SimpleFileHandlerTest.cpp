@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
+#include <atomic>
+#include <chrono>
 #include <cstdio>
+#include <limits>
+#include <thread>
 
 #include <gtest/gtest.h>
 
 #include <TestDataDir/TestDataDir.h>
 
 #include <vrs/DataLayoutConventions.h>
+#include <vrs/DiskFile.h>
+#include <vrs/ErrorCode.h>
 #include <vrs/FileHandler.h>
 #include <vrs/FileHandlerFactory.h>
 #include <vrs/RecordFileReader.h>
@@ -252,7 +258,43 @@ struct SimpleFileHandlerTest : testing::Test {
   }
 };
 
+class FailingWriteDiskFile : public DiskFile {
+ public:
+  using DiskFile::write;
+  int write(const void* buffer, size_t length) override {
+    return failWrites ? DISKFILE_PARTIAL_WRITE_ERROR : DiskFile::write(buffer, length);
+  }
+  atomic<bool> failWrites{false};
+};
+
 } // namespace
+
+TEST_F(SimpleFileHandlerTest, getFileErrorReportsAFailedWriteBeforeTheFileIsClosed) {
+  const string testPath = os::getTempFolder() + "FileErrorSimpleFileHandlerTest.vrs";
+  RecordFileWriter fileWriter;
+  ImageStream imageStream;
+  fileWriter.addRecordable(&imageStream);
+  auto file = make_unique<FailingWriteDiskFile>();
+  FailingWriteDiskFile* fault = file.get();
+  ASSERT_EQ(fileWriter.setWriteFileHandler(std::move(file)), 0);
+  EXPECT_EQ(fileWriter.getFileError(), 0);
+  ASSERT_EQ(fileWriter.createFileAsync(testPath), 0);
+  EXPECT_EQ(fileWriter.getFileError(), 0);
+  fault->failWrites = true;
+  // Keep feeding records: a write request can reach the writer thread before it waits for one.
+  const auto deadline = chrono::steady_clock::now() + chrono::seconds(10);
+  for (uint32_t frame = 0; fileWriter.getFileError() == 0 && chrono::steady_clock::now() < deadline;
+       ++frame) {
+    imageStream.createFrame(frame);
+    fileWriter.writeRecordsAsync(numeric_limits<double>::max());
+    /* sleep override */
+    this_thread::sleep_for(chrono::milliseconds(10));
+  }
+  EXPECT_EQ(fileWriter.getFileError(), DISKFILE_PARTIAL_WRITE_ERROR);
+  EXPECT_EQ(fileWriter.waitForFileClosed(), DISKFILE_PARTIAL_WRITE_ERROR);
+  EXPECT_EQ(fileWriter.getFileError(), 0);
+  os::remove(testPath);
+}
 
 TEST_F(SimpleFileHandlerTest, simpleCreation) {
   const string testPath = os::getTempFolder() + "SyncSimpleFileHandlerTest.vrs";

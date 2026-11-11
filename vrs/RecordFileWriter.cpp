@@ -635,6 +635,10 @@ uint64_t RecordFileWriter::getBackgroundThreadQueueByteSize() {
   return queueByteSize_ ? queueByteSize_->load(memory_order_relaxed) : 0;
 }
 
+int RecordFileWriter::getFileError() const {
+  return writerThreadData_ != nullptr ? writerThreadData_->fileError.load(memory_order_relaxed) : 0;
+}
+
 int RecordFileWriter::closeFileAsync() {
   if (writerThreadData_ == nullptr) {
     return NO_FILE_OPEN;

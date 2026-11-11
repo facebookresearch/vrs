@@ -222,6 +222,14 @@ class VRS_API RecordFileWriter {
   /// @return The number record bytes are waiting to be processed by the background thread.
   uint64_t getBackgroundThreadQueueByteSize();
 
+  /// Get the first error that occurred while writing the file in the background, so that a
+  /// recording can report a failed write as it happens, rather than when closing the file.
+  /// Not synchronized with closing the file: call it from the thread that closes the file, or
+  /// serialize the two.
+  /// @return 0 if no error occurred, or if no file is being written, a file system error code
+  /// otherwise.
+  int getFileError() const;
+
   /// Request to close the file, when all data has been written, but don't wait for that.
   /// @return A status code: 0 if no error occurred, a file system error code otherwise.
   int closeFileAsync();
