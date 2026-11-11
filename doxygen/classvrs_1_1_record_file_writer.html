@@ -79,6 +79,7 @@ $(function() {
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pub-static-attribs">Static Public Attributes</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="#friends">Friends</a> &#124;
@@ -176,6 +177,11 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a242da4ebbc9df6c8eb305855e49d3eb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab4d5061fcb4a9923169ab619741c0a02" id="r_ab4d5061fcb4a9923169ab619741c0a02"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#ab4d5061fcb4a9923169ab619741c0a02">backgroundPurgeThreadActivity</a> ()</td></tr>
 <tr class="separator:ab4d5061fcb4a9923169ab619741c0a02"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a96cf2a2152227148ec46832d722f7fe8" id="r_a96cf2a2152227148ec46832d722f7fe8"><td class="memItemLeft" align="right" valign="top">static uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrs_1_1_record_file_writer.html#a96cf2a2152227148ec46832d722f7fe8">getDefaultMaxQueueByteSize</a> ()</td></tr>
+<tr class="separator:a96cf2a2152227148ec46832d722f7fe8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
@@ -524,6 +530,32 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>::vrs::test::Record
       </table>
 </div><div class="memdoc">
 <p>Get how many record-bytes have been passed to the background thread, but not yet processed, which correlates with how much memory is being used by the queue. </p><dl class="section return"><dt>Returns</dt><dd>The number record bytes are waiting to be processed by the background thread. </dd></dl>
+
+</div>
+</div>
+<a id="a96cf2a2152227148ec46832d722f7fe8" name="a96cf2a2152227148ec46832d722f7fe8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a96cf2a2152227148ec46832d722f7fe8">&#9670;&#160;</a></span>getDefaultMaxQueueByteSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint64_t vrs::RecordFileWriter::getDefaultMaxQueueByteSize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Get a default limit for <a class="el" href="classvrs_1_1_record_file_writer.html#ac7d5ba84186faf5026df2a6607d27da4">getBackgroundThreadQueueByteSize()</a>, for code that throttles how fast it creates records: 1/8 of os::getAvailableMemory(), between 128 MiB and 800 MiB. Computed on the first call, then cached: cheap enough to call for every record. </p>
 
 </div>
 </div>
