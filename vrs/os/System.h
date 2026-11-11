@@ -36,5 +36,14 @@ uint32_t getTerminalWidth(uint32_t setValue = 0); // option to set value for tes
 /// or quota are ignored.
 uint32_t getAvailableConcurrency();
 
+/// Get how much memory this process may use in total, in bytes: not how much is free now, but how
+/// much the process could allocate before the system kills or throttles it. Use it to size caches,
+/// buffers and queues. It is the size of the physical memory, limited:
+/// - on Linux, by the memory limits of the process' cgroup and its ancestors (cgroup v2
+///   memory.max and memory.high), as in containers;
+/// - on Android and iOS, to 2 GiB, since these OSes kill apps well before they use all the memory.
+/// Computed on the first call, then cached for the life of the process.
+uint64_t getAvailableMemory();
+
 } // namespace os
 } // namespace vrs

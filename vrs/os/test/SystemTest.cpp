@@ -18,6 +18,7 @@
 
 #include <gtest/gtest.h>
 
+#include <vrs/os/Platform.h>
 #include <vrs/os/System.h>
 
 using namespace std;
@@ -28,4 +29,13 @@ TEST(SystemTest, availableConcurrency) {
   EXPECT_GE(concurrency, 1);
   EXPECT_LE(concurrency, max<uint32_t>(thread::hardware_concurrency(), 1));
   EXPECT_EQ(os::getAvailableConcurrency(), concurrency); // cached
+}
+
+TEST(SystemTest, availableMemory) {
+  uint64_t memory = os::getAvailableMemory();
+  EXPECT_GT(memory, 0);
+#if IS_MOBILE_PLATFORM()
+  EXPECT_LE(memory, 2ULL << 30);
+#endif
+  EXPECT_EQ(os::getAvailableMemory(), memory); // cached
 }
