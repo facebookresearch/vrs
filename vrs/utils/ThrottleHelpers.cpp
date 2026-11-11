@@ -26,14 +26,6 @@
 
 namespace {
 
-#if IS_LINUX_PLATFORM() || IS_MAC_PLATFORM() || IS_WINDOWS_PLATFORM()
-// Be more generous on memory usage with desktop platforms
-const size_t kMaxQueueByteSize = 600 * 1024 * 1024ULL; // 600 MB
-#else
-// Mobile environments are memory constrained, and might kill a memory greedy app
-const size_t kMaxQueueByteSize = 400 * 1024 * 1024; // 400 MB
-#endif
-const size_t kReadAgainQueueByteSize = kMaxQueueByteSize * 9 / 10; // 90%
 const size_t kLowQueueByteSize = 40 * 1024 * 1024ULL;
 
 const double kRefreshDelaySec = 1. / 3; // limit how frequently we show updates
@@ -102,7 +94,8 @@ void ThrottledWriter::onRecordDecoded(double timestamp, double writeGraceWindow)
     writer_.writeRecordsAsync(timestamp - max<double>(writeGraceWindow, copyOptions_.graceWindow));
   }
   // don't go crazy with memory usage, if we read data much faster than we can process it...
-  if (queueByteSize > kMaxQueueByteSize || (waitCondition_ && waitCondition_())) {
+  const uint64_t maxQueueByteSize = RecordFileWriter::getDefaultMaxQueueByteSize();
+  if (queueByteSize > maxQueueByteSize || (waitCondition_ && waitCondition_())) {
     writer_.writeRecordsAsync(timestamp - max<double>(writeGraceWindow, copyOptions_.graceWindow));
     // wait that most of the buffers are processed to resume,
     // limiting collisions between input & output file operations.
@@ -110,7 +103,7 @@ void ThrottledWriter::onRecordDecoded(double timestamp, double writeGraceWindow)
       printPercentAndQueueSize(queueByteSize, true);
       this_thread::sleep_for(chrono::duration<double>(kRefreshDelaySec));
       queueByteSize = writer_.getBackgroundThreadQueueByteSize();
-    } while (queueByteSize > kReadAgainQueueByteSize || (waitCondition_ && waitCondition_()));
+    } while (queueByteSize > maxQueueByteSize * 9 / 10 || (waitCondition_ && waitCondition_()));
     if (showProgress()) {
       cout << kResetCurrentLine;
       nextUpdateTime_ = 0;

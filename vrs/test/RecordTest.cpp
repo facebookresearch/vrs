@@ -619,3 +619,11 @@ TEST_F(RecordTester, instanceIdTest) {
   TestRecordable r3;
   EXPECT_EQ(r3.getRecordableInstanceId(), 3);
 }
+
+TEST(RecordFileWriterTest, defaultMaxQueueByteSize) {
+  const uint64_t kMiB = 1024 * 1024;
+  uint64_t maxQueueByteSize = RecordFileWriter::getDefaultMaxQueueByteSize();
+  EXPECT_GE(maxQueueByteSize, 128 * kMiB);
+  EXPECT_LE(maxQueueByteSize, 800 * kMiB);
+  EXPECT_EQ(RecordFileWriter::getDefaultMaxQueueByteSize(), maxQueueByteSize); // cached
+}

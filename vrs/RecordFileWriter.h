@@ -221,6 +221,10 @@ class VRS_API RecordFileWriter {
   /// which correlates with how much memory is being used by the queue.
   /// @return The number record bytes are waiting to be processed by the background thread.
   uint64_t getBackgroundThreadQueueByteSize();
+  /// Get a default limit for getBackgroundThreadQueueByteSize(), for code that throttles how fast
+  /// it creates records: 1/8 of os::getAvailableMemory(), between 128 MiB and 800 MiB.
+  /// Computed on the first call, then cached: cheap enough to call for every record.
+  static uint64_t getDefaultMaxQueueByteSize();
 
   /// Get the first error that occurred while writing the file in the background, so that a
   /// recording can report a failed write as it happens, rather than when closing the file.

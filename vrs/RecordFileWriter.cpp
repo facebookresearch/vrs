@@ -640,6 +640,14 @@ int RecordFileWriter::getFileError() const {
   return writerThreadData_ != nullptr ? writerThreadData_->fileError.load(memory_order_relaxed) : 0;
 }
 
+uint64_t RecordFileWriter::getDefaultMaxQueueByteSize() {
+  const uint64_t kMinQueueByteSize = 128ULL << 20; // 128 MiB
+  const uint64_t kMaxQueueByteSize = 800ULL << 20; // 800 MiB
+  static const uint64_t sDefaultMaxQueueByteSize =
+      clamp<uint64_t>(os::getAvailableMemory() / 8, kMinQueueByteSize, kMaxQueueByteSize);
+  return sDefaultMaxQueueByteSize;
+}
+
 int RecordFileWriter::closeFileAsync() {
   if (writerThreadData_ == nullptr) {
     return NO_FILE_OPEN;
