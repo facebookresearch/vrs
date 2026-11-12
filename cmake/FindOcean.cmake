@@ -40,7 +40,7 @@ endforeach()
 if(OCEAN_SOURCE_DIR)
   message(STATUS "Found Ocean in fbsource at ${OCEAN_SOURCE_DIR}")
   set(OCEAN_BUILD_MINIMAL ON CACHE BOOL "" FORCE)
-  set(OCEAN_BUILD_TEST OFF CACHE BOOL "" FORCE)
+  set(OCEAN_BUILD_TESTS OFF CACHE BOOL "" FORCE)
   # Ocean requires CMake 3.26, VRS requires 3.16 - allow higher version
   add_subdirectory("${OCEAN_SOURCE_DIR}" "${CMAKE_BINARY_DIR}/ocean")
   set(ocean_SOURCE_DIR "${OCEAN_SOURCE_DIR}")
@@ -51,10 +51,10 @@ else()
   FetchContent_Declare(
     ocean
     GIT_REPOSITORY https://github.com/facebookresearch/ocean.git
-    GIT_TAG        5fca1d27a9f37e868738b6db09a6b1e00723d80f # master branch, 2025.11.07
+    GIT_TAG        f94761f386377148225dc850040505a2c49f32e9 # main branch, 2026-11-11
   )
   set(OCEAN_BUILD_MINIMAL ON)
-  set(OCEAN_BUILD_TEST    OFF)
+  set(OCEAN_BUILD_TESTS   OFF)
   message(STATUS "⤷ FetchContent: pulling and building Facebook Ocean…")
   FetchContent_MakeAvailable(ocean)
 endif()
