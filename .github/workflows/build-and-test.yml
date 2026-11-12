@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-14, macos-latest, ubuntu-latest] # note: macos builds are arm only
+        os: [macos-latest, ubuntu-latest] # note: macos builds are arm only
         XPRS_FLAG: ["ON", "OFF"]
       fail-fast: false
 
