@@ -73,6 +73,7 @@ cd "FFmpeg-$FFMPEG_VERSION"
 echo "Configuring FFmpeg..."
 ./configure --prefix="$INSTALL_PATH" \
   --disable-swresample --disable-swscale --disable-everything \
+  --disable-doc \
   --enable-decoder=hevc \
   --disable-asm --disable-x86asm \
   $( [ "$VRS_PLATFORM" = "macos" ] && printf '%s ' \
