@@ -16,7 +16,7 @@ add_library(vrs_helpers_strings INTERFACE)
 target_include_directories(vrs_helpers_strings
   INTERFACE
     $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 file(GLOB VRS_HELPERS_SRCS *.cpp *.h *.hpp)
@@ -33,14 +33,14 @@ target_link_libraries(vrs_helpers
 target_include_directories(vrs_helpers
   PUBLIC
     $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 install(TARGETS vrs_helpers vrs_helpers_strings EXPORT VRSLibTargets
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-  RUNTIME DESTINATION bin
-  INCLUDES DESTINATION include
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
 if (UNIT_TESTS)
