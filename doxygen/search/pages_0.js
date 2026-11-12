@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['folder_0',['folder',['../md_vrs_2_read_me.html',1,'What is in this folder?'],['../md_sample__code_2_read_me.html',1,'What is in this folder?'],['../md_sample__apps_2_read_me.html',1,'What is in this folder?']]]
+  ['a_20datalayout_0',['Anatomy of a DataLayout',['../classvrs_1_1_data_layout.html#autotoc_md0',1,'']]],
+  ['anatomy_20of_20a_20datalayout_1',['Anatomy of a DataLayout',['../classvrs_1_1_data_layout.html#autotoc_md0',1,'']]]
 ];

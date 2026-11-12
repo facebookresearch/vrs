@@ -27,7 +27,7 @@ var searchData=
   ['datapiecevalue_3c_20uint8_5ft_20_3e_24',['DataPieceValue&lt; uint8_t &gt;',['../classvrs_1_1_data_piece_value.html',1,'vrs']]],
   ['datapiecevector_25',['DataPieceVector',['../classvrs_1_1_data_piece_vector.html',1,'vrs']]],
   ['datapiecevector_3c_20float_20_3e_26',['DataPieceVector&lt; float &gt;',['../classvrs_1_1_data_piece_vector.html',1,'vrs']]],
-  ['datapiecevector_3c_20vrs_3a_3amatrixnd_20_3e_27',['DataPieceVector&lt; vrs::MatrixND &gt;',['../classvrs_1_1_data_piece_vector.html',1,'vrs']]],
+  ['datapiecevector_3c_20vrs_3a_3amatrixnd_3c_20double_2c_203_20_3e_20_3e_27',['DataPieceVector&lt; vrs::MatrixND&lt; double, 3 &gt; &gt;',['../classvrs_1_1_data_piece_vector.html',1,'vrs']]],
   ['datareference_28',['DataReference',['../classvrs_1_1_data_reference.html',1,'vrs']]],
   ['dataslice_29',['DataSlice',['../structvrs_1_1_data_slice.html',1,'vrs']]],
   ['datasource_30',['DataSource',['../classvrs_1_1_data_source.html',1,'vrs']]],
@@ -36,6 +36,7 @@ var searchData=
   ['directwriterecorddata_33',['DirectWriteRecordData',['../classvrs_1_1_direct_write_record_data.html',1,'vrs']]],
   ['diskfilechunk_34',['DiskFileChunk',['../classvrs_1_1_disk_file_chunk.html',1,'vrs']]],
   ['diskfilet_35',['DiskFileT',['../classvrs_1_1_disk_file_t.html',1,'vrs']]],
-  ['diskrecordinfo_36',['DiskRecordInfo',['../structvrs_1_1_index_record_1_1_disk_record_info.html',1,'vrs::IndexRecord']]],
-  ['diskstreamid_37',['DiskStreamId',['../structvrs_1_1_index_record_1_1_disk_stream_id.html',1,'vrs::IndexRecord']]]
+  ['diskfilet_3c_20diskfilechunk_20_3e_36',['DiskFileT&lt; DiskFileChunk &gt;',['../classvrs_1_1_disk_file_t.html',1,'vrs']]],
+  ['diskrecordinfo_37',['DiskRecordInfo',['../structvrs_1_1_index_record_1_1_disk_record_info.html',1,'vrs::IndexRecord']]],
+  ['diskstreamid_38',['DiskStreamId',['../structvrs_1_1_index_record_1_1_disk_stream_id.html',1,'vrs::IndexRecord']]]
 ];

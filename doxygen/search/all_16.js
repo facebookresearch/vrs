@@ -1,7 +1,7 @@
 var searchData=
 [
   ['waitforfileclosed_0',['waitForFileClosed',['../classvrs_1_1_record_file_writer.html#a4f17115d0823c49cad9537a444175106',1,'vrs::RecordFileWriter']]],
-  ['what_20is_20in_20this_20folder_1',['what is in this folder',['../md_vrs_2_read_me.html',1,'What is in this folder?'],['../md_sample__apps_2_read_me.html',1,'What is in this folder?'],['../md_sample__code_2_read_me.html',1,'What is in this folder?']]],
+  ['what_20is_20in_20this_20folder_1',['What is in this folder',['../dir_9363abee50b60a0d223173280d6b3c23.html#autotoc_md1',1,'What is in this folder?'],['../dir_c51846f5e8dbd128360a10458ada96dd.html#autotoc_md8',1,'What is in this folder?'],['../dir_db1bba5d52de7256a69df6a0259e7a96.html#autotoc_md9',1,'What is in this folder?']]],
   ['wifibeaconrecordableclass_2',['WifiBeaconRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5af32ce687a800396e4c980c19d91e4100',1,'vrs']]],
   ['worldobservercamerarecordableclass_3',['WorldObserverCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5adfc68b38a4f1b4dfd771cefa868068ab',1,'vrs']]],
   ['write_4',['write',['../classvrs_1_1_direct_write_record_data.html#aea70517f275be4d78b253ef6af7ba670',1,'vrs::DirectWriteRecordData::write()'],['../classvrs_1_1_disk_file_t.html#a658dd362aa98bbe33920af26f3cc39c8',1,'vrs::DiskFileT::write(const void *buffer, size_t length) override'],['../classvrs_1_1_disk_file_t.html#ac36e6f8fa707c7b15cf28a08a780c37a',1,'vrs::DiskFileT::write(const T &amp;object)'],['../classvrs_1_1_write_file_handler.html#a969eee6da2824daf5e5957e78b7748a9',1,'vrs::WriteFileHandler::write(const void *buffer, size_t length)=0'],['../classvrs_1_1_write_file_handler.html#a10d230d9751bc35e81f369c81d929afb',1,'vrs::WriteFileHandler::write(const T &amp;object)'],['../namespacevrs_1_1_file_details_cache.html#ad769103073ddd403a497c28748f16b2b',1,'vrs::FileDetailsCache::write()']]],
@@ -16,5 +16,5 @@ var searchData=
   ['writetofile_13',['writeToFile',['../classvrs_1_1_record_file_writer.html#ad3a1faddddafd31345419dd1845533c1',1,'vrs::RecordFileWriter']]],
   ['writeunaligned_14',['writeUnaligned',['../namespacevrs.html#a0ff4cc79bae39464050a6ce835c3fbc8',1,'vrs']]],
   ['writezstdfile_15',['writeZstdFile',['../classvrs_1_1_disk_file_t.html#a640daf0417fe194ae6da70cb71f2bb44',1,'vrs::DiskFileT']]],
-  ['writing_20vrs_20files_16',['Writing VRS Files',['../md_vrs_2_read_me.html#autotoc_md3',1,'']]]
+  ['writing_20vrs_20files_16',['Writing VRS Files',['../dir_9363abee50b60a0d223173280d6b3c23.html#autotoc_md3',1,'']]]
 ];

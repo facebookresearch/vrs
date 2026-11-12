@@ -7,7 +7,7 @@ var searchData=
   ['emptyblockreader_4',['EmptyBlockReader',['../classvrs_1_1_empty_block_reader.html',1,'vrs']]],
   ['emptydatalayout_5',['EmptyDataLayout',['../classvrs_1_1_empty_data_layout.html',1,'vrs']]],
   ['enablefrontindexrecordsupport_6',['enableFrontIndexRecordSupport',['../structvrs_1_1_file_format_1_1_file_header.html#a0de96eb90d16c861e17820c7f7ec05bf',1,'vrs::FileFormat::FileHeader']]],
-  ['enableifstringconvertible_7',['EnableIfStringConvertible',['../namespacevrs.html#a285f77136ffb7d2a7655325ebd5c03e0',1,'vrs']]],
+  ['enableifstringconvertible_7',['EnableIfStringConvertible',['../namespacevrs.html#adb3bac5e42d5db588da6d4d0957853d1',1,'vrs']]],
   ['endframe_8',['endFrame',['../classvrs_1_1_compressor.html#a9f661dc89e73af8a08af5ec6088303b2',1,'vrs::Compressor']]],
   ['endlayout_9',['endLayout',['../classvrs_1_1_manual_data_layout.html#a6463defc156ea5ac909bafa04be58b55',1,'vrs::ManualDataLayout']]],
   ['error_10',['error',['../classvrs_1_1_telemetry_logger.html#acf7f0886a08a2a79e2014b4ac1fa0fe5',1,'vrs::TelemetryLogger']]],
@@ -19,6 +19,6 @@ var searchData=
   ['eventrecordableclass_16',['EventRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5a51b34261622abb0e084e161ec148fcca',1,'vrs']]],
   ['externalcompact_17',['ExternalCompact',['../namespacevrs.html#ab5a2876628d1cfe8288aa4d4b557d433a0e8d54de4c26fd67bd91dd4f295b47e1',1,'vrs']]],
   ['externalpretty_18',['ExternalPretty',['../namespacevrs.html#ab5a2876628d1cfe8288aa4d4b557d433a5b497216e012891fb7a93dcf072a8356',1,'vrs']]],
-  ['extras_19',['Extras',['../structvrs_1_1_file_spec.html#a76464a53f34587c44a663a3ba7e956dd',1,'vrs::FileSpec']]],
+  ['extras_19',['Extras',['../structvrs_1_1_file_spec.html#ad4f8b89cc43dbd44489e722e6be69921',1,'vrs::FileSpec']]],
   ['eyecamerarecordableclass_20',['EyeCameraRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5ad1cba9cdd661a9c56ebebb65f99137b3',1,'vrs']]]
 ];

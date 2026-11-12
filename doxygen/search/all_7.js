@@ -8,5 +8,5 @@ var searchData=
   ['hasindex_5',['hasIndex',['../classvrs_1_1_record_file_reader.html#a5a97a396f125c4fe2e1d23549d55492c',1,'vrs::RecordFileReader']]],
   ['headingrecordableclass_6',['HeadingRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5aa26fa58b342d0cfbf75c56e3f858716d',1,'vrs']]],
   ['heartraterecordableclass_7',['HeartRateRecordableClass',['../namespacevrs.html#ae6fdfd6738201eddee4597c27fe31ac5aa1028cd5ac562131a22ebf8dea35498c',1,'vrs']]],
-  ['helpers_8',['helpers',['../md_vrs_2_read_me.html#autotoc_md5',1,'File Operation Helpers'],['../md_vrs_2_read_me.html#autotoc_md6',1,'Misc Helpers']]]
+  ['helpers_8',['Helpers',['../dir_9363abee50b60a0d223173280d6b3c23.html#autotoc_md5',1,'File Operation Helpers'],['../dir_9363abee50b60a0d223173280d6b3c23.html#autotoc_md6',1,'Misc Helpers']]]
 ];
