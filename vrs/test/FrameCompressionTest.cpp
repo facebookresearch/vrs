@@ -535,6 +535,36 @@ TEST_F(FrameCompressionTest, multiSliceCompressRoundTripsThroughDecompressor) {
   }
 }
 
+TEST_F(FrameCompressionTest, compressAfterClearReleasedLargeContext) {
+  vector<uint8_t> input(4 * 1024 * 1024);
+  for (size_t i = 0; i < input.size(); ++i) {
+    input[i] = static_cast<uint8_t>(i / 7);
+  }
+  Compressor compressor;
+  for (int pass = 0; pass < 2; ++pass) {
+    uint32_t compressedSize = 0;
+    ASSERT_EQ(
+        compressor.compress(
+            input.data(), input.size(), CompressionPreset::ZstdTight, compressedSize),
+        SUCCESS);
+    ASSERT_GT(compressedSize, 0u);
+    Decompressor decompressor;
+    decompressor.setCompressionType(compressor.getCompressionType());
+    std::memcpy(
+        decompressor.allocateCompressedDataBuffer(compressedSize),
+        compressor.getData(),
+        compressedSize);
+    vector<uint8_t> decompressed(input.size());
+    uint32_t writtenSize = 0;
+    ASSERT_EQ(
+        decompressor.decompress(
+            decompressed.data(), static_cast<uint32_t>(decompressed.size()), writtenSize),
+        0);
+    EXPECT_EQ(decompressed, input);
+    compressor.clear();
+  }
+}
+
 TEST_F(FrameCompressionTest, compressedFrames) {
   const string testPath = os::getTempFolder() + "compressedFrames.vrs";
   DiskFile file;
@@ -581,6 +611,36 @@ TEST_F(FrameCompressionTest, compressedFrames) {
   EXPECT_EQ(frame4, readFrame4);
   EXPECT_EQ(maxReadSize, 0);
 
+  os::remove(testPath);
+}
+
+TEST_F(FrameCompressionTest, compressedFramesAfterClearReleasedLargeContext) {
+  const string testPath = os::getTempFolder() + "compressedFramesAfterClear.vrs";
+  DiskFile file;
+  Compressor compressor;
+  ASSERT_EQ(file.create(testPath), 0);
+  size_t totalSize = 0;
+  vector<uint8_t> frame1, frame2;
+  const size_t kFrameSize = 4 * 1024 * 1024;
+  ASSERT_EQ(
+      makeAndWriteFrame(
+          file, compressor, frame1, kFrameSize, 65536, 17, CompressionPreset::ZstdTight, totalSize),
+      0);
+  compressor.clear();
+  ASSERT_EQ(
+      makeAndWriteFrame(
+          file, compressor, frame2, kFrameSize, 65536, 29, CompressionPreset::ZstdTight, totalSize),
+      0);
+  EXPECT_EQ(file.close(), 0);
+  Decompressor decompressor;
+  ASSERT_EQ(file.open(testPath), 0);
+  size_t maxReadSize = static_cast<size_t>(os::getFileSize(testPath));
+  vector<uint8_t> readFrame1, readFrame2;
+  ASSERT_EQ(readFrame(file, decompressor, readFrame1, maxReadSize), 0);
+  ASSERT_EQ(readFrame(file, decompressor, readFrame2, maxReadSize), 0);
+  EXPECT_EQ(frame1, readFrame1);
+  EXPECT_EQ(frame2, readFrame2);
+  EXPECT_EQ(maxReadSize, 0);
   os::remove(testPath);
 }
 

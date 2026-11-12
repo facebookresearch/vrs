@@ -175,10 +175,10 @@ class VRS_API Compressor {
   }
   CompressionType getCompressionType() const;
 
-  /// Deallocate the internal buffer's storage.
-  void clear() {
-    buffer_.release();
-  }
+  /// Deallocate the internal buffer's storage, and the compression context of high presets when
+  /// it is large.
+  /// Don't call between startFrame() and endFrame().
+  void clear();
 
   static bool shouldTryToCompress(CompressionPreset preset, size_t size);
 

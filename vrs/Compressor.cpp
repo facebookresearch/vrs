@@ -131,6 +131,10 @@ namespace vrs {
 
 const size_t Compressor::kMinByteCountForCompression = 250;
 
+namespace {
+const size_t kMaxIdleZstdContextSize = 2 * 1024 * 1024;
+} // namespace
+
 DEFINE_ENUM_CONVERTERS(CompressionPreset);
 DEFINE_ENUM_CONVERTERS(CompressionType)
 
@@ -173,6 +177,19 @@ class Compressor::CompressorImpl {
       LZ4F_freeCompressionContext(lz4Context_);
     }
   }
+  void setUpZstdContext(CompressionPreset preset) {
+    if (zstdContext_ == nullptr) {
+      zstdContext_ = ZSTD_createCCtx();
+    }
+    zstdPreset_ = preset;
+  }
+  void releaseLargeHighPresetContext() {
+    if (zstdContext_ != nullptr && zstdPreset_ >= CompressionPreset::ZstdHigh &&
+        ZSTD_sizeof_CCtx(zstdContext_) > kMaxIdleZstdContextSize) {
+      ZSTD_freeCCtx(zstdContext_);
+      zstdContext_ = nullptr;
+    }
+  }
   int lz4Compress(
       helpers::IOVector<uint8_t>& buffer,
       const void* data,
@@ -212,9 +229,7 @@ class Compressor::CompressorImpl {
     if (buffer.size() < headerSpace + maxCompressedSize) {
       buffer.resizeDiscardingWithoutInitialization(headerSpace + maxCompressedSize);
     }
-    if (zstdContext_ == nullptr) {
-      zstdContext_ = ZSTD_createCCtx();
-    }
+    setUpZstdContext(preset);
     size_t zresult = 0;
     IF_ZSTD_COMP_ERROR_LOG_AND_RETURN(ZSTD_CCtx_reset(zstdContext_, ZSTD_reset_session_only));
     IF_ZSTD_COMP_ERROR_LOG_AND_RETURN(ZSTD_CCtx_setParameter(
@@ -341,9 +356,7 @@ class Compressor::CompressorImpl {
     if (buffer.size() < headerSpace + maxCompressedSize) {
       buffer.resizeDiscardingWithoutInitialization(headerSpace + maxCompressedSize);
     }
-    if (zstdContext_ == nullptr) {
-      zstdContext_ = ZSTD_createCCtx();
-    }
+    setUpZstdContext(preset);
     size_t zresult = 0;
     IF_ZSTD_COMP_ERROR_LOG_AND_RETURN(ZSTD_CCtx_reset(zstdContext_, ZSTD_reset_session_only));
     IF_ZSTD_COMP_ERROR_LOG_AND_RETURN(ZSTD_CCtx_setParameter(
@@ -379,9 +392,7 @@ class Compressor::CompressorImpl {
       lz4FrameBytes_ = 0;
       return SUCCESS;
     }
-    if (zstdContext_ == nullptr) {
-      zstdContext_ = ZSTD_createCCtx();
-    }
+    setUpZstdContext(preset);
     size_t zresult = 0;
     IF_ZSTD_COMP_ERROR_LOG_AND_RETURN(ZSTD_CCtx_setParameter(
         zstdContext_, ZSTD_c_compressionLevel, zstdPresetToCompressionLevel(preset)));
@@ -538,6 +549,7 @@ class Compressor::CompressorImpl {
   }
 
   ZSTD_CCtx* zstdContext_ = nullptr;
+  CompressionPreset zstdPreset_ = CompressionPreset::Undefined;
   LZ4F_compressionContext_t lz4Context_ = nullptr;
   CompressionPreset streamPreset_ = CompressionPreset::None;
   bool lz4FrameStarted_ = false;
@@ -612,6 +624,11 @@ int Compressor::compress(
         buffer_, dataSlices, dataSliceCount, preset, outCompressedSize, headerSpace, totalSize);
   }
   return SUCCESS;
+}
+
+void Compressor::clear() {
+  buffer_.release();
+  impl_->releaseLargeHighPresetContext();
 }
 
 int Compressor::startFrame(size_t frameSize, CompressionPreset preset, uint32_t& outSize) {
