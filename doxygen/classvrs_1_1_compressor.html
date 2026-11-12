@@ -110,9 +110,7 @@ template&lt;class HeaderType&gt; </td></tr>
 <tr class="memdesc:ac60c5c6ad4615405ee99ce1036e117f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the space reserved for a header. <br /></td></tr>
 <tr class="memitem:a5a48717a464327cb3ecff499fcac81a4" id="r_a5a48717a464327cb3ecff499fcac81a4"><td class="memItemLeft" align="right" valign="top"><a id="a5a48717a464327cb3ecff499fcac81a4" name="a5a48717a464327cb3ecff499fcac81a4"></a>
 <a class="el" href="namespacevrs.html#ac167a592f5255abc1a276d8ed0b96f2f">CompressionType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getCompressionType</b> () const</td></tr>
-<tr class="memitem:a25a6b98fb7a1ee28f77b623341c7b8b9" id="r_a25a6b98fb7a1ee28f77b623341c7b8b9"><td class="memItemLeft" align="right" valign="top"><a id="a25a6b98fb7a1ee28f77b623341c7b8b9" name="a25a6b98fb7a1ee28f77b623341c7b8b9"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>clear</b> ()</td></tr>
-<tr class="memdesc:a25a6b98fb7a1ee28f77b623341c7b8b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deallocate the internal buffer's storage. <br /></td></tr>
+<tr class="memitem:a25a6b98fb7a1ee28f77b623341c7b8b9" id="r_a25a6b98fb7a1ee28f77b623341c7b8b9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a25a6b98fb7a1ee28f77b623341c7b8b9">clear</a> ()</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -172,6 +170,24 @@ static const size_t&#160;</td><td class="memItemRight" valign="bottom"><b>kMinBy
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>0 for success, or an error code. The input buffer may be recycled immediately, but all the data may not have been written out to the file yet. You may add all the data of the frame in as many calls as you wish, one byte at a time, all at once, and anything in between. </dd></dl>
+
+</div>
+</div>
+<a id="a25a6b98fb7a1ee28f77b623341c7b8b9" name="a25a6b98fb7a1ee28f77b623341c7b8b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a25a6b98fb7a1ee28f77b623341c7b8b9">&#9670;&#160;</a></span>clear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void vrs::Compressor::clear </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Deallocate the internal buffer's storage, and the compression context of high presets when it is large. Don't call between <a class="el" href="#aa20e3cb3955cba5ac5867535fd470e05">startFrame()</a> and <a class="el" href="#a9f661dc89e73af8a08af5ec6088303b2">endFrame()</a>. </p>
 
 </div>
 </div>
