@@ -177,7 +177,8 @@ class VRS_API DiskFileT : public WriteFileHandler {
 
 using DiskFile = DiskFileT<DiskFileChunk>;
 
-#if (IS_LINUX_PLATFORM() && IS_X86_PLATFORM()) || IS_ANDROID_PLATFORM() || \
+// New Linux targets must be 64-bit: AsyncFileDescriptor::read() takes its file offset as size_t.
+#if (IS_LINUX_PLATFORM() && (IS_X86_PLATFORM() || defined(__LP64__))) || IS_ANDROID_PLATFORM() || \
     (IS_WINDOWS_PLATFORM() && IS_VRS_FB_INTERNAL())
 #define VRS_ASYNC_DISKFILE_SUPPORTED() true
 
