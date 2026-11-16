@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest] # note: macos builds are arm only
+        os: [macos-latest, ubuntu-latest, ubuntu-24.04-arm] # note: macos builds are arm only
         XPRS_FLAG: ["ON", "OFF"]
       fail-fast: false
 
@@ -51,6 +51,12 @@ jobs:
               echo "$RUNNER_OS not supported"
               exit 1
           fi
+
+      - name: Test Ocean resize patch
+        shell: bash
+        run: |
+          cmake -DTEST_ROOT="$RUNNER_TEMP/ocean-resize-patch-test" \
+            -P cmake/tests/PatchOceanTwoChannelResizeTest.cmake
 
       - name: Build FFMPEG
         shell: bash
