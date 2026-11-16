@@ -73,12 +73,12 @@ The simplest way to build VRS is to install the libraries on your system using s
 
 ### Install build tools & libraries (Ubuntu)
 
-_These instructions are validated using Ubuntu 20.04, whereas Ubuntu 18.04 doesn't install recent enough versions of cmake, fmt, lz4, and zstd, and is therefore not supported._
+_These instructions are validated using Ubuntu 24.04. The CMake configure step fetches and builds [Ocean](https://github.com/facebookresearch/ocean), which requires CMake 3.26 or newer, so the CMake shipped by Ubuntu 22.04 (3.22) and older releases is not recent enough._
 
 - install tools & libraries:
   ```
   sudo apt-get install cmake git ninja-build ccache libgtest-dev libfmt-dev libjpeg-dev libturbojpeg-dev libpng-dev
-  sudo apt-get install liblz4-dev libzstd-dev libxxhash-dev nasm yasm libeigen3-dev
+  sudo apt-get install liblz4-dev libzstd-dev libxxhash-dev libeigen3-dev
   sudo apt-get install libboost-dev
   sudo apt-get install qtbase5-dev portaudio19-dev libopus-dev
   sudo apt-get install npm doxygen
