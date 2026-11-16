@@ -140,7 +140,7 @@ XprsResult enumDecoders(CodecList& codecs, bool hwCapabilityCheck) {
 
   // stable_sort so decoders with equal hwAccel keep their
   // kPreferredDecoderImplementations order (e.g. dav1d ahead of libaom for AV1).
-  std::stable_sort(codecs.begin(), codecs.end(), [](const VideoCodec& lhs, const VideoCodec& rhs) {
+  std::ranges::stable_sort(codecs, [](const VideoCodec& lhs, const VideoCodec& rhs) {
     return lhs.hwAccel > rhs.hwAccel;
   });
 
@@ -190,7 +190,7 @@ enumDecodersByFormat(CodecList& codecs, VideoCodecFormat standard, bool hwCapabi
 
   // stable_sort so decoders with equal hwAccel keep their
   // kPreferredDecoderImplementations order (e.g. dav1d ahead of libaom for AV1).
-  std::stable_sort(codecs.begin(), codecs.end(), [](const VideoCodec& lhs, const VideoCodec& rhs) {
+  std::ranges::stable_sort(codecs, [](const VideoCodec& lhs, const VideoCodec& rhs) {
     return lhs.hwAccel > rhs.hwAccel;
   });
 
