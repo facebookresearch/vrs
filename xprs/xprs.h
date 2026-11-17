@@ -340,11 +340,14 @@ struct EncoderConfig {
   LatencyTuning latencyTuning = LatencyTuning::Default;
 
   /**
-   * Hint for the encoder's CPU thread pool size. Currently consumed only by the libx265
+   * Hint for the encoder's CPU thread pool size. Consumed by the libx265
    * (H.265 software) backend, where it sets `pools=N:wpp=1` in
-   * x265-params. This enables wavefront parallelism within a frame without altering
-   * one-frame-in / one-frame-out behavior (frame-threads stays at 1). 0 = leave codec
-   * defaults unchanged (libx265 autodetects pool size from the host).
+   * x265-params, and by the libx264 (H.264 software) backend, where it sets
+   * `AVCodecContext::thread_count`. For libx265 it enables wavefront
+   * parallelism within a frame without altering one-frame-in /
+   * one-frame-out behavior (frame-threads stays at 1). For libx264,
+   * 1 disables sliced threading. 0 = leave codec defaults unchanged
+   * (libx265 autodetects pool size from the host; libx264 uses 8 threads).
    */
   int32_t threadCount = 0;
 
