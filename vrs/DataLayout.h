@@ -109,10 +109,9 @@ struct VRS_API JsonFormatProfileSpec {
 /// content that make up a DataLayoutContentBlock, both for writing & reading.
 ///
 /// Note that though DataLayout objects may look like structs, constructing them is relatively
-/// expensive, and creating AutoDataLayout objects involve a synchronisation lock. Therefore, avoid
-/// creating & destroying using short lived AutoDataLayout stack variables. Instead, prefer
-/// allocating the DataLayout objects you will need frequently as member variables of other classes
-/// that are long lived.
+/// expensive. Therefore, avoid creating & destroying using short lived AutoDataLayout stack
+/// variables. Instead, prefer allocating the DataLayout objects you will need frequently as member
+/// variables of other classes that are long lived.
 ///
 /// A DataLayout object can generate a json representation of itself, that is stored by VRS as an
 /// internal tag of a VRS record stream. This json data will be used when reading the VRS file to
@@ -616,7 +615,7 @@ class VRS_API AutoDataLayoutEnd {
 /// \brief Specialized DataLayout for programmatic DataLayout generation.
 ///
 /// Helper class to build a DataLayout manually, piece-by-piece.
-/// Make sure to call endLayout as soon as you're no longer adding pieces, to release a global lock.
+/// Make sure to call endLayout, in the same thread, as soon as you're no longer adding pieces.
 class VRS_API ManualDataLayout : public DataLayout {
  public:
   /// Build a DataLayout from a json definition.

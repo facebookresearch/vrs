@@ -18,6 +18,7 @@
 #include <cstring>
 #include <iostream>
 #include <limits>
+#include <thread>
 #include <type_traits>
 
 #include <gtest/gtest.h>
@@ -1340,4 +1341,15 @@ TEST_F(DataLayoutTester, stringVectorBogusCount) {
   values = {"stale"};
   EXPECT_FALSE(layout.strings.get(values));
   EXPECT_TRUE(values.empty());
+}
+
+TEST_F(DataLayoutTester, constructInParallelThreads) {
+  const OldConfig expected;
+  ManualDataLayout mainThreadLayout;
+  mainThreadLayout.add(make_unique<DataPieceValue<int32_t>>("main_thread_piece"));
+  unique_ptr<OldConfig> otherThreadLayout;
+  thread([&otherThreadLayout] { otherThreadLayout = make_unique<OldConfig>(); }).join();
+  mainThreadLayout.endLayout();
+  EXPECT_TRUE(otherThreadLayout->isSame(expected));
+  EXPECT_EQ(mainThreadLayout.getDeclaredFixedDataPiecesCount(), 1);
 }

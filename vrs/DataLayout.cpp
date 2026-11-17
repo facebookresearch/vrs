@@ -25,7 +25,6 @@
 
 #include <iomanip>
 #include <iterator>
-#include <mutex>
 #include <sstream>
 
 #include <fmt/format.h>
@@ -40,7 +39,6 @@
 #include <vrs/helpers/EnumStringConverter.h>
 #include <vrs/helpers/Rapidjson.hpp>
 #include <vrs/helpers/Strings.h>
-#include <vrs/os/CompilerAttributes.h>
 #include <vrs/os/Platform.h>
 #include <vrs/os/System.h>
 
@@ -404,25 +402,32 @@ namespace internal {
 ///  - call dataLayoutBegin(layout) to start registering DataPiece objects with a layout object.
 ///  - create DataPiece objects, which will automatically call registerDataPiece(dataPiece).
 ///  - call dataLayoutEnd() to end the registration.
-/// This class uses a global lock to prevent simultaneous construction of DataLayout objects from
-/// mixing each other. This class is purely internal to VRS, and nothing outside of VRS should ever
+/// Each thread has its own DataLayouter instance, so DataLayout objects can be constructed
+/// concurrently in different threads, but the construction of a DataLayout must begin and end in
+/// the same thread. This class is purely internal to VRS, and nothing outside of VRS should ever
 /// rely on it. This is one of the reasons why it's only declared & defined in the same cpp file.
 class DataLayouter {
  public:
   static DataLayouter& get() {
-    static DataLayouter sLayouter;
+    thread_local DataLayouter sLayouter;
     return sLayouter;
   }
   /// Start auto-registration of DataPiece objects in the provided DataLayout.
-  /// Attention! This function acquires a global DataLayout creation lock to prevent mixups if two
-  /// DataLayouts were to be created concurrently in two threads.
-  /// You must guarantee that this call is matched by a call to data dataLayoutEnd() to release the
-  /// global lock. This is called by the constructors of AutoDataLayout and ManualDataLayout.
+  /// You must guarantee that this call is matched by a call to dataLayoutEnd() in the same thread.
+  /// This is called by the constructors of AutoDataLayout and ManualDataLayout.
   /// @param layout: DataLayout all DataPieces created will register themselves with.
-  void dataLayoutBegin(DataLayout& layout) DISABLE_THREAD_SAFETY_ANALYSIS {
-    // If your thread blocks here, an AutoDataLayout class is missing an AutoDataLayoutEnd field,
-    // or a ManualDataLayout is missing a ManualDataLayout::endLayout() call...
-    mutex_.lock();
+  void dataLayoutBegin(DataLayout& layout) {
+    if (currentLayout_ != nullptr) {
+      XR_LOGE(
+          "\n"
+          "**********************************************************************************\n"
+          "*** DataLayout construction error: the previous DataLayout was never completed! ***\n"
+          "*** An AutoDataLayout is missing its AutoDataLayoutEnd field, or a              ***\n"
+          "*** ManualDataLayout is missing its endLayout() call. That DataLayout is        ***\n"
+          "*** abandoned, and is NOT usable. Fix your DataLayout definition!               ***\n"
+          "**********************************************************************************");
+      XR_DEV_CHECK(false, "DataLayout construction started before the previous one ended.");
+    }
     currentLayout_ = &layout;
     prefix_.clear();
   }
@@ -443,14 +448,16 @@ class DataLayouter {
   }
   /// End the construction of a DataLayout.
   /// This is called by AutoDataLayoutEnd's constructor, and on demand by ManualDataLayout.
-  void dataLayoutEnd() DISABLE_THREAD_SAFETY_ANALYSIS {
-    XR_CHECK_NE(
-        currentLayout_,
-        nullptr,
-        "DataLayouter::dataLayoutEnd() called without prior matching call to DataLayouter::dataLayoutBegin().");
+  void dataLayoutEnd() {
+    if (currentLayout_ == nullptr) {
+      XR_LOGE(
+          "DataLayouter::dataLayoutEnd() called without prior matching call to "
+          "DataLayouter::dataLayoutBegin(), or after its DataLayout was abandoned.");
+      XR_DEV_CHECK(false, "DataLayout construction ended without a matching beginning.");
+      return;
+    }
     DataLayout* layout = currentLayout_;
     currentLayout_ = nullptr;
-    mutex_.unlock();
     layout->initLayout();
   }
   /// Start a sub-structure within a DataLayout, with its own "namespace".
@@ -493,7 +500,6 @@ class DataLayouter {
  private:
   DataLayouter() = default;
 
-  mutex mutex_;
   DataLayout* currentLayout_ = nullptr;
   string prefix_;
 };
