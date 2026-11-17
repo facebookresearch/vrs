@@ -90,9 +90,9 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ac0d333f3834c679854a7e64cbfea2916" id="r_ac0d333f3834c679854a7e64cbfea2916"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac0d333f3834c679854a7e64cbfea2916">dataLayoutBegin</a> (<a class="el" href="classvrs_1_1_data_layout.html">DataLayout</a> &amp;layout) DISABLE_THREAD_SAFETY_ANALYSIS</td></tr>
+<tr class="memitem:a22ae6074c1dcd14b9fbd6489fab35285" id="r_a22ae6074c1dcd14b9fbd6489fab35285"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a22ae6074c1dcd14b9fbd6489fab35285">dataLayoutBegin</a> (<a class="el" href="classvrs_1_1_data_layout.html">DataLayout</a> &amp;layout)</td></tr>
 <tr class="memitem:adc3af169fb77711d0b6a46ed390019ef" id="r_adc3af169fb77711d0b6a46ed390019ef"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classvrs_1_1_data_layout.html">DataLayout</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adc3af169fb77711d0b6a46ed390019ef">registerDataPiece</a> (<a class="el" href="classvrs_1_1_data_piece.html">DataPiece</a> *dataPiece)</td></tr>
-<tr class="memitem:a6d4df5e07704d3051ec7f62fcb3d6f28" id="r_a6d4df5e07704d3051ec7f62fcb3d6f28"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6d4df5e07704d3051ec7f62fcb3d6f28">dataLayoutEnd</a> () DISABLE_THREAD_SAFETY_ANALYSIS</td></tr>
+<tr class="memitem:a59424ba50fb68c35d4a275a35d635cd1" id="r_a59424ba50fb68c35d4a275a35d635cd1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59424ba50fb68c35d4a275a35d635cd1">dataLayoutEnd</a> ()</td></tr>
 <tr class="memitem:af2b00e36a4ee109ceb14df7955a87bf5" id="r_af2b00e36a4ee109ceb14df7955a87bf5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af2b00e36a4ee109ceb14df7955a87bf5">dataLayoutStructStart</a> (const string &amp;structName)</td></tr>
 <tr class="memitem:a09f3b2aa1bd8f8e6244dbeff6faf2639" id="r_a09f3b2aa1bd8f8e6244dbeff6faf2639"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a09f3b2aa1bd8f8e6244dbeff6faf2639">dataLayoutPieceLabel</a> (string &amp;&amp;label)</td></tr>
 <tr class="memitem:a2c91e8f24b724cc90b6781837b6d890b" id="r_a2c91e8f24b724cc90b6781837b6d890b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2c91e8f24b724cc90b6781837b6d890b">dataLayoutStructEnd</a> (const string &amp;structName)</td></tr>
@@ -107,11 +107,11 @@ static DataLayouter &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>
 <p>C++ doesn't support a form of introspection that would allow objects to "find their parent". This technique allows the automatic registration of <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> objects.</p><ul>
 <li>call dataLayoutBegin(layout) to start registering <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> objects with a layout object.</li>
 <li>create <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> objects, which will automatically call registerDataPiece(dataPiece).</li>
-<li>call <a class="el" href="#a6d4df5e07704d3051ec7f62fcb3d6f28">dataLayoutEnd()</a> to end the registration. This class uses a global lock to prevent simultaneous construction of <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> objects from mixing each other. This class is purely internal to VRS, and nothing outside of VRS should ever rely on it. This is one of the reasons why it's only declared &amp; defined in the same cpp file. </li>
+<li>call <a class="el" href="#a59424ba50fb68c35d4a275a35d635cd1">dataLayoutEnd()</a> to end the registration. Each thread has its own <a class="el" href="classvrs_1_1internal_1_1_data_layouter.html" title="Helper class to manage the registration of DataPiece objects within a single DataLayout.">DataLayouter</a> instance, so <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> objects can be constructed concurrently in different threads, but the construction of a <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> must begin and end in the same thread. This class is purely internal to VRS, and nothing outside of VRS should ever rely on it. This is one of the reasons why it's only declared &amp; defined in the same cpp file. </li>
 </ul>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
-<a id="ac0d333f3834c679854a7e64cbfea2916" name="ac0d333f3834c679854a7e64cbfea2916"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac0d333f3834c679854a7e64cbfea2916">&#9670;&#160;</a></span>dataLayoutBegin()</h2>
+<a id="a22ae6074c1dcd14b9fbd6489fab35285" name="a22ae6074c1dcd14b9fbd6489fab35285"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a22ae6074c1dcd14b9fbd6489fab35285">&#9670;&#160;</a></span>dataLayoutBegin()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -132,7 +132,7 @@ static DataLayouter &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Start auto-registration of <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> objects in the provided <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a>. Attention! This function acquires a global <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> creation lock to prevent mixups if two DataLayouts were to be created concurrently in two threads. You must guarantee that this call is matched by a call to data <a class="el" href="#a6d4df5e07704d3051ec7f62fcb3d6f28">dataLayoutEnd()</a> to release the global lock. This is called by the constructors of <a class="el" href="classvrs_1_1_auto_data_layout.html" title="Specialized DataLayout class to declare a DataLayout in struct format.">AutoDataLayout</a> and <a class="el" href="classvrs_1_1_manual_data_layout.html" title="Specialized DataLayout for programmatic DataLayout generation.">ManualDataLayout</a>. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Start auto-registration of <a class="el" href="classvrs_1_1_data_piece.html" title="Abstract class representing a piece of information part of a DataLayout.">DataPiece</a> objects in the provided <a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a>. You must guarantee that this call is matched by a call to <a class="el" href="#a59424ba50fb68c35d4a275a35d635cd1">dataLayoutEnd()</a> in the same thread. This is called by the constructors of <a class="el" href="classvrs_1_1_auto_data_layout.html" title="Specialized DataLayout class to declare a DataLayout in struct format.">AutoDataLayout</a> and <a class="el" href="classvrs_1_1_manual_data_layout.html" title="Specialized DataLayout for programmatic DataLayout generation.">ManualDataLayout</a>. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">layout</td><td><a class="el" href="classvrs_1_1_data_layout.html" title="The DataLayout class describes the data stored inside a DataLayoutContentBlock.">DataLayout</a> all DataPieces created will register themselves with. </td></tr>
   </table>
@@ -141,8 +141,8 @@ static DataLayouter &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>
 
 </div>
 </div>
-<a id="a6d4df5e07704d3051ec7f62fcb3d6f28" name="a6d4df5e07704d3051ec7f62fcb3d6f28"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6d4df5e07704d3051ec7f62fcb3d6f28">&#9670;&#160;</a></span>dataLayoutEnd()</h2>
+<a id="a59424ba50fb68c35d4a275a35d635cd1" name="a59424ba50fb68c35d4a275a35d635cd1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59424ba50fb68c35d4a275a35d635cd1">&#9670;&#160;</a></span>dataLayoutEnd()</h2>
 
 <div class="memitem">
 <div class="memproto">
