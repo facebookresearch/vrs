@@ -35,6 +35,7 @@
 #include <vrs/Recordable.h>
 #include <vrs/TagsRecord.h>
 #include <vrs/helpers/JobQueue.h>
+#include <vrs/helpers/WaitableCounter.h>
 #include <vrs/os/Event.h>
 #include <vrs/os/System.h>
 #include <vrs/os/Time.h>
@@ -432,7 +433,7 @@ void RecordFileWriter::backgroundWriterThreadActivity() {
     closeFileAfterError(fileError);
   }
   if (queueByteSize_) {
-    queueByteSize_->store(0, memory_order_relaxed);
+    queueByteSize_->reset();
   }
   // resume purging records, if we were doing that
   if (purgeThreadData_ != nullptr) {
@@ -466,6 +467,7 @@ bool RecordFileWriter::autoCollectRecords(bool checkTime) {
           if (LOG_FILE_OPERATIONS) {
             logBatch(*newBatch, "autoCollectRecords");
           }
+          addToQueueByteSize(*newBatch);
           writerThreadData_->recordsReadyToWrite.emplace_back(std::move(newBatch));
           writerThreadData_->hasRecordsReadyToWrite.store(true, memory_order_relaxed);
           somethingToWrite = true;
@@ -526,7 +528,7 @@ int RecordFileWriter::createFileAsync(const string& filePath, bool splitHead) {
     purgeThreadData_->purgingPaused_ = true;
   }
   if (queueByteSize_) {
-    queueByteSize_->store(0, memory_order_relaxed);
+    queueByteSize_->reset();
   }
   // make sure we have recent configuration & state records
   for (auto* recordable : getRecordables()) {
@@ -582,6 +584,7 @@ int RecordFileWriter::writeRecordsAsync(double maxTimestamp) {
     if (LOG_FILE_OPERATIONS) {
       logBatch(*recordBatch, "writeRecordsAsync");
     }
+    addToQueueByteSize(*recordBatch);
     { // mutex guard
       unique_lock<recursive_mutex> guard{writerThreadData_->mutex};
       writerThreadData_->recordsReadyToWrite.emplace_back(std::move(recordBatch));
@@ -629,12 +632,36 @@ int RecordFileWriter::autoPurgeRecords(
 
 void RecordFileWriter::trackBackgroundThreadQueueByteSize() {
   if (queueByteSize_ == nullptr) {
-    queueByteSize_ = make_unique<atomic<uint64_t>>();
+    queueByteSize_ = make_unique<WaitableCounter>();
+  }
+}
+
+void RecordFileWriter::addToQueueByteSize(const RecordBatch& batch) {
+  if (queueByteSize_) {
+    uint64_t byteSize = 0;
+    for (const auto& streamRecords : batch) {
+      for (const Record* record : streamRecords.second) {
+        byteSize += record->getSize();
+      }
+    }
+    queueByteSize_->add(byteSize);
   }
 }
 
 uint64_t RecordFileWriter::getBackgroundThreadQueueByteSize() {
-  return queueByteSize_ ? queueByteSize_->load(memory_order_relaxed) : 0;
+  return queueByteSize_ ? queueByteSize_->get() : 0;
+}
+
+void RecordFileWriter::waitForBackgroundThreadQueueByteSize(uint64_t maxQueueByteSize) {
+  if (queueByteSize_) {
+    queueByteSize_->waitForAtMost(maxQueueByteSize);
+  }
+}
+
+bool RecordFileWriter::waitForBackgroundThreadQueueByteSize(
+    uint64_t maxQueueByteSize,
+    double timeoutSec) {
+  return !queueByteSize_ || queueByteSize_->waitForAtMost(maxQueueByteSize, timeoutSec);
 }
 
 int RecordFileWriter::getFileError() const {
@@ -746,10 +773,7 @@ bool RecordFileWriter::addRecordsReadyToWrite(
       indexRecordWriter_.addStream(streamRecords.first);
     }
   }
-  uint64_t addedSize = addRecordBatchesToSortedRecords(batches, inOutRecordsToWrite);
-  if (queueByteSize_) {
-    queueByteSize_->fetch_add(addedSize, memory_order_relaxed);
-  }
+  addRecordBatchesToSortedRecords(batches, inOutRecordsToWrite);
   return true;
 }
 
@@ -1073,7 +1097,7 @@ void RecordFileWriter::writeOneRecord(
     rwd.currentChunkSize = 0; // reset, even if addChunk() failed to reduce retrying.
   }
   if (queueByteSize_) {
-    queueByteSize_->fetch_sub(record->getSize(), memory_order_relaxed);
+    queueByteSize_->sub(record->getSize());
   }
   int error = record->writeRecord(*file_, streamId, lastRecordSize_, compressor, compressedSize);
   if (error != 0) {
@@ -1102,7 +1126,7 @@ int RecordFileWriter::writeRecordsSingleThread(SortedRecords& records, int lastE
     if (rwd.getError() != 0) {
       rwd.skippedRecords++;
       if (queueByteSize_) {
-        queueByteSize_->fetch_sub(record->getSize(), memory_order_relaxed);
+        queueByteSize_->sub(record->getSize());
       }
       record->recycle();
     } else {
@@ -1114,7 +1138,7 @@ int RecordFileWriter::writeRecordsSingleThread(SortedRecords& records, int lastE
         XR_LOGE("Compression failed: {}", errorCodeToMessageWithCode(compressionError));
         rwd.error = compressionError;
         if (queueByteSize_) {
-          queueByteSize_->fetch_sub(record->getSize(), memory_order_relaxed);
+          queueByteSize_->sub(record->getSize());
         }
         record->recycle();
       } else {
@@ -1185,14 +1209,14 @@ int RecordFileWriter::writeRecordsMultiThread(
       if (rwd.getError() != 0) {
         rwd.skippedRecords++;
         if (queueByteSize_) {
-          queueByteSize_->fetch_sub(record->getSize(), memory_order_relaxed);
+          queueByteSize_->sub(record->getSize());
         }
         record->recycle();
       } else if (job->getCompressionError() != SUCCESS) {
         XR_LOGE("Compression failed: {}", errorCodeToMessageWithCode(job->getCompressionError()));
         rwd.error = job->getCompressionError();
         if (queueByteSize_) {
-          queueByteSize_->fetch_sub(record->getSize(), memory_order_relaxed);
+          queueByteSize_->sub(record->getSize());
         }
         record->recycle();
       } else {

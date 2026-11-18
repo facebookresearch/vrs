@@ -99,11 +99,19 @@ void ThrottledWriter::onRecordDecoded(double timestamp, double writeGraceWindow)
     writer_.writeRecordsAsync(timestamp - max<double>(writeGraceWindow, copyOptions_.graceWindow));
     // wait that most of the buffers are processed to resume,
     // limiting collisions between input & output file operations.
-    do {
-      printPercentAndQueueSize(queueByteSize, true);
+    const uint64_t resumeQueueByteSize = maxQueueByteSize * 9 / 10;
+    while (true) {
+      printPercentAndQueueSize(writer_.getBackgroundThreadQueueByteSize(), true);
+      if (!writer_.waitForBackgroundThreadQueueByteSize(resumeQueueByteSize, kRefreshDelaySec)) {
+        continue;
+      }
+      if (!waitCondition_ || !waitCondition_()) {
+        break;
+      }
+      // Nothing notifies when waitCondition_ changes, so poll it.
+      // NOLINTNEXTLINE(facebook-hte-BadCall-sleep_for)
       this_thread::sleep_for(chrono::duration<double>(kRefreshDelaySec));
-      queueByteSize = writer_.getBackgroundThreadQueueByteSize();
-    } while (queueByteSize > maxQueueByteSize * 9 / 10 || (waitCondition_ && waitCondition_()));
+    }
     if (showProgress()) {
       cout << kResetCurrentLine;
       nextUpdateTime_ = 0;
@@ -167,11 +175,7 @@ void ThrottledWriter::waitForBackgroundThreadQueueSize(size_t maxSize) {
            << helpers::humanReadableFileSize(queueByteSize);
       cout.flush();
     }
-    // Check more frequently when we're getting close. This is Science.
-    const double sleepDuration = queueByteSize > 3 * kLowQueueByteSize ? kRefreshDelaySec
-        : queueByteSize > kLowQueueByteSize                            ? kRefreshDelaySec / 2
-                                                                       : kRefreshDelaySec / 5;
-    this_thread::sleep_for(chrono::duration<double>(sleepDuration));
+    writer_.waitForBackgroundThreadQueueByteSize(maxSize, kRefreshDelaySec);
   }
   if (showProgress()) {
     cout << kResetCurrentLine << "Finishing...";

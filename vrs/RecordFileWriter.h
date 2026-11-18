@@ -46,6 +46,7 @@ using std::string;
 
 class Record;
 class Recordable;
+class WaitableCounter;
 
 /// Namespace for RecordFileWriter's private implementation classes.
 namespace RecordFileWriter_ {
@@ -221,6 +222,16 @@ class VRS_API RecordFileWriter {
   /// which correlates with how much memory is being used by the queue.
   /// @return The number record bytes are waiting to be processed by the background thread.
   uint64_t getBackgroundThreadQueueByteSize();
+  /// Block until getBackgroundThreadQueueByteSize() is at most maxQueueByteSize, waking up each
+  /// time the background thread processes records, rather than polling.
+  /// Returns immediately if trackBackgroundThreadQueueByteSize() was not called.
+  /// @param maxQueueByteSize: Queue byte size at or below which to return.
+  void waitForBackgroundThreadQueueByteSize(uint64_t maxQueueByteSize);
+  /// Same as above, but giving up after a timeout.
+  /// @param maxQueueByteSize: Queue byte size at or below which to return.
+  /// @param timeoutSec: Maximum number of seconds to wait.
+  /// @return True if the queue byte size is at most maxQueueByteSize, false on timeout.
+  bool waitForBackgroundThreadQueueByteSize(uint64_t maxQueueByteSize, double timeoutSec);
   /// Get a default limit for getBackgroundThreadQueueByteSize(), for code that throttles how fast
   /// it creates records: 1/8 of os::getAvailableMemory(), between 128 MiB and 800 MiB.
   /// Computed on the first call, then cached: cheap enough to call for every record.
@@ -325,6 +336,7 @@ class VRS_API RecordFileWriter {
 
   void backgroundWriteCollectedRecord(); ///< internal
   bool addRecordsReadyToWrite(SortedRecords& inOutRecordsToWrite); ///< internal
+  void addToQueueByteSize(const RecordBatch& batch); ///< internal
 
   /// set of recordables registered with this file
   set<Recordable*> recordables_;
@@ -346,7 +358,7 @@ class VRS_API RecordFileWriter {
 
   /// when a background thread is active
   RecordFileWriter_::WriterThreadData* writerThreadData_;
-  std::unique_ptr<std::atomic<uint64_t>> queueByteSize_; // background thread's queue byte size
+  unique_ptr<WaitableCounter> queueByteSize_; // background thread's queue size
 
   /// when a purge thread is active
   RecordFileWriter_::PurgeThreadData* purgeThreadData_;

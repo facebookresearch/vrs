@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <cstring>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -598,6 +599,9 @@ class TestRecordable : public Recordable {
   const Record* createStateRecord() override {
     return nullptr;
   }
+  void createDataRecord(double timestamp, const vector<uint8_t>& payload) {
+    createRecord(timestamp, Record::Type::DATA, 1, DataSource(DataSourceChunk(payload)));
+  }
 };
 } // namespace
 
@@ -626,4 +630,29 @@ TEST(RecordFileWriterTest, defaultMaxQueueByteSize) {
   EXPECT_GE(maxQueueByteSize, 128 * kMiB);
   EXPECT_LE(maxQueueByteSize, 800 * kMiB);
   EXPECT_EQ(RecordFileWriter::getDefaultMaxQueueByteSize(), maxQueueByteSize); // cached
+}
+
+TEST(RecordFileWriterTest, waitForUntrackedQueueByteSize) {
+  RecordFileWriter writer;
+  writer.waitForBackgroundThreadQueueByteSize(0);
+  EXPECT_TRUE(writer.waitForBackgroundThreadQueueByteSize(0, 0));
+}
+
+TEST(RecordFileWriterTest, waitForQueueByteSizeAfterWrite) {
+  TemporaryRecordableInstanceIdsResetter instanceIdsResetter;
+  TemporaryRecordPath filePath;
+  RecordFileWriter writer;
+  writer.trackBackgroundThreadQueueByteSize();
+  TestRecordable recordable;
+  recordable.setCompression(CompressionPreset::None);
+  writer.addRecordable(&recordable);
+  ASSERT_EQ(writer.createFileAsync(filePath.get()), 0);
+  const vector<uint8_t> payload(1024 * 1024, 42);
+  for (int k = 0; k < 10; k++) {
+    recordable.createDataRecord(k, payload);
+  }
+  ASSERT_EQ(writer.writeRecordsAsync(numeric_limits<double>::max()), 0);
+  EXPECT_TRUE(writer.waitForBackgroundThreadQueueByteSize(0, 30));
+  EXPECT_EQ(writer.getBackgroundThreadQueueByteSize(), 0);
+  EXPECT_EQ(writer.waitForFileClosed(), 0);
 }

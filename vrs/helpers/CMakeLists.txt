@@ -28,6 +28,7 @@ target_link_libraries(vrs_helpers
   PUBLIC
     vrs_logging
     vrs_os
+    vrs_oss_thread_safety_analysis
     rapidjson::rapidjson
 )
 target_include_directories(vrs_helpers
@@ -49,6 +50,7 @@ if (UNIT_TESTS)
   add_executable(test_vrs_helpers
     test/IOVectorTest.cpp
     test/StringsTest.cpp
+    test/WaitableCounterTest.cpp
   )
   target_link_libraries(test_vrs_helpers
     PUBLIC
