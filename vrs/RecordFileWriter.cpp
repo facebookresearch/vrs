@@ -407,8 +407,9 @@ void RecordFileWriter::backgroundWriterThreadActivity() {
   while (!writerThreadData_->shouldEndThread) {
     double waitDelay = writerThreadData_->getBackgroundThreadWaitTime();
     os::EventChannel::Event event{};
-    os::EventChannel::Status status =
-        writerThreadData_->writeEventChannel.waitForEvent(event, waitDelay);
+    // Look back without limit, to catch requests dispatched while this thread wasn't waiting.
+    os::EventChannel::Status status = writerThreadData_->writeEventChannel.waitForEvent(
+        event, waitDelay, numeric_limits<double>::max());
     if (status == os::EventChannel::Status::SUCCESS) {
       if (!writerThreadData_->shouldEndThread) {
         backgroundWriteCollectedRecord();
