@@ -52,7 +52,11 @@ PlayerWindow::PlayerWindow(QApplication& app) : QMainWindow(nullptr), player_{th
       &PlayerWindow::updateLayoutAndPresetMenu);
   connect(&player_, &PlayerUI ::overlaySettingChanged, this, &PlayerWindow::updateTextOverlayMenu);
   setWindowFlags(windowFlags() | Qt::CustomizeWindowHint | Qt::WindowMinMaxButtonsHint);
+#if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
   QApplication::setActiveWindow(this);
+#else
+  activateWindow();
+#endif
 }
 
 void PlayerWindow::createMenus() {
