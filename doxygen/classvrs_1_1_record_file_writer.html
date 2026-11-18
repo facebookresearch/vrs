@@ -137,6 +137,8 @@ RecordFileWriter &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>ope
 <tr class="memitem:adf3a7ed71bdec9326a781aba2789828f" id="r_adf3a7ed71bdec9326a781aba2789828f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adf3a7ed71bdec9326a781aba2789828f">isWriting</a> () const</td></tr>
 <tr class="memitem:ae13cabd33d9e7b2b7f7a97d52c13291a" id="r_ae13cabd33d9e7b2b7f7a97d52c13291a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae13cabd33d9e7b2b7f7a97d52c13291a">trackBackgroundThreadQueueByteSize</a> ()</td></tr>
 <tr class="memitem:ac7d5ba84186faf5026df2a6607d27da4" id="r_ac7d5ba84186faf5026df2a6607d27da4"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac7d5ba84186faf5026df2a6607d27da4">getBackgroundThreadQueueByteSize</a> ()</td></tr>
+<tr class="memitem:a23dc0364f140a16047bd382504af1c7c" id="r_a23dc0364f140a16047bd382504af1c7c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a23dc0364f140a16047bd382504af1c7c">waitForBackgroundThreadQueueByteSize</a> (uint64_t maxQueueByteSize)</td></tr>
+<tr class="memitem:aa35d02b974fa644cae2fc937d557bf11" id="r_aa35d02b974fa644cae2fc937d557bf11"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa35d02b974fa644cae2fc937d557bf11">waitForBackgroundThreadQueueByteSize</a> (uint64_t maxQueueByteSize, double timeoutSec)</td></tr>
 <tr class="memitem:a86ba07c09054685c45acb692c63ed332" id="r_a86ba07c09054685c45acb692c63ed332"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a86ba07c09054685c45acb692c63ed332">getFileError</a> () const</td></tr>
 <tr class="memitem:acfc62c321a72cb16c5fba1c128f16676" id="r_acfc62c321a72cb16c5fba1c128f16676"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acfc62c321a72cb16c5fba1c128f16676">closeFileAsync</a> ()</td></tr>
 <tr class="memitem:a4f17115d0823c49cad9537a444175106" id="r_a4f17115d0823c49cad9537a444175106"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4f17115d0823c49cad9537a444175106">waitForFileClosed</a> ()</td></tr>
@@ -184,8 +186,8 @@ size_t&#160;</td><td class="memItemRight" valign="bottom"><b>compressionThreadPo
 <tr class="memitem:a804d2cc31fd910476563d445997d5505" id="r_a804d2cc31fd910476563d445997d5505"><td class="memItemLeft" align="right" valign="top"><a id="a804d2cc31fd910476563d445997d5505" name="a804d2cc31fd910476563d445997d5505"></a>
 <a class="el" href="structvrs_1_1_record_file_writer___1_1_writer_thread_data.html">RecordFileWriter_::WriterThreadData</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>writerThreadData_</b></td></tr>
 <tr class="memdesc:a804d2cc31fd910476563d445997d5505"><td class="mdescLeft">&#160;</td><td class="mdescRight">when a background thread is active <br /></td></tr>
-<tr class="memitem:a5af634c147db44f9cfbd811d85717c4d" id="r_a5af634c147db44f9cfbd811d85717c4d"><td class="memItemLeft" align="right" valign="top"><a id="a5af634c147db44f9cfbd811d85717c4d" name="a5af634c147db44f9cfbd811d85717c4d"></a>
-std::unique_ptr&lt; std::atomic&lt; uint64_t &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>queueByteSize_</b></td></tr>
+<tr class="memitem:a8d3ce6f72990c3f7f2f91799ab09d78b" id="r_a8d3ce6f72990c3f7f2f91799ab09d78b"><td class="memItemLeft" align="right" valign="top"><a id="a8d3ce6f72990c3f7f2f91799ab09d78b" name="a8d3ce6f72990c3f7f2f91799ab09d78b"></a>
+unique_ptr&lt; WaitableCounter &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>queueByteSize_</b></td></tr>
 <tr class="memitem:a625e8d8842c54f6c6b95242f3ef705a5" id="r_a625e8d8842c54f6c6b95242f3ef705a5"><td class="memItemLeft" align="right" valign="top"><a id="a625e8d8842c54f6c6b95242f3ef705a5" name="a625e8d8842c54f6c6b95242f3ef705a5"></a>
 <a class="el" href="structvrs_1_1_record_file_writer___1_1_purge_thread_data.html">RecordFileWriter_::PurgeThreadData</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>purgeThreadData_</b></td></tr>
 <tr class="memdesc:a625e8d8842c54f6c6b95242f3ef705a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">when a purge thread is active <br /></td></tr>
@@ -761,6 +763,58 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>::vrs::test::Record
       </table>
 </div><div class="memdoc">
 <p>It can be useful/necessary to track how much buffer memory is used by the background threads, so as to report errors, stop recording, or simply wait that enough data has been processed. To avoid threading/cache invalidation costs, this feature needs to be enabled by calling this method before you start writing to disk. For race conditions, you need to call this before the background thread is active. To be safe, call it before creating the file. </p>
+
+</div>
+</div>
+<a id="a23dc0364f140a16047bd382504af1c7c" name="a23dc0364f140a16047bd382504af1c7c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a23dc0364f140a16047bd382504af1c7c">&#9670;&#160;</a></span>waitForBackgroundThreadQueueByteSize() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void vrs::RecordFileWriter::waitForBackgroundThreadQueueByteSize </td>
+          <td>(</td>
+          <td class="paramtype">uint64_t</td>          <td class="paramname"><span class="paramname"><em>maxQueueByteSize</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Block until <a class="el" href="#ac7d5ba84186faf5026df2a6607d27da4">getBackgroundThreadQueueByteSize()</a> is at most maxQueueByteSize, waking up each time the background thread processes records, rather than polling. Returns immediately if <a class="el" href="#ae13cabd33d9e7b2b7f7a97d52c13291a">trackBackgroundThreadQueueByteSize()</a> was not called. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">maxQueueByteSize</td><td>Queue byte size at or below which to return. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aa35d02b974fa644cae2fc937d557bf11" name="aa35d02b974fa644cae2fc937d557bf11"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa35d02b974fa644cae2fc937d557bf11">&#9670;&#160;</a></span>waitForBackgroundThreadQueueByteSize() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool vrs::RecordFileWriter::waitForBackgroundThreadQueueByteSize </td>
+          <td>(</td>
+          <td class="paramtype">uint64_t</td>          <td class="paramname"><span class="paramname"><em>maxQueueByteSize</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>timeoutSec</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Same as above, but giving up after a timeout. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">maxQueueByteSize</td><td>Queue byte size at or below which to return. </td></tr>
+    <tr><td class="paramname">timeoutSec</td><td>Maximum number of seconds to wait. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the queue byte size is at most maxQueueByteSize, false on timeout. </dd></dl>
 
 </div>
 </div>
