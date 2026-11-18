@@ -20,6 +20,8 @@
 
 #include <fmt/format.h>
 
+#include <vrs/os/CompilerAttributes.h>
+
 namespace vrs {
 
 using std::string;
