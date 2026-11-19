@@ -580,7 +580,11 @@ class VRS_API RecordFileReader {
 
  private:
   int doOpenFile(const FileSpec& fileSpec, bool autoWriteFixedIndex, bool checkSignatureOnly);
-  int readFileHeader(const FileSpec& fileSpec, FileFormat::FileHeader& outFileHeader);
+  int readFileHeader(
+      const FileSpec& fileSpec,
+      bool prefetchOpenReads,
+      FileFormat::FileHeader& outFileHeader);
+  void prefetchFileDetails(const FileFormat::FileHeader& fileHeader);
   int readFileDetails(
       const FileSpec& fileSpec,
       bool autoWriteFixedIndex,
@@ -623,6 +627,7 @@ class VRS_API RecordFileReader {
   uint32_t recordHeaderSize_{};
   bool fileHasAnIndex_{};
   bool autoPrefetch_{};
+  bool openReadSequenceDeclared_{}; ///< a read sequence was declared for the open in progress
 };
 
 /// The method to search the nearest record from the index list.

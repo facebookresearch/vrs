@@ -45,6 +45,7 @@ add_executable(test_vrslib
   GetRecordTest.cpp
   MultiRecordFileReaderTest.cpp
   NestedDataLayoutTest.cpp
+  RecordFileReaderTest.cpp
   RecordFormatFileTest.cpp
   RecordFormatTest.cpp
   RecordManagerTest.cpp

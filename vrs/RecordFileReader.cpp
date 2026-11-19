@@ -48,8 +48,33 @@ using namespace std;
 namespace {
 
 constexpr size_t kMinHeaderRead = 1024 * 1024;
+// Cloud files are expected to be cloud-optimized, with their index right after the description
+// record, so this much should hold everything an open reads.
+constexpr int64_t kOpenPrefetchSize = 4 * 1024 * 1024;
 
 using namespace vrs;
+
+/// Drops the read sequence declared to open a file, however the open ends, so that the caching
+/// strategy is back in charge.
+class OpenReadSequenceGuard {
+ public:
+  OpenReadSequenceGuard(unique_ptr<FileHandler>& handler, const bool& declared)
+      : handler_{handler}, originalPtr_{handler.get()}, declared_{declared} {}
+  OpenReadSequenceGuard(const OpenReadSequenceGuard&) = delete;
+  OpenReadSequenceGuard& operator=(const OpenReadSequenceGuard&) = delete;
+  OpenReadSequenceGuard(OpenReadSequenceGuard&&) = delete;
+  OpenReadSequenceGuard& operator=(OpenReadSequenceGuard&&) = delete;
+  ~OpenReadSequenceGuard() {
+    if (declared_ && originalPtr_ == handler_.get()) {
+      handler_->prefetchReadSequence({}, /* clearSequence */ true);
+    }
+  }
+
+ private:
+  unique_ptr<FileHandler>& handler_;
+  FileHandler* originalPtr_;
+  const bool& declared_;
+};
 
 bool before(Record::Type lhs, Record::Type rhs) {
   if (lhs == Record::Type::CONFIGURATION && rhs == Record::Type::STATE) {
@@ -255,8 +280,10 @@ int RecordFileReader::doOpenFile(
   }
   TemporaryCachingStrategy temporaryCachingStrategy(file_, CachingStrategy::Passive);
   autoPrefetch_ = fileSpec.getExtraAsBool(kPrefetchCache, false);
+  openReadSequenceDeclared_ = false;
+  OpenReadSequenceGuard openReadSequenceGuard(file_, openReadSequenceDeclared_);
   FileFormat::FileHeader fileHeader;
-  LOG_PROGRESS(readFileHeader(fileSpec, fileHeader), error, [&]() {
+  LOG_PROGRESS(readFileHeader(fileSpec, !checkSignatureOnly, fileHeader), error, [&]() {
     string fileSize = helpers::humanReadableFileSize(file_->getTotalSize());
     return "Reading " + fileSize + ' ' + file_->getFileHandlerName() + " file header";
   });
@@ -346,6 +373,7 @@ int RecordFileReader::doOpenFile(
 
 int RecordFileReader::readFileHeader(
     const FileSpec& fileSpec,
+    bool prefetchOpenReads,
     FileFormat::FileHeader& outFileHeader) {
   bool readHeaderFromCache = false;
   FileCache* fileCache = FileCache::getFileCache();
@@ -362,6 +390,11 @@ int RecordFileReader::readFileHeader(
   if (!readHeaderFromCache) {
     if (autoPrefetch_) {
       file_->prefetchReadSequence({{0, kMinHeaderRead}});
+    } else if (prefetchOpenReads && file_->isRemoteFileSystem()) {
+      auto prefetchSize =
+          static_cast<size_t>(min<int64_t>(kOpenPrefetchSize, file_->getTotalSize()));
+      file_->prefetchReadSequence({{0, prefetchSize}}, /* clearSequence */ true);
+      openReadSequenceDeclared_ = true;
     }
     IF_ERROR_LOG_AND_RETURN(file_->read(outFileHeader));
     if (!headerCacheFilePath.empty()) {
@@ -369,6 +402,42 @@ int RecordFileReader::readFileHeader(
     }
   }
   return 0;
+}
+
+void RecordFileReader::prefetchFileDetails(const FileFormat::FileHeader& fileHeader) {
+  const int64_t totalSize = file_->getTotalSize();
+  // Only what the header prefetch didn't cover, in file order.
+  const int64_t prefetchedSize =
+      openReadSequenceDeclared_ ? min<int64_t>(kOpenPrefetchSize, totalSize) : 0;
+  vector<pair<size_t, size_t>> ranges;
+  auto addRange = [&](int64_t begin, int64_t end) {
+    begin = max<int64_t>(begin, prefetchedSize);
+    end = min<int64_t>(end, totalSize);
+    if (begin < end) {
+      ranges.emplace_back(static_cast<size_t>(begin), static_cast<size_t>(end - begin));
+    }
+  };
+  const int64_t descriptionRecordOffset = fileHeader.descriptionRecordOffset > 0
+      ? fileHeader.descriptionRecordOffset
+      : static_cast<int64_t>(fileHeader.fileHeaderSize);
+  const int64_t firstUserRecordOffset = fileHeader.firstUserRecordOffset;
+  const int64_t indexRecordOffset = fileHeader.indexRecordOffset;
+  // Reading a block that isn't in the sequence discards the rest of the sequence, so the
+  // description record must be declared too, followed by the index when it's at the front.
+  // Old files don't have firstUserRecordOffset, so the description's size is unknown.
+  addRange(
+      descriptionRecordOffset,
+      firstUserRecordOffset > descriptionRecordOffset ? firstUserRecordOffset
+                                                      : descriptionRecordOffset + 1);
+  // A classic index written at the end of the file is the file's last record.
+  if (indexRecordOffset > 0 && indexRecordOffset >= firstUserRecordOffset) {
+    addRange(indexRecordOffset, totalSize);
+  }
+  if (!ranges.empty()) {
+    // Extends the header prefetch's sequence, if there was one.
+    file_->prefetchReadSequence(ranges, /* clearSequence */ !openReadSequenceDeclared_);
+    openReadSequenceDeclared_ = true;
+  }
 }
 
 int RecordFileReader::readFileDetails(
@@ -379,6 +448,8 @@ int RecordFileReader::readFileDetails(
   int64_t firstUserRecordOffset = fileHeader.firstUserRecordOffset;
   if (autoPrefetch_) {
     file_->prefetchReadSequence({{0, max<size_t>(kMinHeaderRead, firstUserRecordOffset)}});
+  } else if (file_->isRemoteFileSystem()) {
+    prefetchFileDetails(fileHeader);
   }
   if (firstUserRecordOffset == 0) {
     // firstUserRecordOffset was only created when we added support for early index records.
@@ -408,7 +479,6 @@ int RecordFileReader::readFileDetails(
     XR_LOGW("No description record.");
   }
   // Read the file's index
-  file_->setCachingStrategy(CachingStrategy::Streaming);
   IndexRecord::Reader indexReader(
       *file_, fileHeader, openProgressLogger_, streamIds_, recordIndex_);
   int64_t usedFileSize = 0;
@@ -435,7 +505,15 @@ int RecordFileReader::readFileDetails(
       return INDEX_RECORD_ERROR;
     }
     XR_LOGW("Index incomplete. Rebuilding index of '{}'...", fileSpec.getEasyPath());
-    indexReader.rebuildIndex(autoWriteFixedIndex);
+    {
+      // Scanning the whole file: read ahead, and drop the open's read sequence first.
+      if (openReadSequenceDeclared_) {
+        file_->prefetchReadSequence({}, /* clearSequence */ true);
+        openReadSequenceDeclared_ = false;
+      }
+      TemporaryCachingStrategy streaming(file_, CachingStrategy::Streaming);
+      indexReader.rebuildIndex(autoWriteFixedIndex);
+    }
     if (!file_->isReadOnly()) {
       XR_LOGI("Re-opening file in read-only mode.");
       return doOpenFile(fileSpec, /* autoWriteFixedIndex */ false, /* checkSignatureOnly */ false);
