@@ -467,23 +467,41 @@ int AsyncBuffer::start_write(
     const AsyncHandle& file,
     int64_t offset,
     complete_write_callback on_complete) {
-  ssize_t io_return = 0;
-  int io_errno = SUCCESS;
-
+#if POSIX_AIO_SUPPORTED()
+  return startWrite(file, offset, std::move(on_complete), aioWrite);
+#else
+  on_complete_ = std::move(on_complete);
 #if IS_WINDOWS_PLATFORM()
   ov_.self = this;
   ov_.ov = {};
   ov_.ov.Offset = (DWORD)offset;
   ov_.ov.OffsetHigh = (DWORD)(offset >> 32);
   if (!WriteFileEx(file.h_, AlignedBuffer::data(), size(), &ov_.ov, CompletedWriteRoutine)) {
-    io_return = -1;
-    io_errno = GetLastError();
-    if (io_errno == 0) {
-      io_errno = ERROR_GEN_FAILURE;
-    }
+    const int error = GetLastError();
+    on_complete_ = nullptr;
+    return error != SUCCESS ? error : ERROR_GEN_FAILURE;
   }
+  return SUCCESS;
+#else
+  const ssize_t written =
+      ::pwrite64(file.fd_, AlignedBuffer::data(), size(), static_cast<off64_t>(offset));
+  if (written < 0) {
+    const int error = errno;
+    on_complete_ = nullptr;
+    return error != SUCCESS ? error : DISKFILE_INVALID_STATE;
+  }
+  on_complete_(written, SUCCESS);
+  return SUCCESS;
+#endif
+#endif
+}
 
-#elif POSIX_AIO_SUPPORTED()
+#if POSIX_AIO_SUPPORTED()
+int AsyncBuffer::startWrite(
+    const AsyncHandle& file,
+    int64_t offset,
+    complete_write_callback on_complete,
+    AioSubmitter submit) {
   aiocb_ = {};
   aiocb_.aio_fildes = file.fd_;
   aiocb_.aio_offset = offset;
@@ -494,46 +512,16 @@ int AsyncBuffer::start_write(
   aiocb_.aio_sigevent.sigev_notify_function = SigEvNotifyFunction;
   aiocb_.aio_sigevent.sigev_value.sival_ptr = this;
   aiocb_.aio_sigevent.sigev_notify_attributes = nullptr;
-  aiocb_.aio_lio_opcode = 0; // used for lio_lioio only, unused
+  aiocb_.aio_lio_opcode = 0;
   on_complete_ = std::move(on_complete);
-
-  if (aioWrite(&aiocb_) != 0) {
-    io_return = -1;
-    io_errno = errno;
-    if (io_errno == 0) {
-      XR_LOGCD(VRS_DISKFILECHUNK, "aio_write failed, errno is 0");
-      io_errno = -1;
-    }
+  if (submit(&aiocb_) != SUCCESS) {
+    const int error = errno;
+    on_complete_ = nullptr;
+    return error != SUCCESS ? error : DISKFILE_INVALID_STATE;
   }
-  // The submission failed, call the cleanup function.
-  // Note that the return value of aio_write is a subset of the aio_return (which is what a normal
-  // completion calls). `aio_write` will either return -1 and set perror (same as aio_return), or
-  // will return 0
-#else
-  // no POSIX AIO, use synchronous pwrite as fallback
-  on_complete_ = std::move(on_complete);
-  ssize_t written =
-      ::pwrite64(file.fd_, AlignedBuffer::data(), size(), static_cast<off64_t>(offset));
-  if (written < 0) {
-    io_return = -1;
-    io_errno = errno;
-  } else {
-    io_return = written;
-    io_errno = SUCCESS;
-  }
-  // Call completion callback synchronously
-  on_complete_(io_return, io_errno);
-  return io_return < 0 ? -1 : 0;
-#endif
-
-#if POSIX_AIO_SUPPORTED() || IS_WINDOWS_PLATFORM()
-  if (io_return != 0) {
-    // If aio_write failed call the completion callback immediately to free the buffer
-    on_complete_(io_return, io_errno);
-  }
-  return static_cast<int>(io_return);
-#endif
+  return SUCCESS;
 }
+#endif
 
 #if IS_WINDOWS_PLATFORM()
 void AsyncBuffer::CompletedWriteRoutine(
@@ -678,6 +666,9 @@ int AsyncDiskFileChunk::close() {
   }
 
   int error = flushWriteBuffer();
+  if (current_buffer_) {
+    free_buffer(current_buffer_);
+  }
 
   // Release the write buffers, if any. File chunking is a rare enough event that it's not worth
   // trying to move these to the next currentChunk.
@@ -799,7 +790,7 @@ int AsyncDiskFileChunk::write(const void* buffer, size_t count, size_t& outWritt
               });
           current_buffer_ = nullptr;
           file_position_ += towrite;
-          pump_buffers_locked();
+          pump_buffers_locked(lock);
 
           if (count != 0) {
             current_buffer_ = get_free_buffer_locked(lock);
@@ -1016,17 +1007,14 @@ void AsyncDiskFileChunk::complete_write(AsyncBuffer* buffer, ssize_t io_return, 
   }
 
   if (io_errno != SUCCESS) {
-    int current_error = async_error_.load();
-    while (current_error == SUCCESS &&
-           !async_error_.compare_exchange_weak(current_error, io_errno)) {
-    }
+    recordAsyncError(io_errno);
   }
 
   {
     std::unique_lock lock{buffers_mutex_};
     free_buffer_locked(lock, buffer);
     buffers_writing_ -= 1;
-    pump_buffers_locked();
+    pump_buffers_locked(lock);
   }
 }
 
@@ -1063,28 +1051,31 @@ void AsyncDiskFileChunk::free_buffer_locked(
 
 void AsyncDiskFileChunk::pump_buffers() {
   std::unique_lock lock{buffers_mutex_};
-  pump_buffers_locked();
+  pump_buffers_locked(lock);
 }
 
-void AsyncDiskFileChunk::pump_buffers_locked() {
-  // You must own a lock on buffers_mutex_ to call this
-
-  // Move as many queued buffers as we can to the writing state
+void AsyncDiskFileChunk::pump_buffers_locked(
+    std::unique_lock<std::mutex>& lock,
+    const WriteSubmitter& submit) {
   while (buffers_writing_ < iodepth_ && !buffers_queued_.empty()) {
-    int result = SUCCESS;
-    {
-      // N.B. item's storage in in buffers_queued_, don't `pop_front()` until we're done using
-      // it
-      auto& item = buffers_queued_.front();
-      result = item.buffer_->start_write(item.file_, item.offset_, std::move(item.callback_));
-    }
+    auto& item = buffers_queued_.front();
+    auto* buffer = item.buffer_;
+    const int result = submit
+        ? submit(item)
+        : buffer->start_write(item.file_, item.offset_, std::move(item.callback_));
     buffers_queued_.pop_front();
-    // Note that `async_error_` is set by the completion routine on a start_write failure, no need
-    // to modify it here
     if (result == SUCCESS) {
       buffers_writing_ += 1;
+    } else {
+      recordAsyncError(result);
+      free_buffer_locked(lock, buffer);
     }
   }
+}
+
+void AsyncDiskFileChunk::recordAsyncError(int error) {
+  int expected = SUCCESS;
+  async_error_.compare_exchange_strong(expected, error);
 }
 
 int AsyncDiskFileChunk::alloc_write_buffers() {
