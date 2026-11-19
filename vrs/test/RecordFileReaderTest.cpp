@@ -138,6 +138,12 @@ TEST(RecordFileReaderTest, remoteOpenDeclaresWhatItReads) {
       {"segundo.p.config.100ms.vrs", true}, // index at the end
       {"arcata_raw10.vrs", false}, // index at the front
   };
+  // Most of these files are not in the open source test data.
+  for (const auto& file : files) {
+    if (!os::isFile(getTestFilePath(file.first))) {
+      GTEST_SKIP() << "Missing test file " << file.first;
+    }
+  }
   for (const auto& [name, extended] : files) {
     for (CachingStrategy strategy : {CachingStrategy::Passive, CachingStrategy::Streaming}) {
       SCOPED_TRACE(name + " " + toString(strategy));
