@@ -205,6 +205,10 @@ class VRS_API AsyncBuffer : public AlignedBuffer {
   ~AsyncBuffer() override = default;
 
   void complete_write(ssize_t io_return, int io_errno);
+  /// @param file File receiving the write.
+  /// @param offset File offset of the write.
+  /// @param on_complete Callback for an accepted write; synchronous for the PSync fallback.
+  /// @return SUCCESS if accepted, otherwise an error without invoking on_complete.
   [[nodiscard]] int
   start_write(const AsyncHandle& file, int64_t offset, complete_write_callback on_complete);
 
@@ -218,7 +222,14 @@ class VRS_API AsyncBuffer : public AlignedBuffer {
   static void CompletedWriteRoutine(DWORD dwErr, DWORD cbBytesWritten, LPOVERLAPPED lpOverlapped);
 #elif POSIX_AIO_SUPPORTED()
   AioControlBlock aiocb_{};
+  using AioSubmitter = int (*)(decltype(aiocb_)*);
+  int startWrite(
+      const AsyncHandle& file,
+      int64_t offset,
+      complete_write_callback on_complete,
+      AioSubmitter submit);
   static void SigEvNotifyFunction(union sigval val);
+  friend class AsyncDiskFileChunkTestPeer;
 #endif
   complete_write_callback on_complete_ = nullptr;
 };
@@ -288,7 +299,12 @@ class VRS_API AsyncDiskFileChunk {
   void free_buffer(AsyncBuffer*& buffer);
   void free_buffer_locked(std::unique_lock<std::mutex>& lock, AsyncBuffer*& buffer);
   void pump_buffers();
-  void pump_buffers_locked();
+  using WriteSubmitter = std::function<int(QueuedWrite&)>;
+  void pump_buffers_locked(
+      std::unique_lock<std::mutex>& lock,
+      const WriteSubmitter& submit = nullptr);
+  void recordAsyncError(int error);
+  friend class AsyncDiskFileChunkTestPeer;
   int alloc_write_buffers();
   int free_write_buffers();
   int init_parameters(const FileSpec::Extras& options);
