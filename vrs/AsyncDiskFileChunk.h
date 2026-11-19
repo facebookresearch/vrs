@@ -56,6 +56,18 @@
 
 namespace vrs {
 
+#if POSIX_AIO_SUPPORTED()
+#if IS_LINUX_PLATFORM()
+// On 32-bit Linux, struct aiocb holds its file offset as a 32-bit off_t unless the whole build
+// sets _FILE_OFFSET_BITS=64. Use the explicit 64-bit control block, the same way
+// AsyncFileDescriptor uses lseek64 and pread64, so the layout of AsyncBuffer does not depend on
+// the feature macros of the code that includes this header.
+using AioControlBlock = aiocb64;
+#else
+using AioControlBlock = aiocb;
+#endif
+#endif
+
 #if IS_WINDOWS_PLATFORM()
 // Windows doesn't normally define these.
 using ssize_t = int64_t;
@@ -113,10 +125,10 @@ struct VRS_API AsyncFileDescriptor {
 
   int open(const std::string& path, const char* modes, int flags);
   [[nodiscard]] bool isOpened() const;
-  int read(void* ptr, size_t bufferSize, size_t offset, size_t& outReadSize);
+  int read(void* ptr, size_t bufferSize, int64_t offset, size_t& outReadSize);
   int truncate(int64_t newSize);
   int seek(int64_t pos, int origin, int64_t& outFilepos);
-  int pwrite(const void* buf, size_t count, off_t offset, size_t& written);
+  int pwrite(const void* buf, size_t count, int64_t offset, size_t& written);
   int close();
 
   int fd_ = INVALID_FILE_DESCRIPTOR;
@@ -205,7 +217,7 @@ class VRS_API AsyncBuffer : public AlignedBuffer {
   AsyncOVERLAPPED ov_;
   static void CompletedWriteRoutine(DWORD dwErr, DWORD cbBytesWritten, LPOVERLAPPED lpOverlapped);
 #elif POSIX_AIO_SUPPORTED()
-  struct aiocb aiocb_{};
+  AioControlBlock aiocb_{};
   static void SigEvNotifyFunction(union sigval val);
 #endif
   complete_write_callback on_complete_ = nullptr;
@@ -256,12 +268,12 @@ class VRS_API AsyncDiskFileChunk {
     // N.B. QueuedWrite's are guaranteed to be flushed before the associated file descriptor is
     // close, so storing this via reference is safe.
     const AsyncHandle& file_;
-    off_t offset_;
+    int64_t offset_;
     AsyncBuffer::complete_write_callback callback_;
     QueuedWrite(
         AsyncBuffer* buffer,
         AsyncHandle& file,
-        off_t offset,
+        int64_t offset,
         AsyncBuffer::complete_write_callback callback)
         : buffer_(buffer), file_(file), offset_(offset), callback_(std::move(callback)) {}
   };

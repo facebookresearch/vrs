@@ -21,9 +21,13 @@
 #include <cstdint>
 #include <cstring>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
+
+#include <vrs/DiskFile.h>
+#include <vrs/os/Utils.h>
 
 using namespace std;
 using namespace vrs;
@@ -152,5 +156,43 @@ TEST(AlignedBufferTest, ZeroLenAlignSkipsTheCapacityConstraint) {
   ASSERT_NE(buffer, nullptr);
   EXPECT_EQ(buffer->capacity(), kCapacity + 1);
 }
+
+#if !IS_WINDOWS_PLATFORM()
+// File offsets must reach the file descriptor as 64-bit values, whatever the size of off_t.
+// The payload fills one write buffer, so it goes through the async write path, not through the
+// pwrite of a partial buffer at close. The file is sparse, so the 4 GiB gap costs no disk space;
+// NTFS has no sparse files by default.
+TEST(AsyncDiskFileTest, ReadsWritesAndTruncatesBeyond4GiB) {
+  const string path = os::getTempFolder() + "AsyncDiskFileBeyond4GiB.vrs";
+  constexpr int64_t kOffset = (int64_t{1} << 32) + 64 * 1024;
+  const vector<uint8_t> payload = makePayload(64 * 1024, 3);
+  const FileSpec::Extras options = {{"buffer_size", "65536"}};
+
+  AsyncDiskFile file;
+  ASSERT_EQ(file.create(path, options), 0);
+  ASSERT_EQ(file.setPos(kOffset), 0);
+  ASSERT_EQ(file.write(payload.data(), payload.size()), 0);
+  EXPECT_EQ(file.getPos(), kOffset + static_cast<int64_t>(payload.size()));
+  ASSERT_EQ(file.close(), 0);
+  EXPECT_EQ(os::getFileSize(path), kOffset + static_cast<int64_t>(payload.size()));
+
+  ASSERT_EQ(file.open(path), 0);
+  ASSERT_EQ(file.setPos(kOffset), 0);
+  vector<uint8_t> readBack(payload.size());
+  ASSERT_EQ(file.read(readBack.data(), readBack.size()), 0);
+  EXPECT_EQ(readBack, payload);
+  ASSERT_EQ(file.close(), 0);
+
+  ASSERT_EQ(file.create(path, options), 0);
+  ASSERT_EQ(file.setPos(kOffset), 0);
+  ASSERT_EQ(file.write(payload.data(), payload.size()), 0);
+  ASSERT_EQ(file.setPos(kOffset + 1024), 0);
+  ASSERT_EQ(file.truncate(), 0);
+  ASSERT_EQ(file.close(), 0);
+  EXPECT_EQ(os::getFileSize(path), kOffset + 1024);
+
+  os::remove(path);
+}
+#endif
 
 #endif // VRS_ASYNC_DISKFILE_SUPPORTED()
