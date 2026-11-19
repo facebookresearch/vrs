@@ -15,6 +15,7 @@
  */
 
 #include <cmath>
+#include <cstring>
 
 #include <fstream>
 #include <memory>
@@ -854,6 +855,84 @@ TEST_F(PixelFrameTest, normalizeBayer10GbrgQualityPathRespectsStride) {
       EXPECT_EQ(row[x * 3 + 2], 100) << "B leaked at (" << x << "," << y << ")";
     }
   }
+}
+
+// Build a RAW10 Bayer source with constant per-channel values. Each group of 4 pixels is stored as
+// 4 bytes of 8 MSBs, followed by 1 byte of 2 LSBs per pixel, here left at 0.
+// RGGB: even rows R G, odd rows G B. BGGR: even rows B G, odd rows G R.
+static PixelFrame makeRaw10BayerFrame(
+    PixelFormat format,
+    uint32_t width,
+    uint32_t height,
+    uint8_t red8,
+    uint8_t green8,
+    uint8_t blue8,
+    uint32_t strideBytes = 0) {
+  if (strideBytes == 0) {
+    strideBytes = width * 5 / 4;
+  }
+  const bool rggb = format == PixelFormat::RAW10_BAYER_RGGB;
+  const uint8_t evenRowEvenCol = rggb ? red8 : blue8;
+  const uint8_t oddRowOddCol = rggb ? blue8 : red8;
+  PixelFrame frame(format, width, height, strideBytes);
+  memset(frame.wdata(), 0xff, frame.size());
+  for (uint32_t y = 0; y < height; ++y) {
+    uint8_t* row = frame.wdata() + y * strideBytes;
+    for (uint32_t x = 0; x < width; ++x) {
+      const bool evenRow = (y % 2) == 0;
+      const bool evenCol = (x % 2) == 0;
+      row[x / 4 * 5 + x % 4] =
+          evenRow ? (evenCol ? evenRowEvenCol : green8) : (evenCol ? green8 : oddRowOddCol);
+      row[x / 4 * 5 + 4] = 0;
+    }
+  }
+  return frame;
+}
+
+static void expectRaw10BayerNormalization(
+    PixelFormat format,
+    bool speedOverPrecision,
+    uint32_t strideBytes = 0) {
+  constexpr uint8_t kRed8 = 50;
+  constexpr uint8_t kGreen8 = 200;
+  constexpr uint8_t kBlue8 = 100;
+  constexpr uint32_t kSize = 8;
+  PixelFrame source =
+      makeRaw10BayerFrame(format, kSize, kSize, kRed8, kGreen8, kBlue8, strideBytes);
+  shared_ptr<PixelFrame> normalized;
+  NormalizeOptions options(ImageSemantic::Image);
+  options.speedOverPrecision = speedOverPrecision;
+  ASSERT_TRUE(source.normalizeFrame(normalized, true, options));
+  ASSERT_EQ(normalized->getPixelFormat(), PixelFormat::RGB8);
+  const uint32_t outSize = speedOverPrecision ? kSize / 2 : kSize;
+  ASSERT_EQ(normalized->getWidth(), outSize);
+  ASSERT_EQ(normalized->getHeight(), outSize);
+  // Bilinear debayering is exact for constant channels, except on the border.
+  const uint32_t margin = speedOverPrecision ? 0 : 2;
+  for (uint32_t y = margin; y < outSize - margin; ++y) {
+    const uint8_t* row = normalized->rdata() + y * normalized->getStride();
+    for (uint32_t x = margin; x < outSize - margin; ++x) {
+      EXPECT_EQ(row[x * 3 + 0], kRed8) << "R at (" << x << "," << y << ")";
+      EXPECT_EQ(row[x * 3 + 1], kGreen8) << "G at (" << x << "," << y << ")";
+      EXPECT_EQ(row[x * 3 + 2], kBlue8) << "B at (" << x << "," << y << ")";
+    }
+  }
+}
+
+TEST_F(PixelFrameTest, normalizeRaw10BayerRggb) {
+  expectRaw10BayerNormalization(PixelFormat::RAW10_BAYER_RGGB, false);
+  expectRaw10BayerNormalization(PixelFormat::RAW10_BAYER_RGGB, true);
+}
+
+TEST_F(PixelFrameTest, normalizeRaw10BayerBggr) {
+  expectRaw10BayerNormalization(PixelFormat::RAW10_BAYER_BGGR, false);
+  expectRaw10BayerNormalization(PixelFormat::RAW10_BAYER_BGGR, true);
+}
+
+TEST_F(PixelFrameTest, normalizeRaw10BayerRespectsStride) {
+  constexpr uint32_t kPaddedStride = 8 * 5 / 4 + 6;
+  expectRaw10BayerNormalization(PixelFormat::RAW10_BAYER_BGGR, false, kPaddedStride);
+  expectRaw10BayerNormalization(PixelFormat::RAW10_BAYER_BGGR, true, kPaddedStride);
 }
 
 TEST_F(PixelFrameTest, jpegTest) {
