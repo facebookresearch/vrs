@@ -70,6 +70,7 @@ class NvDecoder : public InternalDecoder {
   size_t _deviceFramePitch = 0;
   int _surfaceHeight = 0;
   bool _isKeyFrame = false;
+  bool _sequenceDeclined = false;
   cudaVideoSurfaceFormat _output_format = cudaVideoSurfaceFormat_NV12;
   std::vector<uint8_t> _decoded_image_yuv;
   AVFrame* _decoded_frame_ptr;

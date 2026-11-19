@@ -16,9 +16,30 @@
 
 #pragma once
 
+#include <cstdint>
+#include <vector>
+
 #include <vrs/utils/DecoderFactory.h>
 
+namespace xprs {
+struct Frame;
+}
+
 namespace vrs::vxprs {
+
+namespace detail {
+// Decoder-produced LE samples are LSB-aligned, including NV1210LE (not P010).
+bool normalizeMain10ForRgb8(
+    const xprs::Frame& source,
+    std::vector<uint8_t>& inOutStorage,
+    xprs::Frame& outNormalized);
+
+int convertMain10ForRgb8(
+    const xprs::Frame& source,
+    void* outDecodedFrame,
+    const ImageContentBlockSpec& outputImageSpec,
+    std::vector<uint8_t>& inOutStorage);
+} // namespace detail
 
 using DecoderOptions = vrs::utils::DecoderOptions;
 

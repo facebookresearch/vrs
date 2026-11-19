@@ -246,6 +246,7 @@ void CVideoDecoder::convertAVFrame(const AVFrame* avframe, Frame& frameOut) {
       uint16_t* p = (uint16_t*)(_buffer.data() + i);
       *p = (*p >> 6);
     }
+    frameOut.fullRange = pixelFormat == kCVPixelFormatType_420YpCbCr10BiPlanarFullRange;
   }
 
   frameOut.width = width;

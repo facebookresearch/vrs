@@ -144,6 +144,13 @@ void NvDecoder::open() {}
 // >1:  succeeded, and driver should override CUVIDPARSERPARAMS::ulMaxNumDecodeSurfaces with this
 // return value
 int NvDecoder::HandleVideoSequence(CUVIDEOFORMAT* vdeo_format) {
+  // This backend returns 8-bit NV12, not P016 or LSB-aligned Main10 planes.
+  if (vdeo_format->bit_depth_luma_minus8 != 0 || vdeo_format->bit_depth_chroma_minus8 != 0) {
+    _sequenceDeclined = true;
+    XR_LOGW("XPRS NVDEC output is 8-bit only; declining a high-bit-depth stream for SW fallback");
+    return 0;
+  }
+  _sequenceDeclined = false;
   CUVIDDECODECREATEINFO video_decode_create_info = {0};
   video_decode_create_info.CodecType = vdeo_format->codec;
   video_decode_create_info.ChromaFormat = vdeo_format->chroma_format;
@@ -256,10 +263,17 @@ void NvDecoder::decode(
       _nvcodec_context._cuvid_functions->cuvidParseVideoData(_parser, &packet),
       _nvcodec_context._cuda_functions,
       THROW_IF_ERROR);
+  if (_sequenceDeclined) {
+    throw std::runtime_error("XPRS NVDEC rejected a sequence or has no decoder; using SW decode");
+  }
 }
 
 // 0: fail, >=1: succeeded
 int NvDecoder::HandlePictureDecode(CUVIDPICPARAMS* pic_params) {
+  if (_sequenceDeclined || _decoder == nullptr) {
+    _sequenceDeclined = true;
+    return 0;
+  }
   CUDAContextScope cuda_context_scope(_nvcodec_context);
   _isKeyFrame = pic_params->intra_pic_flag;
   CUDA_API_CALL(
@@ -271,6 +285,10 @@ int NvDecoder::HandlePictureDecode(CUVIDPICPARAMS* pic_params) {
 
 //  0: fail; >=1: succeeded
 int NvDecoder::HandlePictureDisplay(CUVIDPARSERDISPINFO* parser_disp_info) {
+  if (_sequenceDeclined || _decoder == nullptr) {
+    _sequenceDeclined = true;
+    return 0;
+  }
   CUVIDPROCPARAMS video_processing_parameters = {};
   video_processing_parameters.progressive_frame = parser_disp_info->progressive_frame;
   video_processing_parameters.second_field = parser_disp_info->repeat_first_field + 1;
