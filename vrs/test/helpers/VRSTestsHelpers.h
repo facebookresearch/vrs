@@ -27,6 +27,7 @@
 #include <vrs/RecordFileReader.h>
 #include <vrs/RecordFileWriter.h>
 #include <vrs/Recordable.h>
+#include <vrs/os/Platform.h>
 
 namespace vrs {
 namespace test {
@@ -35,6 +36,16 @@ using namespace vrs;
 
 void deleteChunkedFile(const string& path);
 void deleteChunkedFile(DiskFile& file);
+
+#if !IS_WINDOWS_PLATFORM()
+/// Make this process's writes past `size` bytes of any file come up short, as when a disk fills
+/// up. Only call this in a death test's child process. The limit applies to the file gtest
+/// captures the child's output in too, so keep `size` above what the code under test logs: the OSS
+/// build's logging throws when its write fails.
+void limitFileSize(uint64_t size);
+/// Undo limitFileSize().
+void removeFileSizeLimit();
+#endif
 
 // backdoor operations for testing
 struct RecordFileWriterTester {

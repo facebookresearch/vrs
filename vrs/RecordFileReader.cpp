@@ -327,6 +327,10 @@ int RecordFileReader::doOpenFile(
           recordIndex_,
           fileHasAnIndex_) != 0) {
     error = readFileDetails(fileSpec, autoWriteFixedIndex, fileHeader);
+    if (error != 0 && !file_->isOpened()) {
+      closeFile();
+      return error;
+    }
     // Maybe write the file's details to disk
     if (tryToUseCache && !detailsCacheFilePath.empty()) {
       detailsSaveThread_ = make_unique<thread>([detailsCacheFilePath, this]() {
@@ -505,6 +509,7 @@ int RecordFileReader::readFileDetails(
       return INDEX_RECORD_ERROR;
     }
     XR_LOGW("Index incomplete. Rebuilding index of '{}'...", fileSpec.getEasyPath());
+    int rebuildError = 0;
     {
       // Scanning the whole file: read ahead, and drop the open's read sequence first.
       if (openReadSequenceDeclared_) {
@@ -512,7 +517,11 @@ int RecordFileReader::readFileDetails(
         openReadSequenceDeclared_ = false;
       }
       TemporaryCachingStrategy streaming(file_, CachingStrategy::Streaming);
-      indexReader.rebuildIndex(autoWriteFixedIndex);
+      rebuildError = indexReader.rebuildIndex(autoWriteFixedIndex);
+    }
+    if (!file_->isOpened()) {
+      XR_LOGE("Index patching failed, and the file could not be reopened.");
+      return rebuildError != 0 ? rebuildError : NO_FILE_OPEN;
     }
     if (!file_->isReadOnly()) {
       XR_LOGI("Re-opening file in read-only mode.");

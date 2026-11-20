@@ -1,0 +1,3 @@
+# LeakSanitizer reports the thread-local storage of glibc's detached AIO helper threads.
+leak:__aio_create_helper_thread
+leak:__aio_notify_only

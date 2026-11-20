@@ -16,7 +16,12 @@
 
 #include "VRSTestsHelpers.h"
 
+#if !IS_WINDOWS_PLATFORM()
+#include <sys/resource.h>
+#endif
+
 #include <array>
+#include <csignal>
 
 #include <gtest/gtest.h>
 
@@ -257,6 +262,23 @@ void deleteChunkedFile(DiskFile& file) {
     os::remove(chunk.first);
   }
 }
+
+#if !IS_WINDOWS_PLATFORM()
+void limitFileSize(uint64_t size) {
+  ASSERT_NE(signal(SIGXFSZ, SIG_IGN), SIG_ERR);
+  rlimit limit{};
+  ASSERT_EQ(getrlimit(RLIMIT_FSIZE, &limit), 0);
+  limit.rlim_cur = static_cast<rlim_t>(size);
+  ASSERT_EQ(setrlimit(RLIMIT_FSIZE, &limit), 0);
+}
+
+void removeFileSizeLimit() {
+  rlimit limit{};
+  ASSERT_EQ(getrlimit(RLIMIT_FSIZE, &limit), 0);
+  limit.rlim_cur = limit.rlim_max;
+  ASSERT_EQ(setrlimit(RLIMIT_FSIZE, &limit), 0);
+}
+#endif
 
 void RecordFileWriterTester::skipFinalizeIndexRecord(RecordFileWriter& writer) {
   writer.skipFinalizeIndexRecords_ = true;

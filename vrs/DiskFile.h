@@ -17,6 +17,8 @@
 #pragma once
 
 #include <cstdio>
+#include <memory>
+#include <vector>
 
 #include <vrs/VrsExport.h>
 #include <vrs/WriteFileHandler.h>
@@ -36,6 +38,10 @@ class VRS_API DiskFileT : public WriteFileHandler {
   static const string& staticName();
 
   DiskFileT();
+  DiskFileT(const DiskFileT&) = delete;
+  DiskFileT& operator=(const DiskFileT&) = delete;
+  DiskFileT(DiskFileT&&) = delete;
+  DiskFileT& operator=(DiskFileT&&) = delete;
   ~DiskFileT() override;
 
   /// Make a new DiskFile object, with a default state.
@@ -166,7 +172,8 @@ class VRS_API DiskFileT : public WriteFileHandler {
   bool trySetPosInCurrentChunk(int64_t offset);
 
   FileSpec::Extras options_; // optional options provided in openSpec or createFile
-  std::unique_ptr<vector<FileChunk>> chunks_; // all the chunks, when a VRS file is opened.
+  // All the chunks, when a VRS file is opened. Chunks never move: writes in flight point at them.
+  vector<std::unique_ptr<FileChunk>> chunks_;
   FileChunk* currentChunk_{}; // always points to the current chunk within chunks_.
   int filesOpenCount_{};
 

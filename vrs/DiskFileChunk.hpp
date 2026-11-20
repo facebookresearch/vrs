@@ -29,20 +29,11 @@ namespace vrs {
 
 class DiskFileChunk {
  public:
-  DiskFileChunk() = default;
-  DiskFileChunk(string path, int64_t offset, int64_t size)
-      : path_{std::move(path)}, offset_{offset}, size_{size} {}
+  explicit DiskFileChunk(size_t index) : index_{index} {}
+  DiskFileChunk(size_t index, string path, int64_t offset, int64_t size)
+      : index_{index}, path_{std::move(path)}, offset_{offset}, size_{size} {}
   DiskFileChunk(const DiskFileChunk& other) = delete;
-  DiskFileChunk(DiskFileChunk&& other) noexcept {
-    close();
-    file_ = other.file_;
-    path_ = std::move(other.path_);
-    offset_ = other.offset_;
-    size_ = other.size_;
-    other.file_ = nullptr;
-    other.offset_ = 0;
-    other.size_ = 0;
-  }
+  DiskFileChunk(DiskFileChunk&& other) = delete;
   ~DiskFileChunk() {
     close();
   }
@@ -80,8 +71,11 @@ class DiskFileChunk {
   bool isOpened() const {
     return file_ != nullptr;
   }
-  void rewind() const {
-    ::rewind(file_);
+  int rewind() const {
+    // Unlike ::rewind(), fseek() reports a failure to flush pending writes.
+    const int error = ::fseek(file_, 0, SEEK_SET) != 0 ? errno : SUCCESS;
+    ::clearerr(file_);
+    return error;
   }
   int flush() {
     return ::fflush(file_) != 0 ? errno : SUCCESS;
@@ -139,8 +133,12 @@ class DiskFileChunk {
   bool contains(int64_t fileOffset) const {
     return fileOffset >= offset_ && fileOffset < offset_ + size_;
   }
+  size_t getIndex() const {
+    return index_;
+  }
 
  private:
+  const size_t index_; // position of this chunk in the file's chunk list
   FILE* file_{}; // may be nullptr or not!
   string path_; // path of this chunk
   int64_t offset_{}; // offset of this chunk in the file

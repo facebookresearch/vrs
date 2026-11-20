@@ -101,6 +101,10 @@ struct VrsCommand {
   /// Some operations can take multiple VRS files as input. This opens the other VRS files,
   /// while applying the filters on those as well.
   bool openOtherVrsFiles(RecordFileInfo::Details details);
+  /// For fix-index, check that the file's index was fixed, or report that it wasn't.
+  /// @param reader: The reader that opened the file.
+  /// @return False if the command is fix-index and the index could not be fixed.
+  bool checkIndexFixed(const utils::FilteredFileReader& reader) const;
   /// Apply the recorded filters
   void applyFilters(utils::FilteredFileReader& filteredReader);
   /// Run the commands requested using the member variables below
