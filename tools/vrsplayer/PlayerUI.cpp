@@ -417,7 +417,7 @@ void PlayerUI::reportError(const QString& errorTitle, const QString& errorMessag
 }
 
 void PlayerUI::setOverlayColor(QColor color) {
-  overlayColor_ = std::move(color);
+  overlayColor_ = color;
   fileReader_.setOverlayColor(overlayColor_);
   settings_.setValue(kOverlayColorSetting, overlayColor_);
   overlaySettingChanged();

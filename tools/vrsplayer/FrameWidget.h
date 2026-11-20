@@ -127,7 +127,7 @@ class FrameWidget : public QWidget {
     setNeedsUpdate();
   }
   void setOverlayColor(QColor color) {
-    overlayColor_ = std::move(color);
+    overlayColor_ = color;
     setNeedsUpdate();
   }
   void setFontSize(int fontSize) {
