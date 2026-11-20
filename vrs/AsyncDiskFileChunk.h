@@ -172,6 +172,9 @@ class VRS_API AlignedBuffer {
 
   void free();
   void clear();
+  /// Remove the first `size` bytes, moving the bytes after them to the start of the buffer.
+  /// @param size: Number of bytes to remove, at most size().
+  void consume(size_t size);
   [[nodiscard]] inline void* data() const {
     return aligned_buffer_;
   }
@@ -293,6 +296,9 @@ class VRS_API AsyncDiskFileChunk {
   };
 
   int flushWriteBuffer();
+  int waitForAsyncWrites();
+  int writeTail();
+  void writeRejectedBuffer(AsyncBuffer& buffer, int64_t offset, int submitError);
   int ensureOpenNonDirect();
   int ensureOpenDirect();
   int ensureOpen_(int requested_flags);
@@ -314,6 +320,9 @@ class VRS_API AsyncDiskFileChunk {
 
   const size_t index_{}; // position of this chunk in the file's chunk list
   AsyncHandle file_{};
+  // Open from create() or open() to close(), even while `file_` is closed by a failed reopen, so
+  // that close() still writes, or reports, what is buffered.
+  bool opened_ = false;
   std::string path_; // path of this chunk
   int64_t offset_{}; // offset of this chunk in the file
   int64_t size_{}; // size of the chunk
@@ -349,10 +358,10 @@ class VRS_API AsyncDiskFileChunk {
   // The current buffer (if any) being filled by calls to `write()`. It will either be queued
   // for async write by `write()`, or written out by `flushWriteBuffer()`
   AsyncBuffer* current_buffer_ = nullptr;
-  // If != SUCCESS, represents errors that were signaled by async writes completing. Typically
-  // returned to the caller as the result of another, later operation (e.g. another write after
-  // the failure, or a call to flushWriteBuffer(), etc)
+  // The first error that lost data write() had already accepted. Every later write, close, and
+  // operation that flushes returns it, until create() or open().
   std::atomic<int> async_error_ = SUCCESS;
+  bool rejected_submission_logged_ = false;
 
   // Operational parameters initialized from the FileSpec extra params/options at create/open
   // time. These can be tuned by the user via uri parameters.
