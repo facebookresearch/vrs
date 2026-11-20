@@ -378,7 +378,18 @@ bool VrsCommand::openVrsFile() {
     return false;
   }
   if (getCommandSpec(cmd).mainFileIsVRS) {
-    return filteredReader.reader.openFile(filteredReader.spec, cmd == Command::FixIndex) == 0;
+    return filteredReader.reader.openFile(filteredReader.spec, cmd == Command::FixIndex) == 0 &&
+        checkIndexFixed(filteredReader);
+  }
+  return true;
+}
+
+bool VrsCommand::checkIndexFixed(const FilteredFileReader& reader) const {
+  // A file that can't be modified opens read-only, with its index rebuilt only in memory.
+  if (cmd == Command::FixIndex && !reader.reader.hasIndex()) {
+    cerr << "Error: could not write a fixed index to " << reader.spec.getEasyPath()
+         << ", which was not modified.\n";
+    return false;
   }
   return true;
 }
@@ -390,6 +401,9 @@ bool VrsCommand::openOtherVrsFile(
     // Open the reader, apply the filters and print their overview
     if (otherReader.reader.openFile(otherReader.spec, cmd == Command::FixIndex) != 0) {
       cerr << "Error: could not open " << otherReader.spec.getEasyPath() << "\n";
+      return false;
+    }
+    if (!checkIndexFixed(otherReader)) {
       return false;
     }
     otherReader.filter.copyTimeConstraints(filteredReader.filter);

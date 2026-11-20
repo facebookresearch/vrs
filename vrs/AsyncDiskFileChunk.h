@@ -237,11 +237,11 @@ class VRS_API AsyncBuffer : public AlignedBuffer {
 class VRS_API AsyncDiskFileChunk {
  public:
   AsyncDiskFileChunk() = default;
-  AsyncDiskFileChunk(std::string path, int64_t offset, int64_t size)
-      : path_{std::move(path)}, offset_{offset}, size_{size} {}
-  AsyncDiskFileChunk(AsyncDiskFileChunk&& other) noexcept;
-
-  // Prevent copying
+  explicit AsyncDiskFileChunk(size_t index) : index_{index} {}
+  AsyncDiskFileChunk(size_t index, std::string path, int64_t offset, int64_t size)
+      : index_{index}, path_{std::move(path)}, offset_{offset}, size_{size} {}
+  // Writes in flight point at this object, so it can neither be copied nor moved.
+  AsyncDiskFileChunk(AsyncDiskFileChunk&& other) = delete;
   AsyncDiskFileChunk(const AsyncDiskFileChunk& other) noexcept = delete;
   AsyncDiskFileChunk& operator=(const AsyncDiskFileChunk& other) noexcept = delete;
   AsyncDiskFileChunk& operator=(AsyncDiskFileChunk&& rhs) noexcept = delete;
@@ -266,6 +266,9 @@ class VRS_API AsyncDiskFileChunk {
   [[nodiscard]] const std::string& getPath() const;
   void setOffset(int64_t newOffset);
   [[nodiscard]] int64_t getOffset() const;
+  [[nodiscard]] size_t getIndex() const {
+    return index_;
+  }
 
   enum class IoEngine {
     Sync,
@@ -309,6 +312,7 @@ class VRS_API AsyncDiskFileChunk {
   int free_write_buffers();
   int init_parameters(const FileSpec::Extras& options);
 
+  const size_t index_{}; // position of this chunk in the file's chunk list
   AsyncHandle file_{};
   std::string path_; // path of this chunk
   int64_t offset_{}; // offset of this chunk in the file

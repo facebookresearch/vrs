@@ -26,12 +26,18 @@
 
 #include <gtest/gtest.h>
 
+#include <vrs/DiskFile.h>
 #include <vrs/os/Utils.h>
+#include <vrs/test/helpers/VRSTestsHelpers.h>
 
 namespace vrs {
 
 class AsyncDiskFileChunkTestPeer {
  public:
+  static void recordAsyncError(AsyncDiskFileChunk& chunk, int error) {
+    chunk.recordAsyncError(error);
+  }
+
   static void verifyRejectedSubmission(AsyncDiskFileChunk& chunk) {
     AsyncBuffer* buffer = nullptr;
     enqueue(chunk, buffer);
@@ -173,6 +179,52 @@ class AsyncDiskFileChunkTestPeer {
 } // namespace vrs
 
 namespace {
+
+using vrs::AsyncDiskFileChunkTestPeer;
+
+class AsyncDiskFileWithChunkAccess : public vrs::AsyncDiskFile {
+ public:
+  vrs::AsyncDiskFileChunk& getChunk(size_t index) {
+    return *chunks_[index];
+  }
+};
+
+TEST(AsyncDiskFileSubmissionTest, SwitchingBackToAChunkReturnsItsDeferredWriteError) {
+  const std::string path = vrs::os::getTempFolder() + "deferred_rewind_error.vrs";
+  const std::string data(4096, 'A');
+  AsyncDiskFileWithChunkAccess file;
+  ASSERT_EQ(file.create(path, {{"buffer_size", "4096"}, {"buffer_count", "4"}}), vrs::SUCCESS);
+  ASSERT_EQ(file.write(data.data(), data.size()), vrs::SUCCESS);
+  ASSERT_EQ(file.addChunk(), vrs::SUCCESS);
+  ASSERT_EQ(file.write(data.data(), data.size()), vrs::SUCCESS);
+  ASSERT_EQ(file.setPos(0), vrs::SUCCESS); // reopens the first chunk for writing
+  ASSERT_EQ(file.setPos(static_cast<int64_t>(data.size())), vrs::SUCCESS);
+  AsyncDiskFileChunkTestPeer::recordAsyncError(file.getChunk(0), EIO);
+  EXPECT_EQ(file.setPos(0), EIO);
+  EXPECT_EQ(file.close(), vrs::SUCCESS);
+  vrs::test::deleteChunkedFile(path);
+}
+
+TEST(AsyncDiskFileSubmissionTest, ClosingAnEvictedChunkReturnsItsDeferredWriteError) {
+  const std::string path = vrs::os::getTempFolder() + "deferred_eviction_error.vrs";
+  const std::string data(4096, 'A');
+  AsyncDiskFileWithChunkAccess file;
+  ASSERT_EQ(file.create(path, {{"buffer_size", "4096"}, {"buffer_count", "4"}}), vrs::SUCCESS);
+  ASSERT_EQ(file.write(data.data(), data.size()), vrs::SUCCESS);
+  for (int chunk = 1; chunk < 4; ++chunk) {
+    ASSERT_EQ(file.addChunk(), vrs::SUCCESS);
+    ASSERT_EQ(file.write(data.data(), data.size()), vrs::SUCCESS);
+  }
+  // Writing closes each chunk as the next one is added. Reopen the first two...
+  const auto chunkOffset = [&data](int chunk) { return static_cast<int64_t>(chunk * data.size()); };
+  ASSERT_EQ(file.setPos(chunkOffset(0)), vrs::SUCCESS);
+  ASSERT_EQ(file.setPos(chunkOffset(1)), vrs::SUCCESS);
+  // ... so reopening a third one evicts the current chunk, the second.
+  AsyncDiskFileChunkTestPeer::recordAsyncError(file.getChunk(1), EIO);
+  EXPECT_EQ(file.setPos(chunkOffset(2)), EIO);
+  EXPECT_EQ(file.close(), vrs::SUCCESS);
+  vrs::test::deleteChunkedFile(path);
+}
 
 class AsyncDiskFileSubmissionDeathTest : public testing::Test {
  protected:

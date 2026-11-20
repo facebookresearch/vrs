@@ -580,41 +580,6 @@ void AsyncBuffer::SigEvNotifyFunction(union sigval val) {
 }
 #endif // IS_WINDOWS_PLATFORM / POSIX_AIO_SUPPORTED
 
-AsyncDiskFileChunk::AsyncDiskFileChunk(AsyncDiskFileChunk&& other) noexcept {
-  file_ = std::move(other.file_);
-  path_ = std::move(other.path_);
-  offset_ = other.offset_;
-  size_ = other.size_;
-
-  // Keeps track of the current read/write position in the file of the current buffer.
-  file_position_ = other.file_position_;
-
-  file_mode_ = other.file_mode_;
-  current_flags_ = other.current_flags_;
-  supported_flags_ = other.supported_flags_;
-
-  // Note that these members are not movable
-  // buffers_mutex_
-  // buffer_freed_cv_
-
-  buffers_free_ = std::move(other.buffers_free_);
-  buffers_queued_ = std::move(other.buffers_queued_);
-  buffers_writing_ = other.buffers_writing_;
-  other.buffers_writing_ = 0;
-  buffers_ = std::move(other.buffers_);
-  current_buffer_ = other.current_buffer_;
-  other.current_buffer_ = nullptr;
-  async_error_ = other.async_error_.load();
-
-  ioengine_ = other.ioengine_;
-  use_directio_ = other.use_directio_;
-  num_buffers_ = other.num_buffers_;
-  buffer_size_ = other.buffer_size_;
-  iodepth_ = other.iodepth_;
-  offset_align_ = other.offset_align_;
-  mem_align_ = other.mem_align_;
-}
-
 AsyncDiskFileChunk::~AsyncDiskFileChunk() {
   int error = close();
   if (error != 0) {
@@ -683,9 +648,8 @@ int AsyncDiskFileChunk::rewind() {
   // deferred error If we can't return errors here, we'll need to remember that we must flush on
   // the next operation, whatever it is, and THEN reset the file_position_. Pain.
   //
-  // TODO: DiskFile doesn't currently check the return value of this, why would it? In a world in
-  // which writes may be failing asynchronously, what should DiskFile or RecordFileWriter do to
-  // recover, if anything?
+  // TODO: In a world in which writes may be failing asynchronously, what should DiskFile or
+  // RecordFileWriter do to recover, if anything?
   IF_ERROR_RETURN(flushWriteBuffer());
 
   file_position_ = 0;
