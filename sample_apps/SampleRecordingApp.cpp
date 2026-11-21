@@ -122,7 +122,7 @@ class ImageStream : public Recordable {
 /// Stream of audio blocks. Because audio samples can come at a high frequency, we collect in blocks
 /// that we save in records. Note that the size of these blocks may vary from record to record,
 /// even though in this sample, the records are always of the same size.
-/// This sample stream doesn't use any configuration record, but we coud easily add one if needed.
+/// The sample writes an empty configuration record. A stream can use that record to store settings.
 class AudioStream : public Recordable {
   static const uint32_t kDataRecordFormatVersion = 1;
 
