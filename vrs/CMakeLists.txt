@@ -22,7 +22,7 @@ add_library(vrslib ${VRS_SRCS})
 target_include_directories(vrslib
   PUBLIC
     $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 target_link_libraries(vrslib
   PUBLIC
@@ -41,23 +41,23 @@ target_link_libraries(vrslib
 target_link_libraries (vrslib PUBLIC $<$<PLATFORM_ID:Linux>:rt>)
 
 install(TARGETS vrslib EXPORT VRSLibTargets
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-  RUNTIME DESTINATION bin
-  INCLUDES DESTINATION include
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
 install(EXPORT VRSLibTargets
   NAMESPACE vrs::
   FILE vrslibTargets.cmake
-  DESTINATION lib/cmake/vrslib
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/vrslib
 )
 
 include(CMakePackageConfigHelpers)
 
 configure_package_config_file(vrslibConfig.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/vrslibConfig.cmake
-  INSTALL_DESTINATION ${LIB_INSTALL_DIR}/vrslib/cmake
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/vrslib
 )
 
 write_basic_package_version_file(
@@ -68,21 +68,21 @@ write_basic_package_version_file(
 
 install(
   DIRECTORY .
-  DESTINATION include/vrs
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/vrs
   COMPONENT headers
-  FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h"
+  FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" PATTERN "*.inc"
 )
 
 install(
   DIRECTORY ../cmake
-  DESTINATION lib/cmake/vrslib
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/vrslib
   FILES_MATCHING PATTERN "*.cmake"
 )
 
 install(FILES
   "${CMAKE_CURRENT_BINARY_DIR}/vrslibConfig.cmake"
   "${CMAKE_CURRENT_BINARY_DIR}/vrslibConfigVersion.cmake"
-  DESTINATION lib/cmake/vrslib
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/vrslib
 )
 
 if (UNIT_TESTS)

@@ -1,2 +1,3 @@
 # Declare txt file must remain as provided (unchanged carriage return)
 *.txt binary
+CMakeLists.txt -binary text diff merge

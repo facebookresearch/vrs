@@ -23,7 +23,7 @@ add_library(vrs_os ${VRS_OS_SRCS})
 target_include_directories(vrs_os
   PUBLIC
     $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 target_link_libraries(vrs_os
@@ -38,16 +38,16 @@ add_library(vrs_platform INTERFACE)
 target_include_directories(vrs_platform
   INTERFACE
     $<BUILD_INTERFACE:${VRS_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 # When building with cmake, always enable OSS build mode
 target_compile_definitions(vrs_platform INTERFACE OSS_BUILD_MODE)
 
 install(TARGETS vrs_os vrs_platform EXPORT VRSLibTargets
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-  RUNTIME DESTINATION bin
-  INCLUDES DESTINATION include
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
 if (UNIT_TESTS)
