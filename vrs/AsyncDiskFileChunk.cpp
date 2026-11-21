@@ -63,6 +63,9 @@ int aioError(const vrs::AioControlBlock* cb) {
 ssize_t aioReturn(vrs::AioControlBlock* cb) {
   return ::aio_return64(cb);
 }
+int aioSuspend(const vrs::AioControlBlock* const list[], int count) {
+  return ::aio_suspend64(list, count, nullptr);
+}
 #else
 int aioWrite(vrs::AioControlBlock* cb) {
   return ::aio_write(cb);
@@ -72,6 +75,9 @@ int aioError(const vrs::AioControlBlock* cb) {
 }
 ssize_t aioReturn(vrs::AioControlBlock* cb) {
   return ::aio_return(cb);
+}
+int aioSuspend(const vrs::AioControlBlock* const list[], int count) {
+  return ::aio_suspend(list, count, nullptr);
 }
 #endif
 #endif
@@ -473,126 +479,46 @@ std::unique_ptr<AsyncBuffer> AsyncBuffer::make(size_t size, size_t memalign, siz
   return buffer->isValid() ? std::move(buffer) : nullptr;
 }
 
-void AsyncBuffer::complete_write(ssize_t io_return, int io_errno) {
-  on_complete_(io_return, io_errno);
-}
-
 int AsyncBuffer::start_write(
-    const AsyncHandle& file,
-    int64_t offset,
-    complete_write_callback on_complete) {
+    [[maybe_unused]] const AsyncHandle& file,
+    [[maybe_unused]] int64_t offset) {
 #if POSIX_AIO_SUPPORTED()
-  return startWrite(file, offset, std::move(on_complete), aioWrite);
+  return startWrite(file, offset, aioWrite);
 #else
-  on_complete_ = std::move(on_complete);
-#if IS_WINDOWS_PLATFORM()
-  ov_.self = this;
-  ov_.ov = {};
-  ov_.ov.Offset = (DWORD)offset;
-  ov_.ov.OffsetHigh = (DWORD)(offset >> 32);
-  if (!WriteFileEx(file.h_, AlignedBuffer::data(), size(), &ov_.ov, CompletedWriteRoutine)) {
-    const int error = GetLastError();
-    on_complete_ = nullptr;
-    return error != SUCCESS ? error : ERROR_GEN_FAILURE;
-  }
-  return SUCCESS;
-#else
-  const ssize_t written =
-      ::pwrite64(file.fd_, AlignedBuffer::data(), size(), static_cast<off64_t>(offset));
-  if (written < 0) {
-    const int error = errno;
-    on_complete_ = nullptr;
-    return error != SUCCESS ? error : DISKFILE_INVALID_STATE;
-  }
-  on_complete_(written, SUCCESS);
-  return SUCCESS;
-#endif
+  return ENOSYS; // init_parameters() never selects the AIO engine without POSIX AIO
 #endif
 }
 
 #if POSIX_AIO_SUPPORTED()
-int AsyncBuffer::startWrite(
-    const AsyncHandle& file,
-    int64_t offset,
-    complete_write_callback on_complete,
-    AioSubmitter submit) {
+int AsyncBuffer::startWrite(const AsyncHandle& file, int64_t offset, AioSubmitter submit) {
   aiocb_ = {};
   aiocb_.aio_fildes = file.fd_;
   aiocb_.aio_offset = offset;
   aiocb_.aio_buf = AlignedBuffer::data();
   aiocb_.aio_nbytes = size();
   aiocb_.aio_reqprio = 0;
-  aiocb_.aio_sigevent.sigev_notify = SIGEV_THREAD;
-  aiocb_.aio_sigevent.sigev_notify_function = SigEvNotifyFunction;
-  aiocb_.aio_sigevent.sigev_value.sival_ptr = this;
-  aiocb_.aio_sigevent.sigev_notify_attributes = nullptr;
+  // No notification: libc may fail to start a SIGEV_THREAD thread, and then never notifies.
+  aiocb_.aio_sigevent.sigev_notify = SIGEV_NONE;
   aiocb_.aio_lio_opcode = 0;
-  on_complete_ = std::move(on_complete);
   if (submit(&aiocb_) != SUCCESS) {
     const int error = errno;
-    on_complete_ = nullptr;
     return error != SUCCESS ? error : DISKFILE_INVALID_STATE;
   }
   return SUCCESS;
 }
+
+bool AsyncBuffer::poll_write(ssize_t& outWritten, int& outError) {
+  outError = aioError(&aiocb_);
+  if (outError == EINPROGRESS) {
+    return false;
+  }
+  if (outError < 0) {
+    outError = errno;
+  }
+  outWritten = aioReturn(&aiocb_);
+  return true;
+}
 #endif
-
-#if IS_WINDOWS_PLATFORM()
-void AsyncBuffer::CompletedWriteRoutine(
-    DWORD dwErr,
-    DWORD cbBytesWritten,
-    LPOVERLAPPED lpOverlapped) {
-  auto self = reinterpret_cast<AsyncOVERLAPPED*>(
-                  reinterpret_cast<char*>(lpOverlapped) - offsetof(AsyncOVERLAPPED, ov))
-                  ->self;
-  ssize_t io_return;
-  int io_errno;
-
-  if (dwErr == 0) {
-    io_errno = 0;
-    io_return = cbBytesWritten;
-  } else {
-    io_return = -1;
-    io_errno = 0;
-  }
-
-  self->complete_write(io_return, io_errno);
-}
-#elif POSIX_AIO_SUPPORTED()
-void AsyncBuffer::SigEvNotifyFunction(union sigval val) {
-  auto* self = reinterpret_cast<AsyncBuffer*>(val.sival_ptr);
-
-  ssize_t io_return = 0;
-  int io_errno = 0;
-
-  // Runs on a libc SIGEV_THREAD thread.
-  io_errno = aioError(&self->aiocb_);
-  if (io_errno == 0) {
-    io_return = aioReturn(&self->aiocb_);
-    XR_CHECK_GE(
-        io_return, 0, "aio_return returned {} despite aio_error indicating success", io_return);
-  } else if (io_errno == EINPROGRESS) {
-    XR_CHECK(false, "aio_error()==EINPROGRESS on a completed aio_write");
-  } else if (io_errno == ECANCELED) {
-    // If canceled, aio_return will give -1
-    io_return = aioReturn(&self->aiocb_);
-    XR_CHECK_LT(
-        io_return, 0, "aio_error() signaled cancellation, but aio_return returned {}", io_return);
-  } else if (io_errno > 0) {
-    io_return = aioReturn(&self->aiocb_);
-    XR_CHECK_LT(
-        io_return,
-        0,
-        "aio_error() signaled error {}, but aio_return returned {}",
-        io_errno,
-        io_return);
-  } else {
-    XR_CHECK(false, "aio_error() returned an unexpected negative number: {}", io_errno);
-  }
-
-  self->complete_write(io_return, io_errno);
-}
-#endif // IS_WINDOWS_PLATFORM / POSIX_AIO_SUPPORTED
 
 AsyncDiskFileChunk::~AsyncDiskFileChunk() {
   int error = close();
@@ -697,7 +623,8 @@ int AsyncDiskFileChunk::write(const void* buffer, size_t count, size_t& outWritt
   if (isReadOnlyMode(file_mode_)) {
     return DISKFILE_READ_ONLY;
   }
-  IF_ERROR_RETURN(async_error_.load());
+  reapWrites(false);
+  IF_ERROR_RETURN(async_error_);
   if (count == 0) {
     return SUCCESS;
   }
@@ -743,7 +670,7 @@ int AsyncDiskFileChunk::write(const void* buffer, size_t count, size_t& outWritt
     if (current_buffer_ == nullptr) {
       return ENOMEM;
     }
-    IF_ERROR_RETURN(async_error_.load());
+    IF_ERROR_RETURN(async_error_);
   }
 
   while (count != 0) {
@@ -764,24 +691,17 @@ int AsyncDiskFileChunk::write(const void* buffer, size_t count, size_t& outWritt
         case IoEngine::AIO: {
           // Other async IO engines like uring or libaio would go here in the future, and the
           // `start_write` call would dispatch it
-          std::unique_lock lock{buffers_mutex_};
-          buffers_queued_.emplace_back(
-              current_buffer_,
-              file_,
-              file_position_,
-              [this, buffer = current_buffer_](ssize_t io_return, int io_errno) {
-                this->complete_write(buffer, io_return, io_errno);
-              });
+          buffers_queued_.emplace_back(current_buffer_, file_, file_position_);
           current_buffer_ = nullptr;
           file_position_ += towrite;
-          pump_buffers_locked(lock);
-          IF_ERROR_RETURN(async_error_.load());
+          reapWrites(false);
+          IF_ERROR_RETURN(async_error_);
           if (count != 0) {
-            current_buffer_ = get_free_buffer_locked(lock);
+            current_buffer_ = get_free_buffer();
             if (!current_buffer_) {
               return ENOMEM;
             }
-            IF_ERROR_RETURN(async_error_.load());
+            IF_ERROR_RETURN(async_error_);
           }
           break;
         }
@@ -896,15 +816,10 @@ int AsyncDiskFileChunk::flushWriteBuffer() {
 }
 
 int AsyncDiskFileChunk::waitForAsyncWrites() {
-  // Note that `buffers_` may be empty because of default construction.
-  if (!buffers_.empty()) {
-    std::unique_lock lock{buffers_mutex_};
-    size_t expected_free = buffers_.size() - (current_buffer_ ? 1 : 0);
-    // N.B. as buffers are freed they pump the queue to completion.
-    buffer_freed_cv_.wait(
-        lock, [this, expected_free] { return buffers_free_.size() == expected_free; });
+  while (!buffers_writing_.empty() || !buffers_queued_.empty()) {
+    reapWrites(true);
   }
-  return async_error_.load();
+  return async_error_;
 }
 
 int AsyncDiskFileChunk::writeTail() {
@@ -963,9 +878,6 @@ int AsyncDiskFileChunk::ensureOpen_(int requested_flags) {
 }
 
 void AsyncDiskFileChunk::complete_write(AsyncBuffer* buffer, ssize_t io_return, int io_errno) {
-  // N.B. this is called asynchronously by the write completion "thread" from the kernel, it
-  // must be thread-safe
-
   if (io_return == buffer->size()) {
     if (io_errno != SUCCESS) {
       XR_LOGCD(
@@ -987,20 +899,51 @@ void AsyncDiskFileChunk::complete_write(AsyncBuffer* buffer, ssize_t io_return, 
   if (io_errno != SUCCESS) {
     recordAsyncError(io_errno);
   }
+  free_buffer(buffer);
+}
 
-  {
-    std::unique_lock lock{buffers_mutex_};
-    free_buffer_locked(lock, buffer);
-    buffers_writing_ -= 1;
-    pump_buffers_locked(lock);
+void AsyncDiskFileChunk::reapWrites(bool waitForOne) {
+  while (true) {
+    const size_t freeCount = buffers_free_.size();
+#if POSIX_AIO_SUPPORTED()
+    for (size_t index = 0; index < buffers_writing_.size();) {
+      AsyncBuffer* buffer = buffers_writing_[index];
+      ssize_t written = 0;
+      int error = SUCCESS;
+      if (buffer->poll_write(written, error)) {
+        buffers_writing_.erase(buffers_writing_.begin() + index);
+        complete_write(buffer, written, error);
+      } else {
+        ++index;
+      }
+    }
+#endif
+    pump_buffers();
+    if (!waitForOne || buffers_free_.size() > freeCount || buffers_writing_.empty()) {
+      return;
+    }
+    waitForAWriteToFinish();
   }
 }
 
-AsyncBuffer* AsyncDiskFileChunk::get_free_buffer_locked(std::unique_lock<std::mutex>& lock) {
-  if (buffers_free_.empty()) {
-    buffer_freed_cv_.wait(lock, [this] { return !buffers_free_.empty(); });
+void AsyncDiskFileChunk::waitForAWriteToFinish() {
+#if POSIX_AIO_SUPPORTED()
+  writes_to_wait_for_.clear();
+  for (const AsyncBuffer* buffer : buffers_writing_) {
+    writes_to_wait_for_.push_back(buffer->control_block());
   }
-  assert(!buffers_free_.empty());
+  // Returns early on a signal (EINTR): the caller polls again either way.
+  aioSuspend(writes_to_wait_for_.data(), static_cast<int>(writes_to_wait_for_.size()));
+#endif
+}
+
+AsyncBuffer* AsyncDiskFileChunk::get_free_buffer() {
+  while (buffers_free_.empty()) {
+    if (buffers_writing_.empty() && buffers_queued_.empty()) {
+      return nullptr;
+    }
+    reapWrites(true);
+  }
   auto* buffer = buffers_free_.back();
   buffers_free_.pop_back();
   assert(buffer);
@@ -1008,46 +951,24 @@ AsyncBuffer* AsyncDiskFileChunk::get_free_buffer_locked(std::unique_lock<std::mu
   return buffer;
 }
 
-AsyncBuffer* AsyncDiskFileChunk::get_free_buffer() {
-  std::unique_lock lock{buffers_mutex_};
-  return get_free_buffer_locked(lock);
-}
-
 void AsyncDiskFileChunk::free_buffer(AsyncBuffer*& buffer) {
-  std::unique_lock lock{buffers_mutex_};
-  free_buffer_locked(lock, buffer);
-}
-
-void AsyncDiskFileChunk::free_buffer_locked(
-    std::unique_lock<std::mutex>& /* lock */,
-    AsyncBuffer*& buffer) {
   buffer->clear();
   buffers_free_.push_back(buffer);
   buffer = nullptr;
-  buffer_freed_cv_.notify_one();
 }
 
-void AsyncDiskFileChunk::pump_buffers() {
-  std::unique_lock lock{buffers_mutex_};
-  pump_buffers_locked(lock);
-}
-
-void AsyncDiskFileChunk::pump_buffers_locked(
-    std::unique_lock<std::mutex>& lock,
-    const WriteSubmitter& submit) {
-  while (buffers_writing_ < iodepth_ && !buffers_queued_.empty()) {
+void AsyncDiskFileChunk::pump_buffers(const WriteSubmitter& submit) {
+  while (buffers_writing_.size() < iodepth_ && !buffers_queued_.empty()) {
     auto& item = buffers_queued_.front();
     auto* buffer = item.buffer_;
     const int64_t offset = item.offset_;
-    const int result = submit
-        ? submit(item)
-        : buffer->start_write(item.file_, item.offset_, std::move(item.callback_));
+    const int result = submit ? submit(item) : buffer->start_write(item.file_, item.offset_);
     buffers_queued_.pop_front();
     if (result == SUCCESS) {
-      buffers_writing_ += 1;
+      buffers_writing_.push_back(buffer);
     } else {
       writeRejectedBuffer(*buffer, offset, result);
-      free_buffer_locked(lock, buffer);
+      free_buffer(buffer);
     }
   }
 }
@@ -1069,16 +990,21 @@ void AsyncDiskFileChunk::writeRejectedBuffer(AsyncBuffer& buffer, int64_t offset
 }
 
 void AsyncDiskFileChunk::recordAsyncError(int error) {
-  int expected = SUCCESS;
-  if (async_error_.compare_exchange_strong(expected, error)) {
+  if (async_error_ == SUCCESS) {
+    async_error_ = error;
     XR_LOGCE(VRS_DISKFILECHUNK, "Write to {} failed: {}", path_, errorCodeToMessageWithCode(error));
   }
 }
 
 int AsyncDiskFileChunk::alloc_write_buffers() {
-  assert(buffers_writing_ == 0);
+  assert(buffers_writing_.empty());
   buffers_free_.reserve(num_buffers_);
   buffers_.reserve(num_buffers_);
+  // Tracking a write libc accepted must never fail to allocate.
+  buffers_writing_.reserve(num_buffers_);
+#if POSIX_AIO_SUPPORTED()
+  writes_to_wait_for_.reserve(num_buffers_);
+#endif
   while (buffers_.size() < num_buffers_) {
     auto buffer = AsyncBuffer::make(buffer_size_, mem_align_, offset_align_);
     if (!buffer) {
@@ -1092,7 +1018,7 @@ int AsyncDiskFileChunk::alloc_write_buffers() {
 
 int AsyncDiskFileChunk::free_write_buffers() {
   assert(buffers_free_.size() == buffers_.size());
-  assert(buffers_writing_ == 0);
+  assert(buffers_writing_.empty());
   assert(buffers_queued_.empty());
   current_buffer_ = nullptr;
   buffers_free_.clear();
@@ -1110,10 +1036,8 @@ int AsyncDiskFileChunk::init_parameters(const FileSpec::Extras& options) {
   }
 
 #ifdef VRS_ASYNC_DISKFILE_TSAN
-  // N.B. The aio_notify completions come in on a thread spawned from glibc that is not
-  // tsan-instrumented. As a result, the `malloc()` call in the `aio_notify()` (which does go
-  // through the tsan version) crashes when it tries to access the tsan thread state for tracking
-  // the allocation. Force the use of the non-aio APIs in this case.
+  // N.B. glibc runs AIO requests on threads it spawns itself, which are not tsan-instrumented.
+  // Force the use of the non-aio APIs in this case.
   ioengine_ = IoEngine::Sync;
 #elif POSIX_AIO_SUPPORTED()
   {
@@ -1164,34 +1088,6 @@ int AsyncDiskFileChunk::init_parameters(const FileSpec::Extras& options) {
 
   mem_align_ = 4 * 1024;
   offset_align_ = 4 * 1024;
-
-#if defined(STATX_DIOALIGN) && POSIX_AIO_SUPPORTED()
-  // Current kernel versions deployed around Meta don't have statx. Rely on the defaults/users
-  // to set this up correctly for now.
-  {
-    struct statx statxbuf;
-    int statErr = ::statx(AT_FDCWD, chunkFilePath.c_str(), 0, STATX_DIOALIGN, &statxbuf);
-    if (statErr != 0) {
-      XR_LOGCE(VRS_DISKFILECHUNK, "statx failed: %s", strerror(errno));
-      return errno;
-    } else {
-      mem_align_ = statxbuf.stx_dio_mem_align;
-      offset_align_ = statxbuf.stx_dio_mem_align;
-
-      XR_LOGCD(
-          VRS_DISKFILECHUNK,
-          "statx reports blocksize:{:#x} mem_align:{:#x} offset_align:{:#x}",
-          statxbuf.stx_blksize,
-          mem_align_,
-          offset_align_);
-    }
-
-    if (0 == mem_align_ || 0 == offset_align_) {
-      XR_LOGCE(VRS_DISKFILECHUNK, "failed to get alignment info");
-      return DISKFILE_NOT_OPEN;
-    }
-  }
-#endif
 
   // Allow overrides, but don't bother checking that they are powers of two or anything, on
   // the assumption that the underlying write() calls will fail if they're bad values.

@@ -31,6 +31,8 @@
 #if IS_WINDOWS_PLATFORM()
 #define VC_EXTRALEAN
 #include <Windows.h>
+
+#include <mutex>
 #elif POSIX_AIO_SUPPORTED()
 #include <aio.h>
 #include <fcntl.h>
@@ -40,13 +42,11 @@
 #include <unistd.h>
 #endif
 
-#include <atomic>
-#include <condition_variable>
 #include <deque>
 #include <functional>
-#include <map>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <vrs/ErrorCode.h>
 #include <vrs/VrsExport.h>
@@ -188,62 +188,55 @@ class VRS_API AlignedBuffer {
   [[nodiscard]] bool add(const void* buffer, size_t size, size_t& outCopiedSize);
 };
 
-class AsyncBuffer;
-#if IS_WINDOWS_PLATFORM()
-struct VRS_API AsyncOVERLAPPED {
-  OVERLAPPED ov;
-  // Allows the completion routine to recover a pointer to the containing AsyncBuffer
-  AsyncBuffer* self;
-};
-#endif
-
 class VRS_API AsyncBuffer : public AlignedBuffer {
  public:
-  using complete_write_callback = std::function<void(ssize_t io_return, int io_errno)>;
-
   /// @return A buffer of `size` bytes aligned to `memalign`, or nullptr if it couldn't be
   /// allocated.
   static std::unique_ptr<AsyncBuffer> make(size_t size, size_t memalign, size_t lenalign);
 
   ~AsyncBuffer() override = default;
 
-  void complete_write(ssize_t io_return, int io_errno);
+  /// Submit an asynchronous write of the buffer's content. Nothing signals its completion:
+  /// poll it with poll_write().
   /// @param file File receiving the write.
   /// @param offset File offset of the write.
-  /// @param on_complete Callback for an accepted write; synchronous for the PSync fallback.
-  /// @return SUCCESS if accepted, otherwise an error without invoking on_complete.
-  [[nodiscard]] int
-  start_write(const AsyncHandle& file, int64_t offset, complete_write_callback on_complete);
+  /// @return SUCCESS if submitted, otherwise the submission error (ENOSYS without POSIX AIO).
+  [[nodiscard]] int start_write(const AsyncHandle& file, int64_t offset);
+#if POSIX_AIO_SUPPORTED()
+  /// Check whether the write submitted by start_write() has finished.
+  /// @param outWritten: Set to the number of bytes written, or -1, once finished.
+  /// @param outError: Set to the write's errno value, once finished.
+  /// @return False while the write is still in progress.
+  [[nodiscard]] bool poll_write(ssize_t& outWritten, int& outError);
+  [[nodiscard]] const AioControlBlock* control_block() const {
+    return &aiocb_;
+  }
+#endif
 
  protected:
   AsyncBuffer(size_t size, size_t memalign, size_t lenalign)
       : AlignedBuffer(size, memalign, lenalign) {}
 
  private:
-#if IS_WINDOWS_PLATFORM()
-  AsyncOVERLAPPED ov_;
-  static void CompletedWriteRoutine(DWORD dwErr, DWORD cbBytesWritten, LPOVERLAPPED lpOverlapped);
-#elif POSIX_AIO_SUPPORTED()
+#if POSIX_AIO_SUPPORTED()
   AioControlBlock aiocb_{};
   using AioSubmitter = int (*)(decltype(aiocb_)*);
-  int startWrite(
-      const AsyncHandle& file,
-      int64_t offset,
-      complete_write_callback on_complete,
-      AioSubmitter submit);
-  static void SigEvNotifyFunction(union sigval val);
+  int startWrite(const AsyncHandle& file, int64_t offset, AioSubmitter submit);
   friend class AsyncDiskFileChunkTestPeer;
 #endif
-  complete_write_callback on_complete_ = nullptr;
 };
 
+/// A file chunk that writes through aligned buffers, submitting full ones as asynchronous writes.
+/// Writes complete on the calling thread, when a later call polls them: nothing calls back into
+/// this object, so it needs no locking. With `iodepth` below `buffer_count`, full buffers beyond
+/// `iodepth` stay in memory until the next write(), flush() or close().
 class VRS_API AsyncDiskFileChunk {
  public:
   AsyncDiskFileChunk() = default;
   explicit AsyncDiskFileChunk(size_t index) : index_{index} {}
   AsyncDiskFileChunk(size_t index, std::string path, int64_t offset, int64_t size)
       : index_{index}, path_{std::move(path)}, offset_{offset}, size_{size} {}
-  // Writes in flight point at this object, so it can neither be copied nor moved.
+  // Queued writes refer to this object's file handle, so it can neither be copied nor moved.
   AsyncDiskFileChunk(AsyncDiskFileChunk&& other) = delete;
   AsyncDiskFileChunk(const AsyncDiskFileChunk& other) noexcept = delete;
   AsyncDiskFileChunk& operator=(const AsyncDiskFileChunk& other) noexcept = delete;
@@ -286,13 +279,8 @@ class VRS_API AsyncDiskFileChunk {
     // close, so storing this via reference is safe.
     const AsyncHandle& file_;
     int64_t offset_;
-    AsyncBuffer::complete_write_callback callback_;
-    QueuedWrite(
-        AsyncBuffer* buffer,
-        AsyncHandle& file,
-        int64_t offset,
-        AsyncBuffer::complete_write_callback callback)
-        : buffer_(buffer), file_(file), offset_(offset), callback_(std::move(callback)) {}
+    QueuedWrite(AsyncBuffer* buffer, AsyncHandle& file, int64_t offset)
+        : buffer_(buffer), file_(file), offset_(offset) {}
   };
 
   int flushWriteBuffer();
@@ -303,15 +291,15 @@ class VRS_API AsyncDiskFileChunk {
   int ensureOpenDirect();
   int ensureOpen_(int requested_flags);
   void complete_write(AsyncBuffer* buffer, ssize_t io_return, int io_errno);
-  AsyncBuffer* get_free_buffer_locked(std::unique_lock<std::mutex>& lock);
+  // Complete the writes that have finished and submit queued ones. With `waitForOne`, wait until
+  // at least one buffer is freed, or nothing is in flight.
+  void reapWrites(bool waitForOne);
+  void waitForAWriteToFinish();
+  // @return nullptr if no buffer can ever become free.
   AsyncBuffer* get_free_buffer();
   void free_buffer(AsyncBuffer*& buffer);
-  void free_buffer_locked(std::unique_lock<std::mutex>& lock, AsyncBuffer*& buffer);
-  void pump_buffers();
   using WriteSubmitter = std::function<int(QueuedWrite&)>;
-  void pump_buffers_locked(
-      std::unique_lock<std::mutex>& lock,
-      const WriteSubmitter& submit = nullptr);
+  void pump_buffers(const WriteSubmitter& submit = nullptr);
   void recordAsyncError(int error);
   friend class AsyncDiskFileChunkTestPeer;
   int alloc_write_buffers();
@@ -337,21 +325,17 @@ class VRS_API AsyncDiskFileChunk {
   // The flags supported by the underlying path_ file
   int supported_flags_ = 0;
 
-  // Protects the following members from the writing thread as well as the asyncio callback
-  // thread(s). Note that this lock is not really required on Windows, as the callbacks are
-  // delivered on the dispatching thread when it's in an alertable state.
-  std::mutex buffers_mutex_;
-  // Used to notify a waiting writing thread that a buffer was freed.
-  std::condition_variable buffer_freed_cv_;
   // The list of free buffers
   std::vector<AsyncBuffer*> buffers_free_;
-  // The list of buffers to be written. Drained by pump_buffers()
+  // The list of buffers to be written. Drained by pump_buffers(), up to `iodepth_` writes in
+  // flight. Queued buffers wait for the next call that writes or flushes.
   std::deque<QueuedWrite> buffers_queued_;
-  // A count of the number of buffers waiting on async completions
-  //
-  // This could be a std::atomic<size_t>, but the current implementation has to take the lock
-  // anyway to manage the list of buffers_free_, so don't bother.
-  size_t buffers_writing_ = 0;
+  // The buffers with a write in flight
+  std::vector<AsyncBuffer*> buffers_writing_;
+#if POSIX_AIO_SUPPORTED()
+  // The control blocks of `buffers_writing_`, for aio_suspend
+  std::vector<const AioControlBlock*> writes_to_wait_for_;
+#endif
   // A list of all the buffers to keep them alive when they are being written (no longer in any
   // other queue)
   std::vector<std::unique_ptr<AsyncBuffer>> buffers_;
@@ -360,7 +344,7 @@ class VRS_API AsyncDiskFileChunk {
   AsyncBuffer* current_buffer_ = nullptr;
   // The first error that lost data write() had already accepted. Every later write, close, and
   // operation that flushes returns it, until create() or open().
-  std::atomic<int> async_error_ = SUCCESS;
+  int async_error_ = SUCCESS;
   bool rejected_submission_logged_ = false;
 
   // Operational parameters initialized from the FileSpec extra params/options at create/open
