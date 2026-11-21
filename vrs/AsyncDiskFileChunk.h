@@ -126,6 +126,18 @@ struct VRS_API AsyncFileDescriptor {
   int seek(int64_t pos, int origin, int64_t& outFilepos);
   int pwrite(const void* buf, size_t count, int64_t offset, size_t& written);
   int close();
+  /// Turn O_DIRECT on or off for the open file.
+  /// @param direct: True to turn O_DIRECT on, false to turn it off.
+  /// @return The fcntl() error, EINVAL when the file system rejects O_DIRECT.
+  int setDirect(bool direct);
+  /// Open `path` again with `flags`, and switch to the new descriptor if it is the same file.
+  /// @param path: Path the file was opened with.
+  /// @param modes: Open modes, which must not create or truncate ("rb" or "rb+").
+  /// @param flags: Additional open() flags, such as O_DIRECT.
+  /// @param outCloseError: Once switched, the result of closing the old descriptor: some file
+  /// systems only report a failed earlier write then.
+  /// @return ESTALE if `path` now leads to a different file, which stays untouched.
+  int reopenSameFile(const std::string& path, const char* modes, int flags, int& outCloseError);
 
   int fd_ = INVALID_FILE_DESCRIPTOR;
 };
@@ -287,6 +299,7 @@ class VRS_API AsyncDiskFileChunk {
   int ensureOpenNonDirect();
   int ensureOpenDirect();
   int ensureOpen_(int requested_flags);
+  void disableDirectIo();
   void complete_write(AsyncBuffer* buffer, ssize_t io_return, int io_errno);
   // Complete the writes that have finished and submit queued ones. With `waitForOne`, wait until
   // at least one buffer is freed, or nothing is in flight.

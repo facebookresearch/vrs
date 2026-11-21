@@ -19,6 +19,7 @@
 #if VRS_ASYNC_DISKFILE_SUPPORTED()
 #if POSIX_AIO_SUPPORTED()
 
+#include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -546,6 +547,77 @@ TEST_F(AsyncDiskFileChunkWriteTest, RetriedReopenAfterAFailedOneDoesNotTruncate)
   EXPECT_EQ(chunk_.flush(), vrs::SUCCESS);
   EXPECT_EQ(chunk_.close(), vrs::SUCCESS);
   EXPECT_EQ(AsyncDiskFileChunkTestPeer::readFile(path_), data + tail);
+}
+
+TEST_F(AsyncDiskFileChunkWriteTest, ReopenSameFileSwitchesToANewDescriptor) {
+  const std::string path = path_ + "_fd";
+  vrs::AsyncFileDescriptor file;
+  ASSERT_EQ(file.open(path, "wb+", 0), vrs::SUCCESS);
+  size_t written = 0;
+  ASSERT_EQ(file.pwrite("abc", 3, 0, written), vrs::SUCCESS);
+  const int first = file.fd_;
+  int closeError = EBADF;
+  ASSERT_EQ(file.reopenSameFile(path, "rb+", 0, closeError), vrs::SUCCESS);
+  EXPECT_EQ(closeError, vrs::SUCCESS);
+  // Opened while the old descriptor was still open, so it can't have the same number.
+  EXPECT_NE(file.fd_, first);
+  ASSERT_EQ(file.pwrite("def", 3, 3, written), vrs::SUCCESS);
+  EXPECT_EQ(file.close(), vrs::SUCCESS);
+  EXPECT_EQ(AsyncDiskFileChunkTestPeer::readFile(path), "abcdef");
+  EXPECT_EQ(vrs::os::remove(path), 0);
+}
+
+TEST_F(AsyncDiskFileChunkWriteTest, ReopenSameFileKeepsTheDescriptorOfAReplacedFile) {
+  const std::string path = path_ + "_fd";
+  const std::string moved = path + "_moved";
+  vrs::AsyncFileDescriptor file;
+  ASSERT_EQ(file.open(path, "wb+", 0), vrs::SUCCESS);
+  ASSERT_EQ(::rename(path.c_str(), moved.c_str()), 0);
+  {
+    std::ofstream(path) << "replacement";
+  }
+  const int original = file.fd_;
+  int closeError = EBADF;
+  EXPECT_EQ(file.reopenSameFile(path, "rb+", 0, closeError), ESTALE);
+  EXPECT_EQ(closeError, vrs::SUCCESS);
+  EXPECT_EQ(file.fd_, original);
+  size_t written = 0;
+  ASSERT_EQ(file.pwrite("abc", 3, 0, written), vrs::SUCCESS);
+  EXPECT_EQ(file.close(), vrs::SUCCESS);
+  EXPECT_EQ(AsyncDiskFileChunkTestPeer::readFile(moved), "abc");
+  EXPECT_EQ(AsyncDiskFileChunkTestPeer::readFile(path), "replacement");
+  EXPECT_EQ(vrs::os::remove(moved), 0);
+  EXPECT_EQ(vrs::os::remove(path), 0);
+}
+
+TEST_F(AsyncDiskFileChunkWriteTest, SetDirectChangesTheOpenFile) {
+  const std::string path = path_ + "_fd";
+  vrs::AsyncFileDescriptor file;
+  ASSERT_EQ(file.open(path, "wb+", 0), vrs::SUCCESS);
+  const int error = file.setDirect(true);
+  if (error == EINVAL) {
+    EXPECT_EQ(file.close(), vrs::SUCCESS);
+    EXPECT_EQ(vrs::os::remove(path), 0);
+    GTEST_SKIP() << "the temporary folder's file system doesn't support O_DIRECT";
+  }
+  ASSERT_EQ(error, vrs::SUCCESS);
+  EXPECT_NE(::fcntl(file.fd_, F_GETFL) & O_DIRECT, 0);
+  ASSERT_EQ(file.setDirect(false), vrs::SUCCESS);
+  EXPECT_EQ(::fcntl(file.fd_, F_GETFL) & O_DIRECT, 0);
+  EXPECT_EQ(file.close(), vrs::SUCCESS);
+  EXPECT_EQ(vrs::os::remove(path), 0);
+}
+
+TEST_F(AsyncDiskFileChunkWriteTest, SetDirectFailsWhereODirectIsNotSupported) {
+  struct stat device{};
+  if (::stat("/dev/null", &device) != 0 || !S_ISCHR(device.st_mode)) {
+    GTEST_SKIP() << "needs /dev/null";
+  }
+  vrs::AsyncFileDescriptor file;
+  ASSERT_EQ(file.open("/dev/null", "rb+", 0), vrs::SUCCESS);
+  EXPECT_EQ(file.setDirect(true), EINVAL);
+  EXPECT_EQ(::fcntl(file.fd_, F_GETFL) & O_DIRECT, 0);
+  EXPECT_EQ(file.close(), vrs::SUCCESS);
 }
 
 TEST_F(AsyncDiskFileChunkWriteTest, SeekAndTruncateOfAClosedChunkFail) {

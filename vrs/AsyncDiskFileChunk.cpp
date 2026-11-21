@@ -27,10 +27,16 @@
 #endif
 #endif
 
+#if !IS_WINDOWS_PLATFORM()
+#include <sys/stat.h>
+#endif
+
 #include <logging/Checks.h>
 #include <logging/Log.h>
 
 #include <algorithm>
+#include <iterator>
+#include <utility>
 
 #include <vrs/helpers/EnumStringConverter.h>
 #include <vrs/helpers/FileMacros.h>
@@ -365,6 +371,39 @@ int AsyncFileDescriptor::read(void* ptr, size_t bufferSize, int64_t offset, size
   return SUCCESS;
 }
 
+int AsyncFileDescriptor::setDirect(bool direct) {
+  const int flags = ::fcntl(fd_, F_GETFL);
+  if (flags < 0) {
+    return errno;
+  }
+  const int newFlags = direct ? (flags | O_DIRECT) : (flags & ~O_DIRECT);
+  return ::fcntl(fd_, F_SETFL, newFlags) == 0 ? SUCCESS : errno;
+}
+
+int AsyncFileDescriptor::reopenSameFile(
+    const string& path,
+    const char* modes,
+    int flags,
+    int& outCloseError) {
+  outCloseError = SUCCESS;
+  AsyncFileDescriptor reopened;
+  IF_ERROR_RETURN(reopened.open(path, modes, flags));
+  struct stat current{};
+  struct stat other{};
+  if (::fstat(fd_, &current) != 0 || ::fstat(reopened.fd_, &other) != 0) {
+    const int error = errno;
+    reopened.close();
+    return error;
+  }
+  if (current.st_dev != other.st_dev || current.st_ino != other.st_ino) {
+    reopened.close();
+    return ESTALE;
+  }
+  outCloseError = close();
+  std::swap(fd_, reopened.fd_);
+  return SUCCESS;
+}
+
 int AsyncFileDescriptor::truncate(int64_t newSize) {
 #if (defined(__ANDROID_API__) && __ANDROID_API__ < 21)
   return ::ftruncate(fd_, newSize) == 0 ? SUCCESS : errno;
@@ -545,11 +584,7 @@ int AsyncDiskFileChunk::create(const string& newpath, const FileSpec::Extras& op
   if (error != 0 && 0 != (O_DIRECT & supported_flags_)) {
     error = ensureOpenNonDirect();
     if (error == 0) {
-      XR_LOGCW(
-          VRS_DISKFILECHUNK,
-          "O_DIRECT appears not to be supported for {}, falling back to non-direct IO",
-          newpath);
-      supported_flags_ &= ~O_DIRECT;
+      disableDirectIo();
     }
   }
   opened_ = error == SUCCESS;
@@ -874,6 +909,14 @@ int AsyncDiskFileChunk::ensureOpen_(int requested_flags) {
   return SUCCESS;
 }
 
+void AsyncDiskFileChunk::disableDirectIo() {
+  XR_LOGCW(
+      VRS_DISKFILECHUNK,
+      "O_DIRECT appears not to be supported for {}, falling back to non-direct IO",
+      path_);
+  supported_flags_ &= ~O_DIRECT;
+}
+
 void AsyncDiskFileChunk::complete_write(AsyncBuffer* buffer, ssize_t io_return, int io_errno) {
   if (io_return == buffer->size()) {
     if (io_errno != SUCCESS) {
@@ -926,9 +969,11 @@ void AsyncDiskFileChunk::reapWrites(bool waitForOne) {
 void AsyncDiskFileChunk::waitForAWriteToFinish() {
 #if POSIX_AIO_SUPPORTED()
   writes_to_wait_for_.clear();
-  for (const AsyncBuffer* buffer : buffers_writing_) {
-    writes_to_wait_for_.push_back(buffer->control_block());
-  }
+  std::transform(
+      buffers_writing_.begin(),
+      buffers_writing_.end(),
+      std::back_inserter(writes_to_wait_for_),
+      [](const AsyncBuffer* buffer) { return buffer->control_block(); });
   // Returns early on a signal (EINTR): the caller polls again either way.
   aioSuspend(writes_to_wait_for_.data(), static_cast<int>(writes_to_wait_for_.size()));
 #endif
