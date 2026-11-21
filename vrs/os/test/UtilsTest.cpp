@@ -29,7 +29,9 @@
 #include <vrs/os/Platform.h>
 #include <vrs/os/System.h>
 
-#if !IS_WINDOWS_PLATFORM() && !IS_ANDROID_PLATFORM()
+#if IS_WINDOWS_PLATFORM()
+#include <winerror.h>
+#elif !IS_ANDROID_PLATFORM()
 #include <unistd.h>
 #endif
 
@@ -189,6 +191,40 @@ TEST_F(FileTest, testSanitize) {
   EXPECT_EQ(os::sanitizeFileName("."), "~.");
   EXPECT_EQ(os::sanitizeFileName(".."), "~..");
 }
+
+#if IS_WINDOWS_PLATFORM()
+TEST_F(FileTest, testUtf8Paths) {
+  const string folder = os::makeUniqueFolder();
+  const string utf8Name = "caf\xC3\xA9_\xE6\xB5\x8B\xE8\xAF\x95.vrs";
+  const std::filesystem::path nativeFolder(folder);
+  const std::filesystem::path nativePath = nativeFolder / L"caf\u00e9_\u6d4b\u8bd5.vrs";
+  const string utf8Path = os::pathJoin(folder, utf8Name);
+  std::error_code ec;
+  createEmptyFile(utf8Path);
+  EXPECT_TRUE(std::filesystem::is_regular_file(nativePath, ec));
+  const string renamedPath = utf8Path + ".renamed";
+  EXPECT_EQ(os::rename(utf8Path, renamedPath), 0);
+  const std::filesystem::path nativeRenamedPath =
+      nativeFolder / L"caf\u00e9_\u6d4b\u8bd5.vrs.renamed";
+  EXPECT_TRUE(std::filesystem::is_regular_file(nativeRenamedPath, ec));
+  EXPECT_EQ(os::hidePath(renamedPath, true), 0);
+  EXPECT_EQ(os::remove(renamedPath), 0);
+  EXPECT_FALSE(std::filesystem::exists(nativeRenamedPath, ec));
+  const string malformedPath = os::pathJoin(folder, "bad\xC3.vrs");
+  EXPECT_EQ(os::fileOpen(malformedPath, "wb"), nullptr);
+  EXPECT_NE(os::remove(malformedPath), 0);
+  EXPECT_NE(os::rename(malformedPath, utf8Path), 0);
+  EXPECT_NE(os::hidePath(malformedPath, true), 0);
+  int64_t freeSpace = 0;
+  EXPECT_EQ(
+      os::getFreeDiskSpace(os::pathJoin(malformedPath, "file.vrs"), freeSpace),
+      ERROR_NO_UNICODE_TRANSLATION);
+  EXPECT_EQ(freeSpace, -1);
+  const string embeddedNul = utf8Path + string("\0.ignored", 9);
+  EXPECT_EQ(os::fileOpen(embeddedNul, "wb"), nullptr);
+  EXPECT_FALSE(std::filesystem::exists(nativePath, ec));
+}
+#endif // IS_WINDOWS_PLATFORM()
 
 TEST_F(FileTest, testGetFilename) {
   EXPECT_EQ("file.txt", os::getFilename("some/path/file.txt"));
