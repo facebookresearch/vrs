@@ -155,7 +155,7 @@ class OpenProgressDialog : public ProgressLogger {
   bool keepGoing_;
 };
 
-// Helper to prefetch a frameset, making sure we cancel the sequence on exit
+// Requests frame-set prefetching for non-local files and clears the sequence on scope exit.
 class Prefetcher {
  public:
   Prefetcher(RecordFileReader& reader, const set<size_t>& frameSet, bool isLocalFile)

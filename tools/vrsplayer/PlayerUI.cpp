@@ -71,7 +71,7 @@ const vector<pair<QString, double>> kSpeeds = {
     {"6.00x", 6.00},
     {"8.00x", 8.00}};
 
-// Slider that jumps to the position, when you click the slider's bar but not the thumb itself
+// A left-click outside the handle emits sliderMoved so the player can seek to that position.
 class JumpSlider : public QSlider {
  public:
   JumpSlider() : QSlider(Qt::Horizontal) {}
