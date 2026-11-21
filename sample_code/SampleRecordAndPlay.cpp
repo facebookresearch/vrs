@@ -100,9 +100,8 @@ class RecordableDemo : public Recordable {
      for an algorithm, it might be a position.
 
      Every record produced by a recordable has a timestamp, which tells when that data was created.
-     All records (all types) will be sorted by timestamp before being written,
-     to be played back in that order, so it is critical to produce data
-     with meaningful and system-coherent timestamps.
+     Playback follows the timestamp-sorted index, even when records were written out of order.
+     Use a common time source so records from different streams play back in the intended order.
   */
 
  public:

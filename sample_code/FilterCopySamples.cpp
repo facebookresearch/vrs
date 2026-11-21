@@ -90,8 +90,9 @@ namespace {
 
 using namespace vrs::datalayout_conventions;
 
-// Image filter that demonstrates changing both the image spec & the image data
-// This filter simply drops the lower half of the image
+// Demonstrates cropping the lower half of a raw, single-plane image by updating both the
+// configuration DataLayout and the pixel buffer. The image must have an even height, with
+// the height supplied by the configuration DataLayout rather than the image block spec.
 class HalfHeightFilter : public RecordFilterCopier {
  public:
   HalfHeightFilter(
