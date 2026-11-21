@@ -19,8 +19,10 @@
 #if VRS_ASYNC_DISKFILE_SUPPORTED()
 #if POSIX_AIO_SUPPORTED()
 
+#include <sys/stat.h>
 #include <unistd.h>
 
+#include <algorithm>
 #include <cerrno>
 #include <cstdint>
 #include <cstdio>
@@ -64,6 +66,12 @@ class AsyncDiskFileChunkTestPeer {
     return capacities;
   }
 
+  // Wait until an in-flight write finishes, without completing it.
+  static void waitForAWriteToFinish(AsyncDiskFileChunk& chunk) {
+    ASSERT_FALSE(chunk.buffers_writing_.empty());
+    chunk.waitForAWriteToFinish();
+  }
+
   // The file offset where the buffer being filled starts.
   static int64_t bufferStart(const AsyncDiskFileChunk& chunk) {
     return chunk.file_position_;
@@ -73,13 +81,9 @@ class AsyncDiskFileChunkTestPeer {
     AsyncBuffer* buffer = nullptr;
     enqueue(chunk, buffer, 0x72);
     test::limitFileSize(2048); // cuts the 4096-byte write short, leaves room for the log lines
-    {
-      std::unique_lock lock{chunk.buffers_mutex_}; // NOLINT(facebook-thread-safety-analysis)
-      chunk.pump_buffers_locked(lock, [](AsyncDiskFileChunk::QueuedWrite& item) {
-        return item.buffer_->startWrite(
-            item.file_, item.offset_, std::move(item.callback_), rejectAgain);
-      });
-    }
+    chunk.pump_buffers([](AsyncDiskFileChunk::QueuedWrite& item) {
+      return item.buffer_->startWrite(item.file_, item.offset_, rejectAgain);
+    });
     test::removeFileSizeLimit();
     const int error = chunk.flush();
     EXPECT_NE(error, SUCCESS);
@@ -96,17 +100,13 @@ class AsyncDiskFileChunkTestPeer {
   static void verifyRejectedSubmissionIsWrittenSynchronously(AsyncDiskFileChunk& chunk) {
     AsyncBuffer* buffer = nullptr;
     enqueue(chunk, buffer, 0x72);
-    {
-      std::unique_lock lock{chunk.buffers_mutex_}; // NOLINT(facebook-thread-safety-analysis)
-      chunk.pump_buffers_locked(lock, [](AsyncDiskFileChunk::QueuedWrite& item) {
-        return item.buffer_->startWrite(
-            item.file_, item.offset_, std::move(item.callback_), rejectAgain);
-      });
-      EXPECT_EQ(chunk.buffers_writing_, 0);
-      EXPECT_TRUE(chunk.buffers_queued_.empty());
-      EXPECT_EQ(chunk.buffers_free_.size(), chunk.buffers_.size());
-      EXPECT_FALSE(buffer->on_complete_);
-    }
+    chunk.pump_buffers([](AsyncDiskFileChunk::QueuedWrite& item) {
+      return item.buffer_->startWrite(item.file_, item.offset_, captureNotificationAndReject);
+    });
+    EXPECT_EQ(sNotification, SIGEV_NONE);
+    EXPECT_TRUE(chunk.buffers_writing_.empty());
+    EXPECT_TRUE(chunk.buffers_queued_.empty());
+    EXPECT_EQ(chunk.buffers_free_.size(), chunk.buffers_.size());
     EXPECT_EQ(chunk.flush(), SUCCESS);
     expectContent(chunk, std::string(chunk.buffer_size_, 0x72));
     EXPECT_EQ(chunk.close(), SUCCESS);
@@ -118,25 +118,18 @@ class AsyncDiskFileChunkTestPeer {
     enqueue(chunk, buffer, 0x22);
     enqueue(chunk, buffer, 0x33);
     const std::string tail(17, 0x43);
-    size_t written = 0;
-    ASSERT_EQ(chunk.write(tail.data(), tail.size(), written), SUCCESS);
+    bufferTail(chunk, tail);
     size_t submissions = 0;
-    {
-      std::unique_lock lock{chunk.buffers_mutex_}; // NOLINT(facebook-thread-safety-analysis)
-      chunk.pump_buffers_locked(lock, [&submissions](AsyncDiskFileChunk::QueuedWrite& item) {
-        ++submissions;
-        if (submissions == 2) {
-          return item.buffer_->start_write(item.file_, item.offset_, std::move(item.callback_));
-        }
-        return item.buffer_->startWrite(
-            item.file_,
-            item.offset_,
-            std::move(item.callback_),
-            submissions == 1 ? rejectAgain : rejectNoMemory);
-      });
-      EXPECT_EQ(submissions, 3);
-      EXPECT_TRUE(chunk.buffers_queued_.empty());
-    }
+    chunk.pump_buffers([&submissions](AsyncDiskFileChunk::QueuedWrite& item) {
+      ++submissions;
+      if (submissions == 2) {
+        return item.buffer_->start_write(item.file_, item.offset_);
+      }
+      return item.buffer_->startWrite(
+          item.file_, item.offset_, submissions == 1 ? rejectAgain : rejectNoMemory);
+    });
+    EXPECT_EQ(submissions, 3);
+    EXPECT_TRUE(chunk.buffers_queued_.empty());
     EXPECT_EQ(chunk.flush(), SUCCESS);
     const size_t size = chunk.buffer_size_;
     expectContent(
@@ -149,17 +142,16 @@ class AsyncDiskFileChunkTestPeer {
       const std::string& path) {
     AsyncBuffer* failed = nullptr;
     enqueue(chunk, failed, 0x72);
-    {
-      std::unique_lock lock{chunk.buffers_mutex_}; // NOLINT(facebook-thread-safety-analysis)
-      chunk.pump_buffers_locked(lock, [](AsyncDiskFileChunk::QueuedWrite& item) {
-        return item.buffer_->startWrite(
-            item.file_, item.offset_, std::move(item.callback_), acceptWithoutWriting);
-      });
-    }
     const std::string tail(17, 0x43);
+    bufferTail(chunk, tail);
+    chunk.pump_buffers([](AsyncDiskFileChunk::QueuedWrite& item) {
+      return item.buffer_->startWrite(item.file_, item.offset_, acceptWithoutWriting);
+    });
+    // Complete the write that was never submitted before anything polls it.
+    ASSERT_EQ(chunk.buffers_writing_.size(), 1);
+    chunk.buffers_writing_.clear();
+    chunk.complete_write(failed, -1, EIO);
     size_t written = 0;
-    ASSERT_EQ(chunk.write(tail.data(), tail.size(), written), SUCCESS);
-    failed->complete_write(-1, EIO);
     chunk.recordAsyncError(ENOSPC); // the first error is the one kept
     EXPECT_EQ(chunk.write(tail.data(), tail.size(), written), EIO);
     EXPECT_EQ(written, 0u);
@@ -178,6 +170,14 @@ class AsyncDiskFileChunkTestPeer {
 
  private:
   using ControlBlock = decltype(AsyncBuffer::aiocb_);
+
+  static inline int sNotification = -1;
+
+  static int captureNotificationAndReject(ControlBlock* controlBlock) {
+    sNotification = controlBlock->aio_sigevent.sigev_notify;
+    errno = EAGAIN;
+    return -1;
+  }
 
   static int rejectAgain(ControlBlock*) {
     errno = EAGAIN;
@@ -200,14 +200,17 @@ class AsyncDiskFileChunkTestPeer {
     size_t copied = 0;
     ASSERT_TRUE(outBuffer->add(payload.data(), payload.size(), copied));
     ASSERT_EQ(copied, payload.size());
-    chunk.buffers_queued_.emplace_back(
-        outBuffer,
-        chunk.file_,
-        chunk.file_position_,
-        [&chunk, buffer = outBuffer](ssize_t written, int error) {
-          chunk.complete_write(buffer, written, error);
-        });
+    chunk.buffers_queued_.emplace_back(outBuffer, chunk.file_, chunk.file_position_);
     chunk.file_position_ += static_cast<int64_t>(payload.size());
+  }
+
+  // Put `tail` in the buffer being filled, as write() would, without polling or submitting.
+  static void bufferTail(AsyncDiskFileChunk& chunk, const std::string& tail) {
+    chunk.current_buffer_ = chunk.get_free_buffer();
+    ASSERT_NE(chunk.current_buffer_, nullptr);
+    size_t copied = 0;
+    ASSERT_TRUE(chunk.current_buffer_->add(tail.data(), tail.size(), copied));
+    ASSERT_EQ(copied, tail.size());
   }
 
   static void expectContent(AsyncDiskFileChunk& chunk, const std::string& expected) {
@@ -359,54 +362,31 @@ class AsyncDiskFileChunkWriteTest : public testing::Test {
 
 using AsyncDiskFileChunkWriteDeathTest = AsyncDiskFileChunkWriteTest;
 
-// The death tests run in a child process: a regression that completes a write on the submitting
-// thread deadlocks on the queue lock, and file size limits must not leak into other tests.
-TEST_F(AsyncDiskFileChunkWriteDeathTest, RejectedSubmissionIsWrittenSynchronously) {
-  ASSERT_EXIT(
-      {
-        alarm(5);
-        AsyncDiskFileChunkTestPeer::verifyRejectedSubmissionIsWrittenSynchronously(chunk_);
-        _exit(testing::Test::HasFailure() ? 1 : 0);
-      },
-      testing::ExitedWithCode(0),
-      "");
+TEST_F(AsyncDiskFileChunkWriteTest, RejectedSubmissionIsWrittenSynchronously) {
+  AsyncDiskFileChunkTestPeer::verifyRejectedSubmissionIsWrittenSynchronously(chunk_);
 }
 
-TEST_F(AsyncDiskFileChunkWriteDeathTest, RejectedAndAcceptedSubmissionsAreAllWritten) {
+TEST_F(AsyncDiskFileChunkWriteTest, RejectedAndAcceptedSubmissionsAreAllWritten) {
   if (!writesAreBuffered()) {
     GTEST_SKIP() << "needs an engine that buffers writes";
   }
-  ASSERT_EXIT(
-      {
-        alarm(5);
-        AsyncDiskFileChunkTestPeer::verifyMixedSubmissionsAreAllWritten(chunk_);
-        _exit(testing::Test::HasFailure() ? 1 : 0);
-      },
-      testing::ExitedWithCode(0),
-      "");
+  AsyncDiskFileChunkTestPeer::verifyMixedSubmissionsAreAllWritten(chunk_);
 }
 
-TEST_F(AsyncDiskFileChunkWriteDeathTest, FailedAsyncWriteErrorPersistsAndTailIsStillWritten) {
+TEST_F(AsyncDiskFileChunkWriteTest, FailedAsyncWriteErrorPersistsAndTailIsStillWritten) {
   if (!writesAreBuffered()) {
     GTEST_SKIP() << "needs an engine that buffers writes";
   }
-  ASSERT_EXIT(
-      {
-        alarm(5);
-        AsyncDiskFileChunkTestPeer::verifyFailedAsyncWriteErrorPersistsUntilClose(chunk_, path_);
-        _exit(testing::Test::HasFailure() ? 1 : 0);
-      },
-      testing::ExitedWithCode(0),
-      "");
+  AsyncDiskFileChunkTestPeer::verifyFailedAsyncWriteErrorPersistsUntilClose(chunk_, path_);
 }
 
+// Death tests run in a child process, so the file size limits they set don't leak into other tests.
 TEST_F(AsyncDiskFileChunkWriteDeathTest, ShortTailWriteKeepsTheRestAndThePosition) {
   if (!writesAreBuffered()) {
     GTEST_SKIP() << "needs an engine that buffers writes";
   }
   ASSERT_EXIT(
       {
-        alarm(5);
         const std::string tail(17, 0x43);
         size_t written = 0;
         ASSERT_EQ(chunk_.write(tail.data(), tail.size(), written), vrs::SUCCESS);
@@ -459,7 +439,6 @@ TEST_F(AsyncDiskFileChunkWriteDeathTest, ShortPsyncWriteKeepsTheRestAndThePositi
   }
   ASSERT_EXIT(
       {
-        alarm(5);
         vrs::AsyncDiskFileChunk chunk;
         const std::string path = path_ + "_psync";
         ASSERT_EQ(
@@ -477,6 +456,62 @@ TEST_F(AsyncDiskFileChunkWriteDeathTest, ShortPsyncWriteKeepsTheRestAndThePositi
         removeFileSizeLimit();
         EXPECT_EQ(chunk.close(), vrs::SUCCESS);
         EXPECT_EQ(AsyncDiskFileChunkTestPeer::readFile(path), data.substr(0, written));
+        EXPECT_EQ(vrs::os::remove(path), 0);
+        _exit(testing::Test::HasFailure() ? 1 : 0);
+      },
+      testing::ExitedWithCode(0),
+      "");
+}
+
+TEST_F(AsyncDiskFileChunkWriteDeathTest, FailedAsyncWriteIsReturnedByTheNextWrite) {
+  if (!writesAreBuffered()) {
+    GTEST_SKIP() << "needs an engine that buffers writes";
+  }
+  // A forked child can't use AIO once its parent has: glibc's AIO threads don't survive fork().
+  GTEST_FLAG_SET(death_test_style, "threadsafe");
+  ASSERT_EXIT(
+      {
+        vrs::AsyncDiskFileChunk chunk;
+        const std::string path = path_ + "_one_buffer";
+        ASSERT_EQ(
+            chunk.create(path, {{"buffer_size", "4096"}, {"buffer_count", "1"}, {"iodepth", "1"}}),
+            vrs::SUCCESS);
+        const std::string data = makeData(2 * 4096);
+        limitFileSize(4096); // the second buffer's write fails, after write() returned
+        size_t written = 0;
+        EXPECT_EQ(chunk.write(data.data(), data.size(), written), vrs::SUCCESS);
+        EXPECT_EQ(chunk.write(data.data(), 17, written), EFBIG);
+        EXPECT_EQ(written, 0u);
+        removeFileSizeLimit();
+        EXPECT_EQ(chunk.close(), EFBIG);
+        EXPECT_EQ(vrs::os::remove(path), 0);
+        _exit(testing::Test::HasFailure() ? 1 : 0);
+      },
+      testing::ExitedWithCode(0),
+      "");
+}
+
+TEST_F(AsyncDiskFileChunkWriteDeathTest, ShortAsyncWriteIsAnError) {
+  if (!writesAreBuffered()) {
+    GTEST_SKIP() << "needs an engine that buffers writes";
+  }
+  // A forked child can't use AIO once its parent has: glibc's AIO threads don't survive fork().
+  GTEST_FLAG_SET(death_test_style, "threadsafe");
+  ASSERT_EXIT(
+      {
+        vrs::AsyncDiskFileChunk chunk;
+        const std::string path = path_ + "_short";
+        ASSERT_EQ(
+            chunk.create(
+                path, {{"buffer_size", "4096"}, {"buffer_count", "1"}, {"direct", "false"}}),
+            vrs::SUCCESS);
+        const std::string data = makeData(2 * 4096);
+        limitFileSize(4096 + 100); // the second buffer's write comes up short
+        size_t written = 0;
+        EXPECT_EQ(chunk.write(data.data(), data.size(), written), vrs::SUCCESS);
+        EXPECT_EQ(chunk.write(data.data(), 17, written), vrs::DISKFILE_PARTIAL_WRITE_ERROR);
+        removeFileSizeLimit();
+        EXPECT_EQ(chunk.close(), vrs::DISKFILE_PARTIAL_WRITE_ERROR);
         EXPECT_EQ(vrs::os::remove(path), 0);
         _exit(testing::Test::HasFailure() ? 1 : 0);
       },
@@ -537,6 +572,40 @@ TEST_F(AsyncDiskFileChunkWriteTest, CreateAfterAFailedCreateUsesTheNewOptions) {
   EXPECT_FALSE(AsyncDiskFileChunkTestPeer::usesDirectIo(chunk));
   EXPECT_EQ(chunk.close(), vrs::SUCCESS);
   EXPECT_EQ(vrs::os::remove(path), 0);
+}
+
+TEST_F(AsyncDiskFileChunkWriteTest, MoreBuffersThanIodepthAreAllWritten) {
+  vrs::AsyncDiskFileChunk chunk;
+  const std::string path = path_ + "_iodepth";
+  ASSERT_EQ(
+      chunk.create(path, {{"buffer_size", "4096"}, {"buffer_count", "4"}, {"iodepth", "1"}}),
+      vrs::SUCCESS);
+  const std::string data = makeData(10 * 4096 + 333);
+  for (size_t offset = 0; offset < data.size(); offset += 1000) {
+    const size_t size = std::min<size_t>(1000, data.size() - offset);
+    size_t written = 0;
+    ASSERT_EQ(chunk.write(data.data() + offset, size, written), vrs::SUCCESS);
+    ASSERT_EQ(written, size);
+  }
+  EXPECT_EQ(chunk.close(), vrs::SUCCESS);
+  EXPECT_EQ(AsyncDiskFileChunkTestPeer::readFile(path), data);
+  EXPECT_EQ(vrs::os::remove(path), 0);
+}
+
+TEST_F(AsyncDiskFileChunkWriteTest, NextWriteReturnsAFailureThatAlreadyHappened) {
+  struct stat device{};
+  if (!writesAreBuffered() || ::stat("/dev/full", &device) != 0 || !S_ISCHR(device.st_mode)) {
+    GTEST_SKIP() << "needs an engine that buffers writes, and /dev/full";
+  }
+  vrs::AsyncDiskFileChunk chunk;
+  ASSERT_EQ(
+      chunk.create("/dev/full", {{"buffer_size", "4096"}, {"buffer_count", "4"}}), vrs::SUCCESS);
+  const std::string data = makeData(4096);
+  size_t written = 0;
+  ASSERT_EQ(chunk.write(data.data(), data.size(), written), vrs::SUCCESS);
+  AsyncDiskFileChunkTestPeer::waitForAWriteToFinish(chunk); // /dev/full fails it with ENOSPC
+  EXPECT_EQ(chunk.write(data.data(), 10, written), ENOSPC); // a free buffer was available
+  EXPECT_EQ(chunk.close(), ENOSPC);
 }
 
 TEST_F(AsyncDiskFileChunkWriteTest, ReadOnlyOpenHasNoWriteBuffers) {
