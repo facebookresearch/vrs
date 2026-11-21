@@ -42,6 +42,13 @@ namespace vrs {
 
 class AsyncDiskFileChunkTestPeer {
  public:
+  // Close the descriptor but not the chunk, as a platform that can't switch O_DIRECT in place
+  // does, so the next write needs to reopen the file by path.
+  static void closeDescriptor(AsyncDiskFileChunk& chunk) {
+    ASSERT_EQ(chunk.waitForAsyncWrites(), SUCCESS);
+    chunk.file_.close();
+  }
+
   static void recordAsyncError(AsyncDiskFileChunk& chunk, int error) {
     chunk.recordAsyncError(error);
   }
@@ -52,6 +59,10 @@ class AsyncDiskFileChunkTestPeer {
 
   static bool usesDirectIo(const AsyncDiskFileChunk& chunk) {
     return (chunk.current_flags_ & O_DIRECT) != 0;
+  }
+
+  static bool supportsDirectIo(const AsyncDiskFileChunk& chunk) {
+    return (chunk.supported_flags_ & O_DIRECT) != 0;
   }
 
   static bool hasWriteBuffers(const AsyncDiskFileChunk& chunk) {
@@ -618,6 +629,31 @@ TEST_F(AsyncDiskFileChunkWriteTest, SetDirectFailsWhereODirectIsNotSupported) {
   EXPECT_EQ(file.setDirect(true), EINVAL);
   EXPECT_EQ(::fcntl(file.fd_, F_GETFL) & O_DIRECT, 0);
   EXPECT_EQ(file.close(), vrs::SUCCESS);
+}
+
+TEST_F(AsyncDiskFileChunkWriteTest, WritesKeepWorkingWhereODirectIsNotSupported) {
+  struct stat device{};
+  if (!writesAreBuffered() || ::stat("/dev/null", &device) != 0 || !S_ISCHR(device.st_mode)) {
+    GTEST_SKIP() << "needs an engine that buffers writes, and /dev/null";
+  }
+  // /dev/null rejects O_DIRECT with EINVAL.
+  const std::string link = path_ + "_devnull";
+  ASSERT_EQ(::symlink("/dev/null", link.c_str()), 0);
+  const vrs::FileSpec::Extras options = {{"buffer_size", "4096"}, {"buffer_count", "1"}};
+  vrs::AsyncDiskFileChunk chunk;
+  ASSERT_EQ(chunk.create(link, options), vrs::SUCCESS);
+  EXPECT_FALSE(AsyncDiskFileChunkTestPeer::supportsDirectIo(chunk));
+  ASSERT_EQ(chunk.close(), vrs::SUCCESS);
+  const std::string data = makeData(4096);
+  size_t written = 0;
+  // Reopening with O_DIRECT fails: it reopens without it.
+  ASSERT_EQ(chunk.open(false, options), vrs::SUCCESS); // asks for O_DIRECT again
+  EXPECT_TRUE(AsyncDiskFileChunkTestPeer::supportsDirectIo(chunk));
+  AsyncDiskFileChunkTestPeer::closeDescriptor(chunk);
+  EXPECT_EQ(chunk.write(data.data(), data.size(), written), vrs::SUCCESS);
+  EXPECT_FALSE(AsyncDiskFileChunkTestPeer::supportsDirectIo(chunk));
+  EXPECT_EQ(chunk.close(), vrs::SUCCESS);
+  EXPECT_EQ(::unlink(link.c_str()), 0);
 }
 
 TEST_F(AsyncDiskFileChunkWriteTest, SeekAndTruncateOfAClosedChunkFail) {

@@ -884,20 +884,33 @@ int AsyncDiskFileChunk::ensureOpenDirect() {
 }
 
 int AsyncDiskFileChunk::ensureOpen_(int requested_flags) {
+  const char* mode = file_mode_;
+  if (mode == nullptr) {
+    return DISKFILE_NOT_OPEN;
+  }
+#if !IS_WINDOWS_PLATFORM()
+  const bool wantDirect = (requested_flags & O_DIRECT) != 0;
+#endif
   if (file_.isOpened()) {
     if (requested_flags == current_flags_) {
       return SUCCESS;
     }
     file_.close();
   }
-  const char* mode = file_mode_;
-  if (mode == nullptr) {
-    return DISKFILE_NOT_OPEN;
-  }
   if (!isReadOnlyMode(mode)) {
     IF_ERROR_RETURN(alloc_write_buffers());
   }
   int error = file_.open(path_, mode, requested_flags);
+#if !IS_WINDOWS_PLATFORM()
+  if (error == EINVAL && wantDirect) {
+    const int bufferedFlags = requested_flags & ~O_DIRECT;
+    error = file_.open(path_, mode, bufferedFlags);
+    if (error == SUCCESS) {
+      disableDirectIo();
+      requested_flags = bufferedFlags;
+    }
+  }
+#endif
   if (error != 0) {
     return error;
   }
