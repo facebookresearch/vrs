@@ -16,6 +16,7 @@
 
 #include <vrs/os/Utils.h>
 
+#include <climits>
 #include <cstdio>
 
 #include <algorithm>
@@ -30,7 +31,6 @@
 #if IS_WINDOWS_PLATFORM()
 #include <io.h>
 #include <windows.h>
-#include <codecvt>
 #else // !IS_WINDOWS_PLATFORM()
 // Darwin's 'stat' support 64-bit if you set a flag. On linux, use 'stat64' instead.
 #if IS_APPLE_PLATFORM()
@@ -74,8 +74,25 @@ namespace vrs {
 namespace os {
 
 #if IS_WINDOWS_PLATFORM()
+// Returns an empty string for malformed UTF-8 or an embedded NUL, so no other path is resolved.
 std::wstring osUtf8ToWstring(const string& utf8String) {
-  return std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().from_bytes(utf8String);
+  if (utf8String.empty() || utf8String.size() > static_cast<size_t>(INT_MAX) ||
+      utf8String.find('\0') != string::npos) {
+    return {};
+  }
+  const int byteCount = static_cast<int>(utf8String.size());
+  const int length =
+      MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, utf8String.data(), byteCount, nullptr, 0);
+  if (length <= 0) {
+    return {};
+  }
+  std::wstring wideString(length, L'\0');
+  if (MultiByteToWideChar(
+          CP_UTF8, MB_ERR_INVALID_CHARS, utf8String.data(), byteCount, wideString.data(), length) !=
+      length) {
+    return {};
+  }
+  return wideString;
 }
 #endif // IS_WINDOWS_PLATFORM()
 
@@ -506,6 +523,9 @@ int getFreeDiskSpace(const string& targetPath, int64_t& outFreeSpace) {
 #if IS_WINDOWS_PLATFORM()
   ULARGE_INTEGER freeBytesAvailable{};
   std::wstring wdir = osUtf8ToWstring(dir);
+  if (wdir.empty()) {
+    return ERROR_NO_UNICODE_TRANSLATION;
+  }
   if (!GetDiskFreeSpaceExW(wdir.c_str(), &freeBytesAvailable, nullptr, nullptr)) {
     return static_cast<int>(GetLastError());
   }
