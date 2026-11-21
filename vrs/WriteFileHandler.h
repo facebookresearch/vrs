@@ -49,7 +49,7 @@ class VRS_API WriteFileHandler : public FileHandler {
 
   /// Create a new file for writing, using a spec.
   /// The path of the file to create is expected to be in the first chunk.
-  /// Optional URI parameters might be provided in the spec' extras.
+  /// Optional URI parameters might be provided in the spec's extras.
   virtual int create(const FileSpec& spec) {
     return spec.chunks.empty() ? INVALID_FILE_SPEC : create(spec.chunks.front(), spec.extras);
   }
@@ -76,7 +76,7 @@ class VRS_API WriteFileHandler : public FileHandler {
   /// When creating a split-head file, we may need to add a new chunk for the head file.
   /// @param inOutSpec: file spec used for the file creation, that will be passed to a
   /// DiskFile's create(inOutSpec) to create the head file,
-  /// and to createSplitFile(inOutSpec, options) to create the body file.
+  /// and to createSplitFile(inOutSpec, initialFilePath) to create the body file.
   virtual void addSplitHead(MAYBE_UNUSED FileSpec& inOutSpec) {}
 
   /// Close the file after a failed recording, rather than completing it.
@@ -102,7 +102,8 @@ class VRS_API WriteFileHandler : public FileHandler {
   /// @param buffer: a pointer to the data bytes to write.
   /// @param length: the number of bytes to write.
   /// @return A status code, 0 meaning success.
-  /// In case of error, you can use getLastRWSize() to know how many bytes were really written.
+  /// In case of error, you can use getLastRWSize() to know how many bytes were accepted, which
+  /// may include bytes still buffered.
   virtual int write(const void* buffer, size_t length) = 0;
   /// Helper for trivially copyable objects.
   template <typename T, std::enable_if_t<std::is_trivially_copyable<T>::value, int> = 0>
@@ -122,14 +123,15 @@ class VRS_API WriteFileHandler : public FileHandler {
     return overwrite(&object, sizeof(object));
   }
 
-  /// Append a new chunk to the current file, when in writing to disk.
+  /// Append a new chunk to the current file, when writing to disk.
   /// The next write will happen at the beginning of the new chunk.
   /// @return A status code, 0 meaning success.
   virtual int addChunk() = 0;
   /// Truncate chunk to the current file position. Use with care.
   /// @return A status code, 0 meaning success.
   virtual int truncate() = 0;
-  /// Get the path of the current chunk, or an empty string if no chunk is open.
+  /// Get the path and the index of the current chunk.
+  /// @return False if no chunk is open.
   virtual bool getCurrentChunk(string& outChunkPath, size_t& outChunkIndex) const = 0;
 };
 

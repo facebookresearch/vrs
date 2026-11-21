@@ -23,16 +23,13 @@
 #include <cassert>
 #include <cstdio>
 
-// POSIX AIO (aio_write/aio_error/aio_return) is available on Linux/Mac but not Android NDK.
-// When AIO is not available, fallback to PSync (O_DIRECT + pwrite) which bypasses page cache
-// without needing POSIX AIO.
+// POSIX AIO (aio_write/aio_error/aio_return) is used on Linux. Android (its NDK has no <aio.h>)
+// and Windows default to PSync (pwrite, with O_DIRECT unless disabled) instead.
 #define POSIX_AIO_SUPPORTED() (IS_MAC_PLATFORM() || IS_LINUX_PLATFORM())
 
 #if IS_WINDOWS_PLATFORM()
 #define VC_EXTRALEAN
 #include <Windows.h>
-
-#include <mutex>
 #elif POSIX_AIO_SUPPORTED()
 #include <aio.h>
 #include <fcntl.h>
@@ -99,7 +96,6 @@ struct VRS_API AsyncWindowsHandle {
 
  public:
   HANDLE h_ = INVALID_HANDLE_VALUE;
-  std::mutex mtx_;
 };
 using AsyncHandle = AsyncWindowsHandle;
 #else
@@ -151,8 +147,8 @@ class VRS_API AlignedBuffer {
   }
 
  public:
-  /// @return A buffer of `size` bytes aligned to `memalign`, or nullptr if it couldn't be
-  /// allocated.
+  /// @return An empty buffer of capacity `size`, aligned to `memalign`, or nullptr if it couldn't
+  /// be allocated.
   static std::unique_ptr<AlignedBuffer> make(size_t size, size_t memalign, size_t lenalign);
 
   virtual ~AlignedBuffer();
@@ -190,8 +186,8 @@ class VRS_API AlignedBuffer {
 
 class VRS_API AsyncBuffer : public AlignedBuffer {
  public:
-  /// @return A buffer of `size` bytes aligned to `memalign`, or nullptr if it couldn't be
-  /// allocated.
+  /// @return An empty buffer of capacity `size`, aligned to `memalign`, or nullptr if it couldn't
+  /// be allocated.
   static std::unique_ptr<AsyncBuffer> make(size_t size, size_t memalign, size_t lenalign);
 
   ~AsyncBuffer() override = default;
@@ -227,9 +223,10 @@ class VRS_API AsyncBuffer : public AlignedBuffer {
 };
 
 /// A file chunk that writes through aligned buffers, submitting full ones as asynchronous writes.
-/// Writes complete on the calling thread, when a later call polls them: nothing calls back into
-/// this object, so it needs no locking. With `iodepth` below `buffer_count`, full buffers beyond
-/// `iodepth` stay in memory until the next write(), flush() or close().
+/// Finished writes are only processed by later calls, on the caller's thread: nothing calls back
+/// into this object, so it needs no locking, but calls must not be concurrent. With `iodepth`
+/// below `buffer_count`, full buffers beyond `iodepth` stay in memory until the next write(),
+/// flush() or close().
 class VRS_API AsyncDiskFileChunk {
  public:
   AsyncDiskFileChunk() = default;
@@ -275,8 +272,8 @@ class VRS_API AsyncDiskFileChunk {
  private:
   struct QueuedWrite {
     AsyncBuffer* buffer_;
-    // N.B. QueuedWrite's are guaranteed to be flushed before the associated file descriptor is
-    // close, so storing this via reference is safe.
+    // Queued writes are always drained before the file handle is closed or replaced, so they
+    // can refer to it.
     const AsyncHandle& file_;
     int64_t offset_;
     QueuedWrite(AsyncBuffer* buffer, AsyncHandle& file, int64_t offset)
@@ -315,14 +312,13 @@ class VRS_API AsyncDiskFileChunk {
   int64_t offset_{}; // offset of this chunk in the file
   int64_t size_{}; // size of the chunk
 
-  // Keeps track of the current read/write position in the file of the current buffer.
+  // File position of the start of the current buffer. tell() adds the bytes buffered.
   int64_t file_position_ = 0;
 
   const char* file_mode_ = nullptr;
-  // Keeps track of the flags currently in force for the opened fd_. Typically a subset of the
-  // supported_flags_
+  // The flags currently in force for the open `file_`. Typically a subset of supported_flags_.
   int current_flags_ = 0;
-  // The flags supported by the underlying path_ file
+  // The flags to use for full buffers: O_DIRECT unless disabled, or rejected by the file system.
   int supported_flags_ = 0;
 
   // The list of free buffers
@@ -339,11 +335,11 @@ class VRS_API AsyncDiskFileChunk {
   // A list of all the buffers to keep them alive when they are being written (no longer in any
   // other queue)
   std::vector<std::unique_ptr<AsyncBuffer>> buffers_;
-  // The current buffer (if any) being filled by calls to `write()`. It will either be queued
-  // for async write by `write()`, or written out by `flushWriteBuffer()`
+  // The current buffer (if any) being filled by calls to `write()`. Once full, `write()` queues
+  // or writes it. Otherwise, `flushWriteBuffer()` writes it out.
   AsyncBuffer* current_buffer_ = nullptr;
-  // The first error that lost data write() had already accepted. Every later write, close, and
-  // operation that flushes returns it, until create() or open().
+  // The first error that lost data write() had already accepted. While the chunk is open, every
+  // later write, close, and operation that flushes returns it, until create() or open().
   int async_error_ = SUCCESS;
   bool rejected_submission_logged_ = false;
 
@@ -355,7 +351,7 @@ class VRS_API AsyncDiskFileChunk {
   size_t num_buffers_ = 0;
   // The size of each individual buffer
   size_t buffer_size_ = 0;
-  // The maximum number of simultaneous async_write operations allowed
+  // The maximum number of AIO writes in flight
   size_t iodepth_ = 4;
   // The requested alignment of buffer lengths and file offsets
   size_t offset_align_ = 0;

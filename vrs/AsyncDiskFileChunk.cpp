@@ -204,8 +204,8 @@ int AsyncWindowsHandle::_readwrite(
   }
 
   // N.B. this does not create an hEvent for the OVERLAPPED structure, instead using the file
-  // handle. This is only a valid thing to do if there are NO other IO operations occurring during
-  // this one. The calls to flushWriteBuffer() before calling this ensures this is the case.
+  // handle. This is only valid because there are NO other IO operations on this handle during
+  // this one: Windows has no asynchronous writes, so every operation completes before the next.
   OVERLAPPED ov = {};
   ov.Offset = (DWORD)offset;
   ov.OffsetHigh = (DWORD)(offset >> 32);
@@ -403,7 +403,7 @@ int AsyncFileDescriptor::close() {
   }
   int fd = fd_;
   fd_ = INVALID_FILE_DESCRIPTOR;
-  return ::close(fd);
+  return ::close(fd) == 0 ? SUCCESS : errno;
 }
 
 #endif
@@ -647,10 +647,9 @@ int AsyncDiskFileChunk::write(const void* buffer, size_t count, size_t& outWritt
   } // Otherwise writes can be aligned to anything, write nothing synchronously here
 
   if (towrite != 0) {
-    // Rather than read-modify-write lenalign chunks of the file, and deal with all of the
+    // Rather than read-modify-write offset_align_ blocks of the file, and deal with all of the
     // corner cases of "do we overlap the end of the file or not, previously written data or
-    // not, etc", we just close/reopen the file here to do the handful of partial writes
-    // required by the library.
+    // not, etc", we do the handful of partial writes required by the library without O_DIRECT.
 
     IF_ERROR_RETURN(flushWriteBuffer());
 
@@ -674,7 +673,7 @@ int AsyncDiskFileChunk::write(const void* buffer, size_t count, size_t& outWritt
   }
 
   while (count != 0) {
-    // This data is aligned to lenalign, so cache it in the current_buffer_
+    // The file position is aligned to offset_align_, so stage the data in the current_buffer_
     size_t additionalBuffered = 0;
     if (!current_buffer_->add(bbuffer, count, additionalBuffered)) {
       return DISKFILE_PARTIAL_WRITE_ERROR;
@@ -789,8 +788,8 @@ int AsyncDiskFileChunk::seek(int64_t pos, int origin) {
     IF_ERROR_RETURN(ensureOpenNonDirect());
   }
 
-  // we track the file offset ourselves, but let os::fileSeek do the actual work to compute the
-  // final position, as our own `size_` member may not reflect the current size of the chunk.
+  // We track the file offset ourselves, but let the OS compute the final position, as our own
+  // `size_` member may not reflect the current size of the chunk.
   int64_t position = 0;
   IF_ERROR_RETURN(file_.seek(file_position_, SEEK_SET, position));
   IF_ERROR_RETURN(file_.seek(pos, origin, position));
@@ -869,8 +868,6 @@ int AsyncDiskFileChunk::ensureOpen_(int requested_flags) {
   }
   current_flags_ = requested_flags;
   // Reopening must never truncate what was written, even after a failed reopen closed the file.
-  // This could fail if we don't have read permissions on the drive. If so, we'd need to refactor
-  // so that we can provide the `O_TRUNC` or not flag to `open()`.
   if (mode[0] == 'w') {
     file_mode_ = "rb+";
   }
@@ -1028,8 +1025,6 @@ int AsyncDiskFileChunk::free_write_buffers() {
 
 int AsyncDiskFileChunk::init_parameters(const FileSpec::Extras& options) {
   supported_flags_ = 0;
-  // The VRS_DISKFILECHUNKASYNC_* options are primarily used for running the test suite with
-  // different default IO configurations
   if (!helpers::getBool(options, "direct", use_directio_) &&
       !helpers::getBool(options, "directio", use_directio_)) {
     use_directio_ = true;
@@ -1045,14 +1040,14 @@ int AsyncDiskFileChunk::init_parameters(const FileSpec::Extras& options) {
     auto it = options.find("ioengine");
     if (it != options.end()) {
       // ioengine names here have been chosen to correspond to the `fio` program's `ioengine` as
-      // closely as possible, except `sync`, which acts like the basic DiskFileChunk.hpp, which
-      // synchronously writes the buffer to disk write away, no buffering in this class.
+      // closely as possible. `sync` writes everything right away, without O_DIRECT, without
+      // buffering in this class.
       ioengine_ = IoEngineTypeConverter::toEnum(it->second);
     }
   }
 #else
-  // No POSIX AIO available (e.g., Android NDK does not provide <aio.h>).
-  // Default to PSync (O_DIRECT + pwrite) which bypasses page cache without needing POSIX AIO.
+  // No POSIX AIO available (Android NDK does not provide <aio.h>, Windows).
+  // Default to PSync (pwrite, with O_DIRECT unless disabled), which needs no POSIX AIO.
   {
     ioengine_ = IoEngine::PSync;
     auto it = options.find("ioengine");
@@ -1089,8 +1084,9 @@ int AsyncDiskFileChunk::init_parameters(const FileSpec::Extras& options) {
   mem_align_ = 4 * 1024;
   offset_align_ = 4 * 1024;
 
-  // Allow overrides, but don't bother checking that they are powers of two or anything, on
-  // the assumption that the underlying write() calls will fail if they're bad values.
+  // Allow overrides, clamped, but don't check that they are powers of two, on the assumption that
+  // the underlying allocations or writes will fail if they're bad values. The buffer size is
+  // checked below.
 
   uint64_t temp_u64 = 0;
   mem_align_ = helpers::getByteSize(options, "mem_align", temp_u64) ? temp_u64 : mem_align_;
@@ -1102,8 +1098,7 @@ int AsyncDiskFileChunk::init_parameters(const FileSpec::Extras& options) {
   // The defaults below might not be optimal for your rig.
   // They can still be overwritten with the parameter names below from the input URI.
   // fio testing showed each worker using 32MB buffers for non-pre-allocated disk was pretty
-  // good. Avoids using more than 128 outstanding IO requests at a time, beyond which IO calls
-  // were blocking.
+  // good.
 
   buffer_size_ =
       helpers::getByteSize(options, "buffer_size", temp_u64) ? temp_u64 : 32 * 1024 * 1024;
@@ -1119,7 +1114,7 @@ int AsyncDiskFileChunk::init_parameters(const FileSpec::Extras& options) {
     num_buffers_ = 1;
   }
 
-  // fio testing showed that we really only need to keep a couple of these at a time
+  // By default, every buffer can be in flight
   iodepth_ = helpers::getUInt64(options, "iodepth", temp_u64) ? temp_u64 : num_buffers_;
   iodepth_ = std::clamp<size_t>(iodepth_, 1, 512);
 

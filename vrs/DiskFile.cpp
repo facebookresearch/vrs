@@ -170,8 +170,8 @@ int DiskFileT<FileChunk>::setPos(int64_t offset) {
 }
 
 // Try to set position within the current chunk.
-// Returns false is chunk isn't the right one, otherwise,
-// calls file seek in current chunk, sets lastError_ accordingly, and always returns true.
+// Returns false if the chunk isn't the right one. Otherwise, seeks in the chunk, sets lastError_
+// accordingly, and returns true, even if the seek failed.
 template <class FileChunk>
 bool DiskFileT<FileChunk>::trySetPosInCurrentChunk(int64_t offset) {
   if (currentChunk_->contains(offset) ||
@@ -229,7 +229,7 @@ int DiskFileT<FileChunk>::read(void* buffer, size_t length) {
     }
     // we reached the end of a chunk, but we have more to read in the next one
     if (openChunk(chunks_[currentChunk_->getIndex() + 1].get()) != 0) {
-      return lastError_; // we can't open the next chunk
+      return lastError_; // we can't switch to the next chunk
     }
     lastError_ = currentChunk_->seek(0, SEEK_SET);
   } while (lastError_ == 0);
@@ -329,7 +329,7 @@ int DiskFileT<FileChunk>::overwrite(const void* buffer, size_t length) {
     // we reached the end of a chunk, but we have more to write in the next one
     openChunk(chunks_[currentChunk_->getIndex() + 1].get());
   } while (lastError_ == 0);
-  return lastError_; // we could not open the next chunk
+  return lastError_; // we could not switch to the next chunk
 }
 
 template <class FileChunk>
@@ -440,14 +440,14 @@ int DiskFileT<FileChunk>::addChunk(const string& chunkFilePath) {
       lastError_ = currentChunk_->flush();
     }
     if (lastError_ != 0) {
-      // We're s***d: the last chunk is messed up, no point in trying to use the new one
+      // The current chunk can't be finalized: don't switch to the new one
       newChunk->close();
       os::remove(chunkFilePath);
       return lastError_;
     }
     if (!readOnly_ || filesOpenCount_ + 1 > kMaxFilesOpenCount) {
       int error = closeChunk(currentChunk_);
-      // the chunk is flushed: log an error, but not block the transition to a new chunk
+      // The chunk is flushed: log an error, but don't block the transition to a new chunk
       XR_VERIFY(
           error == 0,
           "Error closing '{}': {}, {}",

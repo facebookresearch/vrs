@@ -44,7 +44,7 @@ class VRS_API DiskFileT : public WriteFileHandler {
   DiskFileT& operator=(DiskFileT&&) = delete;
   ~DiskFileT() override;
 
-  /// Make a new DiskFile object, with a default state.
+  /// Make a new object of the same type, with a default state.
   std::unique_ptr<FileHandler> makeNew() const override;
 
   const string& getFileHandlerName() const override;
@@ -57,7 +57,7 @@ class VRS_API DiskFileT : public WriteFileHandler {
 
   /// Create a new file
   int create(const string& newFilePath, const FileSpec::Extras& options = {}) override;
-  /// Call this method to forget any chunk beyond this file size.
+  /// Forget the chunks after the current one that start at or beyond this file size.
   void forgetFurtherChunks(int64_t fileSize) override;
   /// Get the total size of all the chunks considered.
   int64_t getTotalSize() const override;
@@ -88,7 +88,8 @@ class VRS_API DiskFileT : public WriteFileHandler {
 
   /// Tell if modifying files is supported by this FileHandler implementation.
   bool reopenForUpdatesSupported() const override;
-  /// Switch from read-only to read-write mode.
+  /// Switch from read-only to read-write mode. Does nothing if the file is already writable.
+  /// On failure, the file is open read-only again, or closed if even that failed.
   int reopenForUpdates() override;
   /// Find out if the file is in read-only mode.
   bool isReadOnly() const override;
@@ -120,15 +121,17 @@ class VRS_API DiskFileT : public WriteFileHandler {
   int64_t getPos() const override;
   /// Get position in the current chunk.
   int64_t getChunkPos() const override;
-  /// Get range of the current chunk.
+  /// Get range of the current chunk, or of the next one when at the end of a chunk that isn't the
+  /// last.
   int getChunkRange(int64_t& outChunkOffset, int64_t& outChunkSize) const override;
-  /// Get the path of the current chunk, or an empty string if no chunk is open.
+  /// Get the path and the index of the current chunk.
+  /// @return False if no chunk is open, leaving the output parameters unchanged.
   bool getCurrentChunk(string& outChunkPath, size_t& outChunkIndex) const override;
 
   bool isRemoteFileSystem() const override;
 
   /// Helper methods to write a blob of data, or a string, to disk in one shot.
-  /// Note that the data is compressed, so that we have high confidence it wasn't edited.
+  /// The data is compressed, which discourages editing it by hand.
   static int writeZstdFile(const string& path, const void* data, size_t dataSize);
   static int writeZstdFile(const string& path, const string& string);
   template <typename T, std::enable_if_t<std::is_trivially_copyable<T>::value, int> = 0>
@@ -151,9 +154,8 @@ class VRS_API DiskFileT : public WriteFileHandler {
 
   /// Read a local file, expected to contain some text
   /// @param path: local file to read
-  /// @return The content of the file, if found, or the empty string otherwise.
-  /// Will log errors if some unexpected access error happens, but will be silent and
-  /// return an empty string if the file doesn't exist.
+  /// @return The content of the file, or an empty string if it can't be opened (silently),
+  /// is empty, is 50 MB or larger, or can't be read (the last two log an error).
   static string readTextFile(const string& path);
   /// Write string to a local file
   /// @param path: local file path
@@ -171,10 +173,10 @@ class VRS_API DiskFileT : public WriteFileHandler {
   bool isLastChunk() const;
   bool trySetPosInCurrentChunk(int64_t offset);
 
-  FileSpec::Extras options_; // optional options provided in openSpec or createFile
-  // All the chunks, when a VRS file is opened. Chunks never move: writes in flight point at them.
+  FileSpec::Extras options_; // optional options provided in openSpec() or create()
+  // All the chunks, when a VRS file is opened. Chunks never move: queued writes refer to them.
   vector<std::unique_ptr<FileChunk>> chunks_;
-  FileChunk* currentChunk_{}; // always points to the current chunk within chunks_.
+  FileChunk* currentChunk_{}; // the current chunk within chunks_, or nullptr if none is open
   int filesOpenCount_{};
 
   size_t lastRWSize_{};

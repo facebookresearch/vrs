@@ -139,7 +139,7 @@ class DiskFileChunk {
 
  private:
   const size_t index_; // position of this chunk in the file's chunk list
-  FILE* file_{}; // may be nullptr or not!
+  FILE* file_{}; // nullptr when closed
   string path_; // path of this chunk
   int64_t offset_{}; // offset of this chunk in the file
   int64_t size_{}; // size of the chunk

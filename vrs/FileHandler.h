@@ -81,13 +81,13 @@ VRS_API CachingStrategy toEnum<>(const string& name);
 /// \brief Class to abstract VRS file system operations, to enable support for alternate storage
 /// methods, in particular network/cloud storage implementations.
 ///
-/// For simplicity, in this documentation, we will references "files", but they might be one or more
+/// For simplicity, in this documentation, we will reference "files", but they might be one or more
 /// data blobs on a network storage.
 ///
 /// VRS file users probably only need to use RecordFileReader & RecordFileWriter, but they have the
 /// option to use FileHandler directly to access files stored on remote file systems, same as VRS.
 /// Use FileHandlerFactory::delegateOpen() to find the proper FileHandler implementation and open a
-/// file. FileHandler only exposes read operations, because it's the most implementation, while
+/// file. FileHandler only exposes read operations, which every implementation supports, while
 /// WriteFileHandler extends FileHandler for write operations. Both are abstract classes.
 ///
 /// 'int' return values are status codes: 0 means success, while other values are error codes,
@@ -139,7 +139,7 @@ class VRS_API FileHandler : public FileDelegator {
   /// FileHandler was not ultimately the right one to handle the provided path,
   /// or cleared if the current FileHandler should be used to continue accessing the file.
   /// @return A status code, 0 meaning success.
-  /// Use errorCodeToString() to get an error description.
+  /// Use errorCodeToMessage() to get an error description.
   int delegateOpen(const FileSpec& fileSpec, unique_ptr<FileHandler>& outNewDelegate) override;
 
   /// Tell if a file is actually open.
@@ -172,8 +172,8 @@ class VRS_API FileHandler : public FileDelegator {
   /// then use getLastRWSize() to know how many bytes were really read.
   /// If there are too few remaining bytes in the current chunk, then the new chunk is opened and
   /// read, until enough data can be read.
-  /// @param buffer: a buffer to the bytes to write.
-  /// @param length: the number of bytes to write.
+  /// @param buffer: a buffer to receive the bytes read.
+  /// @param length: the number of bytes to read.
   /// @return A status code, 0 meaning success and length bytes were successfully read.
   virtual int read(void* buffer, size_t length) = 0;
   /// Helper to read trivially copyable objects, in a chunk aware way.
