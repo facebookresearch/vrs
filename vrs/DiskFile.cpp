@@ -219,7 +219,8 @@ int DiskFileT<FileChunk>::read(void* buffer, size_t length) {
     if (readSize == requestSize) {
       return lastError_;
     }
-    if (currentChunk_->eof() == 0 || isLastChunk()) {
+    if ((lastError_ != 0 && lastError_ != DISKFILE_NOT_ENOUGH_DATA) || currentChunk_->eof() == 0 ||
+        isLastChunk()) {
       // give up and make sure that if we did not read enough bytes, we flag it
       if (lastError_ == 0) {
         lastError_ = DISKFILE_NOT_ENOUGH_DATA;

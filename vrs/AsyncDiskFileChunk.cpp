@@ -47,6 +47,10 @@ struct IoEngineTypeConverter : public vrs::EnumStringConverter<
                                    vrs::AsyncDiskFileChunk::IoEngine::AIO,
                                    true> {};
 
+bool isReadOnlyMode(const char* mode) {
+  return mode != nullptr && mode[0] == 'r' && strchr(mode, '+') == nullptr;
+}
+
 #if POSIX_AIO_SUPPORTED()
 #if IS_LINUX_PLATFORM()
 // The 64-bit variants of the AIO calls, matching vrs::AioControlBlock.
@@ -210,12 +214,16 @@ int AsyncWindowsHandle::_readwrite(
 
   if (!success) {
     int error = GetLastError();
-    if (error != ERROR_IO_PENDING) {
-      return error;
+    if (error == ERROR_IO_PENDING) {
+      error = GetOverlappedResult(h_, &ov, &dwNumberOfBytesTransferred, TRUE) ? SUCCESS
+                                                                              : GetLastError();
     }
-
-    if (!GetOverlappedResult(h_, &ov, &dwNumberOfBytesTransferred, TRUE)) {
-      return GetLastError();
+    // A read starting at the end of the file reports ERROR_HANDLE_EOF: that's a short read.
+    if (error == ERROR_HANDLE_EOF && readNotWrite) {
+      error = SUCCESS;
+    }
+    if (error != SUCCESS) {
+      return error;
     }
   }
 
@@ -353,9 +361,9 @@ int AsyncFileDescriptor::read(void* ptr, size_t bufferSize, int64_t offset, size
 
 int AsyncFileDescriptor::truncate(int64_t newSize) {
 #if (defined(__ANDROID_API__) && __ANDROID_API__ < 21)
-  return ::ftruncate(fd_, newSize);
+  return ::ftruncate(fd_, newSize) == 0 ? SUCCESS : errno;
 #else
-  return ::ftruncate64(fd_, static_cast<off64_t>(newSize));
+  return ::ftruncate64(fd_, static_cast<off64_t>(newSize)) == 0 ? SUCCESS : errno;
 #endif
 }
 
@@ -438,6 +446,12 @@ void AlignedBuffer::free() {
 
 void AlignedBuffer::clear() {
   size_ = 0;
+}
+
+void AlignedBuffer::consume(size_t size) {
+  XR_CHECK_LE(size, size_);
+  memmove(aligned_buffer_, bdata() + size, size_ - size);
+  size_ -= size;
 }
 
 bool AlignedBuffer::add(const void* buffer, size_t size, size_t& outCopiedSize) {
@@ -589,6 +603,7 @@ AsyncDiskFileChunk::~AsyncDiskFileChunk() {
 
 int AsyncDiskFileChunk::create(const string& newpath, const FileSpec::Extras& options) {
   close();
+  free_write_buffers();
 
   path_ = newpath;
   offset_ = 0;
@@ -596,6 +611,7 @@ int AsyncDiskFileChunk::create(const string& newpath, const FileSpec::Extras& op
 
   file_position_ = 0;
   async_error_ = SUCCESS;
+  rejected_submission_logged_ = false;
   file_mode_ = "wb+";
 
   IF_ERROR_RETURN(init_parameters(options));
@@ -610,19 +626,23 @@ int AsyncDiskFileChunk::create(const string& newpath, const FileSpec::Extras& op
       supported_flags_ &= ~O_DIRECT;
     }
   }
-
+  opened_ = error == SUCCESS;
   return error;
 }
 
 int AsyncDiskFileChunk::open(bool readOnly, const FileSpec::Extras& options) {
   close();
+  free_write_buffers();
 
   file_position_ = 0;
   async_error_ = SUCCESS;
+  rejected_submission_logged_ = false;
   file_mode_ = readOnly ? "rb" : "rb+";
 
   IF_ERROR_RETURN(init_parameters(options));
-  return ensureOpenNonDirect();
+  const int error = ensureOpenNonDirect();
+  opened_ = error == SUCCESS;
+  return error;
 }
 
 int AsyncDiskFileChunk::close() {
@@ -630,7 +650,12 @@ int AsyncDiskFileChunk::close() {
     return SUCCESS;
   }
 
-  int error = flushWriteBuffer();
+  int error = waitForAsyncWrites();
+  const int tailError = writeTail();
+  if (error == SUCCESS) {
+    error = tailError;
+  }
+  // Like fclose(), close even when the tail can't be written: the returned error reports it.
   if (current_buffer_) {
     free_buffer(current_buffer_);
   }
@@ -640,21 +665,13 @@ int AsyncDiskFileChunk::close() {
   free_write_buffers();
 
   int error2 = file_.close();
+  opened_ = false;
   return error != 0 ? error : error2;
 }
 
 int AsyncDiskFileChunk::rewind() {
-  // Normally rewind can't return an error, but this may be the only spot we have to return a
-  // deferred error If we can't return errors here, we'll need to remember that we must flush on
-  // the next operation, whatever it is, and THEN reset the file_position_. Pain.
-  //
-  // TODO: In a world in which writes may be failing asynchronously, what should DiskFile or
-  // RecordFileWriter do to recover, if anything?
   IF_ERROR_RETURN(flushWriteBuffer());
-
   file_position_ = 0;
-  async_error_ = SUCCESS;
-
   return SUCCESS;
 }
 
@@ -668,37 +685,38 @@ bool AsyncDiskFileChunk::eof() const {
 }
 
 bool AsyncDiskFileChunk::isOpened() {
-  return file_.isOpened();
+  return opened_;
 }
 
 int AsyncDiskFileChunk::write(const void* buffer, size_t count, size_t& outWrittenSize) {
-  if (count == 0) {
-    return SUCCESS;
-  } else if (!isOpened()) {
+  outWrittenSize = 0;
+  if (!isOpened()) {
     XR_LOGCE(VRS_DISKFILECHUNK, "DiskFile not opened");
     return DISKFILE_NOT_OPEN;
   }
-  const auto* bbuffer = static_cast<const char*>(buffer);
-  outWrittenSize = 0;
-
-  if (!isOpened()) {
-    return DISKFILE_NOT_OPEN;
+  if (isReadOnlyMode(file_mode_)) {
+    return DISKFILE_READ_ONLY;
   }
-
+  IF_ERROR_RETURN(async_error_.load());
   if (count == 0) {
     return SUCCESS;
   }
+  const auto* bbuffer = static_cast<const char*>(buffer);
 
   // compute the number of bytes to write synchronously, if any.
   size_t towrite = 0;
   if (ioengine_ == IoEngine::Sync) {
     // Write the entire buffer synchronously
     towrite = count;
-  } else if (
-      use_directio_ && (current_buffer_ == nullptr || current_buffer_->empty()) &&
-      (file_position_ % offset_align_) != 0) {
+  } else if (use_directio_ && (file_position_ % offset_align_) != 0) {
+    // A buffer only starts unaligned when it holds what a short write left over: write that out.
+    if (current_buffer_ != nullptr && !current_buffer_->empty()) {
+      IF_ERROR_RETURN(flushWriteBuffer());
+    }
     // Write as much as we need to in order to hit offset_align_, then fill the buffers
-    towrite = std::min<size_t>(count, offset_align_ - (file_position_ % offset_align_));
+    if ((file_position_ % offset_align_) != 0) {
+      towrite = std::min<size_t>(count, offset_align_ - (file_position_ % offset_align_));
+    }
   } // Otherwise writes can be aligned to anything, write nothing synchronously here
 
   if (towrite != 0) {
@@ -712,11 +730,12 @@ int AsyncDiskFileChunk::write(const void* buffer, size_t count, size_t& outWritt
     IF_ERROR_RETURN(ensureOpenNonDirect());
 
     size_t thiswritten = 0;
-    IF_ERROR_RETURN(file_.pwrite(bbuffer, towrite, file_position_, thiswritten));
+    const int error = file_.pwrite(bbuffer, towrite, file_position_, thiswritten);
     bbuffer += thiswritten;
     count -= thiswritten;
     outWrittenSize += thiswritten;
     file_position_ += thiswritten;
+    IF_ERROR_RETURN(error);
   }
 
   if (count != 0 && current_buffer_ == nullptr) {
@@ -724,6 +743,7 @@ int AsyncDiskFileChunk::write(const void* buffer, size_t count, size_t& outWritt
     if (current_buffer_ == nullptr) {
       return ENOMEM;
     }
+    IF_ERROR_RETURN(async_error_.load());
   }
 
   while (count != 0) {
@@ -755,12 +775,13 @@ int AsyncDiskFileChunk::write(const void* buffer, size_t count, size_t& outWritt
           current_buffer_ = nullptr;
           file_position_ += towrite;
           pump_buffers_locked(lock);
-
+          IF_ERROR_RETURN(async_error_.load());
           if (count != 0) {
             current_buffer_ = get_free_buffer_locked(lock);
             if (!current_buffer_) {
               return ENOMEM;
             }
+            IF_ERROR_RETURN(async_error_.load());
           }
           break;
         }
@@ -768,13 +789,14 @@ int AsyncDiskFileChunk::write(const void* buffer, size_t count, size_t& outWritt
           size_t thiswritten = 0;
           int err = file_.pwrite(
               current_buffer_->data(), current_buffer_->size(), file_position_, thiswritten);
+          file_position_ += thiswritten;
+          if (err != SUCCESS) {
+            current_buffer_->consume(thiswritten);
+            return err;
+          }
           // There's no need to release this buffer, as we've already written it. Save a fetch
           // later
           current_buffer_->clear();
-          file_position_ += thiswritten;
-          if (err) {
-            return err;
-          }
           break;
         }
         default:
@@ -795,8 +817,13 @@ int AsyncDiskFileChunk::flush() {
 }
 
 int AsyncDiskFileChunk::truncate(int64_t newSize) {
+  if (!isOpened()) {
+    return DISKFILE_NOT_OPEN;
+  }
   IF_ERROR_RETURN(flushWriteBuffer());
-
+  if (!file_.isOpened()) {
+    IF_ERROR_RETURN(ensureOpenNonDirect());
+  }
   IF_ERROR_RETURN(file_.truncate(newSize));
   size_ = newSize;
   return SUCCESS;
@@ -832,15 +859,22 @@ int AsyncDiskFileChunk::tell(int64_t& outFilepos) const {
 }
 
 int AsyncDiskFileChunk::seek(int64_t pos, int origin) {
+  if (!isOpened()) {
+    return DISKFILE_NOT_OPEN;
+  }
   // We don't know if we'll be reading or overwriting existing data, flush the buffers, and return
   // any errors that may surface from the completing operations
   IF_ERROR_RETURN(flushWriteBuffer());
+  if (!file_.isOpened()) {
+    IF_ERROR_RETURN(ensureOpenNonDirect());
+  }
 
   // we track the file offset ourselves, but let os::fileSeek do the actual work to compute the
   // final position, as our own `size_` member may not reflect the current size of the chunk.
-  IF_ERROR_RETURN(file_.seek(file_position_, SEEK_SET, file_position_));
-  IF_ERROR_RETURN(file_.seek(pos, origin, file_position_));
-
+  int64_t position = 0;
+  IF_ERROR_RETURN(file_.seek(file_position_, SEEK_SET, position));
+  IF_ERROR_RETURN(file_.seek(pos, origin, position));
+  file_position_ = position;
   return SUCCESS;
 }
 
@@ -857,46 +891,38 @@ int64_t AsyncDiskFileChunk::getOffset() const {
 }
 
 int AsyncDiskFileChunk::flushWriteBuffer() {
-  // Allow any other aio writes to complete. Note that `buffers_` may be empty because of
-  // default construction and swapping.
+  IF_ERROR_RETURN(waitForAsyncWrites());
+  return writeTail();
+}
+
+int AsyncDiskFileChunk::waitForAsyncWrites() {
+  // Note that `buffers_` may be empty because of default construction.
   if (!buffers_.empty()) {
     std::unique_lock lock{buffers_mutex_};
     size_t expected_free = buffers_.size() - (current_buffer_ ? 1 : 0);
-    while (buffers_free_.size() != expected_free) {
-      // N.B. as buffers are freed they pump the queue to completion.
-      buffer_freed_cv_.wait(
-          lock, [this, expected_free] { return buffers_free_.size() == expected_free; });
-    }
-
-    int async_error = async_error_.exchange(0);
-    if (async_error != 0) {
-      XR_LOGCE(VRS_DISKFILECHUNK, "Returning async error on flush {}", async_error);
-      return async_error;
-    }
+    // N.B. as buffers are freed they pump the queue to completion.
+    buffer_freed_cv_.wait(
+        lock, [this, expected_free] { return buffers_free_.size() == expected_free; });
   }
+  return async_error_.load();
+}
 
-  if (current_buffer_ && !current_buffer_->empty()) {
+int AsyncDiskFileChunk::writeTail() {
+  if (current_buffer_ == nullptr) {
+    return SUCCESS;
+  }
+  if (!current_buffer_->empty()) {
     IF_ERROR_RETURN(ensureOpenNonDirect());
-
-    while (current_buffer_) {
-      size_t towrite = current_buffer_->size();
-
-      // if we've gotten here we're flushing, so just pwrite() the contents, don't bother being
-      // fast about it
-      size_t thiswritten = 0;
-      int error = file_.pwrite(current_buffer_->data(), towrite, file_position_, thiswritten);
-      free_buffer(current_buffer_);
-      if (error != 0) {
-        return error;
-      }
-      file_position_ += thiswritten;
+    size_t written = 0;
+    const int error =
+        file_.pwrite(current_buffer_->data(), current_buffer_->size(), file_position_, written);
+    file_position_ += written;
+    if (error != SUCCESS) {
+      current_buffer_->consume(written);
+      return error;
     }
   }
-
-  if (current_buffer_) {
-    free_buffer(current_buffer_);
-  }
-
+  free_buffer(current_buffer_);
   return SUCCESS;
 }
 
@@ -909,42 +935,30 @@ int AsyncDiskFileChunk::ensureOpenDirect() {
 }
 
 int AsyncDiskFileChunk::ensureOpen_(int requested_flags) {
-  bool no_truncate = false;
   if (file_.isOpened()) {
     if (requested_flags == current_flags_) {
       return SUCCESS;
     }
-    no_truncate = true;
     file_.close();
   }
-
   const char* mode = file_mode_;
   if (mode == nullptr) {
     return DISKFILE_NOT_OPEN;
   }
-
-  bool readOnly = (mode[0] == 'w') && (strchr(mode, '+') == nullptr);
-
-  // When re-opening a file here, we must convert 'w' modes to 'r+' modes to ensure that we do not
-  // truncate the file. This could fail if we don't have read permissions on the drive. If so,
-  // we'd need to refactor so that we can provide the `O_TRUNC` or not flag to `open()`
-  //
-  // We assume that all VRS modes are binary here to avoid more string manipulation.
-  if (mode[0] == 'w' && no_truncate) {
-    mode = "rb+";
-  }
-
-  if (!readOnly) {
+  if (!isReadOnlyMode(mode)) {
     IF_ERROR_RETURN(alloc_write_buffers());
   }
-
   int error = file_.open(path_, mode, requested_flags);
   if (error != 0) {
-    close();
     return error;
   }
   current_flags_ = requested_flags;
-
+  // Reopening must never truncate what was written, even after a failed reopen closed the file.
+  // This could fail if we don't have read permissions on the drive. If so, we'd need to refactor
+  // so that we can provide the `O_TRUNC` or not flag to `open()`.
+  if (mode[0] == 'w') {
+    file_mode_ = "rb+";
+  }
   return SUCCESS;
 }
 
@@ -1024,6 +1038,7 @@ void AsyncDiskFileChunk::pump_buffers_locked(
   while (buffers_writing_ < iodepth_ && !buffers_queued_.empty()) {
     auto& item = buffers_queued_.front();
     auto* buffer = item.buffer_;
+    const int64_t offset = item.offset_;
     const int result = submit
         ? submit(item)
         : buffer->start_write(item.file_, item.offset_, std::move(item.callback_));
@@ -1031,15 +1046,33 @@ void AsyncDiskFileChunk::pump_buffers_locked(
     if (result == SUCCESS) {
       buffers_writing_ += 1;
     } else {
-      recordAsyncError(result);
+      writeRejectedBuffer(*buffer, offset, result);
       free_buffer_locked(lock, buffer);
     }
   }
 }
 
+void AsyncDiskFileChunk::writeRejectedBuffer(AsyncBuffer& buffer, int64_t offset, int submitError) {
+  if (!rejected_submission_logged_) {
+    rejected_submission_logged_ = true;
+    XR_LOGCW(
+        VRS_DISKFILECHUNK,
+        "Asynchronous write rejected for {}: {}. Writing synchronously instead.",
+        path_,
+        errorCodeToMessage(submitError));
+  }
+  size_t written = 0;
+  const int error = file_.pwrite(buffer.data(), buffer.size(), offset, written);
+  if (error != SUCCESS) {
+    recordAsyncError(error);
+  }
+}
+
 void AsyncDiskFileChunk::recordAsyncError(int error) {
   int expected = SUCCESS;
-  async_error_.compare_exchange_strong(expected, error);
+  if (async_error_.compare_exchange_strong(expected, error)) {
+    XR_LOGCE(VRS_DISKFILECHUNK, "Write to {} failed: {}", path_, errorCodeToMessageWithCode(error));
+  }
 }
 
 int AsyncDiskFileChunk::alloc_write_buffers() {
@@ -1068,6 +1101,7 @@ int AsyncDiskFileChunk::free_write_buffers() {
 }
 
 int AsyncDiskFileChunk::init_parameters(const FileSpec::Extras& options) {
+  supported_flags_ = 0;
   // The VRS_DISKFILECHUNKASYNC_* options are primarily used for running the test suite with
   // different default IO configurations
   if (!helpers::getBool(options, "direct", use_directio_) &&
