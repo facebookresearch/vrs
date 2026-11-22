@@ -74,7 +74,8 @@ class VRS_API Bool {
 /// \brief POD type for of 2, 3 and 4 dimensions points, each for either int32_t, float or double.
 ///
 /// Note how the coordinates can be accessed using x(), y(), z() and w() convenience methods, but
-/// that the z() and w() methods are only available for larger dimensions.
+/// that z() must only be used for points with at least three coordinates, and w() for points
+/// with at least four. These accessors do not check bounds.
 template <typename T, size_t N>
 struct PointND {
   using type = T;
@@ -176,7 +177,7 @@ using Point4Df = PointND<float, 4>;
 /// 4D int32_t point class.
 using Point4Di = PointND<int32_t, 4>;
 
-/// Class to represent matrices of 3 and 4 dimensions, each for either int32_t, float or double.
+/// Class to represent 2-by-2, 3-by-3 and 4-by-4 matrices of int32_t, float or double.
 template <typename T, size_t N>
 struct MatrixND {
   using type = T;

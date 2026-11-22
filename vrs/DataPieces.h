@@ -36,8 +36,7 @@ using std::string;
 
 /// \brief Abstract class representing a piece of information part of a DataLayout.
 ///
-/// DataPiece objects have a type (DataPieceType) and label (a text name),
-/// which together are enough to identify uniquely a DataPiece of a particular DataLayout.
+/// DataPiece objects are matched by label, DataPieceType, element type and fixed byte size.
 /// See DataLayout for more details.
 class VRS_API DataPiece {
  public:
@@ -177,8 +176,8 @@ class VRS_API DataPiece {
   /// @return The DataPiece's element type name.
   virtual const string& getElementTypeName() const = 0;
   /// Tell if the DataPiece is available.
-  /// @return True if the DataLayout was not mapped, or if a matching DataPiece was found,
-  /// False if the DataLayout was mapped and no matching DataPiece was found.
+  /// @return True if the piece can access its payload buffer. A field can match during mapping
+  /// without having readable bytes yet; this also does not check whether decoding will succeed.
   virtual bool isAvailable() const = 0;
   /// Tells if the DataPiece is mapped to another DataPiece in a mapped DataLayout.
   bool isMapped() const {

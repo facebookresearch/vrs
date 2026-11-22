@@ -40,7 +40,6 @@ void log(Level level, const char* channel, const string& message);
 /// Logging backend: redirect where you need, depending on the log level and your preferences
 /// This variant filters out too frequent output, based on the call site and a minimum duration
 /// between printouts.
-/// Warning: Currently does the same thing as regular logging (no time filtering yet).
 void log_every_n_seconds(
     const char* file,
     int line,

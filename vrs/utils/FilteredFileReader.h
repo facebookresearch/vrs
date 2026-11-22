@@ -161,26 +161,30 @@ struct FilteredFileReader {
   // Make an index of the filtered records. Useful to pre-allocate the index during copy operations.
   unique_ptr<deque<IndexRecord::DiskRecordInfo>> buildIndex();
 
-  // Make sure the latest config & state records are read before reading.
+  // Make sure the latest config & state records for selected streams and record types are read
+  // before the range start.
   // Needed when we don't read from the start
   // This version reads the records
   void preRollConfigAndState();
-  // Make sure the latest config & state records are read before reading.
+  // Make sure the latest config & state records for selected streams and record types are read
+  // before the range start.
   // Needed when we don't read from the start
-  // This version hands the records to the function provided
+  // This version hands the records to the function provided and ignores its return value.
   void preRollConfigAndState(const RecordReaderFunc& recordReaderFunc);
 
   // ** Preferred iteration method for code that doesn't require expert internal knowledge **
   // Determine the time range boundaries based on the file and the filters,
   // pre-roll config and state records as required, then iterates over records.
+  // Returns the number of read attempts in the range, excluding pre-roll.
   uint32_t iterateSafe();
 
   // Read all the records of the reader than meet the specs, assuming time range is already valid.
-  // Use a ThrottledWriter object to get a callback after each record is decoded
+  // Use a ThrottledWriter object to get a callback after each read attempt.
+  // Clears the reader's stream players after a valid iteration.
   uint32_t iterateAdvanced(ThrottledWriter* throttledWriter = nullptr);
 
   // Iterate and call the provided function for each record
-  // Use a ThrottledWriter object to get a callback after each record is decoded
+  // Use a ThrottledWriter object to get a notification after each main-loop callback.
   void iterateAdvanced(
       RecordReaderFunc recordReaderFunc,
       ThrottledWriter* throttledWriter = nullptr);

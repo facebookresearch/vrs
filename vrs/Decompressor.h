@@ -24,13 +24,12 @@
 
 namespace vrs {
 
-/// \brief Decompressor helper class, to decompresses data at a target location.
+/// \brief Decompressor helper class that decodes data into a caller-provided buffer.
 ///
-/// The data to decompress must be in the internal buffer. Use getBuffer(size) to allocate memory
-/// for the internal buffer reserving at least size bytes and get a pointer where to write the data,
-/// probably reading from disk directly in that internal buffer.
-/// Call decompress to decompress a full record to the DataReference location. The whole record will
-/// be decompressed & written at the target location without intermediate memory copy.
+/// The data to decompress must be in the internal buffer. Use allocateCompressedDataBuffer(size)
+/// to reserve space and get a pointer to fill, for example by reading directly from disk.
+/// Call decompress() with a destination and its size to decode into that buffer. The caller can
+/// decode a record in parts instead of allocating a separate buffer for the entire payload.
 /// @internal For VRS internal use only.
 class VRS_API Decompressor {
  public:

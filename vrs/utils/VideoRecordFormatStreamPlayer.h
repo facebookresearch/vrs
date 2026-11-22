@@ -49,7 +49,7 @@ class VideoRecordFormatStreamPlayer : public RecordFormatStreamPlayer {
   /// Tell if the last image played from a stream couldn't be decoded because of missing frames.
   /// @param streamId: the id of the stream to check, required because a stream player may be
   /// attached to multiple streams at once.
-  /// @return True if
+  /// @return True if the stream's handler indicates earlier frames need to be replayed.
   bool isMissingFrames(StreamId streamId) const;
 
   /// Same functionality as above, but only valid when attached to a single stream.
@@ -67,8 +67,10 @@ class VideoRecordFormatStreamPlayer : public RecordFormatStreamPlayer {
   /// @param record: the record that needs to be properly read.
   /// @param exactFrame: if true, all the frames up to that frame might be read.
   /// Designed to be used in VideoRecordFormatStreamPlayer::recordReadComplete().
-  /// If false, only up to one frame will be read, probably the keyframe.
+  /// If false, read at most the keyframe.
   /// Use this API when scrubbing in a UI, as the result is unspecified.
+  /// @return 0 if no replay was needed or the handler returned success; this does not guarantee
+  /// the target frame was decoded.
   int readMissingFrames(
       RecordFileReader& fileReader,
       const IndexRecord::RecordInfo& recordInfo,

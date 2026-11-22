@@ -156,7 +156,8 @@ class VRS_API TelemetryLogger {
   static constexpr const char* kInfoType = "info";
 
   /// Change active telemetry logger.
-  /// The new logger will be started after assignment, and the old one will be stopped after.
+  /// The old logger is stopped before the replacement is installed; the new one starts afterward.
+  /// Events can reach either logger during the transition.
   /// @param telemetryLogger: new TelemetryLogger, or nullptr for default logger.
   static void setLogger(unique_ptr<TelemetryLogger> telemetryLogger = nullptr);
 

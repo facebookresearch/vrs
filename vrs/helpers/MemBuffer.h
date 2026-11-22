@@ -26,11 +26,8 @@ namespace vrs {
 namespace helpers {
 
 /// Helper class to collect data "written" to it in various sizes.
-/// If the allocation size provided is large enough to hold the whole data,
-/// memory copy is minimized, and the data vector returned is swapped out (no copy),
-/// otherwise, one extra copy is required to put all the pieces together in a single
-/// contiguous buffer.
-/// However, the class guarantees no extra copies, and no initialization overhead.
+/// When all accumulated data fits in one chunk, getData() swaps the vector out without copying.
+/// Otherwise, it copies each chunk once to assemble the contiguous output.
 
 class MemBuffer {
   struct uninitialized_byte final {

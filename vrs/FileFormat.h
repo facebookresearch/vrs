@@ -201,7 +201,7 @@ struct VRS_API RecordHeader {
 
   /// Initialize this header, for use as a description record.
   /// @param formatVersion: Record format version for this description record.
-  /// @param descriptionRecordSize: Payload size of the description record (without header).
+  /// @param descriptionRecordSize: Total size of the description record (including header).
   /// @param previousRecordSize: Size of the previous record, including the header.
   void initDescriptionHeader(
       uint32_t formatVersion,

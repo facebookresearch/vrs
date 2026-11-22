@@ -244,7 +244,7 @@ class DataPieceValue : public DataPiece {
 
   /// Clone data piece.
   /// @return A clone of the data piece, with the same label and same type.
-  /// All the other data piece properties (default value and properties) are not cloned.
+  /// Clone the tags, required flag, default and properties, but not the stored value.
   unique_ptr<DataPiece> clone() const override {
     auto other = std::make_unique<DataPieceValue<T>>(getLabel());
     other->tags_ = tags_;
@@ -330,9 +330,9 @@ class DataPieceEnum : public DataPieceValue<StorageType> {
     return static_cast<EnumType>(DataPieceValue<StorageType>::getDefault());
   }
 
-  /// Get the default value returned by get() when the DataPiece is not mapped.
-  /// @param reference: Reference to the variable to set.
-  /// @return True if the value was set to an explicitly specified default value.
+  /// Use getDefault() without arguments. This overload cannot be instantiated because the base
+  /// DataPieceValue<StorageType> has no getDefault() overload with an output parameter.
+  /// @param outDefault: Intended destination for the default enum value.
   bool getDefault(EnumType& outDefault) const {
     StorageType v;
     bool r = DataPieceValue<StorageType>::getDefault(v);

@@ -61,7 +61,7 @@ enum class DataPieceType : uint8_t {
   Value = 1, ///< Single value.
   Array = 2, ///< Fixed size array.
   Vector = 3, ///< Variable size array of T.
-  String = 4, ///< Variable size array of char, null terminated.
+  String = 4, ///< Variable size array of char, stored without a null terminator.
   StringMap = 5, ///< Map with string keys, and T values.
 
   COUNT ///< Count of enum values
@@ -140,7 +140,7 @@ struct VRS_API JsonFormatProfileSpec {
 /// - native C/C++ types, like int8, int16, int32, int64, signed or unsigned, float & double.
 /// - Bool, which is a replacement for bool, because vector<bool> is not an STL container, see
 ///   https://stackoverflow.com/questions/17794569/why-is-vectorbool-not-a-stl-container
-/// - 2, 3 & 4D points, 3 & 4D matrices, of types int32, float & double, for instance:
+/// - 2, 3 & 4D points and square matrices, of types int32, float & double, for instance:
 ///   Point2Df: a 2 dimension point using float.
 ///   Matrix4Dd: a 4 dimension matrix using double.
 ///
@@ -268,9 +268,8 @@ class VRS_API DataLayout {
     return fixedDataSizeNeeded_;
   }
 
-  /// Set or stage all the DataPieces to their custom default value.
-  /// Default values provide a custom value to return when retrieving the value of an unmapped
-  /// DataPiece value with get(). Default values are not automatic DataPiece initialization values.
+  /// Set or stage all the DataPieces to their custom default value. Does nothing on mapped layouts.
+  /// Default values provide a custom fallback when retrieving a value with get().
   /// When a DataLayout instance is created, DataPiece values are initialized to the default for
   /// their type, NOT to possibly provided custom default values!
   void initDataPiecesToDefaultValue();
@@ -293,7 +292,8 @@ class VRS_API DataLayout {
   /// Collect all the variable-size fields in the varData_ buffer.
   /// @internal
   void collectVariableDataAndUpdateIndex();
-  /// Collect variable-size data to the buffer specified.
+  /// Collect variable-size data to the buffer specified. This updates the index but does not
+  /// refresh the layout's variable-size read buffer.
   /// @param destination: Pointer to the buffer.
   /// The buffer must be at least getVarDataSizeNeeded() large.
   /// @internal
@@ -329,6 +329,8 @@ class VRS_API DataLayout {
   size_t copyDataPieceValuesFromMappedLayout(const DataLayout& mappedLayout);
 
   /// Map the data pieces of this layout to that of another layout, field by field.
+  /// The mapping does not own its target; keep the target alive while using the mapping.
+  /// Fixed-size setters write through to the target, while stage() stages on the local piece.
   /// Note that this call is fairly expensive, and it is normally not necessary to call directly.
   /// In particular, in the callback RecordFormatStreamPlayer::onDataLayoutRead(), calling
   /// mapLayout() directly can usually be avoided by using the methods
@@ -396,7 +398,8 @@ class VRS_API DataLayout {
 
   /// Create a DataLayout from a json description generated with asJson().
   /// @param json: json datalayout description.
-  /// @return A DataLayout, or nullptr in case of error.
+  /// @return A DataLayout. Invalid JSON or unsupported field types can yield an empty or partial
+  /// layout rather than nullptr.
   /// @internal
   static unique_ptr<DataLayout> makeFromJson(const string& json);
 
@@ -595,7 +598,7 @@ class VRS_API EmptyDataLayout : public DataLayout {
 ///
 ///   class MyConfig : public AutoDataLayout {
 ///     DataPieceValue<uint32_t> exposureMode{"exposure_mode"};
-///     DataPieceValue<int8_t> serial{"serial_number", 12}; // array of 12 int8_t values
+///     DataPieceArray<int8_t> serial{"serial_number", 12}; // array of 12 int8_t values
 ///     DataPieceString description{"description"};
 ///     AutoDataLayoutEnd end;
 ///   };
@@ -720,9 +723,9 @@ struct VRS_API DataLayoutStruct {
 ///
 /// Tracking will declare:
 ///  - 2 vrs::DataPieceVector<vrs::Matrix4Dd> fields, labelled:
-///  "0/orientation" and "1/orientation"
+///  "hands/0/orientation" and "hands/1/orientation"
 ///  - 2 vrs::DataPieceVector<vrs::Matrix3Dd> fields, labelled:
-///  "0/translation" and "1/translation"
+///  "hands/0/translation" and "hands/1/translation"
 template <typename T, size_t Size>
 struct DataLayoutStructArray : public vrs::DataLayoutStruct {
   DATA_LAYOUT_STRUCT(DataLayoutStructArray)

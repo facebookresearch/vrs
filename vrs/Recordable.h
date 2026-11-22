@@ -85,10 +85,10 @@ class VRS_API Recordable {
     return StreamId{typeId_, instanceId_};
   }
 
-  /// Activate a recordable to enable recording. Must be enabled for pre-record buffering.
-  /// Recording a device's records can be enabled and disabled on the fly during recording.
-  /// Recordables can't be added or removed from a RecordFileWriter while a file is being written,
-  /// but recordables can be activated and deactivated instead.
+  /// Activate a recordable to enable recording. Recordables start active.
+  /// Deactivation does not stop record creation or cancel writes already queued.
+  /// @param isActive: True to collect pending records for writing; false to purge old records
+  /// instead at the next collection.
   void setRecordableIsActive(bool isActive) {
     isActive_ = isActive;
   }
@@ -154,7 +154,8 @@ class VRS_API Recordable {
       uint32_t recordFormatVersion,
       const DataSource& data)>;
 
-  /// Record creation requests may be intercepted by setting a CreationRecordDelegate.
+  /// Record creation requests through the DataSource-only createRecord() overload may be
+  /// intercepted by setting a CreateRecordDelegate.
   /// Using this method, as opposed to making createRecord virtual, can allow interception of record
   /// creation requests, for instance, if you want to redirect record creations to another process,
   /// without having to change the class inheritance hierarchy.
@@ -247,10 +248,10 @@ class VRS_API Recordable {
   /// Create a new record for this recordable. That's the preferred API to create records.
   ///
   /// When the call returns:
-  ///  - a record has been created and is fully owned and managed by the recordable's RecordManager,
+  ///  - without a delegate, the record is owned and managed by the recordable's RecordManager,
   ///  despite returning a pointer to it.
-  ///  - the DataSource referenced by data has fully been copied in the record, so that the caller
-  ///  is immediately entirely free to reuse or delete the source data as desired.
+  ///  - without a delegate, the DataSource payload has been copied and can be reused or deleted.
+  ///  A delegate must copy any source data it keeps.
   ///
   /// @param timestampSec: Timestamp of the record. *All the records of all the recordables*
   /// attached to the same RecordFileWriter must have timestamps in *the same time domain*, or they
@@ -265,9 +266,7 @@ class VRS_API Recordable {
   /// The version number only need to be unique for this device and record type, but needs to be
   /// carefully managed over time, or you won't be able to interpret files created in the past.
   /// @param data: A DataSource that points to the record's actual data payload.
-  /// @return record: A pointer to the created record, that's owned & managed by the recordable's
-  /// RecordManager. Client code probably shouldn't do much with that pointer.
-  /// Attention! This pointer may be null, in particular when a delegate intercepts the request!
+  /// @return A non-owning pointer to the created record, or nullptr if the delegate declines.
   const Record* createRecord(
       double timestampSec,
       Record::Type recordType,

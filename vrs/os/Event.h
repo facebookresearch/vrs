@@ -60,8 +60,8 @@ class EventChannel {
   void dispatchEvent(int64_t value = 0);
 
   /// Wait to get an instance of event, in future or in past.
-  /// The number of past events is in returned Param. The counter in event is then set to 0
-  /// when someone successfully gets an instance of event.
+  /// The returned event includes the number of missed events. The channel resets its pending
+  /// event count when it checks for a past event, even if the wait eventually times out.
   /// In broadcast mode, multiple listeners can get a future event, but one listener can get
   /// a past event.
   /// Of note, do not use kInfiniteTimeout as timeout. If nobody dispatches event, your thread will

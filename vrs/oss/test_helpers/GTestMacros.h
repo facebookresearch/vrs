@@ -21,7 +21,7 @@
 // Platform specific macros to disable unit tests:
 // Usage:
 //   TEST(MyTestSuite, DISABLE_TEST(testingThings)) { ... }
-//   TEST(MyTestSuite, ANDROID_DISABLE(testingThings)) { ... }
+//   TEST(MyTestSuite, ANDROID_DISABLED(testingThings)) { ... }
 #define DISABLE_TEST(x) DISABLED_##x
 
 #if IS_ANDROID_PLATFORM()

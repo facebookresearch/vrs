@@ -49,8 +49,10 @@ struct VRS_API CurrentRecord {
 /// For each record, the stream player will be presented the record in a callback named
 /// processXXXHeader(), which will tell if the record should be read by returning true, in which
 /// case the callback is expected to set the provided DataReference to tell where the record's data
-/// should be read. Upon completion of the read, the matching processXXX() callback will be
-/// invoked, allowing the StreamPlayer to interpret/use the read data.
+/// should be read. A player can leave the DataReference empty to read the payload through
+/// CurrentRecord::reader in processRecord(). After a successful initial read (including an empty
+/// one), the matching processXXX() callback will be invoked, allowing the StreamPlayer to
+/// interpret/use the read data.
 class VRS_API StreamPlayer {
  public:
   virtual ~StreamPlayer();
@@ -81,7 +83,7 @@ class VRS_API StreamPlayer {
   /// Called after processRecordHeader() set the DataReference it was given and returned true, and
   /// after data was written to memory specified by the DataReference.
   /// @param record: Details about the record being read. @see CurrentRecord.
-  /// @param bytesWrittenCount: Number of bytes read and written to the DataReference.
+  /// @param readSize: Number of bytes read and written to the DataReference.
   /// The default implementation delegates to the specialized callbacks below.
   virtual void processRecord(const CurrentRecord& record, uint32_t readSize) {
     if (record.recordType == Record::Type::DATA) {
@@ -149,6 +151,7 @@ class VRS_API StreamPlayer {
   /// Called after a record was read, so maybe a follow-up action can be performed.
   /// @param reader: the VRS file reader used to read the file.
   /// @param recordInfo: the record that was just read.
+  /// @return Status returned by RecordFileReader::readRecord(): 0 on success, non-zero on error.
   virtual int recordReadComplete(
       RecordFileReader& /*reader*/,
       const IndexRecord::RecordInfo& /*recordInfo*/) {

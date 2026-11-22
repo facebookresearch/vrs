@@ -39,8 +39,9 @@ class VRS_API NewChunkHandler {
   /// Note that chunk notifications may come out of sequence, so do not rely on any ordering.
   /// However, when you get this notification, the chunk is complete and will never change,
   /// and you may even delete the chunk (maybe when upload streaming with limited disk space?).
-  /// When isLastChunk set to true, the file is complete, and a notification for every of the file's
-  /// chunks has been sent. These callbacks can happen from any thread context.
+  /// When isLastChunk is true, all chunk notifications have been sent, but index finalization or
+  /// file close can still have failed. Check RecordFileWriter::waitForFileClosed() for the final
+  /// status. These callbacks can happen from any thread context.
   virtual void newChunk(const string& path, size_t index, bool isLastChunk) = 0;
   /// Callback function to be notified that the recording failed because writing records failed.
   /// It replaces the remaining newChunk() notifications: no notification follows it, and the file

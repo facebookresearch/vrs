@@ -324,8 +324,7 @@ class VRS_API ImageContentBlockSpec {
     return getBytesPerPixel(pixelFormat_);
   }
 
-  /// Get name of the video codec used to encode the image, if any.
-  /// Only used for ImageFormat::VIDEO
+  /// Get the codec name for VIDEO and CUSTOM_CODEC blocks.
   const string& getCodecName() const {
     return codecName_;
   }
@@ -429,7 +428,8 @@ class VRS_API AudioContentBlockSpec {
   /// Assuming PCM, get the number of bytes for this content block, or ContentBlock::kSizeUnknown.
   size_t getPcmBlockSize() const;
 
-  /// Tell if two audio block have identical audio formats.
+  /// Compare sample format, channel count, frame stride, and sample rate. The encoding and
+  /// number of frames in the block are not compared.
   bool isCompatibleWith(const AudioContentBlockSpec& rhs) const;
   /// Get audio format.
   AudioFormat getAudioFormat() const {
@@ -643,14 +643,14 @@ class VRS_API CustomContentBlock : public ContentBlock {
 /// Map a pair of record type/format version to a record format, for a particular stream.
 using RecordFormatMap = map<pair<Record::Type, uint32_t>, RecordFormat>;
 
-/// \brief Helper to identify a particular content block within a file.
+/// \brief Identifies a content block in a record format or legacy format lookup.
 ///
-/// A ContentBlock is the part of a record, a defined by RecordFormat.
-/// A ContentBlock is uniquely identified by this combo:
-/// - a recordable type id,
+/// A ContentBlock is part of a record, as defined by RecordFormat. This key contains:
+/// - a recordable type ID (for legacy lookup),
 /// - a record type,
 /// - a record format version,
-/// - a block index.
+/// - a zero-based block index.
+/// It does not distinguish stream instances or individual records.
 class VRS_API ContentBlockId {
  public:
   ContentBlockId(
@@ -792,16 +792,16 @@ class VRS_API RecordFormat {
     return getContentBlock(0);
   }
   /// Get the size of all the blocks at and past an index, or ContentBlock::kSizeUnknown.
-  /// @param firstBlock: Size of the first content block to count the size of.
+  /// @param firstBlock: Zero-based index of the first block to include.
   /// @return The size of all the content blocks at and past the index, or
   /// ContentBlock::kSizeUnknown if any of the blocks doesn't have a known size.
   size_t getRemainingBlocksSize(size_t firstBlock) const;
-  /// Get the size of a particular block, knowing the remaining record size including this block, or
+  /// Get the size of a particular block from its specification or the unread payload size.
+  /// @param blockIndex: Zero-based index of an existing block in the format.
+  /// @param remainingSize: Unread payload bytes, including this block.
+  /// @return The block's known size if it fits. For a block of unknown size, subtract the sizes
+  /// of all following blocks from remainingSize. If the sizes are unknown or do not fit, return
   /// ContentBlock::kSizeUnknown.
-  /// @param firstBlock: Size of the first content block to count the size of.
-  /// @param remainingSize: Number of bytes left in the record for the remaining blocks.
-  /// @return The size of all the content blocks at and past the index, or
-  /// ContentBlock::kSizeUnknown if more than one block doesn't have a known size.
   size_t getBlockSize(size_t blockIndex, size_t remainingSize) const;
 
   // Static VRS dedicated helper methods, for RecordFormat & DataLayout purposes.

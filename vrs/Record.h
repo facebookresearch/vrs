@@ -78,8 +78,9 @@ enum class CompressionType : uint8_t {
 /// records whenever data is received from some kind of device driver, or arbitrarily in the
 /// case of synthetic data.
 ///
-/// Records and compressed Records have space for a RecordHeader allocated before their data,
-/// so records can be written in a single write operation.
+/// Ordinary records and compressed output reserve space for a RecordHeader before the payload,
+/// so the header and buffered bytes can be written together. An uncompressed borrowed or
+/// direct-write tail is written separately.
 ///
 /// See Recordable::createRecord() to see how to create records.
 class VRS_API Record final {

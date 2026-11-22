@@ -124,8 +124,9 @@ class DataPieceVector : public DataPiece {
     return false;
   }
   /// Get the read values without copying them, as bytes that may not be aligned for T.
-  /// The bytes are in the variable-size data buffer of the DataLayout, or of the mapped DataLayout,
-  /// and they stay valid until that buffer changes.
+  /// The bytes are in the variable-size data buffer of the DataLayout, or of the mapped DataLayout.
+  /// Consume them before the backing layout is destroyed or its buffer is updated, for example
+  /// by reading another record. Copy into aligned storage before accessing them as T.
   /// @param outData: set to the address of the first value, or nullptr if there are none.
   /// @param outCount: set to the number of values.
   /// @return True if values were read, maybe none. False if the piece is not mapped.
@@ -231,7 +232,7 @@ class DataPieceVector : public DataPiece {
 
   /// Clone data piece.
   /// @return A clone of the data piece, with the same label and same type.
-  /// All the other data piece properties (default and staged values) are not cloned.
+  /// Tags, required flag and defaults are cloned; neither stored nor staged values are copied.
   unique_ptr<DataPiece> clone() const override {
     auto other = std::make_unique<DataPieceVector<T>>(getLabel());
     other->tags_ = tags_;

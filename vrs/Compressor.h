@@ -77,8 +77,8 @@ VRS_API CompressionType toEnum<CompressionType>(const string& compressionTypeNam
 
 /// \brief Helper class to compress data using lz4 or zstd presets.
 ///
-/// You can switch between presets at no cost. If presets don't work well enough with your data, you
-/// can easily experiment with new settings and add your own preset to CompressionPreset.
+/// You can select a different preset for each compression call. If existing presets don't work
+/// well enough with your data, you can experiment with new settings and add a CompressionPreset.
 /// @internal
 class VRS_API Compressor {
  public:

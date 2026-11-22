@@ -80,10 +80,10 @@ class VideoFrameHandler {
   /// @param filereader: the file reader to read records from.
   /// @param record: the record that needs to be properly read.
   /// @param exactFrame: if true, all the frames up to that frame might be read.
-  /// If false, only up to one frame will be read, probably the keyframe.
+  /// If false, read at most the keyframe.
   /// Use this API when scrubbing in a UI, as the result is unspecified.
-  /// If replay reaches the frame but decoding still fails, the current keyframe group is abandoned
-  /// and success is returned; decoding is retried at the next keyframe group.
+  /// If decoding fails during replay and isMissingFrames() is still true, the current keyframe
+  /// group is abandoned and success is returned; decoding is retried at the next keyframe group.
   int readMissingFrames(
       RecordFileReader& fileReader,
       const IndexRecord::RecordInfo& record,

@@ -238,12 +238,12 @@ constexpr bool isARecordableClass(RecordableTypeId typeId) {
 /// Identifier for a stream of records, containing a RecordableTypeId and an instance id, so
 /// that multiple streams of the same kind can be recorded side-by-side in a VRS file unambiguously.
 ///
-/// Note that instance ids are not meant to be controlled, set, or defined by the recording code.
+/// Note that recording code doesn't set the instance ID of a Recordable. MultiRecordFileReader
+/// may remap IDs to avoid collisions across files.
 ///
-/// During recording, VRS generates a unique instance id when a recordable is created,
-/// to ensure that each recordable has a unique stream id in the whole system. In particular, by
-/// design, if you stop recording, destroy the recordables and create new ones, the instance ids
-/// generated will keep increasing.
+/// During recording, Recordable assigns instance IDs from a counter per recordable type. The
+/// counters normally continue across recordings in the same process, so a new Recordable of the
+/// same type usually gets a new instance ID, even when it represents the same device.
 /// Therefore, when discovering the streams in a VRS file, specific instance ids can't be used to
 /// recognize different instances of particular RecordableTypeId. Instead, use recordable tags or
 /// flavors. The APIs RecordFileReader::getStreamForTag() and RecordFileReader::getStreamForFlavor()
@@ -286,7 +286,7 @@ class StreamId {
 
   /// Test if the instance represents device.
   /// Useful when an API returns a StreamId, and needs to tell that no device was found.
-  /// @return True if the instance is valid/found, false otherwise.
+  /// @return True if the type is not Undefined. This does not check whether a stream exists.
   constexpr bool isValid() const {
     return typeId_ != RecordableTypeId::Undefined;
   }

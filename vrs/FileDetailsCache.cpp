@@ -118,7 +118,7 @@ int writeRecordInfo(
     WriteFileHandler& file,
     const vector<IndexRecord::RecordInfo>& index,
     uint32_t& writtenSize) {
-  // Write the count of records, and one RecordIndexStruct for each (in batch of fixed size)
+  // Write one DiskRecordInfo per record in zstd frames of up to kMaxBatchSize entries.
   uint32_t recordsLeft = static_cast<uint32_t>(index.size());
   vector<DiskRecordInfo> recordStructs;
   writtenSize = 0;

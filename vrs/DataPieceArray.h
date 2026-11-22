@@ -288,11 +288,11 @@ class DataPieceArray : public DataPiece {
   bool getMin(T& outMin) const {
     return getProperty(kMinValue, outMin);
   }
-  /// Get maximum value for each element of the array.
-  /// @param outMax: Reference to set to the maximum valid value.
-  /// @return True if there is maximum value & outMax was set.
+  /// Get the maximum valid value for each element of the array.
+  /// @param outMax: Receives the stored maximum, if present.
+  /// @return True if the maximum property was found and outMax was set.
   bool getMax(T& outMax) const {
-    return getProperty(kMinValue, outMax);
+    return getProperty(kMaxValue, outMax);
   }
 
   /// Patch values in the mapped DataLayout.
@@ -334,7 +334,7 @@ class DataPieceArray : public DataPiece {
 
   /// Clone data piece.
   /// @return A clone of the data piece, with the same label, same type and same size.
-  /// All the other data piece properties (default value and properties) are not cloned.
+  /// Clone the tags, required flag, defaults and properties, but not the stored values.
   unique_ptr<DataPiece> clone() const override {
     auto other = std::make_unique<DataPieceArray<T>>(getLabel(), getArraySize());
     other->tags_ = tags_;

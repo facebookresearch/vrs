@@ -26,7 +26,7 @@
 namespace vrs {
 
 /// Thread-safe counter that threads can wait on, until its value drops to a threshold.
-/// Reading and increasing the value are lock-free. Decreasing or resetting it wakes up waiters.
+/// Reads and additions do not take the wait mutex. Decreasing or resetting the value wakes waiters.
 class WaitableCounter {
  public:
   /// @return The current value.

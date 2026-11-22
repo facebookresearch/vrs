@@ -850,6 +850,19 @@ TEST_F(DataLayoutTester, testMetaData) {
   ASSERT_NE(stringValue, nullptr);
 }
 
+TEST_F(DataLayoutTester, arrayMaximumUsesMaximumProperty) {
+  MetadataTest data;
+  auto& piece = data.floatArrayValue;
+
+  piece.setMin(-4.f);
+  float maximum = 0.f;
+  EXPECT_FALSE(piece.getMax(maximum));
+
+  piece.setMax(12.f);
+  ASSERT_TRUE(piece.getMax(maximum));
+  EXPECT_EQ(maximum, 12.f);
+}
+
 TEST_F(DataLayoutTester, testStaging) {
   VarSizeLayout layout;
   string name, expectedName;

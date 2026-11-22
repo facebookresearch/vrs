@@ -71,8 +71,8 @@ constexpr const char* kFailFastOnIncompleteIndex = "fail_fast_on_incomplete_inde
 /// - playback records one-by-one using readRecord(), or all at once using readAllRecords().
 /// - close the file.
 /// State, configuration & data records handling is delegated to their stream id players.
-/// Player can 'process' the data in the callback made by the file reader's thread,
-/// or delegate the work by posting a PlaybackRecord to a PlaybackThread.
+/// Players can process the data in callbacks on the thread that called readRecord() or
+/// readAllRecords(), or delegate the work by posting a PlaybackRecord to a PlaybackThread.
 class VRS_API RecordFileReader {
  public:
   RecordFileReader();
@@ -195,7 +195,7 @@ class VRS_API RecordFileReader {
   /// @return The number of bytes of all the chunks combined.
   int64_t getTotalSourceSize() const;
 
-  /// Close the underlying file, if one is open.
+  /// Close the underlying file, if one is open. Stream player registrations are not cleared.
   /// @return 0 on success or if no file was open, or some file system error code.
   int closeFile();
 
@@ -263,14 +263,14 @@ class VRS_API RecordFileReader {
 
   /// Get the index of the VRS file, which is an ordered array of RecordInfo, each describing
   /// the records, sorted by timestamp.
-  /// @return The index.
+  /// @return The index. Pointers and references to its entries are invalidated by closeFile().
   const vector<IndexRecord::RecordInfo>& getIndex() const {
     return recordIndex_;
   }
 
   /// Get a record index limited to a specific stream.
   /// @param streamId: StreamId of the record stream to consider.
-  /// @return The index of the file, with all the records.
+  /// @return Pointers into the global index for this stream, invalidated by closeFile().
   const vector<const IndexRecord::RecordInfo*>& getIndex(StreamId streamId) const;
 
   /// Get the number of records in the whole file.
@@ -362,8 +362,8 @@ class VRS_API RecordFileReader {
   uint32_t getRecordIndex(const IndexRecord::RecordInfo* record) const;
 
   /// Get a record's index in the record's stream index.
-  /// @param record: pointer of the record.
-  /// @return Index in the record's stream index, or getRecordCount() is record is nullptr.
+  /// @param record: Non-null pointer to a record in this reader's index.
+  /// @return Index in the record's stream index.
   uint32_t getRecordStreamIndex(const IndexRecord::RecordInfo* record) const;
 
   /// Get a record's disk size.

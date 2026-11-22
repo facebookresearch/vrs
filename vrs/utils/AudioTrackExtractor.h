@@ -50,7 +50,7 @@ class AudioTrackExtractor : public RecordFormatStreamPlayer {
   // flag set to true when an error occurred, and file decoding should probably stop
   bool& stop_;
   // used to track compatibility of successive audio blocks within a stream;
-  // if format changes, we close the wav file and start a new one
+  // if the format becomes incompatible, extraction stops without starting a new WAV file
   AudioContentBlockSpec fileAudioSpec_;
   // output stream of wav file currently being written
   DiskFile wavFile_;

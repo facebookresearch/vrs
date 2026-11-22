@@ -152,7 +152,7 @@ class AudioBlock {
     return audioBytes_.data() + audioSpec_.getSampleFrameStride() * sampleIndex;
   }
 
-  /// Clear the audio sample buffer
+  /// Zero the audio sample buffer without changing its size.
   void clearBuffer();
 
   /// Read the audio content block (no decoding).
@@ -162,8 +162,8 @@ class AudioBlock {
   /// From any supported AudioFormat, decompress the audio block to AudioFormat::PCM if necessary.
   bool decompressAudio(AudioDecompressionHandler& handler);
 
-  /// Decode an Opus encoded audio block into the internal buffer.
-  /// @param handler: Compression/decompression handler to be reused for that audio stream.
+  /// Decode an Opus encoded audio block into outAudioBlock as S16_LE PCM.
+  /// @param handler: Decoder state to be reused for that audio stream.
   /// @param outAudioBlock: On success, on exit, set to the audio extracted.
   /// @return True only if the audio block was decompressed and outAudioBlock is valid (success).
   bool opusDecompress(AudioDecompressionHandler& handler, AudioBlock& outAudioBlock);

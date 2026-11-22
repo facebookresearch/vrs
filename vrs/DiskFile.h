@@ -89,7 +89,8 @@ class VRS_API DiskFileT : public WriteFileHandler {
   /// Tell if modifying files is supported by this FileHandler implementation.
   bool reopenForUpdatesSupported() const override;
   /// Switch from read-only to read-write mode. Does nothing if the file is already writable.
-  /// On failure, the file is open read-only again, or closed if even that failed.
+  /// If opening in read-write mode fails, reopen read-only or close if that fails too.
+  /// An error closing an old handle can be returned even if the file is now writable.
   int reopenForUpdates() override;
   /// Find out if the file is in read-only mode.
   bool isReadOnly() const override;

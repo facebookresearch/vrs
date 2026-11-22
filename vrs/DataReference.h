@@ -30,8 +30,10 @@ class FileHandler;
 
 /// \brief Container of data pointers, to tell where to write data when reading a record.
 ///
-/// This is essentially a wrapper for two pairs of pointers to a buffer and the size of that buffer,
-/// both of which may be null.
+/// This wraps up to two writable buffers, each specified by a pointer and byte count. The reader
+/// fills them in order. An unused buffer has size zero; a nonzero size requires a valid pointer.
+/// Keep the buffers alive and at the same address until the read completes. Vector overloads use
+/// the current size, not capacity, and do not resize. The combined byte count must fit in uint32_t.
 ///
 /// Examples:
 ///

@@ -40,8 +40,9 @@ class VRS_API RecordFormatRegistrar {
  public:
   // Public interface
 
-  /// Register a provider. Do this before reading a VRS file.
-  /// @param provider: The provider to register.
+  /// Register a provider before the first lookup for each type it supplies. The registry caches
+  /// the result by type, including a lookup that found no definitions.
+  /// @param provider: Non-null provider whose ownership moves to the registry.
   static void registerProvider(unique_ptr<LegacyFormatsProvider> provider);
 
   // VRS internal interface

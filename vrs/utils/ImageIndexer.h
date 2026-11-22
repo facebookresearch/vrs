@@ -21,6 +21,9 @@
 namespace vrs::utils {
 
 /// Helper class to reference images in a VRS file, optimized for reading.
+/// For uncompressed records, dataOffset and dataSize locate the image payload. For compressed
+/// records, they locate the compressed record payload; compressedOffset and compressedLength
+/// locate the image within the decompressed bytes.
 struct DirectImageReference {
   DirectImageReference(int64_t dataOffset, uint32_t dataSize, string imageFormat)
       : dataOffset{dataOffset}, dataSize{dataSize}, imageFormat{std::move(imageFormat)} {}
@@ -94,7 +97,7 @@ struct DirectImageReferencePlus : public DirectImageReference {
         dataRecordIndex{dataRecordIndex} {}
 
   StreamId streamId;
-  uint32_t dataRecordIndex; // data record index within the stream
+  uint32_t dataRecordIndex; // zero-based index among DATA records visited in this stream
 };
 
 /// Get the list of references for all the images found in a VRS file.

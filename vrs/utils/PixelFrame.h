@@ -147,7 +147,8 @@ class PixelFrame {
   /// Clear the pixel buffer
   void blankFrame();
 
-  /// Read a RAW, PNG, or JPEG encoded frame into the internal buffer.
+  /// Read a RAW frame, or read and decode PNG, JPEG, JPEG XL, or a registered CUSTOM_CODEC.
+  /// VIDEO frames require VideoFrameHandler.
   /// @return True if the frame type is supported & the frame was read.
   template <class T>
   static inline bool readFrame(T& framePtr, RecordReader* reader, const ContentBlock& cb) {
@@ -155,15 +156,16 @@ class PixelFrame {
   }
   bool readFrame(RecordReader* reader, const ContentBlock& cb);
 
-  /// Read a record's image data, merely reading the disk data without any decompression.
-  /// The resulting PixelFrame will have an unmodified ImageFormat (raw, jpg, png, jxl, video).
+  /// Read a record's image payload without decoding the image.
+  /// The resulting PixelFrame retains its ImageFormat (e.g. RAW, JPG, PNG, JXL, VIDEO).
   template <class T>
   static inline bool readDiskImageData(T& framePtr, RecordReader* reader, const ContentBlock& cb) {
     return init(framePtr, cb.image()).readDiskImageData(reader, cb);
   }
   bool readDiskImageData(RecordReader* reader, const ContentBlock& cb);
 
-  /// From any ImageFormat, decompress the image to ImageFormat::RAW if necessary.
+  /// Decompress a supported image to ImageFormat::RAW if necessary. On failure, encoded bytes
+  /// may be lost.
   /// To decompress ImageFormat::VIDEO data, you must provide a valid VideoFrameHandler object, the
   /// same one for all the frames of a particular stream.
   bool decompressImage(VideoFrameHandler* videoFrameHandler = nullptr);
@@ -180,7 +182,7 @@ class PixelFrame {
       const ImageContentBlockSpec& inputImageSpec,
       bool preserveStride = false);
 
-  /// Decode compressed image data, except for video codec compression.
+  /// Decode JPEG, JPEG XL, or PNG data from memory.
   bool readCompressedFrame(const vector<uint8_t>& pixels, ImageFormat imageFormat);
 
   /// Read a CUSTOM_CODEC frame and decode it via a DecoderFactory-registered decoder.
@@ -254,21 +256,23 @@ class PixelFrame {
   /// Returns false, if no decoder was installed, or the data couldn't be decoded correctly.
   bool readJxlFrame(const vector<uint8_t>& buffer, bool decodePixels = true);
 
-  /// Compress pixel frame to jxl. Supports ImageFormat::RAW and PixelFormat::RGB8 or GREY8 only.
+  /// Compress raw GREY8, GREY16, RGB8, or RGBA8 pixels to JPEG XL.
   /// @param outBuffer: on exit, the jxl payload which can be saved as a .jxl file
-  /// @param quality: jxl quality setting, from 20 to 100 for percentage, or 0 to 15 for distance.
+  /// @param quality: percentage (100 is lossless), or Butteraugli distance (0 is lossless),
+  /// as selected by options.jxlQualityIsButteraugliDistance.
   /// @param options: compression options. See CompressionOptions for details.
   /// @return True if the image and pixel formats are supported, the compression succeeded, and
   /// outBuffer was set. If returning False, do not use outBuffer.
   bool
   jxlCompress(vector<uint8_t>& outBuffer, float quality, const CompressionOptions& options = {});
 
-  /// Compress pixel frame to jxl. Supports ImageFormat::RAW and PixelFormat::RGB8 or GREY8 only.
+  /// Compress raw GREY8, GREY16, RGB8, or RGBA8 pixels to JPEG XL.
   /// @param pixelSpec: specs of the pixel buffer.
   /// @param pixels: the raw pixel buffer.
   /// @param outBuffer: on exit, the jxl payload which can be saved as a .jxl file.
   /// outBuffer may be the same as pixels.
-  /// @param quality: jxl quality setting, from 20 to 100 for percentage, or 0 to 15 for distance.
+  /// @param quality: percentage (100 is lossless), or Butteraugli distance (0 is lossless),
+  /// as selected by options.jxlQualityIsButteraugliDistance.
   /// @param options: compression options. See CompressionOptions for details.
   /// @return True if the image and pixel formats are supported, the compression succeeded, and
   /// outBuffer was set. If returning False, do not use outBuffer.
@@ -355,9 +359,8 @@ class PixelFrame {
       bool grey16supported,
       const NormalizeOptions& options);
 
-  /// Tell if an image format supports a specific pixel format.
-  /// Only meaningful for png, jpg, jxl.
-  /// Always true for ImageFormat::VIDEO (needs decoders to be sure).
+  /// Check nominal image/pixel format compatibility, not codec availability.
+  /// For RAW and VIDEO, true for any defined pixel format.
   /// Always false for ImageFormat::CUSTOM_CODEC (decodability comes from a registered decoder,
   /// not this table).
   static bool areCompatible(ImageFormat imageFormat, PixelFormat pixelFormat);
@@ -373,7 +376,7 @@ class PixelFrame {
 
   /// Compare this image with another image, and return a PSNR score.
   /// @param other: the other image to compare with.
-  /// @param msssim: on exit, the PSNR.
+  /// @param outPsnr: on exit, the PSNR.
   /// @return True if the images have identical dimensions and pixel formats, the pixel format is
   /// supported (grey8 or rgb8), and the comparison succeeded.
   bool psnrCompare(const PixelFrame& other, double& outPsnr);

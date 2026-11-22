@@ -61,7 +61,9 @@ struct RecordFormatReader {
 /// of content block. The content blocks are decoded in order, until they are all read, some
 /// decoding error occurred, or a callback returns false.
 /// The block's index is passed in case you need to disambiguate successive blocks of the same type,
-/// or need to know when a new block is started.
+/// or need to know when a new block is started. Image, audio, and custom block callbacks must
+/// consume the block before returning true to continue.
+/// Attach each player to only one RecordFileReader; it caches formats by stream ID, not file.
 class VRS_API RecordFormatStreamPlayer : public StreamPlayer {
  public:
   RecordFormatStreamPlayer() = default;

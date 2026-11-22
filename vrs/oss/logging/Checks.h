@@ -80,6 +80,5 @@ void logAndAbort(const char* condition, const string& message = {});
 // so this macro can be used in initializer lists
 #define XR_PRECONDITION_NOTNULL(_val, ...) ((XR_CHECK_NOTNULL(_val, ##__VA_ARGS__)), _val)
 
-// XR_DEV_PRECONDITION_NOTNULL is the same as XR_PRECONDITION_NOTNULL,
-// except that the check is compiled out in production builds
+// XR_DEV_PRECONDITION_NOTNULL is the same as XR_PRECONDITION_NOTNULL in OSS builds.
 #define XR_DEV_PRECONDITION_NOTNULL(_val, ...) ((XR_DEV_CHECK_NOTNULL(_val, ##__VA_ARGS__)), _val)

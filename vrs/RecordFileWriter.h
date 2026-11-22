@@ -80,7 +80,7 @@ using InitCreatedThreadCallback = std::function<void(std::thread&, ThreadRole, i
 ///   - add the (active) recordables you want to record using addRecordable().
 ///   - create the file using createFileAsync().This will create the file & write a few bytes,
 ///     but should be quite quick.
-///   - optional: call purgeOldData() to discard records that were created before
+///   - optional: call purgeOldRecords() to discard records that were created before
 ///     what you really want to record.
 ///   - call writeRecordsAsync() regularly to write old enough records to disk in the background.
 ///     (very fast call)
@@ -102,6 +102,8 @@ class VRS_API RecordFileWriter {
   /// A record file holds data from various recordables, registered using this method.
   /// The ownership of the recordable is not transferred, and the caller is responsible for deleting
   /// the recordables after the RecordFileWriter is deleted.
+  /// When adding a recordable to an open file, the writer captures its stream tags and calls its
+  /// configuration and state hooks.
   /// @param recordable: Recordable object for the device to record.
   void addRecordable(Recordable* recordable);
 
@@ -161,7 +163,7 @@ class VRS_API RecordFileWriter {
   /// for the file's header and index.
   /// @param chunkHandler: optional listener to be notified each time a chunk is complete, and when
   /// chunk handling should be completed (finalize uploads, maybe?).
-  /// See NewChunkCallback's documentation for details.
+  /// See NewChunkHandler's documentation for details.
   int createChunkedFile(
       const string& filePath,
       size_t maxChunkSizeMB = 0,
@@ -246,11 +248,13 @@ class VRS_API RecordFileWriter {
   int getFileError() const;
 
   /// Request to close the file, when all data has been written, but don't wait for that.
-  /// @return A status code: 0 if no error occurred, a file system error code otherwise.
+  /// Call waitForFileClosed() to get the final status.
+  /// @return 0 if no error has been recorded yet, the current writer error, or NO_FILE_OPEN.
   int closeFileAsync();
 
   /// Start writing all the pending records, and wait for the file to be written & closed.
-  /// @return A status code: 0 if no error occurred, a file system error code otherwise.
+  /// @return 0 on success, NO_FILE_OPEN if there is no background writer to join, or the final
+  /// recording error.
   virtual int waitForFileClosed();
 
   /// Set a tag value.

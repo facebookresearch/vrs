@@ -90,7 +90,8 @@ class VRS_API MultiRecordFileReader {
   }
 
   /// Set the tags that determine whether VRS files are related to each other.
-  /// When multiple files are opened, they must have identical values for these tags.
+  /// When multiple files are opened, their non-empty values for these tags must match.
+  /// Missing and empty values are ignored.
   /// Use this method before opening files to override the default tags.
   /// Defaults to kCaptureTimeEpoch and kSessionId.
   /// @param tags: Vector of tag names that must match across files.
@@ -98,9 +99,7 @@ class VRS_API MultiRecordFileReader {
   void setRelatedFileTags(vector<string>&& tags);
 
   /// Close the underlying files, if any are open.
-  /// @return 0 on success or if no file was open.
-  /// Some file system error code upon encountering an error while closing any of the underlying
-  /// files.
+  /// @return 0 on success, NO_FILE_OPEN if the reader is not open, or the first close error.
   int close();
 
   /// Get the set of StreamId for all the streams across all the open files.
@@ -298,7 +297,8 @@ class VRS_API MultiRecordFileReader {
   uint32_t getRecordFormats(UniqueStreamId streamId, RecordFormatMap& outFormats) const;
 
   /// Preferred way to read records.
-  /// @param recordInfo: RecordInfo reference of the record to read.
+  /// @param recordInfo: Entry from one of the open file indexes. A copy is not accepted because
+  /// the reader uses the entry's address to find the source file.
   /// @return 0 on success, or a non-zero error code.
   /// If there is no StreamPlayer hooked up for the stream, no read operation is done and 0 is
   /// returned.
@@ -308,7 +308,8 @@ class VRS_API MultiRecordFileReader {
   /// Attention! Unlike the RecordFileReader version of this API, do not read different streams
   /// with the same stream player, or you might get unexpected results. Stream players should not be
   /// used with different RecordFileReader objects, which this class might do.
-  /// @param recordInfo: RecordInfo reference of the record to read.
+  /// @param recordInfo: Entry from one of the open file indexes, not a copy.
+  /// @param player: Player for this read only, or nullptr to skip the record.
   /// @param setupPlayer: tell if the player should be initialized through its
   /// onAttachedToFileReader callback. This must happen at least once per player, the first time
   /// around. This operation can be expensive, so this should be done only once.
@@ -417,9 +418,9 @@ class VRS_API MultiRecordFileReader {
   /// Get UniqueStreamId corresponding to the given record.
   /// This must be used as opposed to reading the StreamId from RecordInfo directly since it handles
   /// StreamId collisions between streams from multiple files.
-  /// @param record: Record whose UniqueStreamId is supposed to be determined
-  /// @return UniqueStreamId corresponding to the given record. An invalid UniqueStreamId is
-  /// returned for an illegal record.
+  /// @param record: Pointer to an entry in this reader's index; valid only until close().
+  /// @return The corresponding UniqueStreamId, or an invalid ID if record is nullptr or the
+  /// reader is not open.
   UniqueStreamId getUniqueStreamId(const IndexRecord::RecordInfo* record) const;
 
   /// Get the total size of all underlying files.

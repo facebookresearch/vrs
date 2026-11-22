@@ -62,8 +62,8 @@ class DecoderI {
   virtual void flush() {}
 };
 
-/// Selects a DecoderI for a stream; it must only select, never decode, else the frame decodes
-/// twice.
+/// Selects a DecoderI for a stream. For VIDEO, the maker also decodes the first frame into
+/// outDecodedFrame. For CUSTOM_CODEC, it must only select, because the caller invokes decode().
 using DecoderMaker = std::function<std::unique_ptr<DecoderI>(
     const vector<uint8_t>& encodedFrame,
     void* outDecodedFrame,

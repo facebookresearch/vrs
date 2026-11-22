@@ -51,7 +51,7 @@ class DataExtractor {
   /// Start the extraction process, by creating the main files.
   /// However, no record is actually extracted, which is the caller's responsibility.
   /// If the whole file, should be extracted, simply call 'reader.readAllRecords()'.
-  /// If a stream was registered using the 'extract(id)' call, it will be ignored.
+  /// Streams not registered using the 'extract(id)' call will be ignored.
   /// @return A status code, 0 representing success.
   int createOutput();
 

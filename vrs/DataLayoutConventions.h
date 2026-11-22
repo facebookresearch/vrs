@@ -83,9 +83,10 @@ class VRS_API ImageSpec : public AutoDataLayout {
 
   /// Helper method to determine the image content block based on available values.
   /// Will interpret legacy specifications, when a pixel format wasn't specified.
-  /// imageFormat: image format expected, RAW or VIDEO.
-  /// blockSize: content block size, required for VIDEO blocks.
-  /// return An image content type on success, or an empty content block on failure.
+  /// @param base: Supplies the expected image format (RAW, VIDEO or CUSTOM_CODEC) and fallback
+  /// codec information.
+  /// @param blockSize: Content block size in bytes, required for VIDEO and CUSTOM_CODEC blocks.
+  /// @return An image content block on success, or an empty content block on failure.
   ContentBlock getImageContentBlock(
       const ImageContentBlockSpec& base,
       size_t blockSize = ContentBlock::kSizeUnknown);
@@ -97,7 +98,8 @@ constexpr const char* kImageKeyFrameTimeStamp = "image_key_frame_timestamp";
 /// 0 = this frame is a key frame, 1 = the previous frame was the last seen key frame, etc...
 constexpr const char* kImageKeyFrameIndex = "image_key_frame_index";
 
-/// DataLayout definitions use to describe a video image content block.
+/// DataLayout definitions used to describe a video image content block.
+/// Put both fields in the DataLayout immediately before the video block for the reader to use them.
 class VRS_API VideoFrameSpec : public AutoDataLayout {
  public:
   DataPieceValue<double> keyFrameTimestamp{kImageKeyFrameTimeStamp};
@@ -126,7 +128,7 @@ constexpr const char* kAudioSampleRate = "audio_sample_rate";
 /// A sample frame contains one sample per channel (e.g., for stereo int16 audio,
 /// one frame = 2 int16 values = 4 bytes). This is NOT the total number of individual
 /// samples across all channels.
-/// Expected content block size = sampleCount * channelCount * bytesPerSample.
+/// Expected PCM content block size = sampleCount * sample-frame stride (including padding).
 /// Example: 3840 frames of stereo int16 = 3840 * 2 * 2 = 15360 bytes.
 constexpr const char* kAudioSampleCount = "audio_sample_count";
 /// DataLayout convention name for a count of audio coupled stream count.

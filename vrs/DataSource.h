@@ -71,7 +71,7 @@ struct VRS_API DataLayoutChunk {
 /// DataSource.
 class VRS_API DataSourceChunk {
  public:
-  /// Not copyable as there are derived classes that aren't safe to copy from the base class.
+  /// Copying the base chunk does not preserve derived-class behavior.
   DataSourceChunk(const DataSourceChunk& other) = default;
   DataSourceChunk(DataSourceChunk&& other) noexcept = default;
 
@@ -146,11 +146,12 @@ class VRS_API NonContiguousChunk final : public vrs::DataSourceChunk {
 /// DataSource's default implementation holds 2 DataLayoutChunk objects, and 3 DataSourceChunk
 /// objects, in that order, which covers standard use cases, as each only optionally contains data.
 ///
-/// For more advanced needs, you can override copyTo() and copy data at the provided location the
-/// way you like, but you must provide the exact amount of data upfront in the constructor.
-/// Alternatively, you can use custom DataSourceChunk objects that override fillAndAdvanceBuffer().
-/// DataSource objects are expected to be temporary object created on the stack each time
-/// createdRecord() is called.
+/// For more advanced needs, you can override copyTo(), but you must provide the exact byte count
+/// upfront in the constructor. Alternatively, use custom DataSourceChunk objects that override
+/// fillAndAdvanceBuffer().
+/// DataSource does not own the chunks or their backing storage. Keep them alive until
+/// createRecord() returns. If passing a temporary chunk, construct the DataSource in the same
+/// expression as the createRecord() call.
 class VRS_API DataSource {
  public:
   /// No DataLayout, no DataSourceChunk
@@ -263,7 +264,8 @@ class VRS_API DirectWriteRecordData {
 /// The borrowed segments are written after the DataSource payload, in order: compressed with it
 /// when the record is compressed, or raw when it isn't. Multiple segments let non-contiguous memory
 /// regions be borrowed as one payload. `owner` keeps the borrowed memory alive until the record is
-/// written, which may happen later on a background thread.
+/// written, which may happen later on a background thread. Do not modify the bytes while VRS may
+/// still be writing the record.
 class VRS_API BorrowedData {
  public:
   BorrowedData(const void* data, size_t size, std::shared_ptr<void> owner)

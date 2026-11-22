@@ -155,7 +155,7 @@ class VRS_API DataPieceString : public DataPiece {
 
   /// Clone data piece.
   /// @return A clone of the data piece, with the same label and same type.
-  /// All the other data piece properties (default and staged values) are not cloned.
+  /// Tags, required flag and default value are cloned; neither stored nor staged values are copied.
   unique_ptr<DataPiece> clone() const override {
     auto other = std::make_unique<DataPieceString>(getLabel());
     other->tags_ = tags_;

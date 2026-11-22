@@ -134,10 +134,7 @@ class VRS_API UnsupportedBlockReader : public ContentBlockReader {
   bool readBlock(const CurrentRecord&, RecordFormatStreamPlayer&) override;
 };
 
-/// \brief Specialized version of ContentBlockReader to handle an empty content block.
-///
-/// This can happen, when a variable size block is empty, or when a content block ends up being
-/// a placeholder.
+/// \brief Skips a block declared with ContentType::EMPTY without consuming payload bytes.
 /// @internal
 class VRS_API EmptyBlockReader : public ContentBlockReader {
  public:

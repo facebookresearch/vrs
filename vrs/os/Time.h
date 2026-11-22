@@ -24,13 +24,11 @@ namespace vrs {
 namespace os {
 
 /// Time in seconds since some unspecified point in time, which might be the last boot time.
-/// This time is guaranteed to be monotonous throughout the run of the app, and really measure
-/// walltime spent between two invocations, even if the device sleeps.
+/// This clock is monotonic throughout the run of the app but may not include time spent asleep.
 double getTimestampSec();
 
 /// Time in milliseconds since some unspecified point in time, which might be the last boot time.
-/// This time is guaranteed to be monotonous throughout the run of the app, and really measure
-/// walltime spent between two invocations, even if the device sleeps.
+/// This clock is monotonic throughout the run of the app but may not include time spent asleep.
 /// Use this clock for interval measurements.
 int64_t getTimestampMs();
 

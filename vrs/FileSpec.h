@@ -122,8 +122,8 @@ struct VRS_API FileSpec {
   /// Get an extra parameter interpreted as a double, or a default value if not available,
   /// or in case of type conversion error.
   double getExtraAsDouble(string_view name, double defaultValue = 0) const;
-  /// Get an extra parameter interpreted as a bool, or a default value if not available.
-  /// The value is evaluated to be true if it is either "1" or "true", o/w this returns false.
+  /// Get an extra parameter interpreted as a bool, or a default value if missing or empty.
+  /// The value is false for "0", "false", "off", or "no" (case insensitive), and true otherwise.
   bool getExtraAsBool(string_view name, bool defaultValue = false) const;
 
   static int decodeQuery(string_view query, string& outKey, string& outValue);

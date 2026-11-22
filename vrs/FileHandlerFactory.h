@@ -82,7 +82,7 @@ class VRS_API FileHandlerFactory { // NOLINT(cppcoreguidelines-virtual-class-des
   ///      "chunks": [ "chunk_path_1", "chunk2_path_2", ... ],
   ///    }```
   ///    JSON paths are converted into FileSpec objects by FileSpec::fromJson()
-  /// 4) If all the above methods fail, fall back to opening path as file path.
+  /// A parse error for a recognized URI or JSON spec is returned without retrying as a file path.
   ///
   /// Method is virtual to enable mock FileHandlerFactories to be created for unit testing.
   virtual int delegateOpen(const string& path, unique_ptr<FileHandler>& outNewDelegate);

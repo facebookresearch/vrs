@@ -49,7 +49,7 @@ constexpr const char* kFileHandlerField = "storage";
 constexpr const char* kFileNameField = "filename";
 constexpr const char* kUriField = "source_uri";
 
-// Validates URI scheme according to RFC 3986.
+// Validates URI schemes using RFC 3986 syntax plus underscores.
 // Schema must start with a letter and contain only alphanumeric characters, '.', '-', '+', or '_'.
 // Returns true if valid, false otherwise.
 bool validateUriSchema(string_view uri, size_t colonPos) {
