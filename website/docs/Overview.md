@@ -5,28 +5,28 @@ title: Overview
 
 import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
 
-VRS is a file format optimized to record and playback streams of sensor data, such as images, audio, and other discrete sensors (IMU, temperature, etc.), that are stored in per-device streams of time-stamped records.
+VRS is a file format optimized for recording and playing back time-stamped sensor data, such as images, audio, and IMU or temperature readings, in separate streams.
 
-VRS was first created to record images and sensor data produced by early prototypes of the [Meta Quest device](https://store.facebook.com/quest/products/quest-2), to develop the device’s positional tracking system known as [Oculus Insight](https://ai.facebook.com/blog/powered-by-ai-oculus-insight/), [Meta Quest 2's hand tracking](https://www.meta.com/help/quest/articles/headsets-and-accessories/controllers-and-hand-tracking/hand-tracking/), and more to come.
+VRS was first created to record images and sensor data from early [Meta Quest](https://store.facebook.com/quest/products/quest-2) prototypes for development of the [Oculus Insight](https://ai.facebook.com/blog/powered-by-ai-oculus-insight/) positional tracking system. It was also used to develop [Meta Quest 2 hand tracking](https://www.meta.com/help/quest/articles/headsets-and-accessories/controllers-and-hand-tracking/hand-tracking/).
 
-[Project Aria](https://about.facebook.com/realitylabs/projectaria/) records its data as VRS files.
+[Project Aria](https://about.facebook.com/realitylabs/projectaria/) records its data in VRS files.
 
 ## Appropriate Use Cases
 
-VRS is designed to record similar looking bundles of data produced repeatedly over a period of time, in time-stamped records.
+VRS is designed to record similarly structured bundles of data produced repeatedly over time.
 
 <Tabs>
 
   <TabItem value="good_cases" label="Good Use Cases" default>
-VRS is very well suited to record and playback:
+VRS is well suited to recording and playing back:
 <li>Data produced by the cameras and sensors of a Meta Quest device, including IMUs.</li>
-<li>Data produced by the cameras and sensors of Project Aria Glasses, including positional tracking cameras, eye tracking cameras, barometer sensors, GPS and BT beacons, multi-channel audio.</li>
-<li>Data produced in burst of activity, such as keyboard or mouse input data.</li>
+<li>Data produced by the cameras and sensors of Project Aria glasses, including tracking cameras, barometers, GPS, Bluetooth beacons, and multichannel audio.</li>
+<li>Data produced in bursts, such as keyboard or mouse input.</li>
 <li>TCP/IP or USB packets.</li>
   </TabItem>
 
   <TabItem value="bad_cases" label="Poor Use Cases">
-Even if VRS could be used to store pretty much any data, VRS is a poor choice to record anything without temporal information or data format regularity, such as:
+Although VRS can store many kinds of data, it is a poor choice for standalone objects or data without timestamps or a recurring format, such as:
 <li>Text documents.</li>
 <li>Web pages.</li>
 <li>Point cloud data.</li>
@@ -38,12 +38,12 @@ Even if VRS could be used to store pretty much any data, VRS is a poor choice to
 
 <!-- prettier-ignore -->
 :::info
-While VRS is very effective at streaming very large amounts of data to disk, potentially to and from cloud storage, with real-time lossless compression, creating files potentially very large (typical VRS files range from 5 to 80 GB, but 1.5 TB VRS files exist), editing VRS files is not nearly as convenient, as the entire container typically needs to be rewritten.
+While VRS can stream large recordings to disk with real-time lossless compression, editing an existing recording typically requires rewriting the entire container.
 :::
 
 ## Data Types and Data Conventions
 
-VRS provides standardized methods to store images, audio, and discrete sensors data in compact and format evolution resilient records, so you can save data without having to worry too much about evolving requirements. But while VRS standardizes how to save common data types, VRS does not prescribe how to address specific use cases. Data format conventions are desirable, to enable teams working on identical or similar use cases to exchange data. However, such data format conventions are out of the scope of VRS.
+VRS provides standard ways to store images, audio, and other sensor data in compact records whose layouts can evolve. VRS does not prescribe conventions for specific applications; teams working with the same kinds of data can agree on their own conventions to make recordings interchangeable.
 
 ## Features Overview
 
@@ -51,9 +51,9 @@ VRS provides standardized methods to store images, audio, and discrete sensors d
 - The file and each stream contain an independent set of tags, which are string name/value pairs that describe them.
 - Streams may contain `Configuration`, `State` and `Data` records, each with a timestamp in a common time domain for the whole file. Typically, streams contain one `Configuration` record and one `State` record, followed by one to millions of `Data` records.
 - Records are structured as a succession of typed content blocks. Typically, content blocks are metadata, image, audio, and custom content blocks.
-- Metadata content blocks contain raw sensor data described once per stream, making the file format very efficient. The marginal cost of adding 1 byte of data to each metadata content block in a stream is 1 byte per record (or less when lossless compression happens).
-- Records can be losslessly compressed using lz4 or zstd, which can be fast enough to compress while recording on device.
-- Multiple threads can create records concurrently for the same file, without CPU contention.
+- Metadata content blocks contain structured sensor data. The layout is stored separately from the records, so adding a fixed-size, 1-byte field costs 1 byte per record before compression.
+- Records can be losslessly compressed using LZ4 or Zstandard, including while recording on a device if enough CPU time is available.
+- Multiple threads can create records concurrently for the same file. Each `Recordable` manages its own records to limit lock contention.
 - VRS supports huge file sizes (tested with multi-terabyte use cases).
 - VRS supports chunked files: auto-chunking on creation and automated chunk detection for playback.
 - Playback is optimized for timestamp order, which is key for network streaming.

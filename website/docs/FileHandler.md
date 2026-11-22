@@ -7,7 +7,7 @@ The VRS toolbox offers a powerful layer to abstract storage access: the `FileHan
 
 `FileHandler` offers benefits similar to those of Python file-like objects, but goes beyond that by expanding the scope of “file path” to include URIs and JSON-format file specifications. It also provides mechanisms to create a `FileHandler` that will be able to interpret them.
 
-While the `FileHandler` interface is part of the VRS toolbox, it is effectively a layer below the code that accesses the VRS files. In practice, all IO accesses made by the VRS library use `FileHandler` objects, but the `FileHandler` interface knows nothing intrinsically about VRS or any storage.
+VRS uses `FileHandler` to access recording data, but the interface itself is not specific to the VRS file format or to any storage backend.
 
 ## Why is `FileHandler` useful?
 
@@ -49,10 +49,10 @@ In the end, VRS supports regular file paths, URIs, and JSON file specifications,
 
 ### JSON File Specifications
 
-A JSON file specification must have the following required fields:
+A JSON file specification can identify a handler and list the chunks to open:
 
-- `“storage"`: the name of the `FileHandler` able to read that location.
-- `“chunks”`: an ordered list of strings, each representing a chunk of the logical file, in a format that the designated `FileHandler` can handle.
+- `storage`: the name of the `FileHandler` that can read that location. If omitted, VRS normally uses `diskfile`.
+- `chunks`: an ordered list of strings, each representing a chunk of the logical file, in a format that the designated `FileHandler` can handle.
 
 A valid JSON file specification can simply be as follows:  
 `{"storage":"diskfile","chunks":["/local/folder/file.vrs"]}`
@@ -60,33 +60,33 @@ A valid JSON file specification can simply be as follows:
 A chunked local file may look like this:  
 `{"storage":"diskfile","chunks":["/local/folder/file.vrs","/local/folder/file.vrs_part_2"]}`
 
-A chunked file in the cloud might be accessed using chunks published as HTTP objects, and be represented like this:  
-`{"storage":"http","chunks":["http://cdn.meta.com/HASH1","http://cdn.meta.com/HASH2"]}`
+A chunked file in the cloud might use a specification like this, if an HTTP `FileHandler` has been registered:  
+`{"storage":"http","chunks":["https://example.com/HASH1","https://example.com/HASH2"]}`
 
 **Optional Fields**
 
-When dealing with objects in cloud storage, it can be expensive to do a basic operation, such as getting the size of a file chunk, particularly when you have many. Knowing how to name a file to download, and remembering how a file was originally referenced is critical. Therefore, the following optional fields have been introduced to answer these questions:
+When dealing with objects in cloud storage, even getting the size of a chunk can require a network request. These optional fields can provide chunk sizes and preserve the original file name or URI:
 
-- `chunk_sizes`: an ordered list of integers, which should match the list of `chunks`.
-- `filename`: a name suitable to save the file locally. It might be the name of the file before it was uploaded to cloud storage.
-- `source_uri`: a URI representation of how the object was initially represented, in particular if the JSON file specification was generated from a URI.
+- `chunk_sizes`: an ordered list of integer byte sizes, one per entry in `chunks`.
+- `filename`: a name suitable for saving the file locally. It might be the name of the file before it was uploaded to cloud storage.
+- `source_uri`: the URI originally used to identify the file, if applicable.
 
 Example:  
-`{"storage":"http","chunks":["http://cdn.meta.com/HASH1"],"chunk_sizes":[123456],"filename":"scene23.vrs","source_uri":"aria:456789"}`
+`{"storage":"http","chunks":["https://example.com/HASH1"],"chunk_sizes":[123456],"filename":"scene23.vrs","source_uri":"dataset:456789"}`
 
 **Extra fields**
 
-Additional fields can be provided, outside of the core JSON file specifications. Extra values are string values, which name isn't reserved for required or optional fields. These might include authentication options for some cloud storage implementations, for instance:  
-`{"storage":"http","chunks":["http://cdn.meta.com/HASH1"],"source_uri":"aria:456789","auth_token":"09*JOYBAaSLBG@#O@"}`
+Additional fields use string values and names not reserved by the file specification. A handler can use them for storage-specific options, for example:  
+`{"storage":"http","chunks":["https://example.com/HASH1"],"source_uri":"dataset:456789","cache":"local"}`
 
 ### URIs
 
-URIs can be very compact and convenient, and they are commonly used already, so `FileHandler` can also handle URIs. VRS interprets the scheme part of the URI as a `FileHandler` name, and uses a `FileHandler` with that name to interpret the rest of the URI.  
-Example: `aria:456789?auth_token=09%2AJOYBAaSLBG%40%23O%40`
+VRS uses the URI scheme to select a registered `FileHandler` or delegator. That implementation can define how to interpret the rest of the URI.  
+Example: `dataset:456789?cache=local`
 
 ### `FileSpec`
 
-Parsing JSON messages and URIs can become expensive if we need to repeat the operation multiple times. This is why, internally, string paths are always immediately converted into `FileSpec` objects, which are used for all file location operations.
+VRS converts a path, URI, or JSON specification into a `FileSpec` before opening the file.
 
 At its core, a `FileSpec` object is simply a struct with the following public fields:
 
@@ -96,14 +96,14 @@ At its core, a `FileSpec` object is simply a struct with the following public fi
   string uri;
   vector<string> chunks;
   vector<int64_t> chunkSizes;
-  map<string, string> extras;
+  Extras extras;
 ```
 
 `FileSpec` provides helper functions to convert to and from JSON and to get the size of a file (when specified directly). In practice, JSON file specifications and `FileSpec` objects are equivalent.
 
 ## `FileHandlerFactory`
 
-The primary role of `FileHandler` is to provide an abstract way to read files. VRS core provides a single `FileHandler` implementation that can read local files. All other `FileHandler` implementations do not belong in the VRS core. This is so that its dependencies can be limited as much as possible, and it can be easily compiled for mobile and other embedded environments.
+The primary role of `FileHandler` is to provide a common interface for reading files. VRS core provides `diskfile` for local files and, on supported platforms, `asyncdiskfile`. Access to other storage backends requires a separately registered implementation, keeping the core library's dependencies small.
 
 The `FileHandlerFactory` singleton allows:
 
@@ -130,7 +130,7 @@ When the VRS `RecordFileReader` class opens a VRS file using the string path, th
 
 ### Further Nested Delegation
 
-For completeness, more levels of indirection might be required. When `FileHandlerFactory` asks `FileHandler` to open a file, it uses the `FileHandler` eponym API to open the `FileSpec`, using `delegateOpen`. This is so the `FileHandler` itself may delegate the actual handling of the `FileSpec` to yet another `FileHandler` implementation.
+A `FileHandler` can open the `FileSpec` itself or delegate the work to another handler. Each delegation uses `delegateOpen()`, so the reader does not need to know which handler ultimately opens the file.
 
 For example, imagine you have an HTTP `FileHandler`, which can stream data from an HTTP file. Also imagine you have a database of VRS files in cloud storage, named "MyAIDataSet", which references files using a 64 bit number. You can implement a custom `MyAIDataSetFileHandler`, which accesses the MyAIDataSet database, and converts MyAIDataSet URIs into HTTP URLs. The `MyAIDataSetFileHandler` code will convert the URI, "myaidataset:12345", for the MyAIDataSet dataset #12345, into a content delivery network (CDN) URL, appropriate for your computer (it might do that by looking up the dataset online using a service that will return that URL after validations and permissions checks). Then, the `MyAIDataSetFileHandler` logic will delegate reading the data from that URL to the HTTP `FileHandler` that can stream the data from an HTTP URL. The `RecordFileReader` will decode the remote VRS file just as if it were a local file, because all its file accesses are done using a `FileHandler` instance.
 
@@ -138,28 +138,28 @@ For example, imagine you have an HTTP `FileHandler`, which can stream data from 
 
 Putting it all together, when VRS needs to interpret a string path, the following logic is used:
 
-- If the string path is a JSON specification, it is converted into a `FileSpec` object with a `FileHandler` name.
-- If the string path is a URI, it is parsed and made into a valid `FileSpec` object, by the `FileHandler` with the same name as the URI scheme, if such a `FileHandler` is available.
-- Otherwise, the string path is assumed to be a local file path, that is readable to the VRS built-in disk file `FileHandler`, using the standard POSIX file APIs.
-- Once the `FileSpec` object is built, the `FileHandlerFactory` tries to open the file, using `delegateOpen()` to find the correct `FileHandler` for the job.
+- If the string is a JSON specification, it is converted into a `FileSpec`.
+- If the string is a URI, the registered handler or delegator for that scheme can parse it. Otherwise, VRS uses its generic URI parser; a successful parse does not mean the scheme can be opened.
+- Otherwise, the string is treated as a local path by default.
+- Once the `FileSpec` is built, `FileHandlerFactory::delegateOpen()` selects a handler or delegator and tries to open the file.
 
 ## `FileHandler` vs. `WriteFileHandler`
 
 As you may have noticed, `FileHandler` is strictly a read-only interface, because most `FileHandler` implementations, by far, only support reading. This is largely because cloud storage is usually either completely immutable, or only offers very limited creation and mutation options. Some cloud storage might only support creating new objects. Other cloud storage might only support creating new objects of constrained size, but will be able to concatenate existing objects to create new objects.
 
-The `WriteFileHandler` classes that derive from `FileHandler` can add support for write operations, but they may not be able to support any write operations. Creating a `WriteFileHandler` is much more complicated than creating a read-only `FileHandler`.
+`WriteFileHandler` extends `FileHandler` with write operations. Not every implementation supports overwriting data or reopening an existing file for updates.
 
 ### Reading is easy
 
-A (read) `FileHandler` only really needs to implement the following operations:
+The core read operations are:
 
-- `open()`
+- `openSpec()`
 - `close()`
-- `getFileSize()`
-- `setPos(position)`
-- `read(length)`
+- `getTotalSize()`
+- `setPos(offset)`
+- `read(buffer, length)`
 
-Effectively, cloud storage is typically stateless, and only offers support for `getFileSize()` and `readRange(position, length)`, but these can be enough to implement the `FileHandler` interface. As a result, it is easy to read cloud-stored data using the same interface as for files, even if performance will obviously differ greatly. In practice, all our `FileHandler` interfaces fully implement the read operations, or delegate them to other `FileHandler` implementations, that implement caching too.
+A cloud storage service typically provides object sizes and byte-range reads. A `FileHandler` can use these to implement the same read operations as for local files, and add caching where useful.
 
 ### Writing is complex
 

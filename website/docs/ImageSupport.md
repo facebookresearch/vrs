@@ -7,39 +7,39 @@ _This page describes how VRS handles content blocks using the DataLayout Convent
 
 Prerequisite: Understanding how `RecordFormat` works.
 
-Image content blocks can be any of the following different subtypes:
+Image content blocks can have the following subtypes:
 
 - `image/raw`\
-   The image is stored as a buffer of raw pixels, which might be a compacted pixel format such as [RAW10](https://developer.android.com/reference/android/graphics/ImageFormat#RAW10), but not compressed using a `PixelFormat`.\
-   The exact [list of pixel formats](https://github.com/facebookresearch/vrs/blob/main/vrs/RecordFormat.h#L68-L100) grows over time.
+   The image is stored as a buffer of raw pixels, which may use a packed pixel format such as [RAW10](https://developer.android.com/reference/android/graphics/ImageFormat#RAW10), but is not encoded by an image or video codec.\
+   See the [list of pixel formats](https://github.com/facebookresearch/vrs/blob/main/vrs/RecordFormat.h#L68-L100).
 - `image/png`, `image/jpg`, `image/jxl`, and `image/custom_codec`\
-   The image is compressed using png, jpeg, jpeg-xl, or a custom codec. The payload of the image content block contains exactly what regular file of that image type would contain\
+   PNG, JPEG, and JPEG XL blocks contain the same bytes as a standalone image file. The custom codec defines its own payload format.\
    _Note that when using a custom codec, you must specify a codec name, or the image content block will be reported as unsupported on read._
 - `image/video`\
    The image is compressed according to the spec of a video codec standard, such as H.264 or H.265.\
-   _Note that the list of supported video codecs is deliberately not part of the spec, but rather, is meant to be implementation dependent, by an extension. VRS Open Source provides the vrs/xprs module to interface with ffmpeg and expose the codecs it was built with._
+   _VRS does not specify which video codecs a decoder must support. The optional FFmpeg-based XPRS decoder supports the codecs enabled in its build._
 
 ## Additional Image Properties
 
-To be complete, image content blocks, in particular `image/raw` content blocks, may require the following complementary properties for an image:
+Image content blocks, particularly `image/raw` blocks, may need these additional properties:
 
 - Resolution
 - Stride
 - Pixel format
 
-Without these properties, `image/raw` images cannot be interpreted safely. These properties can be provided in two distinct ways:
+Raw images need a resolution and pixel format. Specify strides if the rows include padding beyond the format’s defaults. These properties can be provided in two ways:
 
-- The image properties can be part of the `RecordFormat` description itself, meaning that the records using that `RecordFormat` will all be using the exact same pixel format.  
+- The image properties can be part of the `RecordFormat` description itself. They are then the same for every record using that format.  
   The content block description might look like this:
   - `image/raw/640x480/pixel=grey8`
   - `image/raw/640x480/pixel=yuv_i420_split/stride=640`
-- The image properties can be provided in the datalayout content block found either before the `image` content block in the same record, or in the stream’s last configuration record. When using this method, the properties must be specified using the [Datalayout Conventions](https://github.com/facebookresearch/vrs/blob/main/vrs/DataLayoutConventions.h#L30-L47), which are merely a collection of data types and labels to use in your `DataLayout` to specify properties.
+- The image properties can be provided in a datalayout content block before the `image` block in the same record, or in a configuration record for the same stream. Use the types and labels defined by the [DataLayout Conventions](https://github.com/facebookresearch/vrs/blob/main/vrs/DataLayoutConventions.h#L30-L50). Read the applicable configuration record before reading the image record.
 
-Whichever method you use, VRS collects the image properties for you, so that the `RecordFormatStreamPlayer::onImageRead()` callback can directly provide a content block object that you can query for the image format, regardless of how or where it was specified.
+When VRS resolves the block’s format and size, `RecordFormatStreamPlayer::onImageRead()` receives a `ContentBlock` with the available image properties. If VRS cannot resolve the block, it calls `onUnsupportedBlock()` instead.
 
 ### Specifying Additional Image Properties
 
-For `image/raw` and `image/video` images, use a [`vrs::datalayout_conventions::ImageSpec`](https://github.com/facebookresearch/vrs/blob/main/vrs/DataLayoutConventions.h#L65) to describe your image in a configuration record, or in a `DataLayout` block just before the image content block of your data records.
+For `image/raw`, `image/custom_codec`, and `image/video`, use the fields from [`vrs::datalayout_conventions::ImageSpec`](https://github.com/facebookresearch/vrs/blob/main/vrs/DataLayoutConventions.h#L65) in a configuration record or a `DataLayout` before the image content block in the same record.
 
 The `DataLayout` fields are:
 
@@ -51,11 +51,11 @@ The `DataLayout` fields are:
   DataPieceEnum<PixelFormat, ImageSpecType> pixelFormat{kImagePixelFormat};
 
   // For image/custom_codec and image/video only
-  DataPieceString codecName{kImageCodecName}; // required
+  DataPieceString codecName{kImageCodecName}; // required unless provided by the RecordFormat
   DataPieceValue<ImageSpecType> codecQuality{kImageCodecQuality}; // optional
 ```
 
-For `image/video` images, specify the keyframe timestamp and the keyframe index using a [`vrs::datalayout_conventions::VideoFrameSpec`](https://github.com/facebookresearch/vrs/blob/main/vrs/DataLayoutConventions.h#L101), or the following `DataLayout` fields, in the `DataLayout` block immediately before the image content block:
+For `image/video` images, specify the keyframe timestamp and the keyframe index using a [`vrs::datalayout_conventions::VideoFrameSpec`](https://github.com/facebookresearch/vrs/blob/main/vrs/DataLayoutConventions.h#L101) or the following `DataLayout` fields, in the `DataLayout` block immediately before the image content block:
 
 ```cpp
   DataPieceValue<double> keyFrameTimestamp{kImageKeyFrameTimeStamp};
@@ -66,33 +66,33 @@ For `image/video` images, specify the keyframe timestamp and the keyframe index 
 
 ### `image/raw`
 
-Without the following properties, `image/raw` image content blocks can not be interpreted:
+The properties for interpreting an `image/raw` content block are:
 
 - Required properties: width, height, pixel format.
 - Optional properties: stride, stride2.
 
-When properties are provided using the Datalayout Conventions, all additional properties must be provided by a single `DataLayout` structure in one record. For example, you must not put the pixel format in the configuration record, and then put the image dimensions in the data record. You must either put both the pixel format and the image dimensions in a configuration record's `DataLayout`, or you must put them both in a `DataLayout` just before the image content block.
+When using the DataLayout Conventions, put the width, height, pixel format, and any non-default strides in a single `DataLayout`. VRS does not combine these properties across layouts or fill in a partial `RecordFormat` description from a `DataLayout`.
 
 ### `image/png`, `image/jpg` and `image/jxl`
 
-png, jpg, and jxl payloads are exactly the same as png, jpg, and jxl files, which are fully self-described. Therefore, when those image formats are used, properties specified using the Datalayout Conventions are ignored by VRS.
+PNG, JPEG, and JPEG XL payloads are self-describing. VRS does not look up their image properties in `ImageSpec` fields. It must still know the block size; if it cannot infer the size from the record format and remaining bytes, specify it with `NextContentBlockSpec` in the preceding `DataLayout`.
 
 ### `image/custom_codec`
 
 - Required properties: codec name.
-- Optional properties: width, height, pixel format, keyframe timestamp, keyframe index.
+- Optional properties: width, height, pixel format, stride, stride2, and codec quality.
 
-The only property VRS itself requires is a codec name for an image content block to be recognized. However, a particular custom codec may require additional properties, such as width, height, and pixel format. Whether a custom codec requires that information or not is an implementation detail of each specific custom codec. VRS does not support any particular custom codec by default, they are meant for experimentation and special cases.
+Provide the codec name in a `DataLayout` using `ImageSpec`. If the name is in the `RecordFormat` instead, the reader still needs width, height, and pixel format from an `ImageSpec`. A custom decoder may require more properties. VRS does not ship decoders for custom codecs by default.
 
 ### `image/video`
 
 Video image content blocks require additional properties to decode images:
 
-- Required properties: width, height, pixel format, codec name, keyframe timestamp, keyframe index.
-- Optional properties: compression quality, which may affect how to decode the image.
+- Required properties: width, height, pixel format, and codec name. Provide the keyframe timestamp and index for decoding frames out of sequence.
+- Optional properties: stride, stride2, and codec quality.
 
-Similar to `image/raw` images, pixel format and image dimension information must be provided in a single `DataLayout`, either in the configuration record or in the data record of the image. Typically, the pixel format and image resolution will not change without a configuration change. Therefore, they are best stored in a configuration record.  
-On the other hand, the keyframe timestamp and the keyframe index properties change with every frame, and are therefore searched only in a `DataLayout` that must be immediately before the `image/video` content block.
+As with raw images, put the pixel format and dimensions in a single `DataLayout`. Use a configuration record if they change only when the stream is reconfigured; otherwise use a layout before the image block in the same record.  
+VRS reads the keyframe timestamp and index only from the `DataLayout` immediately before the `image/video` block. The timestamp identifies the group’s keyframe. The index is `0` for the keyframe, `1` for the next frame, and so on.
 
 ## Reading Images
 
@@ -107,27 +107,27 @@ bool onImageRead(
 
 The `RecordFormatStreamPlayer::onDataLayoutRead()` callback happens **after** the `DataLayout` data has been read from disk.
 
-The `RecordFormatStreamPlayer::onImageRead()` callback happens **before** any image data has been read. However, the provided `contentBlock` object holds all the image properties, so the following information can be found:
+The `RecordFormatStreamPlayer::onImageRead()` callback runs **before** the image payload is read. The `contentBlock` provides the properties VRS has resolved:
 
-- For all types: the `contentBlock` size is known. That's the size of the buffer you will need to read the image data stored in the image content block.
+- For all types: `contentBlock.getBlockSize()` gives the number of bytes in the stored image payload.
 - For `image/raw` images: resolution, strides, and pixel format are defined.
-- For `image/custom_codec` images: codec name is defined. Resolution, strides, and pixel format might be defined too, if provided in the stream using the Datalayout Conventions.
-- For `image/video` images: the pixel format, resolution, codec name, keyframe timestamp, and keyframe index are defined.
+- For `image/custom_codec` images: the codec name is defined. Resolution, strides, and pixel format may also be available.
+- For `image/video` images: pixel format, resolution, and codec name are defined. Keyframe timestamp and index are available when both fields were supplied in the preceding layout.
 
-The image data itself can be read using the `RecordReader` object provided by the `CurrentRecord` object. The image is described by an `ImageContentBlockSpec` object provided by `contentBlock.image()`.
+Use `record.reader` to read the image payload and `contentBlock.image()` to get its `ImageContentBlockSpec`. Consume the entire image block before returning `true` to continue to the next block.
 
 ### `image/raw` images
 
-Allocate or reuse a buffer where you can read the image data. Be careful to properly handle the image’s stride and stride2. `stride` describes the stride of the first plane (the number of bytes separating the first byte of each successive line), while `stride2` describes the stride of all the following planes, if the image is stored in a multi-plane format.
+Allocate or reuse a buffer for the image payload. `stride` is the number of bytes between successive rows of the first plane, and `stride2` is the stride of the remaining planes. Use `getPlaneStride()` and `getPlaneHeight()` to account for padding and subsampling.
 
 ### `image/png`, `image/jpg`, and `image/jxl` images
 
-You will need to read and decode the compressed image data using a standard implementation.
+Use `vrs::utils::PixelFrame::readFrame()` or another image decoder to read and decode the payload. JPEG XL decoding requires a build with JPEG XL support.
 
 ### `image/custom_codec` images
 
-You will need to read and decode the compressed image data using your own implementation of the custom codec, which implementation is presumably unknown to VRS.
+Read and decode the payload with a decoder for the named codec, or register a decoder with `vrs::utils::DecoderFactory` and use `PixelFrame::readFrame()`.
 
 ### `image/video` images
 
-Support for `image/video` images is provided by the vrs/xprs module, that depends on ffmpeg, and exposes the codecs built with it.
+Use `vrs::utils::VideoRecordFormatStreamPlayer` to read and decode video frames. For FFmpeg-based decoding, enable XPRS with `-DBUILD_WITH_XPRS=ON` on a supported build. When seeking to a non-keyframe, decoding may require reading the preceding frames back to the keyframe.

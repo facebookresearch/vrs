@@ -6,35 +6,35 @@ title: File Creation
 To create a VRS file:
 
 - Create a [`RecordFileWriter`](https://github.com/facebookresearch/vrs/blob/main/vrs/RecordFileWriter.h) object.
-- Create as many [`Recordable`](https://github.com/facebookresearch/vrs/blob/main/vrs/Recordable.h) objects as needed, one per _device_. Each Recordable object will create a stream of records for itself. Recordables do not need to be aware of either the file writer or any other Recordables.
-- Add tags to the file writer and the Recordables as necessary to describe your devices and setup. Add things such as serial numbers, global configuration settings, user names, locations, user heights, etc. Make sure you capture all the context you will need when you play back the VRS file.
+- Create one [`Recordable`](https://github.com/facebookresearch/vrs/blob/main/vrs/Recordable.h) per _stream_. A stream can represent a physical device, an algorithm, or another source of records. Recordables do not need to know about the writer or one another.
+- Add file tags for the overall recording setup, and stream tags for details specific to a Recordable, such as its device serial number. Capture the context you will need during playback.
 
-- The following best practices are extremely important:
-  - Use the tag name conventions defined in [`<VRS/TagConventions.h>`](https://github.com/facebookresearch/vrs/blob/main/vrs/TagConventions.h) as much as possible.
-  - Capture all the tags upfront, in case the recording is interrupted (out of disk space or crashes).
+- Set tags before creating the file:
+  - Use the tag name conventions defined in [`<vrs/TagConventions.h>`](https://github.com/facebookresearch/vrs/blob/main/vrs/TagConventions.h) where applicable.
+  - Set all tags before opening the file for writing. VRS writes them at file creation; changes made afterward are not saved.
 
-- Add the Recordable objects to the file writer.
-- Have your Recordables start to produce records, by calling [`Recordable::createRecord()`](https://github.com/facebookresearch/vrs/blob/main/vrs/Recordable.h#L236) as needed, from any thread. Create a record when an IMU packet is received, or an image is received from a camera. Recordables do not need to know when recording is active. They just need to produce records as often as necessary, all the time.
+- Add the Recordable objects to the file writer with `addRecordable()`. The writer does not take ownership, so the Recordables must outlive it.
+- Have your Recordables produce records by calling [`Recordable::createRecord()`](https://github.com/facebookresearch/vrs/blob/main/vrs/Recordable.h) as data arrives, for example when an IMU packet or camera frame is received. Recordables can produce records from multiple threads. Synchronize access to any buffers or `DataLayout` objects shared by those threads.
 
 <!-- prettier-ignore -->
 :::note
-*Every record has a timestamp (a `double` count of seconds), and the records of all the Recordables must use the **same time domain**, as records will be sorted based on their timestamp!*
+*Every record has a timestamp (a `double` count of seconds), and the records of all the Recordables must use the **same time domain**, as records are indexed by timestamp!*
 :::
 
-- Tell the file writer how often to discard "old" records, and what "old" actually means.
-- Tell the file writer when to start recording. Older records will be discarded. Newer records will start to be compressed (by default) and written to disk in realtime in a background thread.
-- Create the file and start recording. Just after creating the file, explicitly discard records that are older than you need.
-- Tell the file writer when to stop recording. Newer records will be discarded.
-- Stop recording and close the file.
-- Stop producing records, eventually.
+- If you buffer records before creating the file, use `autoPurgeRecords()` to discard records outside the window you want to keep.
+- Call `createFileAsync()` to open the file and start the background writer. Automatic purging is suspended while the file is open.
+- To trim the initial buffer further, call `purgeOldRecords()` before sending the first batch to the writer. It keeps the latest configuration and state records before the cutoff for each stream.
+- Call `writeRecordsAsync()` periodically, or configure `autoWriteRecordsAsync()`, to send records older than a moving timestamp cutoff to the background writer.
+- Stop producing records for this file, then call `waitForFileClosed()` to write any remaining records and close the file. Check its return value for write errors.
+- If all the records are already in memory and no file is open, you can use `writeToFile()` instead of the asynchronous writing calls.
 
 ## Choosing a `RecordableTypeId`
 
-Originally, each device was given its own `RecordableTypeId` enum value, which implied the modification of the [`<vrs/StreamId.h>`](https://github.com/facebookresearch/vrs/blob/main/vrs/StreamId.h) file every time.
+Originally, each device was given its own `RecordableTypeId` enum value, which required editing [`<vrs/StreamId.h>`](https://github.com/facebookresearch/vrs/blob/main/vrs/StreamId.h).
 
-We now recommend that you use an existing «Recordable Class» enum value of `RecordableTypeId` enum, defined in [`<vrs/StreamId.h>`](https://github.com/facebookresearch/vrs/blob/main/vrs/StreamId.h). Choose the one that best matches your use case, and associate it with a «Recordable Flavor», which is a text string describing your specific use case.
+Use an existing «Recordable Class» value of `RecordableTypeId`, defined in [`<vrs/StreamId.h>`](https://github.com/facebookresearch/vrs/blob/main/vrs/StreamId.h). Choose the class that best matches your data, and pair it with a «Recordable Flavor», a string describing your specific use case.
 
-«Recordable Flavors» should respect the following conventions, that will help make «flavors» unique, and more importantly, make them meaningful to human readers.
+Use the following «Recordable Flavor» conventions to make flavors distinct and meaningful to readers.
 
 - «Flavors» should preferably start with “team”, “project”, “device”, or “tech”.
 - Follow it with a name for that team, project, device, or tech.

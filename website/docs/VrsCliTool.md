@@ -5,20 +5,20 @@ title: The vrs Command Line Tool
 
 import Link from '@docusaurus/Link';
 
-The `vrs` command line tool is a Swiss army knife utility to manipulate VRS files in different ways.
+The `vrs` command-line tool lets you inspect VRS files, extract data, and make modified copies. See the [VRS build instructions](https://github.com/facebookresearch/vrs#getting-started) if you need to build it from source.
 
-The VRS file format is designed for very efficient and robust data collection of large volumes of sensor data in realtime. The priorities are:
+The VRS file format is designed to collect large volumes of sensor data efficiently and reliably in real time. The priorities are:
 
-- any data written to disk is "safe".
+- recovery of complete records after an interrupted write.
 - write to a single file, but file chunking is supported if requested.
 - ability to access data quickly, avoiding indirections as much as possible.
 - minimal amortized data processing, in particular, very efficient serialization.
-- transparent lossless data compression in realtime during capture, as much as possible (if possible at all, depending on CPU).
-- data compactness and fidelity (no text to string conversions).
+- transparent lossless compression during capture when CPU capacity allows.
+- compact storage that preserves data fidelity.
 - huge file size support (as large as the filesystem will allow).
 - simplicity and safety, to avoid data loss.
 
-As a compromise, VRS file modifications are basically not possible. Instead, files can be copied, record-by-record, and during copies, certain transformations can be applied, but editing an existing VRS file in place is not a goal.
+VRS files are not generally editable in place. Instead, the tool can copy records into a new file and apply transformations during the copy.
 
 ## File Inspection
 
@@ -31,17 +31,17 @@ vrs vrs/oss/test_data/VRS_Files/sample_file.vrs
 
 <!-- prettier-ignore -->
 :::note
-This is the only command that doesn't expect a command name to be specified as the first parameter.
+For file inspection, you can pass the file path as the first argument instead of the `details` command.
 :::
 
 A sample output is:
 
 ```
 VRS file: 'vrs/oss/test_data/VRS_Files/sample_file.vrs', 81.1 KB.
+Found 3 streams, 307 records, 301 data records from 1493865.291 to 1493866.378 (1.087s, 275.9rps).
   Tag: capture_time_epoch = 1636165950 -- Sat Nov  6 03:32:30 2021 CET
   Tag: os_fingerprint = MacOS 20.6.0
   Tag: purpose = sample_code
-Found 3 devices, 307 records, 301 data records from 1493865.291 to 1493866.378 (1.087s, 275.9rps).
 102 Generic Audio Stream #1 - sample/audio [101-1] records.
   VRS Tag: RF:Data:1 = audio/pcm/int16le/channels=1/rate=44100
   VRS Tag: VRS_Original_Recordable_Name = Generic Audio Stream
@@ -72,27 +72,27 @@ Found 3 devices, 307 records, 301 data records from 1493865.291 to 1493866.378 (
   100 data records, from 1493865.297 to 1493866.378 (1.081s, 91.61rps).
 ```
 
-That's a lot of information, that can be overwhelming the first time you see what's in a VRS file!
+The output contains file information followed by a section for each stream.
 
 ### Part 1: Global File Information
 
 <!-- prettier-ignore -->
 ```
 VRS file: 'vrs/oss/test_data/VRS_Files/sample_file.vrs', 81.1 KB.
+Found 3 streams, 307 records, 301 data records from 1493865.291 to 1493866.378 (1.087s, 275.9rps).
   Tag: capture_time_epoch = 1636165950 -- Sat Nov  6 03:32:30 2021 CET
   Tag: os_fingerprint = MacOS 20.6.0
   Tag: purpose = sample_code
-Found 3 devices, 307 records, 301 data records from 1493865.291 to 1493866.378 (1.087s, 275.9rps).
 ```
 
 - file chunks & sizes
 - file tags
-- count of streams: "found 3 devices"
-- count of records (any types): "307 records"
+- count of streams: "Found 3 streams"
+- count of records (all types): "307 records"
 - count of data records: "301 data records"
-- data records timestamp range (if applicable): "data records from 1493865.291 to 1493866.378"
+- timestamp range of data records (if applicable): "data records from 1493865.291 to 1493866.378"
 - time duration when data records are available (if applicable): "1.087s"
-- data records rate in rps ("records per second", if applicable): "275rps"
+- data record rate in rps ("records per second", if applicable): "275.9rps"
 
 ### Part 2: Stream Information (Once per Stream)
 
@@ -112,17 +112,17 @@ Found 3 devices, 307 records, 301 data records from 1493865.291 to 1493866.378 (
 ```
 
 - Count of records in that stream: "103" ... "records."
-- `RecordableTypeID` name: "Forward Camera Class"
+- Original recordable type name: "Forward Camera Class"
 - Stream instance ID: "#1"
 - Stream flavor (if used): "sample/camera"
 - Stream identifier: "200-1". `200` is the stream's `RecordableTypeId` numeric value, and `1` is the stream's instance ID.
-- Stream VRS tags, which show, among other things, the stream's `RecordFormat` and `DataLayout` definitions in json form. These definitions are truncated if they are too long. See the `record-formats` sub-command below if you need complete definitions.
+- Stream VRS tags, which include the stream's `RecordFormat` and `DataLayout` definitions. Long tag values can be truncated. See the `record-formats` command below to print the definitions.
 - Stream (user) tags.
 - count of Configuration records, timestamp range and rps when there are more than one.
 - count of State records, timestamp range and rps when there are more than one.
 - count of Data records, timestamp range and rps when there are more than one.
 
-All that information is presented in a human readable format, but you can get the same information in json form using:
+To get the file description as JSON, use `json-description`. Use `json-pretty-description` for indented JSON.
 
 ```
 vrs json-description file.vrs
@@ -140,7 +140,7 @@ To list records with their top-level metadata, simply run:
 vrs list file.vrs
 ```
 
-This command lists all the records with timestamp, stream name and instance ID, stream identifier, the record type, and the size of the uncompressed record payload. "Uncompressed" refers to the file format lossless compression using lz4 or zstd that might be happening at the record level, rather than image or video codec compression. Records are treated as a black box, so this command will work with any VRS file. For instance:
+This command lists each record with its timestamp, stream name and instance ID, stream identifier, record type, and uncompressed payload size. "Uncompressed" refers to lossless record compression (LZ4 or Zstandard), not image or video codec compression. The command does not interpret the payload. For instance:
 
 ```
 1493865.286 Motion Data Class #1 [372-1], Configuration record, 8 bytes total.
@@ -157,13 +157,13 @@ This command lists all the records with timestamp, stream name and instance ID, 
 
 _Commands: `print`, `print-details`, `print-json`, `print-json-pretty`._
 
-When records are represented using `RecordFormat` and `DataLayout`, it is possible to interpret a record's payload. VRS can recognize the record's successive content blocks, their type, and print metadata blocks otherwise known as `DataLayout` blocks in a human readable form, or in json.
+When records have `RecordFormat` and `DataLayout` definitions, VRS can identify the types of content blocks in each payload and print metadata (`DataLayout`) blocks in a human-readable format or as JSON.
 
 ```
 vrs print file.vrs
 ```
 
-This command lists all the records with timestamp, stream name and instance ID, stream identifier, the record type, the record's `RecordFormat` definition, and the size of the uncompressed record payload. This format is meant to be most human readable, even if it requires a little getting used to. Notice that the text indentation to help group information together.
+This command lists each record with its timestamp, stream name and instance ID, stream identifier, record type, `RecordFormat` definition, and uncompressed payload size. Indentation groups the content blocks under each record.
 
 For instance:
 
@@ -196,7 +196,7 @@ For instance:
  ...
 ```
 
-In the output above, `data_layout/size=8` and `data_layout/size=24+image/raw` are `RecordFormat` definitions. When records have such a definition, then their content is printed out, depending on the content block types: `DataLayout` content blocks, aka, metadata blocks, are printed field by field, with name and values. An overview of image blocks and audio blocks are printed.
+In the output above, `data_layout/size=8` and `data_layout/size=24+image/raw` are `RecordFormat` definitions. VRS prints each `DataLayout` field by name and value, and summarizes image and audio blocks.
 
 A variation of this command provides more low-level details than most users need:
 
@@ -204,7 +204,7 @@ A variation of this command provides more low-level details than most users need
 vrs print-details file.vrs
 ```
 
-The output is similar, but notice how the metadata blocks contain more information, field types, field block offsets and field sizes:
+The output is similar, but the metadata blocks include field types, offsets, and sizes:
 
 ```
 1493865.286 Motion Data Class #1 [372-1], Configuration record, data_layout/size=8 = 8 bytes total.
@@ -248,7 +248,7 @@ Interpretation of `image_width (uint32_t) @ 0+4 Value: 640`:
 - `@ 0+4` means the data starts at byte offset 0 and uses 4 bytes (the size of `uint32_t`),
 - `640` is the field's actual value.
 
-If you plan on parsing the output with code, then json is probably a better format. You can use:
+If you plan to parse the output with code, use JSON:
 
 ```
 vrs print-json file.vrs
@@ -275,7 +275,7 @@ Output:
 ...
 ```
 
-Notice that every record starts with `{"record":{"timestamp":...`, follow by a number of content blocks lines. Because `DataLayout` blocks are printed in a single line json blob, they can be difficult for a human to read. Use `vrs print-json-pretty file.vrs` to get the same content, but with `DataLayout` blocks printed out using indented json.
+Each record starts with `{"record":{"timestamp":...`, followed by JSON lines for its content blocks. Use `vrs print-json-pretty file.vrs` for the same content with indented `DataLayout` blocks.
 
 ```
 {"record":{"timestamp":1493865.286,"device":"372-1","type":"Configuration","size":8}}
@@ -322,9 +322,9 @@ Content block 0: {
 ...
 ```
 
-Which means: For the stream `1100-7` named "Polaris Camera", stream instance ID 1, the record format definition for data records version 1 is `data_layout/size=24+image/raw`. A plus sign '+' separates successive content blocks, so here, we have two content blocks. Content block index 0 is `data_layout/size=24`, and content block index 1 is `image/raw`.
+For stream `1100-7`, named "Polaris Camera" with instance ID 7, the format for version 1 data records is `data_layout/size=24+image/raw`. The `+` separates two content blocks: `data_layout/size=24` at index 0 and `image/raw` at index 1.
 
-The line starting with `Content block 0` provides the `DataLayout` definition of the content block index 0, which has 3 values, an `uint64_t` field, followed by two `double` fields, for a total of 24 bytes. So no matter what the record's content is, the first content block will always use 24 bytes (before lossless compression), which is why that content block's definition is `data_layout/size=24`.
+The line starting with `Content block 0` gives the `DataLayout` definition for the first block: a `uint64_t` field followed by two `double` fields. Together they always occupy 24 bytes before lossless compression.
 
 It might be useful to examine `RecordFormat` definitions one stream at a time. This can be done easily using stream filtering (fully documented below):
 
@@ -336,19 +336,19 @@ vrs record-formats file.vrs + 1100-7
 
 Because printing everything is rarely what you need (VRS files usually contain way too much data!), you are likely to want to restrict the range of records to print or "consider" for your operation, be it data printing, data extraction, copy, etc.
 
-Specifying record filters options as additional parameters works with most commands for which it makes sense.
+Most commands that process records accept the following filters.
 
 #### Filtering by Timestamp
 
-_Options: `--before [+|-]<max-timestamp>`, `--after [+|-]<min-timestamp>`, ` --range [+|-]<min-timestamp> [+|-]<max-timestamp>`, `--around [+|-]<timestamp> <time-range>`._
+_Options: `--before [+|-]<max-timestamp>`, `--after [+|-]<min-timestamp>`, `--range [+|-]<min-timestamp> [+|-]<max-timestamp>`, `--around [+|-]<timestamp> <duration>`._
 
-To only print records which timestamps is less than the absolute timestamp `1493866`, do:
+To print records with timestamps at or before the absolute timestamp `1493866`, use:
 
 ```
 vrs print file.vrs --before 1493866
 ```
 
-Because timestamps vary from file to file, there are shortcuts to compute timestamps relative to the file's first and last data records. By convention, timestamps specified with a '+' sign are relative to the first data record's timestamp. Timestamps specified with a '-' sign are relative to the last data record's timestamp.
+All timestamps and durations are in seconds. A `+` prefix gives an offset from the first data record in the selected streams; a `-` prefix gives an offset back from the last. When trimming with `copy`, the latest configuration and state records before the start of the range are also copied, unless those record types are filtered out.
 
 Therefore, to print records up to 1 second after the first data record, do:
 
@@ -368,7 +368,7 @@ vrs print file.vrs --after +1 --before -1
 vrs print file.vrs --range +1 -1
 ```
 
-To focus around a particular timestamp, for instance, to print 1 second of records around a particular timestamp:
+The last argument to `--around` is the total duration. For example, to print one second of records centered on `1493866`, use:
 
 ```
 vrs print file.vrs --around 1493866 1
@@ -382,12 +382,12 @@ _Options: `+ <recordable_type_id>`, `- <recordable_type_id>`, `+ <recordable_typ
 
 <!-- prettier-ignore -->
 :::important
-Notice the space between the `+` or `-` sign, and the argument that follows!
+Include a space between the `+` or `-` sign and the argument that follows.
 :::
 
-`+` options allow you to include a particular record type, all the streams with a particular recordable type ID, or a stream fully identified by recordable type ID and instance ID. `-` options allow you to exclude a particular record type, all the streams with a particular recordable type ID, or the stream fully identified by recordable type ID and instance ID. If the first of the options starts with a `+`, it is assumed nothing was included before for that category (record type or streams), whereas if the first option is `-`, it is assumed that all the elements for that category is the starting set. In other words `+ configuration` will filter out all the record types except configuration records, whereas `- configuration` will filter out all configuration records.
+`+` includes a record type, all streams with a given recordable type ID, or a single stream specified by its type and instance IDs. `-` excludes them. For each category (record types or streams), a first `+` starts with nothing selected, and a first `-` starts with everything selected. For example, `+ configuration` selects only configuration records, while `- configuration` excludes configuration records.
 
-These options function in accumulation, left to right, so you can include all the stream with the recordable type ID `1100` except the one with the instance ID `3` by doing: `+ 1100 - 1100-3`.
+The options apply from left to right. To include all streams with recordable type ID `1100` except instance `3`, use `+ 1100 - 1100-3`.
 
 #### First Records Filter
 
@@ -409,7 +409,7 @@ vrs print file.vrs --first-records + 1100-7
 
 _Options: `--decimate <recordable_type_id>[-<instance_id>] <timestamp_interval>`, `--bucket-interval <timestamp_interval>`, `--bucket-max-delta <timestamp_delta>`._
 
-The decimation options let your drop data records based on their timestamp relative to other records. For instance, you might only want at most one data record per second for a particular stream, dropping many records, as necessary.
+Decimation drops data records based on their timestamps. For example, you can keep at most one data record per second for a stream.
 
 For instance, compare:
 
@@ -419,13 +419,13 @@ to:
 
 `vrs list vrs/oss/test_data/VRS_Files/simulated.vrs + 214-1 --decimate 214-1 1`.
 
-The options `--bucket-interval` and `--bucket-max-delta` work together, and work across all streams. Use `--bucket-interval` to create "buckets" at regular intervals throughout the file, from which at most one record per stream will be kept. Add the `--bucket-max-delta` to restrict the size of these buckets (this option doesn't work alone).
+Use `--bucket-interval` to group timestamps into regularly spaced buckets, with at most one data record kept per stream per bucket. `--bucket-max-delta` limits how far a record can be from the bucket timestamp and has no effect on its own. Use bucketing as an alternative to `--decimate`.
 
 ## Data Extraction
 
 _Commands: `extract-images`, `extract-audio`, `extract-all`._
 
-These commands let you extract images, audio, and metadata into files. Use the `--to <folder_path>` to specify a destination folder where the data is to be extracted, or it will be added to the current working directory.
+These commands extract images, audio, or metadata into files. Use `--to <folder_path>` to choose an output folder; otherwise, files are written to the current working directory.
 
 For instance, to extract images from a VRS file into image files, use:
 
@@ -433,20 +433,20 @@ For instance, to extract images from a VRS file into image files, use:
 vrs extract-images file.vrs --to image-folder
 ```
 
-Note that images in RAW format will be saved as png files, and that this operation might require a lossy pixel format conversion. To avoid that, use the `--raw-images` option, which will make RAW images be saved in `.raw` files, with a name that will provide the actual image specifications. Such a name might be `214-1-00099-147.293-bayer8_rggb-1408x1408-stride_1408.raw`, where:
+Raw images are saved as PNG files by default, which can require a lossy pixel format conversion. Use `--raw-images` to save the original bytes in `.raw` files, with the image specifications in the filename. For example, `214-1-00099-147.293-bayer8_rggb-1408x1408-stride_1408.raw` means:
 
 - `214-1` is the stream identifier,
-- `00099` the image number in that stream,
+- `00099` is the image number for this extraction run,
 - `147.293` the image's timestamp,
 - `bayer8_rggb` is the pixel format,
 - `1408x1408` are the image dimensions,
-- `stride_1408` tells that there are 1408 bytes of data per line.
+- `stride_1408` means there are 1408 bytes per row.
 
-`extract-audio` will extract audio data in .wav files, one per stream.
+`extract-audio` writes `.wav` files for each stream. It starts a new file if the audio format changes or the current file would reach the 4 GiB WAV limit.
 
-`extract-all` will extract images, audio data, and metadata. The metadata is extracted in a single .jsons file that contains a succession of json messages, one per line. Each line corresponds to a single record, in timestamp order, so it is possible to parse it even if the number of records is huge. Saving all the data in a single file prevents saturating your disk with possibly millions of small files.
+`extract-all` extracts images, audio, and metadata. In `metadata.jsons`, each line is a separate JSON value: a file overview on the first line, then two lines per record (the record header and its content blocks). Parse the file line by line.
 
-Of course, the filtering options work with the extract commands, so you can extract only some of the streams, or only a few seconds of recording, etc. For instance, the following command will extract images from the `200-1` stream only, that are in the 10 first seconds of that stream, and at most 1 image per second of data.
+Extraction commands also support filters. For example, this command extracts images from the first 10 seconds of stream `200-1`, keeping images from data records at least one second apart.
 
 ```
 vrs extract-images file.vrs --to image-folder + 200-1 --before +10 --decimate 200-1 1
@@ -458,7 +458,7 @@ _Commands: `copy`, `merge`._
 
 ### Copying Files
 
-The primary use of the `copy` command is to copy records from an existing VRS into a new VRS file. Use the filter options in conjunction with the copy command to selectively copy parts of a file into a new one. With the filters you can do things like select a subset of streams, truncate a file by timestamp, or decimate a file.
+The `copy` command copies records from an existing VRS file into a new one. Use filters to select streams, trim the recording by timestamp, or decimate data records.
 
 In its most basic form, a copy operation looks like this:
 
@@ -469,10 +469,10 @@ vrs copy original.vrs --to new.vrs
 This will simply copy all the records from `original.vrs` and create a new VRS file named `new.vrs` that contains the same data. It is important to note that such a copy operation:
 
 - processes all the records one after the other.
-- at the lowest level, all the records are decompressed, then recompressed in the new file, maybe using a different lossless compression setting. Commonly, during capture, files are compressed only very lightly, because data is generated too quickly and/or enough CPU bandwidth isn't available to compress more. During a copy operation, by default, `zstd` is used at the "zlight" level (`zstd` level "3"), but you can select a different lossless compression setting, such as "zmedium" (`zstd` level 5), or "ztight" (`zstd` level 18). Note that if decompression speed is critical for you, you can use `lz4` instead of `zstd`, at the expense of compression ratio.
-- the file is "cleaned-up", records are sorted if they were out of order, and an optimized index is created, possibly making the file slightly more efficient to read.
+- compressed records are decompressed, and the new file is written using the selected lossless compression preset. By default, `copy` uses Zstandard at `zmedium` (level 7) on Apple silicon and `zlight` (level 3) elsewhere. LZ4 is an alternative when decompression speed matters more than compression ratio.
+- records are written in timestamp order, and a new index is created.
 
-To control the lossless compression applied at the record level, use the `--compression=<level>` option, where `<level>` is one of `none`, `fast`, `tight`, `zfast`, `zlight`, `zmedium`, `ztight`, `zmax`. The compression levels which name starts with a `z` use `zstd`, while the others use `lz4`. In practice, `zlight` or `zmedium` are likely to be your best options, because `ztight` and `zmax` usually offer marginal size gains while being too slow to be practical.
+Use `--compression=<level>` to choose `none` (no compression), `fast` or `tight` (LZ4), or `zfaster`, `zfast`, `zlight`, `zmedium`, `zheavy`, `zhigh`, `ztight`, or `zmax` (Zstandard). Use `--chunk-size <size>` to split the output into chunks; specify MiB with `M` or no suffix, or GiB with `G`.
 
 To copy 10 seconds of a file with `zmedium` compression while skipping the first 2 seconds of data records, use:
 
@@ -482,7 +482,7 @@ vrs copy original.vrs --to new.vrs --range +2 +12 --compression=zmedium
 
 <!-- prettier-ignore -->
 :::important
-Stream instance ID numbers might not be preserved in the output VRS file. Stream instance IDs are not guaranteed during file creation, and they are not necessarily preserved during copy operations.
+Stream instance IDs may change during a copy. Check the output file for the new stream IDs.
 :::
 
 ### Copying Files While Modifying Data
@@ -500,19 +500,19 @@ vrs copy original.vrs --to new.vrs --file-tag "date" "April 1, 2022"
 vrs copy original.vrs --to new.vrs --stream-tag 1100-1 "position" "top_left"
 ```
 
-You can set or overwrite as many file and stream tags as you need, by using the `--file-tag` and `--stream-tag ` options as many times as you need in the same command.
+Repeat `--file-tag` and `--stream-tag` to override multiple tags in the same command. For `--stream-tag`, use the stream ID in the output file.
 
 ##### Zero Files
 
-The `--zero` option lets you copy all the data. Clearing all image and audio data with zeros will dramatically reduce the size of files that have this type of data. This is mainly due to the lossless compression at the record level. Zeroed files can be over 99% smaller than the original files. This can be useful for several reasons:
+Use `vrs copy --zero-vrs original.vrs --to new.vrs` to make a copy with recognized image and audio content blocks replaced by zeros. These payloads compress well but may no longer decode.
 
-- you now have a lightweight version of a file, that contains all its metadata.
-- since images and audio data are cleared, the copy might be anonymized, should there be no sensitive data in the metadata of the file.
-- this file is identical to the original, except for the image and audio data (obviously), which can make it convenient to share over the internet to debug issues not related to the image and audio data.
+- the copy retains the metadata for inspection.
+- zeroing is not anonymization: tags, metadata, and other payloads are not cleared.
+- the copy can help debug issues unrelated to the original image or audio content.
 
 ### Merging Files
 
-The `copy` and `merge` command let you merge files together, simply by specifying more than one input files:
+Both `copy` and `merge` accept multiple input files:
 
 ```
 vrs copy original.vrs original2.vrs original3.vrs --to new.vrs
@@ -521,18 +521,18 @@ vrs merge original.vrs original2.vrs original3.vrs --to new.vrs
 
 <!-- prettier-ignore -->
 :::danger
-Attention, while both `copy` and `merge` allow you to merge multiple files into a single output VRS file, their behavior is very different!
+Both commands combine input files into one VRS file, but they handle streams differently.
 :::
 
-Because VRS files must have timestamps in a single time domain, it is assumed that all the files merged are using the same time domain, but effectively, no validation is performed for you: you need to know what you're doing!
+All input timestamps must be in the same time domain. Neither command checks this or aligns the timestamps for you.
 
-File tags are merged. In case of name collision and the values are different, the first instance "wins". The other values of the tag are preserved, by adding a tag with a different name: "name" becomes "name_merged", then "name_merged-1" if there are more conflicting values, etc.
+File tags are merged. If a tag has conflicting values, the first value keeps the original name. The other values are saved under names such as `name_merged`, then `name_merged-1` if needed.
 
 When a file tag is explicitly overridden with `--file-tag`, conflicting input values for that tag are not preserved under `_merged` names. The explicit value is the only output value for that tag.
 
 #### Merging Files with `copy`
 
-When handling multiple source files, the **`copy` operation copies all the streams side-by-side** in the output file, so that the number of streams in the output file will always be the sum of the number of streams in all the input files, even if two or more streams in input files have the same stream identifier. When streams with the same recordable type ID are copied in a single file, the stream instance IDs will be ordered so that the streams with a particular recordable type ID from the first file will have the lowest instance IDs, in the same order they had in their source file, then come the streams from the next file, etc.
+With multiple inputs, **`copy` keeps the selected streams separate**, even when streams from different files have the same ID. For each recordable type, the output IDs follow the input file order, then the instance order within each input file.
 
 Example:
 
@@ -545,11 +545,11 @@ Output: 100-1, 100-2, 100-3, 200-1, 200-2, 300-1
 Source: File1  File1  File2  File1  File3  File3
 ```
 
-Notice how the "200" stream are ordered based on their original file, not their original instance ID.
+The two streams of type `200` are ordered by input file, not by their original instance IDs.
 
 #### Merging Files with `merge`
 
-The **`merge` operation merges streams with the same recordable type ID, one per file, into one stream, in sequence** in the output file. Records with the exact same timestamp are deduplicated, by keeping only the record from the earliest file. This behavior is usually only needed when files have been truncated by timestamp and they are merged together again.
+**`merge` combines streams by recordable type and their order within that type**, taking at most one stream from each input file for each output stream. Within a merged stream, it keeps only one record of a given type at each exact timestamp. Use this to rejoin segments of a recording with matching stream layouts.
 
 Example:
 
@@ -559,34 +559,34 @@ File 2: 100-1
 File 3: 300-1, 200-1
 
 Output: 100-1, 100-2, 200-1, 300-1
-Source: File1  File1  File2  File3
+Source: File1  File1  File1  File3
           +             +
         File2         File3
 ```
 
-Notice how the "200" stream are now ordered based on their original file, not their original instance ID.
+Here, `200-2` from File 1 and `200-1` from File 3 are both the first stream of type `200` in their file, so they are merged into `200-1`.
 
 ## File Validation
 
-_Commands: `check`, `checksum`, `checksums`, `checksum-verbatim`, `hexdump`, `compare`, `compare-verbatim`._
+_Commands: `check`, `decode`, `checksum`, `checksums`, `checksum-verbatim`, `hexdump`, `compare`, `compare-verbatim`._
 
 ### File Integrity Validation
 
-The `check` command "simply" decodes every record in the VRS file and prints how many records were decoded successfully. It proves that the VRS file is correct at the VRS level.
+The `check` command reads records and reports how many it could read and decompress. To also validate record formats and try decoding images, use `vrs decode file.vrs`. The `check` command verifies that:
 
-- the file is actually a VRS file (!)
-- the file has an index or it was rebuilt (see the logs to tell)
-- the records are found where they were expected
-- the records were read successfully
-- the records were decompressed successfully (VRS-internal lossless decompression only).
+- the file is recognized as VRS.
+- the file has an index or an index was rebuilt (see the logs).
+- records are found at the indexed offsets.
+- records can be read.
+- losslessly compressed record payloads can be decompressed.
 
 ```
 vrs check file.vrs
 ```
 
-Records are all referenced in the file's index. They also have a header in the file just before the actual record payload. These two pieces of metadata must match otherwise an error is reported. Records are usually losslessly compressed with lz4 or zstd when record size exceeds a certain number (around 200 bytes). This provides some level of corruption detection, because compressed payloads have an internal checksum.
+Each index entry has corresponding metadata in the record header immediately before the payload. A mismatch or a decompression error can reveal corruption, but a successful check does not verify every byte of the payload.
 
-This type of file corruption rarely happens, and can usually be traced back to a corrupt file transfer.
+To verify that a transfer preserved every byte, use `compare-verbatim`.
 
 ### Checksums
 
@@ -604,13 +604,13 @@ vrs checksum file.vrs
 
 The intent is that you can copy a VRS file using the `copy` command, change the lossless compression level, and though the files are very different at the file system level, they will still be identical from a VRS logical content and checksum standpoint.
 
-If two files do not have the same checksum, use the `checksums` command to have separate checksums, which should reveal which parts are different.
+If the logical checksums differ, use `checksums` to find which parts differ.
 
-If you can checksum any file at the file system level, regardless of whether the file is a VRS file or not, using the `checksum-verbatim` command.
+Use `checksum-verbatim` to checksum the raw bytes of a file, whether or not it is a VRS file.
 
 ### Viewing Records
 
-If you are curious about how records look like inside a VRS file, you can use the `hexdump` command. This will print record payloads, uncompressed, in hexadecimal, after a minimal header per record. You will probably want to combine this option with the filtering options, to limit the size of the output.
+The `hexdump` command prints uncompressed record payloads in hexadecimal, with a short header per record. Use filters to limit the output.
 
 ### Comparing Files
 
@@ -620,7 +620,7 @@ You can compare files at the logical level, with the `compare` command.
 vrs compare file1.vrs file2.vrs
 ```
 
-The output will tell you whether the files are identical, and if they are not, which part(s) aren't.
+The output reports whether the files are logically equivalent and describes any differences.
 
 You can also use the `compare-verbatim` command to compare files at the file system byte level.
 
@@ -632,10 +632,10 @@ vrs compare-verbatim file1.vrs file2.vrs
 
 _Commands: `fix-index`, `debug`, `rage`._
 
-If a VRS recording was interrupted during creation, the VRS file probably won't have a proper index, because it is written to disk last at the end of the file. Maybe the recording app crashed, or the system ran out of disk space. By design, this situation is ok, and whatever was written is "safe": an index will be rebuilt by scanning the file, discovering records and their metadata by walking the list of daisy-chained records. But this process can be slow if the file is large and/or the disk slow. In order to "fix" such files, you have two options:
+An interrupted recording may not have a valid index. VRS can rebuild the index in memory by scanning the recorded data, but that can be slow for large files. To save a rebuilt index, you have two options:
 
 - copy the recording using the `vrs copy` command. The new recording will have a proper index.
-- use the `fix-index` command, to patch the original file in place. The command might truncate the end of the file to get rid of incomplete data, which is usually simply the last record what wasn't fully written out, then the rebuilt index will be written out at the end of the file, provided there is enough disk space for it. Because the original recording file is modified, it is a bit riskier, but much faster, than copying the file. Note that normally, the resulting file contains the same data, as partially written records can't be recovered by VRS either way.
+- use `fix-index` to patch the original file in place. This can truncate incomplete data, and it requires a writable file. Neither method can recover a partially written record.
 
 ```
 vrs fix-index file1.vrs
@@ -647,9 +647,9 @@ To produce enough information for a bug report about a file that's not working r
 vrs rage file.vrs
 ```
 
-This command simply produces the combined information of `vrs details` and `vrs print-details file.vrs --first-records` in one easy to remember command.
+This command prints the file details and detailed output for the first record of each type in each stream.
 
-To check some VRS internal data structures and display some diagnostic information about a VRS file, use:
+To inspect the file format structures and diagnostic information, use:
 
 ```
 vrs debug file.vrs

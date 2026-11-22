@@ -9,9 +9,9 @@ import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
 
 Each record in a stream has its own format version number, which is a `uint32_t` value. However, because records belong to a single stream and each has a record type (Configuration, State, or Data), format version numbers are only meaningful within that stream and for that record type. You do not need to worry about format version collisions between streams and record types.
 
-Before `RecordFormat` was available, record format versioning was critical, because it was the only information about how the record's data was formatted. In the `StreamPlayer` callbacks you received when reading a file, you were responsible for interpreting every byte of data and you also had to manually manage all data format changes. Since record data formats were not self-described within the file, each time you needed to add, remove, or change a field, you had to change the format version, and handle a growing number of format versions explicitly in your code. This was unmanageable. Moreover, it was not possible to write standard tools that could interpret what was stored in records, show the images they might contains, or any other metadata.
+Before `RecordFormat` was available, record format versioning was critical, because it was the only information about how the record's data was formatted. In the `StreamPlayer` callbacks you received when reading a file, you were responsible for interpreting every byte of data and you also had to manually manage all data format changes. Since record data formats were not self-described within the file, each time you needed to add, remove, or change a field, you had to change the format version and handle a growing number of format versions explicitly in your code. This was unmanageable. Moreover, it was not possible to write standard tools that could interpret what was stored in records or display their images and other metadata.
 
-`RecordFormat` and `DataLayout` were designed to solve these challenges, and since, record format version changes are very rarely needed. `RecordFormat` structures records as a succession of typed content blocks, embedding descriptions, including `DataLayout` definitions, in the stream itself. VRS uses these embedded descriptions to interpret records, calculate content block boundaries using DataLayout Conventions, and send parsed content blocks to `RecordFormatStreamPlayer` callbacks when reading a VRS file. With `RecordFormat` and the DataLayout Conventions, it is now possible to write generic tools like vrsplayer, that can let you explore what's in a VRS file without any prior knowledge of the use case in which the file was recorded.
+`RecordFormat` and `DataLayout` were designed to solve these challenges. Changes to `DataLayout` alone rarely require a new record format version. `RecordFormat` structures records as a succession of typed content blocks, embedding descriptions, including `DataLayout` definitions, in the stream itself. VRS uses these embedded descriptions to interpret records, calculate content block boundaries using DataLayout Conventions, and send parsed content blocks to `RecordFormatStreamPlayer` callbacks when reading a VRS file. With `RecordFormat` and the DataLayout Conventions, it is now possible to write generic tools like `vrsplayer` that let you explore a VRS file without knowing how it was recorded.
 
 ## `RecordFormat`
 
@@ -19,7 +19,7 @@ Use `RecordFormat` to describe records as a sequence of typed content blocks. Th
 
 ### `ContentBlock`
 
-The content block types are: `image`, `audio`, `data_layout`, and `custom`. VRS saves `RecordFormat` definitions as a string that is generated and parsed for you, but which was designed to be very expressive and compact. Content block descriptions may contain additional information, specific to the content type. Here are some examples of single content block `RecordFormat` definitions:
+The content block types are: `image`, `audio`, `data_layout`, and `custom`. VRS generates and parses a compact string for each `RecordFormat` definition. Content block descriptions may contain additional information specific to the content type. Here are some examples of single content block `RecordFormat` definitions:
 
 - `image`
 - `image/png`
@@ -40,7 +40,7 @@ The content block types are: `image`, `audio`, `data_layout`, and `custom`. VRS 
 - `custom/format=my_own_payload_format`
 - `custom/size=160`
 
-`image` and `audio` content blocks are pretty much what you expect when you read their text description. `data_layout` blocks contain structured metadata information. `custom` content blocks are blocks of raw data, which format is known only to you, and which you are responsible for interpreting.
+`image` and `audio` content blocks are pretty much what you expect when you read their text description. `data_layout` blocks contain structured metadata. `custom` content blocks contain raw data in a format you are responsible for interpreting.
 
 You can assemble as many content blocks as you like in a record, which might look like this:
 
@@ -51,41 +51,41 @@ Again, these text descriptions are generated and parsed for you, so you don't ne
 
 The `RecordFormat` and `DataLayout` descriptions of a stream's records are stored in the VRS tags of the stream. You will only see these text descriptions when you are using tools to dump a stream's VRS tags. VRS tags are associated with each stream for VRS internal usage, and are kept separate from the user stream tags.
 
-In practice, the majority of the records used in VRS today use one of the following record formats:
+Common VRS record formats include:
 
 - `data_layout`: for records containing a single metadata content block, which is typical of configuration records.
-- `data_layout+image/raw`: for records containing some image specific metadata and the raw pixel data of an image.
-- `data_layout+image/jpg` and `data_layout+image/video`: for records containing some image specific metadata and compressed image data.
+- `data_layout+image/raw`: for records containing some image-specific metadata and the raw pixel data of an image.
+- `data_layout+image/jpg` and `data_layout+image/video`: for records containing some image-specific metadata and compressed image data.
 
 ### Datalayout Content Blocks
 
 Datalayout content blocks, commonly referred to as datalayouts, are `DataLayout` objects that hold a collection of `DataPieceXXX` objects, which are containers of [POD values](https://en.wikipedia.org/wiki/Passive_data_structure) and strings. If you have never seen a `DataLayout` definition, look at the `MyDataLayout` definition in the **`DataLayout` Examples** section below.
 
-`DataLayout` are typically `struct` objects containing a series of `DataPieceXXX` member variables, that each have their own type and text label. The supported `DataPieceXXX` types are:
+`DataLayout` definitions are typically `struct`s containing `DataPieceXXX` members, each with a type and a label. The supported `DataPieceXXX` types are:
 
 `DataPieceValue`, a single value of POD type `T`:
 
-- Type: `template <class T> DataPieceValue<T>;`
+- Type: `DataPieceValue<T>`
 - Example: `DataPieceValue<int32_t> exposure{"exposure"};`
 
-`DataPieceEnum`, a single value of enum `ENUM_TYPE` with the underlying type `POD_TYPE`:
+`DataPieceEnum`, a single value of enum `ENUM_TYPE` stored as `POD_TYPE`:
 
-- Type: `template <typename ENUM_TYPE, typename POD_TYPE> DataPieceEnum<ENUM_TYPE, POD_TYPE>`
+- Type: `DataPieceEnum<ENUM_TYPE, POD_TYPE>`
 - Example: `DataPieceEnum<PixelFormat, uint32_t> pixelFormat{"pixel_format"};`
 
-`DataPieceArray`, a fixed size array of values of POD type `T`:
+`DataPieceArray`, a fixed-size array of values of POD type `T`:
 
-- Type: `template <class T> DataPieceArray<T>;`
+- Type: `DataPieceArray<T>`
 - Example: `DataPieceArray<float> calibration{"calibration", 25};`
 
-`DataPieceVector`, a vector of values of type `T`, which size may change for each record:
+`DataPieceVector`, a vector of values of type `T`, whose size may vary by record:
 
-- Type: `template <class T> DataPieceVector<T>`
+- Type: `DataPieceVector<T>`
 - Example: `DataPieceVector<int8_t> udpPayload{"udp_payload"};`
 
 `DataPieceStringMap`, the equivalent of `std::map<std::string, T>`:
 
-- Type: `template <class T> DataPieceStringMap<T>`
+- Type: `DataPieceStringMap<T>`
 - Example: `DataPieceStringMap<Point2Di> labelledPoints{"labelled_points"};`
 
 `DataPieceString`, a `std::string` value:
@@ -97,38 +97,38 @@ Template class `T` can be any of these built-in POD types:
 
 - Boolean (use `vrs::Bool`)
 - Signed or unsigned integer (8, 16, 32, or 64 bits)
-- 32 bit float
-- 64 bit double
+- 32-bit `float`
+- 64-bit `double`
 
-Template class `T` can also be any of these vector types (using `float`, `double` or `int32_t` for coordinates):
+Template class `T` can also be any of these types (using `float`, `double` or `int32_t` for coordinates):
 
-- 2, 3, or 4D points
-- 3 or 4D matrices
+- 2D, 3D, or 4D points
+- 3×3 or 4×4 matrices
 
 `std::string` can be used with `DataPieceVector<T>` and `DataPieceStringMap<T>`, but cannot be used with the other template types.
 
 <!-- prettier-ignore -->
 :::note
-Always use `<cstdint>` definitions. Never use native platform dependent types like `short`, `int`, `long`, or `size_t`, because their actual size will vary depending on the architecture or the compiler configuration.
+For integer fields, use fixed-width types from `<cstdint>`. Never use native platform-dependent types like `short`, `int`, `long`, or `size_t`, because their size can vary depending on the architecture or the compiler configuration.
 :::
 
 ### `DataLayout` Format Resilience
 
-`DataLayout` objects are structs, so it is very simple to add, remove, and reorder `DataPieceXXX` fields. But datalayouts definitions are very resilient to definition changes, so that even when making such changes, newer code can read older files, and older code can read newer files.
+`DataLayout` definitions can add, remove, or reorder `DataPieceXXX` fields. Newer code can still read older files, and older code can read newer files, as long as the fields it needs still match.
 
-Datalayouts format resilience is possible, because each `DataPieceXXX` object is identified by a unique combination of these elements:
+VRS matches each `DataPieceXXX` using the following:
 
 - `DataPiece` type
 - Label
-- Template class `T`, except for `DataPieceString`
+- Stored element type, when applicable, and the length of a fixed-size array
 
-This unique combination is critical to providing datalayout forward/backward compatibility, without worrying about the actual placement of the data. If you change the type or the label of a field, you will change its signature, and it won't be recognized in older files. The modified field will look like a new field, and the data from older files will no longer be accessible using the updated definition.
+This unique combination is critical to providing datalayout forward/backward compatibility, without worrying about the actual placement of the data. If you change the type, label, or fixed array length of a field, you will change its signature, and it won't be recognized in older files. The modified field will look like a new field, and the data from older files will no longer be accessible using the updated definition.
 
-`DataLayout` definitions do not support other types of containers or nested containers, because that would make it impossible to guarantee forward/backward compatibility. However, it is possible to use repeated and nested structs, using `DataLayoutStruct`, as shown in the second example below.
+`DataLayout` does not support arbitrary or nested `DataPiece` containers. To group fields in nested structs, use `DataLayoutStruct`, as shown in the second example below. For a fixed-size array of those structs, use `DataLayoutStructArray`.
 
-In some situations, such as when you need to save space, it is desirable to store some fields only in some conditions. The `OptionalDataPieces` template makes it easy to specify and control if a group of fields should be saved or not, but the choice must be made once for the whole file.
+In some situations, such as when you need to save space, it is desirable to store some fields only in some conditions. The `OptionalDataPieces` template makes it easy to control whether a group of fields should be saved or not, but the choice must be made once for the whole file.
 
-If you need more freedom, you can use a free form container such as JSON in a `DataPieceString` field. If you have binary data, you can use a `DataPieceVector<uint8_t>` field.
+If you need more freedom, you can use a format such as JSON in a `DataPieceString` field. If you have binary data, you can use a `DataPieceVector<uint8_t>` field.
 
 We recommend that you use lowercase [snake_case](https://en.wikipedia.org/wiki/Snake_case) as your naming convention for labels. This will limit problems if these names are used as keys in a Python dictionary, in particular when using **pyvrs** to create or read datalayouts.
 
@@ -160,7 +160,7 @@ struct MyDataLayout : public AutoDataLayout {
 };
 ```
 
-Notice that this struct must derive from `AutoDataLayout`, and finish with an `AutoDataLayoutEnd` field. This is required to make the `DataLayout` magic happen. Under the hood, the `DataPieceXXX` constructors will register themselves to the enclosing `AutoDataLayout`. As we will generally only create a single `DataLayout` instance, the overhead is minimal and does not matter. Also, notice that each field has a unique label.
+The struct must derive from `AutoDataLayout` and end with an `AutoDataLayoutEnd` field. The `DataPieceXXX` constructors register each field with the enclosing layout. Each field has a unique label.
 
   </TabItem>
   <TabItem value="example_2" label="Example 2: nested definitions">
@@ -186,7 +186,7 @@ struct MyDataLayout : public AutoDataLayout {
 };
 ```
 
-The name of each field in the `DataLayoutStruct` is prepended by the name of the `DataLayoutStruct` itself, with a ‘`/`’ added to make it look like a path. This also makes it unique at the datalayout level.
+Each field label in a `DataLayoutStruct` is prefixed with the struct instance’s name and a `/`. This keeps labels unique within the layout.
 
 Effectively, the declaration above creates the same `DataPiece` fields and the same datalayout definition as the datalayout definition below, which requires different member variable names to avoid conflicts at the struct level:
 
@@ -200,7 +200,7 @@ struct MyDataLayout: public AutoDataLayout {
 };
 ```
 
-It is possible to nest a `DataLayoutStruct` within other `DataLayoutStruct` definitions as often as makes sense. The resulting `DataPiece` fields will have labels similarly constructed, with deeper nesting. However, it is not possible to use `DataLayoutStruct` definitions in template containers.
+It is possible to nest a `DataLayoutStruct` within other `DataLayoutStruct` definitions as often as makes sense. The resulting `DataPiece` fields will have labels similarly constructed, with deeper nesting. However, a `DataLayoutStruct` cannot be the element type of a `DataPiece` container.
 
   </TabItem>
   <TabItem value="example_3" label="Example 3: optional definitions">
@@ -221,8 +221,8 @@ struct TemperatureData {
 };
 
 struct MyDataLayout : public AutoDataLayout {
-  MyDataLayout(bool allocateOptionalFields = false)
-      : optionalFields(allocateOptionalFields) {}
+  MyDataLayout(bool allocateOptionalFields = true)
+      : optionalTemperature(allocateOptionalFields) {}
 
   DataPieceValue<double> exposureTime{"exposure_time"};
   DataPieceValue<uint64_t> frameCounter{"frame_counter"};
@@ -235,23 +235,23 @@ struct MyDataLayout : public AutoDataLayout {
 
 When recording a file, you need to decide upfront, at runtime, whether the optional fields are needed for this recording, and then select the appropriate constructor. This is because the optional fields must be allocated during the datalayout construction.
 
-When reading a file, you can try to use the appropriate constructor, or you can always include the optional fields and test if data is present by checking the `isAvailable()` method for each optional field.
+When reading a file, construct the expected layout with the optional fields allocated (the default in this example), then call `isAvailable()` on each optional field to see whether it was recorded.
 
   </TabItem>
 </Tabs>
 
 ### Image, Audio, and Custom Content Blocks
 
-Image, audio, and custom content blocks directly contain their payload, and no additional metadata. In some cases, such as for `image/jpg` or `image/png` data, no other information is needed to interpret the data. In other cases, such with `images/raw` images, which are raw pixel buffers, image dimensions, pixel format and possibly stride information are required to know how to interpret the image content block. If that information never changes, it may provided directly in the `RecordFormat` definition, otherwise, it might need to be provided in a configuration record, or in the data records themselves, using what we call the Datalayout Conventions.
+Image, audio, and custom content blocks directly contain their payload and no additional metadata. In some cases, such as for `image/jpg` or `image/png` data, no other information is needed to interpret the data. In other cases, such as with `image/raw` images, which are raw pixel buffers, image dimensions, pixel format, and possibly stride are needed to interpret the image content block. If that information never changes, it may be provided directly in the `RecordFormat` definition. Otherwise, it may need to be provided in a configuration record, or in the data records themselves, using what we call the Datalayout Conventions.
 
 <Tabs>
   <TabItem value="example_1" label="Image Content Block Examples" default>
 
 ```cpp
 ContentBlock(ContentType::IMAGE); // Image content block, without any detail
-ContentBlock(ContentType::JPG); // A jpeg image
-ContentBlock(ContentType::JPG, 640, 480); // A 640x480 jpeg image
-ContentBlock(ContentType::RAW); // A raw pixel buffer image
+ContentBlock(ImageFormat::JPG); // A JPEG image
+ContentBlock(ImageFormat::JPG, 640, 480); // A 640x480 JPEG image
+ContentBlock(ImageFormat::RAW); // A raw pixel buffer image
 ContentBlock(PixelFormat::GREY8, 640, 480); // A raw pixel buffer image, 640x480 large, with 8 bit greyscale pixels.
 ```
 
@@ -263,10 +263,10 @@ Please refer to the Image Support section for more details on how to manage imag
 ```cpp
 ContentBlock(ContentType::AUDIO); // Audio content block, without any detail
 ContentBlock(AudioFormat::PCM); // PCM audio data
-ContentBlock(AudioSampleFormat::S16_LE, 2, 48000); // PCM audio data, int16 little endian samples, 2 channels, 48 kHz
+ContentBlock(AudioFormat::PCM, AudioSampleFormat::S16_LE, 2, 0, 48000); // PCM audio data, int16 little-endian samples, 2 channels, 48 kHz, default stride
 ```
 
-Audio blocks are analog to image blocks, and are handled the same way.
+Audio blocks are handled similarly to image blocks. VRS supports PCM and Opus audio blocks; decoding Opus requires a build with Opus support.
 
   </TabItem>
   <TabItem value="example_3" label="Custom Content Block Examples">
@@ -277,7 +277,7 @@ ContentBlock(ContentType::CUSTOM, 256); // 256 bytes custom content block
 CustomContentBlock("my_thing", 48); // 48 bytes custom content block in the format "my_thing"
 ```
 
-If they are not the last content block in the record, custom content blocks may need to have their size provided using the Datalayout conventions.
+If VRS cannot infer the size of a custom block from the record format and remaining bytes, provide it in the immediately preceding `DataLayout` using the DataLayout Conventions.
 
   </TabItem>
 </Tabs>
@@ -312,23 +312,23 @@ addRecordFormat(
   {&data_}); // DataLayout definition for the first block, nothing for the image block
 ```
 
-Each record has a record format version number. Each `RecordFormat`, its record format version number, and its `DataLayout` definitions are tied to a particular stream. Therefore, it is possible to have records using different `RecordFormat`/`DataLayout` definitions within a particular stream, by using different record format version numbers.
+Each stream stores one `RecordFormat` and set of `DataLayout` definitions per record type and format version. Use a new format version if the same stream needs to write records of the same type with different block sequences or layout definitions. In `addRecordFormat()`, each layout pointer must be at the index of its corresponding content block; use `nullptr` for preceding blocks that are not `DataLayout` blocks.
 
 <!-- prettier-ignore -->
 :::note
-`DataLayout` definitions fully describe what is stored in a datalayout content block. So, you can freely change `DataLayout` definitions without changing the record format version.
+You do not need a new record format version just because a `DataLayout` changes between files: each file carries its own definition. Within one stream, all records with the same record type and format version must match the registered definitions.
 :::
 
 ## Reading Records
 
-To read records described using `RecordFormat` conventions, attach a `RecordFormatStreamPlayer` to your `RecordFileReader`. Then, hook code to whichever of these virtual methods is appropriate for your records:
+To read records described using `RecordFormat` conventions, attach a `RecordFormatStreamPlayer` to the stream using `RecordFileReader::setStreamPlayer()`. Override the callbacks for the content blocks you want to read:
 
 - `onDataLayoutRead()`
 - `onImageRead()`
 - `onAudioRead()`
 - `onCustomBlockRead()`
 
-You will get one callback per content block, until one of the callbacks returns `false`, signaling that the end of the record should not be decoded.
+VRS processes content blocks in order and stops if a callback returns `false` or a read fails. The image, audio, and custom callbacks run before the payload is read; consume the entire block before returning `true` to continue.
 
 ### Reading a Datalayout
 
@@ -336,7 +336,7 @@ When reading a `data_layout` content block, you will get an `onDataLayoutRead` c
 
 For each record type, you will have a specific `DataLayout` definition, describing the latest version of the datalayout you are using. But you cannot know if that definition matches what was read, since the file could be using an older or newer version of the datalayout definition. Use the `getExpectedLayout<MyDataLayout>` API to get a `DataLayout` instance of the type your code is looking for. You can then access each of its fields safely, with the caveat that each field may or may not find actual data in the datalayout that was read from disk.
 
-Each data field is mapped according to its data type and label only. So, you do not need to worry whether fields have been added, removed, or moved. Mapping is cached per file/stream/type. So, after the first record is mapped, mapping is extremely cheap, and fields are read in constant time, no matter how complicated the datalayouts are.
+Fields are matched by label, piece type, stored element type, and fixed array length where applicable. The mapping is cached per stream, record type, format version, and block index. Once mapped, VRS can locate a field directly, though reading a variable-size value still depends on its size.
 
 <!-- prettier-ignore -->
 :::tip
@@ -361,7 +361,7 @@ bool onDataLayoutRead(const CurrentRecord& record, size_t blockIndex, DataLayout
       // use the data...
       myData.cameraTemperature.get();
 
-      // Rare case: access field that were removed or renamed
+      // Rare case: access fields that were removed or renamed
       // e.g., frame_counter's type was changed: fetch the old version if necessary
       uint64_t frameCounter = 0;
       if (myData.frameCounter.isAvailable()) {
@@ -380,58 +380,59 @@ bool onDataLayoutRead(const CurrentRecord& record, size_t blockIndex, DataLayout
   }
   return true; // read next content blocks, if any
 }
+};
 ```
 
 ### Datalayout Conventions
 
-Datalayout Conventions are a set of names and types that VRS uses to find missing `RecordFormat` specifications, such as the resolution and pixel format, if they are missing in the definition of an `“image/raw”` content block. Datalayout Conventions can also be used to specify the size of a content block when it is ambiguous. Refer to the source header [`<vrs/DataLayoutConventions.h>`](https://github.com/facebookresearch/vrs/blob/main/vrs/DataLayoutConventions.h) to see the actual Datalayout Conventions.
+Datalayout Conventions are a set of names and types that VRS uses to find properties missing from a `RecordFormat`, such as the resolution and pixel format of an `image/raw` block. Datalayout Conventions can also be used to specify the size of a content block when it is ambiguous. Refer to the source header [`<vrs/DataLayoutConventions.h>`](https://github.com/facebookresearch/vrs/blob/main/vrs/DataLayoutConventions.h) to see the actual Datalayout Conventions.
 
-In the examples above, you can determine the size of the datalayout blocks by looking at the actual `DataLayout` definition. However, that only works if only fixed type pieces are used. When only fixed type pieces are used, the datalayout size is constant no matter what the content is. Look again at the definition of `MyDataLayout` above to see the difference between fixed size pieces and variable size pieces.
+In the examples above, you can determine the size of the datalayout blocks by looking at the actual `DataLayout` definition. However, that only works when all pieces are fixed-size. In that case, the datalayout size is constant no matter what the content is. Look again at the definition of `MyDataLayout` above to see the difference between fixed-size and variable-size pieces.
 
-When only fixed size pieces are used, the `getContentBlock()` API generates `"data_layout/size=XXX"`, with `XXX` being the number of bytes. If the datalayout contains any variable size pieces, the size of the datalayout can change from record to record, and the `getContentBlock()` API will return `"data_layout"`.
+For a layout with only fixed-size pieces, `getContentBlock()` returns a block described as `data_layout/size=XXX`, where `XXX` is its size in bytes. For a layout with variable-size pieces, the size can change from record to record, so the description is `data_layout`.
 
-If any variable size pieces are present, the datalayout will include an index, which has a fixed size. The index's size depends only on the number of variable size pieces declared, not on their actual values. This index makes it possible for VRS to determine the overall size of the `DataLayout` in two successive reads. The first read includes the data for all the fixed size pieces and the index for the variable size pieces. The added sizes found in the variable size index tells the total size of the variable size pieces, which VRS can now read with a second file read call. Therefore, VRS can always read a `DataLayout` block, because we can always determine its actual size.
+A layout with variable-size pieces includes a fixed-size index with one entry per variable-size piece. VRS first reads the fixed-size data and the index. The last entry’s offset and length give the total size of the variable data, which VRS reads separately.
 
-In the second `RecordFormat` example above, we have a datalayout block followed by an image block (`“data_layout+image/raw”`). Since the image block is the last content block of the record, and VRS knows the overall size of the record, and how to figure out the size of the datalayout, we can see that all the remaining bytes must belong to the `“image/raw”` block. However, this is not sufficient to interpret the image pixel data. This is when we need the Datalayout Conventions.
+In the second `RecordFormat` example above, we have a datalayout block followed by an image block (`data_layout+image/raw`). Since the image block is the last content block of the record, and VRS knows the overall size of the record, and how to figure out the size of the datalayout, we can see that all the remaining bytes must belong to the `image/raw` block. However, this is not sufficient to interpret the image pixel data. This is when we need the Datalayout Conventions.
 
-When working with a device such as a camera, typically, during the hardware initialization/setup, before the data collection begins, the software stack will configure the camera to function in a particular mode, which includes parameters such as resolution, color mode, exposure mode, and frame rate. These parameters will never change unless the configuration of the camera is changed, which is extremely rare in practice. These parameters all belong to a configuration record and can easily be saved in a datalayout block.
+Cameras generally have settings such as resolution, color mode, exposure mode, and frame rate that change only when the camera is reconfigured. Store those settings in a datalayout block in a configuration record.
 
-In a more advanced system, a camera’s resolution and color mode may change for each frame, as when driven by a computer vision algorithm or some other heuristic. When you save only a sub-region of a whole image (the way Portal does when it tracks a target and crops the image received from the sensor), the crop size of the image might change in every frame. In such cases, the image parameters should not be placed in a configuration record. Those parameters should be specified in the datalayout block preceding the image block.
+In a more advanced system, a camera’s resolution and color mode may change for each frame, as when driven by a computer vision algorithm or some other heuristic. When you save only a sub-region of a whole image, the crop size of the image might change in every frame. In such cases, the image parameters should not be placed in a configuration record. Those parameters should be specified in the datalayout block preceding the image block.
 
 VRS uses the following heuristics:
 
-- Search each datalayout block before the ambiguous block, in the same record, in reverse content block order. If the `RecordFormat` is `“data_layout+data_layout+image/raw+data_layout”`, to disambiguate the `“image/raw”` block, VRS ignores the last datalayout block (because it comes after the image/raw block), and searches the second datalayout block first. If that is not enough, it then searches the first datalayout block.
+- Search each datalayout block before the ambiguous block, in the same record, in reverse content block order. If the `RecordFormat` is `data_layout+data_layout+image/raw+data_layout`, to disambiguate the `image/raw` block, VRS ignores the last datalayout block (because it comes after the image/raw block), and searches the second datalayout block first. If that block does not provide the required properties together, VRS tries the first datalayout block. It does not combine fields from multiple datalayout blocks.
 
-- If the resolution and pixel format values cannot be found in the same record, VRS will search the last read configuration record in that stream.
+- If VRS cannot find the required image properties in the same record, it looks in the last configuration record read for that stream, provided its timestamp is not later than the current record’s.
 
 <!-- prettier-ignore -->
 :::note
-This look-up uses cached data. The configuration record must have been read before the data record. Reading a record will not cause another record to be read implicitly.
+Read the applicable configuration record before reading data records that depend on it, including when seeking. Reading a data record does not implicitly read a configuration record.
 :::
 
-Using cached data works because `RecordFormatStreamPlayer` caches the data of the last record of each type of record it has read.
+`RecordFormatStreamPlayer` caches the location of a matching layout for subsequent records of that format. If a stream uses several configuration formats, a cached location can still refer to the last record read of an earlier format.
 
-The Datalayout Conventions make `RecordFormatStreamPlayer` work very efficiently. For example, you get an `onImageRead()` callback, and the `ContentBlock` object is fully fleshed out, with the resolution and pixel format, which might have been specified in a configuration record a long time ago.
+For example, `onImageRead()` can provide a `ContentBlock` with the resolution and pixel format taken from a previously read configuration record.
 
-If VRS cannot determine, unambiguously, how the image block is formatted, it does not send an `onImageRead()` callback. It sends an `onUnsupportedBlock()` callback instead.
+If VRS cannot determine the image block’s format or size, it calls `onUnsupportedBlock()` instead of `onImageRead()`.
 
-Datalayout Conventions can also be used to specify the size of a content block coming right after a datalayout content block. Refer to [`<vrs/DataLayoutConventions.h>`](https://github.com/facebookresearch/vrs/blob/main/vrs/DataLayoutConventions.h) for implementation details.
+To give the size of the block immediately after a datalayout block, use `datalayout_conventions::NextContentBlockSpec` (the `next_content_block_size` field). See [`<vrs/DataLayoutConventions.h>`](https://github.com/facebookresearch/vrs/blob/main/vrs/DataLayoutConventions.h).
 
 ## Mistakes to Avoid
 
 While `RecordFormat` and `DataLayout` are designed to resolve a large number of backward and forward compatibility issues, you still need to be aware of the following potential problems:
 
-- **Do not persist any raw `struct`, always copy fields one by one.** If you are receiving a data structure, such as data a C `struct` from a driver, you need to copy each field needed in that data structure into a `DataLayout`, one by one, no matter how tedious. You will also have to adjust the fields in your `DataLayout` structure when the incoming `struct` changes. You might be tempted to save the whole memory block to your VRS records, to spare yourself the work. However, doing that would make your file format vulnerable to any changes made to the struct definition, which is controlled and updated by the maintainers of that data structure. It would make it extremely difficult to understand why data read from older files look corrupt, and even harder to be able to read those files. C/C++ `struct`s do not have any data format introspection capability, and this is why VRS does not, and will not, support the use of any arbitrary `<class T>` in its template `DataPiece` containers. Doing so would be a massive design blunder. _Writing the tedious code that copies each field, one by one, from a received data structure to a copycat `DataLayout` protects your data from unexpected data format changes, and will save you hours, maybe even days, of work and frustration._
+- **Do not persist any raw `struct`, always copy fields one by one.** If you are receiving a data structure, such as a C `struct` from a driver, you need to copy each field needed in that data structure into a `DataLayout`, one by one, no matter how tedious. You will also have to adjust the fields in your `DataLayout` structure when the incoming `struct` changes. You might be tempted to save the whole memory block to your VRS records, to spare yourself the work. However, doing that would make your file format vulnerable to any changes made to the struct definition, which is controlled and updated by the maintainers of that data structure. It would make it extremely difficult to understand why data read from older files looks corrupt, and even harder to be able to read those files. C/C++ `struct`s do not have any data format introspection capability, and this is why VRS does not, and will not, support the use of any arbitrary `<class T>` in its template `DataPiece` containers. Doing so would be a massive design blunder. _Writing the tedious code that copies each field, one by one, from a received data structure to a copycat `DataLayout` protects your data from unexpected data format changes, and will save you hours, maybe even days, of work and frustration._
 
-- **Do not use `short`, `int`, or `size_t`** directly in any `DataPiece` template, because their size is architecture and compiler dependent, and using them can result in files that cannot be read as expected if the reading code is compiled with different configuration settings than the writing code. You should always use fully sized types, such as `uint8_t` instead. Do not use `size_t` either, because [its size is not dependable](https://stackoverflow.com/questions/918787/whats-sizeofsize-t-on-32-bit-vs-the-various-64-bit-data-models).
+- **Do not use `short`, `int`, or `size_t`** directly in any `DataPiece` template. Use fixed-width integer types such as `uint8_t` instead, since native integer widths can vary across architectures and compiler configurations.
 
-- **Do not persist enums using `DataPieceValue<ENUM_TYPE>`** because the type of the enum is captured in the file format (`int` by default), and if the underlying type associated with the enum is ever changed, the data will no longer be accessible. Instead, use `DataPieceEnum<ENUM_TYPE, T>`, which captures the underlying type and performs casting. For the underlying type `T`, use a fixed-size integral type from `<cstdint>`, such as `int32_t` rather than ambiguous types like `int`.
+- **Do not persist enums using `DataPieceValue<ENUM_TYPE>`.** Use `DataPieceEnum<ENUM_TYPE, T>` to cast between the enum and a fixed-width integer storage type such as `int32_t`. VRS stores the integer type and value, not the enum definition.
 
 - **Be very careful when persisting external enums** when casting them as integers to store them, because you might not control external enum definitions. You should convert external enums to text or to your own version of these enums. If the definition of an external enum changes, the code will start to misinterpret data, and it will be very difficult to fix. If you convert enums to text or create your own enums, whose evolution you control, you will avoid difficult debugging issues. If you really want to persist enums by casting their numeric value, you should create a unit test that will break when the enum values change, or you can simply add `static_assert`s to your code.
 
-- Creating `DataLayout` objects is relatively expensive, as they use external memory buffers and indexes, but they usually do not consume too much memory. The amount of memory used is directly proportional to the number of fields in your layout, and their size. Prefer **reusing a single instance of each `DataLayout` type** that you need. Update its fields before creating the record, rather than creating a new `DataLayout` object on the stack each time you need to create a record.
+- Creating `DataLayout` objects is relatively expensive, as they use external memory buffers and indexes, but they usually do not consume too much memory. The amount of memory used is directly proportional to the number and size of the fields in the layout. Prefer **reusing a single instance of each `DataLayout` type** that you need. Update its fields before creating the record, rather than creating a new `DataLayout` object on the stack each time you need to create a record.
 
-- If you are using `AutoDataLayout` to build your `DataLayout` objects (like virtually everyone), be aware that their constructor uses a synchronization lock, which could potentially compromise multi-threading performance. Therefore, you _really_ should be **reusing a single instance of each `DataLayout` type** that you need.
+- Construct an `AutoDataLayout` on one thread. Different threads can construct separate instances concurrently.
 
 - When using containers (such as `DataPieceVector` and `DataPieceStringMap`), **use `stagedValues()` to update the containers**, rather than creating a new container each time and calling `stage()`. This will avoid doing a new container allocation and copy each time. For most use cases, successive records are very similar, often with an identical memory footprint, and updating containers will be significantly faster this way.
 
@@ -445,28 +446,28 @@ _What's so special about DataLayout? Why did you not use JSON, Thrift, or some o
 
 Historically, `DataLayout` was designed to be backward compatible with our early VRS files, which used straight-up structures of POD data. However, we now have better reasons than that. `DataLayout` leverages a specific pattern of sensor data collection, for which VRS was designed, where records are remarkably regular throughout a recording. For each device and record type, the exact same content blocks, using the same `DataLayout`s are recorded over and over again, often many millions of times.
 
-For each record type in a stream, there is one `RecordFormat`, with its own set of `DataLayout` definitions, which is the dictionary of field types and labels in the datalayout content blocks of the stream. Each `DataLayout` block in the record contains only its own data, in raw binary form, which reduces processing overhead to a minimum. Therefore, the marginal cost of a `DataPieceValue<uint8_t>`, before compression, is one byte per record, regardless of its label, and even if it is the only field in the datalayout content block.
+For each record type and format version in a stream, there is one `RecordFormat`, with its own set of `DataLayout` definitions, which is the dictionary of field types and labels in the datalayout content blocks of the stream. Each `DataLayout` block in the record contains only its own data, in raw binary form, which reduces processing overhead to a minimum. Therefore, the marginal cost of a `DataPieceValue<uint8_t>`, before compression, is one byte per record, regardless of its label, and even if it is the only field in the datalayout content block.
 
-When reading and writing records, no binary-ascii conversions are made, only binary copies, and no pre or post processing of the source code is required. `DataLayout` definitions are as readable as possible, since they are `struct` definitions. The `DataLayout` definition is interpreted only once when the file is read, and the `DataLayout` that the reader expects is mapped only once to the `DataLayout` that is actually present in the stream. Therefore, reading the fields of a `DataLayout` happens in amortized constant time, with no parsing of any kind, since only pointer and size checks are required. If a field is not available in a record, the default value for that type is returned, and the `isAvailable()` method can be used to check.
+Record payloads are stored in binary, and no code generation is required. The reader parses each `DataLayout` definition and maps the fields your code expects to their stored locations once per layout. If a field is missing, its getter returns the field’s default; use `isAvailable()` to tell whether a field is present in the record.
 
 ### What is `DataLayout` “really” good at?
 
 All the power of `DataLayout` lies in its ability to amortize costs. Amortized, `DataLayout` objects...
 
-- ...store one byte of payload at the cost of 1 byte of storage (or less, because of record level compression).
-- ...have zero serialization/deserialization overhead, both on read and write, including when handling a format mismatch (that’s when the data stored in a file and the definition you have when reading that file don’t match).
-- ...have constant field access time, no matter how many you have.
-- ...are pure binary containers (no string conversions, unlike json).
+- ...store each fixed-size scalar in its storage width before record-level compression.
+- ...avoid parsing the layout or matching fields for each record.
+- ...locate mapped fields in constant time, regardless of how many fields the layout has.
+- ...are pure binary containers (no string conversions, unlike JSON).
 - ...require no pre-processor/code generation: `DataLayout` definitions are directly compiled by a C++ compiler.
-- ...minimize memory allocations overhead. It’s possible to create and read records without memory allocations beyond record management, even when dealing with variable size arrays (vectors). Again, amortized.
+- ...can reuse buffers and staged containers across records, including for variable-size fields.
 - ...look, behave, and feel like a simple C++ struct: they are very readable, very easy and efficient to read and write to.
-- ...no format evolution cost: you can iterate over your `DataLayout` definitions as often as you like, they'll be just as efficient as if there had been no format evolutions.
+- ...map matching fields once even when the reader and writer use different layout definitions.
 
-The key assumption VRS makes is that data collected within each stream is extremely repetitive throughout a particular file, and everything is done to leverage that property to the fullest. `DataLayout` definitions are stored once per stream, parsed once per file-read, expected `DataLayout` formats are mapped to the `DataLayout` found in the stream once, so all the relatively expensive operations are amortized (done only once).
+The key assumption VRS makes is that data collected within each stream is extremely repetitive throughout a particular file, and everything is done to leverage that property to the fullest. `DataLayout` definitions are stored per stream and format. The reader reuses the parsed definitions and field mappings across records.
 
 ### What is `DataLayout` not so good at?
 
-- seamless integration with existing data representations, like structs and other classes. You will need to write converters to copy your data source(s) to your `DataLayout` definitions, field by field.\
-  This can feel tedious, but ultimately, protects you against unexpected changes and provides a clear place where to handle format conversions and evolutions.
+- Seamless integration with existing data representations, like structs and other classes. You will need to write converters to copy your data source(s) to your `DataLayout` definitions, field by field.\
+  This can feel tedious, but it protects you against unexpected changes and provides a clear place to handle format changes.
 - Nested definitions are supported, but with limitations. See [this documentation (in the “Example 2: nested definitions” tab) for details](https://facebookresearch.github.io/vrs/docs/RecordFormat#datalayout-examples). For 99% of sensor data use cases, `DataLayout` works great and this limitation isn’t even apparent, but for advanced use cases with more structured data and variable formats, or when you have nested definitions with variable size data, `DataLayout` conversion becomes a pain point.
-- complex data structures, in particular, arbitrary data structures that might change with every record, or not be known at compile time, so that converter code can not be written. In that case, you might need to use a self-described container, such as json or msgpack (binary variation of json). Looking at the needs of sensor data collection, this should be rare, or needed only for configuration records. Using json in configuration records is fine, because it’s typically a one record need, and the trade offs are radically different when you need to do an expensive operation and store data relatively inefficiently once during setup vs. N million times in realtime (for each record). For instance, camera calibration is often provided as a json string the stream's configuration record, and there is no reason to change that.
+- Complex data structures, in particular, arbitrary data structures that might change with every record, or not be known at compile time, so that converter code cannot be written. In that case, you might need to use a self-described container, such as JSON or MessagePack. Looking at the needs of sensor data collection, this should be rare, or needed only for configuration records. Using JSON in configuration records is fine, because it’s typically a one-time cost, and the trade-offs are radically different when you need to do an expensive operation and store data relatively inefficiently once during setup vs. N million times in real time (for each record). For instance, camera calibration is often provided as a JSON string in the stream's configuration record, and there is no reason to change that.
