@@ -872,7 +872,8 @@ int AsyncDiskFileChunk::writeTail() {
     }
   }
   free_buffer(current_buffer_);
-  return SUCCESS;
+  // Switching descriptors to write the tail may have recorded an error closing the old one.
+  return async_error_;
 }
 
 int AsyncDiskFileChunk::ensureOpenNonDirect() {
@@ -895,7 +896,40 @@ int AsyncDiskFileChunk::ensureOpen_(int requested_flags) {
     if (requested_flags == current_flags_) {
       return SUCCESS;
     }
-    file_.close();
+#if !IS_WINDOWS_PLATFORM()
+    // Keep writing to the open file: reopening by path alone can fail, or open a different file.
+    // Windows can't change a handle's buffering, so it reopens.
+    if (((requested_flags ^ current_flags_) & ~O_DIRECT) == 0) {
+      int error = SUCCESS;
+      if (wantDirect) {
+        error = file_.setDirect(true);
+        if (error == EINVAL) {
+          disableDirectIo();
+          return SUCCESS;
+        }
+      } else {
+        // Some stacked file systems don't pass an fcntl() clearing O_DIRECT down to the lower file,
+        // which then rejects unaligned writes (S705350). A new descriptor doesn't have that
+        // problem.
+        int closeError = SUCCESS;
+        error = file_.reopenSameFile(path_, mode, requested_flags, closeError);
+        if (closeError != SUCCESS) {
+          recordAsyncError(closeError);
+        }
+        if (error != SUCCESS) {
+          error = file_.setDirect(false);
+        }
+      }
+      if (error == SUCCESS) {
+        current_flags_ = requested_flags;
+      }
+      return error;
+    }
+#endif
+    const int closeError = file_.close();
+    if (closeError != SUCCESS) {
+      recordAsyncError(closeError);
+    }
   }
   if (!isReadOnlyMode(mode)) {
     IF_ERROR_RETURN(alloc_write_buffers());
