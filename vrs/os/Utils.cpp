@@ -68,7 +68,7 @@ constexpr auto kRegularFileType = std::filesystem::file_type::regular;
 #endif
 
 using std::string;
-using std::vector;
+using std::vector; // NOLINT(misc-unused-using-decls)
 
 namespace vrs {
 namespace os {
